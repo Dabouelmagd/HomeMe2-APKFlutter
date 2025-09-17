@@ -1427,6 +1427,14 @@ class ChatTestSuite:
             self.test_message_reactions,
             self.test_multiple_user_reactions,
             self.test_attachment_metadata,
+            # Push notification tests
+            self.test_push_subscription_subscribe,
+            self.test_get_notification_preferences,
+            self.test_update_notification_preferences,
+            self.test_push_test_notification,
+            self.test_push_notification_chat_integration,
+            self.test_push_unsubscribe,
+            self.test_push_notification_unauthorized_access,
             # Security and edge case tests
             self.test_unauthorized_access,
             self.test_access_control,

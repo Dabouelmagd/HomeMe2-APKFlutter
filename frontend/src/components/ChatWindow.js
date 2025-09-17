@@ -732,6 +732,13 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
           </form>
         )}
       </div>
+      
+      {/* Message Search Modal */}
+      <MessageSearch
+        isOpen={showMessageSearch}
+        onClose={() => setShowMessageSearch(false)}
+        onSelectMessage={handleMessageSelect}
+      />
     </div>
   );
 };

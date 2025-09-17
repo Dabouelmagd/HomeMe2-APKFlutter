@@ -272,6 +272,10 @@ function App() {
                 <Route path="notifications" element={
                   <NotificationCenter />
                 } />
+                
+                <Route path="settings" element={
+                  <Settings />
+                } />
               </Route>
             </Routes>
             <Toaster />

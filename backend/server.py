@@ -410,6 +410,29 @@ class ChatParticipant(BaseModel):
     is_admin: bool = False
     is_active: bool = True
 
+class PushSubscription(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    endpoint: str
+    p256dh: str  # Public key
+    auth: str    # Auth secret
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+
+class NotificationPreferences(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    push_enabled: bool = True
+    message_notifications: bool = True
+    group_notifications: bool = True
+    direct_notifications: bool = True
+    compound_notifications: bool = True
+    quiet_hours_enabled: bool = False
+    quiet_hours_start: str = "22:00"  # 24-hour format
+    quiet_hours_end: str = "08:00"
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Request/Response Models
 class UserCreate(BaseModel):
     username: str

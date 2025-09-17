@@ -77,7 +77,7 @@ class ConnectionManager:
             "type": "chat_update",
             "chat_id": chat_id,
             "update_type": update_type,
-            "data": data
+            "data": serialize_datetime(data)
         }
         message = json.dumps(notification)
         for participant_id in participants:

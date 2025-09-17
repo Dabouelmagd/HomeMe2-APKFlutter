@@ -22,6 +22,7 @@ const CompoundManagement = () => {
 
   useEffect(() => {
     fetchCompound();
+    fetchResidences();
   }, []);
 
   const fetchCompound = async () => {
@@ -32,6 +33,15 @@ const CompoundManagement = () => {
       toast.error('Failed to load compound data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchResidences = async () => {
+    try {
+      const response = await axios.get(`${API}/compounds/${user.compound_id}/residences`);
+      setResidences(response.data.residences);
+    } catch (error) {
+      console.error('Failed to load residences:', error);
     }
   };
 

@@ -2768,9 +2768,9 @@ async def get_notification_preferences(current_user: User = Depends(get_current_
         # Create default preferences
         default_preferences = NotificationPreferences(user_id=current_user.id)
         await db.notification_preferences.insert_one(default_preferences.dict())
-        return {"preferences": default_preferences}
+        return {"preferences": serialize_datetime(default_preferences.dict())}
     
-    return {"preferences": preferences}
+    return {"preferences": serialize_datetime(preferences)}
 
 @api_router.put("/notifications/preferences")
 async def update_notification_preferences(

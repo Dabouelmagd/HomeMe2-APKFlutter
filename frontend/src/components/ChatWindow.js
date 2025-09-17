@@ -467,6 +467,13 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
           <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
             <EllipsisVerticalIcon className="h-5 w-5" />
           </button>
+          <button 
+            onClick={() => setShowMessageSearch(true)}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            title={t('search.searchInChat')}
+          >
+            <MagnifyingGlassIcon className="h-5 w-5" />
+          </button>
         </div>
       </div>
 

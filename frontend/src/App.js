@@ -264,6 +264,10 @@ function App() {
                   <MessageCenter />
                 } />
                 
+                <Route path="chat" element={
+                  <Chat />
+                } />
+                
                 <Route path="notifications" element={
                   <NotificationCenter />
                 } />

@@ -3513,6 +3513,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_db_client():
+    """Initialize database connection and indexes"""
+    global client, db
+    client = AsyncIOMotorClient(mongo_url)
+    db = client[os.environ['DB_NAME']]
+    
+    # Create text indexes for search functionality
+    await create_text_index()
+    
+    logging.info("Database connection and indexes initialized")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()

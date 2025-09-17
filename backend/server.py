@@ -2673,6 +2673,137 @@ async def add_participants(
     
     return {"message": f"Added {len(new_participant_ids)} participants to chat"}
 
+# ============ PUSH NOTIFICATION ENDPOINTS ============
+
+@api_router.post("/push/subscribe")
+async def subscribe_to_push_notifications(
+    subscription_data: PushSubscriptionRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Subscribe user to push notifications"""
+    try:
+        # Check if subscription already exists
+        existing = await db.push_subscriptions.find_one({
+            "user_id": current_user.id,
+            "endpoint": subscription_data.endpoint
+        })
+        
+        if existing:
+            # Update existing subscription
+            await db.push_subscriptions.update_one(
+                {"id": existing["id"]},
+                {
+                    "$set": {
+                        "p256dh": subscription_data.keys.get("p256dh"),
+                        "auth": subscription_data.keys.get("auth"),
+                        "is_active": True
+                    }
+                }
+            )
+            return {"message": "Push subscription updated successfully"}
+        else:
+            # Create new subscription
+            subscription = PushSubscription(
+                user_id=current_user.id,
+                endpoint=subscription_data.endpoint,
+                p256dh=subscription_data.keys.get("p256dh", ""),
+                auth=subscription_data.keys.get("auth", "")
+            )
+            
+            await db.push_subscriptions.insert_one(subscription.dict())
+            return {"message": "Push subscription created successfully"}
+    
+    except Exception as e:
+        logging.error(f"Error subscribing to push notifications: {e}")
+        raise HTTPException(status_code=500, detail="Failed to subscribe to push notifications")
+
+@api_router.delete("/push/unsubscribe")
+async def unsubscribe_from_push_notifications(
+    endpoint: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Unsubscribe from push notifications"""
+    try:
+        result = await db.push_subscriptions.update_many(
+            {
+                "user_id": current_user.id,
+                "endpoint": endpoint
+            },
+            {"$set": {"is_active": False}}
+        )
+        
+        if result.modified_count > 0:
+            return {"message": "Unsubscribed successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="Push subscription not found")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error unsubscribing from push notifications: {e}")
+        raise HTTPException(status_code=500, detail="Failed to unsubscribe from push notifications")
+
+@api_router.get("/notifications/preferences")
+async def get_notification_preferences(current_user: User = Depends(get_current_user)):
+    """Get user's notification preferences"""
+    preferences = await db.notification_preferences.find_one({"user_id": current_user.id})
+    
+    if not preferences:
+        # Create default preferences
+        default_preferences = NotificationPreferences(user_id=current_user.id)
+        await db.notification_preferences.insert_one(default_preferences.dict())
+        return {"preferences": default_preferences}
+    
+    return {"preferences": preferences}
+
+@api_router.put("/notifications/preferences")
+async def update_notification_preferences(
+    preferences_update: NotificationPreferencesUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update user's notification preferences"""
+    try:
+        # Get existing preferences or create default
+        existing = await db.notification_preferences.find_one({"user_id": current_user.id})
+        
+        if not existing:
+            # Create new preferences
+            new_preferences = NotificationPreferences(user_id=current_user.id)
+            preferences_dict = new_preferences.dict()
+        else:
+            preferences_dict = existing.copy()
+        
+        # Update with provided values
+        update_data = preferences_update.dict(exclude_unset=True)
+        update_data["updated_at"] = datetime.utcnow()
+        
+        preferences_dict.update(update_data)
+        
+        # Upsert preferences
+        await db.notification_preferences.update_one(
+            {"user_id": current_user.id},
+            {"$set": preferences_dict},
+            upsert=True
+        )
+        
+        return {"message": "Notification preferences updated successfully", "preferences": preferences_dict}
+    
+    except Exception as e:
+        logging.error(f"Error updating notification preferences: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update notification preferences")
+
+@api_router.post("/push/test")
+async def test_push_notification(current_user: User = Depends(get_current_user)):
+    """Send a test push notification"""
+    await send_push_notification(
+        current_user.id,
+        "Test Notification",
+        "This is a test notification from HomeMe!",
+        {"type": "test", "url": "/dashboard"}
+    )
+    
+    return {"message": "Test notification sent"}
+
 # WebSocket endpoint for real-time chat
 @app.websocket("/ws/chat/{user_id}")
 async def websocket_chat_endpoint(websocket: WebSocket, user_id: str):

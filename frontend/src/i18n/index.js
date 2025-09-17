@@ -494,7 +494,31 @@ const resources = {
       
       'common': {
         'cancel': 'إلغاء',
-        'creating': 'إنشاء...'
+        'creating': 'إنشاء...',
+        'loading': 'تحميل...'
+      },
+      
+      // Notifications
+      'notifications': {
+        'pushNotifications': 'إشعارات الدفع',
+        'subscribed': 'أنت مشترك في إشعارات الدفع',
+        'notSubscribed': 'إشعارات الدفع معطلة',
+        'enable': 'تفعيل الإشعارات',
+        'disable': 'تعطيل الإشعارات',
+        'testNotification': 'إشعار تجريبي',
+        'preferences': 'تفضيلات الإشعارات',
+        'messageNotifications': 'إشعارات الرسائل',
+        'messageNotificationsDesc': 'تلقي إشعارات لجميع رسائل الدردشة',
+        'directChats': 'الرسائل المباشرة',
+        'directChatsDesc': 'إشعارات للمحادثات الفردية',
+        'groupChats': 'المحادثات الجماعية',
+        'groupChatsDesc': 'إشعارات للمحادثات الجماعية',
+        'compoundAnnouncements': 'إعلانات المجمع',
+        'compoundAnnouncementsDesc': 'الإعلانات المهمة من الإدارة',
+        'quietHours': 'ساعات الهدوء',
+        'quietHoursDesc': 'تعطيل الإشعارات خلال الساعات المحددة',
+        'from': 'من',
+        'to': 'إلى'
       }
     }
   },

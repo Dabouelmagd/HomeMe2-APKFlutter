@@ -83,7 +83,7 @@ const Layout = () => {
       show: true
     },
     {
-      name: t('notifications'),
+      name: t('notifications_nav'),
       href: '/notifications',
       icon: BellIcon,
       show: true

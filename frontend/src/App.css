@@ -5,6 +5,15 @@
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+/* RTL Support */
+.rtl {
+  direction: rtl;  
+}
+
+.ltr {
+  direction: ltr;
+}
+
 /* Authentication Pages */
 .auth-container {
   min-height: 100vh;
@@ -13,6 +22,7 @@
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  position: relative;
 }
 
 .auth-card {
@@ -22,6 +32,7 @@
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
   width: 100%;
   max-width: 400px;
+  position: relative;
 }
 
 .auth-logo {

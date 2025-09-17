@@ -915,6 +915,254 @@ async def get_compound_residents(compound_id: str, current_user: User = Depends(
         "total_count": len(residents)
     }
 
+# Database Management Routes (Super Admin Only)
+@api_router.get("/database/users")
+async def get_all_users(current_user: User = Depends(get_current_user)):
+    # Only allow specific super admin users
+    if current_user.username not in ["johndoe", "admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    # Get all users from database
+    users = await db.users.find({}, {"password_hash": 0}).to_list(None)
+    
+    # Get additional statistics for each user
+    user_data = []
+    for user in users:
+        user_info = {
+            "id": user.get("id"),
+            "username": user.get("username"),
+            "email": user.get("email"),
+            "full_name": user.get("full_name"),
+            "phone": user.get("phone"),
+            "role": user.get("role"),
+            "compound_id": user.get("compound_id"),
+            "family_id": user.get("family_id"),
+            "unit_number": user.get("unit_number"),
+            "is_family_head": user.get("is_family_head", False),
+            "is_active": user.get("is_active", True),
+            "created_at": user.get("created_at").isoformat() if user.get("created_at") else None
+        }
+        
+        # Get user statistics
+        if user.get("role") == "resident":
+            # Count messages sent
+            message_count = await db.messages.count_documents({"sender_id": user.get("id")})
+            user_info["message_count"] = message_count
+            
+            # Count service bookings
+            booking_count = await db.service_bookings.count_documents({"resident_id": user.get("id")})
+            user_info["booking_count"] = booking_count
+            
+            # Count pending payments
+            pending_invoices = await db.invoices.count_documents({
+                "family_id": user.get("family_id"),
+                "status": "pending"
+            })
+            user_info["pending_payments"] = pending_invoices
+        else:
+            user_info["message_count"] = 0
+            user_info["booking_count"] = 0
+            user_info["pending_payments"] = 0
+        
+        user_data.append(user_info)
+    
+    return {"users": user_data, "total_count": len(user_data)}
+
+@api_router.get("/database/compounds")
+async def get_all_compounds(current_user: User = Depends(get_current_user)):
+    if current_user.username not in ["johndoe", "admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    compounds = await db.compounds.find({}).to_list(None)
+    
+    compound_data = []
+    for compound in compounds:
+        # Count users in compound
+        user_count = await db.users.count_documents({"compound_id": compound.get("id")})
+        admin_count = await db.users.count_documents({
+            "compound_id": compound.get("id"),
+            "role": "admin"
+        })
+        resident_count = await db.users.count_documents({
+            "compound_id": compound.get("id"),
+            "role": "resident"
+        })
+        family_count = await db.families.count_documents({"compound_id": compound.get("id")})
+        
+        compound_info = {
+            "id": compound.get("id"),
+            "name": compound.get("name"),
+            "address": compound.get("address"),
+            "admin_id": compound.get("admin_id"),
+            "additional_admins": compound.get("additional_admins", []),
+            "user_count": user_count,
+            "admin_count": admin_count,
+            "resident_count": resident_count,
+            "family_count": family_count,
+            "created_at": compound.get("created_at").isoformat() if compound.get("created_at") else None
+        }
+        compound_data.append(compound_info)
+    
+    return {"compounds": compound_data}
+
+@api_router.get("/database/statistics")
+async def get_system_statistics(current_user: User = Depends(get_current_user)):
+    if current_user.username not in ["johndoe", "admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    # Get comprehensive system statistics
+    total_users = await db.users.count_documents({})
+    total_admins = await db.users.count_documents({"role": "admin"})
+    total_residents = await db.users.count_documents({"role": "resident"})
+    total_compounds = await db.compounds.count_documents({})
+    total_families = await db.families.count_documents({})
+    total_services = await db.services.count_documents({})
+    total_bookings = await db.service_bookings.count_documents({})
+    total_messages = await db.messages.count_documents({})
+    total_invoices = await db.invoices.count_documents({})
+    total_payments = await db.payments.count_documents({})
+    total_utility_bills = await db.utility_bills.count_documents({})
+    total_notifications = await db.notifications.count_documents({})
+    
+    # Recent activity
+    recent_users = await db.users.find({}, {"password_hash": 0}).sort("created_at", -1).limit(5).to_list(None)
+    recent_messages = await db.messages.find({}).sort("created_at", -1).limit(5).to_list(None)
+    recent_bookings = await db.service_bookings.find({}).sort("created_at", -1).limit(5).to_list(None)
+    
+    # Clean recent data
+    clean_recent_users = []
+    for user in recent_users:
+        clean_recent_users.append({
+            "id": user.get("id"),
+            "username": user.get("username"),
+            "full_name": user.get("full_name"),
+            "role": user.get("role"),
+            "created_at": user.get("created_at").isoformat() if user.get("created_at") else None
+        })
+    
+    clean_recent_messages = []
+    for message in recent_messages:
+        clean_recent_messages.append({
+            "id": message.get("id"),
+            "subject": message.get("subject"),
+            "message_type": message.get("message_type"),
+            "created_at": message.get("created_at").isoformat() if message.get("created_at") else None
+        })
+    
+    clean_recent_bookings = []
+    for booking in recent_bookings:
+        clean_recent_bookings.append({
+            "id": booking.get("id"),
+            "service_id": booking.get("service_id"),
+            "status": booking.get("status"),
+            "created_at": booking.get("created_at").isoformat() if booking.get("created_at") else None
+        })
+    
+    return {
+        "overview": {
+            "total_users": total_users,
+            "total_admins": total_admins,
+            "total_residents": total_residents,
+            "total_compounds": total_compounds,
+            "total_families": total_families,
+            "total_services": total_services,
+            "total_bookings": total_bookings,
+            "total_messages": total_messages,
+            "total_invoices": total_invoices,
+            "total_payments": total_payments,
+            "total_utility_bills": total_utility_bills,
+            "total_notifications": total_notifications
+        },
+        "recent_activity": {
+            "recent_users": clean_recent_users,
+            "recent_messages": clean_recent_messages,
+            "recent_bookings": clean_recent_bookings
+        }
+    }
+
+@api_router.put("/database/users/{user_id}")
+async def update_user(
+    user_id: str,
+    user_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.username not in ["johndoe", "admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    # Remove sensitive fields that shouldn't be updated
+    allowed_fields = [
+        "username", "email", "full_name", "phone", "role", 
+        "compound_id", "unit_number", "is_active"
+    ]
+    
+    update_data = {k: v for k, v in user_data.items() if k in allowed_fields}
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User updated successfully"}
+
+@api_router.delete("/database/users/{user_id}")
+async def delete_user(user_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.username not in ["johndoe", "admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    # Don't allow deleting yourself
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    # Delete user and related data
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Delete related data
+    await db.users.delete_one({"id": user_id})
+    await db.messages.delete_many({"sender_id": user_id})
+    await db.service_bookings.delete_many({"resident_id": user_id})
+    await db.notifications.delete_many({"sender_id": user_id})
+    
+    return {"message": "User and related data deleted successfully"}
+
+@api_router.get("/database/search")
+async def search_database(
+    query: str,
+    type: str = "users",
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.username not in ["johndoe", "admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    if type == "users":
+        # Search users by username, email, or full_name
+        users = await db.users.find({
+            "$or": [
+                {"username": {"$regex": query, "$options": "i"}},
+                {"email": {"$regex": query, "$options": "i"}},
+                {"full_name": {"$regex": query, "$options": "i"}}
+            ]
+        }, {"password_hash": 0}).to_list(None)
+        
+        return {"results": users}
+    
+    elif type == "compounds":
+        compounds = await db.compounds.find({
+            "$or": [
+                {"name": {"$regex": query, "$options": "i"}},
+                {"address": {"$regex": query, "$options": "i"}}
+            ]
+        }).to_list(None)
+        
+        return {"results": compounds}
+    
+    else:
+        raise HTTPException(status_code=400, detail="Invalid search type")
+
 # Utility Bills Management Routes
 @api_router.get("/compounds/{compound_id}/utility-connections")
 async def get_utility_connections(compound_id: str, current_user: User = Depends(get_current_user)):

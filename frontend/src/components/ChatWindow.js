@@ -497,12 +497,24 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
                       }`}
                     >
                       {/* Text content */}
-                      {message.content && (
+                      {message.content && message.message_type !== 'voice' && (
                         <p className="text-sm mb-2">{message.content}</p>
                       )}
                       
-                      {/* Attachments */}
-                      {message.attachments && message.attachments.length > 0 && (
+                      {/* Voice message */}
+                      {message.message_type === 'voice' && (
+                        <div className="mb-2">
+                          <VoiceMessagePlayer
+                            audioUrl={message.attachments?.[0]?.file_url ? `${BACKEND_URL}${message.attachments[0].file_url}` : null}
+                            duration={message.voice_duration || message.attachments?.[0]?.duration || 0}
+                            waveformData={message.voice_waveform || message.attachments?.[0]?.waveform || []}
+                            isOwnMessage={isOwn}
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Other attachments */}
+                      {message.attachments && message.attachments.length > 0 && message.message_type !== 'voice' && (
                         <div className="space-y-2 mb-2">
                           {message.attachments.map((attachment, idx) => (
                             <div key={idx}>

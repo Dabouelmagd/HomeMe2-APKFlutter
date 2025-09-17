@@ -2527,6 +2527,89 @@ async def upload_file_to_chat(
     
     return {"message": message}
 
+@api_router.post("/chats/{chat_id}/voice")
+async def send_voice_message(
+    chat_id: str,
+    voice_file: UploadFile = File(...),
+    duration: float = 0.0,
+    current_user: User = Depends(get_current_user)
+):
+    """Send a voice message to a chat"""
+    # Verify user is participant
+    chat = await db.chats.find_one({
+        "id": chat_id,
+        "compound_id": current_user.compound_id,
+        "participants": current_user.id,
+        "is_active": True
+    })
+    
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # Validate file type
+    if not voice_file.filename or not any(voice_file.filename.lower().endswith(ext) for ext in ALLOWED_EXTENSIONS["voice"]):
+        raise HTTPException(status_code=400, detail="Invalid voice file format")
+    
+    # Process voice file
+    try:
+        attachment = await save_uploaded_file(voice_file, "voice")
+        
+        # Create voice message
+        message = ChatMessage(
+            chat_id=chat_id,
+            sender_id=current_user.id,
+            content="🎵 Voice message",
+            message_type="voice",
+            attachments=[attachment],
+            voice_duration=attachment.get("duration", duration),
+            voice_waveform=attachment.get("waveform", []),
+            read_by={current_user.id: datetime.utcnow()}
+        )
+        
+        # Insert message
+        await db.chat_messages.insert_one(message.dict())
+        
+        # Update chat's last message time
+        await db.chats.update_one(
+            {"id": chat_id},
+            {"$set": {"last_message_at": message.created_at, "updated_at": datetime.utcnow()}}
+        )
+        
+        # Get sender info
+        sender_info = {
+            "id": current_user.id,
+            "full_name": current_user.full_name,
+            "username": current_user.username
+        }
+        
+        # Prepare message for WebSocket
+        ws_message = message.dict()
+        ws_message["sender"] = sender_info
+        
+        # Send to all participants via WebSocket
+        await manager.send_chat_message(
+            {
+                "type": "new_message",
+                "chat_id": chat_id,
+                "message": ws_message
+            },
+            chat["participants"]
+        )
+        
+        # Send push notifications to participants
+        await notify_chat_participants(
+            chat_id,
+            current_user.id,
+            "🎵 Voice message",
+            "voice"
+        )
+        
+        return {"message": message}
+        
+    except Exception as e:
+        logging.error(f"Error processing voice message: {e}")
+        raise HTTPException(status_code=500, detail="Failed to process voice message")
+
 @api_router.post("/chats/{chat_id}/messages/{message_id}/react")
 async def add_message_reaction(
     chat_id: str,

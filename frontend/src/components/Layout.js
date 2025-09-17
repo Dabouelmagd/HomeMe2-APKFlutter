@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useNotifications } from '../App';
 import {
   HomeIcon,
@@ -13,13 +14,16 @@ import {
   Bars3Icon,
   XMarkIcon
 } from '@heroicons/react/24/outline';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Layout = () => {
+  const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
+  const isRTL = i18n.language === 'ar';
 
   const handleLogout = () => {
     logout();
@@ -28,37 +32,37 @@ const Layout = () => {
 
   const navigation = [
     {
-      name: 'Dashboard',
+      name: t('dashboard'),
       href: '/dashboard',
       icon: HomeIcon,
       show: true
     },
     {
-      name: 'Compound Management',
+      name: t('compound_management'),
       href: '/compound',
       icon: BuildingOfficeIcon,
       show: user?.role === 'admin'
     },
     {
-      name: 'Family Management',
+      name: t('family_management'),
       href: '/family',
       icon: UsersIcon,
       show: user?.role === 'resident'
     },
     {
-      name: 'Financial Management',
+      name: t('financial_management'),
       href: '/finances',
       icon: CurrencyDollarIcon,
       show: true
     },
     {
-      name: 'Message Center',
+      name: t('message_center'),
       href: '/messages',
       icon: ChatBubbleLeftEllipsisIcon,
       show: true
     },
     {
-      name: 'Notifications',
+      name: t('notifications'),
       href: '/notifications',
       icon: BellIcon,
       show: true
@@ -68,7 +72,7 @@ const Layout = () => {
   const isActive = (href) => location.pathname === href || location.pathname.startsWith(href + '/');
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className={`flex h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -79,9 +83,9 @@ const Layout = () => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
         lg:translate-x-0 lg:static lg:inset-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${sidebarOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}
       `}>
         <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200">
           <div className="flex items-center">
@@ -110,20 +114,20 @@ const Layout = () => {
                 className={`
                   group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200
                   ${isActive(item.href)
-                    ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
+                    ? `bg-blue-50 text-blue-700 ${isRTL ? 'border-l-2 border-blue-700' : 'border-r-2 border-blue-700'}`
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                   }
                 `}
                 onClick={() => setSidebarOpen(false)}
               >
                 <item.icon
-                  className={`mr-3 h-5 w-5 ${
+                  className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 ${
                     isActive(item.href) ? 'text-blue-700' : 'text-gray-500 group-hover:text-gray-700'
                   }`}
                 />
                 {item.name}
-                {item.name === 'Notifications' && unreadCount > 0 && (
-                  <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {item.name === t('notifications') && unreadCount > 0 && (
+                  <span className={`${isRTL ? 'mr-auto' : 'ml-auto'} bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center`}>
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </span>
                 )}
@@ -141,24 +145,28 @@ const Layout = () => {
                     </span>
                   </div>
                 </div>
-                <div className="ml-3">
+                <div className={`${isRTL ? 'mr-3' : 'ml-3'}`}>
                   <p className="text-sm font-medium text-gray-700">
                     {user?.full_name}
                   </p>
                   <p className="text-xs text-gray-500 capitalize">
-                    {user?.role}
+                    {t(user?.role)}
                   </p>
                 </div>
               </div>
             </div>
 
-            <button
-              onClick={handleLogout}
-              className="mt-2 group flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 hover:text-gray-900"
-            >
-              <ArrowRightOnRectangleIcon className="mr-3 h-5 w-5 text-gray-500 group-hover:text-gray-700" />
-              Sign Out
-            </button>
+            <div className="mt-2 space-y-1">
+              <LanguageSwitcher className="w-full justify-start" />
+              
+              <button
+                onClick={handleLogout}
+                className={`group flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 hover:text-gray-900`}
+              >
+                <ArrowRightOnRectangleIcon className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 text-gray-500 group-hover:text-gray-700`} />
+                {t('sign_out')}
+              </button>
+            </div>
           </div>
         </nav>
       </div>

@@ -680,6 +680,67 @@ async def mark_notification_read(
     
     return {"message": "Notification marked as read"}
 
+# Residence Management Routes
+@api_router.get("/compounds/{compound_id}/residences")
+async def get_compound_residences(compound_id: str, current_user: User = Depends(require_admin)):
+    if current_user.compound_id != compound_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get all families in the compound
+    families = await db.families.find({"compound_id": compound_id}).to_list(None)
+    
+    # Get all residents
+    residents = await db.users.find({
+        "compound_id": compound_id,
+        "role": UserRole.RESIDENT
+    }).to_list(None)
+    
+    # Create residence list with occupancy information
+    residences = []
+    occupied_units = set()
+    
+    for family in families:
+        # Get family members
+        family_members = [r for r in residents if r["id"] in family["members"]]
+        
+        residence = {
+            "unit_number": family["unit_number"],
+            "family_id": family["id"],
+            "occupancy_status": "occupied",
+            "family_head": next((m for m in family_members if m.get("is_family_head", False)), None),
+            "family_members": family_members,
+            "member_count": len(family_members),
+            "created_at": family["created_at"]
+        }
+        residences.append(residence)
+        occupied_units.add(family["unit_number"])
+    
+    # Get compound info to potentially show total units (if available)
+    compound = await db.compounds.find_one({"id": compound_id})
+    
+    return {
+        "residences": residences,
+        "total_units": len(residences),
+        "occupied_units": len(occupied_units),
+        "compound": compound
+    }
+
+@api_router.get("/compounds/{compound_id}/residents")
+async def get_compound_residents(compound_id: str, current_user: User = Depends(require_admin)):
+    if current_user.compound_id != compound_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get all residents in the compound
+    residents = await db.users.find({
+        "compound_id": compound_id,
+        "role": UserRole.RESIDENT
+    }, {"password_hash": 0}).to_list(None)
+    
+    return {
+        "residents": residents,
+        "total_count": len(residents)
+    }
+
 # Dashboard Routes
 @api_router.get("/dashboard/admin")
 async def get_admin_dashboard(current_user: User = Depends(require_admin)):

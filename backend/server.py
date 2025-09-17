@@ -76,6 +76,80 @@ class PaymentStatus(str):
     PAID = "paid"
     OVERDUE = "overdue"
 
+class UtilityType(str):
+    WATER = "water"
+    ELECTRICITY = "electricity"
+    TELEPHONE = "telephone"
+    GAS = "gas"
+    INTERNET = "internet"
+
+class UtilityBill(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    compound_id: str
+    family_id: str
+    unit_number: str
+    utility_type: str  # water, electricity, telephone, gas, internet
+    provider_name: str
+    account_number: str
+    billing_period: str  # "2024-01", "Q1-2024", etc.
+    issue_date: datetime
+    due_date: datetime
+    amount: float
+    previous_reading: Optional[float] = None
+    current_reading: Optional[float] = None
+    consumption: Optional[float] = None
+    unit_price: Optional[float] = None
+    status: str = PaymentStatus.PENDING
+    government_reference: str
+    payment_method: Optional[str] = None
+    payment_date: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UtilityConnection(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    compound_id: str
+    family_id: str
+    unit_number: str
+    utility_type: str
+    provider_name: str
+    account_number: str
+    meter_number: Optional[str] = None
+    connection_date: datetime
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UtilityPayment(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    bill_id: str
+    family_id: str
+    amount: float
+    payment_method: str = "mock"
+    government_transaction_id: str
+    homeMe_transaction_id: str
+    payment_date: datetime = Field(default_factory=datetime.utcnow)
+    status: str = PaymentStatus.PAID
+
+# Request/Response Models for Utilities
+class UtilityConnectionCreate(BaseModel):
+    utility_type: str
+    provider_name: str
+    account_number: str
+    meter_number: Optional[str] = None
+
+class UtilityBillCreate(BaseModel):
+    family_id: str
+    unit_number: str
+    utility_type: str
+    provider_name: str
+    account_number: str
+    billing_period: str
+    issue_date: datetime
+    due_date: datetime
+    amount: float
+    previous_reading: Optional[float] = None
+    current_reading: Optional[float] = None
+    government_reference: str
+
 class ServiceCategory(str):
     MEDICAL = "medical"
     MAINTENANCE = "maintenance"

@@ -160,6 +160,18 @@ backend:
           agent: "main"
           comment: "Implemented complete push notification system using Browser Push API with Service Workers: POST /api/push/subscribe, DELETE /api/push/unsubscribe, GET/PUT /api/notifications/preferences, POST /api/push/test. Added PushSubscription and NotificationPreferences models, quiet hours functionality, chat integration with automatic notifications on message/file send, and VAPID key support. Backend testing achieved 97.1% success rate (34/35 tests passed) - production ready!"
 
+  - task: "Voice Messages System"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented comprehensive voice message system with POST /api/chats/{chat_id}/voice endpoint for voice message upload, enhanced ChatMessage model with voice_duration and voice_waveform fields, automatic waveform generation using numpy, voice file processing with duration extraction, support for voice file types (.wav, .webm, .mp3, .m4a, .ogg), push notification integration with '🎵 Voice message' text, and file serving via /uploads/ endpoint. Voice messages are processed with metadata extraction and integrated with existing chat system."
+
 frontend:
   - task: "Chat Frontend UI - Phase 2"
     implemented: true

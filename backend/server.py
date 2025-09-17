@@ -19,6 +19,9 @@ import base64
 import mimetypes
 import aiofiles
 import asyncio
+import wave
+import struct
+import numpy as np
 from io import BytesIO
 from PIL import Image
 from datetime import timezone

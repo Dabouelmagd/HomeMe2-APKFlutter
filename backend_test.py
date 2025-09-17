@@ -1102,6 +1102,16 @@ class ChatTestSuite:
             self.test_mark_messages_as_read,
             self.test_add_participants,
             self.test_delete_message,
+            # New multimedia tests
+            self.test_file_upload_with_message,
+            self.test_multiple_file_upload,
+            self.test_file_size_limits,
+            self.test_file_type_validation,
+            self.test_file_serving,
+            self.test_message_reactions,
+            self.test_multiple_user_reactions,
+            self.test_attachment_metadata,
+            # Security and edge case tests
             self.test_unauthorized_access,
             self.test_access_control,
             self.test_edge_cases

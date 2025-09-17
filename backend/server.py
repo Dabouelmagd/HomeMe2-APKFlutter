@@ -2350,6 +2350,14 @@ async def send_message(
         chat["participants"]
     )
     
+    # Send push notifications to participants
+    await notify_chat_participants(
+        chat_id,
+        current_user.id,
+        message_data.content,
+        message_data.message_type
+    )
+    
     return {"message": message}
 
 @api_router.post("/chats/{chat_id}/upload")

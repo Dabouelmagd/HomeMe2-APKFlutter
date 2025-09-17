@@ -554,6 +554,21 @@ const resources = {
         'privacy': 'الخصوصية',
         'language': 'اللغة',
         'manageYourPreferences': 'إدارة تفضيلات وإعدادات حسابك'
+      },
+      
+      // Voice Messages
+      'voice': {
+        'voiceMessage': 'رسالة صوتية',
+        'recording': 'تسجيل...',
+        'recorded': 'تم تسجيل الرسالة الصوتية',
+        'readyToRecord': 'جاهز للتسجيل',
+        'microphonePermissionDenied': 'تم رفض إذن الميكروفون. يرجى السماح بالوصول للميكروفون.',
+        'microphoneNotAvailable': 'الميكروفون غير متاح',
+        'recordingError': 'حدث خطأ أثناء التسجيل',
+        'recordingInstructions': 'انقر على الإيقاف عند الانتهاء من التسجيل',
+        'playbackInstructions': 'انقر على التشغيل للاستماع، إرسال للمشاركة',
+        'startInstructions': 'انقر على الميكروفون لتسجيل رسالة صوتية',
+        'waveformPlaceholder': 'ستظهر موجة الصوت هنا'
       }
     }
   },

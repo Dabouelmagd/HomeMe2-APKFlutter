@@ -831,6 +831,21 @@ const resources = {
         'manageYourPreferences': 'Gérer vos préférences et paramètres de compte'
       },
       
+      // Voice Messages
+      'voice': {
+        'voiceMessage': 'Message vocal',
+        'recording': 'Enregistrement...',
+        'recorded': 'Message vocal enregistré',
+        'readyToRecord': 'Prêt à enregistrer',
+        'microphonePermissionDenied': 'Permission du microphone refusée. Veuillez autoriser l\'accès au microphone.',
+        'microphoneNotAvailable': 'Microphone non disponible',
+        'recordingError': 'Erreur lors de l\'enregistrement',
+        'recordingInstructions': 'Cliquez sur arrêt une fois terminé',
+        'playbackInstructions': 'Cliquez sur lecture pour écouter, envoyer pour partager',
+        'startInstructions': 'Cliquez sur le microphone pour enregistrer un message vocal',
+        'waveformPlaceholder': 'La forme d\'onde vocale apparaîtra ici'
+      },
+      
       // Common
       'error': 'Erreur',
       'success': 'Succès',

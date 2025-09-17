@@ -184,6 +184,29 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
     }
   };
 
+  const sendVoiceMessage = async (audioBlob, duration) => {
+    if (!audioBlob || !chat) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('voice_file', audioBlob, 'voice_message.webm');
+      formData.append('duration', duration.toString());
+
+      await axios.post(`${API}/chats/${chat.id}/voice`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      setShowVoiceRecorder(false);
+    } catch (error) {
+      console.error('Failed to send voice message:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const downloadFile = (fileUrl, filename) => {
     const link = document.createElement('a');
     link.href = `${BACKEND_URL}${fileUrl}`;

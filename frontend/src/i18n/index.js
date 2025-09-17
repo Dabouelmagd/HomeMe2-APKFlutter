@@ -349,7 +349,51 @@ const resources = {
       'confirmed': 'مؤكد',
       'in_progress': 'قيد التنفيذ',
       'completed': 'مكتمل',
-      'cancelled': 'ملغي'
+      'cancelled': 'ملغي',
+      
+      // Utility Bills
+      'government_utility_gateway': 'بوابة المرافق الحكومية',
+      'manage_government_utility_bills': 'إدارة فواتير المرافق الحكومية والمدفوعات',
+      'utility_bills': 'فواتير المرافق',
+      'utility_connections': 'توصيلات المرافق',
+      'pending_bills': 'الفواتير المعلقة',
+      'overdue_bills': 'الفواتير المتأخرة',
+      'total_pending': 'إجمالي المعلق',
+      'connections': 'التوصيلات',
+      'overdue_bills_alert': 'لديك {{count}} فاتورة متأخرة',
+      'overdue_bills_alert_plural': 'لديك {{count}} فواتير متأخرة',
+      'pay_overdue_bills_message': 'يرجى دفع فواتيرك المتأخرة لتجنب انقطاع الخدمة',
+      'add_bill': 'إضافة فاتورة',
+      'add_connection': 'إضافة توصيل',
+      'add_utility_connection': 'إضافة توصيل مرفق',
+      'no_utility_bills': 'لا توجد فواتير مرافق',
+      'add_first_utility_bill': 'أضف فاتورة المرافق الأولى',
+      'no_bills_available': 'لا توجد فواتير متاحة في الوقت الحالي',
+      'no_utility_connections': 'لا توجد توصيلات مرافق',
+      'add_first_connection': 'أضف أول توصيل مرافق',
+      
+      // Utility Types
+      'electricity': 'الكهرباء',
+      'water': 'المياه',
+      'telephone': 'الهاتف',
+      'gas': 'الغاز',
+      'internet': 'الإنترنت',
+      
+      // Utility Bill Details
+      'account_number': 'رقم الحساب',
+      'billing_period': 'فترة الفوترة',
+      'due_date': 'تاريخ الاستحقاق',
+      'consumption': 'الاستهلاك',
+      'gov_ref': 'المرجع الحكومي',
+      'receipt': 'الإيصال',
+      'meter_number': 'رقم العداد',
+      'utility_type': 'نوع المرفق',
+      'provider_name': 'اسم المقدم',
+      'select_provider': 'اختر المقدم',
+      'enter_account_number': 'أدخل رقم الحساب',
+      'enter_meter_number': 'أدخل رقم العداد',
+      'active': 'نشط',
+      'inactive': 'غير نشط'
     }
   },
   fr: {

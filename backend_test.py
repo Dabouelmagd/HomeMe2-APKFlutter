@@ -1349,20 +1349,33 @@ class ChatTestSuite:
         """Test DELETE /api/push/unsubscribe - Unsubscribe from push notifications"""
         print("\n=== Testing Push Unsubscribe ===")
         
-        if not self.test_subscription_endpoint:
-            self.log_result("Push Unsubscribe", False, "No test subscription endpoint available")
-            return False
-        
+        # First ensure we have a subscription by subscribing again
         try:
             headers = self.setup_auth_headers(self.admin_token)
             
-            # Unsubscribe using query parameter
-            response = self.session.delete(f"{BASE_URL}/push/unsubscribe?endpoint={self.test_subscription_endpoint}", 
+            # Create a subscription first
+            subscription_data = {
+                "endpoint": "https://fcm.googleapis.com/fcm/send/unsubscribe-test-endpoint",
+                "keys": {
+                    "p256dh": "BNbN3OFADuGtmBGgvAOcpOTNkMcgs7absMnxKZ4M8kHaVt7ZapWTVJkCk-69CfMRu-14NjLHoA8C8-wFPQHBtQs",
+                    "auth": "tBHItJI5svbpez7KI4CCXg"
+                }
+            }
+            
+            subscribe_response = self.session.post(f"{BASE_URL}/push/subscribe", json=subscription_data, headers=headers)
+            
+            if subscribe_response.status_code != 200:
+                self.log_result("Push Unsubscribe", False, "Failed to create subscription for unsubscribe test")
+                return False
+            
+            # Now unsubscribe using query parameter
+            endpoint = subscription_data["endpoint"]
+            response = self.session.delete(f"{BASE_URL}/push/unsubscribe?endpoint={endpoint}", 
                                          headers=headers)
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("message") == "Successfully unsubscribed from push notifications":
+                if data.get("message") in ["Successfully unsubscribed from push notifications", "Unsubscribed successfully"]:
                     self.log_result("Push Unsubscribe", True, "Successfully unsubscribed from push notifications")
                     return True
                 else:

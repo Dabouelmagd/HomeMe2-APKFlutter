@@ -923,6 +923,22 @@ const resources = {
         'manageYourPreferences': 'Gérer vos préférences et paramètres de compte'
       },
       
+      // PWA
+      'pwa': {
+        'installHomeMe': 'Installer HomeMe',
+        'installDescription': 'Obtenez l\'expérience complète de l\'application avec accès hors ligne et notifications push',
+        'install': 'Installer',
+        'later': 'Plus tard',
+        'feature1': 'Fonctionne Hors ligne',
+        'feature2': 'Notifications Push',
+        'feature3': 'Expérience Native',
+        'installInstructions': 'Pour installer: Appuyez sur le bouton menu de votre navigateur et sélectionnez "Ajouter à l\'écran d\'accueil" ou "Installer l\'application"',
+        'updateAvailable': 'Mise à jour Disponible',
+        'updateDescription': 'Une nouvelle version de HomeMe est disponible',
+        'update': 'Mettre à jour Maintenant',
+        'dismiss': 'Ignorer'
+      },
+      
       // Voice Messages
       'voice': {
         'voiceMessage': 'Message vocal',

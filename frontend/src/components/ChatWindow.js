@@ -39,6 +39,7 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
   const [hasMore, setHasMore] = useState(true);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
+  const [showMessageSearch, setShowMessageSearch] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);

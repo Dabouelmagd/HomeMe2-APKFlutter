@@ -665,7 +665,7 @@ const resources = {
       'family_management': 'Gestion familiale',
       'financial_management': 'Gestion financière',
       'message_center': 'Centre de messages',
-      'notifications': 'Notifications',
+      'notifications_nav': 'Notifications',
       'sign_out': 'Se déconnecter',
       
       // Dashboard

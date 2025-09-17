@@ -52,6 +52,12 @@ const Layout = () => {
       show: true
     },
     {
+      name: t('government_utility_gateway'),
+      href: '/utilities',
+      icon: BoltIcon,
+      show: true
+    },
+    {
       name: t('family_management'),
       href: '/family',
       icon: UsersIcon,

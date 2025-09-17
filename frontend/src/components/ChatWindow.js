@@ -126,22 +126,173 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
 
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || sending || !chat) return;
+    if ((!newMessage.trim() && selectedFiles.length === 0) || sending || !chat) return;
 
     setSending(true);
     try {
-      const response = await axios.post(`${API}/chats/${chat.id}/messages`, {
-        content: newMessage.trim(),
-        message_type: 'text'
-      });
+      if (selectedFiles.length > 0) {
+        // Send files
+        const formData = new FormData();
+        selectedFiles.forEach(file => {
+          formData.append('files', file);
+        });
+        formData.append('message_content', newMessage.trim());
+
+        await axios.post(`${API}/chats/${chat.id}/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        
+        setSelectedFiles([]);
+      } else {
+        // Send text message
+        await axios.post(`${API}/chats/${chat.id}/messages`, {
+          content: newMessage.trim(),
+          message_type: 'text'
+        });
+      }
       
       setNewMessage('');
-      // Message will be added via WebSocket
     } catch (error) {
       console.error('Failed to send message:', error);
     } finally {
       setSending(false);
     }
+  };
+
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files);
+    setSelectedFiles(prev => [...prev, ...files]);
+  };
+
+  const removeSelectedFile = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const addReaction = async (messageId, emoji) => {
+    try {
+      await axios.post(`${API}/chats/${chat.id}/messages/${messageId}/react`, {
+        emoji
+      });
+    } catch (error) {
+      console.error('Failed to add reaction:', error);
+    }
+  };
+
+  const downloadFile = (fileUrl, filename) => {
+    const link = document.createElement('a');
+    link.href = `${BACKEND_URL}${fileUrl}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const renderAttachment = (attachment) => {
+    const fileUrl = `${BACKEND_URL}${attachment.file_url}`;
+    
+    switch (attachment.file_type) {
+      case 'image':
+        return (
+          <div className="relative max-w-sm">
+            <img
+              src={attachment.thumbnail_url ? `${BACKEND_URL}${attachment.thumbnail_url}` : fileUrl}
+              alt={attachment.original_filename}
+              className="rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={() => window.open(fileUrl, '_blank')}
+            />
+            <button
+              onClick={() => downloadFile(attachment.file_url, attachment.original_filename)}
+              className="absolute top-2 right-2 p-1 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
+            >
+              <ArrowDownTrayIcon className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      
+      case 'video':
+        return (
+          <div className="relative max-w-sm">
+            <video
+              controls
+              className="rounded-lg max-w-full"
+              preload="metadata"
+            >
+              <source src={fileUrl} type={attachment.mime_type} />
+              Your browser does not support the video tag.
+            </video>
+            <button
+              onClick={() => downloadFile(attachment.file_url, attachment.original_filename)}
+              className="absolute top-2 right-2 p-1 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
+            >
+              <ArrowDownTrayIcon className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      
+      case 'audio':
+        return (
+          <div className="flex items-center space-x-3 p-3 bg-gray-100 rounded-lg max-w-sm">
+            <SpeakerWaveIcon className="h-6 w-6 text-gray-500" />
+            <div className="flex-1">
+              <audio controls className="w-full">
+                <source src={fileUrl} type={attachment.mime_type} />
+                Your browser does not support the audio tag.
+              </audio>
+              <p className="text-xs text-gray-500 mt-1">{attachment.original_filename}</p>
+            </div>
+            <button
+              onClick={() => downloadFile(attachment.file_url, attachment.original_filename)}
+              className="p-1 text-gray-500 hover:text-gray-700"
+            >
+              <ArrowDownTrayIcon className="h-4 w-4" />
+            </button>
+          </div>
+        );
+      
+      default:
+        return (
+          <div className="flex items-center space-x-3 p-3 bg-gray-100 rounded-lg max-w-sm">
+            <DocumentIcon className="h-6 w-6 text-gray-500" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900">{attachment.original_filename}</p>
+              <p className="text-xs text-gray-500">
+                {(attachment.file_size / 1024 / 1024).toFixed(2)} MB
+              </p>
+            </div>
+            <button
+              onClick={() => downloadFile(attachment.file_url, attachment.original_filename)}
+              className="p-2 text-gray-500 hover:text-gray-700 border border-gray-300 rounded-lg"
+            >
+              <ArrowDownTrayIcon className="h-4 w-4" />
+            </button>
+          </div>
+        );
+    }
+  };
+
+  const renderReactions = (reactions, messageId) => {
+    if (!reactions || Object.keys(reactions).length === 0) return null;
+    
+    return (
+      <div className="flex flex-wrap gap-1 mt-1">
+        {Object.entries(reactions).map(([emoji, userIds]) => (
+          <button
+            key={emoji}
+            onClick={() => addReaction(messageId, emoji)}
+            className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs ${
+              userIds.includes(user.id)
+                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            <span>{emoji}</span>
+            <span>{userIds.length}</span>
+          </button>
+        ))}
+      </div>
+    );
   };
 
   const scrollToBottom = () => {

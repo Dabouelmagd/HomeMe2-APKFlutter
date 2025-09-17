@@ -690,7 +690,8 @@ const resources = {
         'searchUsers': 'Rechercher des utilisateurs...',
         'noUsersFound': 'Aucun utilisateur trouvé',
         'noUsersAvailable': 'Aucun utilisateur disponible',
-        'createChat': 'Créer une Discussion'
+        'createChat': 'Créer une Discussion',
+        'selectedFiles': 'Fichiers Sélectionnés'
       },
       
       'common': {

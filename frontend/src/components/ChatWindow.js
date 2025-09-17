@@ -517,27 +517,102 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
 
       {/* Message Input */}
       <div className="px-6 py-4 border-t border-gray-200 bg-white">
+        {/* Selected Files Preview */}
+        {selectedFiles.length > 0 && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">
+              {t('chat.selectedFiles')} ({selectedFiles.length})
+            </h4>
+            <div className="space-y-2 max-h-32 overflow-y-auto">
+              {selectedFiles.map((file, index) => (
+                <div key={index} className="flex items-center justify-between p-2 bg-white rounded border">
+                  <div className="flex items-center space-x-2">
+                    {file.type.startsWith('image/') && <PhotoIcon className="h-4 w-4 text-blue-500" />}
+                    {file.type.startsWith('video/') && <VideoCameraIcon className="h-4 w-4 text-purple-500" />}
+                    {file.type.startsWith('audio/') && <SpeakerWaveIcon className="h-4 w-4 text-green-500" />}
+                    {!file.type.startsWith('image/') && !file.type.startsWith('video/') && !file.type.startsWith('audio/') && (
+                      <DocumentIcon className="h-4 w-4 text-gray-500" />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-gray-900 truncate max-w-48">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => removeSelectedFile(index)}
+                    className="text-red-500 hover:text-red-700 p-1"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Emoji Picker */}
+        {showEmojiPicker && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-8 gap-2">
+              {[...commonEmojis, '🤔', '🙄', '😴', '🤗', '🤣', '😅', '😇', '🥰', '😘', '🤩', '😊', '☺️', '😌', '😉', '🤤', '😋'].map(emoji => (
+                <button
+                  key={emoji}
+                  onClick={() => {
+                    setNewMessage(prev => prev + emoji);
+                    setShowEmojiPicker(false);
+                  }}
+                  className="p-2 text-lg hover:bg-white rounded transition-colors"
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <form onSubmit={sendMessage} className="flex items-end space-x-3">
           <div className="flex-1">
             <div className="relative">
-              <input
-                type="text"
+              <textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder={t('chat.typeMessage')}
-                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                disabled={sending}
+                className="w-full px-4 py-3 pr-24 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                rows="1"
+                style={{ minHeight: '44px', maxHeight: '120px' }}
+                disabled={sending || uploading}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage(e);
+                  }
+                }}
               />
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+              <div className="absolute right-3 bottom-3 flex items-center space-x-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  multiple
+                  accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+                  className="hidden"
+                />
                 <button
                   type="button"
-                  className="text-gray-400 hover:text-gray-600"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  disabled={uploading}
                 >
                   <PaperClipIcon className="h-5 w-5" />
                 </button>
                 <button
                   type="button"
-                  className="text-gray-400 hover:text-gray-600"
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <FaceSmileIcon className="h-5 w-5" />
                 </button>
@@ -546,10 +621,14 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
           </div>
           <button
             type="submit"
-            disabled={!newMessage.trim() || sending}
+            disabled={(!newMessage.trim() && selectedFiles.length === 0) || sending || uploading}
             className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <PaperAirplaneIcon className="h-5 w-5" />
+            {sending || uploading ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            ) : (
+              <PaperAirplaneIcon className="h-5 w-5" />
+            )}
           </button>
         </form>
       </div>

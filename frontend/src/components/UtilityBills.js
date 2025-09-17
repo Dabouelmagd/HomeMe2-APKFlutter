@@ -1,0 +1,620 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../App';
+import { toast } from 'sonner';
+import {
+  BoltIcon,
+  PhoneIcon,
+  BeakerIcon,
+  FireIcon,
+  WifiIcon,
+  CurrencyDollarIcon,
+  DocumentTextIcon,
+  PlusIcon,
+  PrinterIcon,
+  CalendarIcon,
+  ClockIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon
+} from '@heroicons/react/24/outline';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+const UtilityBills = () => {
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const [bills, setBills] = useState([]);
+  const [connections, setConnections] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('bills');
+  const [showAddConnection, setShowAddConnection] = useState(false);
+  const [showAddBill, setShowAddBill] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(null);
+
+  const [connectionForm, setConnectionForm] = useState({
+    utility_type: 'electricity',
+    provider_name: '',
+    account_number: '',
+    meter_number: ''
+  });
+
+  const [billForm, setBillForm] = useState({
+    family_id: '',
+    unit_number: '',
+    utility_type: 'electricity',
+    provider_name: '',
+    account_number: '',
+    billing_period: '',
+    issue_date: '',
+    due_date: '',
+    amount: '',
+    previous_reading: '',
+    current_reading: '',
+    government_reference: ''
+  });
+
+  const utilityTypes = {
+    electricity: { 
+      name: t('electricity'), 
+      icon: BoltIcon, 
+      color: 'bg-yellow-500',
+      providers: ['National Electric Company', 'Cairo Electricity', 'Alexandria Power']
+    },
+    water: { 
+      name: t('water'), 
+      icon: BeakerIcon, 
+      color: 'bg-blue-500',
+      providers: ['National Water Authority', 'Cairo Water', 'Giza Water Company']
+    },
+    telephone: { 
+      name: t('telephone'), 
+      icon: PhoneIcon, 
+      color: 'bg-green-500',
+      providers: ['Telecom Egypt', 'Orange Egypt', 'Vodafone Egypt', 'Etisalat Egypt']
+    },
+    gas: { 
+      name: t('gas'), 
+      icon: FireIcon, 
+      color: 'bg-red-500',
+      providers: ['Egyptian Natural Gas', 'Cairo Gas', 'National Gas Company']
+    },
+    internet: { 
+      name: t('internet'), 
+      icon: WifiIcon, 
+      color: 'bg-purple-500',
+      providers: ['TE Data', 'Orange Internet', 'Vodafone Internet', 'Etisalat Internet']
+    }
+  };
+
+  useEffect(() => {
+    fetchBills();
+    fetchConnections();
+  }, [user]);
+
+  const fetchBills = async () => {
+    try {
+      const response = user?.role === 'admin' 
+        ? await axios.get(`${API}/compounds/${user.compound_id}/utility-bills`)
+        : await axios.get(`${API}/utility-bills/my`);
+      setBills(response.data.bills);
+    } catch (error) {
+      toast.error('Failed to load utility bills');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchConnections = async () => {
+    try {
+      const response = await axios.get(`${API}/compounds/${user.compound_id}/utility-connections`);
+      setConnections(response.data.connections);
+    } catch (error) {
+      console.error('Failed to load utility connections:', error);
+    }
+  };
+
+  const handleCreateConnection = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/compounds/${user.compound_id}/utility-connections`, connectionForm);
+      toast.success('Utility connection added successfully!');
+      setShowAddConnection(false);
+      setConnectionForm({
+        utility_type: 'electricity',
+        provider_name: '',
+        account_number: '',
+        meter_number: ''
+      });
+      fetchConnections();
+    } catch (error) {
+      toast.error('Failed to add utility connection');
+    }
+  };
+
+  const handleCreateBill = async (e) => {
+    e.preventDefault();
+    try {
+      const billData = {
+        ...billForm,
+        amount: parseFloat(billForm.amount),
+        previous_reading: billForm.previous_reading ? parseFloat(billForm.previous_reading) : null,
+        current_reading: billForm.current_reading ? parseFloat(billForm.current_reading) : null,
+        issue_date: new Date(billForm.issue_date).toISOString(),
+        due_date: new Date(billForm.due_date).toISOString()
+      };
+      
+      await axios.post(`${API}/compounds/${user.compound_id}/utility-bills`, billData);
+      toast.success('Utility bill created successfully!');
+      setShowAddBill(false);
+      setBillForm({
+        family_id: '',
+        unit_number: '',
+        utility_type: 'electricity',
+        provider_name: '',
+        account_number: '',
+        billing_period: '',
+        issue_date: '',
+        due_date: '',
+        amount: '',
+        previous_reading: '',
+        current_reading: '',
+        government_reference: ''
+      });
+      fetchBills();
+    } catch (error) {
+      toast.error('Failed to create utility bill');
+    }
+  };
+
+  const handlePayBill = async (billId, amount) => {
+    setProcessingPayment(billId);
+    try {
+      const response = await axios.post(`${API}/utility-bills/${billId}/pay`);
+      toast.success(`Payment successful! Gov Ref: ${response.data.government_transaction_id}`);
+      fetchBills();
+    } catch (error) {
+      toast.error('Payment failed. Please try again.');
+    } finally {
+      setProcessingPayment(null);
+    }
+  };
+
+  const getUtilityIcon = (type) => {
+    const utilityInfo = utilityTypes[type] || utilityTypes.electricity;
+    const IconComponent = utilityInfo.icon;
+    return <IconComponent className="h-6 w-6" />;
+  };
+
+  const getUtilityColor = (type) => {
+    return utilityTypes[type]?.color || utilityTypes.electricity.color;
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'paid':
+        return 'bg-green-100 text-green-800';
+      case 'overdue':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-yellow-100 text-yellow-800';
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'EGP',
+      minimumFractionDigits: 2
+    }).format(amount);
+  };
+
+  const isOverdue = (dueDate) => {
+    return new Date(dueDate) < new Date();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  const pendingBills = bills.filter(bill => bill.status === 'pending');
+  const totalPending = pendingBills.reduce((sum, bill) => sum + bill.amount, 0);
+  const overdueBills = bills.filter(bill => bill.status === 'pending' && isOverdue(bill.due_date));
+
+  return (
+    <div className="p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">
+          {t('government_utility_gateway')}
+        </h1>
+        <p className="text-gray-600 mt-2">
+          {t('manage_government_utility_bills')}
+        </p>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">{t('pending_bills')}</p>
+              <p className="text-2xl font-bold text-yellow-600">{pendingBills.length}</p>
+            </div>
+            <ClockIcon className="h-8 w-8 text-yellow-500" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">{t('overdue_bills')}</p>
+              <p className="text-2xl font-bold text-red-600">{overdueBills.length}</p>
+            </div>
+            <ExclamationTriangleIcon className="h-8 w-8 text-red-500" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">{t('total_pending')}</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalPending)}</p>
+            </div>
+            <CurrencyDollarIcon className="h-8 w-8 text-blue-500" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">{t('connections')}</p>
+              <p className="text-2xl font-bold text-gray-900">{connections.length}</p>
+            </div>
+            <DocumentTextIcon className="h-8 w-8 text-green-500" />
+          </div>
+        </div>
+      </div>
+
+      {/* Pending Bills Alert */}
+      {overdueBills.length > 0 && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="flex items-center">
+            <ExclamationTriangleIcon className="h-5 w-5 text-red-600 mr-3" />
+            <div>
+              <h3 className="text-sm font-medium text-red-800">
+                {t('overdue_bills_alert', { count: overdueBills.length })}
+              </h3>
+              <p className="text-sm text-red-700 mt-1">
+                {t('pay_overdue_bills_message')}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tab Navigation */}
+      <div className="mb-6">
+        <nav className="flex space-x-8" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab('bills')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'bills'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            {t('utility_bills')} ({bills.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('connections')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'connections'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            {t('utility_connections')} ({connections.length})
+          </button>
+        </nav>
+      </div>
+
+      {/* Bills Tab */}
+      {activeTab === 'bills' && (
+        <div className="space-y-6">
+          {user?.role === 'admin' && (
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowAddBill(true)}
+                className="btn btn-primary flex items-center space-x-2"
+              >
+                <PlusIcon className="h-4 w-4" />
+                <span>{t('add_bill')}</span>
+              </button>
+            </div>
+          )}
+
+          {bills.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {bills.map((bill) => (
+                <div key={bill.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-lg ${getUtilityColor(bill.utility_type)}`}>
+                        <div className="text-white">
+                          {getUtilityIcon(bill.utility_type)}
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 capitalize">
+                          {utilityTypes[bill.utility_type]?.name || bill.utility_type}
+                        </h3>
+                        <p className="text-sm text-gray-600">{bill.provider_name}</p>
+                      </div>
+                    </div>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(bill.status)}`}>
+                      {t(bill.status)}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 mb-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t('account_number')}:</span>
+                      <span className="font-medium">{bill.account_number}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t('billing_period')}:</span>
+                      <span className="font-medium">{bill.billing_period}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t('due_date')}:</span>
+                      <span className={`font-medium ${isOverdue(bill.due_date) ? 'text-red-600' : ''}`}>
+                        {new Date(bill.due_date).toLocaleDateString()}
+                      </span>
+                    </div>
+                    {bill.consumption && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">{t('consumption')}:</span>
+                        <span className="font-medium">{bill.consumption} units</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-lg font-bold text-gray-900">
+                        {formatCurrency(bill.amount)}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {t('gov_ref')}: {bill.government_reference}
+                      </span>
+                    </div>
+
+                    {user?.role === 'resident' && bill.status === 'pending' && (
+                      <button
+                        onClick={() => handlePayBill(bill.id, bill.amount)}
+                        disabled={processingPayment === bill.id}
+                        className="w-full btn btn-primary text-sm flex items-center justify-center space-x-2"
+                      >
+                        {processingPayment === bill.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            <span>{t('processing')}</span>
+                          </>
+                        ) : (
+                          <>
+                            <CurrencyDollarIcon className="h-4 w-4" />
+                            <span>{t('pay_now')}</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    {bill.status === 'paid' && (
+                      <div className="flex space-x-2">
+                        <div className="flex items-center text-green-600 text-sm">
+                          <CheckCircleIcon className="h-4 w-4 mr-1" />
+                          {t('paid')}
+                        </div>
+                        <button className="ml-auto text-blue-600 text-sm flex items-center space-x-1">
+                          <PrinterIcon className="h-4 w-4" />
+                          <span>{t('receipt')}</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_utility_bills')}</h3>
+              <p className="text-gray-600">
+                {user?.role === 'admin'
+                  ? t('add_first_utility_bill')
+                  : t('no_bills_available')
+                }
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Connections Tab */}
+      {activeTab === 'connections' && (
+        <div className="space-y-6">
+          <div className="flex justify-end">
+            <button
+              onClick={() => setShowAddConnection(true)}
+              className="btn btn-primary flex items-center space-x-2"
+            >
+              <PlusIcon className="h-4 w-4" />
+              <span>{t('add_connection')}</span>
+            </button>
+          </div>
+
+          {connections.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {connections.map((connection) => (
+                <div key={connection.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className={`p-2 rounded-lg ${getUtilityColor(connection.utility_type)}`}>
+                      <div className="text-white">
+                        {getUtilityIcon(connection.utility_type)}
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 capitalize">
+                        {utilityTypes[connection.utility_type]?.name || connection.utility_type}
+                      </h3>
+                      <p className="text-sm text-gray-600">{connection.provider_name}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t('account_number')}:</span>
+                      <span className="font-medium">{connection.account_number}</span>
+                    </div>
+                    {connection.meter_number && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">{t('meter_number')}:</span>
+                        <span className="font-medium">{connection.meter_number}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t('unit')}:</span>
+                      <span className="font-medium">{connection.unit_number}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t('status')}:</span>
+                      <span className={`font-medium ${connection.is_active ? 'text-green-600' : 'text-red-600'}`}>
+                        {connection.is_active ? t('active') : t('inactive')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_utility_connections')}</h3>
+              <p className="text-gray-600">{t('add_first_connection')}</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Add Connection Modal */}
+      {showAddConnection && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-lg w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t('add_utility_connection')}
+                </h3>
+                <button
+                  onClick={() => setShowAddConnection(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+
+              <form onSubmit={handleCreateConnection} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('utility_type')}
+                  </label>
+                  <select
+                    value={connectionForm.utility_type}
+                    onChange={(e) => setConnectionForm({...connectionForm, utility_type: e.target.value})}
+                    className="form-input"
+                    required
+                  >
+                    {Object.keys(utilityTypes).map(type => (
+                      <option key={type} value={type}>
+                        {utilityTypes[type].name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('provider_name')}
+                  </label>
+                  <select
+                    value={connectionForm.provider_name}
+                    onChange={(e) => setConnectionForm({...connectionForm, provider_name: e.target.value})}
+                    className="form-input"
+                    required
+                  >
+                    <option value="">{t('select_provider')}</option>
+                    {utilityTypes[connectionForm.utility_type]?.providers.map(provider => (
+                      <option key={provider} value={provider}>
+                        {provider}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('account_number')}
+                  </label>
+                  <input
+                    type="text"
+                    value={connectionForm.account_number}
+                    onChange={(e) => setConnectionForm({...connectionForm, account_number: e.target.value})}
+                    className="form-input"
+                    required
+                    placeholder={t('enter_account_number')}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('meter_number')} ({t('optional')})
+                  </label>
+                  <input
+                    type="text"
+                    value={connectionForm.meter_number}
+                    onChange={(e) => setConnectionForm({...connectionForm, meter_number: e.target.value})}
+                    className="form-input"
+                    placeholder={t('enter_meter_number')}
+                  />
+                </div>
+
+                <div className="flex space-x-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddConnection(false)}
+                    className="btn btn-secondary flex-1"
+                  >
+                    {t('cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary flex-1"
+                  >
+                    {t('add_connection')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default UtilityBills;

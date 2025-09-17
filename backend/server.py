@@ -67,7 +67,7 @@ class ConnectionManager:
     
     async def send_chat_message(self, chat_message: dict, participants: List[str]):
         """Send chat message to all participants"""
-        message = json.dumps(chat_message)
+        message = json.dumps(serialize_datetime(chat_message))
         for participant_id in participants:
             await self.send_personal_message(message, participant_id)
     

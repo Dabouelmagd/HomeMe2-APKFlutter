@@ -2000,7 +2000,7 @@ async def get_chat_messages(
     for message in messages:
         message["sender"] = senders_dict.get(message["sender_id"])
     
-    return {"messages": messages}
+    return {"messages": serialize_datetime(messages)}
 
 @api_router.post("/chats/{chat_id}/messages")
 async def send_message(

@@ -8,7 +8,14 @@ import {
   PaperClipIcon,
   EllipsisVerticalIcon,
   UserGroupIcon,
-  InformationCircleIcon
+  InformationCircleIcon,
+  PhotoIcon,
+  VideoCameraIcon,
+  SpeakerWaveIcon,
+  DocumentIcon,
+  PlayIcon,
+  PauseIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import { CheckIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 

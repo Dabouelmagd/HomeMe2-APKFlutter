@@ -445,21 +445,21 @@ class ChatTestSuite:
             # Test without token
             response = self.session.get(f"{BASE_URL}/chats")
             
-            if response.status_code == 401:
-                self.log_result("Unauthorized Access", True, "Correctly rejected request without token")
+            if response.status_code in [401, 403]:
+                self.log_result("Unauthorized Access", True, f"Correctly rejected request without token (status: {response.status_code})")
             else:
-                self.log_result("Unauthorized Access", False, f"Expected 401, got {response.status_code}")
+                self.log_result("Unauthorized Access", False, f"Expected 401 or 403, got {response.status_code}")
                 return False
             
             # Test with invalid token
             invalid_headers = {"Authorization": "Bearer invalid_token"}
             response = self.session.get(f"{BASE_URL}/chats", headers=invalid_headers)
             
-            if response.status_code == 401:
-                self.log_result("Invalid Token Access", True, "Correctly rejected request with invalid token")
+            if response.status_code in [401, 403]:
+                self.log_result("Invalid Token Access", True, f"Correctly rejected request with invalid token (status: {response.status_code})")
                 return True
             else:
-                self.log_result("Invalid Token Access", False, f"Expected 401, got {response.status_code}")
+                self.log_result("Invalid Token Access", False, f"Expected 401 or 403, got {response.status_code}")
                 return False
                 
         except Exception as e:

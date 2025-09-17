@@ -459,7 +459,22 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
                           : 'bg-gray-100 text-gray-900'
                       }`}
                     >
-                      <p className="text-sm">{message.content}</p>
+                      {/* Text content */}
+                      {message.content && (
+                        <p className="text-sm mb-2">{message.content}</p>
+                      )}
+                      
+                      {/* Attachments */}
+                      {message.attachments && message.attachments.length > 0 && (
+                        <div className="space-y-2 mb-2">
+                          {message.attachments.map((attachment, idx) => (
+                            <div key={idx}>
+                              {renderAttachment(attachment)}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
                       <div className={`flex items-center justify-end mt-1 space-x-1 ${
                         isOwn ? 'text-blue-100' : 'text-gray-500'
                       }`}>
@@ -472,6 +487,24 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
                         )}
                       </div>
                     </div>
+                    
+                    {/* Reactions */}
+                    {renderReactions(message.reactions, message.id)}
+                    
+                    {/* Quick reaction buttons */}
+                    {!isOwn && (
+                      <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {commonEmojis.slice(0, 5).map(emoji => (
+                          <button
+                            key={emoji}
+                            onClick={() => addReaction(message.id, emoji)}
+                            className="p-1 text-sm hover:bg-gray-100 rounded"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               );

@@ -241,7 +241,71 @@ const resources = {
       
       // Common
       'loading': 'جاري التحميل...',
-      'language': 'اللغة'
+      'language': 'اللغة',
+      
+      // Services
+      'services_management': 'إدارة الخدمات',
+      'services': 'الخدمات',
+      'add_service': 'إضافة خدمة',
+      'edit_service': 'تعديل الخدمة',
+      'create_service': 'إنشاء خدمة',
+      'update_service': 'تحديث الخدمة',
+      'book_service': 'حجز الخدمة',
+      'service_name': 'اسم الخدمة',
+      'enter_service_name': 'أدخل اسم الخدمة',
+      'category': 'الفئة',
+      'specialty': 'التخصص',
+      'select_specialty': 'اختر التخصص',
+      'enter_description': 'أدخل وصف الخدمة',
+      'enter_phone': 'أدخل رقم الهاتف',
+      'enter_email': 'أدخل البريد الإلكتروني',
+      'working_hours': 'ساعات العمل',
+      'reviews': 'مراجعات',
+      'available': 'متاح',
+      'busy': 'مشغول',
+      'offline': 'غير متصل',
+      'no_services': 'لا توجد خدمات',
+      'add_first_service': 'أضف خدمتك الأولى للبدء',
+      'no_services_available': 'لا توجد خدمات متاحة حالياً',
+      
+      // Service Categories
+      'medical': 'طبية',
+      'maintenance': 'صيانة',
+      'security': 'أمن',
+      'cleaning': 'تنظيف',
+      'other': 'أخرى',
+      
+      // Maintenance Specialties
+      'carpenter': 'نجار',
+      'plumber': 'سباك',
+      'electrician': 'كهربائي',
+      'gardener': 'بستاني',
+      'painter': 'دهان',
+      'hvac_technician': 'فني تكييف',
+      'locksmith': 'صانع أقفال',
+      'appliance_repair': 'إصلاح الأجهزة',
+      'general_maintenance': 'صيانة عامة',
+      
+      // Bookings
+      'all_bookings': 'جميع الحجوزات',
+      'my_bookings': 'حجوزاتي',
+      'no_bookings': 'لا توجد حجوزات',
+      'issue_description': 'وصف المشكلة',
+      'describe_issue': 'صف المشكلة أو الخدمة المطلوبة',
+      'preferred_date': 'التاريخ المفضل',
+      'preferred_time': 'الوقت المفضل',
+      'additional_notes': 'ملاحظات إضافية',
+      'optional': 'اختياري',
+      'any_additional_info': 'أي معلومات إضافية',
+      'issue': 'المشكلة',
+      'resident': 'المقيم',
+      'unit': 'الوحدة',
+      'notes': 'ملاحظات',
+      'pending': 'معلق',
+      'confirmed': 'مؤكد',
+      'in_progress': 'قيد التنفيذ',
+      'completed': 'مكتمل',
+      'cancelled': 'ملغي'
     }
   },
   fr: {

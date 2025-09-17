@@ -260,6 +260,16 @@ const resources = {
         'quietHoursDesc': 'Disable notifications during specified hours',
         'from': 'From',
         'to': 'To'
+      },
+      
+      // Settings
+      'settings': {
+        'settings': 'Settings',
+        'notifications': 'Notifications',
+        'profile': 'Profile',
+        'privacy': 'Privacy',
+        'language': 'Language',
+        'manageYourPreferences': 'Manage your account preferences and settings'
       }
     }
   },

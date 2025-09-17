@@ -511,6 +511,20 @@ class AddParticipantsRequest(BaseModel):
 class MessageReactionRequest(BaseModel):
     emoji: str  # The emoji/reaction to add or remove
 
+class PushSubscriptionRequest(BaseModel):
+    endpoint: str
+    keys: Dict[str, str]  # Contains p256dh and auth keys
+
+class NotificationPreferencesUpdate(BaseModel):
+    push_enabled: Optional[bool] = None
+    message_notifications: Optional[bool] = None
+    group_notifications: Optional[bool] = None
+    direct_notifications: Optional[bool] = None
+    compound_notifications: Optional[bool] = None
+    quiet_hours_enabled: Optional[bool] = None
+    quiet_hours_start: Optional[str] = None
+    quiet_hours_end: Optional[str] = None
+
 class FileAttachment(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     filename: str

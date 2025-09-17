@@ -483,6 +483,23 @@ class ChatUpdate(BaseModel):
 class AddParticipantsRequest(BaseModel):
     participant_ids: List[str]
 
+class MessageReactionRequest(BaseModel):
+    emoji: str  # The emoji/reaction to add or remove
+
+class FileAttachment(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    filename: str
+    original_filename: str
+    file_type: str  # image, video, audio, document
+    file_size: int
+    mime_type: str
+    file_url: str
+    thumbnail_url: Optional[str] = None
+    duration: Optional[float] = None  # For audio/video files
+    width: Optional[int] = None  # For images/videos
+    height: Optional[int] = None  # For images/videos
+    uploaded_at: datetime = Field(default_factory=datetime.utcnow)
+
 def serialize_datetime(obj):
     """Convert datetime objects and ObjectIds to JSON serializable format"""
     if isinstance(obj, datetime):

@@ -3349,7 +3349,7 @@ async def get_saved_searches(current_user: User = Depends(get_current_user)):
             "user_id": current_user.id
         }).sort("updated_at", -1).to_list(None)
         
-        return {"saved_searches": saved_searches}
+        return {"saved_searches": serialize_datetime(saved_searches)}
         
     except Exception as e:
         logging.error(f"Error getting saved searches: {e}")

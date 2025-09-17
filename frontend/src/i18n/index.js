@@ -529,6 +529,16 @@ const resources = {
         'quietHoursDesc': 'تعطيل الإشعارات خلال الساعات المحددة',
         'from': 'من',
         'to': 'إلى'
+      },
+      
+      // Settings
+      'settings': {
+        'settings': 'الإعدادات',
+        'notifications': 'الإشعارات',
+        'profile': 'الملف الشخصي',
+        'privacy': 'الخصوصية',
+        'language': 'اللغة',
+        'manageYourPreferences': 'إدارة تفضيلات وإعدادات حسابك'
       }
     }
   },

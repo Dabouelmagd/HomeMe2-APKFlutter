@@ -16,6 +16,7 @@ import json
 import base64
 from io import BytesIO
 from PIL import Image
+from datetime import timezone
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent

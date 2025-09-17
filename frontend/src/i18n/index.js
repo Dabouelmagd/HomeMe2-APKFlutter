@@ -235,7 +235,31 @@ const resources = {
       
       'common': {
         'cancel': 'Cancel',
-        'creating': 'Creating...'
+        'creating': 'Creating...',
+        'loading': 'Loading...'
+      },
+      
+      // Notifications
+      'notifications': {
+        'pushNotifications': 'Push Notifications',
+        'subscribed': 'You are subscribed to push notifications',
+        'notSubscribed': 'Push notifications are disabled',
+        'enable': 'Enable Notifications',
+        'disable': 'Disable Notifications',
+        'testNotification': 'Test Notification',
+        'preferences': 'Notification Preferences',
+        'messageNotifications': 'Message Notifications',
+        'messageNotificationsDesc': 'Receive notifications for all chat messages',
+        'directChats': 'Direct Messages',
+        'directChatsDesc': 'Notifications for one-on-one conversations',
+        'groupChats': 'Group Chats',
+        'groupChatsDesc': 'Notifications for group conversations',
+        'compoundAnnouncements': 'Compound Announcements',
+        'compoundAnnouncementsDesc': 'Important announcements from management',
+        'quietHours': 'Quiet Hours',
+        'quietHoursDesc': 'Disable notifications during specified hours',
+        'from': 'From',
+        'to': 'To'
       }
     }
   },

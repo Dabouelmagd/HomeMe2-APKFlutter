@@ -1948,6 +1948,14 @@ class ChatTestSuite:
             self.test_message_reactions,
             self.test_multiple_user_reactions,
             self.test_attachment_metadata,
+            # Voice message tests
+            self.test_voice_message_upload,
+            self.test_voice_file_processing,
+            self.test_voice_file_type_support,
+            self.test_voice_message_push_notification,
+            self.test_voice_file_serving,
+            self.test_voice_message_chat_integration,
+            self.test_voice_message_validation,
             # Push notification tests
             self.test_push_subscription_subscribe,
             self.test_get_notification_preferences,

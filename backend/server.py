@@ -3517,7 +3517,7 @@ logger = logging.getLogger(__name__)
 async def startup_db_client():
     """Initialize database connection and indexes"""
     global client, db
-    client = AsyncIOMotorClient(mongo_url)
+    client = AsyncIOMotorClient(os.environ['MONGO_URL'])
     db = client[os.environ['DB_NAME']]
     
     # Create text indexes for search functionality

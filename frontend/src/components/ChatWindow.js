@@ -29,10 +29,17 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // Common emojis for reactions
+  const commonEmojis = ['❤️', '😍', '😂', '👍', '👎', '😮', '😢', '😡', '🎉', '🔥'];
 
   useEffect(() => {
     if (chat) {

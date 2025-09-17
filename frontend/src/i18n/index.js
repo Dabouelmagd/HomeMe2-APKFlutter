@@ -550,7 +550,8 @@ const resources = {
       'common': {
         'cancel': 'إلغاء',
         'creating': 'إنشاء...',
-        'loading': 'تحميل...'
+        'loading': 'تحميل...',
+        'save': 'حفظ'
       },
       
       // Notifications

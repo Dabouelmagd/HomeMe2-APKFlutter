@@ -1,0 +1,709 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../App';
+import { toast } from 'sonner';
+import {
+  WrenchScrewdriverIcon,
+  UserIcon,
+  ShieldCheckIcon,
+  SparklesIcon,
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  PhoneIcon,
+  EnvelopeIcon,
+  ClockIcon,
+  StarIcon,
+  CalendarIcon
+} from '@heroicons/react/24/outline';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+const ServicesManagement = () => {
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const [services, setServices] = useState([]);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('services');
+  const [showAddService, setShowAddService] = useState(false);
+  const [showBookService, setShowBookService] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [editingService, setEditingService] = useState(null);
+
+  const [serviceForm, setServiceForm] = useState({
+    name: '',
+    category: 'maintenance',
+    specialty: '',
+    description: '',
+    phone: '',
+    email: '',
+    working_hours: '9:00 AM - 6:00 PM'
+  });
+
+  const [bookingForm, setBookingForm] = useState({
+    service_id: '',
+    issue_description: '',
+    preferred_date: '',
+    preferred_time: '09:00',
+    notes: ''
+  });
+
+  const serviceCategories = {
+    medical: { name: t('medical'), icon: UserIcon, color: 'bg-red-500' },
+    maintenance: { name: t('maintenance'), icon: WrenchScrewdriverIcon, color: 'bg-blue-500' },
+    security: { name: t('security'), icon: ShieldCheckIcon, color: 'bg-green-500' },
+    cleaning: { name: t('cleaning'), icon: SparklesIcon, color: 'bg-purple-500' },
+    other: { name: t('other'), icon: WrenchScrewdriverIcon, color: 'bg-gray-500' }
+  };
+
+  const maintenanceSpecialties = [
+    'carpenter', 'plumber', 'electrician', 'gardener', 'painter', 
+    'hvac_technician', 'locksmith', 'appliance_repair', 'general_maintenance'
+  ];
+
+  useEffect(() => {
+    fetchServices();
+    if (user?.role === 'admin') {
+      fetchBookings();
+    } else {
+      fetchMyBookings();
+    }
+  }, [user]);
+
+  const fetchServices = async () => {
+    try {
+      const response = await axios.get(`${API}/compounds/${user.compound_id}/services`);
+      setServices(response.data.services);
+    } catch (error) {
+      toast.error('Failed to load services');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchBookings = async () => {
+    try {
+      const response = await axios.get(`${API}/compounds/${user.compound_id}/bookings`);
+      setBookings(response.data.bookings);
+    } catch (error) {
+      console.error('Failed to load bookings:', error);
+    }
+  };
+
+  const fetchMyBookings = async () => {
+    try {
+      const response = await axios.get(`${API}/bookings/my`);
+      setBookings(response.data.bookings);
+    } catch (error) {
+      console.error('Failed to load my bookings:', error);
+    }
+  };
+
+  const handleCreateService = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/compounds/${user.compound_id}/services`, serviceForm);
+      toast.success('Service created successfully!');
+      setShowAddService(false);
+      setServiceForm({
+        name: '',
+        category: 'maintenance',
+        specialty: '',
+        description: '',
+        phone: '',
+        email: '',
+        working_hours: '9:00 AM - 6:00 PM'
+      });
+      fetchServices();
+    } catch (error) {
+      toast.error('Failed to create service');
+    }
+  };
+
+  const handleUpdateService = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.put(`${API}/compounds/${user.compound_id}/services/${editingService.id}`, serviceForm);
+      toast.success('Service updated successfully!');
+      setEditingService(null);
+      setServiceForm({
+        name: '',
+        category: 'maintenance',
+        specialty: '',
+        description: '',
+        phone: '',
+        email: '',
+        working_hours: '9:00 AM - 6:00 PM'
+      });
+      fetchServices();
+    } catch (error) {
+      toast.error('Failed to update service');
+    }
+  };
+
+  const handleDeleteService = async (serviceId) => {
+    if (window.confirm('Are you sure you want to delete this service?')) {
+      try {
+        await axios.delete(`${API}/compounds/${user.compound_id}/services/${serviceId}`);
+        toast.success('Service deleted successfully!');
+        fetchServices();
+      } catch (error) {
+        toast.error('Failed to delete service');
+      }
+    }
+  };
+
+  const handleBookService = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/services/${bookingForm.service_id}/bookings`, bookingForm);
+      toast.success('Service booked successfully!');
+      setShowBookService(false);
+      setBookingForm({
+        service_id: '',
+        issue_description: '',
+        preferred_date: '',
+        preferred_time: '09:00',
+        notes: ''
+      });
+      fetchMyBookings();
+    } catch (error) {
+      toast.error('Failed to book service');
+    }
+  };
+
+  const openBookingModal = (service) => {
+    setSelectedService(service);
+    setBookingForm({ ...bookingForm, service_id: service.id });
+    setShowBookService(true);
+  };
+
+  const openEditModal = (service) => {
+    setEditingService(service);
+    setServiceForm({
+      name: service.name,
+      category: service.category,
+      specialty: service.specialty || '',
+      description: service.description,
+      phone: service.phone || '',
+      email: service.email || '',
+      working_hours: service.working_hours
+    });
+  };
+
+  const getCategoryIcon = (category) => {
+    const categoryInfo = serviceCategories[category] || serviceCategories.other;
+    const IconComponent = categoryInfo.icon;
+    return <IconComponent className="h-6 w-6" />;
+  };
+
+  const getCategoryColor = (category) => {
+    return serviceCategories[category]?.color || serviceCategories.other.color;
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'confirmed':
+        return 'bg-green-100 text-green-800';
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-800';
+      case 'completed':
+        return 'bg-gray-100 text-gray-800';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-yellow-100 text-yellow-800';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">
+          {t('services_management')}
+        </h1>
+        <p className="text-gray-600 mt-2">
+          {user?.role === 'admin' 
+            ? 'Manage compound services and bookings'
+            : 'View available services and manage your bookings'
+          }
+        </p>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="mb-6">
+        <nav className="flex space-x-8" aria-label="Tabs">
+          <button
+            onClick={() => setActiveTab('services')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'services'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            {t('services')} ({services.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('bookings')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'bookings'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            {user?.role === 'admin' ? t('all_bookings') : t('my_bookings')} ({bookings.length})
+          </button>
+        </nav>
+      </div>
+
+      {/* Services Tab */}
+      {activeTab === 'services' && (
+        <div className="space-y-6">
+          {user?.role === 'admin' && (
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowAddService(true)}
+                className="btn btn-primary flex items-center space-x-2"
+              >
+                <PlusIcon className="h-4 w-4" />
+                <span>{t('add_service')}</span>
+              </button>
+            </div>
+          )}
+
+          {services.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {services.map((service) => (
+                <div key={service.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-lg ${getCategoryColor(service.category)}`}>
+                        <div className="text-white">
+                          {getCategoryIcon(service.category)}
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">{service.name}</h3>
+                        <p className="text-sm text-gray-600 capitalize">
+                          {service.specialty || service.category}
+                        </p>
+                      </div>
+                    </div>
+                    {user?.role === 'admin' && (
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => openEditModal(service)}
+                          className="p-1 text-gray-400 hover:text-blue-600"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteService(service.id)}
+                          className="p-1 text-gray-400 hover:text-red-600"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-gray-600 mb-4 text-sm">{service.description}</p>
+
+                  <div className="space-y-2 mb-4">
+                    {service.phone && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <PhoneIcon className="h-4 w-4 mr-2" />
+                        {service.phone}
+                      </div>
+                    )}
+                    {service.email && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <EnvelopeIcon className="h-4 w-4 mr-2" />
+                        {service.email}
+                      </div>
+                    )}
+                    <div className="flex items-center text-sm text-gray-600">
+                      <ClockIcon className="h-4 w-4 mr-2" />
+                      {service.working_hours}
+                    </div>
+                  </div>
+
+                  {service.rating > 0 && (
+                    <div className="flex items-center mb-4">
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                          <StarIcon
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < Math.floor(service.rating) 
+                                ? 'text-yellow-400' 
+                                : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm text-gray-600 ml-2">
+                        ({service.total_reviews} {t('reviews')})
+                      </span>
+                    </div>
+                  )}
+
+                  {user?.role === 'resident' && (
+                    <button
+                      onClick={() => openBookingModal(service)}
+                      className="w-full btn btn-primary text-sm"
+                    >
+                      {t('book_service')}
+                    </button>
+                  )}
+
+                  <div className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    service.status === 'available' 
+                      ? 'bg-green-100 text-green-800'
+                      : service.status === 'busy'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {t(service.status)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <WrenchScrewdriverIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_services')}</h3>
+              <p className="text-gray-600">
+                {user?.role === 'admin'
+                  ? t('add_first_service')
+                  : t('no_services_available')
+                }
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Bookings Tab */}
+      {activeTab === 'bookings' && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {user?.role === 'admin' ? t('all_bookings') : t('my_bookings')}
+            </h3>
+          </div>
+          <div className="p-6">
+            {bookings.length > 0 ? (
+              <div className="space-y-4">
+                {bookings.map((booking) => (
+                  <div key={booking.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h4 className="font-medium text-gray-900">{booking.service_name}</h4>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                            {t(booking.status)}
+                          </span>
+                        </div>
+                        {user?.role === 'admin' && (
+                          <p className="text-sm text-gray-600 mb-1">
+                            {t('resident')}: {booking.resident_name} ({t('unit')} {booking.unit_number})
+                          </p>
+                        )}
+                        <p className="text-sm text-gray-600 mb-2">
+                          {t('issue')}: {booking.issue_description}
+                        </p>
+                        <div className="flex items-center text-sm text-gray-500 space-x-4">
+                          <div className="flex items-center">
+                            <CalendarIcon className="h-4 w-4 mr-1" />
+                            {new Date(booking.preferred_date).toLocaleDateString()}
+                          </div>
+                          <div className="flex items-center">
+                            <ClockIcon className="h-4 w-4 mr-1" />
+                            {booking.preferred_time}
+                          </div>
+                        </div>
+                        {booking.notes && (
+                          <p className="text-sm text-gray-600 mt-2">
+                            {t('notes')}: {booking.notes}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <CalendarIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">{t('no_bookings')}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Service Modal */}
+      {(showAddService || editingService) && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-90vh overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {editingService ? t('edit_service') : t('add_service')}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowAddService(false);
+                    setEditingService(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+
+              <form onSubmit={editingService ? handleUpdateService : handleCreateService} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('service_name')}
+                    </label>
+                    <input
+                      type="text"
+                      value={serviceForm.name}
+                      onChange={(e) => setServiceForm({...serviceForm, name: e.target.value})}
+                      className="form-input"
+                      required
+                      placeholder={t('enter_service_name')}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('category')}
+                    </label>
+                    <select
+                      value={serviceForm.category}
+                      onChange={(e) => setServiceForm({...serviceForm, category: e.target.value})}
+                      className="form-input"
+                      required
+                    >
+                      {Object.keys(serviceCategories).map(category => (
+                        <option key={category} value={category}>
+                          {serviceCategories[category].name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {serviceForm.category === 'maintenance' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('specialty')}
+                    </label>
+                    <select
+                      value={serviceForm.specialty}
+                      onChange={(e) => setServiceForm({...serviceForm, specialty: e.target.value})}
+                      className="form-input"
+                    >
+                      <option value="">{t('select_specialty')}</option>
+                      {maintenanceSpecialties.map(specialty => (
+                        <option key={specialty} value={specialty}>
+                          {t(specialty)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('description')}
+                  </label>
+                  <textarea
+                    value={serviceForm.description}
+                    onChange={(e) => setServiceForm({...serviceForm, description: e.target.value})}
+                    rows={3}
+                    className="form-input"
+                    required
+                    placeholder={t('enter_description')}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('phone')}
+                    </label>
+                    <input
+                      type="tel"
+                      value={serviceForm.phone}
+                      onChange={(e) => setServiceForm({...serviceForm, phone: e.target.value})}
+                      className="form-input"
+                      placeholder={t('enter_phone')}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('email')}
+                    </label>
+                    <input
+                      type="email"
+                      value={serviceForm.email}
+                      onChange={(e) => setServiceForm({...serviceForm, email: e.target.value})}
+                      className="form-input"
+                      placeholder={t('enter_email')}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('working_hours')}
+                  </label>
+                  <input
+                    type="text"
+                    value={serviceForm.working_hours}
+                    onChange={(e) => setServiceForm({...serviceForm, working_hours: e.target.value})}
+                    className="form-input"
+                    placeholder="9:00 AM - 6:00 PM"
+                  />
+                </div>
+
+                <div className="flex space-x-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddService(false);
+                      setEditingService(null);
+                    }}
+                    className="btn btn-secondary flex-1"
+                  >
+                    {t('cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary flex-1"
+                  >
+                    {editingService ? t('update_service') : t('create_service')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Book Service Modal */}
+      {showBookService && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-lg w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {t('book_service')}: {selectedService?.name}
+                </h3>
+                <button
+                  onClick={() => setShowBookService(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+
+              <form onSubmit={handleBookService} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('issue_description')}
+                  </label>
+                  <textarea
+                    value={bookingForm.issue_description}
+                    onChange={(e) => setBookingForm({...bookingForm, issue_description: e.target.value})}
+                    rows={3}
+                    className="form-input"
+                    required
+                    placeholder={t('describe_issue')}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('preferred_date')}
+                    </label>
+                    <input
+                      type="date"
+                      value={bookingForm.preferred_date}
+                      onChange={(e) => setBookingForm({...bookingForm, preferred_date: e.target.value})}
+                      className="form-input"
+                      required
+                      min={new Date().toISOString().split('T')[0]}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {t('preferred_time')}
+                    </label>
+                    <input
+                      type="time"
+                      value={bookingForm.preferred_time}
+                      onChange={(e) => setBookingForm({...bookingForm, preferred_time: e.target.value})}
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('additional_notes')} ({t('optional')})
+                  </label>
+                  <textarea
+                    value={bookingForm.notes}
+                    onChange={(e) => setBookingForm({...bookingForm, notes: e.target.value})}
+                    rows={2}
+                    className="form-input"
+                    placeholder={t('any_additional_info')}
+                  />
+                </div>
+
+                <div className="flex space-x-4 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowBookService(false)}
+                    className="btn btn-secondary flex-1"
+                  >
+                    {t('cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary flex-1"
+                  >
+                    {t('book_service')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ServicesManagement;

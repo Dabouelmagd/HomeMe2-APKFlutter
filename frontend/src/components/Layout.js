@@ -76,6 +76,12 @@ const Layout = () => {
       show: true
     },
     {
+      name: t('chat.chats'),
+      href: '/chat',
+      icon: ChatBubbleLeftEllipsisIcon,
+      show: true
+    },
+    {
       name: t('notifications'),
       href: '/notifications',
       icon: BellIcon,

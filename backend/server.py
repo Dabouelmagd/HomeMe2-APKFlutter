@@ -456,9 +456,11 @@ class AddParticipantsRequest(BaseModel):
     participant_ids: List[str]
 
 def serialize_datetime(obj):
-    """Convert datetime objects to ISO format strings for JSON serialization"""
+    """Convert datetime objects and ObjectIds to JSON serializable format"""
     if isinstance(obj, datetime):
         return obj.isoformat()
+    elif hasattr(obj, '__class__') and obj.__class__.__name__ == 'ObjectId':
+        return str(obj)
     elif isinstance(obj, dict):
         return {k: serialize_datetime(v) for k, v in obj.items()}
     elif isinstance(obj, list):

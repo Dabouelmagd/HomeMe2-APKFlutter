@@ -233,10 +233,40 @@ const resources = {
         'selectedFiles': 'Selected Files'
       },
       
+      // Search
+      'search': {
+        'searchMessages': 'Search Messages',
+        'searchPlaceholder': 'Search in messages...',
+        'searchInChat': 'Search in chat',
+        'messageTypes': 'Message Types',
+        'text': 'Text',
+        'images': 'Images',
+        'videos': 'Videos',
+        'voiceMessages': 'Voice Messages',
+        'files': 'Files',
+        'dateRange': 'Date Range',
+        'from': 'From',
+        'to': 'To',
+        'recentSearches': 'Recent Searches',
+        'savedSearches': 'Saved Searches',
+        'noRecentSearches': 'No recent searches',
+        'noSavedSearches': 'No saved searches',
+        'searchMessagesDescription': 'Search through your messages',
+        'searchInstructions': 'Type keywords to find messages, files, and conversations',
+        'resultsFound': 'Found {count} results for "{query}"',
+        'noResults': 'No results found',
+        'tryDifferentKeywords': 'Try different keywords or adjust your filters',
+        'loadMore': 'Load More Results',
+        'saveSearch': 'Save Search',
+        'searchName': 'Search name',
+        'messageNotInView': 'This message is in a different part of the chat. You may need to scroll to find it.'
+      },
+      
       'common': {
         'cancel': 'Cancel',
         'creating': 'Creating...',
-        'loading': 'Loading...'
+        'loading': 'Loading...',
+        'save': 'Save'
       },
       
       // Notifications

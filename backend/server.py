@@ -626,6 +626,137 @@ async def save_uploaded_file(file: UploadFile, file_type: str) -> Dict[str, Any]
         "uploaded_at": datetime.utcnow()
     }
 
+def is_quiet_hours(preferences: Dict[str, Any]) -> bool:
+    """Check if current time is within user's quiet hours"""
+    if not preferences.get("quiet_hours_enabled", False):
+        return False
+    
+    now = datetime.now().time()
+    start_time = datetime.strptime(preferences.get("quiet_hours_start", "22:00"), "%H:%M").time()
+    end_time = datetime.strptime(preferences.get("quiet_hours_end", "08:00"), "%H:%M").time()
+    
+    if start_time <= end_time:
+        # Same day range (e.g., 09:00 to 17:00)
+        return start_time <= now <= end_time
+    else:
+        # Crosses midnight (e.g., 22:00 to 08:00)
+        return now >= start_time or now <= end_time
+
+async def send_push_notification(user_id: str, title: str, body: str, data: Dict[str, Any] = None):
+    """Send push notification to a user"""
+    try:
+        # Get user's push subscriptions
+        subscriptions = await db.push_subscriptions.find({
+            "user_id": user_id,
+            "is_active": True
+        }).to_list(None)
+        
+        if not subscriptions:
+            return
+        
+        # Get user's notification preferences
+        preferences = await db.notification_preferences.find_one({"user_id": user_id})
+        if not preferences or not preferences.get("push_enabled", True):
+            return
+        
+        # Check quiet hours
+        if is_quiet_hours(preferences or {}):
+            return
+        
+        # Prepare notification payload
+        payload = {
+            "title": title,
+            "body": body,
+            "icon": "/icons/icon-192x192.png",
+            "badge": "/icons/badge-72x72.png",
+            "data": data or {}
+        }
+        
+        # Send to all user's subscriptions
+        for subscription in subscriptions:
+            try:
+                # In a real implementation, you would use a library like py-vapid
+                # For now, we'll log the notification
+                logging.info(f"Sending push notification to user {user_id}: {title}")
+                
+                # Here you would normally send the actual push notification
+                # using the Web Push Protocol with VAPID keys
+                
+            except Exception as e:
+                logging.error(f"Failed to send push notification to subscription {subscription['id']}: {e}")
+                # Mark subscription as inactive if it fails
+                await db.push_subscriptions.update_one(
+                    {"id": subscription["id"]},
+                    {"$set": {"is_active": False}}
+                )
+    
+    except Exception as e:
+        logging.error(f"Error sending push notification to user {user_id}: {e}")
+
+async def notify_chat_participants(chat_id: str, sender_id: str, message_content: str, message_type: str = "text"):
+    """Send push notifications to chat participants (except sender)"""
+    try:
+        # Get chat details
+        chat = await db.chats.find_one({"id": chat_id})
+        if not chat:
+            return
+        
+        # Get sender info
+        sender = await db.users.find_one({"id": sender_id})
+        sender_name = sender.get("full_name", "Someone") if sender else "Someone"
+        
+        # Determine notification title based on chat type
+        if chat["chat_type"] == "direct":
+            title = f"Message from {sender_name}"
+        elif chat["chat_type"] == "group":
+            title = f"{sender_name} in {chat.get('name', 'Group Chat')}"
+        else:  # compound_wide
+            title = f"{sender_name} in Compound Chat"
+        
+        # Prepare notification body
+        if message_type == "text":
+            body = message_content[:100] + "..." if len(message_content) > 100 else message_content
+        elif message_type == "image":
+            body = "📷 Sent a photo"
+        elif message_type == "video":
+            body = "🎥 Sent a video"
+        elif message_type == "audio":
+            body = "🎵 Sent an audio message"
+        else:
+            body = "📎 Sent a file"
+        
+        # Send notifications to all participants except sender
+        participants = [p for p in chat["participants"] if p != sender_id]
+        
+        for participant_id in participants:
+            # Check user's notification preferences for chat type
+            preferences = await db.notification_preferences.find_one({"user_id": participant_id})
+            
+            should_notify = True
+            if preferences:
+                if chat["chat_type"] == "direct" and not preferences.get("direct_notifications", True):
+                    should_notify = False
+                elif chat["chat_type"] == "group" and not preferences.get("group_notifications", True):
+                    should_notify = False
+                elif chat["chat_type"] == "compound_wide" and not preferences.get("compound_notifications", True):
+                    should_notify = False
+            
+            if should_notify:
+                await send_push_notification(
+                    participant_id,
+                    title,
+                    body,
+                    {
+                        "chatId": chat_id,
+                        "senderId": sender_id,
+                        "messageType": message_type,
+                        "url": f"/chat?open={chat_id}"
+                    }
+                )
+    
+    except Exception as e:
+        logging.error(f"Error sending chat notifications: {e}")
+
 # Utility Functions
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')

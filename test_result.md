@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Add chat with the residence, and you can make a group chat. The chat including attached photo, sounds, messages, and videos and a motion icon like a heart, smile, silly, etc."
+user_problem_statement: "Add chat with the residence, and you can make a group chat. The chat including attached photo, sounds, messages, and videos and a motion icon like a heart, smile, silly, etc. Add Push notifications for mobile, Message search functionality, File organization/gallery, Voice messages, Message scheduling"
 
 backend:
   - task: "Chat Backend Infrastructure - Phase 1"

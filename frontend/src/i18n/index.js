@@ -153,7 +153,51 @@ const resources = {
       'confirmed': 'Confirmed',
       'in_progress': 'In Progress',
       'completed': 'Completed',
-      'cancelled': 'Cancelled'
+      'cancelled': 'Cancelled',
+      
+      // Utility Bills
+      'government_utility_gateway': 'Government Utility Gateway',
+      'manage_government_utility_bills': 'Manage your government utility bills and payments',
+      'utility_bills': 'Utility Bills',
+      'utility_connections': 'Utility Connections',
+      'pending_bills': 'Pending Bills',
+      'overdue_bills': 'Overdue Bills',
+      'total_pending': 'Total Pending',
+      'connections': 'Connections',
+      'overdue_bills_alert': 'You have {{count}} overdue bill',
+      'overdue_bills_alert_plural': 'You have {{count}} overdue bills',
+      'pay_overdue_bills_message': 'Please pay your overdue bills to avoid service disruption',
+      'add_bill': 'Add Bill',
+      'add_connection': 'Add Connection',
+      'add_utility_connection': 'Add Utility Connection',
+      'no_utility_bills': 'No utility bills found',
+      'add_first_utility_bill': 'Add your first utility bill',
+      'no_bills_available': 'No bills available at the moment',
+      'no_utility_connections': 'No utility connections found',
+      'add_first_connection': 'Add your first utility connection',
+      
+      // Utility Types
+      'electricity': 'Electricity',
+      'water': 'Water',
+      'telephone': 'Telephone',
+      'gas': 'Gas',
+      'internet': 'Internet',
+      
+      // Utility Bill Details
+      'account_number': 'Account Number',
+      'billing_period': 'Billing Period',
+      'due_date': 'Due Date',
+      'consumption': 'Consumption',
+      'gov_ref': 'Gov Ref',
+      'receipt': 'Receipt',
+      'meter_number': 'Meter Number',
+      'utility_type': 'Utility Type',
+      'provider_name': 'Provider Name',
+      'select_provider': 'Select Provider',
+      'enter_account_number': 'Enter account number',
+      'enter_meter_number': 'Enter meter number',
+      'active': 'Active',
+      'inactive': 'Inactive'
     }
   },
   ar: {

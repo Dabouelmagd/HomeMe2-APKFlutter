@@ -15,8 +15,10 @@ const API = `${BACKEND_URL}/api`;
 const CompoundManagement = () => {
   const { user } = useAuth();
   const [compound, setCompound] = useState(null);
+  const [residences, setResidences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     fetchCompound();

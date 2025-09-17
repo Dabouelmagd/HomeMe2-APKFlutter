@@ -589,7 +589,437 @@ class ChatTestSuite:
         
         return False
     
-    def test_edge_cases(self):
+    def create_test_image(self, filename: str = "test_image.jpg", size: tuple = (100, 100)) -> bytes:
+        """Create a test image file in memory"""
+        img = Image.new('RGB', size, color='red')
+        img_bytes = io.BytesIO()
+        img.save(img_bytes, format='JPEG')
+        img_bytes.seek(0)
+        return img_bytes.getvalue()
+    
+    def create_test_file(self, filename: str, content: str = "Test file content") -> bytes:
+        """Create a test file in memory"""
+        return content.encode('utf-8')
+    
+    def test_file_upload_with_message(self):
+        """Test POST /api/chats/{chat_id}/upload - Upload files with message"""
+        print("\n=== Testing File Upload with Message ===")
+        
+        if not self.test_chat_id:
+            self.log_result("File Upload with Message", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Test image upload
+            image_data = self.create_test_image("test_upload.jpg")
+            
+            files = {
+                'files': ('test_upload.jpg', image_data, 'image/jpeg')
+            }
+            data = {
+                'content': 'Here is a test image!',
+                'message_type': 'image'
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/upload",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                message = result.get("message")
+                if message and message.get("attachments"):
+                    attachment = message["attachments"][0]
+                    if attachment.get("file_type") == "image" and attachment.get("thumbnail_url"):
+                        self.log_result("File Upload with Message", True, f"Image uploaded successfully with thumbnail")
+                        return True
+                    else:
+                        self.log_result("File Upload with Message", False, "Image uploaded but missing thumbnail or wrong type")
+                        return False
+                else:
+                    self.log_result("File Upload with Message", False, "No message or attachments in response")
+                    return False
+            else:
+                self.log_result("File Upload with Message", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("File Upload with Message", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_multiple_file_upload(self):
+        """Test uploading multiple files in a single message"""
+        print("\n=== Testing Multiple File Upload ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Multiple File Upload", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Create multiple test files
+            image_data = self.create_test_image("multi_test1.jpg")
+            doc_data = self.create_test_file("multi_test.txt", "This is a test document")
+            
+            files = [
+                ('files', ('multi_test1.jpg', image_data, 'image/jpeg')),
+                ('files', ('multi_test.txt', doc_data, 'text/plain'))
+            ]
+            data = {
+                'content': 'Multiple files test!',
+                'message_type': 'mixed'
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/upload",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                message = result.get("message")
+                if message and len(message.get("attachments", [])) == 2:
+                    self.log_result("Multiple File Upload", True, f"Multiple files uploaded successfully ({len(message['attachments'])} files)")
+                    return True
+                else:
+                    self.log_result("Multiple File Upload", False, f"Expected 2 attachments, got {len(message.get('attachments', []))}")
+                    return False
+            else:
+                self.log_result("Multiple File Upload", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Multiple File Upload", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_file_size_limits(self):
+        """Test file size limit enforcement"""
+        print("\n=== Testing File Size Limits ===")
+        
+        if not self.test_chat_id:
+            self.log_result("File Size Limits", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Create a large image (should exceed 10MB limit)
+            # Create a 11MB image by making it very large
+            large_image_data = self.create_test_image("large_test.jpg", size=(5000, 5000))
+            
+            # If the image is still under 10MB, pad it
+            if len(large_image_data) < 11 * 1024 * 1024:
+                # Create padding to make it over 10MB
+                padding = b'0' * (11 * 1024 * 1024 - len(large_image_data))
+                large_image_data += padding
+            
+            files = {
+                'files': ('large_test.jpg', large_image_data, 'image/jpeg')
+            }
+            data = {
+                'content': 'This should fail due to size limit',
+                'message_type': 'image'
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/upload",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if response.status_code == 400:
+                self.log_result("File Size Limits", True, "Correctly rejected oversized file")
+                return True
+            else:
+                self.log_result("File Size Limits", False, f"Expected 400 for oversized file, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("File Size Limits", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_file_type_validation(self):
+        """Test file type validation"""
+        print("\n=== Testing File Type Validation ===")
+        
+        if not self.test_chat_id:
+            self.log_result("File Type Validation", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Try to upload an unsupported file type
+            invalid_file_data = b"This is not a valid file type"
+            
+            files = {
+                'files': ('test.xyz', invalid_file_data, 'application/xyz')
+            }
+            data = {
+                'content': 'This should fail due to invalid file type',
+                'message_type': 'document'
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/upload",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if response.status_code == 400:
+                self.log_result("File Type Validation", True, "Correctly rejected invalid file type")
+                return True
+            else:
+                self.log_result("File Type Validation", False, f"Expected 400 for invalid file type, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("File Type Validation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_file_serving(self):
+        """Test file serving endpoints"""
+        print("\n=== Testing File Serving ===")
+        
+        if not self.test_chat_id:
+            self.log_result("File Serving", False, "No test chat ID available")
+            return False
+        
+        try:
+            # First upload a file
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            image_data = self.create_test_image("serve_test.jpg")
+            
+            files = {
+                'files': ('serve_test.jpg', image_data, 'image/jpeg')
+            }
+            data = {
+                'content': 'File for serving test',
+                'message_type': 'image'
+            }
+            
+            upload_response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/upload",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if upload_response.status_code == 200:
+                message = upload_response.json().get("message")
+                if message and message.get("attachments"):
+                    attachment = message["attachments"][0]
+                    file_url = attachment.get("file_url")
+                    
+                    if file_url:
+                        # Test file access
+                        file_response = self.session.get(f"https://compound-hub.preview.emergentagent.com{file_url}")
+                        
+                        if file_response.status_code == 200:
+                            self.log_result("File Serving", True, "File served successfully")
+                            return True
+                        else:
+                            self.log_result("File Serving", False, f"File serving failed with status {file_response.status_code}")
+                            return False
+                    else:
+                        self.log_result("File Serving", False, "No file URL in attachment")
+                        return False
+                else:
+                    self.log_result("File Serving", False, "No attachments in upload response")
+                    return False
+            else:
+                self.log_result("File Serving", False, f"File upload failed: {upload_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("File Serving", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_message_reactions(self):
+        """Test POST /api/chats/{chat_id}/messages/{message_id}/react - Add/remove reactions"""
+        print("\n=== Testing Message Reactions ===")
+        
+        if not self.test_chat_id or not self.test_message_id:
+            self.log_result("Message Reactions", False, "No test chat ID or message ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Add a reaction
+            reaction_data = {
+                "emoji": "👍"
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/messages/{self.test_message_id}/react",
+                json=reaction_data,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("action") == "added":
+                    # Test removing the same reaction
+                    remove_response = self.session.post(
+                        f"{BASE_URL}/chats/{self.test_chat_id}/messages/{self.test_message_id}/react",
+                        json=reaction_data,
+                        headers=headers
+                    )
+                    
+                    if remove_response.status_code == 200:
+                        remove_result = remove_response.json()
+                        if remove_result.get("action") == "removed":
+                            self.log_result("Message Reactions", True, "Reaction added and removed successfully")
+                            return True
+                        else:
+                            self.log_result("Message Reactions", False, f"Expected 'removed' action, got {remove_result.get('action')}")
+                            return False
+                    else:
+                        self.log_result("Message Reactions", False, f"Failed to remove reaction: {remove_response.status_code}")
+                        return False
+                else:
+                    self.log_result("Message Reactions", False, f"Expected 'added' action, got {result.get('action')}")
+                    return False
+            else:
+                self.log_result("Message Reactions", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Message Reactions", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_multiple_user_reactions(self):
+        """Test reactions from multiple users"""
+        print("\n=== Testing Multiple User Reactions ===")
+        
+        if not self.test_chat_id or not self.test_message_id:
+            self.log_result("Multiple User Reactions", False, "No test chat ID or message ID available")
+            return False
+        
+        try:
+            # Admin adds reaction
+            admin_headers = self.setup_auth_headers(self.admin_token)
+            admin_reaction = {"emoji": "❤️"}
+            
+            admin_response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/messages/{self.test_message_id}/react",
+                json=admin_reaction,
+                headers=admin_headers
+            )
+            
+            # Resident adds different reaction
+            resident_headers = self.setup_auth_headers(self.resident_token)
+            resident_reaction = {"emoji": "😊"}
+            
+            resident_response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/messages/{self.test_message_id}/react",
+                json=resident_reaction,
+                headers=resident_headers
+            )
+            
+            if admin_response.status_code == 200 and resident_response.status_code == 200:
+                # Get message to check reactions
+                message_response = self.session.get(
+                    f"{BASE_URL}/chats/{self.test_chat_id}/messages?page=1&limit=50",
+                    headers=admin_headers
+                )
+                
+                if message_response.status_code == 200:
+                    messages = message_response.json().get("messages", [])
+                    target_message = next((m for m in messages if m["id"] == self.test_message_id), None)
+                    
+                    if target_message and target_message.get("reactions"):
+                        reactions = target_message["reactions"]
+                        if "❤️" in reactions and "😊" in reactions:
+                            self.log_result("Multiple User Reactions", True, "Multiple users can add different reactions")
+                            return True
+                        else:
+                            self.log_result("Multiple User Reactions", False, f"Expected both reactions, got: {list(reactions.keys())}")
+                            return False
+                    else:
+                        self.log_result("Multiple User Reactions", False, "No reactions found in message")
+                        return False
+                else:
+                    self.log_result("Multiple User Reactions", False, f"Failed to get messages: {message_response.status_code}")
+                    return False
+            else:
+                self.log_result("Multiple User Reactions", False, f"Failed to add reactions: admin={admin_response.status_code}, resident={resident_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Multiple User Reactions", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_attachment_metadata(self):
+        """Test attachment metadata is correctly stored and retrieved"""
+        print("\n=== Testing Attachment Metadata ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Attachment Metadata", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Upload an image to test metadata
+            image_data = self.create_test_image("metadata_test.jpg", size=(200, 150))
+            
+            files = {
+                'files': ('metadata_test.jpg', image_data, 'image/jpeg')
+            }
+            data = {
+                'content': 'Testing attachment metadata',
+                'message_type': 'image'
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/upload",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                message = response.json().get("message")
+                if message and message.get("attachments"):
+                    attachment = message["attachments"][0]
+                    
+                    # Check required metadata fields
+                    required_fields = ["id", "filename", "original_filename", "file_type", "file_size", "mime_type", "file_url"]
+                    missing_fields = [field for field in required_fields if field not in attachment]
+                    
+                    if not missing_fields:
+                        # Check image-specific metadata
+                        if attachment.get("width") == 200 and attachment.get("height") == 150:
+                            self.log_result("Attachment Metadata", True, "All attachment metadata fields present and correct")
+                            return True
+                        else:
+                            self.log_result("Attachment Metadata", False, f"Image dimensions incorrect: {attachment.get('width')}x{attachment.get('height')}")
+                            return False
+                    else:
+                        self.log_result("Attachment Metadata", False, f"Missing metadata fields: {missing_fields}")
+                        return False
+                else:
+                    self.log_result("Attachment Metadata", False, "No attachments in response")
+                    return False
+            else:
+                self.log_result("Attachment Metadata", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Attachment Metadata", False, f"Exception occurred: {str(e)}")
+            return False
         """Test various edge cases"""
         print("\n=== Testing Edge Cases ===")
         

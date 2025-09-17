@@ -431,7 +431,45 @@ const resources = {
       'enter_account_number': 'أدخل رقم الحساب',
       'enter_meter_number': 'أدخل رقم العداد',
       'active': 'نشط',
-      'inactive': 'غير نشط'
+      'inactive': 'غير نشط',
+      
+      // Chat
+      'chat': {
+        'chats': 'المحادثات',
+        'newChat': 'محادثة جديدة',
+        'searchChats': 'البحث في المحادثات...',
+        'noChatsFound': 'لم يتم العثور على محادثات',
+        'noChatsYet': 'لا توجد محادثات بعد',
+        'startFirstChat': 'ابدأ محادثتك الأولى',
+        'directChat': 'محادثة مباشرة',
+        'groupChat': 'محادثة جماعية',
+        'compoundChat': 'محادثة المجمع',
+        'directChatDescription': 'محادثة فردية',
+        'groupChatDescription': 'محادثة مع عدة أشخاص',
+        'compoundChatDescription': 'محادثة إعلانات لجميع المقيمين',
+        'compoundChatInfo': 'هذا سينشئ محادثة على مستوى المجمع لجميع المقيمين',
+        'participants': 'مشاركين',
+        'you': 'أنت',
+        'yesterday': 'أمس',
+        'today': 'اليوم',
+        'selectChatToStart': 'اختر محادثة لبدء المراسلة',
+        'typeMessage': 'اكتب رسالة...',
+        'loadMore': 'تحميل المزيد من الرسائل',
+        'edited': 'معدلة',
+        'groupName': 'اسم المجموعة',
+        'groupDescription': 'وصف المجموعة',
+        'enterGroupName': 'أدخل اسم المجموعة',
+        'enterGroupDescription': 'أدخل وصف المجموعة (اختياري)',
+        'searchUsers': 'البحث عن المستخدمين...',
+        'noUsersFound': 'لم يتم العثور على مستخدمين',
+        'noUsersAvailable': 'لا يوجد مستخدمون متاحون',
+        'createChat': 'إنشاء محادثة'
+      },
+      
+      'common': {
+        'cancel': 'إلغاء',
+        'creating': 'إنشاء...'
+      }
     }
   },
   fr: {

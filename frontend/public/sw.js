@@ -276,7 +276,7 @@ self.addEventListener('notificationclick', event => {
   }
   
   event.waitUntil(
-    clients.matchAll({
+    self.clients.matchAll({
       type: 'window',
       includeUncontrolled: true
     }).then(clientList => {
@@ -292,8 +292,8 @@ self.addEventListener('notificationclick', event => {
       }
       
       // If no existing window, open new one
-      if (clients.openWindow) {
-        return clients.openWindow(urlToOpen);
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(urlToOpen);
       }
     })
   );

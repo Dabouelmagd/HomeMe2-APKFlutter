@@ -1020,6 +1020,66 @@ class ChatTestSuite:
         except Exception as e:
             self.log_result("Attachment Metadata", False, f"Exception occurred: {str(e)}")
             return False
+    
+    def test_edge_cases(self):
+        """Test various edge cases"""
+        print("\n=== Testing Edge Cases ===")
+        
+        success_count = 0
+        total_tests = 0
+        
+        # Test invalid chat ID
+        try:
+            total_tests += 1
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/chats/invalid-chat-id", headers=headers)
+            
+            if response.status_code == 404:
+                self.log_result("Invalid Chat ID", True, "Correctly returned 404 for invalid chat ID")
+                success_count += 1
+            else:
+                self.log_result("Invalid Chat ID", False, f"Expected 404, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Invalid Chat ID", False, f"Exception occurred: {str(e)}")
+        
+        # Test invalid message ID
+        try:
+            total_tests += 1
+            if self.test_chat_id:
+                headers = self.setup_auth_headers(self.admin_token)
+                response = self.session.put(f"{BASE_URL}/chats/{self.test_chat_id}/messages/invalid-message-id", 
+                                          json={"content": "test"}, headers=headers)
+                
+                if response.status_code == 404:
+                    self.log_result("Invalid Message ID", True, "Correctly returned 404 for invalid message ID")
+                    success_count += 1
+                else:
+                    self.log_result("Invalid Message ID", False, f"Expected 404, got {response.status_code}")
+            else:
+                self.log_result("Invalid Message ID", False, "No test chat ID available")
+        except Exception as e:
+            self.log_result("Invalid Message ID", False, f"Exception occurred: {str(e)}")
+        
+        # Test creating direct chat with more than 2 participants
+        try:
+            total_tests += 1
+            headers = self.setup_auth_headers(self.admin_token)
+            chat_data = {
+                "chat_type": "direct",
+                "participant_ids": [self.resident_user["id"], "fake-user-id"]
+            }
+            
+            response = self.session.post(f"{BASE_URL}/chats", json=chat_data, headers=headers)
+            
+            if response.status_code == 400:
+                self.log_result("Direct Chat Validation", True, "Correctly rejected direct chat with invalid participants")
+                success_count += 1
+            else:
+                self.log_result("Direct Chat Validation", False, f"Expected 400, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Direct Chat Validation", False, f"Exception occurred: {str(e)}")
+        
+        return success_count == total_tests
         """Test various edge cases"""
         print("\n=== Testing Edge Cases ===")
         

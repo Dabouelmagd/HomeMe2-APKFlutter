@@ -8,7 +8,7 @@ const LanguageSwitcher = ({ className = "" }) => {
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+    { code: 'ar', name: 'العربية', flag: '🇪🇬' },
     { code: 'fr', name: 'Français', flag: '🇫🇷' }
   ];
 

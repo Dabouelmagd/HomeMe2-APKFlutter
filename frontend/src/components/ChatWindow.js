@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import VoiceRecorder from './VoiceRecorder';
 import VoiceMessagePlayer from './VoiceMessagePlayer';
+import MessageSearch from './MessageSearch';
 import {
   PaperAirplaneIcon,
   FaceSmileIcon,
@@ -18,7 +19,8 @@ import {
   PlayIcon,
   PauseIcon,
   ArrowDownTrayIcon,
-  MicrophoneIcon
+  MicrophoneIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import { CheckIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 

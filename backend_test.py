@@ -1396,9 +1396,9 @@ class ChatTestSuite:
             return False
     
     def run_all_tests(self):
-        """Run all chat system tests"""
-        print("🚀 Starting Chat Backend Test Suite")
-        print("=" * 50)
+        """Run all chat system and push notification tests"""
+        print("🚀 Starting Chat Backend & Push Notification Test Suite")
+        print("=" * 60)
         
         # Authentication setup
         if not self.test_authentication():

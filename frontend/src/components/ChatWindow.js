@@ -566,8 +566,19 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
 
       {/* Message Input */}
       <div className="px-6 py-4 border-t border-gray-200 bg-white">
+        {/* Voice Recorder */}
+        {showVoiceRecorder && (
+          <div className="mb-4">
+            <VoiceRecorder
+              onSend={sendVoiceMessage}
+              onCancel={() => setShowVoiceRecorder(false)}
+              disabled={uploading}
+            />
+          </div>
+        )}
+
         {/* Selected Files Preview */}
-        {selectedFiles.length > 0 && (
+        {selectedFiles.length > 0 && !showVoiceRecorder && (
           <div className="mb-4 p-3 bg-gray-50 rounded-lg">
             <h4 className="text-sm font-medium text-gray-700 mb-2">
               {t('chat.selectedFiles')} ({selectedFiles.length})
@@ -604,7 +615,7 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
         )}
 
         {/* Emoji Picker */}
-        {showEmojiPicker && (
+        {showEmojiPicker && !showVoiceRecorder && (
           <div className="mb-4 p-3 bg-gray-50 rounded-lg">
             <div className="grid grid-cols-8 gap-2">
               {[...commonEmojis, '🤔', '🙄', '😴', '🤗', '🤣', '😅', '😇', '🥰', '😘', '🤩', '😊', '☺️', '😌', '😉', '🤤', '😋'].map(emoji => (
@@ -623,63 +634,73 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
           </div>
         )}
 
-        <form onSubmit={sendMessage} className="flex items-end space-x-3">
-          <div className="flex-1">
-            <div className="relative">
-              <textarea
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder={t('chat.typeMessage')}
-                className="w-full px-4 py-3 pr-24 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                rows="1"
-                style={{ minHeight: '44px', maxHeight: '120px' }}
-                disabled={sending || uploading}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage(e);
-                  }
-                }}
-              />
-              <div className="absolute right-3 bottom-3 flex items-center space-x-2">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileSelect}
-                  multiple
-                  accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
-                  className="hidden"
+        {!showVoiceRecorder && (
+          <form onSubmit={sendMessage} className="flex items-end space-x-3">
+            <div className="flex-1">
+              <div className="relative">
+                <textarea
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder={t('chat.typeMessage')}
+                  className="w-full px-4 py-3 pr-32 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  rows="1"
+                  style={{ minHeight: '44px', maxHeight: '120px' }}
+                  disabled={sending || uploading}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage(e);
+                    }
+                  }}
                 />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                  disabled={uploading}
-                >
-                  <PaperClipIcon className="h-5 w-5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <FaceSmileIcon className="h-5 w-5" />
-                </button>
+                <div className="absolute right-3 bottom-3 flex items-center space-x-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    multiple
+                    accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt"
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    disabled={uploading}
+                  >
+                    <PaperClipIcon className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowVoiceRecorder(true)}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                    disabled={uploading}
+                  >
+                    <MicrophoneIcon className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <FaceSmileIcon className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-          <button
-            type="submit"
-            disabled={(!newMessage.trim() && selectedFiles.length === 0) || sending || uploading}
-            className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {sending || uploading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-            ) : (
-              <PaperAirplaneIcon className="h-5 w-5" />
-            )}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={(!newMessage.trim() && selectedFiles.length === 0) || sending || uploading}
+              className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {sending || uploading ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              ) : (
+                <PaperAirplaneIcon className="h-5 w-5" />
+              )}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );

@@ -197,7 +197,45 @@ const resources = {
       'enter_account_number': 'Enter account number',
       'enter_meter_number': 'Enter meter number',
       'active': 'Active',
-      'inactive': 'Inactive'
+      'inactive': 'Inactive',
+      
+      // Chat
+      'chat': {
+        'chats': 'Chats',
+        'newChat': 'New Chat',
+        'searchChats': 'Search chats...',
+        'noChatsFound': 'No chats found',
+        'noChatsYet': 'No chats yet',
+        'startFirstChat': 'Start your first chat',
+        'directChat': 'Direct Chat',
+        'groupChat': 'Group Chat',
+        'compoundChat': 'Compound Chat',
+        'directChatDescription': 'One-on-one conversation',
+        'groupChatDescription': 'Chat with multiple people',
+        'compoundChatDescription': 'Announcement chat for all residents',
+        'compoundChatInfo': 'This will create a compound-wide chat for all residents',
+        'participants': 'participants',
+        'you': 'You',
+        'yesterday': 'Yesterday',
+        'today': 'Today',
+        'selectChatToStart': 'Select a chat to start messaging',
+        'typeMessage': 'Type a message...',
+        'loadMore': 'Load more messages',
+        'edited': 'edited',
+        'groupName': 'Group Name',
+        'groupDescription': 'Group Description',
+        'enterGroupName': 'Enter group name',
+        'enterGroupDescription': 'Enter group description (optional)',
+        'searchUsers': 'Search users...',
+        'noUsersFound': 'No users found',
+        'noUsersAvailable': 'No users available',
+        'createChat': 'Create Chat'
+      },
+      
+      'common': {
+        'cancel': 'Cancel',
+        'creating': 'Creating...'
+      }
     }
   },
   ar: {

@@ -579,6 +579,70 @@ def generate_unique_filename(original_filename: str) -> str:
     unique_id = str(uuid.uuid4())
     return f"{unique_id}{ext}"
 
+def generate_waveform_data(audio_file_path: str, samples: int = 100) -> List[float]:
+    """Generate waveform data from audio file"""
+    try:
+        # Try to read as WAV file first
+        with wave.open(audio_file_path, 'rb') as wav_file:
+            frames = wav_file.readframes(-1)
+            sound_info = np.frombuffer(frames, dtype=np.int16)
+            
+            # Normalize to 0-1 range
+            if len(sound_info) > 0:
+                sound_info = np.abs(sound_info)
+                max_val = np.max(sound_info) if np.max(sound_info) > 0 else 1
+                sound_info = sound_info / max_val
+                
+                # Downsample to desired number of samples
+                chunk_size = len(sound_info) // samples
+                if chunk_size > 0:
+                    waveform = []
+                    for i in range(0, len(sound_info), chunk_size)[:samples]:
+                        chunk = sound_info[i:i + chunk_size]
+                        waveform.append(float(np.mean(chunk)))
+                    return waveform
+            
+        return [0.0] * samples
+        
+    except Exception as e:
+        logging.warning(f"Could not generate waveform for {audio_file_path}: {e}")
+        # Return a simple placeholder waveform
+        return [0.1, 0.3, 0.5, 0.7, 0.5, 0.3, 0.1] * (samples // 7)
+
+def get_audio_duration(audio_file_path: str) -> float:
+    """Get duration of audio file in seconds"""
+    try:
+        with wave.open(audio_file_path, 'rb') as wav_file:
+            frames = wav_file.getnframes()
+            sample_rate = wav_file.getframerate()
+            duration = frames / float(sample_rate)
+            return duration
+    except Exception as e:
+        logging.warning(f"Could not get duration for {audio_file_path}: {e}")
+        return 0.0
+
+async def process_voice_message(file_path: Path, original_filename: str) -> Dict[str, Any]:
+    """Process voice message and extract metadata"""
+    try:
+        # Get duration
+        duration = get_audio_duration(str(file_path))
+        
+        # Generate waveform data
+        waveform = generate_waveform_data(str(file_path))
+        
+        return {
+            "duration": duration,
+            "waveform": waveform,
+            "is_voice_message": True
+        }
+    except Exception as e:
+        logging.error(f"Error processing voice message {original_filename}: {e}")
+        return {
+            "duration": 0.0,
+            "waveform": [0.1] * 50,
+            "is_voice_message": True
+        }
+
 async def save_uploaded_file(file: UploadFile, file_type: str) -> Dict[str, Any]:
     """Save uploaded file and return metadata"""
     if not is_allowed_file(file.filename):

@@ -3808,6 +3808,242 @@ async def delete_saved_search(
         logging.error(f"Error deleting saved search: {e}")
         raise HTTPException(status_code=500, detail="Failed to delete saved search")
 
+# ============ FILE GALLERY ENDPOINTS ============
+
+@api_router.post("/gallery/files")
+async def get_gallery_files(
+    gallery_filter: FileGalleryFilter,
+    current_user: User = Depends(get_current_user)
+):
+    """Get files for gallery view with filters"""
+    try:
+        results = await get_file_gallery(
+            current_user.id,
+            current_user.compound_id,
+            gallery_filter
+        )
+        
+        return {
+            "success": True,
+            "results": results
+        }
+        
+    except Exception as e:
+        logging.error(f"Error in gallery files endpoint: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get gallery files")
+
+@api_router.get("/gallery/stats")
+async def get_gallery_stats(current_user: User = Depends(get_current_user)):
+    """Get file gallery statistics"""
+    try:
+        # Get user's accessible chats
+        user_chats = await db.chats.find({
+            "compound_id": current_user.compound_id,
+            "participants": current_user.id,
+            "is_active": True
+        }).to_list(None)
+        
+        user_chat_ids = [chat["id"] for chat in user_chats]
+        stats = await get_file_stats(user_chat_ids)
+        
+        return {"stats": stats}
+        
+    except Exception as e:
+        logging.error(f"Error getting gallery stats: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get gallery statistics")
+
+# ============ MESSAGE SCHEDULING ENDPOINTS ============
+
+@api_router.post("/chats/{chat_id}/schedule")
+async def schedule_message(
+    chat_id: str,
+    schedule_data: ScheduledMessageCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Schedule a message to be sent later"""
+    # Verify user is participant
+    chat = await db.chats.find_one({
+        "id": chat_id,
+        "compound_id": current_user.compound_id,
+        "participants": current_user.id,
+        "is_active": True
+    })
+    
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # Validate scheduled time is in the future
+    if schedule_data.scheduled_for <= datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Scheduled time must be in the future")
+    
+    try:
+        # Create scheduled message
+        scheduled_message = ScheduledMessage(
+            chat_id=chat_id,
+            sender_id=current_user.id,
+            content=schedule_data.content,
+            message_type=schedule_data.message_type,
+            scheduled_for=schedule_data.scheduled_for,
+            timezone=schedule_data.timezone,
+            is_recurring=schedule_data.is_recurring,
+            recurrence_pattern=schedule_data.recurrence_pattern,
+            recurrence_end=schedule_data.recurrence_end
+        )
+        
+        await db.scheduled_messages.insert_one(scheduled_message.dict())
+        
+        return {"message": "Message scheduled successfully", "scheduled_message": scheduled_message}
+        
+    except Exception as e:
+        logging.error(f"Error scheduling message: {e}")
+        raise HTTPException(status_code=500, detail="Failed to schedule message")
+
+@api_router.get("/scheduled-messages")
+async def get_scheduled_messages(
+    chat_id: Optional[str] = None,
+    status: Optional[str] = None,
+    limit: int = 50,
+    skip: int = 0,
+    current_user: User = Depends(get_current_user)
+):
+    """Get user's scheduled messages"""
+    try:
+        # Build query
+        query = {"sender_id": current_user.id}
+        
+        if chat_id:
+            # Verify user has access to this chat
+            chat = await db.chats.find_one({
+                "id": chat_id,
+                "compound_id": current_user.compound_id,
+                "participants": current_user.id,
+                "is_active": True
+            })
+            if not chat:
+                raise HTTPException(status_code=404, detail="Chat not found")
+            query["chat_id"] = chat_id
+        else:
+            # Get all user's accessible chats
+            user_chats = await db.chats.find({
+                "compound_id": current_user.compound_id,
+                "participants": current_user.id,
+                "is_active": True
+            }).to_list(None)
+            user_chat_ids = [chat["id"] for chat in user_chats]
+            query["chat_id"] = {"$in": user_chat_ids}
+        
+        if status:
+            query["status"] = status
+        
+        # Get scheduled messages
+        scheduled_messages = await db.scheduled_messages.find(query).sort("scheduled_for", 1).skip(skip).limit(limit).to_list(None)
+        
+        # Get total count
+        total_count = await db.scheduled_messages.count_documents(query)
+        
+        # Get chat details
+        chat_ids = list(set(msg["chat_id"] for msg in scheduled_messages))
+        chats = await db.chats.find(
+            {"id": {"$in": chat_ids}},
+            {"id": 1, "name": 1, "chat_type": 1}
+        ).to_list(None)
+        chats_dict = {chat["id"]: chat for chat in chats}
+        
+        # Enhance messages with chat info
+        for msg in scheduled_messages:
+            msg["chat"] = chats_dict.get(msg["chat_id"])
+        
+        return {
+            "scheduled_messages": scheduled_messages,
+            "total_count": total_count,
+            "has_more": total_count > (skip + len(scheduled_messages))
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting scheduled messages: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get scheduled messages")
+
+@api_router.put("/scheduled-messages/{message_id}")
+async def update_scheduled_message(
+    message_id: str,
+    update_data: ScheduledMessageUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a scheduled message"""
+    try:
+        # Find scheduled message
+        scheduled_message = await db.scheduled_messages.find_one({
+            "id": message_id,
+            "sender_id": current_user.id,
+            "status": "pending"
+        })
+        
+        if not scheduled_message:
+            raise HTTPException(status_code=404, detail="Scheduled message not found or cannot be modified")
+        
+        # Validate scheduled time if provided
+        if update_data.scheduled_for and update_data.scheduled_for <= datetime.utcnow():
+            raise HTTPException(status_code=400, detail="Scheduled time must be in the future")
+        
+        # Build update data
+        update_fields = update_data.dict(exclude_unset=True)
+        if update_fields:
+            await db.scheduled_messages.update_one(
+                {"id": message_id, "sender_id": current_user.id},
+                {"$set": update_fields}
+            )
+        
+        return {"message": "Scheduled message updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating scheduled message: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update scheduled message")
+
+@api_router.delete("/scheduled-messages/{message_id}")
+async def cancel_scheduled_message(
+    message_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Cancel a scheduled message"""
+    try:
+        result = await db.scheduled_messages.update_one(
+            {
+                "id": message_id,
+                "sender_id": current_user.id,
+                "status": "pending"
+            },
+            {"$set": {"status": "cancelled"}}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Scheduled message not found or cannot be cancelled")
+        
+        return {"message": "Scheduled message cancelled successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error cancelling scheduled message: {e}")
+        raise HTTPException(status_code=500, detail="Failed to cancel scheduled message")
+
+@api_router.post("/scheduled-messages/process")
+async def process_scheduled_messages_endpoint(current_user: User = Depends(get_current_user)):
+    """Manually trigger processing of scheduled messages (admin only)"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can trigger message processing")
+    
+    try:
+        processed_count = await process_scheduled_messages()
+        return {"message": f"Processed {processed_count} scheduled messages"}
+        
+    except Exception as e:
+        logging.error(f"Error processing scheduled messages: {e}")
+        raise HTTPException(status_code=500, detail="Failed to process scheduled messages")
+
 # WebSocket endpoint for real-time chat
 @app.websocket("/ws/chat/{user_id}")
 async def websocket_chat_endpoint(websocket: WebSocket, user_id: str):

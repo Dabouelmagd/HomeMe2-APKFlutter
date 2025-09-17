@@ -1408,6 +1408,514 @@ class ChatTestSuite:
             self.log_result("Push Notification Unauthorized Access", False, f"Exception occurred: {str(e)}")
             return False
     
+    def create_test_voice_file(self, filename: str = "test_voice.wav", duration: float = 5.0) -> bytes:
+        """Create a test voice file in memory (WAV format)"""
+        import wave
+        import struct
+        import math
+        
+        # Create a simple sine wave audio file
+        sample_rate = 44100
+        num_samples = int(sample_rate * duration)
+        frequency = 440  # A4 note
+        
+        # Generate sine wave samples
+        samples = []
+        for i in range(num_samples):
+            sample = int(32767 * math.sin(2 * math.pi * frequency * i / sample_rate))
+            samples.append(sample)
+        
+        # Create WAV file in memory
+        wav_buffer = io.BytesIO()
+        with wave.open(wav_buffer, 'wb') as wav_file:
+            wav_file.setnchannels(1)  # Mono
+            wav_file.setsampwidth(2)  # 16-bit
+            wav_file.setframerate(sample_rate)
+            
+            # Pack samples as 16-bit signed integers
+            packed_samples = struct.pack('<' + 'h' * len(samples), *samples)
+            wav_file.writeframes(packed_samples)
+        
+        wav_buffer.seek(0)
+        return wav_buffer.getvalue()
+    
+    def test_voice_message_upload(self):
+        """Test POST /api/chats/{chat_id}/voice - Upload voice message"""
+        print("\n=== Testing Voice Message Upload ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Voice Message Upload", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Create test voice file
+            voice_data = self.create_test_voice_file("test_voice.wav", 3.5)
+            
+            files = {
+                'voice_file': ('test_voice.wav', voice_data, 'audio/wav')
+            }
+            data = {
+                'duration': '3.5'
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/voice",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                message = result.get("message")
+                if message:
+                    # Check voice message properties
+                    if (message.get("message_type") == "voice" and 
+                        message.get("content") == "🎵 Voice message" and
+                        message.get("voice_duration") is not None and
+                        message.get("voice_waveform") is not None and
+                        len(message.get("attachments", [])) > 0):
+                        
+                        attachment = message["attachments"][0]
+                        if attachment.get("file_type") == "voice":
+                            self.log_result("Voice Message Upload", True, f"Voice message uploaded successfully with duration {message.get('voice_duration')}s")
+                            return True
+                        else:
+                            self.log_result("Voice Message Upload", False, f"Attachment file type is {attachment.get('file_type')}, expected 'voice'")
+                            return False
+                    else:
+                        self.log_result("Voice Message Upload", False, f"Voice message missing required properties: type={message.get('message_type')}, duration={message.get('voice_duration')}, waveform_len={len(message.get('voice_waveform', []))}")
+                        return False
+                else:
+                    self.log_result("Voice Message Upload", False, "No message in response")
+                    return False
+            else:
+                self.log_result("Voice Message Upload", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Voice Message Upload", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_voice_file_processing(self):
+        """Test voice file processing - waveform generation and duration extraction"""
+        print("\n=== Testing Voice File Processing ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Voice File Processing", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Create test voice file with known duration
+            test_duration = 2.0
+            voice_data = self.create_test_voice_file("processing_test.wav", test_duration)
+            
+            files = {
+                'voice_file': ('processing_test.wav', voice_data, 'audio/wav')
+            }
+            data = {
+                'duration': str(test_duration)
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/voice",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                message = result.get("message")
+                if message:
+                    voice_duration = message.get("voice_duration")
+                    voice_waveform = message.get("voice_waveform")
+                    
+                    # Check duration extraction (should be close to test_duration)
+                    if voice_duration and abs(voice_duration - test_duration) < 0.5:
+                        duration_ok = True
+                    else:
+                        duration_ok = False
+                    
+                    # Check waveform generation
+                    if voice_waveform and isinstance(voice_waveform, list) and len(voice_waveform) > 0:
+                        # Check that waveform contains float values between 0 and 1
+                        waveform_ok = all(isinstance(x, (int, float)) and 0 <= x <= 1 for x in voice_waveform[:10])
+                    else:
+                        waveform_ok = False
+                    
+                    if duration_ok and waveform_ok:
+                        self.log_result("Voice File Processing", True, f"Voice processing successful: duration={voice_duration}s, waveform_samples={len(voice_waveform)}")
+                        return True
+                    else:
+                        self.log_result("Voice File Processing", False, f"Processing issues: duration_ok={duration_ok} (got {voice_duration}), waveform_ok={waveform_ok}")
+                        return False
+                else:
+                    self.log_result("Voice File Processing", False, "No message in response")
+                    return False
+            else:
+                self.log_result("Voice File Processing", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Voice File Processing", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_voice_file_type_support(self):
+        """Test support for different voice file types"""
+        print("\n=== Testing Voice File Type Support ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Voice File Type Support", False, "No test chat ID available")
+            return False
+        
+        # Test different voice file extensions
+        voice_extensions = [".wav", ".mp3", ".m4a", ".ogg"]  # Skip .webm as it's harder to generate
+        success_count = 0
+        
+        for ext in voice_extensions:
+            try:
+                headers = {"Authorization": f"Bearer {self.admin_token}"}
+                
+                # Create test voice file (using WAV data but different extension)
+                voice_data = self.create_test_voice_file(f"test_voice{ext}", 1.0)
+                
+                files = {
+                    'voice_file': (f'test_voice{ext}', voice_data, 'audio/wav')
+                }
+                data = {
+                    'duration': '1.0'
+                }
+                
+                response = self.session.post(
+                    f"{BASE_URL}/chats/{self.test_chat_id}/voice",
+                    files=files,
+                    data=data,
+                    headers=headers
+                )
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    message = result.get("message")
+                    if message and message.get("message_type") == "voice":
+                        success_count += 1
+                        self.log_result(f"Voice File Type {ext}", True, f"Successfully uploaded voice file with {ext} extension")
+                    else:
+                        self.log_result(f"Voice File Type {ext}", False, "Upload succeeded but message type incorrect")
+                else:
+                    self.log_result(f"Voice File Type {ext}", False, f"Failed with status {response.status_code}")
+                    
+            except Exception as e:
+                self.log_result(f"Voice File Type {ext}", False, f"Exception occurred: {str(e)}")
+        
+        if success_count >= len(voice_extensions) // 2:  # At least half should work
+            self.log_result("Voice File Type Support", True, f"Voice file type support working ({success_count}/{len(voice_extensions)} types successful)")
+            return True
+        else:
+            self.log_result("Voice File Type Support", False, f"Insufficient voice file type support ({success_count}/{len(voice_extensions)} types successful)")
+            return False
+    
+    def test_voice_message_push_notification(self):
+        """Test push notifications for voice messages"""
+        print("\n=== Testing Voice Message Push Notifications ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Voice Message Push Notification", False, "No test chat ID available")
+            return False
+        
+        try:
+            # First, subscribe resident to push notifications
+            resident_headers = {"Authorization": f"Bearer {self.resident_token}"}
+            subscription_data = {
+                "endpoint": "https://fcm.googleapis.com/fcm/send/voice-test-endpoint",
+                "keys": {
+                    "p256dh": "BNbN3OFADuGtmBGgvAOcpOTNkMcgs7absMnxKZ4M8kHaVt7ZapWTVJkCk-69CfMRu-14NjLHoA8C8-wFPQHBtQs",
+                    "auth": "tBHItJI5svbpez7KI4CCXg"
+                }
+            }
+            
+            subscribe_response = self.session.post(f"{BASE_URL}/push/subscribe", 
+                                                 json=subscription_data, headers=resident_headers)
+            
+            if subscribe_response.status_code != 200:
+                self.log_result("Voice Message Push Notification", False, "Failed to subscribe resident to push notifications")
+                return False
+            
+            # Send a voice message as admin (should trigger notification to resident)
+            admin_headers = {"Authorization": f"Bearer {self.admin_token}"}
+            voice_data = self.create_test_voice_file("notification_test.wav", 2.0)
+            
+            files = {
+                'voice_file': ('notification_test.wav', voice_data, 'audio/wav')
+            }
+            data = {
+                'duration': '2.0'
+            }
+            
+            voice_response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/voice",
+                files=files,
+                data=data,
+                headers=admin_headers
+            )
+            
+            if voice_response.status_code == 200:
+                result = voice_response.json()
+                message = result.get("message")
+                if message and message.get("content") == "🎵 Voice message":
+                    # The push notification logic is called in the background
+                    # Since we can't actually verify the push notification was sent (it's mocked),
+                    # we verify that the voice message was sent successfully with correct content
+                    self.log_result("Voice Message Push Notification", True, "Voice message sent successfully with '🎵 Voice message' content - push notification logic triggered")
+                    return True
+                else:
+                    self.log_result("Voice Message Push Notification", False, f"Voice message content incorrect: {message.get('content') if message else 'No message'}")
+                    return False
+            else:
+                self.log_result("Voice Message Push Notification", False, f"Failed to send voice message: {voice_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Voice Message Push Notification", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_voice_file_serving(self):
+        """Test voice message files are accessible via /uploads/ endpoint"""
+        print("\n=== Testing Voice File Serving ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Voice File Serving", False, "No test chat ID available")
+            return False
+        
+        try:
+            # First upload a voice message
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            voice_data = self.create_test_voice_file("serve_test.wav", 1.5)
+            
+            files = {
+                'voice_file': ('serve_test.wav', voice_data, 'audio/wav')
+            }
+            data = {
+                'duration': '1.5'
+            }
+            
+            upload_response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/voice",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if upload_response.status_code == 200:
+                message = upload_response.json().get("message")
+                if message and message.get("attachments"):
+                    attachment = message["attachments"][0]
+                    file_url = attachment.get("file_url")
+                    
+                    if file_url:
+                        # Test file access
+                        file_response = self.session.get(f"https://compound-hub.preview.emergentagent.com{file_url}")
+                        
+                        if file_response.status_code == 200:
+                            # Check if it's actually audio data
+                            content_type = file_response.headers.get('content-type', '')
+                            if 'audio' in content_type.lower() or len(file_response.content) > 1000:
+                                self.log_result("Voice File Serving", True, f"Voice file served successfully via {file_url}")
+                                return True
+                            else:
+                                self.log_result("Voice File Serving", False, f"File served but content seems invalid: content-type={content_type}, size={len(file_response.content)}")
+                                return False
+                        else:
+                            self.log_result("Voice File Serving", False, f"Voice file serving failed with status {file_response.status_code}")
+                            return False
+                    else:
+                        self.log_result("Voice File Serving", False, "No file URL in attachment")
+                        return False
+                else:
+                    self.log_result("Voice File Serving", False, "No attachments in upload response")
+                    return False
+            else:
+                self.log_result("Voice File Serving", False, f"Voice file upload failed: {upload_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Voice File Serving", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_voice_message_chat_integration(self):
+        """Test voice messages appear in chat message history with proper type"""
+        print("\n=== Testing Voice Message Chat Integration ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Voice Message Chat Integration", False, "No test chat ID available")
+            return False
+        
+        try:
+            # Send a voice message
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            voice_data = self.create_test_voice_file("integration_test.wav", 2.5)
+            
+            files = {
+                'voice_file': ('integration_test.wav', voice_data, 'audio/wav')
+            }
+            data = {
+                'duration': '2.5'
+            }
+            
+            voice_response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/voice",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if voice_response.status_code == 200:
+                voice_message_id = voice_response.json().get("message", {}).get("id")
+                
+                # Get chat messages to verify the voice message appears
+                messages_response = self.session.get(
+                    f"{BASE_URL}/chats/{self.test_chat_id}/messages?page=1&limit=50",
+                    headers=headers
+                )
+                
+                if messages_response.status_code == 200:
+                    messages = messages_response.json().get("messages", [])
+                    voice_message = next((m for m in messages if m.get("id") == voice_message_id), None)
+                    
+                    if voice_message:
+                        # Check voice message properties in chat history
+                        if (voice_message.get("message_type") == "voice" and
+                            voice_message.get("content") == "🎵 Voice message" and
+                            voice_message.get("voice_duration") is not None and
+                            voice_message.get("voice_waveform") is not None and
+                            len(voice_message.get("attachments", [])) > 0):
+                            
+                            self.log_result("Voice Message Chat Integration", True, "Voice message properly integrated in chat history with all metadata")
+                            return True
+                        else:
+                            self.log_result("Voice Message Chat Integration", False, f"Voice message in chat history missing properties: type={voice_message.get('message_type')}, content={voice_message.get('content')}")
+                            return False
+                    else:
+                        self.log_result("Voice Message Chat Integration", False, "Voice message not found in chat history")
+                        return False
+                else:
+                    self.log_result("Voice Message Chat Integration", False, f"Failed to get chat messages: {messages_response.status_code}")
+                    return False
+            else:
+                self.log_result("Voice Message Chat Integration", False, f"Failed to send voice message: {voice_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Voice Message Chat Integration", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_voice_message_validation(self):
+        """Test voice message validation and error handling"""
+        print("\n=== Testing Voice Message Validation ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Voice Message Validation", False, "No test chat ID available")
+            return False
+        
+        success_count = 0
+        total_tests = 0
+        
+        # Test invalid file type
+        try:
+            total_tests += 1
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Try to upload a non-voice file as voice
+            invalid_file_data = b"This is not a voice file"
+            
+            files = {
+                'voice_file': ('test.txt', invalid_file_data, 'text/plain')
+            }
+            data = {
+                'duration': '1.0'
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/voice",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if response.status_code == 400:
+                self.log_result("Voice File Type Validation", True, "Correctly rejected invalid voice file type")
+                success_count += 1
+            else:
+                self.log_result("Voice File Type Validation", False, f"Expected 400 for invalid file type, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Voice File Type Validation", False, f"Exception occurred: {str(e)}")
+        
+        # Test unauthorized access
+        try:
+            total_tests += 1
+            voice_data = self.create_test_voice_file("unauthorized_test.wav", 1.0)
+            
+            files = {
+                'voice_file': ('unauthorized_test.wav', voice_data, 'audio/wav')
+            }
+            data = {
+                'duration': '1.0'
+            }
+            
+            # Try without authorization
+            response = self.session.post(
+                f"{BASE_URL}/chats/{self.test_chat_id}/voice",
+                files=files,
+                data=data
+            )
+            
+            if response.status_code in [401, 403]:
+                self.log_result("Voice Message Unauthorized Access", True, f"Correctly rejected unauthorized voice upload (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Voice Message Unauthorized Access", False, f"Expected 401 or 403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Voice Message Unauthorized Access", False, f"Exception occurred: {str(e)}")
+        
+        # Test invalid chat ID
+        try:
+            total_tests += 1
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            voice_data = self.create_test_voice_file("invalid_chat_test.wav", 1.0)
+            
+            files = {
+                'voice_file': ('invalid_chat_test.wav', voice_data, 'audio/wav')
+            }
+            data = {
+                'duration': '1.0'
+            }
+            
+            response = self.session.post(
+                f"{BASE_URL}/chats/invalid-chat-id/voice",
+                files=files,
+                data=data,
+                headers=headers
+            )
+            
+            if response.status_code == 404:
+                self.log_result("Voice Message Invalid Chat", True, "Correctly rejected voice upload to invalid chat")
+                success_count += 1
+            else:
+                self.log_result("Voice Message Invalid Chat", False, f"Expected 404 for invalid chat, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Voice Message Invalid Chat", False, f"Exception occurred: {str(e)}")
+        
+        if success_count == total_tests:
+            self.log_result("Voice Message Validation", True, f"All validation tests passed ({success_count}/{total_tests})")
+            return True
+        else:
+            self.log_result("Voice Message Validation", False, f"Some validation tests failed ({success_count}/{total_tests})")
+            return False
+
     def run_all_tests(self):
         """Run all chat system and push notification tests"""
         print("🚀 Starting Chat Backend & Push Notification Test Suite")

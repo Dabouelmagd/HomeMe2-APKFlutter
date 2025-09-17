@@ -40,6 +40,29 @@ JWT_EXPIRATION_HOURS = 24
 app = FastAPI(title="HomeMe API", description="Compound Management System")
 api_router = APIRouter(prefix="/api")
 
+# Create uploads directory
+UPLOAD_DIR = Path("/app/uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+# File size limits (in bytes)
+MAX_FILE_SIZES = {
+    "image": 10 * 1024 * 1024,  # 10MB
+    "video": 50 * 1024 * 1024,  # 50MB
+    "audio": 25 * 1024 * 1024,  # 25MB
+    "document": 20 * 1024 * 1024,  # 20MB
+}
+
+# Allowed file extensions
+ALLOWED_EXTENSIONS = {
+    "image": {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"},
+    "video": {".mp4", ".mov", ".avi", ".mkv", ".webm", ".flv"},
+    "audio": {".mp3", ".wav", ".m4a", ".aac", ".ogg", ".flac"},
+    "document": {".pdf", ".doc", ".docx", ".txt", ".rtf", ".xls", ".xlsx", ".ppt", ".pptx"}
+}
+
+# Mount static files for serving uploads
+app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+
 # Security
 security = HTTPBearer()
 

@@ -62,7 +62,11 @@ const Register = () => {
     <div className="auth-container">
       <div className="auth-card" style={{ maxWidth: '500px' }}>
         <div className="auth-logo">
-          <h1>HomeMe</h1>
+          <img 
+            src="https://customer-assets.emergentagent.com/job_c6284a52-3971-4d5d-97ad-6dbfb32cfec5/artifacts/lwjnxovk_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
+            alt="HomeMe Logo"
+            className="h-20 w-auto mx-auto mb-4"
+          />
           <p>Join your compound community</p>
         </div>
 

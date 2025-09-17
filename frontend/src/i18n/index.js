@@ -744,7 +744,31 @@ const resources = {
       
       'common': {
         'cancel': 'Annuler',
-        'creating': 'Création...'
+        'creating': 'Création...',
+        'loading': 'Chargement...'
+      },
+      
+      // Notifications
+      'notifications': {
+        'pushNotifications': 'Notifications Push',
+        'subscribed': 'Vous êtes abonné aux notifications push',
+        'notSubscribed': 'Les notifications push sont désactivées',
+        'enable': 'Activer les Notifications',
+        'disable': 'Désactiver les Notifications',
+        'testNotification': 'Test de Notification',
+        'preferences': 'Préférences de Notification',
+        'messageNotifications': 'Notifications de Messages',
+        'messageNotificationsDesc': 'Recevoir des notifications pour tous les messages de chat',
+        'directChats': 'Messages Directs',
+        'directChatsDesc': 'Notifications pour les conversations individuelles',
+        'groupChats': 'Discussions de Groupe',
+        'groupChatsDesc': 'Notifications pour les conversations de groupe',
+        'compoundAnnouncements': 'Annonces de Résidence',
+        'compoundAnnouncementsDesc': 'Annonces importantes de la gestion',
+        'quietHours': 'Heures Silencieuses',
+        'quietHoursDesc': 'Désactiver les notifications pendant les heures spécifiées',
+        'from': 'De',
+        'to': 'À'
       },
       
       // Common

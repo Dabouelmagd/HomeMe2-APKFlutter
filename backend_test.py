@@ -29,6 +29,7 @@ class ChatTestSuite:
         self.compound_id = None
         self.test_chat_id = None
         self.test_message_id = None
+        self.test_subscription_endpoint = None
         self.results = []
         
     def log_result(self, test_name: str, success: bool, message: str, details: str = ""):

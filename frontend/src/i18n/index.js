@@ -89,7 +89,71 @@ const resources = {
       
       // Common
       'loading': 'Loading...',
-      'language': 'Language'
+      'language': 'Language',
+      
+      // Services
+      'services_management': 'Services Management',
+      'services': 'Services',
+      'add_service': 'Add Service',
+      'edit_service': 'Edit Service',
+      'create_service': 'Create Service',
+      'update_service': 'Update Service',
+      'book_service': 'Book Service',
+      'service_name': 'Service Name',
+      'enter_service_name': 'Enter service name',
+      'category': 'Category',
+      'specialty': 'Specialty',
+      'select_specialty': 'Select specialty',
+      'enter_description': 'Enter service description',
+      'enter_phone': 'Enter phone number',
+      'enter_email': 'Enter email address',
+      'working_hours': 'Working Hours',
+      'reviews': 'reviews',
+      'available': 'Available',
+      'busy': 'Busy',
+      'offline': 'Offline',
+      'no_services': 'No services found',
+      'add_first_service': 'Add your first service to get started',
+      'no_services_available': 'No services are currently available',
+      
+      // Service Categories
+      'medical': 'Medical',
+      'maintenance': 'Maintenance',
+      'security': 'Security',
+      'cleaning': 'Cleaning',
+      'other': 'Other',
+      
+      // Maintenance Specialties
+      'carpenter': 'Carpenter',
+      'plumber': 'Plumber',
+      'electrician': 'Electrician',
+      'gardener': 'Gardener',
+      'painter': 'Painter',
+      'hvac_technician': 'HVAC Technician',
+      'locksmith': 'Locksmith',
+      'appliance_repair': 'Appliance Repair',
+      'general_maintenance': 'General Maintenance',
+      
+      // Bookings
+      'all_bookings': 'All Bookings',
+      'my_bookings': 'My Bookings',
+      'no_bookings': 'No bookings found',
+      'issue_description': 'Issue Description',
+      'describe_issue': 'Describe the issue or service needed',
+      'preferred_date': 'Preferred Date',
+      'preferred_time': 'Preferred Time',
+      'additional_notes': 'Additional Notes',
+      'optional': 'Optional',
+      'any_additional_info': 'Any additional information',
+      'issue': 'Issue',
+      'resident': 'Resident',
+      'unit': 'Unit',
+      'notes': 'Notes',
+      'pending': 'Pending',
+      'confirmed': 'Confirmed',
+      'in_progress': 'In Progress',
+      'completed': 'Completed',
+      'cancelled': 'Cancelled'
     }
   },
   ar: {

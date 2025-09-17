@@ -1958,7 +1958,7 @@ async def get_chat_details(
     
     chat["participant_details"] = participants
     
-    return {"chat": chat}
+    return {"chat": serialize_datetime(chat)}
 
 @api_router.get("/chats/{chat_id}/messages")
 async def get_chat_messages(

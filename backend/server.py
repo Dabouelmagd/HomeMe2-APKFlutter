@@ -63,6 +63,24 @@ class ConnectionManager:
         users = await db.users.find({"compound_id": compound_id}).to_list(None)
         for user in users:
             await self.send_personal_message(message, str(user["_id"]))
+    
+    async def send_chat_message(self, chat_message: dict, participants: List[str]):
+        """Send chat message to all participants"""
+        message = json.dumps(chat_message)
+        for participant_id in participants:
+            await self.send_personal_message(message, participant_id)
+    
+    async def notify_chat_update(self, chat_id: str, update_type: str, data: dict, participants: List[str]):
+        """Send chat updates (new participants, chat settings, etc.)"""
+        notification = {
+            "type": "chat_update",
+            "chat_id": chat_id,
+            "update_type": update_type,
+            "data": data
+        }
+        message = json.dumps(notification)
+        for participant_id in participants:
+            await self.send_personal_message(message, participant_id)
 
 manager = ConnectionManager()
 

@@ -317,6 +317,50 @@ class Notification(BaseModel):
     is_read: Dict[str, bool] = {}  # user_id: read_status
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Chat Models
+class ChatType(str):
+    DIRECT = "direct"
+    GROUP = "group"
+    COMPOUND_WIDE = "compound_wide"
+
+class Chat(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    compound_id: str
+    chat_type: str  # direct, group, compound_wide
+    name: Optional[str] = None  # For group chats
+    description: Optional[str] = None
+    participants: List[str] = []  # List of user IDs
+    admin_ids: List[str] = []  # Chat admins (for group chats)
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_active: bool = True
+    last_message_at: Optional[datetime] = None
+
+class ChatMessage(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    chat_id: str
+    sender_id: str
+    content: str
+    message_type: str = "text"  # text, image, file
+    attachments: List[str] = []  # List of file URLs
+    reply_to: Optional[str] = None  # Message ID if replying
+    is_edited: bool = False
+    edited_at: Optional[datetime] = None
+    is_deleted: bool = False
+    deleted_at: Optional[datetime] = None
+    read_by: Dict[str, datetime] = {}  # user_id: read_timestamp
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ChatParticipant(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    chat_id: str
+    user_id: str
+    joined_at: datetime = Field(default_factory=datetime.utcnow)
+    last_read_at: Optional[datetime] = None
+    is_admin: bool = False
+    is_active: bool = True
+
 # Request/Response Models
 class UserCreate(BaseModel):
     username: str

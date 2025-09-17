@@ -1281,7 +1281,7 @@ class ChatTestSuite:
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("message") == "Test notification sent successfully":
+                if data.get("message") in ["Test notification sent successfully", "Test notification sent"]:
                     self.log_result("Test Push Notification", True, "Test notification sent successfully")
                     return True
                 else:

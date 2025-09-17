@@ -599,6 +599,35 @@ const resources = {
         'playbackInstructions': 'انقر على التشغيل للاستماع، إرسال للمشاركة',
         'startInstructions': 'انقر على الميكروفون لتسجيل رسالة صوتية',
         'waveformPlaceholder': 'ستظهر موجة الصوت هنا'
+      },
+      
+      // Search
+      'search': {
+        'searchMessages': 'البحث في الرسائل',
+        'searchPlaceholder': 'البحث في الرسائل...',
+        'searchInChat': 'البحث في المحادثة',
+        'messageTypes': 'أنواع الرسائل',
+        'text': 'نص',
+        'images': 'صور',
+        'videos': 'فيديوهات',
+        'voiceMessages': 'رسائل صوتية',
+        'files': 'ملفات',
+        'dateRange': 'نطاق التاريخ',
+        'from': 'من',
+        'to': 'إلى',
+        'recentSearches': 'عمليات البحث الأخيرة',
+        'savedSearches': 'عمليات البحث المحفوظة',
+        'noRecentSearches': 'لا توجد عمليات بحث حديثة',
+        'noSavedSearches': 'لا توجد عمليات بحث محفوظة',
+        'searchMessagesDescription': 'البحث في رسائلك',
+        'searchInstructions': 'اكتب كلمات مفتاحية للعثور على الرسائل والملفات والمحادثات',
+        'resultsFound': 'تم العثور على {count} نتيجة لـ "{query}"',
+        'noResults': 'لم يتم العثور على نتائج',
+        'tryDifferentKeywords': 'جرب كلمات مفتاحية مختلفة أو اضبط المرشحات',
+        'loadMore': 'تحميل المزيد من النتائج',
+        'saveSearch': 'حفظ البحث',
+        'searchName': 'اسم البحث',
+        'messageNotInView': 'هذه الرسالة في جزء مختلف من المحادثة. قد تحتاج للتمرير للعثور عليها.'
       }
     }
   },

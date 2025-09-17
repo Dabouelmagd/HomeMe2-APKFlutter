@@ -906,6 +906,35 @@ const resources = {
         'waveformPlaceholder': 'La forme d\'onde vocale apparaîtra ici'
       },
       
+      // Search
+      'search': {
+        'searchMessages': 'Rechercher des Messages',
+        'searchPlaceholder': 'Rechercher dans les messages...',
+        'searchInChat': 'Rechercher dans la discussion',
+        'messageTypes': 'Types de Messages',
+        'text': 'Texte',
+        'images': 'Images',
+        'videos': 'Vidéos',
+        'voiceMessages': 'Messages Vocaux',
+        'files': 'Fichiers',
+        'dateRange': 'Plage de Dates',
+        'from': 'De',
+        'to': 'À',
+        'recentSearches': 'Recherches Récentes',
+        'savedSearches': 'Recherches Sauvegardées',
+        'noRecentSearches': 'Aucune recherche récente',
+        'noSavedSearches': 'Aucune recherche sauvegardée',
+        'searchMessagesDescription': 'Rechercher dans vos messages',
+        'searchInstructions': 'Tapez des mots-clés pour trouver des messages, fichiers et conversations',
+        'resultsFound': '{count} résultats trouvés pour "{query}"',
+        'noResults': 'Aucun résultat trouvé',
+        'tryDifferentKeywords': 'Essayez des mots-clés différents ou ajustez vos filtres',
+        'loadMore': 'Charger Plus de Résultats',
+        'saveSearch': 'Sauvegarder la Recherche',
+        'searchName': 'Nom de la recherche',
+        'messageNotInView': 'Ce message se trouve dans une autre partie de la discussion. Vous devrez peut-être faire défiler pour le trouver.'
+      },
+      
       // Common
       'error': 'Erreur',
       'success': 'Succès',

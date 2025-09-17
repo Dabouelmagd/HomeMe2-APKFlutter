@@ -29,6 +29,13 @@
   margin-bottom: 30px;
 }
 
+.auth-logo img {
+  height: 80px;
+  width: auto;
+  margin: 0 auto 16px auto;
+  display: block;
+}
+
 .auth-logo h1 {
   font-size: 2.5rem;
   font-weight: bold;

@@ -18,9 +18,11 @@ import json
 import base64
 import mimetypes
 import aiofiles
+import asyncio
 from io import BytesIO
 from PIL import Image
 from datetime import timezone
+import httpx
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent

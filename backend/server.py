@@ -531,6 +531,46 @@ class NotificationPreferencesUpdate(BaseModel):
     quiet_hours_start: Optional[str] = None
     quiet_hours_end: Optional[str] = None
 
+# Search Models
+class SearchHistory(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    query: str
+    search_type: str = "text"  # text, advanced, file, user
+    filters: Dict[str, Any] = {}
+    results_count: int = 0
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SavedSearch(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    name: str
+    query: str
+    search_type: str = "text"
+    filters: Dict[str, Any] = {}
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class SearchRequest(BaseModel):
+    query: str
+    search_type: str = "text"  # text, advanced, file, user
+    chat_ids: Optional[List[str]] = None
+    sender_ids: Optional[List[str]] = None
+    message_types: Optional[List[str]] = None  # text, image, video, audio, voice, file
+    date_from: Optional[datetime] = None
+    date_to: Optional[datetime] = None
+    file_types: Optional[List[str]] = None  # image, video, audio, document
+    limit: int = 50
+    skip: int = 0
+    sort_by: str = "created_at"  # created_at, relevance
+    sort_order: str = "desc"  # asc, desc
+
+class SavedSearchRequest(BaseModel):
+    name: str
+    query: str
+    search_type: str = "text"
+    filters: Dict[str, Any] = {}
+
 class FileAttachment(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     filename: str

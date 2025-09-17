@@ -535,6 +535,52 @@ const resources = {
       'open': 'Ouvert',
       'resolved': 'Résolu',
       'in_progress': 'En cours',
+      'completed': 'Terminé',
+      'cancelled': 'Annulé',
+      
+      // Utility Bills
+      'government_utility_gateway': 'Portail des Services Publics',
+      'manage_government_utility_bills': 'Gérez vos factures de services publics et paiements',
+      'utility_bills': 'Factures de Services',
+      'utility_connections': 'Connexions de Services',
+      'pending_bills': 'Factures en Attente',
+      'overdue_bills': 'Factures en Retard',
+      'total_pending': 'Total en Attente',
+      'connections': 'Connexions',
+      'overdue_bills_alert': 'Vous avez {{count}} facture en retard',
+      'overdue_bills_alert_plural': 'Vous avez {{count}} factures en retard',
+      'pay_overdue_bills_message': 'Veuillez payer vos factures en retard pour éviter l\'interruption de service',
+      'add_bill': 'Ajouter une Facture',
+      'add_connection': 'Ajouter une Connexion',
+      'add_utility_connection': 'Ajouter une Connexion de Service',
+      'no_utility_bills': 'Aucune facture de service trouvée',
+      'add_first_utility_bill': 'Ajoutez votre première facture de service',
+      'no_bills_available': 'Aucune facture disponible pour le moment',
+      'no_utility_connections': 'Aucune connexion de service trouvée',
+      'add_first_connection': 'Ajoutez votre première connexion de service',
+      
+      // Utility Types
+      'electricity': 'Électricité',
+      'water': 'Eau',
+      'telephone': 'Téléphone',
+      'gas': 'Gaz',
+      'internet': 'Internet',
+      
+      // Utility Bill Details
+      'account_number': 'Numéro de Compte',
+      'billing_period': 'Période de Facturation',
+      'due_date': 'Date d\'Échéance',
+      'consumption': 'Consommation',
+      'gov_ref': 'Réf. Gouv.',
+      'receipt': 'Reçu',
+      'meter_number': 'Numéro de Compteur',
+      'utility_type': 'Type de Service',
+      'provider_name': 'Nom du Fournisseur',
+      'select_provider': 'Sélectionnez le Fournisseur',
+      'enter_account_number': 'Entrez le numéro de compte',
+      'enter_meter_number': 'Entrez le numéro de compteur',
+      'active': 'Actif',
+      'inactive': 'Inactif'
       
       // Notifications
       'stay_updated': 'Restez informé des annonces et messages de la résidence',

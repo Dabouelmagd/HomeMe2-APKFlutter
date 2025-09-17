@@ -414,6 +414,28 @@ class PaymentCreate(BaseModel):
     invoice_id: str
     payment_method: str = "mock"
 
+# Chat Request/Response Models
+class ChatCreate(BaseModel):
+    chat_type: str  # direct, group, compound_wide
+    name: Optional[str] = None
+    description: Optional[str] = None
+    participant_ids: List[str] = []
+
+class ChatMessageCreate(BaseModel):
+    content: str
+    message_type: str = "text"
+    reply_to: Optional[str] = None
+
+class ChatMessageUpdate(BaseModel):
+    content: str
+
+class ChatUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+
+class AddParticipantsRequest(BaseModel):
+    participant_ids: List[str]
+
 # Utility Functions
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')

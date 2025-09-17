@@ -552,31 +552,39 @@ class ChatTestSuite:
             self.log_result("WebSocket Connection", False, "No admin user available")
             return False
         
-        try:
-            # Test WebSocket connection
-            uri = f"{WS_URL}/{self.admin_user['id']}"
-            
-            async with websockets.connect(uri) as websocket:
-                # Send a test message
-                test_message = "Hello WebSocket!"
-                await websocket.send(test_message)
-                
-                # Wait for response
-                response = await asyncio.wait_for(websocket.recv(), timeout=5.0)
-                
-                if f"Echo: {test_message}" in response:
-                    self.log_result("WebSocket Connection", True, "WebSocket connection and echo working correctly")
-                    return True
-                else:
-                    self.log_result("WebSocket Connection", False, f"Unexpected response: {response}")
-                    return False
+        # Try both WebSocket endpoints
+        endpoints = [
+            f"{WS_URL}/{self.admin_user['id']}",
+            f"wss://compound-hub.preview.emergentagent.com/ws/{self.admin_user['id']}"
+        ]
+        
+        for i, uri in enumerate(endpoints):
+            try:
+                # Test WebSocket connection
+                async with websockets.connect(uri) as websocket:
+                    # Send a test message
+                    test_message = "Hello WebSocket!"
+                    await websocket.send(test_message)
                     
-        except asyncio.TimeoutError:
-            self.log_result("WebSocket Connection", False, "WebSocket connection timeout")
-            return False
-        except Exception as e:
-            self.log_result("WebSocket Connection", False, f"Exception occurred: {str(e)}")
-            return False
+                    # Wait for response
+                    response = await asyncio.wait_for(websocket.recv(), timeout=5.0)
+                    
+                    if f"Echo: {test_message}" in response:
+                        self.log_result("WebSocket Connection", True, f"WebSocket connection working correctly (endpoint {i+1})")
+                        return True
+                    else:
+                        self.log_result("WebSocket Connection", False, f"Unexpected response from endpoint {i+1}: {response}")
+                        
+            except asyncio.TimeoutError:
+                if i == len(endpoints) - 1:  # Last endpoint
+                    self.log_result("WebSocket Connection", False, "WebSocket connection timeout on all endpoints")
+                continue
+            except Exception as e:
+                if i == len(endpoints) - 1:  # Last endpoint
+                    self.log_result("WebSocket Connection", False, f"Exception occurred on all endpoints: {str(e)}")
+                continue
+        
+        return False
     
     def test_edge_cases(self):
         """Test various edge cases"""

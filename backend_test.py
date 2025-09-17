@@ -869,27 +869,38 @@ class ChatTestSuite:
             
             if response.status_code == 200:
                 result = response.json()
-                if result.get("action") == "added":
-                    # Test removing the same reaction
-                    remove_response = self.session.post(
-                        f"{BASE_URL}/chats/{self.test_chat_id}/messages/{self.test_message_id}/react",
-                        json=reaction_data,
-                        headers=headers
-                    )
-                    
-                    if remove_response.status_code == 200:
-                        remove_result = remove_response.json()
-                        if remove_result.get("action") == "removed":
-                            self.log_result("Message Reactions", True, "Reaction added and removed successfully")
-                            return True
+                if result.get("message") == "Reaction updated successfully" and "reactions" in result:
+                    reactions = result["reactions"]
+                    if "👍" in reactions and self.admin_user["id"] in reactions["👍"]:
+                        # Test removing the same reaction
+                        remove_response = self.session.post(
+                            f"{BASE_URL}/chats/{self.test_chat_id}/messages/{self.test_message_id}/react",
+                            json=reaction_data,
+                            headers=headers
+                        )
+                        
+                        if remove_response.status_code == 200:
+                            remove_result = remove_response.json()
+                            if remove_result.get("message") == "Reaction updated successfully":
+                                # Check if reaction was removed
+                                remove_reactions = remove_result["reactions"]
+                                if "👍" not in remove_reactions or self.admin_user["id"] not in remove_reactions.get("👍", []):
+                                    self.log_result("Message Reactions", True, "Reaction added and removed successfully")
+                                    return True
+                                else:
+                                    self.log_result("Message Reactions", False, "Reaction was not properly removed")
+                                    return False
+                            else:
+                                self.log_result("Message Reactions", False, f"Unexpected remove response: {remove_result}")
+                                return False
                         else:
-                            self.log_result("Message Reactions", False, f"Expected 'removed' action, got {remove_result.get('action')}")
+                            self.log_result("Message Reactions", False, f"Failed to remove reaction: {remove_response.status_code}")
                             return False
                     else:
-                        self.log_result("Message Reactions", False, f"Failed to remove reaction: {remove_response.status_code}")
+                        self.log_result("Message Reactions", False, f"Reaction not properly added: {reactions}")
                         return False
                 else:
-                    self.log_result("Message Reactions", False, f"Expected 'added' action, got {result.get('action')}")
+                    self.log_result("Message Reactions", False, f"Unexpected response format: {result}")
                     return False
             else:
                 self.log_result("Message Reactions", False, f"Failed with status {response.status_code}", response.text)

@@ -570,6 +570,53 @@ class SavedSearchRequest(BaseModel):
     search_type: str = "text"
     filters: Dict[str, Any] = {}
 
+# File Gallery Models
+class FileGalleryFilter(BaseModel):
+    file_types: Optional[List[str]] = None  # image, video, audio, document, voice
+    date_from: Optional[datetime] = None
+    date_to: Optional[datetime] = None
+    chat_ids: Optional[List[str]] = None
+    sender_ids: Optional[List[str]] = None
+    sort_by: str = "uploaded_at"  # uploaded_at, file_size, filename
+    sort_order: str = "desc"  # asc, desc
+    limit: int = 50
+    skip: int = 0
+
+# Message Scheduling Models
+class ScheduledMessage(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    chat_id: str
+    sender_id: str
+    content: str
+    message_type: str = "text"
+    attachments: List[Dict[str, Any]] = []
+    scheduled_for: datetime
+    timezone: str = "UTC"
+    is_recurring: bool = False
+    recurrence_pattern: Optional[str] = None  # daily, weekly, monthly
+    recurrence_end: Optional[datetime] = None
+    status: str = "pending"  # pending, sent, cancelled, failed
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    sent_at: Optional[datetime] = None
+    error_message: Optional[str] = None
+
+class ScheduledMessageCreate(BaseModel):
+    content: str
+    message_type: str = "text"
+    scheduled_for: datetime
+    timezone: str = "UTC"
+    is_recurring: bool = False
+    recurrence_pattern: Optional[str] = None
+    recurrence_end: Optional[datetime] = None
+
+class ScheduledMessageUpdate(BaseModel):
+    content: Optional[str] = None
+    scheduled_for: Optional[datetime] = None
+    timezone: Optional[str] = None
+    is_recurring: Optional[bool] = None
+    recurrence_pattern: Optional[str] = None
+    recurrence_end: Optional[datetime] = None
+
 class FileAttachment(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     filename: str

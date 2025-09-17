@@ -18,6 +18,7 @@ import FinancialManagement from './components/FinancialManagement';
 import MessageCenter from './components/MessageCenter';
 import NotificationCenter from './components/NotificationCenter';
 import Chat from './components/Chat';
+import Settings from './components/Settings';
 import Layout from './components/Layout';
 import { Toaster } from './components/ui/sonner';
 

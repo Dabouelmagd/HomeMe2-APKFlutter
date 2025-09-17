@@ -45,7 +45,7 @@ const Login = () => {
           <img 
             src="https://customer-assets.emergentagent.com/job_c6284a52-3971-4d5d-97ad-6dbfb32cfec5/artifacts/lwjnxovk_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
             alt="HomeMe Logo"
-            className="h-12 w-auto mx-auto mb-4"
+            className="h-24 w-auto mx-auto mb-4"
           />
           <p>Welcome back to your compound</p>
         </div>

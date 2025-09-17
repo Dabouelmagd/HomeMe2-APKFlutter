@@ -464,7 +464,8 @@ const resources = {
         'searchUsers': 'البحث عن المستخدمين...',
         'noUsersFound': 'لم يتم العثور على مستخدمين',
         'noUsersAvailable': 'لا يوجد مستخدمون متاحون',
-        'createChat': 'إنشاء محادثة'
+        'createChat': 'إنشاء محادثة',
+        'selectedFiles': 'الملفات المحددة'
       },
       
       'common': {

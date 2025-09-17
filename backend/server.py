@@ -882,6 +882,211 @@ async def notify_chat_participants(chat_id: str, sender_id: str, message_content
     except Exception as e:
         logging.error(f"Error sending chat notifications: {e}")
 
+async def create_text_index():
+    """Create text index for chat messages search"""
+    try:
+        # Create text index on content field for full-text search
+        await db.chat_messages.create_index([
+            ("content", "text"),
+            ("sender_id", 1),
+            ("chat_id", 1),
+            ("created_at", -1)
+        ])
+        
+        # Create compound indexes for better search performance
+        await db.chat_messages.create_index([
+            ("compound_id", 1),
+            ("created_at", -1)
+        ])
+        
+        await db.chat_messages.create_index([
+            ("message_type", 1),
+            ("created_at", -1)
+        ])
+        
+        logging.info("Text indexes created successfully")
+    except Exception as e:
+        logging.warning(f"Could not create text indexes: {e}")
+
+async def search_messages(
+    user_id: str,
+    compound_id: str,
+    search_request: SearchRequest
+) -> Dict[str, Any]:
+    """Search messages with various filters"""
+    try:
+        # Build MongoDB query
+        query = {
+            "compound_id": compound_id,
+            "is_deleted": False
+        }
+        
+        # Add chat filter - only chats user is participant of
+        user_chats = await db.chats.find({
+            "compound_id": compound_id,
+            "participants": user_id,
+            "is_active": True
+        }).to_list(None)
+        
+        user_chat_ids = [chat["id"] for chat in user_chats]
+        
+        if search_request.chat_ids:
+            # Filter to only chats user is in and requested chats
+            filtered_chat_ids = list(set(user_chat_ids) & set(search_request.chat_ids))
+            query["chat_id"] = {"$in": filtered_chat_ids}
+        else:
+            query["chat_id"] = {"$in": user_chat_ids}
+        
+        # Text search
+        if search_request.query.strip():
+            if search_request.search_type == "text":
+                # Full-text search
+                query["$text"] = {"$search": search_request.query}
+            else:
+                # Regex search for partial matches
+                query["content"] = {
+                    "$regex": search_request.query,
+                    "$options": "i"
+                }
+        
+        # Sender filter
+        if search_request.sender_ids:
+            query["sender_id"] = {"$in": search_request.sender_ids}
+        
+        # Message type filter
+        if search_request.message_types:
+            query["message_type"] = {"$in": search_request.message_types}
+        
+        # Date range filter
+        if search_request.date_from or search_request.date_to:
+            date_query = {}
+            if search_request.date_from:
+                date_query["$gte"] = search_request.date_from
+            if search_request.date_to:
+                date_query["$lte"] = search_request.date_to
+            query["created_at"] = date_query
+        
+        # File type filter (for attachments)
+        if search_request.file_types:
+            query["attachments.file_type"] = {"$in": search_request.file_types}
+        
+        # Build sort criteria
+        sort_criteria = []
+        if search_request.sort_by == "relevance" and "$text" in query:
+            sort_criteria.append(("score", {"$meta": "textScore"}))
+        
+        if search_request.sort_order == "desc":
+            sort_criteria.append((search_request.sort_by, -1))
+        else:
+            sort_criteria.append((search_request.sort_by, 1))
+        
+        # Execute search
+        cursor = db.chat_messages.find(query)
+        
+        if sort_criteria:
+            cursor = cursor.sort(sort_criteria)
+        
+        cursor = cursor.skip(search_request.skip).limit(search_request.limit)
+        
+        messages = await cursor.to_list(None)
+        
+        # Get total count for pagination
+        total_count = await db.chat_messages.count_documents(query)
+        
+        # Get sender details
+        sender_ids = list(set(msg["sender_id"] for msg in messages))
+        senders = await db.users.find(
+            {"id": {"$in": sender_ids}},
+            {"id": 1, "full_name": 1, "username": 1}
+        ).to_list(None)
+        senders_dict = {sender["id"]: sender for sender in senders}
+        
+        # Get chat details
+        chat_ids = list(set(msg["chat_id"] for msg in messages))
+        chats = await db.chats.find(
+            {"id": {"$in": chat_ids}},
+            {"id": 1, "name": 1, "chat_type": 1, "participants": 1}
+        ).to_list(None)
+        chats_dict = {chat["id"]: chat for chat in chats}
+        
+        # Enhance messages with sender and chat info
+        for message in messages:
+            message["sender"] = senders_dict.get(message["sender_id"])
+            message["chat"] = chats_dict.get(message["chat_id"])
+        
+        return {
+            "messages": messages,
+            "total_count": total_count,
+            "has_more": total_count > (search_request.skip + len(messages)),
+            "query": search_request.query,
+            "filters_applied": {
+                "chat_ids": search_request.chat_ids,
+                "sender_ids": search_request.sender_ids,
+                "message_types": search_request.message_types,
+                "date_from": search_request.date_from,
+                "date_to": search_request.date_to,
+                "file_types": search_request.file_types
+            }
+        }
+        
+    except Exception as e:
+        logging.error(f"Error searching messages: {e}")
+        return {
+            "messages": [],
+            "total_count": 0,
+            "has_more": False,
+            "error": str(e)
+        }
+
+async def get_search_suggestions(
+    user_id: str,
+    compound_id: str,
+    query: str,
+    limit: int = 10
+) -> List[str]:
+    """Get search suggestions based on query"""
+    try:
+        suggestions = []
+        
+        # Get user's chats
+        user_chats = await db.chats.find({
+            "compound_id": compound_id,
+            "participants": user_id,
+            "is_active": True
+        }).to_list(None)
+        
+        user_chat_ids = [chat["id"] for chat in user_chats]
+        
+        # Get recent searches
+        recent_searches = await db.search_history.find({
+            "user_id": user_id,
+            "query": {"$regex": query, "$options": "i"}
+        }).sort("created_at", -1).limit(5).to_list(None)
+        
+        suggestions.extend([search["query"] for search in recent_searches])
+        
+        # Get common words from recent messages
+        if len(query) >= 2:
+            recent_messages = await db.chat_messages.find({
+                "chat_id": {"$in": user_chat_ids},
+                "content": {"$regex": query, "$options": "i"},
+                "is_deleted": False
+            }).sort("created_at", -1).limit(20).to_list(None)
+            
+            # Extract words that contain the query
+            for message in recent_messages:
+                words = message["content"].split()
+                for word in words:
+                    if query.lower() in word.lower() and len(word) > len(query):
+                        if word not in suggestions:
+                            suggestions.append(word)
+        
+        return suggestions[:limit]
+        
+    except Exception as e:
+        logging.error(f"Error getting search suggestions: {e}")
+        return []
+
 # Utility Functions
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')

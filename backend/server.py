@@ -693,36 +693,62 @@ async def get_compound_residences(compound_id: str, current_user: User = Depends
     residents = await db.users.find({
         "compound_id": compound_id,
         "role": UserRole.RESIDENT
-    }).to_list(None)
+    }, {"password_hash": 0}).to_list(None)
     
     # Create residence list with occupancy information
     residences = []
     occupied_units = set()
     
     for family in families:
-        # Get family members
-        family_members = [r for r in residents if r["id"] in family["members"]]
+        # Get family members - convert ObjectId to string safely
+        family_member_ids = family.get("members", [])
+        family_members = []
+        
+        for resident in residents:
+            if resident.get("id") in family_member_ids:
+                # Clean up resident data for JSON serialization
+                clean_resident = {
+                    "id": resident.get("id"),
+                    "username": resident.get("username"),
+                    "email": resident.get("email"),
+                    "full_name": resident.get("full_name"),
+                    "phone": resident.get("phone"),
+                    "is_family_head": resident.get("is_family_head", False)
+                }
+                family_members.append(clean_resident)
+        
+        # Find family head
+        family_head = next((m for m in family_members if m.get("is_family_head", False)), 
+                          family_members[0] if family_members else None)
         
         residence = {
-            "unit_number": family["unit_number"],
-            "family_id": family["id"],
+            "unit_number": family.get("unit_number"),
+            "family_id": family.get("id"),
             "occupancy_status": "occupied",
-            "family_head": next((m for m in family_members if m.get("is_family_head", False)), None),
+            "family_head": family_head,
             "family_members": family_members,
             "member_count": len(family_members),
-            "created_at": family["created_at"]
+            "created_at": family.get("created_at").isoformat() if family.get("created_at") else None
         }
         residences.append(residence)
-        occupied_units.add(family["unit_number"])
+        occupied_units.add(family.get("unit_number"))
     
     # Get compound info to potentially show total units (if available)
     compound = await db.compounds.find_one({"id": compound_id})
+    compound_data = None
+    if compound:
+        compound_data = {
+            "id": compound.get("id"),
+            "name": compound.get("name"),
+            "address": compound.get("address"),
+            "created_at": compound.get("created_at").isoformat() if compound.get("created_at") else None
+        }
     
     return {
         "residences": residences,
         "total_units": len(residences),
         "occupied_units": len(occupied_units),
-        "compound": compound
+        "compound": compound_data
     }
 
 @api_router.get("/compounds/{compound_id}/residents")

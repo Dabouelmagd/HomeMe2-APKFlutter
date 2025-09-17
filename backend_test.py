@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Backend Chat System Test Suite
-Tests all chat-related API endpoints and functionality
+Tests all chat-related API endpoints and functionality including multimedia features
 """
 
 import asyncio
@@ -9,8 +9,11 @@ import json
 import requests
 import websockets
 import uuid
+import io
+import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
+from PIL import Image
 
 # Configuration
 BASE_URL = "https://compound-hub.preview.emergentagent.com/api"

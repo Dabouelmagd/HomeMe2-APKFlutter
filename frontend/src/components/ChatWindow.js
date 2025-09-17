@@ -278,6 +278,16 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
           </div>
         );
       
+      case 'voice':
+        return (
+          <VoiceMessagePlayer
+            audioUrl={fileUrl}
+            duration={attachment.duration || 0}
+            waveformData={attachment.waveform || []}
+            isOwnMessage={false}
+          />
+        );
+      
       default:
         return (
           <div className="flex items-center space-x-3 p-3 bg-gray-100 rounded-lg max-w-sm">

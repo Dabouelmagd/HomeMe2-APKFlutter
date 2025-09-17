@@ -1817,6 +1817,432 @@ async def get_resident_dashboard(current_user: User = Depends(get_current_user))
         "my_messages": my_messages
     }
 
+# ============ CHAT ENDPOINTS ============
+
+@api_router.get("/chats")
+async def get_user_chats(current_user: User = Depends(get_current_user)):
+    """Get all chats for the current user"""
+    chats = await db.chats.find({
+        "compound_id": current_user.compound_id,
+        "participants": current_user.id,
+        "is_active": True
+    }).sort("last_message_at", -1).to_list(None)
+    
+    # Get participant details for each chat
+    for chat in chats:
+        # Get participant info
+        participants = await db.users.find(
+            {"id": {"$in": chat["participants"]}},
+            {"password_hash": 0}
+        ).to_list(None)
+        chat["participant_details"] = participants
+        
+        # Get unread count for current user
+        unread_count = await db.chat_messages.count_documents({
+            "chat_id": chat["id"],
+            f"read_by.{current_user.id}": {"$exists": False}
+        })
+        chat["unread_count"] = unread_count
+        
+        # Get last message
+        last_message = await db.chat_messages.find_one(
+            {"chat_id": chat["id"], "is_deleted": False},
+            sort=[("created_at", -1)]
+        )
+        chat["last_message"] = last_message
+    
+    return {"chats": chats}
+
+@api_router.post("/chats")
+async def create_chat(
+    chat_data: ChatCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new chat"""
+    # Validate participants are in the same compound
+    if chat_data.participant_ids:
+        participants = await db.users.find({
+            "id": {"$in": chat_data.participant_ids},
+            "compound_id": current_user.compound_id
+        }).to_list(None)
+        
+        if len(participants) != len(chat_data.participant_ids):
+            raise HTTPException(status_code=400, detail="Some participants not found in compound")
+    
+    # Add current user to participants if not already included
+    participants = set(chat_data.participant_ids)
+    participants.add(current_user.id)
+    
+    # For direct chats, ensure only 2 participants
+    if chat_data.chat_type == ChatType.DIRECT and len(participants) != 2:
+        raise HTTPException(status_code=400, detail="Direct chats must have exactly 2 participants")
+    
+    # Check if direct chat already exists
+    if chat_data.chat_type == ChatType.DIRECT:
+        existing_chat = await db.chats.find_one({
+            "compound_id": current_user.compound_id,
+            "chat_type": ChatType.DIRECT,
+            "participants": {"$all": list(participants), "$size": 2},
+            "is_active": True
+        })
+        if existing_chat:
+            return {"chat": Chat(**existing_chat)}
+    
+    # Create chat
+    chat = Chat(
+        compound_id=current_user.compound_id,
+        chat_type=chat_data.chat_type,
+        name=chat_data.name,
+        description=chat_data.description,
+        participants=list(participants),
+        admin_ids=[current_user.id] if chat_data.chat_type != ChatType.DIRECT else [],
+        created_by=current_user.id
+    )
+    
+    # Insert chat
+    await db.chats.insert_one(chat.dict())
+    
+    # Create participant records
+    for participant_id in participants:
+        participant = ChatParticipant(
+            chat_id=chat.id,
+            user_id=participant_id,
+            is_admin=participant_id in chat.admin_ids
+        )
+        await db.chat_participants.insert_one(participant.dict())
+    
+    # Notify participants
+    await manager.notify_chat_update(
+        chat.id,
+        "chat_created",
+        {"chat": chat.dict()},
+        list(participants)
+    )
+    
+    return {"chat": chat}
+
+@api_router.get("/chats/{chat_id}")
+async def get_chat_details(
+    chat_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get chat details and participants"""
+    chat = await db.chats.find_one({
+        "id": chat_id,
+        "compound_id": current_user.compound_id,
+        "participants": current_user.id,
+        "is_active": True
+    })
+    
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # Get participant details
+    participants = await db.users.find(
+        {"id": {"$in": chat["participants"]}},
+        {"password_hash": 0}
+    ).to_list(None)
+    
+    chat["participant_details"] = participants
+    
+    return {"chat": chat}
+
+@api_router.get("/chats/{chat_id}/messages")
+async def get_chat_messages(
+    chat_id: str,
+    page: int = 1,
+    limit: int = 50,
+    current_user: User = Depends(get_current_user)
+):
+    """Get messages for a chat with pagination"""
+    # Verify user is participant
+    chat = await db.chats.find_one({
+        "id": chat_id,
+        "compound_id": current_user.compound_id,
+        "participants": current_user.id,
+        "is_active": True
+    })
+    
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # Get messages with pagination
+    skip = (page - 1) * limit
+    messages = await db.chat_messages.find({
+        "chat_id": chat_id,
+        "is_deleted": False
+    }).sort("created_at", -1).skip(skip).limit(limit).to_list(None)
+    
+    # Reverse to show oldest first
+    messages.reverse()
+    
+    # Get sender details for each message
+    sender_ids = list(set(msg["sender_id"] for msg in messages))
+    senders = await db.users.find(
+        {"id": {"$in": sender_ids}},
+        {"id": 1, "full_name": 1, "username": 1}
+    ).to_list(None)
+    senders_dict = {sender["id"]: sender for sender in senders}
+    
+    for message in messages:
+        message["sender"] = senders_dict.get(message["sender_id"])
+    
+    return {"messages": messages}
+
+@api_router.post("/chats/{chat_id}/messages")
+async def send_message(
+    chat_id: str,
+    message_data: ChatMessageCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Send a message to a chat"""
+    # Verify user is participant
+    chat = await db.chats.find_one({
+        "id": chat_id,
+        "compound_id": current_user.compound_id,
+        "participants": current_user.id,
+        "is_active": True
+    })
+    
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # Create message
+    message = ChatMessage(
+        chat_id=chat_id,
+        sender_id=current_user.id,
+        content=message_data.content,
+        message_type=message_data.message_type,
+        reply_to=message_data.reply_to,
+        read_by={current_user.id: datetime.utcnow()}
+    )
+    
+    # Insert message
+    await db.chat_messages.insert_one(message.dict())
+    
+    # Update chat's last message time
+    await db.chats.update_one(
+        {"id": chat_id},
+        {"$set": {"last_message_at": message.created_at, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Get sender info
+    sender_info = {
+        "id": current_user.id,
+        "full_name": current_user.full_name,
+        "username": current_user.username
+    }
+    
+    # Prepare message for WebSocket
+    ws_message = message.dict()
+    ws_message["sender"] = sender_info
+    
+    # Send to all participants via WebSocket
+    await manager.send_chat_message(
+        {
+            "type": "new_message",
+            "chat_id": chat_id,
+            "message": ws_message
+        },
+        chat["participants"]
+    )
+    
+    return {"message": message}
+
+@api_router.put("/chats/{chat_id}/messages/{message_id}")
+async def edit_message(
+    chat_id: str,
+    message_id: str,
+    message_data: ChatMessageUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Edit a message (only by sender)"""
+    # Verify user is participant and message sender
+    message = await db.chat_messages.find_one({
+        "id": message_id,
+        "chat_id": chat_id,
+        "sender_id": current_user.id,
+        "is_deleted": False
+    })
+    
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found or you're not the sender")
+    
+    # Update message
+    await db.chat_messages.update_one(
+        {"id": message_id},
+        {"$set": {
+            "content": message_data.content,
+            "is_edited": True,
+            "edited_at": datetime.utcnow()
+        }}
+    )
+    
+    # Get chat participants for notification
+    chat = await db.chats.find_one({"id": chat_id})
+    
+    # Notify participants
+    await manager.send_chat_message(
+        {
+            "type": "message_edited",
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "content": message_data.content
+        },
+        chat["participants"]
+    )
+    
+    return {"message": "Message updated successfully"}
+
+@api_router.delete("/chats/{chat_id}/messages/{message_id}")
+async def delete_message(
+    chat_id: str,
+    message_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a message (only by sender)"""
+    # Verify user is participant and message sender
+    message = await db.chat_messages.find_one({
+        "id": message_id,
+        "chat_id": chat_id,
+        "sender_id": current_user.id,
+        "is_deleted": False
+    })
+    
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found or you're not the sender")
+    
+    # Soft delete message
+    await db.chat_messages.update_one(
+        {"id": message_id},
+        {"$set": {
+            "is_deleted": True,
+            "deleted_at": datetime.utcnow()
+        }}
+    )
+    
+    # Get chat participants for notification
+    chat = await db.chats.find_one({"id": chat_id})
+    
+    # Notify participants
+    await manager.send_chat_message(
+        {
+            "type": "message_deleted",
+            "chat_id": chat_id,
+            "message_id": message_id
+        },
+        chat["participants"]
+    )
+    
+    return {"message": "Message deleted successfully"}
+
+@api_router.put("/chats/{chat_id}/read")
+async def mark_messages_as_read(
+    chat_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Mark all messages in a chat as read"""
+    # Verify user is participant
+    chat = await db.chats.find_one({
+        "id": chat_id,
+        "compound_id": current_user.compound_id,
+        "participants": current_user.id,
+        "is_active": True
+    })
+    
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # Mark all unread messages as read
+    await db.chat_messages.update_many(
+        {
+            "chat_id": chat_id,
+            f"read_by.{current_user.id}": {"$exists": False}
+        },
+        {"$set": {f"read_by.{current_user.id}": datetime.utcnow()}}
+    )
+    
+    return {"message": "Messages marked as read"}
+
+@api_router.post("/chats/{chat_id}/participants")
+async def add_participants(
+    chat_id: str,
+    participants_data: AddParticipantsRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Add participants to a group chat (admin only)"""
+    # Verify user is chat admin
+    chat = await db.chats.find_one({
+        "id": chat_id,
+        "compound_id": current_user.compound_id,
+        "admin_ids": current_user.id,
+        "is_active": True
+    })
+    
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found or you're not an admin")
+    
+    if chat["chat_type"] == ChatType.DIRECT:
+        raise HTTPException(status_code=400, detail="Cannot add participants to direct chats")
+    
+    # Validate new participants are in the same compound
+    new_participants = await db.users.find({
+        "id": {"$in": participants_data.participant_ids},
+        "compound_id": current_user.compound_id
+    }).to_list(None)
+    
+    if len(new_participants) != len(participants_data.participant_ids):
+        raise HTTPException(status_code=400, detail="Some participants not found in compound")
+    
+    # Add to chat participants
+    current_participants = set(chat["participants"])
+    new_participant_ids = [p["id"] for p in new_participants if p["id"] not in current_participants]
+    
+    if not new_participant_ids:
+        return {"message": "All users are already participants"}
+    
+    # Update chat
+    await db.chats.update_one(
+        {"id": chat_id},
+        {
+            "$addToSet": {"participants": {"$each": new_participant_ids}},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    # Create participant records
+    for participant_id in new_participant_ids:
+        participant = ChatParticipant(
+            chat_id=chat_id,
+            user_id=participant_id
+        )
+        await db.chat_participants.insert_one(participant.dict())
+    
+    # Notify all participants
+    all_participants = list(current_participants) + new_participant_ids
+    await manager.notify_chat_update(
+        chat_id,
+        "participants_added",
+        {"new_participants": new_participants},
+        all_participants
+    )
+    
+    return {"message": f"Added {len(new_participant_ids)} participants to chat"}
+
+# WebSocket endpoint for real-time chat
+@app.websocket("/ws/chat/{user_id}")
+async def websocket_chat_endpoint(websocket: WebSocket, user_id: str):
+    """WebSocket endpoint for real-time chat"""
+    await manager.connect(websocket, user_id)
+    try:
+        while True:
+            # Keep connection alive
+            data = await websocket.receive_text()
+            # Echo back for testing
+            await manager.send_personal_message(f"Echo: {data}", user_id)
+    except WebSocketDisconnect:
+        manager.disconnect(user_id)
+
 # Health check
 @api_router.get("/")
 async def root():

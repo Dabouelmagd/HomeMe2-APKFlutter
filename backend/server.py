@@ -388,9 +388,10 @@ class ChatMessage(BaseModel):
     chat_id: str
     sender_id: str
     content: str
-    message_type: str = "text"  # text, image, file
-    attachments: List[str] = []  # List of file URLs
+    message_type: str = "text"  # text, image, video, audio, file
+    attachments: List[Dict[str, Any]] = []  # List of attachment metadata
     reply_to: Optional[str] = None  # Message ID if replying
+    reactions: Dict[str, List[str]] = {}  # emoji -> list of user IDs
     is_edited: bool = False
     edited_at: Optional[datetime] = None
     is_deleted: bool = False

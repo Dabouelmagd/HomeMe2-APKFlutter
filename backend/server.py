@@ -61,7 +61,8 @@ MAX_FILE_SIZES = {
 ALLOWED_EXTENSIONS = {
     "image": {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"},
     "video": {".mp4", ".mov", ".avi", ".mkv", ".webm", ".flv"},
-    "audio": {".mp3", ".wav", ".m4a", ".aac", ".ogg", ".flac"},
+    "audio": {".mp3", ".wav", ".m4a", ".aac", ".ogg", ".flac", ".webm"},
+    "voice": {".wav", ".webm", ".mp3", ".m4a", ".ogg"},
     "document": {".pdf", ".doc", ".docx", ".txt", ".rtf", ".xls", ".xlsx", ".ppt", ".pptx"}
 }
 

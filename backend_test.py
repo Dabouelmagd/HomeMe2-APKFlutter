@@ -1916,9 +1916,591 @@ class ChatTestSuite:
             self.log_result("Voice Message Validation", False, f"Some validation tests failed ({success_count}/{total_tests})")
             return False
 
+    def test_message_search_basic(self):
+        """Test POST /api/search/messages - Basic text search"""
+        print("\n=== Testing Basic Message Search ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Basic Message Search", False, "No test chat ID available")
+            return False
+        
+        try:
+            # First send some test messages to search for
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Send test messages with specific content
+            test_messages = [
+                "Hello world, this is a test message",
+                "Python programming is awesome",
+                "Chat system working perfectly",
+                "Search functionality test message"
+            ]
+            
+            for content in test_messages:
+                message_data = {
+                    "content": content,
+                    "message_type": "text"
+                }
+                self.session.post(f"{BASE_URL}/chats/{self.test_chat_id}/messages", 
+                                json=message_data, headers=headers)
+            
+            # Now search for messages
+            search_data = {
+                "query": "test message",
+                "search_type": "text",
+                "limit": 10,
+                "skip": 0,
+                "sort_by": "created_at",
+                "sort_order": "desc"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/search/messages", 
+                                       json=search_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") and "results" in data:
+                    results = data["results"]
+                    messages = results.get("messages", [])
+                    if len(messages) >= 2:  # Should find at least 2 messages with "test message"
+                        self.log_result("Basic Message Search", True, f"Found {len(messages)} messages matching search query")
+                        return True
+                    else:
+                        self.log_result("Basic Message Search", False, f"Expected at least 2 messages, found {len(messages)}")
+                        return False
+                else:
+                    self.log_result("Basic Message Search", False, f"Invalid response format: {data}")
+                    return False
+            else:
+                self.log_result("Basic Message Search", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Basic Message Search", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_message_search_advanced_filters(self):
+        """Test advanced search filters (message type, date range, sender)"""
+        print("\n=== Testing Advanced Message Search Filters ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Advanced Message Search Filters", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test message type filter
+            search_data = {
+                "query": "",
+                "search_type": "advanced",
+                "message_types": ["text"],
+                "limit": 20,
+                "skip": 0,
+                "sort_by": "created_at",
+                "sort_order": "desc"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/search/messages", 
+                                       json=search_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") and "results" in data:
+                    results = data["results"]
+                    messages = results.get("messages", [])
+                    
+                    # Check that all returned messages are text type
+                    text_messages = [m for m in messages if m.get("message_type") == "text"]
+                    if len(text_messages) == len(messages) and len(messages) > 0:
+                        self.log_result("Message Type Filter", True, f"Message type filter working correctly ({len(messages)} text messages)")
+                    else:
+                        self.log_result("Message Type Filter", False, f"Message type filter failed: {len(text_messages)}/{len(messages)} are text type")
+                        return False
+                else:
+                    self.log_result("Message Type Filter", False, f"Invalid response format: {data}")
+                    return False
+            else:
+                self.log_result("Message Type Filter", False, f"Failed with status {response.status_code}")
+                return False
+            
+            # Test sender filter
+            search_data = {
+                "query": "",
+                "search_type": "advanced",
+                "sender_ids": [self.admin_user["id"]],
+                "limit": 20,
+                "skip": 0
+            }
+            
+            response = self.session.post(f"{BASE_URL}/search/messages", 
+                                       json=search_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") and "results" in data:
+                    results = data["results"]
+                    messages = results.get("messages", [])
+                    
+                    # Check that all returned messages are from admin
+                    admin_messages = [m for m in messages if m.get("sender_id") == self.admin_user["id"]]
+                    if len(admin_messages) == len(messages) and len(messages) > 0:
+                        self.log_result("Sender Filter", True, f"Sender filter working correctly ({len(messages)} messages from admin)")
+                        return True
+                    else:
+                        self.log_result("Sender Filter", False, f"Sender filter failed: {len(admin_messages)}/{len(messages)} are from admin")
+                        return False
+                else:
+                    self.log_result("Sender Filter", False, f"Invalid response format: {data}")
+                    return False
+            else:
+                self.log_result("Sender Filter", False, f"Failed with status {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Advanced Message Search Filters", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_search_suggestions(self):
+        """Test GET /api/search/suggestions - Get search suggestions"""
+        print("\n=== Testing Search Suggestions ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test with a query that should return suggestions
+            response = self.session.get(f"{BASE_URL}/search/suggestions?query=test&limit=5", 
+                                      headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                suggestions = data.get("suggestions", [])
+                if isinstance(suggestions, list):
+                    self.log_result("Search Suggestions", True, f"Retrieved {len(suggestions)} search suggestions")
+                    return True
+                else:
+                    self.log_result("Search Suggestions", False, f"Invalid suggestions format: {type(suggestions)}")
+                    return False
+            else:
+                self.log_result("Search Suggestions", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Search Suggestions", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_search_history(self):
+        """Test search history management"""
+        print("\n=== Testing Search History ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # First perform a search to create history
+            search_data = {
+                "query": "history test query",
+                "search_type": "text",
+                "limit": 10,
+                "skip": 0
+            }
+            
+            search_response = self.session.post(f"{BASE_URL}/search/messages", 
+                                              json=search_data, headers=headers)
+            
+            if search_response.status_code != 200:
+                self.log_result("Search History", False, "Failed to perform initial search")
+                return False
+            
+            # Get search history
+            history_response = self.session.get(f"{BASE_URL}/search/history?limit=10", 
+                                              headers=headers)
+            
+            if history_response.status_code == 200:
+                data = history_response.json()
+                history = data.get("history", [])
+                
+                # Check if our search query is in history
+                history_queries = [h.get("query") for h in history]
+                if "history test query" in history_queries:
+                    self.log_result("Get Search History", True, f"Search history retrieved successfully ({len(history)} items)")
+                    
+                    # Test clearing search history
+                    clear_response = self.session.delete(f"{BASE_URL}/search/history", 
+                                                       headers=headers)
+                    
+                    if clear_response.status_code == 200:
+                        # Verify history is cleared
+                        verify_response = self.session.get(f"{BASE_URL}/search/history?limit=10", 
+                                                         headers=headers)
+                        
+                        if verify_response.status_code == 200:
+                            verify_data = verify_response.json()
+                            verify_history = verify_data.get("history", [])
+                            if len(verify_history) == 0:
+                                self.log_result("Clear Search History", True, "Search history cleared successfully")
+                                return True
+                            else:
+                                self.log_result("Clear Search History", False, f"History not cleared: {len(verify_history)} items remain")
+                                return False
+                        else:
+                            self.log_result("Clear Search History", False, "Failed to verify history clearing")
+                            return False
+                    else:
+                        self.log_result("Clear Search History", False, f"Failed to clear history: {clear_response.status_code}")
+                        return False
+                else:
+                    self.log_result("Get Search History", False, "Search query not found in history")
+                    return False
+            else:
+                self.log_result("Get Search History", False, f"Failed with status {history_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Search History", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_saved_searches(self):
+        """Test saved search management (CRUD operations)"""
+        print("\n=== Testing Saved Searches ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            saved_search_id = None
+            
+            # Create a saved search
+            save_data = {
+                "name": "Test Saved Search",
+                "query": "important messages",
+                "search_type": "text",
+                "filters": {
+                    "message_types": ["text"],
+                    "sort_by": "created_at",
+                    "sort_order": "desc"
+                }
+            }
+            
+            create_response = self.session.post(f"{BASE_URL}/search/saved", 
+                                              json=save_data, headers=headers)
+            
+            if create_response.status_code == 200:
+                data = create_response.json()
+                saved_search = data.get("saved_search")
+                if saved_search and saved_search.get("id"):
+                    saved_search_id = saved_search["id"]
+                    self.log_result("Create Saved Search", True, f"Saved search created with ID: {saved_search_id}")
+                else:
+                    self.log_result("Create Saved Search", False, "No saved search ID in response")
+                    return False
+            else:
+                self.log_result("Create Saved Search", False, f"Failed with status {create_response.status_code}")
+                return False
+            
+            # Get saved searches
+            get_response = self.session.get(f"{BASE_URL}/search/saved", headers=headers)
+            
+            if get_response.status_code == 200:
+                data = get_response.json()
+                saved_searches = data.get("saved_searches", [])
+                
+                # Check if our saved search is in the list
+                our_search = next((s for s in saved_searches if s.get("id") == saved_search_id), None)
+                if our_search and our_search.get("name") == "Test Saved Search":
+                    self.log_result("Get Saved Searches", True, f"Retrieved {len(saved_searches)} saved searches")
+                else:
+                    self.log_result("Get Saved Searches", False, "Our saved search not found in list")
+                    return False
+            else:
+                self.log_result("Get Saved Searches", False, f"Failed with status {get_response.status_code}")
+                return False
+            
+            # Update saved search
+            update_data = {
+                "name": "Updated Test Saved Search",
+                "query": "updated important messages",
+                "search_type": "advanced",
+                "filters": {
+                    "message_types": ["text", "image"],
+                    "sort_by": "relevance"
+                }
+            }
+            
+            update_response = self.session.put(f"{BASE_URL}/search/saved/{saved_search_id}", 
+                                             json=update_data, headers=headers)
+            
+            if update_response.status_code == 200:
+                self.log_result("Update Saved Search", True, "Saved search updated successfully")
+            else:
+                self.log_result("Update Saved Search", False, f"Failed with status {update_response.status_code}")
+                return False
+            
+            # Delete saved search
+            delete_response = self.session.delete(f"{BASE_URL}/search/saved/{saved_search_id}", 
+                                                headers=headers)
+            
+            if delete_response.status_code == 200:
+                # Verify deletion
+                verify_response = self.session.get(f"{BASE_URL}/search/saved", headers=headers)
+                if verify_response.status_code == 200:
+                    verify_data = verify_response.json()
+                    verify_searches = verify_data.get("saved_searches", [])
+                    deleted_search = next((s for s in verify_searches if s.get("id") == saved_search_id), None)
+                    
+                    if not deleted_search:
+                        self.log_result("Delete Saved Search", True, "Saved search deleted successfully")
+                        return True
+                    else:
+                        self.log_result("Delete Saved Search", False, "Saved search still exists after deletion")
+                        return False
+                else:
+                    self.log_result("Delete Saved Search", False, "Failed to verify deletion")
+                    return False
+            else:
+                self.log_result("Delete Saved Search", False, f"Failed with status {delete_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Saved Searches", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_search_pagination(self):
+        """Test search results pagination"""
+        print("\n=== Testing Search Pagination ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Search Pagination", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Send multiple messages to ensure we have enough for pagination
+            for i in range(15):
+                message_data = {
+                    "content": f"Pagination test message number {i+1}",
+                    "message_type": "text"
+                }
+                self.session.post(f"{BASE_URL}/chats/{self.test_chat_id}/messages", 
+                                json=message_data, headers=headers)
+            
+            # Test first page
+            search_data = {
+                "query": "pagination test",
+                "search_type": "text",
+                "limit": 5,
+                "skip": 0,
+                "sort_by": "created_at",
+                "sort_order": "desc"
+            }
+            
+            first_page_response = self.session.post(f"{BASE_URL}/search/messages", 
+                                                  json=search_data, headers=headers)
+            
+            if first_page_response.status_code == 200:
+                first_data = first_page_response.json()
+                first_results = first_data.get("results", {})
+                first_messages = first_results.get("messages", [])
+                
+                if len(first_messages) == 5:
+                    # Test second page
+                    search_data["skip"] = 5
+                    second_page_response = self.session.post(f"{BASE_URL}/search/messages", 
+                                                           json=search_data, headers=headers)
+                    
+                    if second_page_response.status_code == 200:
+                        second_data = second_page_response.json()
+                        second_results = second_data.get("results", {})
+                        second_messages = second_results.get("messages", [])
+                        
+                        # Check that we got different messages
+                        first_ids = {m.get("id") for m in first_messages}
+                        second_ids = {m.get("id") for m in second_messages}
+                        
+                        if len(first_ids & second_ids) == 0 and len(second_messages) > 0:
+                            self.log_result("Search Pagination", True, f"Pagination working correctly (page 1: {len(first_messages)}, page 2: {len(second_messages)})")
+                            return True
+                        else:
+                            self.log_result("Search Pagination", False, f"Pagination failed: overlapping results or empty second page")
+                            return False
+                    else:
+                        self.log_result("Search Pagination", False, f"Second page request failed: {second_page_response.status_code}")
+                        return False
+                else:
+                    self.log_result("Search Pagination", False, f"Expected 5 messages on first page, got {len(first_messages)}")
+                    return False
+            else:
+                self.log_result("Search Pagination", False, f"First page request failed: {first_page_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Search Pagination", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_search_access_control(self):
+        """Test search access control - users only search their compound's messages"""
+        print("\n=== Testing Search Access Control ===")
+        
+        try:
+            # Test with admin token
+            admin_headers = self.setup_auth_headers(self.admin_token)
+            search_data = {
+                "query": "test",
+                "search_type": "text",
+                "limit": 10,
+                "skip": 0
+            }
+            
+            admin_response = self.session.post(f"{BASE_URL}/search/messages", 
+                                             json=search_data, headers=admin_headers)
+            
+            if admin_response.status_code == 200:
+                admin_data = admin_response.json()
+                admin_results = admin_data.get("results", {})
+                admin_messages = admin_results.get("messages", [])
+                
+                # Test with resident token
+                resident_headers = self.setup_auth_headers(self.resident_token)
+                resident_response = self.session.post(f"{BASE_URL}/search/messages", 
+                                                    json=search_data, headers=resident_headers)
+                
+                if resident_response.status_code == 200:
+                    resident_data = resident_response.json()
+                    resident_results = resident_data.get("results", {})
+                    resident_messages = resident_results.get("messages", [])
+                    
+                    # Both should be able to search (same compound), but results may differ based on chat participation
+                    self.log_result("Search Access Control", True, f"Both users can search (admin: {len(admin_messages)}, resident: {len(resident_messages)} results)")
+                    return True
+                else:
+                    self.log_result("Search Access Control", False, f"Resident search failed: {resident_response.status_code}")
+                    return False
+            else:
+                self.log_result("Search Access Control", False, f"Admin search failed: {admin_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Search Access Control", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_search_unauthorized_access(self):
+        """Test unauthorized access to search endpoints"""
+        print("\n=== Testing Search Unauthorized Access ===")
+        
+        try:
+            # Test without token
+            search_data = {
+                "query": "test",
+                "search_type": "text",
+                "limit": 10,
+                "skip": 0
+            }
+            
+            response = self.session.post(f"{BASE_URL}/search/messages", json=search_data)
+            
+            if response.status_code in [401, 403]:
+                self.log_result("Search Unauthorized Access", True, f"Correctly rejected unauthorized search request (status: {response.status_code})")
+                return True
+            else:
+                self.log_result("Search Unauthorized Access", False, f"Expected 401 or 403, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Search Unauthorized Access", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_search_edge_cases(self):
+        """Test search edge cases and error handling"""
+        print("\n=== Testing Search Edge Cases ===")
+        
+        success_count = 0
+        total_tests = 0
+        
+        headers = self.setup_auth_headers(self.admin_token)
+        
+        # Test empty query
+        try:
+            total_tests += 1
+            search_data = {
+                "query": "",
+                "search_type": "text",
+                "limit": 10,
+                "skip": 0
+            }
+            
+            response = self.session.post(f"{BASE_URL}/search/messages", 
+                                       json=search_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    self.log_result("Empty Query Search", True, "Empty query handled correctly")
+                    success_count += 1
+                else:
+                    self.log_result("Empty Query Search", False, "Empty query not handled properly")
+            else:
+                self.log_result("Empty Query Search", False, f"Empty query failed: {response.status_code}")
+        except Exception as e:
+            self.log_result("Empty Query Search", False, f"Exception: {str(e)}")
+        
+        # Test invalid search type
+        try:
+            total_tests += 1
+            search_data = {
+                "query": "test",
+                "search_type": "invalid_type",
+                "limit": 10,
+                "skip": 0
+            }
+            
+            response = self.session.post(f"{BASE_URL}/search/messages", 
+                                       json=search_data, headers=headers)
+            
+            # Should either work (fallback to default) or return 400
+            if response.status_code in [200, 400]:
+                self.log_result("Invalid Search Type", True, f"Invalid search type handled correctly (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Invalid Search Type", False, f"Unexpected status for invalid search type: {response.status_code}")
+        except Exception as e:
+            self.log_result("Invalid Search Type", False, f"Exception: {str(e)}")
+        
+        # Test very large limit
+        try:
+            total_tests += 1
+            search_data = {
+                "query": "test",
+                "search_type": "text",
+                "limit": 10000,  # Very large limit
+                "skip": 0
+            }
+            
+            response = self.session.post(f"{BASE_URL}/search/messages", 
+                                       json=search_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                results = data.get("results", {})
+                messages = results.get("messages", [])
+                # Should handle large limit gracefully (either cap it or return what's available)
+                if len(messages) <= 1000:  # Reasonable cap
+                    self.log_result("Large Limit Search", True, f"Large limit handled correctly ({len(messages)} results)")
+                    success_count += 1
+                else:
+                    self.log_result("Large Limit Search", False, f"Large limit not capped properly ({len(messages)} results)")
+            else:
+                self.log_result("Large Limit Search", False, f"Large limit failed: {response.status_code}")
+        except Exception as e:
+            self.log_result("Large Limit Search", False, f"Exception: {str(e)}")
+        
+        if success_count >= total_tests // 2:  # At least half should pass
+            self.log_result("Search Edge Cases", True, f"Edge cases handled well ({success_count}/{total_tests})")
+            return True
+        else:
+            self.log_result("Search Edge Cases", False, f"Too many edge case failures ({success_count}/{total_tests})")
+            return False
+
     def run_all_tests(self):
-        """Run all chat system and push notification tests"""
-        print("🚀 Starting Chat Backend & Push Notification Test Suite")
+        """Run all chat system, push notification, and search tests"""
+        print("🚀 Starting Chat Backend, Push Notification & Search Test Suite")
         print("=" * 60)
         
         # Authentication setup

@@ -2182,6 +2182,147 @@ async def send_message(
     
     return {"message": message}
 
+@api_router.post("/chats/{chat_id}/upload")
+async def upload_file_to_chat(
+    chat_id: str,
+    files: List[UploadFile] = File(...),
+    message_content: str = "",
+    current_user: User = Depends(get_current_user)
+):
+    """Upload files to a chat and create a message with attachments"""
+    # Verify user is participant
+    chat = await db.chats.find_one({
+        "id": chat_id,
+        "compound_id": current_user.compound_id,
+        "participants": current_user.id,
+        "is_active": True
+    })
+    
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # Process each file
+    attachments = []
+    for file in files:
+        file_type = get_file_type(file.filename)
+        attachment = await save_uploaded_file(file, file_type)
+        attachments.append(attachment)
+    
+    # Determine message type based on attachments
+    if len(attachments) == 1:
+        message_type = attachments[0]["file_type"]
+    else:
+        message_type = "mixed"
+    
+    # Create message with attachments
+    message = ChatMessage(
+        chat_id=chat_id,
+        sender_id=current_user.id,
+        content=message_content or f"Shared {len(attachments)} file{'s' if len(attachments) > 1 else ''}",
+        message_type=message_type,
+        attachments=attachments,
+        read_by={current_user.id: datetime.utcnow()}
+    )
+    
+    # Insert message
+    await db.chat_messages.insert_one(message.dict())
+    
+    # Update chat's last message time
+    await db.chats.update_one(
+        {"id": chat_id},
+        {"$set": {"last_message_at": message.created_at, "updated_at": datetime.utcnow()}}
+    )
+    
+    # Get sender info
+    sender_info = {
+        "id": current_user.id,
+        "full_name": current_user.full_name,
+        "username": current_user.username
+    }
+    
+    # Prepare message for WebSocket
+    ws_message = message.dict()
+    ws_message["sender"] = sender_info
+    
+    # Send to all participants via WebSocket
+    await manager.send_chat_message(
+        {
+            "type": "new_message",
+            "chat_id": chat_id,
+            "message": ws_message
+        },
+        chat["participants"]
+    )
+    
+    return {"message": message}
+
+@api_router.post("/chats/{chat_id}/messages/{message_id}/react")
+async def add_message_reaction(
+    chat_id: str,
+    message_id: str,
+    reaction_data: MessageReactionRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Add or remove a reaction to a message"""
+    # Verify user is participant
+    chat = await db.chats.find_one({
+        "id": chat_id,
+        "compound_id": current_user.compound_id,
+        "participants": current_user.id,
+        "is_active": True
+    })
+    
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+    
+    # Find the message
+    message = await db.chat_messages.find_one({
+        "id": message_id,
+        "chat_id": chat_id,
+        "is_deleted": False
+    })
+    
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    # Get current reactions
+    reactions = message.get("reactions", {})
+    emoji = reaction_data.emoji
+    
+    # Toggle reaction
+    if emoji not in reactions:
+        reactions[emoji] = []
+    
+    if current_user.id in reactions[emoji]:
+        # Remove reaction
+        reactions[emoji].remove(current_user.id)
+        if not reactions[emoji]:  # Remove empty reaction list
+            del reactions[emoji]
+    else:
+        # Add reaction
+        reactions[emoji].append(current_user.id)
+    
+    # Update message
+    await db.chat_messages.update_one(
+        {"id": message_id},
+        {"$set": {"reactions": reactions}}
+    )
+    
+    # Notify participants
+    await manager.send_chat_message(
+        {
+            "type": "message_reaction",
+            "chat_id": chat_id,
+            "message_id": message_id,
+            "emoji": emoji,
+            "user_id": current_user.id,
+            "reactions": reactions
+        },
+        chat["participants"]
+    )
+    
+    return {"message": "Reaction updated successfully", "reactions": reactions}
+
 @api_router.put("/chats/{chat_id}/messages/{message_id}")
 async def edit_message(
     chat_id: str,

@@ -2432,6 +2432,14 @@ async def upload_file_to_chat(
         chat["participants"]
     )
     
+    # Send push notifications to participants
+    await notify_chat_participants(
+        chat_id,
+        current_user.id,
+        message_content or f"Shared {len(attachments)} file{'s' if len(attachments) > 1 else ''}",
+        message_type
+    )
+    
     return {"message": message}
 
 @api_router.post("/chats/{chat_id}/messages/{message_id}/react")

@@ -160,7 +160,7 @@ backend:
           agent: "main"
           comment: "Implemented complete push notification system using Browser Push API with Service Workers: POST /api/push/subscribe, DELETE /api/push/unsubscribe, GET/PUT /api/notifications/preferences, POST /api/push/test. Added PushSubscription and NotificationPreferences models, quiet hours functionality, chat integration with automatic notifications on message/file send, and VAPID key support. Backend testing achieved 97.1% success rate (34/35 tests passed) - production ready!"
 
-  - task: "Voice Messages System"
+  - task: "Message Search System"
     implemented: true
     working: true
     file: "server.py"
@@ -170,7 +170,7 @@ backend:
     status_history:
         - working: true
           agent: "main"
-          comment: "Implemented comprehensive voice message system with POST /api/chats/{chat_id}/voice endpoint, automatic waveform generation using numpy, voice file processing with duration extraction, support for multiple voice formats (.wav, .webm, .mp3, .m4a, .ogg), enhanced ChatMessage model with voice_duration and voice_waveform fields, and full integration with push notification system. Backend testing achieved 100% success rate (7/7 voice tests passed) - production ready!"
+          comment: "Implemented comprehensive message search system with MongoDB text indexing, full-text search capabilities, advanced filtering (message type, date range, sender, file type), search suggestions, search history management, saved search CRUD operations, pagination support, and proper access control. Created SearchHistory and SavedSearch models. Backend testing achieved 96.8% success rate (61/63 tests passed) with critical ObjectId serialization fixes. Production-ready search functionality."
 
   - task: "Voice Messages System"
     implemented: true

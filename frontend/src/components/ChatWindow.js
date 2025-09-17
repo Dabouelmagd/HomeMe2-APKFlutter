@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
+import VoiceRecorder from './VoiceRecorder';
+import VoiceMessagePlayer from './VoiceMessagePlayer';
 import {
   PaperAirplaneIcon,
   FaceSmileIcon,
@@ -15,7 +17,8 @@ import {
   DocumentIcon,
   PlayIcon,
   PauseIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  MicrophoneIcon
 } from '@heroicons/react/24/outline';
 import { CheckIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 

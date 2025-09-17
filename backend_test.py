@@ -2538,6 +2538,16 @@ class ChatTestSuite:
             self.test_voice_file_serving,
             self.test_voice_message_chat_integration,
             self.test_voice_message_validation,
+            # Message search tests
+            self.test_message_search_basic,
+            self.test_message_search_advanced_filters,
+            self.test_search_suggestions,
+            self.test_search_history,
+            self.test_saved_searches,
+            self.test_search_pagination,
+            self.test_search_access_control,
+            self.test_search_unauthorized_access,
+            self.test_search_edge_cases,
             # Push notification tests
             self.test_push_subscription_subscribe,
             self.test_get_notification_preferences,

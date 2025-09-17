@@ -914,12 +914,6 @@ async def search_messages(
 ) -> Dict[str, Any]:
     """Search messages with various filters"""
     try:
-        # Build MongoDB query
-        query = {
-            "compound_id": compound_id,
-            "is_deleted": False
-        }
-        
         # Add chat filter - only chats user is participant of
         user_chats = await db.chats.find({
             "compound_id": compound_id,
@@ -932,9 +926,14 @@ async def search_messages(
         if search_request.chat_ids:
             # Filter to only chats user is in and requested chats
             filtered_chat_ids = list(set(user_chat_ids) & set(search_request.chat_ids))
-            query["chat_id"] = {"$in": filtered_chat_ids}
         else:
-            query["chat_id"] = {"$in": user_chat_ids}
+            filtered_chat_ids = user_chat_ids
+        
+        # Build MongoDB query - messages don't have compound_id, so we filter by chat_id
+        query = {
+            "chat_id": {"$in": filtered_chat_ids},
+            "is_deleted": False
+        }
         
         # Text search
         if search_request.query.strip():

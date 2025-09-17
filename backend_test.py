@@ -77,30 +77,37 @@ class ChatTestSuite:
         
         # Test resident login - try to find or create a resident
         try:
-            # First try existing resident
-            resident_login_data = {
-                "username": "resident1",
-                "password": "password123"
-            }
+            # First try existing residents
+            existing_residents = ["resident1", "alice", "bob", "testuser"]
             
-            response = self.session.post(f"{BASE_URL}/auth/login", json=resident_login_data)
+            for username in existing_residents:
+                resident_login_data = {
+                    "username": username,
+                    "password": "password123"
+                }
+                
+                response = self.session.post(f"{BASE_URL}/auth/login", json=resident_login_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    self.resident_token = data["access_token"]
+                    self.resident_user = data["user"]
+                    self.log_result("Resident Login", True, f"Resident '{username}' authenticated successfully")
+                    break
             
-            if response.status_code == 200:
-                data = response.json()
-                self.resident_token = data["access_token"]
-                self.resident_user = data["user"]
-                self.log_result("Resident Login", True, "Resident authenticated successfully")
-            else:
-                # Try to create a resident user
+            # If no existing resident found, try to create one
+            if not self.resident_token:
+                # Generate unique username
+                unique_id = str(uuid.uuid4())[:8]
                 resident_register_data = {
-                    "username": "testchatresident",
-                    "email": "testchatresident@example.com",
+                    "username": f"testchat{unique_id}",
+                    "email": f"testchat{unique_id}@example.com",
                     "password": "password123",
                     "role": "resident",
                     "compound_id": self.compound_id,
-                    "full_name": "Test Chat Resident",
+                    "full_name": f"Test Chat Resident {unique_id}",
                     "phone": "+1234567890",
-                    "unit_number": "101"
+                    "unit_number": f"10{unique_id[:1]}"
                 }
                 
                 register_response = self.session.post(f"{BASE_URL}/auth/register", json=resident_register_data)
@@ -108,7 +115,7 @@ class ChatTestSuite:
                 if register_response.status_code == 200:
                     # Now login with new resident
                     login_response = self.session.post(f"{BASE_URL}/auth/login", json={
-                        "username": "testchatresident",
+                        "username": resident_register_data["username"],
                         "password": "password123"
                     })
                     
@@ -116,12 +123,12 @@ class ChatTestSuite:
                         data = login_response.json()
                         self.resident_token = data["access_token"]
                         self.resident_user = data["user"]
-                        self.log_result("Resident Login", True, "Resident created and authenticated successfully")
+                        self.log_result("Resident Login", True, "New resident created and authenticated successfully")
                     else:
                         self.log_result("Resident Login", False, f"Failed to login after registration: {login_response.status_code}")
                         return False
                 else:
-                    self.log_result("Resident Login", False, f"Failed to register resident: {register_response.status_code}")
+                    self.log_result("Resident Login", False, f"Failed to register resident: {register_response.status_code}", register_response.text)
                     return False
                     
         except Exception as e:

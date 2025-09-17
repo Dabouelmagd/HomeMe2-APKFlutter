@@ -247,6 +247,10 @@ function App() {
                   <ServicesManagement />
                 } />
                 
+                <Route path="utilities" element={
+                  <UtilityBills />
+                } />
+                
                 <Route path="family" element={
                   <FamilyManagement />
                 } />

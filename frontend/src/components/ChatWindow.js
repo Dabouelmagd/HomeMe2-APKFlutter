@@ -187,6 +187,25 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
     }
   };
 
+  const handleMessageSelect = (message) => {
+    // Scroll to the selected message in the chat
+    setShowMessageSearch(false);
+    
+    // Find the message in current messages and highlight it
+    const messageElement = document.querySelector(`[data-message-id="${message.id}"]`);
+    if (messageElement) {
+      messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      messageElement.classList.add('bg-yellow-100', 'border-yellow-300');
+      setTimeout(() => {
+        messageElement.classList.remove('bg-yellow-100', 'border-yellow-300');
+      }, 3000);
+    } else {
+      // Message is not in current view, we might need to load more messages
+      // For now, just show an info message
+      alert(t('search.messageNotInView'));
+    }
+  };
+
   const sendVoiceMessage = async (audioBlob, duration) => {
     if (!audioBlob || !chat) return;
 

@@ -270,6 +270,21 @@ const resources = {
         'privacy': 'Privacy',
         'language': 'Language',
         'manageYourPreferences': 'Manage your account preferences and settings'
+      },
+      
+      // Voice Messages
+      'voice': {
+        'voiceMessage': 'Voice message',
+        'recording': 'Recording...',
+        'recorded': 'Voice message recorded',
+        'readyToRecord': 'Ready to record',
+        'microphonePermissionDenied': 'Microphone permission denied. Please allow microphone access.',
+        'microphoneNotAvailable': 'Microphone not available',
+        'recordingError': 'Error occurred while recording',
+        'recordingInstructions': 'Click stop when finished recording',
+        'playbackInstructions': 'Click play to listen, send to share',
+        'startInstructions': 'Click the microphone to record a voice message',
+        'waveformPlaceholder': 'Voice waveform will appear here'
       }
     }
   },

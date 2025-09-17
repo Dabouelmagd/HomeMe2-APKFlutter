@@ -37,7 +37,7 @@ const resources = {
       'family_management': 'Family Management',
       'financial_management': 'Financial Management',
       'message_center': 'Message Center',
-      'notifications': 'Notifications',
+      'notifications_nav': 'Notifications',
       'sign_out': 'Sign Out',
       
       // Dashboard

@@ -11,6 +11,7 @@ import Register from './components/Register';
 import AdminDashboard from './components/AdminDashboard';
 import ResidentDashboard from './components/ResidentDashboard';
 import CompoundManagement from './components/CompoundManagement';
+import ServicesManagement from './components/ServicesManagement';
 import FamilyManagement from './components/FamilyManagement';
 import FinancialManagement from './components/FinancialManagement';
 import MessageCenter from './components/MessageCenter';

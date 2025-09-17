@@ -1,5 +1,7 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, File, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, EmailStr
@@ -14,6 +16,8 @@ import jwt
 import bcrypt
 import json
 import base64
+import mimetypes
+import aiofiles
 from io import BytesIO
 from PIL import Image
 from datetime import timezone

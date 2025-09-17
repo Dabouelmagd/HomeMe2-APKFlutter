@@ -242,6 +242,10 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
+                <Route path="services" element={
+                  <ServicesManagement />
+                } />
+                
                 <Route path="family" element={
                   <FamilyManagement />
                 } />

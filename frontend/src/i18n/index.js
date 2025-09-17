@@ -580,7 +580,7 @@ const resources = {
       'enter_account_number': 'Entrez le numéro de compte',
       'enter_meter_number': 'Entrez le numéro de compteur',
       'active': 'Actif',
-      'inactive': 'Inactif'
+      'inactive': 'Inactif',
       
       // Notifications
       'stay_updated': 'Restez informé des annonces et messages de la résidence',

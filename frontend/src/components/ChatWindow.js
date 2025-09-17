@@ -510,7 +510,8 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
               return (
                 <div
                   key={message.id}
-                  className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                  data-message-id={message.id}
+                  className={`flex ${isOwn ? 'justify-end' : 'justify-start'} transition-colors duration-500`}
                 >
                   <div className={`max-w-xs lg:max-w-md ${isOwn ? 'order-2' : 'order-1'}`}>
                     {showSender && (

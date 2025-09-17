@@ -351,7 +351,7 @@ const resources = {
       'family_management': 'إدارة الأسرة',
       'financial_management': 'الإدارة المالية',
       'message_center': 'مركز الرسائل',
-      'notifications': 'الإشعارات',
+      'notifications_nav': 'الإشعارات',
       'sign_out': 'تسجيل الخروج',
       
       // Dashboard

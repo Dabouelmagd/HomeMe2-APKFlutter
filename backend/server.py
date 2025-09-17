@@ -668,6 +668,8 @@ async def save_uploaded_file(file: UploadFile, file_type: str) -> Dict[str, Any]
     # Create thumbnail for images
     thumbnail_url = None
     width, height = None, None
+    duration = None
+    waveform = None
     
     if file_type == "image":
         try:
@@ -682,6 +684,17 @@ async def save_uploaded_file(file: UploadFile, file_type: str) -> Dict[str, Any]
         except Exception as e:
             logging.warning(f"Could not create thumbnail for {file.filename}: {e}")
     
+    elif file_type == "voice":
+        # Process voice message
+        try:
+            voice_metadata = await process_voice_message(file_path, file.filename)
+            duration = voice_metadata.get("duration", 0.0)
+            waveform = voice_metadata.get("waveform", [])
+        except Exception as e:
+            logging.warning(f"Could not process voice message {file.filename}: {e}")
+            duration = 0.0
+            waveform = [0.1] * 50
+    
     return {
         "id": str(uuid.uuid4()),
         "filename": unique_filename,
@@ -693,6 +706,8 @@ async def save_uploaded_file(file: UploadFile, file_type: str) -> Dict[str, Any]
         "thumbnail_url": thumbnail_url,
         "width": width,
         "height": height,
+        "duration": duration,
+        "waveform": waveform,
         "uploaded_at": datetime.utcnow()
     }
 

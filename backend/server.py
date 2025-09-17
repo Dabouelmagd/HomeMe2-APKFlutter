@@ -1135,6 +1135,307 @@ async def get_search_suggestions(
         logging.error(f"Error getting search suggestions: {e}")
         return []
 
+async def get_file_gallery(
+    user_id: str,
+    compound_id: str,
+    gallery_filter: FileGalleryFilter
+) -> Dict[str, Any]:
+    """Get files from chat messages for gallery view"""
+    try:
+        # Get user's accessible chats
+        user_chats = await db.chats.find({
+            "compound_id": compound_id,
+            "participants": user_id,
+            "is_active": True
+        }).to_list(None)
+        
+        user_chat_ids = [chat["id"] for chat in user_chats]
+        
+        # Build query for messages with attachments
+        query = {
+            "compound_id": compound_id,
+            "chat_id": {"$in": user_chat_ids if not gallery_filter.chat_ids else list(set(user_chat_ids) & set(gallery_filter.chat_ids))},
+            "attachments": {"$exists": True, "$not": {"$size": 0}},
+            "is_deleted": False
+        }
+        
+        # File type filter
+        if gallery_filter.file_types:
+            query["$or"] = []
+            for file_type in gallery_filter.file_types:
+                query["$or"].append({"attachments.file_type": file_type})
+                if file_type == "media":  # Special category for images and videos
+                    query["$or"].extend([
+                        {"attachments.file_type": "image"},
+                        {"attachments.file_type": "video"}
+                    ])
+        
+        # Date range filter
+        if gallery_filter.date_from or gallery_filter.date_to:
+            date_query = {}
+            if gallery_filter.date_from:
+                date_query["$gte"] = gallery_filter.date_from
+            if gallery_filter.date_to:
+                date_query["$lte"] = gallery_filter.date_to
+            query["created_at"] = date_query
+        
+        # Sender filter
+        if gallery_filter.sender_ids:
+            query["sender_id"] = {"$in": gallery_filter.sender_ids}
+        
+        # Build sort criteria
+        sort_order = -1 if gallery_filter.sort_order == "desc" else 1
+        sort_criteria = [(gallery_filter.sort_by, sort_order)]
+        
+        # Execute query
+        cursor = db.chat_messages.find(query).sort(sort_criteria)
+        cursor = cursor.skip(gallery_filter.skip).limit(gallery_filter.limit)
+        
+        messages = await cursor.to_list(None)
+        
+        # Extract files with metadata
+        files = []
+        for message in messages:
+            for attachment in message.get("attachments", []):
+                file_info = {
+                    **attachment,
+                    "message_id": message["id"],
+                    "chat_id": message["chat_id"],
+                    "sender_id": message["sender_id"],
+                    "message_content": message.get("content", ""),
+                    "message_created_at": message["created_at"]
+                }
+                files.append(file_info)
+        
+        # Get total count
+        total_count = await db.chat_messages.count_documents(query)
+        
+        # Get sender details
+        sender_ids = list(set(msg["sender_id"] for msg in messages))
+        senders = await db.users.find(
+            {"id": {"$in": sender_ids}},
+            {"id": 1, "full_name": 1, "username": 1}
+        ).to_list(None)
+        senders_dict = {sender["id"]: sender for sender in senders}
+        
+        # Get chat details
+        chat_ids = list(set(msg["chat_id"] for msg in messages))
+        chats = await db.chats.find(
+            {"id": {"$in": chat_ids}},
+            {"id": 1, "name": 1, "chat_type": 1}
+        ).to_list(None)
+        chats_dict = {chat["id"]: chat for chat in chats}
+        
+        # Enhance files with sender and chat info
+        for file_info in files:
+            file_info["sender"] = senders_dict.get(file_info["sender_id"])
+            file_info["chat"] = chats_dict.get(file_info["chat_id"])
+        
+        return {
+            "files": files,
+            "total_count": total_count,
+            "has_more": total_count > (gallery_filter.skip + len(files)),
+            "stats": await get_file_stats(user_chat_ids)
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting file gallery: {e}")
+        return {
+            "files": [],
+            "total_count": 0,
+            "has_more": False,
+            "error": str(e)
+        }
+
+async def get_file_stats(chat_ids: List[str]) -> Dict[str, Any]:
+    """Get file statistics for gallery"""
+    try:
+        # Aggregate file statistics
+        pipeline = [
+            {
+                "$match": {
+                    "chat_id": {"$in": chat_ids},
+                    "attachments": {"$exists": True, "$not": {"$size": 0}},
+                    "is_deleted": False
+                }
+            },
+            {"$unwind": "$attachments"},
+            {
+                "$group": {
+                    "_id": "$attachments.file_type",
+                    "count": {"$sum": 1},
+                    "total_size": {"$sum": "$attachments.file_size"}
+                }
+            }
+        ]
+        
+        stats = await db.chat_messages.aggregate(pipeline).to_list(None)
+        
+        # Format statistics
+        file_stats = {}
+        total_files = 0
+        total_size = 0
+        
+        for stat in stats:
+            file_type = stat["_id"]
+            count = stat["count"]
+            size = stat["total_size"]
+            
+            file_stats[file_type] = {
+                "count": count,
+                "size": size,
+                "size_mb": round(size / (1024 * 1024), 2)
+            }
+            
+            total_files += count
+            total_size += size
+        
+        return {
+            "by_type": file_stats,
+            "total_files": total_files,
+            "total_size": total_size,
+            "total_size_mb": round(total_size / (1024 * 1024), 2)
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting file stats: {e}")
+        return {"by_type": {}, "total_files": 0, "total_size": 0}
+
+async def process_scheduled_messages():
+    """Process scheduled messages that are due to be sent"""
+    try:
+        now = datetime.utcnow()
+        
+        # Find pending messages that are due
+        due_messages = await db.scheduled_messages.find({
+            "status": "pending",
+            "scheduled_for": {"$lte": now}
+        }).to_list(None)
+        
+        for scheduled_msg in due_messages:
+            try:
+                # Create and send the message
+                message = ChatMessage(
+                    chat_id=scheduled_msg["chat_id"],
+                    sender_id=scheduled_msg["sender_id"],
+                    content=scheduled_msg["content"],
+                    message_type=scheduled_msg["message_type"],
+                    attachments=scheduled_msg.get("attachments", []),
+                    read_by={scheduled_msg["sender_id"]: datetime.utcnow()}
+                )
+                
+                # Insert message
+                await db.chat_messages.insert_one(message.dict())
+                
+                # Update chat's last message time
+                await db.chats.update_one(
+                    {"id": scheduled_msg["chat_id"]},
+                    {"$set": {"last_message_at": message.created_at, "updated_at": datetime.utcnow()}}
+                )
+                
+                # Get chat participants for notifications
+                chat = await db.chats.find_one({"id": scheduled_msg["chat_id"]})
+                if chat:
+                    # Send WebSocket notification
+                    sender = await db.users.find_one({"id": scheduled_msg["sender_id"]})
+                    sender_info = {
+                        "id": sender["id"],
+                        "full_name": sender["full_name"],
+                        "username": sender["username"]
+                    } if sender else {}
+                    
+                    ws_message = message.dict()
+                    ws_message["sender"] = sender_info
+                    
+                    await manager.send_chat_message(
+                        {
+                            "type": "new_message",
+                            "chat_id": scheduled_msg["chat_id"],
+                            "message": ws_message
+                        },
+                        chat["participants"]
+                    )
+                    
+                    # Send push notifications
+                    await notify_chat_participants(
+                        scheduled_msg["chat_id"],
+                        scheduled_msg["sender_id"],
+                        scheduled_msg["content"],
+                        scheduled_msg["message_type"]
+                    )
+                
+                # Update scheduled message status
+                update_data = {
+                    "status": "sent",
+                    "sent_at": datetime.utcnow()
+                }
+                
+                # Handle recurring messages
+                if scheduled_msg.get("is_recurring") and scheduled_msg.get("recurrence_pattern"):
+                    next_scheduled = calculate_next_occurrence(
+                        scheduled_msg["scheduled_for"],
+                        scheduled_msg["recurrence_pattern"]
+                    )
+                    
+                    if next_scheduled and (not scheduled_msg.get("recurrence_end") or next_scheduled <= scheduled_msg["recurrence_end"]):
+                        # Create next occurrence
+                        next_msg = ScheduledMessage(
+                            chat_id=scheduled_msg["chat_id"],
+                            sender_id=scheduled_msg["sender_id"],
+                            content=scheduled_msg["content"],
+                            message_type=scheduled_msg["message_type"],
+                            attachments=scheduled_msg.get("attachments", []),
+                            scheduled_for=next_scheduled,
+                            timezone=scheduled_msg.get("timezone", "UTC"),
+                            is_recurring=True,
+                            recurrence_pattern=scheduled_msg["recurrence_pattern"],
+                            recurrence_end=scheduled_msg.get("recurrence_end")
+                        )
+                        
+                        await db.scheduled_messages.insert_one(next_msg.dict())
+                
+                await db.scheduled_messages.update_one(
+                    {"id": scheduled_msg["id"]},
+                    {"$set": update_data}
+                )
+                
+                logging.info(f"Sent scheduled message {scheduled_msg['id']}")
+                
+            except Exception as e:
+                # Mark message as failed
+                await db.scheduled_messages.update_one(
+                    {"id": scheduled_msg["id"]},
+                    {"$set": {
+                        "status": "failed",
+                        "error_message": str(e)
+                    }}
+                )
+                logging.error(f"Failed to send scheduled message {scheduled_msg['id']}: {e}")
+        
+        return len(due_messages)
+        
+    except Exception as e:
+        logging.error(f"Error processing scheduled messages: {e}")
+        return 0
+
+def calculate_next_occurrence(current_date: datetime, pattern: str) -> Optional[datetime]:
+    """Calculate next occurrence for recurring messages"""
+    try:
+        if pattern == "daily":
+            return current_date + timedelta(days=1)
+        elif pattern == "weekly":
+            return current_date + timedelta(weeks=1)
+        elif pattern == "monthly":
+            # Add one month
+            if current_date.month == 12:
+                return current_date.replace(year=current_date.year + 1, month=1)
+            else:
+                return current_date.replace(month=current_date.month + 1)
+        else:
+            return None
+    except Exception:
+        return None
+
 # Utility Functions
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')

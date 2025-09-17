@@ -1864,7 +1864,7 @@ async def get_user_chats(current_user: User = Depends(get_current_user)):
         )
         chat["last_message"] = last_message
     
-    return {"chats": chats}
+    return {"chats": serialize_datetime(chats)}
 
 @api_router.post("/chats")
 async def create_chat(

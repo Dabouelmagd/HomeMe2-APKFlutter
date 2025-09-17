@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import axios from 'axios';
 import io from 'socket.io-client';
 import './App.css';
+import './i18n'; // Initialize i18n
 
 // Components
 import Login from './components/Login';

@@ -1012,8 +1012,9 @@ async def search_messages(
             message["sender"] = senders_dict.get(message["sender_id"])
             message["chat"] = chats_dict.get(message["chat_id"])
         
-        return {
-            "messages": messages,
+        # Serialize all data to handle ObjectIds and datetime objects
+        result = {
+            "messages": serialize_datetime(messages),
             "total_count": total_count,
             "has_more": total_count > (search_request.skip + len(messages)),
             "query": search_request.query,
@@ -1021,11 +1022,13 @@ async def search_messages(
                 "chat_ids": search_request.chat_ids,
                 "sender_ids": search_request.sender_ids,
                 "message_types": search_request.message_types,
-                "date_from": search_request.date_from,
-                "date_to": search_request.date_to,
+                "date_from": serialize_datetime(search_request.date_from),
+                "date_to": serialize_datetime(search_request.date_to),
                 "file_types": search_request.file_types
             }
         }
+        
+        return result
         
     except Exception as e:
         logging.error(f"Error searching messages: {e}")

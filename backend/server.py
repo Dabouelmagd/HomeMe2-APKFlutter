@@ -512,6 +512,81 @@ def serialize_datetime(obj):
         return [serialize_datetime(item) for item in obj]
     return obj
 
+def get_file_type(filename: str) -> str:
+    """Determine file type based on extension"""
+    ext = Path(filename).suffix.lower()
+    for file_type, extensions in ALLOWED_EXTENSIONS.items():
+        if ext in extensions:
+            return file_type
+    return "document"
+
+def is_allowed_file(filename: str) -> bool:
+    """Check if file extension is allowed"""
+    ext = Path(filename).suffix.lower()
+    for extensions in ALLOWED_EXTENSIONS.values():
+        if ext in extensions:
+            return True
+    return False
+
+def generate_unique_filename(original_filename: str) -> str:
+    """Generate unique filename while preserving extension"""
+    ext = Path(original_filename).suffix
+    unique_id = str(uuid.uuid4())
+    return f"{unique_id}{ext}"
+
+async def save_uploaded_file(file: UploadFile, file_type: str) -> Dict[str, Any]:
+    """Save uploaded file and return metadata"""
+    if not is_allowed_file(file.filename):
+        raise HTTPException(status_code=400, detail="File type not allowed")
+    
+    # Check file size
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZES.get(file_type, MAX_FILE_SIZES["document"]):
+        raise HTTPException(status_code=400, detail=f"File too large. Maximum size for {file_type} is {MAX_FILE_SIZES.get(file_type, MAX_FILE_SIZES['document']) // (1024*1024)}MB")
+    
+    # Generate unique filename
+    unique_filename = generate_unique_filename(file.filename)
+    file_path = UPLOAD_DIR / unique_filename
+    
+    # Save file
+    async with aiofiles.open(file_path, 'wb') as f:
+        await f.write(content)
+    
+    # Get file info
+    mime_type = mimetypes.guess_type(file.filename)[0] or "application/octet-stream"
+    file_url = f"/uploads/{unique_filename}"
+    
+    # Create thumbnail for images
+    thumbnail_url = None
+    width, height = None, None
+    
+    if file_type == "image":
+        try:
+            with Image.open(file_path) as img:
+                width, height = img.size
+                # Create thumbnail
+                img.thumbnail((200, 200), Image.Resampling.LANCZOS)
+                thumbnail_filename = f"thumb_{unique_filename}"
+                thumbnail_path = UPLOAD_DIR / thumbnail_filename
+                img.save(thumbnail_path, optimize=True, quality=85)
+                thumbnail_url = f"/uploads/{thumbnail_filename}"
+        except Exception as e:
+            logging.warning(f"Could not create thumbnail for {file.filename}: {e}")
+    
+    return {
+        "id": str(uuid.uuid4()),
+        "filename": unique_filename,
+        "original_filename": file.filename,
+        "file_type": file_type,
+        "file_size": len(content),
+        "mime_type": mime_type,
+        "file_url": file_url,
+        "thumbnail_url": thumbnail_url,
+        "width": width,
+        "height": height,
+        "uploaded_at": datetime.utcnow()
+    }
+
 # Utility Functions
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')

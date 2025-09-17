@@ -3380,7 +3380,7 @@ async def save_search(
         )
         
         await db.saved_searches.insert_one(saved_search.dict())
-        return {"message": "Search saved successfully", "saved_search": saved_search}
+        return {"message": "Search saved successfully", "saved_search": serialize_datetime(saved_search.dict())}
         
     except HTTPException:
         raise

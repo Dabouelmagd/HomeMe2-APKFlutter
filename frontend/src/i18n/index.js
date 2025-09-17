@@ -603,6 +603,22 @@ const resources = {
         'manageYourPreferences': 'إدارة تفضيلات وإعدادات حسابك'
       },
       
+      // PWA
+      'pwa': {
+        'installHomeMe': 'تثبيت هوم مي',
+        'installDescription': 'احصل على تجربة التطبيق الكاملة مع الوصول دون اتصال والإشعارات الفورية',
+        'install': 'تثبيت',
+        'later': 'لاحقاً',
+        'feature1': 'يعمل دون اتصال',
+        'feature2': 'إشعارات فورية',
+        'feature3': 'تجربة أصلية',
+        'installInstructions': 'للتثبيت: اضغط على زر القائمة في متصفحك واختر "إضافة إلى الشاشة الرئيسية" أو "تثبيت التطبيق"',
+        'updateAvailable': 'تحديث متوفر',
+        'updateDescription': 'إصدار جديد من هوم مي متوفر',
+        'update': 'تحديث الآن',
+        'dismiss': 'تجاهل'
+      },
+      
       // Voice Messages
       'voice': {
         'voiceMessage': 'رسالة صوتية',

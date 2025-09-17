@@ -2802,7 +2802,7 @@ async def update_notification_preferences(
             upsert=True
         )
         
-        return {"message": "Notification preferences updated successfully", "preferences": preferences_dict}
+        return {"message": "Notification preferences updated successfully", "preferences": serialize_datetime(preferences_dict)}
     
     except Exception as e:
         logging.error(f"Error updating notification preferences: {e}")

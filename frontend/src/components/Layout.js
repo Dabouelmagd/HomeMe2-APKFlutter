@@ -83,7 +83,7 @@ const Layout = () => {
         lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+        <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <img 

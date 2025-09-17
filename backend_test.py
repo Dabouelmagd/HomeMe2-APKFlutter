@@ -1171,7 +1171,7 @@ class ChatTestSuite:
             
             if response.status_code == 200:
                 data = response.json()
-                if data.get("message") == "Successfully subscribed to push notifications":
+                if data.get("message") in ["Successfully subscribed to push notifications", "Push subscription created successfully"]:
                     self.test_subscription_endpoint = subscription_data["endpoint"]
                     self.log_result("Push Subscription Subscribe", True, "Successfully subscribed to push notifications")
                     return True

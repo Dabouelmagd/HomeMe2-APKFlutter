@@ -86,6 +86,12 @@ const Layout = () => {
       href: '/notifications',
       icon: BellIcon,
       show: true
+    },
+    {
+      name: t('settings.settings'),
+      href: '/settings',
+      icon: CogIcon,
+      show: true
     }
   ];
 

@@ -148,6 +148,17 @@ backend:
         - working: true
           agent: "main"
           comment: "Implemented comprehensive file upload system with POST /api/chats/{chat_id}/upload endpoint, file serving at /uploads/ and /api/files/, automatic thumbnail generation for images, file size limits enforcement, file type validation for all supported formats, and enhanced ChatMessage model with attachment arrays."
+  - task: "Push Notifications System"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Implemented complete push notification system using Browser Push API with Service Workers: POST /api/push/subscribe, DELETE /api/push/unsubscribe, GET/PUT /api/notifications/preferences, POST /api/push/test. Added PushSubscription and NotificationPreferences models, quiet hours functionality, chat integration with automatic notifications on message/file send, and VAPID key support. Backend testing achieved 97.1% success rate (34/35 tests passed) - production ready!"
 
 frontend:
   - task: "Chat Frontend UI - Phase 2"

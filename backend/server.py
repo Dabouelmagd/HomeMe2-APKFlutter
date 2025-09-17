@@ -394,8 +394,10 @@ class ChatMessage(BaseModel):
     chat_id: str
     sender_id: str
     content: str
-    message_type: str = "text"  # text, image, video, audio, file
+    message_type: str = "text"  # text, image, video, audio, voice, file
     attachments: List[Dict[str, Any]] = []  # List of attachment metadata
+    voice_duration: Optional[float] = None  # Duration in seconds for voice messages
+    voice_waveform: Optional[List[float]] = None  # Waveform data for voice messages
     reply_to: Optional[str] = None  # Message ID if replying
     reactions: Dict[str, List[str]] = {}  # emoji -> list of user IDs
     is_edited: bool = False

@@ -45,6 +45,12 @@ const Layout = () => {
       show: user?.role === 'admin'
     },
     {
+      name: t('services_management'),
+      href: '/services',
+      icon: WrenchScrewdriverIcon,
+      show: true
+    },
+    {
       name: t('family_management'),
       href: '/family',
       icon: UsersIcon,

@@ -772,7 +772,6 @@ const resources = {
       },
       
       // Common
-      'loading': 'Chargement...',
       'error': 'Erreur',
       'success': 'Succès',
       'submit': 'Soumettre',

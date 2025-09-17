@@ -2517,6 +2517,22 @@ async def websocket_chat_endpoint(websocket: WebSocket, user_id: str):
     except WebSocketDisconnect:
         manager.disconnect(user_id)
 
+@api_router.get("/files/{filename}")
+async def serve_file(filename: str):
+    """Serve uploaded files"""
+    file_path = UPLOAD_DIR / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Get mime type
+    mime_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
+    
+    return FileResponse(
+        path=str(file_path),
+        media_type=mime_type,
+        filename=filename
+    )
+
 # Health check
 @api_router.get("/")
 async def root():

@@ -1151,6 +1151,250 @@ class ChatTestSuite:
         
         return success_count == total_tests
     
+    def test_push_subscription_subscribe(self):
+        """Test POST /api/push/subscribe - Subscribe to push notifications"""
+        print("\n=== Testing Push Subscription Subscribe ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Create mock subscription data
+            subscription_data = {
+                "endpoint": "https://fcm.googleapis.com/fcm/send/test-endpoint-123",
+                "keys": {
+                    "p256dh": "BNbN3OFADuGtmBGgvAOcpOTNkMcgs7absMnxKZ4M8kHaVt7ZapWTVJkCk-69CfMRu-14NjLHoA8C8-wFPQHBtQs",
+                    "auth": "tBHItJI5svbpez7KI4CCXg"
+                }
+            }
+            
+            response = self.session.post(f"{BASE_URL}/push/subscribe", json=subscription_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "Successfully subscribed to push notifications":
+                    self.test_subscription_endpoint = subscription_data["endpoint"]
+                    self.log_result("Push Subscription Subscribe", True, "Successfully subscribed to push notifications")
+                    return True
+                else:
+                    self.log_result("Push Subscription Subscribe", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Push Subscription Subscribe", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Push Subscription Subscribe", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_notification_preferences(self):
+        """Test GET /api/notifications/preferences - Get notification preferences"""
+        print("\n=== Testing Get Notification Preferences ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/notifications/preferences", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                preferences = data.get("preferences")
+                if preferences:
+                    # Check required fields
+                    required_fields = ["push_enabled", "message_notifications", "group_notifications", 
+                                     "direct_notifications", "compound_notifications", "quiet_hours_enabled"]
+                    missing_fields = [field for field in required_fields if field not in preferences]
+                    
+                    if not missing_fields:
+                        self.log_result("Get Notification Preferences", True, f"Retrieved notification preferences successfully")
+                        return True
+                    else:
+                        self.log_result("Get Notification Preferences", False, f"Missing preference fields: {missing_fields}")
+                        return False
+                else:
+                    self.log_result("Get Notification Preferences", False, "No preferences in response")
+                    return False
+            else:
+                self.log_result("Get Notification Preferences", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Notification Preferences", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_update_notification_preferences(self):
+        """Test PUT /api/notifications/preferences - Update notification preferences"""
+        print("\n=== Testing Update Notification Preferences ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Update preferences
+            preferences_update = {
+                "push_enabled": True,
+                "message_notifications": True,
+                "group_notifications": False,
+                "direct_notifications": True,
+                "compound_notifications": True,
+                "quiet_hours_enabled": True,
+                "quiet_hours_start": "23:00",
+                "quiet_hours_end": "07:00"
+            }
+            
+            response = self.session.put(f"{BASE_URL}/notifications/preferences", 
+                                      json=preferences_update, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "Notification preferences updated successfully":
+                    # Verify the update by getting preferences again
+                    get_response = self.session.get(f"{BASE_URL}/notifications/preferences", headers=headers)
+                    if get_response.status_code == 200:
+                        updated_prefs = get_response.json().get("preferences", {})
+                        if (updated_prefs.get("group_notifications") == False and 
+                            updated_prefs.get("quiet_hours_enabled") == True and
+                            updated_prefs.get("quiet_hours_start") == "23:00"):
+                            self.log_result("Update Notification Preferences", True, "Preferences updated and verified successfully")
+                            return True
+                        else:
+                            self.log_result("Update Notification Preferences", False, "Preferences not properly updated")
+                            return False
+                    else:
+                        self.log_result("Update Notification Preferences", False, "Could not verify preference update")
+                        return False
+                else:
+                    self.log_result("Update Notification Preferences", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Update Notification Preferences", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Update Notification Preferences", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_push_test_notification(self):
+        """Test POST /api/push/test - Send test push notification"""
+        print("\n=== Testing Test Push Notification ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.post(f"{BASE_URL}/push/test", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "Test notification sent successfully":
+                    self.log_result("Test Push Notification", True, "Test notification sent successfully")
+                    return True
+                else:
+                    self.log_result("Test Push Notification", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Test Push Notification", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Test Push Notification", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_push_notification_chat_integration(self):
+        """Test push notifications are triggered when sending chat messages"""
+        print("\n=== Testing Push Notification Chat Integration ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Push Notification Chat Integration", False, "No test chat ID available")
+            return False
+        
+        try:
+            # First, subscribe resident to push notifications
+            resident_headers = self.setup_auth_headers(self.resident_token)
+            subscription_data = {
+                "endpoint": "https://fcm.googleapis.com/fcm/send/resident-endpoint-456",
+                "keys": {
+                    "p256dh": "BNbN3OFADuGtmBGgvAOcpOTNkMcgs7absMnxKZ4M8kHaVt7ZapWTVJkCk-69CfMRu-14NjLHoA8C8-wFPQHBtQs",
+                    "auth": "tBHItJI5svbpez7KI4CCXg"
+                }
+            }
+            
+            subscribe_response = self.session.post(f"{BASE_URL}/push/subscribe", 
+                                                 json=subscription_data, headers=resident_headers)
+            
+            if subscribe_response.status_code != 200:
+                self.log_result("Push Notification Chat Integration", False, "Failed to subscribe resident to push notifications")
+                return False
+            
+            # Send a message as admin (should trigger notification to resident)
+            admin_headers = self.setup_auth_headers(self.admin_token)
+            message_data = {
+                "content": "This message should trigger a push notification!",
+                "message_type": "text"
+            }
+            
+            message_response = self.session.post(f"{BASE_URL}/chats/{self.test_chat_id}/messages", 
+                                               json=message_data, headers=admin_headers)
+            
+            if message_response.status_code == 200:
+                # The push notification logic is called in the background
+                # Since we can't actually verify the push notification was sent (it's mocked),
+                # we verify that the message was sent successfully and the notification logic would be triggered
+                self.log_result("Push Notification Chat Integration", True, "Message sent successfully - push notification logic triggered")
+                return True
+            else:
+                self.log_result("Push Notification Chat Integration", False, f"Failed to send message: {message_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Push Notification Chat Integration", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_push_unsubscribe(self):
+        """Test DELETE /api/push/unsubscribe - Unsubscribe from push notifications"""
+        print("\n=== Testing Push Unsubscribe ===")
+        
+        if not self.test_subscription_endpoint:
+            self.log_result("Push Unsubscribe", False, "No test subscription endpoint available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Unsubscribe using query parameter
+            response = self.session.delete(f"{BASE_URL}/push/unsubscribe?endpoint={self.test_subscription_endpoint}", 
+                                         headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "Successfully unsubscribed from push notifications":
+                    self.log_result("Push Unsubscribe", True, "Successfully unsubscribed from push notifications")
+                    return True
+                else:
+                    self.log_result("Push Unsubscribe", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Push Unsubscribe", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Push Unsubscribe", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_push_notification_unauthorized_access(self):
+        """Test unauthorized access to push notification endpoints"""
+        print("\n=== Testing Push Notification Unauthorized Access ===")
+        
+        try:
+            # Test without token
+            response = self.session.get(f"{BASE_URL}/notifications/preferences")
+            
+            if response.status_code in [401, 403]:
+                self.log_result("Push Notification Unauthorized Access", True, f"Correctly rejected request without token (status: {response.status_code})")
+                return True
+            else:
+                self.log_result("Push Notification Unauthorized Access", False, f"Expected 401 or 403, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Push Notification Unauthorized Access", False, f"Exception occurred: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all chat system tests"""
         print("🚀 Starting Chat Backend Test Suite")

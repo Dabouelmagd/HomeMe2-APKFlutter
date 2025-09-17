@@ -86,9 +86,11 @@ const Layout = () => {
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                HomeMe
-              </h2>
+              <img 
+                src="https://customer-assets.emergentagent.com/job_c6284a52-3971-4d5d-97ad-6dbfb32cfec5/artifacts/lwjnxovk_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
+                alt="HomeMe Logo"
+                className="h-12 w-auto"
+              />
             </div>
           </div>
           <button

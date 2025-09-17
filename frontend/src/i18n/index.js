@@ -791,6 +791,16 @@ const resources = {
         'to': 'À'
       },
       
+      // Settings
+      'settings': {
+        'settings': 'Paramètres',
+        'notifications': 'Notifications',
+        'profile': 'Profil',
+        'privacy': 'Confidentialité',
+        'language': 'Langue',
+        'manageYourPreferences': 'Gérer vos préférences et paramètres de compte'
+      },
+      
       // Common
       'error': 'Erreur',
       'success': 'Succès',

@@ -3301,7 +3301,7 @@ async def get_search_history(
             "user_id": current_user.id
         }).sort("created_at", -1).limit(limit).to_list(None)
         
-        return {"history": history}
+        return {"history": serialize_datetime(history)}
         
     except Exception as e:
         logging.error(f"Error getting search history: {e}")

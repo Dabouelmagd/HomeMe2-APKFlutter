@@ -242,17 +242,17 @@ frontend:
           agent: "main"
           comment: "Implemented complete push notification frontend with Service Worker registration (/sw.js), push subscription management with VAPID keys, notification permission handling, notification preferences UI with quiet hours settings, Settings page with tabbed interface, multilingual support for push notification settings, and integration with existing Layout navigation. Service Worker handles background push events and notification clicks."
 
-  - task: "Voice Messages Frontend"
+  - task: "Message Search Frontend"
     implemented: true
     working: true
-    file: "VoiceRecorder.js, VoiceMessagePlayer.js, ChatWindow.js"
+    file: "MessageSearch.js, ChatWindow.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
         - working: true
           agent: "main"
-          comment: "Implemented comprehensive voice message frontend with VoiceRecorder component (microphone access, real-time waveform visualization, recording controls), VoiceMessagePlayer component (waveform display, playback controls, duration display), integration with ChatWindow for voice message recording and display, microphone permission handling, voice message UI with proper styling for own/other messages, and multilingual support for all voice message features."
+          comment: "Implemented comprehensive message search frontend with MessageSearch component (search input with suggestions, advanced filters UI, search results display with highlighting, search history management, saved searches CRUD), integration with ChatWindow (search button in header, message selection and highlighting), real-time search suggestions, advanced filtering interface (message types, date range, sender filtering), and multilingual support for all search features in English, Arabic (RTL), and French."
 
 metadata:
   created_by: "main_agent"

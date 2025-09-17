@@ -455,6 +455,16 @@ class ChatUpdate(BaseModel):
 class AddParticipantsRequest(BaseModel):
     participant_ids: List[str]
 
+def serialize_datetime(obj):
+    """Convert datetime objects to ISO format strings for JSON serialization"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    elif isinstance(obj, dict):
+        return {k: serialize_datetime(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [serialize_datetime(item) for item in obj]
+    return obj
+
 # Utility Functions
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')

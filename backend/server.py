@@ -76,6 +76,80 @@ class PaymentStatus(str):
     PAID = "paid"
     OVERDUE = "overdue"
 
+class ServiceCategory(str):
+    MEDICAL = "medical"
+    MAINTENANCE = "maintenance"
+    SECURITY = "security"
+    CLEANING = "cleaning"
+    OTHER = "other"
+
+class ServiceStatus(str):
+    AVAILABLE = "available"
+    BUSY = "busy"
+    OFFLINE = "offline"
+
+class Service(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    compound_id: str
+    name: str
+    category: str  # medical, maintenance, security, cleaning, other
+    specialty: Optional[str] = None  # carpenter, plumber, electrician, etc.
+    description: str
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    working_hours: str = "9:00 AM - 6:00 PM"
+    status: str = ServiceStatus.AVAILABLE
+    rating: float = 0.0
+    total_reviews: int = 0
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ServiceBooking(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    service_id: str
+    resident_id: str
+    compound_id: str
+    unit_number: str
+    issue_description: str
+    preferred_date: datetime
+    preferred_time: str
+    status: str = "pending"  # pending, confirmed, in_progress, completed, cancelled
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ServiceReview(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    service_id: str
+    booking_id: str
+    resident_id: str
+    rating: int  # 1-5 stars
+    comment: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Request/Response Models for Services
+class ServiceCreate(BaseModel):
+    name: str
+    category: str
+    specialty: Optional[str] = None
+    description: str
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    working_hours: str = "9:00 AM - 6:00 PM"
+
+class ServiceBookingCreate(BaseModel):
+    service_id: str
+    issue_description: str
+    preferred_date: datetime
+    preferred_time: str
+    notes: Optional[str] = None
+
+class ServiceReviewCreate(BaseModel):
+    booking_id: str
+    service_id: str
+    rating: int
+    comment: Optional[str] = None
+
 class MessageType(str):
     MAINTENANCE_REQUEST = "maintenance_request"
     COMPLAINT = "complaint"

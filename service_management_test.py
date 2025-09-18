@@ -285,7 +285,7 @@ class ServiceManagementTestSuite:
                     self.log_result("Create Emergency Booking", True, f"Emergency booking created successfully with ID: {self.test_booking_id}")
                     
                     # Test scheduled booking
-                    scheduled_date = (datetime.now() + timedelta(days=2)).date()
+                    scheduled_date = (datetime.now() + timedelta(days=4)).date()  # Use different date
                     scheduled_booking_data = {
                         "provider_id": self.test_provider_id,
                         "service_category": "cleaning",
@@ -294,8 +294,8 @@ class ServiceManagementTestSuite:
                         "description": "Regular deep cleaning service for apartment",
                         "priority": "scheduled",
                         "scheduled_date": scheduled_date.isoformat(),
-                        "scheduled_time": "10:00",
-                        "scheduled_end_time": "14:00",
+                        "scheduled_time": "08:00",  # Use different time
+                        "scheduled_end_time": "12:00",
                         "is_recurring": True,
                         "recurrence_pattern": "weekly",
                         "payment_method": "credit_card",

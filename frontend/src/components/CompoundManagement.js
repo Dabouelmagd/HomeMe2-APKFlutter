@@ -44,6 +44,9 @@ const CompoundManagement = () => {
   useEffect(() => {
     fetchCompound();
     fetchResidences();
+    if (user?.role === 'admin') {
+      fetchRegistrationLinks();
+    }
   }, []);
 
   const fetchCompound = async () => {
@@ -64,6 +67,62 @@ const CompoundManagement = () => {
     } catch (error) {
       console.error('Failed to load residences:', error);
     }
+  };
+
+  const fetchRegistrationLinks = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/registration-links`);
+      setRegistrationLinks(response.data.registration_links || []);
+    } catch (error) {
+      console.error('Failed to load registration links:', error);
+    }
+  };
+
+  const handleCreateRegistrationLink = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(`${API}/admin/registration-links`, residenceForm);
+      toast.success('Registration link created successfully!');
+      
+      // Copy link to clipboard
+      navigator.clipboard.writeText(response.data.registration_url);
+      toast.success('Registration URL copied to clipboard!');
+      
+      setShowAddResidence(false);
+      resetResidenceForm();
+      await fetchRegistrationLinks();
+    } catch (error) {
+      console.error('Failed to create registration link:', error);
+      toast.error(error.response?.data?.detail || 'Failed to create registration link');
+    }
+  };
+
+  const handleDeleteRegistrationLink = async (linkId) => {
+    if (window.confirm('Are you sure you want to delete this registration link?')) {
+      try {
+        await axios.delete(`${API}/admin/registration-links/${linkId}`);
+        toast.success('Registration link deleted successfully');
+        await fetchRegistrationLinks();
+      } catch (error) {
+        console.error('Failed to delete registration link:', error);
+        toast.error('Failed to delete registration link');
+      }
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success('Copied to clipboard!');
+  };
+
+  const resetResidenceForm = () => {
+    setResidenceForm({
+      unit_number: '',
+      full_name: '',
+      email: '',
+      phone: '',
+      expires_in_hours: 72
+    });
   };
 
   const handleLogoUpload = async (event) => {

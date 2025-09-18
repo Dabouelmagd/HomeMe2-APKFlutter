@@ -4802,25 +4802,25 @@ async def process_payment(
         elif payment_request.payment_method == "bank_transfer":
             transaction.status = "processing"  # Manual verification needed
         
-        await db.payment_transactions.insert_one(transaction.dict())
+        await db.payment_transactions.insert_one(serialize_datetime(transaction.dict()))
         
         # Update booking payment status
         await db.service_bookings.update_one(
             {"id": booking_id},
             {
-                "$set": {
+                "$set": serialize_datetime({
                     "payment_method": payment_request.payment_method,
                     "payment_status": transaction.status,
                     "payment_id": transaction.id,
                     "final_cost": payment_request.amount,
                     "updated_at": datetime.now(timezone.utc)
-                }
+                })
             }
         )
         
         return {
             "message": "Payment processed successfully",
-            "transaction": transaction,
+            "transaction": serialize_datetime(transaction.dict()),
             "status": transaction.status
         }
         

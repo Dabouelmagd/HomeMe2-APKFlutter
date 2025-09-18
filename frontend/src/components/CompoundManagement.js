@@ -304,7 +304,7 @@ const CompoundManagement = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Compound Management</h1>
         <p className="text-gray-600 mt-2">
-          Manage your compound settings and branding
+          Manage your compound settings and branding ✨ Updated with New Features!
         </p>
       </div>
 

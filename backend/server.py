@@ -5567,6 +5567,122 @@ async def update_user_compound(
         logging.error(f"Error updating user compound: {e}")
         raise HTTPException(status_code=500, detail="Failed to update user compound")
 
+@api_router.post("/admin/residences")
+async def create_residence_directly(
+    unit_number: str = Form(...),
+    full_name: str = Form(...),
+    email: str = Form(...),
+    phone: str = Form(None),
+    compound_id: str = Form(...),
+    profile_picture: UploadFile = File(None),
+    current_user: User = Depends(require_admin)
+):
+    """Create a new residence and user account directly (Admin only)"""
+    try:
+        # Check if user already exists
+        existing_user = await db.users.find_one({
+            "email": email,
+            "compound_id": compound_id
+        })
+        
+        if existing_user:
+            raise HTTPException(status_code=400, detail="User with this email already exists in this compound")
+        
+        # Check if unit number already exists
+        existing_unit = await db.users.find_one({
+            "unit_number": unit_number,
+            "compound_id": compound_id
+        })
+        
+        if existing_unit:
+            raise HTTPException(status_code=400, detail="Unit number already exists in this compound")
+        
+        # Handle profile picture upload
+        profile_picture_url = None
+        if profile_picture and profile_picture.filename:
+            if not profile_picture.content_type.startswith('image/'):
+                raise HTTPException(status_code=400, detail="Profile picture must be an image")
+            
+            # Create user uploads directory
+            user_uploads_dir = f"{UPLOAD_DIR}/users"
+            os.makedirs(user_uploads_dir, exist_ok=True)
+            
+            # Generate unique filename
+            file_extension = profile_picture.filename.split('.')[-1].lower()
+            unique_filename = f"profile_{str(uuid.uuid4())}.{file_extension}"
+            file_path = os.path.join(user_uploads_dir, unique_filename)
+            
+            # Save file
+            content = await profile_picture.read()
+            async with aiofiles.open(file_path, 'wb') as f:
+                await f.write(content)
+            
+            profile_picture_url = f"/uploads/users/{unique_filename}"
+        
+        # Generate temporary password
+        import secrets
+        import string
+        temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(8))
+        hashed_password = pwd_context.hash(temp_password)
+        
+        # Generate username from email
+        username = email.split('@')[0] + str(secrets.randbelow(1000))
+        
+        # Create the user account
+        new_user = User(
+            username=username,
+            email=email,
+            password_hash=hashed_password,
+            full_name=full_name,
+            phone=phone,
+            role="resident",
+            compound_id=compound_id,
+            unit_number=unit_number,
+            profile_picture_url=profile_picture_url,
+            is_family_head=True
+        )
+        
+        await db.users.insert_one(new_user.dict())
+        
+        # Create family for the user
+        new_family = Family(
+            compound_id=compound_id,
+            head_id=new_user.id,
+            members=[{
+                "id": new_user.id,
+                "full_name": full_name,
+                "relationship": "Head",
+                "phone": phone,
+                "email": email,
+                "age": None,
+                "id_number": None,
+                "qr_code": None
+            }]
+        )
+        
+        await db.families.insert_one(new_family.dict())
+        
+        # Update user with family_id
+        await db.users.update_one(
+            {"id": new_user.id},
+            {"$set": {"family_id": new_family.id}}
+        )
+        
+        return {
+            "message": "Residence created successfully",
+            "user_id": new_user.id,
+            "family_id": new_family.id,
+            "temporary_password": temp_password,
+            "username": username,
+            "profile_picture_url": profile_picture_url
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating residence: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create residence")
+
 def create_registration_token(unit_number: str, email: str, compound_id: str, expires_at: datetime) -> str:
     """Create a secure token for resident registration"""
     token_data = {

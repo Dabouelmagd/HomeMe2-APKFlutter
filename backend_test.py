@@ -318,8 +318,9 @@ class CompoundManagementTestSuite:
             
             if response.status_code == 200:
                 data = response.json()
-                if (data.get("valid") == True and data.get("registration_details") and 
-                    data["registration_details"].get("unit_number")):
+                # The API returns the data directly, not nested in registration_details
+                if (data.get("valid") == True and data.get("unit_number") and 
+                    data.get("email") and data.get("compound_id")):
                     self.log_result("Verify Registration Token", True, "Registration token verified successfully")
                     return True
                 else:

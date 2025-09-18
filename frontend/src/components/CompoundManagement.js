@@ -7,7 +7,16 @@ import {
   PhotoIcon,
   UsersIcon,
   PlusIcon,
-  HomeIcon
+  HomeIcon,
+  UserPlusIcon,
+  LinkIcon,
+  ClockIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  TrashIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+  DocumentDuplicateIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -17,9 +26,20 @@ const CompoundManagement = () => {
   const { user } = useAuth();
   const [compound, setCompound] = useState(null);
   const [residences, setResidences] = useState([]);
+  const [registrationLinks, setRegistrationLinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [showAddResidence, setShowAddResidence] = useState(false);
+
+  // Form for adding new residence registration link
+  const [residenceForm, setResidenceForm] = useState({
+    unit_number: '',
+    full_name: '',
+    email: '',
+    phone: '',
+    expires_in_hours: 72
+  });
 
   useEffect(() => {
     fetchCompound();

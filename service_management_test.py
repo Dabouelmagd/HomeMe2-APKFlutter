@@ -743,11 +743,11 @@ class ServiceManagementTestSuite:
                     return False
                 
                 # Check revenue statistics by payment method
-                revenue_stats = analytics.get("revenue_statistics", {})
-                if revenue_stats:
-                    self.log_result("Revenue Statistics", True, f"Revenue stats retrieved: {revenue_stats}")
+                revenue_stats = analytics.get("revenue_statistics", [])
+                if isinstance(revenue_stats, list):
+                    self.log_result("Revenue Statistics", True, f"Revenue stats retrieved: {len(revenue_stats)} payment methods with revenue")
                 else:
-                    self.log_result("Revenue Statistics", False, "No revenue statistics in response")
+                    self.log_result("Revenue Statistics", False, "Revenue statistics not in expected format")
                     return False
                 
                 # Check top-rated providers

@@ -215,7 +215,7 @@ class CompoundEnhancementsTestSuite(CompoundManagementTestSuite):
                     "compound_id": target_compound_id
                 }
                 
-                update_response = self.session.put(f"{self.BASE_URL}/users/{new_user_id}/compound", 
+                update_response = self.session.put(f"{BASE_URL}/users/{new_user_id}/compound", 
                                                  json=compound_data, headers=headers)
                 
                 if update_response.status_code != 200:

@@ -5458,7 +5458,7 @@ async def complete_registration(
                 raise HTTPException(status_code=400, detail="Profile picture must be an image")
             
             # Create user uploads directory
-            user_uploads_dir = f"{UPLOADS_DIR}/users"
+            user_uploads_dir = f"{UPLOAD_DIR}/users"
             os.makedirs(user_uploads_dir, exist_ok=True)
             
             # Generate unique filename

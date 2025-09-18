@@ -352,6 +352,38 @@ const resources = {
         'from': 'From',
         'gridView': 'Grid View',
         'listView': 'List View'
+      },
+      
+      // Message Scheduling
+      'schedule': {
+        'title': 'Message Scheduling',
+        'description': 'Schedule messages to be sent automatically at specific times',
+        'scheduleMessage': 'Schedule Message',
+        'editMessage': 'Edit Scheduled Message',
+        'message': 'Message',
+        'enterMessage': 'Enter your message...',
+        'recipientType': 'Recipient Type',
+        'directMessage': 'Direct Message',
+        'groupMessage': 'Group Message',
+        'compoundMessage': 'Compound-wide Message',
+        'recipient': 'Recipient',
+        'selectRecipient': 'Select recipient...',
+        'scheduledFor': 'Scheduled For',
+        'repeatType': 'Repeat',
+        'noRepeat': 'No Repeat',
+        'daily': 'Daily',
+        'weekly': 'Weekly',
+        'monthly': 'Monthly',
+        'updateMessage': 'Update Message',
+        'noScheduledMessages': 'No scheduled messages',
+        'scheduleFirstMessage': 'Schedule your first message to get started',
+        'status': 'Status',
+        'actions': 'Actions',
+        'pending': 'Pending',
+        'sent': 'Sent',
+        'failed': 'Failed',
+        'cancelled': 'Cancelled',
+        'confirmDelete': 'Are you sure you want to delete this scheduled message?'
       }
     }
   },

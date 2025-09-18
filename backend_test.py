@@ -3371,8 +3371,8 @@ class CompoundManagementTestSuite:
             return False
 
     def run_all_tests(self):
-        """Run all chat system, push notification, and search tests"""
-        print("🚀 Starting Chat Backend, Push Notification & Search Test Suite")
+        """Run all compound management system tests"""
+        print("🏠 Starting Compound Management System Test Suite")
         print("=" * 60)
         
         # Authentication setup
@@ -3380,72 +3380,23 @@ class CompoundManagementTestSuite:
             print("\n❌ Authentication failed. Cannot proceed with other tests.")
             return False
         
-        # Core functionality tests
+        # Compound Management tests
         test_methods = [
-            self.test_get_user_chats,
-            self.test_create_direct_chat,
-            self.test_create_group_chat,
-            self.test_create_compound_wide_chat,
-            self.test_get_chat_details,
-            self.test_send_message,
-            self.test_get_chat_messages,
-            self.test_edit_message,
-            self.test_mark_messages_as_read,
-            self.test_add_participants,
-            self.test_delete_message,
-            # New multimedia tests
-            self.test_file_upload_with_message,
-            self.test_multiple_file_upload,
-            self.test_file_size_limits,
-            self.test_file_type_validation,
-            self.test_file_serving,
-            self.test_message_reactions,
-            self.test_multiple_user_reactions,
-            self.test_attachment_metadata,
-            # Voice message tests
-            self.test_voice_message_upload,
-            self.test_voice_file_processing,
-            self.test_voice_file_type_support,
-            self.test_voice_message_push_notification,
-            self.test_voice_file_serving,
-            self.test_voice_message_chat_integration,
-            self.test_voice_message_validation,
-            # Message search tests
-            self.test_message_search_basic,
-            self.test_message_search_advanced_filters,
-            self.test_search_suggestions,
-            self.test_search_history,
-            self.test_saved_searches,
-            self.test_search_pagination,
-            self.test_search_access_control,
-            self.test_search_unauthorized_access,
-            self.test_search_edge_cases,
-            # File Gallery tests
-            self.test_file_gallery_basic,
-            self.test_file_gallery_filters,
-            self.test_file_gallery_stats,
-            self.test_file_gallery_access_control,
-            self.test_file_gallery_pagination,
-            # Message Scheduling tests
-            self.test_schedule_message_basic,
-            self.test_schedule_message_recurring,
-            self.test_get_scheduled_messages,
-            self.test_update_scheduled_message,
-            self.test_delete_scheduled_message,
-            self.test_schedule_message_validation,
-            self.test_schedule_message_access_control,
-            # Push notification tests
-            self.test_push_subscription_subscribe,
-            self.test_get_notification_preferences,
-            self.test_update_notification_preferences,
-            self.test_push_test_notification,
-            self.test_push_notification_chat_integration,
-            self.test_push_unsubscribe,
-            self.test_push_notification_unauthorized_access,
-            # Security and edge case tests
-            self.test_unauthorized_access,
-            self.test_access_control,
-            self.test_edge_cases
+            # Core compound management tests
+            self.test_get_compound_details,
+            self.test_get_compound_residences,
+            self.test_upload_compound_logo,
+            # Registration link management tests
+            self.test_create_registration_link,
+            self.test_get_registration_links,
+            self.test_verify_registration_token,
+            self.test_complete_registration,
+            self.test_delete_registration_link,
+            # Access control tests
+            self.test_admin_access_control,
+            self.test_compound_access_control,
+            # Security tests
+            self.test_unauthorized_access
         ]
         
         # Run synchronous tests

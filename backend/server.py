@@ -5647,17 +5647,9 @@ async def create_residence_directly(
         # Create family for the user
         new_family = Family(
             compound_id=compound_id,
-            head_id=new_user.id,
-            members=[{
-                "id": new_user.id,
-                "full_name": full_name,
-                "relationship": "Head",
-                "phone": phone,
-                "email": email,
-                "age": None,
-                "id_number": None,
-                "qr_code": None
-            }]
+            unit_number=unit_number,
+            head_user_id=new_user.id,
+            members=[new_user.id]  # List of user IDs
         )
         
         await db.families.insert_one(new_family.dict())

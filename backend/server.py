@@ -4577,7 +4577,7 @@ async def get_service_bookings(
             resident = await db.users.find_one({"id": booking["resident_id"]})
             
             enhanced_booking = {
-                **booking,
+                **serialize_datetime(booking),
                 "provider_name": provider["full_name"] if provider else "Unknown",
                 "provider_phone": provider["phone"] if provider else None,
                 "resident_name": resident["full_name"] if resident else "Unknown"

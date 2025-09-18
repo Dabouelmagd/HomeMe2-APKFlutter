@@ -641,10 +641,11 @@ class CompoundManagementTestSuite:
             headers = {"Authorization": f"Bearer {self.admin_token}"}
             
             # Use admin's email to test duplicate validation
+            admin_email = self.admin_user.get("email", "johndoe@example.com")
             data = {
                 'unit_number': f"DUPTEST",
                 'full_name': f"Duplicate Email Test",
-                'email': self.admin_user["email"],  # Use existing admin email
+                'email': admin_email,  # Use existing admin email
                 'phone': "+1234567890",
                 'compound_id': self.compound_id
             }

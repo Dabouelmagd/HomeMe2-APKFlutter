@@ -93,6 +93,7 @@ const resources = {
       
       // Services
       'services_management': 'Services Management',
+      'service_booking': 'Service Booking & Payments',
       'services': 'Services',
       'add_service': 'Add Service',
       'edit_service': 'Edit Service',

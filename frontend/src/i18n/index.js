@@ -655,6 +655,27 @@ const resources = {
         'waveformPlaceholder': 'ستظهر موجة الصوت هنا'
       },
       
+      // File Gallery
+      'gallery': {
+        'title': 'معرض الملفات',
+        'description': 'تصفح وإدارة جميع الملفات المشتركة من محادثاتك',
+        'allFiles': 'جميع الملفات',
+        'images': 'الصور',
+        'videos': 'الفيديوهات',
+        'voice': 'الصوت',
+        'audio': 'الصوتيات',
+        'documents': 'المستندات',
+        'newestFirst': 'الأحدث أولاً',
+        'largestFirst': 'الأكبر أولاً',
+        'nameAZ': 'الاسم أ-ي',
+        'noFilesFound': 'لم يتم العثور على ملفات',
+        'filesSharedInChats': 'الملفات المشتركة في المحادثات ستظهر هنا',
+        'download': 'تحميل',
+        'from': 'من',
+        'gridView': 'عرض الشبكة',
+        'listView': 'عرض القائمة'
+      },
+      
       // Search
       'search': {
         'searchMessages': 'البحث في الرسائل',

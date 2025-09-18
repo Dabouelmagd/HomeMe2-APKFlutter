@@ -20,6 +20,7 @@ import NotificationCenter from './components/NotificationCenter';
 import Chat from './components/Chat';
 import Settings from './components/Settings';
 import FileGallery from './components/FileGallery';
+import MessageScheduling from './components/MessageScheduling';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
 import { Toaster } from './components/ui/sonner';

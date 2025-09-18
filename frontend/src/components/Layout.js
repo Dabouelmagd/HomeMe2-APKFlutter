@@ -56,7 +56,7 @@ const Layout = () => {
       show: true
     },
     {
-      name: 'Service Booking & Payments',
+      name: t('service_booking'),
       href: '/service-booking',
       icon: CurrencyDollarIcon,
       show: true

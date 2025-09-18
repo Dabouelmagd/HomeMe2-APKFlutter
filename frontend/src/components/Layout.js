@@ -91,6 +91,12 @@ const Layout = () => {
       show: true
     },
     {
+      name: 'Message Scheduling',
+      href: '/schedule',
+      icon: ClockIcon,
+      show: true
+    },
+    {
       name: t('notifications_nav'),
       href: '/notifications',
       icon: BellIcon,

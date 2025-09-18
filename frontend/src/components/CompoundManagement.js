@@ -302,6 +302,7 @@ const CompoundManagement = () => {
 
   return (
     <div className="p-6">
+      <TestUpdate />
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-red-600">🔴 UPDATED - Compound Management</h1>
         <p className="text-gray-600 mt-2">

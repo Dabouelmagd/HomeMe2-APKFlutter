@@ -514,6 +514,320 @@ class CompoundManagementTestSuite:
             self.log_result("Compound Access Control", False, f"Exception occurred: {str(e)}")
             return False
     
+    def test_get_available_compounds(self):
+        """Test GET /api/compounds - Get all available compounds for selection"""
+        print("\n=== Testing Get Available Compounds ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/compounds", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                compounds = data.get("compounds", [])
+                if isinstance(compounds, list):
+                    self.log_result("Get Available Compounds", True, f"Retrieved {len(compounds)} compounds successfully")
+                    return True
+                else:
+                    self.log_result("Get Available Compounds", False, "Invalid compounds data structure")
+                    return False
+            else:
+                self.log_result("Get Available Compounds", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Available Compounds", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_residence_directly(self):
+        """Test POST /api/admin/residences - Create new residence directly with profile picture upload"""
+        print("\n=== Testing Create Residence Directly ===")
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Generate unique data for testing
+            unique_id = str(uuid.uuid4())[:8]
+            
+            # Create a test profile picture
+            profile_pic_data = self.create_test_image("residence_profile.jpg", size=(150, 150))
+            
+            files = {
+                'profile_picture': ('residence_profile.jpg', profile_pic_data, 'image/jpeg')
+            }
+            
+            data = {
+                'unit_number': f"RES{unique_id[:4]}",
+                'full_name': f"Test Residence Owner {unique_id}",
+                'email': f"residence{unique_id}@example.com",
+                'phone': "+1234567890",
+                'compound_id': self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/residences", 
+                                       files=files, data=data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if (result.get("message") == "Residence created successfully" and 
+                    result.get("user_id") and result.get("family_id") and 
+                    result.get("temporary_password") and result.get("username")):
+                    
+                    if result.get("profile_picture_url"):
+                        self.log_result("Create Residence Directly", True, 
+                                      f"Residence created successfully with profile picture for user: {result.get('username')}")
+                        return True
+                    else:
+                        self.log_result("Create Residence Directly", True, 
+                                      f"Residence created successfully for user: {result.get('username')} (no profile picture)")
+                        return True
+                else:
+                    self.log_result("Create Residence Directly", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Create Residence Directly", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Residence Directly", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_residence_without_profile_picture(self):
+        """Test POST /api/admin/residences - Create residence without profile picture"""
+        print("\n=== Testing Create Residence Without Profile Picture ===")
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Generate unique data for testing
+            unique_id = str(uuid.uuid4())[:8]
+            
+            data = {
+                'unit_number': f"RES{unique_id[:4]}",
+                'full_name': f"Test Residence Owner No Pic {unique_id}",
+                'email': f"residencenopic{unique_id}@example.com",
+                'phone': "+1234567890",
+                'compound_id': self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/residences", 
+                                       data=data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if (result.get("message") == "Residence created successfully" and 
+                    result.get("user_id") and result.get("family_id") and 
+                    result.get("temporary_password") and result.get("username")):
+                    
+                    self.log_result("Create Residence Without Profile Picture", True, 
+                                  f"Residence created successfully without profile picture for user: {result.get('username')}")
+                    return True
+                else:
+                    self.log_result("Create Residence Without Profile Picture", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Create Residence Without Profile Picture", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Residence Without Profile Picture", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_residence_duplicate_email(self):
+        """Test POST /api/admin/residences - Duplicate email validation"""
+        print("\n=== Testing Create Residence Duplicate Email Validation ===")
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Use admin's email to test duplicate validation
+            data = {
+                'unit_number': f"DUPTEST",
+                'full_name': f"Duplicate Email Test",
+                'email': self.admin_user["email"],  # Use existing admin email
+                'phone': "+1234567890",
+                'compound_id': self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/residences", 
+                                       data=data, headers=headers)
+            
+            if response.status_code == 400:
+                result = response.json()
+                if "already exists" in result.get("detail", "").lower():
+                    self.log_result("Create Residence Duplicate Email", True, "Correctly rejected duplicate email")
+                    return True
+                else:
+                    self.log_result("Create Residence Duplicate Email", False, f"Unexpected error message: {result}")
+                    return False
+            else:
+                self.log_result("Create Residence Duplicate Email", False, f"Expected 400, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Residence Duplicate Email", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_update_user_compound_admin(self):
+        """Test PUT /api/users/{user_id}/compound - Admin updating user's compound"""
+        print("\n=== Testing Update User Compound (Admin) ===")
+        
+        if not self.resident_user:
+            self.log_result("Update User Compound (Admin)", False, "No resident user available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Get available compounds first
+            compounds_response = self.session.get(f"{BASE_URL}/compounds", headers=headers)
+            if compounds_response.status_code != 200:
+                self.log_result("Update User Compound (Admin)", False, "Could not get available compounds")
+                return False
+            
+            compounds = compounds_response.json().get("compounds", [])
+            if not compounds:
+                self.log_result("Update User Compound (Admin)", False, "No compounds available for testing")
+                return False
+            
+            # Use the first available compound (should be current compound)
+            target_compound_id = compounds[0]["id"]
+            
+            compound_data = {
+                "compound_id": target_compound_id
+            }
+            
+            response = self.session.put(f"{BASE_URL}/users/{self.resident_user['id']}/compound", 
+                                      json=compound_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "User compound updated successfully":
+                    self.log_result("Update User Compound (Admin)", True, "Admin successfully updated user's compound")
+                    return True
+                else:
+                    self.log_result("Update User Compound (Admin)", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Update User Compound (Admin)", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Update User Compound (Admin)", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_update_user_compound_self(self):
+        """Test PUT /api/users/{user_id}/compound - User updating their own compound"""
+        print("\n=== Testing Update User Compound (Self) ===")
+        
+        if not self.resident_user:
+            self.log_result("Update User Compound (Self)", False, "No resident user available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Get available compounds first
+            compounds_response = self.session.get(f"{BASE_URL}/compounds", headers=headers)
+            if compounds_response.status_code != 200:
+                self.log_result("Update User Compound (Self)", False, "Could not get available compounds")
+                return False
+            
+            compounds = compounds_response.json().get("compounds", [])
+            if not compounds:
+                self.log_result("Update User Compound (Self)", False, "No compounds available for testing")
+                return False
+            
+            # Use the first available compound
+            target_compound_id = compounds[0]["id"]
+            
+            compound_data = {
+                "compound_id": target_compound_id
+            }
+            
+            response = self.session.put(f"{BASE_URL}/users/{self.resident_user['id']}/compound", 
+                                      json=compound_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "User compound updated successfully":
+                    self.log_result("Update User Compound (Self)", True, "User successfully updated their own compound")
+                    return True
+                else:
+                    self.log_result("Update User Compound (Self)", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Update User Compound (Self)", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Update User Compound (Self)", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_update_user_compound_unauthorized(self):
+        """Test PUT /api/users/{user_id}/compound - Unauthorized access (resident trying to update another user)"""
+        print("\n=== Testing Update User Compound Unauthorized ===")
+        
+        if not self.resident_user or not self.admin_user:
+            self.log_result("Update User Compound Unauthorized", False, "No resident or admin user available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            compound_data = {
+                "compound_id": self.compound_id
+            }
+            
+            # Resident trying to update admin's compound
+            response = self.session.put(f"{BASE_URL}/users/{self.admin_user['id']}/compound", 
+                                      json=compound_data, headers=headers)
+            
+            if response.status_code == 403:
+                self.log_result("Update User Compound Unauthorized", True, "Correctly denied unauthorized compound update")
+                return True
+            else:
+                self.log_result("Update User Compound Unauthorized", False, f"Expected 403, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Update User Compound Unauthorized", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_update_user_compound_invalid_compound(self):
+        """Test PUT /api/users/{user_id}/compound - Invalid compound validation"""
+        print("\n=== Testing Update User Compound Invalid Compound ===")
+        
+        if not self.resident_user:
+            self.log_result("Update User Compound Invalid Compound", False, "No resident user available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            compound_data = {
+                "compound_id": "invalid-compound-id-12345"
+            }
+            
+            response = self.session.put(f"{BASE_URL}/users/{self.resident_user['id']}/compound", 
+                                      json=compound_data, headers=headers)
+            
+            if response.status_code == 404:
+                result = response.json()
+                if "not found" in result.get("detail", "").lower():
+                    self.log_result("Update User Compound Invalid Compound", True, "Correctly rejected invalid compound ID")
+                    return True
+                else:
+                    self.log_result("Update User Compound Invalid Compound", False, f"Unexpected error message: {result}")
+                    return False
+            else:
+                self.log_result("Update User Compound Invalid Compound", False, f"Expected 404, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Update User Compound Invalid Compound", False, f"Exception occurred: {str(e)}")
+            return False
+    
     def test_get_user_chats(self):
         """Test GET /api/chats endpoint"""
         print("\n=== Testing Get User Chats ===")

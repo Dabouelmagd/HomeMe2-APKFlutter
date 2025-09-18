@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../App';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   UsersIcon,
   PlusIcon,
   UserPlusIcon,
-  HomeIcon
+  HomeIcon,
+  PencilIcon,
+  TrashIcon,
+  QrCodeIcon,
+  PhoneIcon,
+  EnvelopeIcon,
+  IdentificationIcon,
+  CalendarIcon,
+  XCircleIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -14,27 +25,55 @@ const API = `${BACKEND_URL}/api`;
 
 const FamilyManagement = () => {
   const { user } = useAuth();
-  const [familyData, setFamilyData] = useState(null);
+  const { t } = useTranslation();
+  const [familyMembers, setFamilyMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddMember, setShowAddMember] = useState(false);
+  const [showQRModal, setShowQRModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [editingMember, setEditingMember] = useState(null);
+  const [qrCodeData, setQrCodeData] = useState(null);
+
   const [memberForm, setMemberForm] = useState({
-    username: '',
-    email: '',
-    password: '',
     full_name: '',
-    phone: ''
+    age: '',
+    relationship: 'son',
+    phone: '',
+    email: '',
+    id_number: '',
+    emergency_contact_name: '',
+    emergency_contact_phone: '',
+    move_in_date: ''
   });
 
+  const relationshipOptions = [
+    { value: 'spouse', label: 'Spouse' },
+    { value: 'son', label: 'Son' },
+    { value: 'daughter', label: 'Daughter' },
+    { value: 'father', label: 'Father' },
+    { value: 'mother', label: 'Mother' },
+    { value: 'brother', label: 'Brother' },
+    { value: 'sister', label: 'Sister' },
+    { value: 'grandfather', label: 'Grandfather' },
+    { value: 'grandmother', label: 'Grandmother' },
+    { value: 'uncle', label: 'Uncle' },
+    { value: 'aunt', label: 'Aunt' },
+    { value: 'cousin', label: 'Cousin' },
+    { value: 'other', label: 'Other' }
+  ];
+
   useEffect(() => {
-    fetchFamilyData();
+    fetchFamilyMembers();
   }, []);
 
-  const fetchFamilyData = async () => {
+  const fetchFamilyMembers = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(`${API}/families/my`);
-      setFamilyData(response.data);
+      const response = await axios.get(`${API}/family-members`);
+      setFamilyMembers(response.data.family_members || []);
     } catch (error) {
-      toast.error('Failed to load family data');
+      console.error('Failed to load family members:', error);
+      toast.error('Failed to load family members');
     } finally {
       setLoading(false);
     }
@@ -42,11 +81,117 @@ const FamilyManagement = () => {
 
   const handleAddMember = async (e) => {
     e.preventDefault();
-    
-    if (!familyData?.family?.id) {
-      toast.error('No family found');
-      return;
+    try {
+      const memberData = {
+        ...memberForm,
+        age: parseInt(memberForm.age),
+        move_in_date: memberForm.move_in_date || null
+      };
+
+      await axios.post(`${API}/family-members`, memberData);
+      toast.success('Family member added successfully');
+      setShowAddMember(false);
+      resetForm();
+      await fetchFamilyMembers();
+    } catch (error) {
+      console.error('Failed to add family member:', error);
+      toast.error('Failed to add family member');
     }
+  };
+
+  const handleUpdateMember = async (e) => {
+    e.preventDefault();
+    try {
+      const memberData = {
+        ...memberForm,
+        age: parseInt(memberForm.age),
+        move_in_date: memberForm.move_in_date || null
+      };
+
+      await axios.put(`${API}/family-members/${editingMember.id}`, memberData);
+      toast.success('Family member updated successfully');
+      setEditingMember(null);
+      resetForm();
+      await fetchFamilyMembers();
+    } catch (error) {
+      console.error('Failed to update family member:', error);
+      toast.error('Failed to update family member');
+    }
+  };
+
+  const handleDeleteMember = async (memberId) => {
+    if (window.confirm('Are you sure you want to remove this family member?')) {
+      try {
+        await axios.delete(`${API}/family-members/${memberId}`);
+        toast.success('Family member removed successfully');
+        await fetchFamilyMembers();
+      } catch (error) {
+        console.error('Failed to remove family member:', error);
+        toast.error('Failed to remove family member');
+      }
+    }
+  };
+
+  const generateQRCode = async (member) => {
+    try {
+      const response = await axios.post(`${API}/family-members/${member.id}/qr-code`, {
+        expires_in_hours: 24
+      });
+      
+      setQrCodeData({
+        qr_code: response.data.qr_code,
+        expires_at: response.data.expires_at,
+        member_name: member.full_name
+      });
+      setShowQRModal(true);
+      toast.success('QR code generated successfully');
+    } catch (error) {
+      console.error('Failed to generate QR code:', error);
+      toast.error('Failed to generate QR code');
+    }
+  };
+
+  const handleEditMember = (member) => {
+    setEditingMember(member);
+    setMemberForm({
+      full_name: member.full_name,
+      age: member.age.toString(),
+      relationship: member.relationship,
+      phone: member.phone || '',
+      email: member.email || '',
+      id_number: member.id_number || '',
+      emergency_contact_name: member.emergency_contact_name || '',
+      emergency_contact_phone: member.emergency_contact_phone || '',
+      move_in_date: member.move_in_date || ''
+    });
+    setShowAddMember(true);
+  };
+
+  const resetForm = () => {
+    setMemberForm({
+      full_name: '',
+      age: '',
+      relationship: 'son',
+      phone: '',
+      email: '',
+      id_number: '',
+      emergency_contact_name: '',
+      emergency_contact_phone: '',
+      move_in_date: ''
+    });
+    setEditingMember(null);
+    setShowAddMember(false);
+  };
+
+  const getRelationshipLabel = (relationship) => {
+    const option = relationshipOptions.find(opt => opt.value === relationship);
+    return option ? option.label : relationship;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Not specified';
+    return new Date(dateString).toLocaleDateString();
+  };
 
     try {
       await axios.post(`${API}/families/${familyData.family.id}/members`, memberForm);

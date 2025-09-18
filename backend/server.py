@@ -6,6 +6,9 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any
+import qrcode
+import io
+import base64
 from datetime import datetime, timedelta, date
 from dotenv import load_dotenv
 from pathlib import Path

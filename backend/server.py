@@ -866,9 +866,47 @@ def is_allowed_file(filename: str) -> bool:
 
 def generate_unique_filename(original_filename: str) -> str:
     """Generate unique filename while preserving extension"""
-    ext = Path(original_filename).suffix
-    unique_id = str(uuid.uuid4())
-    return f"{unique_id}{ext}"
+    name, ext = Path(original_filename).stem, Path(original_filename).suffix
+    unique_name = f"{name}_{uuid.uuid4().hex[:8]}{ext}"
+    return unique_name
+
+def generate_qr_code(data: str) -> str:
+    """Generate QR code and return as base64 encoded string"""
+    try:
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(data)
+        qr.make(fit=True)
+        
+        # Create QR code image
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convert to base64
+        buffered = io.BytesIO()
+        img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        
+        return f"data:image/png;base64,{img_str}"
+    except Exception as e:
+        logging.error(f"Error generating QR code: {e}")
+        return None
+
+def create_gate_access_token(family_member_id: str, unit_id: str, compound_id: str, expires_at: datetime) -> str:
+    """Create a secure token for gate access"""
+    token_data = {
+        "family_member_id": family_member_id,
+        "unit_id": unit_id,
+        "compound_id": compound_id,
+        "expires_at": expires_at.isoformat(),
+        "issued_at": datetime.now(timezone.utc).isoformat()
+    }
+    # In production, this should be signed/encrypted
+    import json
+    return base64.b64encode(json.dumps(token_data).encode()).decode()
 
 def generate_waveform_data(audio_file_path: str, samples: int = 100) -> List[float]:
     """Generate waveform data from audio file"""

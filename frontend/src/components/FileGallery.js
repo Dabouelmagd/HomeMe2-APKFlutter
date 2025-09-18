@@ -275,7 +275,7 @@ const FileGallery = () => {
                           className="text-blue-600 hover:text-blue-900 flex items-center space-x-1"
                         >
                           <ArrowDownTrayIcon className="h-4 w-4" />
-                          <span>Download</span>
+                          <span>{t('gallery.download')}</span>
                         </button>
                       </td>
                     </tr>

@@ -193,30 +193,6 @@ const FamilyManagement = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-    try {
-      await axios.post(`${API}/families/${familyData.family.id}/members`, memberForm);
-      toast.success('Family member added successfully!');
-      setShowAddMember(false);
-      setMemberForm({
-        username: '',
-        email: '',
-        password: '',
-        full_name: '',
-        phone: ''
-      });
-      fetchFamilyData();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to add family member');
-    }
-  };
-
-  const handleInputChange = (e) => {
-    setMemberForm({
-      ...memberForm,
-      [e.target.name]: e.target.value
-    });
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">

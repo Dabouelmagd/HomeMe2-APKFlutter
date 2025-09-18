@@ -47,8 +47,8 @@ const MessageScheduling = () => {
   const loadScheduledMessages = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/messages/scheduled`);
-      setScheduledMessages(response.data.messages || []);
+      const response = await axios.get(`${API}/scheduled-messages`);
+      setScheduledMessages(response.data.scheduled_messages || []);
     } catch (error) {
       console.error('Failed to load scheduled messages:', error);
     } finally {

@@ -32,6 +32,7 @@ const CompoundManagement = () => {
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [showAddResidence, setShowAddResidence] = useState(false);
+  const [showAddNewResidence, setShowAddNewResidence] = useState(false);
   const [showCompoundSelection, setShowCompoundSelection] = useState(false);
   const [compoundNotFound, setCompoundNotFound] = useState(false);
 

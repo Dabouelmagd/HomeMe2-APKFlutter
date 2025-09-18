@@ -95,12 +95,12 @@ const FileGallery = () => {
   };
 
   const fileTypeCategories = [
-    { value: 'all', label: 'All Files', count: stats.total_files || 0 },
-    { value: 'image', label: 'Images', count: stats.by_type?.image?.count || 0 },
-    { value: 'video', label: 'Videos', count: stats.by_type?.video?.count || 0 },
-    { value: 'voice', label: 'Voice', count: stats.by_type?.voice?.count || 0 },
-    { value: 'audio', label: 'Audio', count: stats.by_type?.audio?.count || 0 },
-    { value: 'document', label: 'Documents', count: stats.by_type?.document?.count || 0 }
+    { value: 'all', label: t('gallery.allFiles'), count: stats.total_files || 0 },
+    { value: 'image', label: t('gallery.images'), count: stats.by_type?.image?.count || 0 },
+    { value: 'video', label: t('gallery.videos'), count: stats.by_type?.video?.count || 0 },
+    { value: 'voice', label: t('gallery.voice'), count: stats.by_type?.voice?.count || 0 },
+    { value: 'audio', label: t('gallery.audio'), count: stats.by_type?.audio?.count || 0 },
+    { value: 'document', label: t('gallery.documents'), count: stats.by_type?.document?.count || 0 }
   ];
 
   if (loading) {

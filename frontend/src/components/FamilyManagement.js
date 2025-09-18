@@ -219,252 +219,301 @@ const FamilyManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Family Management</h1>
-        <p className="text-gray-600 mt-2">
-          Manage your family members and household
-        </p>
-      </div>
-
-      {/* Family Info Card */}
-      {familyData?.family ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="flex items-center space-x-4 mb-6">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <HomeIcon className="h-8 w-8 text-blue-600" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                Unit {familyData.family.unit_number}
-              </h2>
-              <p className="text-gray-600">
-                Family ID: {familyData.family.id}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm font-medium text-gray-500">Total Members</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
-                {familyData.members?.length || 0}
-              </p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm font-medium text-gray-500">Unit Number</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
-                {familyData.family.unit_number}
-              </p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm font-medium text-gray-500">Created</p>
-              <p className="text-lg font-semibold text-gray-900 mt-1">
-                {new Date(familyData.family.created_at).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <div className="text-center py-8">
-            <HomeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Family Found</h3>
-            <p className="text-gray-600">
-              You don't seem to be associated with a family unit yet.
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Family Management</h1>
+            <p className="mt-1 text-sm text-gray-600">
+              Manage family members for Unit {user.unit_number} with QR gate access
             </p>
           </div>
+          <button
+            onClick={() => setShowAddMember(true)}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <UserPlusIcon className="h-5 w-5 mr-2" />
+            Add Family Member
+          </button>
         </div>
-      )}
 
-      {/* Family Members */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Family Members</h3>
-            <p className="text-gray-600">Manage your household members</p>
-          </div>
-          {user?.is_family_head && (
-            <button
-              onClick={() => setShowAddMember(true)}
-              className="btn btn-primary flex items-center space-x-2"
-            >
-              <UserPlusIcon className="h-4 w-4" />
-              <span>Add Member</span>
-            </button>
+        {/* Family Members Grid */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          {familyMembers.length === 0 ? (
+            <div className="text-center py-12">
+              <UsersIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+              <p className="text-gray-500 text-lg">No family members added</p>
+              <p className="text-gray-400 text-sm">Add family members to manage unit access and information</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Relationship</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Age</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Move-in Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {familyMembers.map((member) => (
+                    <tr key={member.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                            <span className="text-sm font-medium text-white">
+                              {member.full_name.charAt(0)}
+                            </span>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">{member.full_name}</div>
+                            {member.id_number && (
+                              <div className="text-sm text-gray-500">ID: {member.id_number}</div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                          {getRelationshipLabel(member.relationship)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{member.age}</td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900">
+                          {member.phone && (
+                            <div className="flex items-center">
+                              <PhoneIcon className="h-4 w-4 mr-1 text-gray-400" />
+                              {member.phone}
+                            </div>
+                          )}
+                          {member.email && (
+                            <div className="flex items-center mt-1">
+                              <EnvelopeIcon className="h-4 w-4 mr-1 text-gray-400" />
+                              {member.email}
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {formatDate(member.move_in_date)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => generateQRCode(member)}
+                            className="text-green-600 hover:text-green-900"
+                            title="Generate QR Code"
+                          >
+                            <QrCodeIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEditMember(member)}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Edit"
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteMember(member.id)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Remove"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
-        {familyData?.members?.length > 0 ? (
-          <div className="space-y-4">
-            {familyData.members.map((member, index) => (
-              <div
-                key={index}
-                className={`flex items-center space-x-4 p-4 rounded-lg border ${
-                  member.is_family_head
-                    ? 'bg-blue-50 border-blue-200'
-                    : 'bg-gray-50 border-gray-200'
-                }`}
-              >
-                <div className="flex-shrink-0">
-                  <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
-                    member.is_family_head
-                      ? 'bg-blue-600'
-                      : 'bg-gray-400'
-                  }`}>
-                    <span className="text-lg font-medium text-white">
-                      {member.full_name?.charAt(0) || 'U'}
-                    </span>
+        {/* Add/Edit Member Modal */}
+        {showAddMember && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-screen overflow-y-auto">
+              <h2 className="text-lg font-semibold mb-6">
+                {editingMember ? 'Edit Family Member' : 'Add Family Member'}
+              </h2>
+              
+              <form onSubmit={editingMember ? handleUpdateMember : handleAddMember} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <input
+                      type="text"
+                      value={memberForm.full_name}
+                      onChange={(e) => setMemberForm({...memberForm, full_name: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                    <input
+                      type="number"
+                      value={memberForm.age}
+                      onChange={(e) => setMemberForm({...memberForm, age: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      min="0"
+                      max="120"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Relationship</label>
+                    <select
+                      value={memberForm.relationship}
+                      onChange={(e) => setMemberForm({...memberForm, relationship: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      required
+                    >
+                      {relationshipOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <input
+                      type="tel"
+                      value={memberForm.phone}
+                      onChange={(e) => setMemberForm({...memberForm, phone: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={memberForm.email}
+                      onChange={(e) => setMemberForm({...memberForm, email: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">ID Number</label>
+                    <input
+                      type="text"
+                      value={memberForm.id_number}
+                      onChange={(e) => setMemberForm({...memberForm, id_number: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Government ID/Passport number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact Name</label>
+                    <input
+                      type="text"
+                      value={memberForm.emergency_contact_name}
+                      onChange={(e) => setMemberForm({...memberForm, emergency_contact_name: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact Phone</label>
+                    <input
+                      type="tel"
+                      value={memberForm.emergency_contact_phone}
+                      onChange={(e) => setMemberForm({...memberForm, emergency_contact_phone: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Move-in Date</label>
+                    <input
+                      type="date"
+                      value={memberForm.move_in_date}
+                      onChange={(e) => setMemberForm({...memberForm, move_in_date: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2">
-                    <p className="font-medium text-gray-900">{member.full_name}</p>
-                    {member.is_family_head && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        Family Head
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600">{member.email}</p>
-                  {member.phone && (
-                    <p className="text-sm text-gray-600">{member.phone}</p>
-                  )}
-                </div>
-                <div className="flex-shrink-0">
-                  <p className="text-sm text-gray-500">
-                    @{member.username}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8">
-            <UsersIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No family members found</p>
-          </div>
-        )}
-      </div>
 
-      {/* Add Member Modal */}
-      {showAddMember && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full max-h-90vh overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Add Family Member</h3>
-                <button
-                  onClick={() => setShowAddMember(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </div>
-
-              <form onSubmit={handleAddMember} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="full_name"
-                    value={memberForm.full_name}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required
-                    placeholder="Enter full name"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    name="username"
-                    value={memberForm.username}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required
-                    placeholder="Choose username"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={memberForm.email}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required
-                    placeholder="Enter email"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={memberForm.password}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required
-                    placeholder="Enter password"
-                    minLength="6"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone (Optional)
-                  </label>
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={memberForm.phone}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    placeholder="Enter phone number"
-                  />
-                </div>
-
-                <div className="flex space-x-4 pt-4">
+                <div className="flex justify-end space-x-2 pt-4">
                   <button
                     type="button"
-                    onClick={() => setShowAddMember(false)}
-                    className="btn btn-secondary flex-1"
+                    onClick={resetForm}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="btn btn-primary flex-1"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    Add Member
+                    {editingMember ? 'Update Member' : 'Add Member'}
                   </button>
                 </div>
               </form>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* QR Code Modal */}
+        {showQRModal && qrCodeData && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+              <div className="text-center">
+                <h2 className="text-lg font-semibold mb-4">Gate Access QR Code</h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  QR Code for {qrCodeData.member_name}
+                </p>
+                
+                <div className="mb-4 p-4 border-2 border-dashed border-gray-300 rounded-lg">
+                  <img 
+                    src={qrCodeData.qr_code} 
+                    alt="QR Code" 
+                    className="mx-auto"
+                    style={{ maxWidth: '200px', maxHeight: '200px' }}
+                  />
+                </div>
+                
+                <p className="text-xs text-gray-500 mb-4">
+                  Valid until: {new Date(qrCodeData.expires_at).toLocaleString()}
+                </p>
+                
+                <div className="bg-blue-50 p-3 rounded-lg mb-4">
+                  <p className="text-sm text-blue-800">
+                    📱 Show this QR code to security at the compound gate for access
+                  </p>
+                </div>
+                
+                <button
+                  onClick={() => setShowQRModal(false)}
+                  className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

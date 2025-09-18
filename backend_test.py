@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend Compound Management System Test Suite
-Tests compound management API endpoints including registration links, compound data, and enhanced registration
+Backend Residence Account Creation and Family Management Test Suite
+Tests the complete residence account creation and family management workflow
 """
 
 import asyncio

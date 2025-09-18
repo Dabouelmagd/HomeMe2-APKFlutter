@@ -5529,6 +5529,44 @@ async def complete_registration(
         logging.error(f"Error completing registration: {e}")
         raise HTTPException(status_code=500, detail="Failed to complete registration")
 
+@api_router.put("/users/{user_id}/compound")
+async def update_user_compound(
+    user_id: str,
+    compound_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Update user's compound assignment"""
+    try:
+        # Verify user can update this user (either self or admin)
+        if current_user.id != user_id and current_user.role != "admin":
+            raise HTTPException(status_code=403, detail="Not authorized to update this user")
+        
+        compound_id = compound_data.get("compound_id")
+        if not compound_id:
+            raise HTTPException(status_code=400, detail="compound_id is required")
+        
+        # Verify compound exists
+        compound = await db.compounds.find_one({"id": compound_id})
+        if not compound:
+            raise HTTPException(status_code=404, detail="Compound not found")
+        
+        # Update user's compound
+        result = await db.users.update_one(
+            {"id": user_id},
+            {"$set": {"compound_id": compound_id}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {"message": "User compound updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating user compound: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update user compound")
+
 def create_registration_token(unit_number: str, email: str, compound_id: str, expires_at: datetime) -> str:
     """Create a secure token for resident registration"""
     token_data = {

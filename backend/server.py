@@ -818,6 +818,7 @@ class GateAccess(BaseModel):
 class FamilyMemberCreate(BaseModel):
     full_name: str
     age: int
+    birthday: Optional[date] = None
     relationship: str
     phone: Optional[str] = None
     email: Optional[str] = None

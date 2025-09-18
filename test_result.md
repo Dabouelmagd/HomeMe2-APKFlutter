@@ -442,14 +442,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Service Management System - Service Provider Management"
-    - "Enhanced Service Management System - Service Booking System"
-    - "Enhanced Service Management System - Payment Processing"
-    - "Enhanced Service Management System - Review System"
-    - "Enhanced Service Management System - Analytics"
-    - "Enhanced Service Management System - Authentication & Authorization"
-    - "Enhanced Service Management System - Error Handling"
-  stuck_tasks: []
+    - "Compound Management System - Registration Link Management"
+    - "Compound Management System - Compound Data APIs"
+    - "Compound Management System - Enhanced Registration Process"
+    - "Compound Management System - Authentication & Authorization"
+  stuck_tasks:
+    - "Compound Management System - Compound Data APIs"
   test_all: false
   test_priority: "high_first"
 

@@ -288,6 +288,10 @@ function App() {
                 <Route path="schedule" element={
                   <MessageScheduling />
                 } />
+                
+                <Route path="service-booking" element={
+                  <ServiceBooking />
+                } />
               </Route>
             </Routes>
             <Toaster />

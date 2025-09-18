@@ -145,6 +145,358 @@ class CompoundManagementTestSuite:
         
         return True
     
+    def test_get_compound_details(self):
+        """Test GET /api/compounds/{compound_id} - Get compound details"""
+        print("\n=== Testing Get Compound Details ===")
+        
+        if not self.compound_id:
+            self.log_result("Get Compound Details", False, "No compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("id") == self.compound_id and data.get("name"):
+                    self.log_result("Get Compound Details", True, f"Retrieved compound details successfully: {data.get('name')}")
+                    return True
+                else:
+                    self.log_result("Get Compound Details", False, "Invalid compound data structure")
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Get Compound Details", False, f"Compound not found (404) - compound_id: {self.compound_id}")
+                return False
+            else:
+                self.log_result("Get Compound Details", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Compound Details", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_compound_residences(self):
+        """Test GET /api/compounds/{compound_id}/residences - Get residence list (Admin only)"""
+        print("\n=== Testing Get Compound Residences ===")
+        
+        if not self.compound_id:
+            self.log_result("Get Compound Residences", False, "No compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                residences = data.get("residences", [])
+                self.log_result("Get Compound Residences", True, f"Retrieved {len(residences)} residences successfully")
+                return True
+            else:
+                self.log_result("Get Compound Residences", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Compound Residences", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_upload_compound_logo(self):
+        """Test PUT /api/compounds/{compound_id}/logo - Upload compound logo (Admin only)"""
+        print("\n=== Testing Upload Compound Logo ===")
+        
+        if not self.compound_id:
+            self.log_result("Upload Compound Logo", False, "No compound ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Create a test logo image
+            logo_data = self.create_test_image("compound_logo.jpg", size=(200, 200))
+            
+            files = {
+                'file': ('compound_logo.jpg', logo_data, 'image/jpeg')
+            }
+            
+            response = self.session.put(
+                f"{BASE_URL}/compounds/{self.compound_id}/logo",
+                files=files,
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "Logo uploaded successfully" and data.get("logo_url"):
+                    self.log_result("Upload Compound Logo", True, "Logo uploaded successfully")
+                    return True
+                else:
+                    self.log_result("Upload Compound Logo", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Upload Compound Logo", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Upload Compound Logo", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_registration_link(self):
+        """Test POST /api/admin/registration-links - Create registration links (Admin only)"""
+        print("\n=== Testing Create Registration Link ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Generate unique email for testing
+            unique_id = str(uuid.uuid4())[:8]
+            registration_data = {
+                "unit_number": f"TEST{unique_id[:3]}",
+                "full_name": f"Test Resident {unique_id}",
+                "email": f"testregister{unique_id}@example.com",
+                "phone": "+1234567890",
+                "expires_in_hours": 72
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/registration-links", 
+                                       json=registration_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if (data.get("message") == "Registration link created successfully" and 
+                    data.get("registration_url") and data.get("registration_link")):
+                    
+                    reg_link = data["registration_link"]
+                    self.test_registration_link_id = reg_link.get("id")
+                    self.test_registration_token = reg_link.get("registration_token")
+                    
+                    self.log_result("Create Registration Link", True, 
+                                  f"Registration link created successfully for {registration_data['email']}")
+                    return True
+                else:
+                    self.log_result("Create Registration Link", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Create Registration Link", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Registration Link", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_registration_links(self):
+        """Test GET /api/admin/registration-links - Get all registration links (Admin only)"""
+        print("\n=== Testing Get Registration Links ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/admin/registration-links", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                links = data.get("registration_links", [])
+                self.log_result("Get Registration Links", True, f"Retrieved {len(links)} registration links successfully")
+                return True
+            else:
+                self.log_result("Get Registration Links", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Registration Links", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_verify_registration_token(self):
+        """Test GET /api/register/verify/{token} - Verify registration token"""
+        print("\n=== Testing Verify Registration Token ===")
+        
+        if not self.test_registration_token:
+            self.log_result("Verify Registration Token", False, "No test registration token available")
+            return False
+        
+        try:
+            response = self.session.get(f"{BASE_URL}/register/verify/{self.test_registration_token}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if (data.get("valid") == True and data.get("registration_details") and 
+                    data["registration_details"].get("unit_number")):
+                    self.log_result("Verify Registration Token", True, "Registration token verified successfully")
+                    return True
+                else:
+                    self.log_result("Verify Registration Token", False, f"Invalid token verification response: {data}")
+                    return False
+            else:
+                self.log_result("Verify Registration Token", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Verify Registration Token", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_complete_registration(self):
+        """Test POST /api/register/complete - Complete registration with profile picture"""
+        print("\n=== Testing Complete Registration ===")
+        
+        if not self.test_registration_token:
+            self.log_result("Complete Registration", False, "No test registration token available")
+            return False
+        
+        try:
+            # Create a test profile picture
+            profile_pic_data = self.create_test_image("profile.jpg", size=(150, 150))
+            
+            # Generate unique username
+            unique_id = str(uuid.uuid4())[:8]
+            
+            files = {
+                'profile_picture': ('profile.jpg', profile_pic_data, 'image/jpeg')
+            }
+            
+            data = {
+                'token': self.test_registration_token,
+                'username': f"newuser{unique_id}",
+                'password': 'newpassword123',
+                'phone': '+1987654321'
+            }
+            
+            response = self.session.post(f"{BASE_URL}/register/complete", 
+                                       files=files, data=data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if (result.get("message") == "Registration completed successfully" and 
+                    result.get("user") and result.get("access_token")):
+                    
+                    user = result["user"]
+                    if user.get("profile_picture_url"):
+                        self.log_result("Complete Registration", True, 
+                                      f"Registration completed successfully with profile picture for user: {user.get('username')}")
+                        return True
+                    else:
+                        self.log_result("Complete Registration", True, 
+                                      f"Registration completed successfully for user: {user.get('username')} (no profile picture)")
+                        return True
+                else:
+                    self.log_result("Complete Registration", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Complete Registration", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Complete Registration", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_delete_registration_link(self):
+        """Test DELETE /api/admin/registration-links/{link_id} - Delete registration links (Admin only)"""
+        print("\n=== Testing Delete Registration Link ===")
+        
+        if not self.test_registration_link_id:
+            self.log_result("Delete Registration Link", False, "No test registration link ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.delete(f"{BASE_URL}/admin/registration-links/{self.test_registration_link_id}", 
+                                         headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "Registration link deleted successfully":
+                    self.log_result("Delete Registration Link", True, "Registration link deleted successfully")
+                    return True
+                else:
+                    self.log_result("Delete Registration Link", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Delete Registration Link", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Delete Registration Link", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_admin_access_control(self):
+        """Test that admin-only endpoints properly reject non-admin users"""
+        print("\n=== Testing Admin Access Control ===")
+        
+        if not self.resident_token or not self.compound_id:
+            self.log_result("Admin Access Control", False, "No resident token or compound ID available")
+            return False
+        
+        success_count = 0
+        total_tests = 0
+        
+        # Test resident trying to access admin registration links
+        try:
+            total_tests += 1
+            resident_headers = self.setup_auth_headers(self.resident_token)
+            response = self.session.get(f"{BASE_URL}/admin/registration-links", headers=resident_headers)
+            
+            if response.status_code == 403:
+                self.log_result("Admin Access - Registration Links", True, "Correctly denied resident access to registration links")
+                success_count += 1
+            else:
+                self.log_result("Admin Access - Registration Links", False, f"Expected 403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Admin Access - Registration Links", False, f"Exception occurred: {str(e)}")
+        
+        # Test resident trying to access compound residences
+        try:
+            total_tests += 1
+            resident_headers = self.setup_auth_headers(self.resident_token)
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences", headers=resident_headers)
+            
+            if response.status_code == 403:
+                self.log_result("Admin Access - Compound Residences", True, "Correctly denied resident access to compound residences")
+                success_count += 1
+            else:
+                self.log_result("Admin Access - Compound Residences", False, f"Expected 403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Admin Access - Compound Residences", False, f"Exception occurred: {str(e)}")
+        
+        # Test resident trying to upload compound logo
+        try:
+            total_tests += 1
+            resident_headers = {"Authorization": f"Bearer {self.resident_token}"}
+            logo_data = self.create_test_image("test_logo.jpg")
+            files = {'file': ('test_logo.jpg', logo_data, 'image/jpeg')}
+            
+            response = self.session.put(f"{BASE_URL}/compounds/{self.compound_id}/logo", 
+                                      files=files, headers=resident_headers)
+            
+            if response.status_code == 403:
+                self.log_result("Admin Access - Upload Logo", True, "Correctly denied resident access to upload compound logo")
+                success_count += 1
+            else:
+                self.log_result("Admin Access - Upload Logo", False, f"Expected 403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Admin Access - Upload Logo", False, f"Exception occurred: {str(e)}")
+        
+        return success_count == total_tests
+    
+    def test_compound_access_control(self):
+        """Test that users can only access their own compound's data"""
+        print("\n=== Testing Compound Access Control ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Try to access a different compound's data
+            fake_compound_id = "fake-compound-id-12345"
+            response = self.session.get(f"{BASE_URL}/compounds/{fake_compound_id}", headers=headers)
+            
+            if response.status_code in [403, 404]:
+                self.log_result("Compound Access Control", True, f"Correctly denied access to other compound (status: {response.status_code})")
+                return True
+            else:
+                self.log_result("Compound Access Control", False, f"Expected 403 or 404, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Compound Access Control", False, f"Exception occurred: {str(e)}")
+            return False
+    
     def test_get_user_chats(self):
         """Test GET /api/chats endpoint"""
         print("\n=== Testing Get User Chats ===")

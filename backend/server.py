@@ -4438,8 +4438,8 @@ async def create_service_provider(
             compound_id=current_user.compound_id
         )
         
-        await db.service_providers.insert_one(provider.dict())
-        return {"message": "Service provider created successfully", "provider": provider}
+        await db.service_providers.insert_one(serialize_datetime(provider.dict()))
+        return {"message": "Service provider created successfully", "provider": serialize_datetime(provider.dict())}
         
     except HTTPException:
         raise

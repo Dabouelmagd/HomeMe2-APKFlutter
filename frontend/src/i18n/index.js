@@ -477,6 +477,7 @@ const resources = {
       
       // Services
       'services_management': 'إدارة الخدمات',
+      'service_booking': 'حجز الخدمات والمدفوعات',
       'services': 'الخدمات',
       'add_service': 'إضافة خدمة',
       'edit_service': 'تعديل الخدمة',

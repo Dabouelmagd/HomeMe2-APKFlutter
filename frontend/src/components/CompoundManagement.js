@@ -189,6 +189,71 @@ const CompoundManagement = () => {
     });
   };
 
+  const resetNewResidenceForm = () => {
+    setNewResidenceForm({
+      unit_number: '',
+      full_name: '',
+      email: '',
+      phone: '',
+      profile_picture: null,
+      profile_picture_preview: null
+    });
+  };
+
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      
+      setNewResidenceForm(prev => ({ ...prev, profile_picture: file }));
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setNewResidenceForm(prev => ({ ...prev, profile_picture_preview: e.target.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCreateNewResidence = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('unit_number', newResidenceForm.unit_number);
+      formData.append('full_name', newResidenceForm.full_name);
+      formData.append('email', newResidenceForm.email);
+      formData.append('phone', newResidenceForm.phone || '');
+      formData.append('compound_id', user.compound_id);
+      
+      if (newResidenceForm.profile_picture) {
+        formData.append('profile_picture', newResidenceForm.profile_picture);
+      }
+
+      const response = await axios.post(`${API}/admin/residences`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      toast.success('New residence created successfully!');
+      
+      if (response.data.temporary_password) {
+        toast.success(`Temporary password: ${response.data.temporary_password}`, { duration: 10000 });
+      }
+      
+      setShowAddNewResidence(false);
+      resetNewResidenceForm();
+      await fetchResidences();
+    } catch (error) {
+      console.error('Failed to create new residence:', error);
+      toast.error(error.response?.data?.detail || 'Failed to create new residence');
+    }
+  };
+
   const handleLogoUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;

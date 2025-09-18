@@ -37,6 +37,7 @@ const FamilyManagement = () => {
   const [memberForm, setMemberForm] = useState({
     full_name: '',
     age: '',
+    birthday: '',
     relationship: 'son',
     phone: '',
     email: '',

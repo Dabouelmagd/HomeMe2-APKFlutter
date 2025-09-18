@@ -303,6 +303,7 @@ class User(BaseModel):
     phone: Optional[str] = None
     unit_number: Optional[str] = None
     is_family_head: bool = False
+    profile_picture_url: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     is_active: bool = True
 

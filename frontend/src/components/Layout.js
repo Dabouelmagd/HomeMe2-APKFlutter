@@ -56,6 +56,12 @@ const Layout = () => {
       show: true
     },
     {
+      name: 'Service Booking',
+      href: '/service-booking',
+      icon: CurrencyDollarIcon,
+      show: true
+    },
+    {
       name: t('government_utility_gateway'),
       href: '/utilities',
       icon: BoltIcon,

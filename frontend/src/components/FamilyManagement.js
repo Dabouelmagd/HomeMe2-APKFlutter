@@ -242,6 +242,7 @@ const FamilyManagement = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Relationship</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Age</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Birthday</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Move-in Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>

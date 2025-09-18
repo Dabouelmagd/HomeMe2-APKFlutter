@@ -278,6 +278,10 @@ function App() {
                 <Route path="settings" element={
                   <Settings />
                 } />
+                
+                <Route path="gallery" element={
+                  <FileGallery />
+                } />
               </Route>
             </Routes>
             <Toaster />

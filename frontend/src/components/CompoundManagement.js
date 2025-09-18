@@ -302,9 +302,9 @@ const CompoundManagement = () => {
   return (
     <div className="p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Compound Management</h1>
+        <h1 className="text-3xl font-bold text-red-600">🔴 UPDATED - Compound Management</h1>
         <p className="text-gray-600 mt-2">
-          Manage your compound settings and branding ✨ Updated with New Features!
+          🚀 NEW FEATURES ADDED: Residence management with profile pictures and direct account creation!
         </p>
       </div>
 

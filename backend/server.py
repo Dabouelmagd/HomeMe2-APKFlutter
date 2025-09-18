@@ -1949,7 +1949,7 @@ async def get_my_family(current_user: User = Depends(get_current_user)):
         {"password_hash": 0}  # Exclude password
     ).to_list(None)
     
-    return {"family": family, "members": members}
+    return {"family": serialize_datetime(family), "members": serialize_datetime(members)}
 
 # Financial Management Routes
 @api_router.post("/maintenance-fees")

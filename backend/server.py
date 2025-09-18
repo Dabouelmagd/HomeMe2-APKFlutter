@@ -4866,9 +4866,11 @@ async def get_service_analytics(
         }).sort("average_rating", -1).limit(5).to_list(length=None)
         
         return {
-            "booking_stats": {stat["_id"]: stat["count"] for stat in booking_stats},
-            "revenue_stats": revenue_stats,
-            "top_providers": top_providers
+            "analytics": {
+                "booking_statistics": {stat["_id"]: stat["count"] for stat in booking_stats},
+                "revenue_statistics": serialize_datetime(revenue_stats),
+                "top_rated_providers": serialize_datetime(top_providers)
+            }
         }
         
     except Exception as e:

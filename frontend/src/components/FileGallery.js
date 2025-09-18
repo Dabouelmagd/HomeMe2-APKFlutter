@@ -173,8 +173,8 @@ const FileGallery = () => {
         {files.length === 0 ? (
           <div className="text-center py-12">
             <PhotoIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-gray-500 text-lg">No files found</p>
-            <p className="text-gray-400 text-sm">Files shared in chats will appear here</p>
+            <p className="text-gray-500 text-lg">{t('gallery.noFilesFound')}</p>
+            <p className="text-gray-400 text-sm">{t('gallery.filesSharedInChats')}</p>
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">

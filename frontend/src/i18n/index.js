@@ -708,6 +708,38 @@ const resources = {
         'listView': 'عرض القائمة'
       },
       
+      // Message Scheduling
+      'schedule': {
+        'title': 'جدولة الرسائل',
+        'description': 'جدولة الرسائل ليتم إرسالها تلقائياً في أوقات محددة',
+        'scheduleMessage': 'جدولة رسالة',
+        'editMessage': 'تعديل الرسالة المجدولة',
+        'message': 'الرسالة',
+        'enterMessage': 'أدخل رسالتك...',
+        'recipientType': 'نوع المستلم',
+        'directMessage': 'رسالة مباشرة',
+        'groupMessage': 'رسالة جماعية',
+        'compoundMessage': 'رسالة على مستوى المجمع',
+        'recipient': 'المستلم',
+        'selectRecipient': 'اختر المستلم...',
+        'scheduledFor': 'مجدولة لـ',
+        'repeatType': 'التكرار',
+        'noRepeat': 'بدون تكرار',
+        'daily': 'يومياً',
+        'weekly': 'أسبوعياً',
+        'monthly': 'شهرياً',
+        'updateMessage': 'تحديث الرسالة',
+        'noScheduledMessages': 'لا توجد رسائل مجدولة',
+        'scheduleFirstMessage': 'جدول رسالتك الأولى للبدء',
+        'status': 'الحالة',
+        'actions': 'الإجراءات',
+        'pending': 'معلق',
+        'sent': 'مُرسل',
+        'failed': 'فشل',
+        'cancelled': 'ملغي',
+        'confirmDelete': 'هل أنت متأكد من حذف هذه الرسالة المجدولة؟'
+      },
+      
       // Search
       'search': {
         'searchMessages': 'البحث في الرسائل',

@@ -54,11 +54,10 @@ class ResidenceAccountCreationTestSuite:
             "Content-Type": "application/json"
         }
     
-    def test_authentication(self):
-        """Test user authentication and setup"""
-        print("\n=== Testing Authentication ===")
+    def test_admin_authentication(self):
+        """Test admin authentication for residence creation"""
+        print("\n=== Testing Admin Authentication ===")
         
-        # Test admin login
         try:
             admin_login_data = {
                 "username": "johndoe",
@@ -72,76 +71,15 @@ class ResidenceAccountCreationTestSuite:
                 self.admin_token = data["access_token"]
                 self.admin_user = data["user"]
                 self.compound_id = self.admin_user["compound_id"]
-                self.log_result("Admin Login", True, "Admin authenticated successfully")
+                self.log_result("Admin Authentication", True, "Admin authenticated successfully")
+                return True
             else:
-                self.log_result("Admin Login", False, f"Failed with status {response.status_code}", response.text)
+                self.log_result("Admin Authentication", False, f"Failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_result("Admin Login", False, f"Exception occurred: {str(e)}")
+            self.log_result("Admin Authentication", False, f"Exception occurred: {str(e)}")
             return False
-        
-        # Test resident login - try to find or create a resident
-        try:
-            # First try existing residents
-            existing_residents = ["resident1", "alice", "bob", "testuser"]
-            
-            for username in existing_residents:
-                resident_login_data = {
-                    "username": username,
-                    "password": "password123"
-                }
-                
-                response = self.session.post(f"{BASE_URL}/auth/login", json=resident_login_data)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    self.resident_token = data["access_token"]
-                    self.resident_user = data["user"]
-                    self.log_result("Resident Login", True, f"Resident '{username}' authenticated successfully")
-                    break
-            
-            # If no existing resident found, try to create one
-            if not self.resident_token:
-                # Generate unique username
-                unique_id = str(uuid.uuid4())[:8]
-                resident_register_data = {
-                    "username": f"testchat{unique_id}",
-                    "email": f"testchat{unique_id}@example.com",
-                    "password": "password123",
-                    "role": "resident",
-                    "compound_id": self.compound_id,
-                    "full_name": f"Test Chat Resident {unique_id}",
-                    "phone": "+1234567890",
-                    "unit_number": f"10{unique_id[:1]}"
-                }
-                
-                register_response = self.session.post(f"{BASE_URL}/auth/register", json=resident_register_data)
-                
-                if register_response.status_code == 200:
-                    # Now login with new resident
-                    login_response = self.session.post(f"{BASE_URL}/auth/login", json={
-                        "username": resident_register_data["username"],
-                        "password": "password123"
-                    })
-                    
-                    if login_response.status_code == 200:
-                        data = login_response.json()
-                        self.resident_token = data["access_token"]
-                        self.resident_user = data["user"]
-                        self.log_result("Resident Login", True, "New resident created and authenticated successfully")
-                    else:
-                        self.log_result("Resident Login", False, f"Failed to login after registration: {login_response.status_code}")
-                        return False
-                else:
-                    self.log_result("Resident Login", False, f"Failed to register resident: {register_response.status_code}", register_response.text)
-                    return False
-                    
-        except Exception as e:
-            self.log_result("Resident Login", False, f"Exception occurred: {str(e)}")
-            return False
-        
-        return True
     
     def test_get_compound_details(self):
         """Test GET /api/compounds/{compound_id} - Get compound details"""

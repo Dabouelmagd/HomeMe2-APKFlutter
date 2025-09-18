@@ -1,5 +1,8 @@
 {
   "appId": "homeme.app",
   "appName": "HomeMe",
-  "webDir": "www"
+  "webDir": "build",
+  "server": {
+    "androidScheme": "https"
+  }
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend Chat System Test Suite
-Tests all chat-related API endpoints and functionality including multimedia features
+Backend Compound Management System Test Suite
+Tests compound management API endpoints including registration links, compound data, and enhanced registration
 """
 
 import asyncio
@@ -11,6 +11,7 @@ import websockets
 import uuid
 import io
 import os
+import base64
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from PIL import Image

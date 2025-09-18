@@ -104,12 +104,6 @@ const Layout = () => {
       show: true
     },
     {
-      name: 'Service Booking',
-      href: '/service-booking',
-      icon: ShoppingBagIcon,
-      show: true
-    },
-    {
       name: t('notifications_nav'),
       href: '/notifications',
       icon: BellIcon,

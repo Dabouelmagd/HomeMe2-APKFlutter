@@ -20,20 +20,18 @@ from PIL import Image
 BASE_URL = "https://homeme-platform.preview.emergentagent.com/api"
 WS_URL = "wss://compound-hub.preview.emergentagent.com/ws/chat"
 
-class CompoundManagementTestSuite:
+class ResidenceAccountCreationTestSuite:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None
-        self.resident_token = None
+        self.new_residence_token = None
         self.admin_user = None
-        self.resident_user = None
+        self.new_residence_user = None
         self.compound_id = None
-        self.test_chat_id = None
-        self.test_message_id = None
-        self.test_subscription_endpoint = None
-        self.scheduled_message_id = None
-        self.test_registration_link_id = None
-        self.test_registration_token = None
+        self.new_residence_family_id = None
+        self.new_residence_username = None
+        self.new_residence_password = None
+        self.test_family_member_id = None
         self.results = []
         
     def log_result(self, test_name: str, success: bool, message: str, details: str = ""):

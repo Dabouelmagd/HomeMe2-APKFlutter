@@ -189,9 +189,9 @@ const MessageScheduling = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Message Scheduling</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{t('schedule.title')}</h1>
             <p className="mt-1 text-sm text-gray-600">
-              Schedule messages to be sent automatically at specific times
+              {t('schedule.description')}
             </p>
           </div>
           <button
@@ -199,7 +199,7 @@ const MessageScheduling = () => {
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <PlusIcon className="h-5 w-5 mr-2" />
-            Schedule Message
+            {t('schedule.scheduleMessage')}
           </button>
         </div>
 

@@ -5269,6 +5269,236 @@ async def get_gate_access_history(
         logging.error(f"Error getting gate access history: {e}")
         raise HTTPException(status_code=500, detail="Failed to get gate access history")
 
+# ============ RESIDENT REGISTRATION LINKS ============
+
+class RegistrationLinkRequest(BaseModel):
+    unit_number: str
+    full_name: str
+    email: str
+    phone: Optional[str] = None
+    expires_in_hours: int = 72  # Default 72 hours validity
+
+class RegistrationLink(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    compound_id: str
+    admin_id: str
+    unit_number: str
+    full_name: str
+    email: str
+    phone: Optional[str] = None
+    registration_token: str
+    is_used: bool = False
+    expires_at: datetime
+    used_at: Optional[datetime] = None
+    registered_user_id: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+@api_router.post("/admin/registration-links")
+async def create_registration_link(
+    link_request: RegistrationLinkRequest,
+    current_user: User = Depends(require_admin)
+):
+    """Create a registration link for a resident (Admin only)"""
+    try:
+        # Check if user already exists
+        existing_user = await db.users.find_one({
+            "email": link_request.email,
+            "compound_id": current_user.compound_id
+        })
+        
+        if existing_user:
+            raise HTTPException(status_code=400, detail="User with this email already exists")
+        
+        # Generate registration token
+        expires_at = datetime.now(timezone.utc) + timedelta(hours=link_request.expires_in_hours)
+        registration_token = create_registration_token(
+            unit_number=link_request.unit_number,
+            email=link_request.email,
+            compound_id=current_user.compound_id,
+            expires_at=expires_at
+        )
+        
+        # Create registration link record
+        reg_link = RegistrationLink(
+            compound_id=current_user.compound_id,
+            admin_id=current_user.id,
+            unit_number=link_request.unit_number,
+            full_name=link_request.full_name,
+            email=link_request.email,
+            phone=link_request.phone,
+            registration_token=registration_token,
+            expires_at=expires_at
+        )
+        
+        await db.registration_links.insert_one(reg_link.dict())
+        
+        # Generate registration URL
+        registration_url = f"{BACKEND_URL}/register?token={registration_token}"
+        
+        return {
+            "message": "Registration link created successfully",
+            "registration_url": registration_url,
+            "expires_at": expires_at.isoformat(),
+            "registration_link": reg_link
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating registration link: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create registration link")
+
+@api_router.get("/admin/registration-links")
+async def get_registration_links(
+    current_user: User = Depends(require_admin)
+):
+    """Get all registration links for the compound (Admin only)"""
+    try:
+        links = await db.registration_links.find({
+            "compound_id": current_user.compound_id
+        }).sort("created_at", -1).to_list(length=None)
+        
+        # Serialize datetime objects
+        serialized_links = [serialize_datetime(link) for link in links]
+        
+        return {"registration_links": serialized_links}
+        
+    except Exception as e:
+        logging.error(f"Error getting registration links: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get registration links")
+
+@api_router.delete("/admin/registration-links/{link_id}")
+async def delete_registration_link(
+    link_id: str,
+    current_user: User = Depends(require_admin)
+):
+    """Delete a registration link (Admin only)"""
+    try:
+        result = await db.registration_links.delete_one({
+            "id": link_id,
+            "compound_id": current_user.compound_id
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Registration link not found")
+        
+        return {"message": "Registration link deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting registration link: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete registration link")
+
+@api_router.get("/register/verify/{token}")
+async def verify_registration_token(token: str):
+    """Verify registration token and return registration details"""
+    try:
+        # Decode the registration token
+        try:
+            token_data = json.loads(base64.b64decode(token).decode())
+        except:
+            raise HTTPException(status_code=400, detail="Invalid registration token")
+        
+        # Check if token is expired
+        expires_at = datetime.fromisoformat(token_data["expires_at"])
+        if expires_at < datetime.now(timezone.utc):
+            raise HTTPException(status_code=400, detail="Registration token has expired")
+        
+        # Find the registration link
+        reg_link = await db.registration_links.find_one({
+            "registration_token": token,
+            "is_used": False
+        })
+        
+        if not reg_link:
+            raise HTTPException(status_code=404, detail="Registration link not found or already used")
+        
+        return {
+            "valid": True,
+            "unit_number": reg_link["unit_number"],
+            "full_name": reg_link["full_name"],
+            "email": reg_link["email"],
+            "compound_id": reg_link["compound_id"]
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error verifying registration token: {e}")
+        raise HTTPException(status_code=500, detail="Failed to verify registration token")
+
+@api_router.post("/register/complete")
+async def complete_registration(
+    token: str,
+    registration_data: dict
+):
+    """Complete user registration using the token"""
+    try:
+        # Verify token first
+        token_verification = await verify_registration_token(token)
+        
+        # Find the registration link
+        reg_link = await db.registration_links.find_one({
+            "registration_token": token,
+            "is_used": False
+        })
+        
+        if not reg_link:
+            raise HTTPException(status_code=404, detail="Registration link not found or already used")
+        
+        # Create the user account
+        hashed_password = pwd_context.hash(registration_data["password"])
+        
+        new_user = User(
+            username=registration_data["username"],
+            email=reg_link["email"],
+            password_hash=hashed_password,
+            full_name=reg_link["full_name"],
+            phone=registration_data.get("phone", reg_link["phone"]),
+            role="resident",
+            compound_id=reg_link["compound_id"],
+            unit_number=reg_link["unit_number"]
+        )
+        
+        await db.users.insert_one(new_user.dict())
+        
+        # Mark registration link as used
+        await db.registration_links.update_one(
+            {"id": reg_link["id"]},
+            {
+                "$set": {
+                    "is_used": True,
+                    "used_at": datetime.now(timezone.utc),
+                    "registered_user_id": new_user.id
+                }
+            }
+        )
+        
+        return {
+            "message": "Registration completed successfully",
+            "user_id": new_user.id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error completing registration: {e}")
+        raise HTTPException(status_code=500, detail="Failed to complete registration")
+
+def create_registration_token(unit_number: str, email: str, compound_id: str, expires_at: datetime) -> str:
+    """Create a secure token for resident registration"""
+    token_data = {
+        "unit_number": unit_number,
+        "email": email,
+        "compound_id": compound_id,
+        "expires_at": expires_at.isoformat(),
+        "issued_at": datetime.now(timezone.utc).isoformat()
+    }
+    # In production, this should be signed/encrypted
+    import json
+    return base64.b64encode(json.dumps(token_data).encode()).decode()
+
 # WebSocket endpoint for real-time chat
 @app.websocket("/ws/chat/{user_id}")
 async def websocket_chat_endpoint(websocket: WebSocket, user_id: str):

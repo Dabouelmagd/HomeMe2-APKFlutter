@@ -485,11 +485,30 @@ const CompoundManagement = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {residence.family_head?.full_name || 'N/A'}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            @{residence.family_head?.username || 'N/A'}
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                              {residence.family_head?.profile_picture_url ? (
+                                <img
+                                  src={residence.family_head.profile_picture_url}
+                                  alt={residence.family_head.full_name}
+                                  className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
+                                />
+                              ) : (
+                                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                  <span className="text-sm font-medium text-white">
+                                    {residence.family_head?.full_name?.charAt(0) || 'R'}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="ml-3">
+                              <div className="text-sm font-medium text-gray-900">
+                                {residence.family_head?.full_name || 'N/A'}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                @{residence.family_head?.username || 'N/A'}
+                              </div>
+                            </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">

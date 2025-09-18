@@ -283,6 +283,10 @@ function App() {
                 <Route path="gallery" element={
                   <FileGallery />
                 } />
+                
+                <Route path="schedule" element={
+                  <MessageScheduling />
+                } />
               </Route>
             </Routes>
             <Toaster />

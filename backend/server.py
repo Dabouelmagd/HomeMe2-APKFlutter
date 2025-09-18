@@ -4718,6 +4718,15 @@ async def get_provider_reviews(
 ):
     """Get reviews for a service provider"""
     try:
+        # Get provider details
+        provider = await db.service_providers.find_one({
+            "id": provider_id,
+            "compound_id": current_user.compound_id
+        })
+        
+        if not provider:
+            raise HTTPException(status_code=404, detail="Service provider not found")
+        
         reviews = await db.service_reviews.find({
             "provider_id": provider_id,
             "compound_id": current_user.compound_id,
@@ -4729,13 +4738,26 @@ async def get_provider_reviews(
         for review in reviews:
             resident = await db.users.find_one({"id": review["resident_id"]})
             enhanced_review = {
-                **review,
+                **serialize_datetime(review),
                 "resident_name": resident["full_name"] if resident else "Anonymous"
             }
             enhanced_reviews.append(enhanced_review)
         
-        return {"reviews": enhanced_reviews}
+        # Get provider stats
+        provider_stats = {
+            "average_rating": provider.get("average_rating", 0.0),
+            "total_reviews": provider.get("total_reviews", 0),
+            "total_jobs_completed": provider.get("total_jobs_completed", 0),
+            "would_recommend_count": sum(1 for r in reviews if r.get("would_recommend", False))
+        }
         
+        return {
+            "reviews": enhanced_reviews,
+            "provider_stats": provider_stats
+        }
+        
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Error getting provider reviews: {e}")
         raise HTTPException(status_code=500, detail="Failed to get provider reviews")

@@ -640,29 +640,48 @@ class CompoundManagementTestSuite:
         try:
             headers = {"Authorization": f"Bearer {self.admin_token}"}
             
-            # Use admin's email to test duplicate validation
-            admin_email = self.admin_user.get("email", "johndoe@example.com")
-            data = {
-                'unit_number': f"DUPTEST",
-                'full_name': f"Duplicate Email Test",
-                'email': admin_email,  # Use existing admin email
+            # First create a residence, then try to create another with same email
+            unique_id = str(uuid.uuid4())[:8]
+            test_email = f"duplicate{unique_id}@example.com"
+            
+            # Create first residence
+            data1 = {
+                'unit_number': f"DUP1{unique_id[:3]}",
+                'full_name': f"First Duplicate Test {unique_id}",
+                'email': test_email,
                 'phone': "+1234567890",
                 'compound_id': self.compound_id
             }
             
-            response = self.session.post(f"{BASE_URL}/admin/residences", 
-                                       data=data, headers=headers)
+            first_response = self.session.post(f"{BASE_URL}/admin/residences", 
+                                             data=data1, headers=headers)
             
-            if response.status_code == 400:
-                result = response.json()
-                if "already exists" in result.get("detail", "").lower():
-                    self.log_result("Create Residence Duplicate Email", True, "Correctly rejected duplicate email")
-                    return True
+            if first_response.status_code == 200:
+                # Now try to create second residence with same email
+                data2 = {
+                    'unit_number': f"DUP2{unique_id[:3]}",
+                    'full_name': f"Second Duplicate Test {unique_id}",
+                    'email': test_email,  # Same email
+                    'phone': "+1234567890",
+                    'compound_id': self.compound_id
+                }
+                
+                second_response = self.session.post(f"{BASE_URL}/admin/residences", 
+                                                  data=data2, headers=headers)
+                
+                if second_response.status_code == 400:
+                    result = second_response.json()
+                    if "already exists" in result.get("detail", "").lower():
+                        self.log_result("Create Residence Duplicate Email", True, "Correctly rejected duplicate email")
+                        return True
+                    else:
+                        self.log_result("Create Residence Duplicate Email", False, f"Unexpected error message: {result}")
+                        return False
                 else:
-                    self.log_result("Create Residence Duplicate Email", False, f"Unexpected error message: {result}")
+                    self.log_result("Create Residence Duplicate Email", False, f"Expected 400, got {second_response.status_code}")
                     return False
             else:
-                self.log_result("Create Residence Duplicate Email", False, f"Expected 400, got {response.status_code}")
+                self.log_result("Create Residence Duplicate Email", False, f"Failed to create first residence: {first_response.status_code}")
                 return False
                 
         except Exception as e:

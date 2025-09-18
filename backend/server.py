@@ -631,6 +631,136 @@ class FileAttachment(BaseModel):
     height: Optional[int] = None  # For images/videos
     uploaded_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Enhanced Service Management Models
+class ServiceProvider(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    full_name: str
+    email: str
+    phone: str
+    services: List[str]  # List of service categories they provide
+    specialties: List[str]  # Specific specialties within categories
+    compound_id: str
+    profile_image: Optional[str] = None
+    bio: Optional[str] = None
+    hourly_rate: Optional[float] = None
+    availability: Dict[str, List[str]] = {}  # Day -> List of time slots
+    is_active: bool = True
+    is_verified: bool = False
+    average_rating: float = 0.0
+    total_reviews: int = 0
+    total_jobs_completed: int = 0
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ServiceBooking(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    resident_id: str
+    provider_id: str
+    compound_id: str
+    service_category: str
+    service_specialty: str
+    title: str
+    description: str
+    priority: str = "standard"  # emergency, urgent, standard, scheduled
+    scheduled_date: Optional[date] = None
+    scheduled_time: Optional[str] = None
+    scheduled_end_time: Optional[str] = None
+    is_recurring: bool = False
+    recurrence_pattern: Optional[str] = None  # weekly, monthly
+    recurrence_end: Optional[date] = None
+    estimated_duration: Optional[int] = None  # in minutes
+    estimated_cost: Optional[float] = None
+    final_cost: Optional[float] = None
+    payment_method: str = "pending"  # card, bank_transfer, instapay, cash, mobile_pay, digital_wallet, qr_code
+    payment_status: str = "pending"  # pending, paid, failed, refunded
+    payment_id: Optional[str] = None
+    status: str = "pending"  # pending, confirmed, in_progress, completed, cancelled
+    booking_notes: Optional[str] = None
+    completion_notes: Optional[str] = None
+    before_photos: List[str] = []
+    after_photos: List[str] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    completed_at: Optional[datetime] = None
+
+class ServiceReview(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    booking_id: str
+    resident_id: str
+    provider_id: str
+    compound_id: str
+    overall_rating: int  # 1-5 stars
+    quality_rating: int  # 1-5 stars
+    punctuality_rating: int  # 1-5 stars
+    professionalism_rating: int  # 1-5 stars
+    value_rating: int  # 1-5 stars
+    would_recommend: bool
+    written_review: Optional[str] = None
+    review_photos: List[str] = []
+    is_public: bool = True
+    is_moderated: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class PaymentTransaction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    booking_id: str
+    resident_id: str
+    provider_id: str
+    compound_id: str
+    amount: float
+    currency: str = "USD"
+    payment_method: str
+    payment_provider: Optional[str] = None  # stripe, paypal, instapay, etc.
+    transaction_id: Optional[str] = None
+    status: str = "pending"  # pending, processing, completed, failed, refunded
+    failure_reason: Optional[str] = None
+    metadata: Dict[str, Any] = {}
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Request/Response Models
+class ServiceProviderCreate(BaseModel):
+    full_name: str
+    email: str
+    phone: str
+    services: List[str]
+    specialties: List[str]
+    bio: Optional[str] = None
+    hourly_rate: Optional[float] = None
+
+class ServiceBookingCreate(BaseModel):
+    provider_id: str
+    service_category: str
+    service_specialty: str
+    title: str
+    description: str
+    priority: str = "standard"
+    scheduled_date: Optional[date] = None
+    scheduled_time: Optional[str] = None
+    scheduled_end_time: Optional[str] = None
+    is_recurring: bool = False
+    recurrence_pattern: Optional[str] = None
+    recurrence_end: Optional[date] = None
+    estimated_duration: Optional[int] = None
+    payment_method: str = "cash"
+    booking_notes: Optional[str] = None
+
+class ServiceReviewCreate(BaseModel):
+    overall_rating: int
+    quality_rating: int
+    punctuality_rating: int
+    professionalism_rating: int
+    value_rating: int
+    would_recommend: bool
+    written_review: Optional[str] = None
+    is_public: bool = True
+
+class PaymentRequest(BaseModel):
+    payment_method: str
+    amount: float
+    currency: str = "USD"
+    metadata: Dict[str, Any] = {}
+
 def serialize_datetime(obj):
     """Convert datetime objects and ObjectIds to JSON serializable format"""
     if isinstance(obj, datetime):

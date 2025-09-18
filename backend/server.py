@@ -830,6 +830,7 @@ class FamilyMemberCreate(BaseModel):
 class FamilyMemberUpdate(BaseModel):
     full_name: Optional[str] = None
     age: Optional[int] = None
+    birthday: Optional[date] = None
     relationship: Optional[str] = None
     phone: Optional[str] = None
     email: Optional[str] = None

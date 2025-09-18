@@ -4989,6 +4989,279 @@ async def get_service_analytics(
         logging.error(f"Error getting service analytics: {e}")
         raise HTTPException(status_code=500, detail="Failed to get service analytics")
 
+# ============ FAMILY MANAGEMENT ENDPOINTS ============
+
+@api_router.post("/family-members")
+async def create_family_member(
+    member_data: FamilyMemberCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new family member for the current user's unit"""
+    try:
+        # Create family member
+        family_member = FamilyMember(
+            **member_data.dict(),
+            unit_id=current_user.id,  # Using user ID as unit ID for now
+            compound_id=current_user.compound_id,
+            primary_resident_id=current_user.id,
+            unit_number=current_user.unit_number
+        )
+        
+        await db.family_members.insert_one(family_member.dict())
+        
+        return {"message": "Family member added successfully", "family_member": family_member}
+        
+    except Exception as e:
+        logging.error(f"Error creating family member: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create family member")
+
+@api_router.get("/family-members")
+async def get_family_members(
+    current_user: User = Depends(get_current_user)
+):
+    """Get all family members for the current user's unit"""
+    try:
+        if current_user.role == "admin":
+            # Admin can see all family members in the compound
+            family_members = await db.family_members.find({
+                "compound_id": current_user.compound_id,
+                "is_active": True
+            }).to_list(length=None)
+        else:
+            # Residents can only see their own family members
+            family_members = await db.family_members.find({
+                "primary_resident_id": current_user.id,
+                "is_active": True
+            }).to_list(length=None)
+        
+        # Serialize datetime objects
+        serialized_members = [serialize_datetime(member) for member in family_members]
+        
+        return {"family_members": serialized_members}
+        
+    except Exception as e:
+        logging.error(f"Error getting family members: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get family members")
+
+@api_router.put("/family-members/{member_id}")
+async def update_family_member(
+    member_id: str,
+    update_data: FamilyMemberUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a family member"""
+    try:
+        # Find the family member
+        family_member = await db.family_members.find_one({
+            "id": member_id,
+            "primary_resident_id": current_user.id
+        })
+        
+        if not family_member:
+            raise HTTPException(status_code=404, detail="Family member not found")
+        
+        # Update the family member
+        update_dict = {k: v for k, v in update_data.dict().items() if v is not None}
+        update_dict["updated_at"] = datetime.now(timezone.utc)
+        
+        await db.family_members.update_one(
+            {"id": member_id},
+            {"$set": update_dict}
+        )
+        
+        return {"message": "Family member updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating family member: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update family member")
+
+@api_router.delete("/family-members/{member_id}")
+async def delete_family_member(
+    member_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete (deactivate) a family member"""
+    try:
+        # Find the family member
+        family_member = await db.family_members.find_one({
+            "id": member_id,
+            "primary_resident_id": current_user.id
+        })
+        
+        if not family_member:
+            raise HTTPException(status_code=404, detail="Family member not found")
+        
+        # Soft delete by setting is_active to False
+        await db.family_members.update_one(
+            {"id": member_id},
+            {"$set": {"is_active": False, "updated_at": datetime.now(timezone.utc)}}
+        )
+        
+        return {"message": "Family member removed successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting family member: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete family member")
+
+@api_router.post("/family-members/{member_id}/qr-code")
+async def generate_member_qr_code(
+    member_id: str,
+    qr_request: QRCodeRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Generate QR code for family member gate access"""
+    try:
+        # Find the family member
+        family_member = await db.family_members.find_one({
+            "id": member_id,
+            "primary_resident_id": current_user.id,
+            "is_active": True
+        })
+        
+        if not family_member:
+            raise HTTPException(status_code=404, detail="Family member not found")
+        
+        # Set expiration time
+        expires_at = datetime.now(timezone.utc) + timedelta(hours=qr_request.expires_in_hours)
+        
+        # Create access token
+        access_token = create_gate_access_token(
+            family_member_id=member_id,
+            unit_id=family_member["unit_id"],
+            compound_id=current_user.compound_id,
+            expires_at=expires_at
+        )
+        
+        # Generate QR code with the access token
+        qr_code_data = generate_qr_code(access_token)
+        
+        if not qr_code_data:
+            raise HTTPException(status_code=500, detail="Failed to generate QR code")
+        
+        # Update family member with QR code
+        await db.family_members.update_one(
+            {"id": member_id},
+            {
+                "$set": {
+                    "qr_code": qr_code_data,
+                    "qr_code_expires": expires_at,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        return {
+            "message": "QR code generated successfully",
+            "qr_code": qr_code_data,
+            "expires_at": expires_at.isoformat(),
+            "access_token": access_token
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error generating QR code: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate QR code")
+
+@api_router.post("/gate-access/verify")
+async def verify_gate_access(
+    access_token: str,
+    gate_location: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Verify gate access token (for security guards)"""
+    try:
+        # Decode the access token
+        import json
+        try:
+            token_data = json.loads(base64.b64decode(access_token).decode())
+        except:
+            raise HTTPException(status_code=400, detail="Invalid access token")
+        
+        # Check if token is expired
+        expires_at = datetime.fromisoformat(token_data["expires_at"])
+        if expires_at < datetime.now(timezone.utc):
+            raise HTTPException(status_code=400, detail="Access token has expired")
+        
+        # Verify family member exists and is active
+        family_member = await db.family_members.find_one({
+            "id": token_data["family_member_id"],
+            "compound_id": token_data["compound_id"],
+            "is_active": True
+        })
+        
+        if not family_member:
+            raise HTTPException(status_code=404, detail="Family member not found or inactive")
+        
+        # Log the gate access
+        gate_access = GateAccess(
+            family_member_id=token_data["family_member_id"],
+            unit_id=token_data["unit_id"],
+            compound_id=token_data["compound_id"],
+            gate_location=gate_location,
+            security_guard_id=current_user.id if current_user.role == "admin" else None,
+            access_granted=True
+        )
+        
+        await db.gate_access.insert_one(gate_access.dict())
+        
+        return {
+            "access_granted": True,
+            "family_member_name": family_member["full_name"],
+            "unit_number": family_member["unit_number"],
+            "relationship": family_member["relationship"],
+            "message": "Access granted"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error verifying gate access: {e}")
+        raise HTTPException(status_code=500, detail="Failed to verify gate access")
+
+@api_router.get("/gate-access/history")
+async def get_gate_access_history(
+    current_user: User = Depends(get_current_user),
+    limit: int = 100
+):
+    """Get gate access history"""
+    try:
+        if current_user.role == "admin":
+            # Admin can see all gate access in the compound
+            access_history = await db.gate_access.find({
+                "compound_id": current_user.compound_id
+            }).sort("access_time", -1).limit(limit).to_list(length=None)
+        else:
+            # Residents can only see their family's access history
+            family_member_ids = await db.family_members.find({
+                "primary_resident_id": current_user.id
+            }).distinct("id")
+            
+            access_history = await db.gate_access.find({
+                "family_member_id": {"$in": family_member_ids}
+            }).sort("access_time", -1).limit(limit).to_list(length=None)
+        
+        # Enhance with family member details
+        enhanced_history = []
+        for access in access_history:
+            family_member = await db.family_members.find_one({"id": access["family_member_id"]})
+            enhanced_access = {
+                **serialize_datetime(access),
+                "family_member_name": family_member["full_name"] if family_member else "Unknown",
+                "relationship": family_member["relationship"] if family_member else "Unknown"
+            }
+            enhanced_history.append(enhanced_access)
+        
+        return {"access_history": enhanced_history}
+        
+    except Exception as e:
+        logging.error(f"Error getting gate access history: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get gate access history")
+
 # WebSocket endpoint for real-time chat
 @app.websocket("/ws/chat/{user_id}")
 async def websocket_chat_endpoint(websocket: WebSocket, user_id: str):

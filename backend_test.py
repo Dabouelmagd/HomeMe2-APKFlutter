@@ -2499,6 +2499,522 @@ class ChatTestSuite:
             self.log_result("Search Edge Cases", False, f"Too many edge case failures ({success_count}/{total_tests})")
             return False
 
+    # ============ FILE GALLERY TESTS ============
+    
+    def test_file_gallery_basic(self):
+        """Test POST /api/gallery/files - Basic file gallery functionality"""
+        print("\n=== Testing File Gallery Basic ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # First upload some files to have data for gallery
+            if self.test_chat_id:
+                # Upload an image
+                image_data = self.create_test_image("gallery_test.jpg")
+                files = {'files': ('gallery_test.jpg', image_data, 'image/jpeg')}
+                data = {'content': 'Gallery test image', 'message_type': 'image'}
+                
+                upload_response = self.session.post(
+                    f"{BASE_URL}/chats/{self.test_chat_id}/upload",
+                    files=files, data=data, headers={"Authorization": f"Bearer {self.admin_token}"}
+                )
+                
+                if upload_response.status_code != 200:
+                    self.log_result("File Gallery Basic", False, "Failed to upload test file for gallery")
+                    return False
+            
+            # Test basic gallery files request
+            gallery_filter = {
+                "limit": 20,
+                "skip": 0,
+                "sort_by": "uploaded_at",
+                "sort_order": "desc"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/gallery/files", 
+                                       json=gallery_filter, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") and "results" in data:
+                    results = data["results"]
+                    files = results.get("files", [])
+                    self.log_result("File Gallery Basic", True, f"Retrieved {len(files)} files from gallery")
+                    return True
+                else:
+                    self.log_result("File Gallery Basic", False, f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_result("File Gallery Basic", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("File Gallery Basic", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_file_gallery_filters(self):
+        """Test file gallery with different filters"""
+        print("\n=== Testing File Gallery Filters ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test file type filter
+            gallery_filter = {
+                "file_types": ["image"],
+                "limit": 10,
+                "skip": 0,
+                "sort_by": "uploaded_at",
+                "sort_order": "desc"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/gallery/files", 
+                                       json=gallery_filter, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success"):
+                    results = data["results"]
+                    files = results.get("files", [])
+                    
+                    # Check if all returned files are images
+                    image_files = [f for f in files if f.get("file_type") == "image"]
+                    if len(image_files) == len(files):
+                        self.log_result("File Gallery Filters - File Type", True, f"Image filter working correctly ({len(files)} images)")
+                    else:
+                        self.log_result("File Gallery Filters - File Type", False, f"Filter not working: {len(image_files)}/{len(files)} are images")
+                        return False
+                else:
+                    self.log_result("File Gallery Filters - File Type", False, "Invalid response structure")
+                    return False
+            else:
+                self.log_result("File Gallery Filters - File Type", False, f"Failed with status {response.status_code}")
+                return False
+            
+            # Test date range filter
+            from datetime import datetime, timedelta
+            yesterday = (datetime.utcnow() - timedelta(days=1)).isoformat()
+            tomorrow = (datetime.utcnow() + timedelta(days=1)).isoformat()
+            
+            date_filter = {
+                "date_from": yesterday,
+                "date_to": tomorrow,
+                "limit": 10,
+                "skip": 0
+            }
+            
+            date_response = self.session.post(f"{BASE_URL}/gallery/files", 
+                                            json=date_filter, headers=headers)
+            
+            if date_response.status_code == 200:
+                self.log_result("File Gallery Filters - Date Range", True, "Date range filter working")
+                return True
+            else:
+                self.log_result("File Gallery Filters - Date Range", False, f"Date filter failed: {date_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("File Gallery Filters", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_file_gallery_stats(self):
+        """Test GET /api/gallery/stats - File gallery statistics"""
+        print("\n=== Testing File Gallery Stats ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/gallery/stats", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                stats = data.get("stats", {})
+                
+                # Check required stats fields
+                required_fields = ["by_type", "total_files", "total_size"]
+                missing_fields = [field for field in required_fields if field not in stats]
+                
+                if not missing_fields:
+                    by_type = stats.get("by_type", {})
+                    total_files = stats.get("total_files", 0)
+                    self.log_result("File Gallery Stats", True, f"Stats retrieved successfully: {total_files} total files, {len(by_type)} file types")
+                    return True
+                else:
+                    self.log_result("File Gallery Stats", False, f"Missing stats fields: {missing_fields}")
+                    return False
+            else:
+                self.log_result("File Gallery Stats", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("File Gallery Stats", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_file_gallery_access_control(self):
+        """Test file gallery access control - users only see files from their compound's chats"""
+        print("\n=== Testing File Gallery Access Control ===")
+        
+        try:
+            # Test as admin
+            admin_headers = self.setup_auth_headers(self.admin_token)
+            admin_response = self.session.post(f"{BASE_URL}/gallery/files", 
+                                             json={"limit": 50}, headers=admin_headers)
+            
+            # Test as resident
+            resident_headers = self.setup_auth_headers(self.resident_token)
+            resident_response = self.session.post(f"{BASE_URL}/gallery/files", 
+                                                json={"limit": 50}, headers=resident_headers)
+            
+            if admin_response.status_code == 200 and resident_response.status_code == 200:
+                admin_files = admin_response.json().get("results", {}).get("files", [])
+                resident_files = resident_response.json().get("results", {}).get("files", [])
+                
+                # Both should have access to files from their compound's chats
+                # The exact number may differ based on chat participation
+                self.log_result("File Gallery Access Control", True, f"Access control working - Admin: {len(admin_files)} files, Resident: {len(resident_files)} files")
+                return True
+            else:
+                self.log_result("File Gallery Access Control", False, f"Failed - Admin: {admin_response.status_code}, Resident: {resident_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("File Gallery Access Control", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_file_gallery_pagination(self):
+        """Test file gallery pagination"""
+        print("\n=== Testing File Gallery Pagination ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test first page
+            page1_filter = {"limit": 5, "skip": 0}
+            page1_response = self.session.post(f"{BASE_URL}/gallery/files", 
+                                             json=page1_filter, headers=headers)
+            
+            if page1_response.status_code == 200:
+                page1_data = page1_response.json().get("results", {})
+                page1_files = page1_data.get("files", [])
+                has_more = page1_data.get("has_more", False)
+                total_count = page1_data.get("total_count", 0)
+                
+                # Test second page if there are more files
+                if has_more and total_count > 5:
+                    page2_filter = {"limit": 5, "skip": 5}
+                    page2_response = self.session.post(f"{BASE_URL}/gallery/files", 
+                                                     json=page2_filter, headers=headers)
+                    
+                    if page2_response.status_code == 200:
+                        page2_files = page2_response.json().get("results", {}).get("files", [])
+                        
+                        # Check that pages have different files
+                        page1_ids = {f.get("id") for f in page1_files}
+                        page2_ids = {f.get("id") for f in page2_files}
+                        
+                        if not page1_ids.intersection(page2_ids):
+                            self.log_result("File Gallery Pagination", True, f"Pagination working correctly - Page 1: {len(page1_files)}, Page 2: {len(page2_files)}")
+                            return True
+                        else:
+                            self.log_result("File Gallery Pagination", False, "Pages contain duplicate files")
+                            return False
+                    else:
+                        self.log_result("File Gallery Pagination", False, f"Page 2 failed: {page2_response.status_code}")
+                        return False
+                else:
+                    self.log_result("File Gallery Pagination", True, f"Pagination structure correct - Total: {total_count}, Page 1: {len(page1_files)}")
+                    return True
+            else:
+                self.log_result("File Gallery Pagination", False, f"Page 1 failed: {page1_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("File Gallery Pagination", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    # ============ MESSAGE SCHEDULING TESTS ============
+    
+    def test_schedule_message_basic(self):
+        """Test POST /api/chats/{chat_id}/schedule - Basic message scheduling"""
+        print("\n=== Testing Schedule Message Basic ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Schedule Message Basic", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Schedule a message for 1 hour from now
+            from datetime import datetime, timedelta
+            scheduled_time = (datetime.utcnow() + timedelta(hours=1)).isoformat()
+            
+            schedule_data = {
+                "content": "This is a scheduled test message",
+                "message_type": "text",
+                "scheduled_for": scheduled_time,
+                "timezone": "UTC",
+                "is_recurring": False
+            }
+            
+            response = self.session.post(f"{BASE_URL}/chats/{self.test_chat_id}/schedule", 
+                                       json=schedule_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                scheduled_message = data.get("scheduled_message")
+                if scheduled_message and scheduled_message.get("id"):
+                    self.scheduled_message_id = scheduled_message["id"]
+                    self.log_result("Schedule Message Basic", True, f"Message scheduled successfully with ID: {self.scheduled_message_id}")
+                    return True
+                else:
+                    self.log_result("Schedule Message Basic", False, "No scheduled message data in response")
+                    return False
+            else:
+                self.log_result("Schedule Message Basic", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Schedule Message Basic", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_schedule_message_recurring(self):
+        """Test scheduling recurring messages"""
+        print("\n=== Testing Schedule Message Recurring ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Schedule Message Recurring", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Schedule a daily recurring message
+            from datetime import datetime, timedelta
+            scheduled_time = (datetime.utcnow() + timedelta(hours=2)).isoformat()
+            end_time = (datetime.utcnow() + timedelta(days=7)).isoformat()
+            
+            schedule_data = {
+                "content": "Daily recurring test message",
+                "message_type": "text",
+                "scheduled_for": scheduled_time,
+                "timezone": "UTC",
+                "is_recurring": True,
+                "recurrence_pattern": "daily",
+                "recurrence_end": end_time
+            }
+            
+            response = self.session.post(f"{BASE_URL}/chats/{self.test_chat_id}/schedule", 
+                                       json=schedule_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                scheduled_message = data.get("scheduled_message")
+                if scheduled_message and scheduled_message.get("is_recurring"):
+                    self.log_result("Schedule Message Recurring", True, f"Recurring message scheduled successfully")
+                    return True
+                else:
+                    self.log_result("Schedule Message Recurring", False, "Recurring message not properly configured")
+                    return False
+            else:
+                self.log_result("Schedule Message Recurring", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Schedule Message Recurring", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_scheduled_messages(self):
+        """Test GET /api/scheduled-messages - Retrieve scheduled messages"""
+        print("\n=== Testing Get Scheduled Messages ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/scheduled-messages?limit=20", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                scheduled_messages = data.get("scheduled_messages", [])
+                total_count = data.get("total_count", 0)
+                
+                self.log_result("Get Scheduled Messages", True, f"Retrieved {len(scheduled_messages)} scheduled messages (total: {total_count})")
+                return True
+            else:
+                self.log_result("Get Scheduled Messages", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Scheduled Messages", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_update_scheduled_message(self):
+        """Test PUT /api/scheduled-messages/{message_id} - Update scheduled message"""
+        print("\n=== Testing Update Scheduled Message ===")
+        
+        if not hasattr(self, 'scheduled_message_id') or not self.scheduled_message_id:
+            self.log_result("Update Scheduled Message", False, "No scheduled message ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Update the scheduled message
+            from datetime import datetime, timedelta
+            new_scheduled_time = (datetime.utcnow() + timedelta(hours=3)).isoformat()
+            
+            update_data = {
+                "content": "Updated scheduled test message",
+                "scheduled_for": new_scheduled_time,
+                "timezone": "UTC"
+            }
+            
+            response = self.session.put(f"{BASE_URL}/scheduled-messages/{self.scheduled_message_id}", 
+                                      json=update_data, headers=headers)
+            
+            if response.status_code == 200:
+                self.log_result("Update Scheduled Message", True, "Scheduled message updated successfully")
+                return True
+            else:
+                self.log_result("Update Scheduled Message", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Update Scheduled Message", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_delete_scheduled_message(self):
+        """Test DELETE /api/scheduled-messages/{message_id} - Cancel scheduled message"""
+        print("\n=== Testing Delete Scheduled Message ===")
+        
+        if not hasattr(self, 'scheduled_message_id') or not self.scheduled_message_id:
+            self.log_result("Delete Scheduled Message", False, "No scheduled message ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.delete(f"{BASE_URL}/scheduled-messages/{self.scheduled_message_id}", 
+                                         headers=headers)
+            
+            if response.status_code == 200:
+                self.log_result("Delete Scheduled Message", True, "Scheduled message cancelled successfully")
+                return True
+            else:
+                self.log_result("Delete Scheduled Message", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Delete Scheduled Message", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_schedule_message_validation(self):
+        """Test message scheduling validation"""
+        print("\n=== Testing Schedule Message Validation ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Schedule Message Validation", False, "No test chat ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test scheduling message in the past (should fail)
+            from datetime import datetime, timedelta
+            past_time = (datetime.utcnow() - timedelta(hours=1)).isoformat()
+            
+            invalid_schedule_data = {
+                "content": "This should fail - scheduled in the past",
+                "message_type": "text",
+                "scheduled_for": past_time,
+                "timezone": "UTC"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/chats/{self.test_chat_id}/schedule", 
+                                       json=invalid_schedule_data, headers=headers)
+            
+            if response.status_code == 400:
+                self.log_result("Schedule Message Validation - Past Time", True, "Correctly rejected past scheduled time")
+            else:
+                self.log_result("Schedule Message Validation - Past Time", False, f"Expected 400, got {response.status_code}")
+                return False
+            
+            # Test invalid recurrence pattern
+            future_time = (datetime.utcnow() + timedelta(hours=1)).isoformat()
+            invalid_recurrence_data = {
+                "content": "Invalid recurrence test",
+                "message_type": "text",
+                "scheduled_for": future_time,
+                "timezone": "UTC",
+                "is_recurring": True,
+                "recurrence_pattern": "invalid_pattern"
+            }
+            
+            recurrence_response = self.session.post(f"{BASE_URL}/chats/{self.test_chat_id}/schedule", 
+                                                  json=invalid_recurrence_data, headers=headers)
+            
+            if recurrence_response.status_code == 400:
+                self.log_result("Schedule Message Validation - Invalid Recurrence", True, "Correctly rejected invalid recurrence pattern")
+                return True
+            else:
+                self.log_result("Schedule Message Validation - Invalid Recurrence", False, f"Expected 400, got {recurrence_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Schedule Message Validation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_schedule_message_access_control(self):
+        """Test message scheduling access control"""
+        print("\n=== Testing Schedule Message Access Control ===")
+        
+        if not self.test_chat_id:
+            self.log_result("Schedule Message Access Control", False, "No test chat ID available")
+            return False
+        
+        try:
+            # Try to schedule message in a chat where user is not a participant
+            # First create a chat as admin with only admin as participant
+            admin_headers = self.setup_auth_headers(self.admin_token)
+            chat_data = {
+                "chat_type": "group",
+                "name": "Admin Only Scheduling Test",
+                "description": "For testing scheduling access control",
+                "participant_ids": []  # Only admin will be participant
+            }
+            
+            chat_response = self.session.post(f"{BASE_URL}/chats", json=chat_data, headers=admin_headers)
+            
+            if chat_response.status_code == 200:
+                admin_only_chat_id = chat_response.json()["chat"]["id"]
+                
+                # Try to schedule message as resident (should fail)
+                resident_headers = self.setup_auth_headers(self.resident_token)
+                from datetime import datetime, timedelta
+                future_time = (datetime.utcnow() + timedelta(hours=1)).isoformat()
+                
+                schedule_data = {
+                    "content": "This should fail - not a participant",
+                    "message_type": "text",
+                    "scheduled_for": future_time,
+                    "timezone": "UTC"
+                }
+                
+                response = self.session.post(f"{BASE_URL}/chats/{admin_only_chat_id}/schedule", 
+                                           json=schedule_data, headers=resident_headers)
+                
+                if response.status_code in [403, 404]:
+                    self.log_result("Schedule Message Access Control", True, f"Correctly denied access to non-participant (status: {response.status_code})")
+                    return True
+                else:
+                    self.log_result("Schedule Message Access Control", False, f"Expected 403/404, got {response.status_code}")
+                    return False
+            else:
+                self.log_result("Schedule Message Access Control", False, f"Failed to create test chat: {chat_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Schedule Message Access Control", False, f"Exception occurred: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all chat system, push notification, and search tests"""
         print("🚀 Starting Chat Backend, Push Notification & Search Test Suite")

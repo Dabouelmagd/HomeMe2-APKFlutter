@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Perform comprehensive testing of the Enhanced Service Management System that was just implemented"
+user_problem_statement: "Test the complete residence account creation and family management workflow"
 
 backend:
   - task: "Enhanced Service Management System - Service Provider Management"

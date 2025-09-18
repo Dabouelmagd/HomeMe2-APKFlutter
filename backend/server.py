@@ -4478,7 +4478,10 @@ async def get_service_providers(
                     available_providers.append(provider)
             providers = available_providers
         
-        return {"providers": providers}
+        # Serialize ObjectIds and datetime objects
+        serialized_providers = [serialize_datetime(provider) for provider in providers]
+        
+        return {"providers": serialized_providers}
         
     except Exception as e:
         logging.error(f"Error getting service providers: {e}")

@@ -57,12 +57,6 @@ const Layout = () => {
       show: true
     },
     {
-      name: t('service_booking'),
-      href: '/service-booking',
-      icon: CreditCardIcon,
-      show: true
-    },
-    {
       name: t('government_utility_gateway'),
       href: '/utilities',
       icon: BoltIcon,

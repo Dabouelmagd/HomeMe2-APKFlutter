@@ -84,6 +84,12 @@ const Layout = () => {
       show: true
     },
     {
+      name: t('gallery.title'),
+      href: '/gallery',
+      icon: PhotoIcon,
+      show: true
+    },
+    {
       name: t('notifications_nav'),
       href: '/notifications',
       icon: BellIcon,

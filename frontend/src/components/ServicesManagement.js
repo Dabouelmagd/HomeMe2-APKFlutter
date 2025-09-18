@@ -121,6 +121,19 @@ const ServicesManagement = () => {
     }
   };
 
+  const serviceCategories = {
+    medical: { name: t('medical'), icon: UserIcon, color: 'bg-red-500' },
+    maintenance: { name: t('maintenance'), icon: WrenchScrewdriverIcon, color: 'bg-blue-500' },
+    security: { name: t('security'), icon: ShieldCheckIcon, color: 'bg-green-500' },
+    cleaning: { name: t('cleaning'), icon: SparklesIcon, color: 'bg-purple-500' },
+    other: { name: t('other'), icon: WrenchScrewdriverIcon, color: 'bg-gray-500' }
+  };
+
+  const maintenanceSpecialties = [
+    'carpenter', 'plumber', 'electrician', 'gardener', 'painter', 
+    'hvac_technician', 'locksmith', 'appliance_repair', 'general_maintenance'
+  ];
+
   const fetchBookings = async () => {
     try {
       const response = await axios.get(`${API}/compounds/${user.compound_id}/bookings`);

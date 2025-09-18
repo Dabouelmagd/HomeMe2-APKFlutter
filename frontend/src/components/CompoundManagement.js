@@ -202,6 +202,18 @@ const CompoundManagement = () => {
           >
             Residence List ({residences.length})
           </button>
+          {user?.role === 'admin' && (
+            <button
+              onClick={() => setActiveTab('registration-links')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'registration-links'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Registration Links ({registrationLinks.length})
+            </button>
+          )}
           <button
             onClick={() => setActiveTab('settings')}
             className={`py-2 px-1 border-b-2 font-medium text-sm ${

@@ -140,7 +140,7 @@ class CompoundEnhancementsTestSuite(CompoundManagementTestSuite):
                 'compound_id': self.compound_id
             }
             
-            response = self.session.post(f"{self.BASE_URL}/admin/residences", 
+            response = self.session.post(f"{BASE_URL}/admin/residences", 
                                        files=files, data=data, headers=headers)
             
             if response.status_code == 400:

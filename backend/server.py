@@ -785,6 +785,7 @@ class FamilyMember(BaseModel):
     primary_resident_id: str  # The account holder who manages this family member
     full_name: str
     age: int
+    birthday: Optional[date] = None
     relationship: str  # father, mother, son, daughter, brother, sister, spouse, etc.
     phone: Optional[str] = None
     email: Optional[str] = None

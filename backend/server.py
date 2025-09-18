@@ -4511,6 +4511,10 @@ async def create_service_booking(
         
         # Check for scheduling conflicts if date/time specified
         if booking_data.scheduled_date and booking_data.scheduled_time:
+            # Validate that scheduled date is not in the past
+            if booking_data.scheduled_date < date.today():
+                raise HTTPException(status_code=400, detail="Cannot schedule booking for past date")
+            
             existing_booking = await db.service_bookings.find_one({
                 "provider_id": booking_data.provider_id,
                 "scheduled_date": booking_data.scheduled_date.isoformat(),
@@ -4519,7 +4523,7 @@ async def create_service_booking(
             })
             
             if existing_booking:
-                raise HTTPException(status_code=400, detail="Time slot already booked")
+                raise HTTPException(status_code=400, detail="Time slot already booked - scheduling conflict detected")
         
         # Calculate estimated cost based on provider's hourly rate
         estimated_cost = None

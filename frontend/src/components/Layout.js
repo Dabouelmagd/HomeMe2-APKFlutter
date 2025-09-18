@@ -18,7 +18,8 @@ import {
   CogIcon,
   PhotoIcon,
   ClockIcon,
-  ShoppingBagIcon
+  ShoppingBagIcon,
+  CreditCardIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 

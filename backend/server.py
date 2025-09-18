@@ -1818,7 +1818,9 @@ async def login(user_data: UserLogin):
             "username": user["username"],
             "role": user["role"],
             "compound_id": user["compound_id"],
-            "full_name": user["full_name"]
+            "full_name": user["full_name"],
+            "is_family_head": user.get("is_family_head", False),
+            "family_id": user.get("family_id")
         }
     }
 

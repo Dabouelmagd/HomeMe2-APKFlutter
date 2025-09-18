@@ -3492,5 +3492,5 @@ class CompoundManagementTestSuite:
         print("\n" + "=" * 50)
 
 if __name__ == "__main__":
-    test_suite = ChatTestSuite()
+    test_suite = CompoundManagementTestSuite()
     test_suite.run_all_tests()

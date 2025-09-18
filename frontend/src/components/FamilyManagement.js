@@ -272,6 +272,16 @@ const FamilyManagement = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">{member.age}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {member.birthday ? (
+                          <div className="flex items-center">
+                            <CalendarIcon className="h-4 w-4 mr-1 text-gray-400" />
+                            {new Date(member.birthday).toLocaleDateString()}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900">
                           {member.phone && (

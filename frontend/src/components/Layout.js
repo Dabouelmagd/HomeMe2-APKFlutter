@@ -48,7 +48,7 @@ const Layout = () => {
       name: t('compound_management'),
       href: '/compound',
       icon: BuildingOfficeIcon,
-      show: user?.role === 'admin'
+      show: true
     },
     {
       name: t('services_management'),

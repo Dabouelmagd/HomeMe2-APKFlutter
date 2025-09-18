@@ -428,6 +428,13 @@ const CompoundManagement = () => {
                 <div className="text-sm text-gray-600">
                   Total Units: <span className="font-semibold">{residences.length}</span>
                 </div>
+                <button
+                  onClick={() => setShowAddNewResidence(true)}
+                  className="btn btn-primary flex items-center space-x-2"
+                >
+                  <PlusIcon className="h-4 w-4" />
+                  <span>New Residence</span>
+                </button>
               </div>
             </div>
 

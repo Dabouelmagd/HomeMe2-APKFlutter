@@ -331,6 +331,27 @@ const resources = {
         'playbackInstructions': 'Click play to listen, send to share',
         'startInstructions': 'Click the microphone to record a voice message',
         'waveformPlaceholder': 'Voice waveform will appear here'
+      },
+      
+      // File Gallery
+      'gallery': {
+        'title': 'File Gallery',
+        'description': 'Browse and manage all shared files from your chats',
+        'allFiles': 'All Files',
+        'images': 'Images',
+        'videos': 'Videos',
+        'voice': 'Voice',
+        'audio': 'Audio',
+        'documents': 'Documents',
+        'newestFirst': 'Newest First',
+        'largestFirst': 'Largest First',
+        'nameAZ': 'Name A-Z',
+        'noFilesFound': 'No files found',
+        'filesSharedInChats': 'Files shared in chats will appear here',
+        'download': 'Download',
+        'from': 'From',
+        'gridView': 'Grid View',
+        'listView': 'List View'
       }
     }
   },

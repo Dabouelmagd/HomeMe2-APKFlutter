@@ -4528,7 +4528,9 @@ async def create_service_booking(
             estimated_cost=estimated_cost
         )
         
-        await db.service_bookings.insert_one(booking.dict())
+        # Serialize the booking data before inserting
+        booking_dict = serialize_datetime(booking.dict())
+        await db.service_bookings.insert_one(booking_dict)
         
         # Send notification to provider (WebSocket or email)
         await manager.send_personal_message(
@@ -4540,7 +4542,7 @@ async def create_service_booking(
             booking_data.provider_id
         )
         
-        return {"message": "Service booking created successfully", "booking": booking}
+        return {"message": "Service booking created successfully", "booking": serialize_datetime(booking.dict())}
         
     except HTTPException:
         raise

@@ -69,7 +69,12 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test"
+    "test": "craco test",
+    "electron": "electron .",
+    "electron-dev": "ELECTRON_IS_DEV=1 electron .",
+    "electron-pack": "yarn build && electron-builder",
+    "electron-dist": "yarn build && electron-builder --publish=never",
+    "preelectron-pack": "yarn build"
   },
   "browserslist": {
     "production": [

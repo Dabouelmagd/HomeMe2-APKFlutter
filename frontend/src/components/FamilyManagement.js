@@ -102,11 +102,12 @@ const FamilyManagement = () => {
   };
 
   const handleUpdateMember = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
     try {
       const memberData = {
         ...memberForm,
         age: parseInt(memberForm.age),
+        birthday: memberForm.birthday || null,
         move_in_date: memberForm.move_in_date || null
       };
 

@@ -3717,6 +3717,17 @@ class CompoundManagementTestSuite:
             self.test_get_compound_details,
             self.test_get_compound_residences,
             self.test_upload_compound_logo,
+            # NEW: Available compounds API
+            self.test_get_available_compounds,
+            # NEW: Direct residence creation API
+            self.test_create_residence_directly,
+            self.test_create_residence_without_profile_picture,
+            self.test_create_residence_duplicate_email,
+            # NEW: User compound update API
+            self.test_update_user_compound_admin,
+            self.test_update_user_compound_self,
+            self.test_update_user_compound_unauthorized,
+            self.test_update_user_compound_invalid_compound,
             # Registration link management tests
             self.test_create_registration_link,
             self.test_get_registration_links,

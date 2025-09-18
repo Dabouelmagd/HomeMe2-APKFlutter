@@ -2284,6 +2284,21 @@ async def get_all_users(current_user: User = Depends(get_current_user)):
     
     return {"users": user_data, "total_count": len(user_data)}
 
+@api_router.get("/compounds")
+async def get_available_compounds(current_user: User = Depends(get_current_user)):
+    """Get all available compounds for compound selection"""
+    try:
+        compounds = await db.compounds.find({}).to_list(None)
+        
+        # Serialize datetime objects
+        serialized_compounds = [serialize_datetime(compound) for compound in compounds]
+        
+        return {"compounds": serialized_compounds}
+        
+    except Exception as e:
+        logging.error(f"Error getting compounds: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get compounds")
+
 @api_router.get("/database/compounds")
 async def get_all_compounds(current_user: User = Depends(get_current_user)):
     if current_user.username not in ["johndoe", "admin", "superadmin"]:

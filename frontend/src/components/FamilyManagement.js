@@ -174,6 +174,7 @@ const FamilyManagement = () => {
     setMemberForm({
       full_name: '',
       age: '',
+      birthday: '',
       relationship: 'son',
       phone: '',
       email: '',

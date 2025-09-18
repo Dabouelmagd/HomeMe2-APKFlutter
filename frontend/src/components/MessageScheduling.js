@@ -122,7 +122,7 @@ const MessageScheduling = () => {
   const handleDelete = async (messageId) => {
     if (window.confirm(t('schedule.confirmDelete'))) {
       try {
-        await axios.delete(`${API}/messages/scheduled/${messageId}`);
+        await axios.delete(`${API}/scheduled-messages/${messageId}`);
         await loadScheduledMessages();
       } catch (error) {
         console.error('Failed to delete scheduled message:', error);

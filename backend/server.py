@@ -755,6 +755,11 @@ class ServiceReviewCreate(BaseModel):
     written_review: Optional[str] = None
     is_public: bool = True
 
+class BookingStatusUpdate(BaseModel):
+    status: str
+    notes: Optional[str] = None
+    final_cost: Optional[float] = None
+
 class PaymentRequest(BaseModel):
     payment_method: str
     amount: float

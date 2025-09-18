@@ -14,6 +14,9 @@ import io
 from PIL import Image
 from backend_test import CompoundManagementTestSuite
 
+# Configuration
+BASE_URL = "https://homeme-platform.preview.emergentagent.com/api"
+
 class CompoundEnhancementsTestSuite(CompoundManagementTestSuite):
     def __init__(self):
         super().__init__()

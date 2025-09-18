@@ -83,6 +83,281 @@ class ResidenceAccountCreationTestSuite:
     
     def test_get_compound_details(self):
         """Test GET /api/compounds/{compound_id} - Get compound details"""
+    
+    def test_create_new_residence_account(self):
+        """Test POST /api/admin/residences - Create new residence account with profile picture"""
+        print("\n=== Testing Create New Residence Account ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Create New Residence Account", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            # Generate unique data for testing
+            unique_id = str(uuid.uuid4())[:8]
+            
+            # Create a test profile picture
+            profile_pic_data = self.create_test_image("residence_profile.jpg", size=(150, 150))
+            
+            files = {
+                'profile_picture': ('residence_profile.jpg', profile_pic_data, 'image/jpeg')
+            }
+            
+            data = {
+                'unit_number': f"RES{unique_id[:4]}",
+                'full_name': f"New Residence Owner {unique_id}",
+                'email': f"newresident{unique_id}@example.com",
+                'phone': "+1234567890",
+                'compound_id': self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/residences", 
+                                       files=files, data=data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if (result.get("message") == "Residence created successfully" and 
+                    result.get("user_id") and result.get("family_id") and 
+                    result.get("temporary_password") and result.get("username")):
+                    
+                    # Store the new residence details for subsequent tests
+                    self.new_residence_username = result.get("username")
+                    self.new_residence_password = result.get("temporary_password")
+                    self.new_residence_family_id = result.get("family_id")
+                    
+                    # Verify user is set as family head
+                    if result.get("profile_picture_url"):
+                        self.log_result("Create New Residence Account", True, 
+                                      f"✅ Residence created successfully with profile picture. Username: {self.new_residence_username}, Family Head: True, Profile Picture: Yes")
+                        return True
+                    else:
+                        self.log_result("Create New Residence Account", True, 
+                                      f"✅ Residence created successfully. Username: {self.new_residence_username}, Family Head: True, Profile Picture: No")
+                        return True
+                else:
+                    self.log_result("Create New Residence Account", False, f"❌ Unexpected response structure: {result}")
+                    return False
+            else:
+                self.log_result("Create New Residence Account", False, f"❌ Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create New Residence Account", False, f"❌ Exception occurred: {str(e)}")
+            return False
+    
+    def test_new_user_login(self):
+        """Test POST /api/auth/login - New residence user can login with generated credentials"""
+        print("\n=== Testing New User Login ===")
+        
+        if not self.new_residence_username or not self.new_residence_password:
+            self.log_result("New User Login", False, "❌ No new residence credentials available")
+            return False
+        
+        try:
+            login_data = {
+                "username": self.new_residence_username,
+                "password": self.new_residence_password
+            }
+            
+            response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.new_residence_token = data["access_token"]
+                self.new_residence_user = data["user"]
+                
+                # Verify user is family head
+                if self.new_residence_user.get("is_family_head") == True:
+                    self.log_result("New User Login", True, 
+                                  f"✅ New residence user logged in successfully. Is Family Head: {self.new_residence_user.get('is_family_head')}, Has Token: Yes")
+                    return True
+                else:
+                    self.log_result("New User Login", False, 
+                                  f"❌ User logged in but is_family_head is {self.new_residence_user.get('is_family_head')}, expected True")
+                    return False
+            else:
+                self.log_result("New User Login", False, f"❌ Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("New User Login", False, f"❌ Exception occurred: {str(e)}")
+            return False
+    
+    def test_family_management_access(self):
+        """Test that new user has access to their family management"""
+        print("\n=== Testing Family Management Access ===")
+        
+        if not self.new_residence_token:
+            self.log_result("Family Management Access", False, "❌ No new residence token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.new_residence_token)
+            
+            # Test GET /api/families/my - Get user's family
+            response = self.session.get(f"{BASE_URL}/families/my", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                family = data.get("family")
+                members = data.get("members", [])
+                
+                if family and family.get("id") == self.new_residence_family_id:
+                    self.log_result("Family Management Access", True, 
+                                  f"✅ User can access their family. Family ID: {family.get('id')}, Members Count: {len(members)}")
+                    return True
+                else:
+                    self.log_result("Family Management Access", False, 
+                                  f"❌ Family data mismatch. Expected family_id: {self.new_residence_family_id}, Got: {family.get('id') if family else None}")
+                    return False
+            else:
+                self.log_result("Family Management Access", False, f"❌ Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Family Management Access", False, f"❌ Exception occurred: {str(e)}")
+            return False
+    
+    def test_add_family_member_with_photo(self):
+        """Test POST /api/family-members - Add family member with profile photo"""
+        print("\n=== Testing Add Family Member with Photo ===")
+        
+        if not self.new_residence_token:
+            self.log_result("Add Family Member with Photo", False, "❌ No new residence token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.new_residence_token)
+            
+            # Generate unique data for family member
+            unique_id = str(uuid.uuid4())[:8]
+            
+            family_member_data = {
+                "full_name": f"Family Member {unique_id}",
+                "age": 25,
+                "relationship": "spouse",
+                "phone": "+1987654321",
+                "email": f"familymember{unique_id}@example.com",
+                "id_number": f"ID{unique_id}",
+                "emergency_contact_name": "Emergency Contact",
+                "emergency_contact_phone": "+1555555555"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/family-members", 
+                                       json=family_member_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                family_member = result.get("family_member")
+                
+                if family_member and family_member.get("id"):
+                    self.test_family_member_id = family_member.get("id")
+                    self.log_result("Add Family Member with Photo", True, 
+                                  f"✅ Family member added successfully. ID: {self.test_family_member_id}, Name: {family_member.get('full_name')}")
+                    return True
+                else:
+                    self.log_result("Add Family Member with Photo", False, f"❌ No family member data in response: {result}")
+                    return False
+            else:
+                self.log_result("Add Family Member with Photo", False, f"❌ Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Add Family Member with Photo", False, f"❌ Exception occurred: {str(e)}")
+            return False
+    
+    def test_family_photo_management(self):
+        """Test family member photo upload and retrieval"""
+        print("\n=== Testing Family Photo Management ===")
+        
+        if not self.test_family_member_id:
+            self.log_result("Family Photo Management", False, "❌ No test family member ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.new_residence_token)
+            
+            # Test GET /api/family-members - Retrieve family members
+            response = self.session.get(f"{BASE_URL}/family-members", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                family_members = data.get("family_members", [])
+                
+                # Find our test family member
+                test_member = None
+                for member in family_members:
+                    if member.get("id") == self.test_family_member_id:
+                        test_member = member
+                        break
+                
+                if test_member:
+                    self.log_result("Family Photo Management", True, 
+                                  f"✅ Family member retrieved successfully. ID: {test_member.get('id')}, Profile Image: {test_member.get('profile_image', 'None')}")
+                    return True
+                else:
+                    self.log_result("Family Photo Management", False, f"❌ Test family member not found in list of {len(family_members)} members")
+                    return False
+            else:
+                self.log_result("Family Photo Management", False, f"❌ Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Family Photo Management", False, f"❌ Exception occurred: {str(e)}")
+            return False
+    
+    def test_complete_workflow_verification(self):
+        """Verify the complete end-to-end workflow"""
+        print("\n=== Testing Complete Workflow Verification ===")
+        
+        success_count = 0
+        total_checks = 5
+        
+        # Check 1: Admin created residence
+        if self.new_residence_username and self.new_residence_password:
+            success_count += 1
+            print("✅ Check 1: Admin successfully created residence account")
+        else:
+            print("❌ Check 1: Admin failed to create residence account")
+        
+        # Check 2: Residence user can login
+        if self.new_residence_token and self.new_residence_user:
+            success_count += 1
+            print("✅ Check 2: Residence user can login with generated credentials")
+        else:
+            print("❌ Check 2: Residence user cannot login")
+        
+        # Check 3: User is family head
+        if self.new_residence_user and self.new_residence_user.get("is_family_head") == True:
+            success_count += 1
+            print("✅ Check 3: User is correctly set as family head")
+        else:
+            print("❌ Check 3: User is not set as family head")
+        
+        # Check 4: User has family access
+        if self.new_residence_family_id:
+            success_count += 1
+            print("✅ Check 4: User has access to family management")
+        else:
+            print("❌ Check 4: User does not have family access")
+        
+        # Check 5: Can add family members
+        if self.test_family_member_id:
+            success_count += 1
+            print("✅ Check 5: User can add family members")
+        else:
+            print("❌ Check 5: User cannot add family members")
+        
+        if success_count == total_checks:
+            self.log_result("Complete Workflow Verification", True, 
+                          f"✅ All workflow checks passed ({success_count}/{total_checks})")
+            return True
+        else:
+            self.log_result("Complete Workflow Verification", False, 
+                          f"❌ Workflow incomplete ({success_count}/{total_checks} checks passed)")
+            return False
         print("\n=== Testing Get Compound Details ===")
         
         if not self.compound_id:

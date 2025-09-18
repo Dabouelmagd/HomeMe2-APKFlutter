@@ -4686,7 +4686,7 @@ async def create_service_review(
             compound_id=current_user.compound_id
         )
         
-        await db.service_reviews.insert_one(review.dict())
+        await db.service_reviews.insert_one(serialize_datetime(review.dict()))
         
         # Update provider's average rating
         provider_reviews = await db.service_reviews.find({"provider_id": booking["provider_id"]}).to_list(length=None)
@@ -4703,7 +4703,7 @@ async def create_service_review(
             }
         )
         
-        return {"message": "Review submitted successfully", "review": review}
+        return {"message": "Review submitted successfully", "review": serialize_datetime(review.dict())}
         
     except HTTPException:
         raise

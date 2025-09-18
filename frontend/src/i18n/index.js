@@ -1081,6 +1081,38 @@ const resources = {
         'listView': 'Vue liste'
       },
       
+      // Message Scheduling
+      'schedule': {
+        'title': 'Planification de Messages',
+        'description': 'Planifier des messages à envoyer automatiquement aux heures spécifiées',
+        'scheduleMessage': 'Planifier un Message',
+        'editMessage': 'Modifier le Message Planifié',
+        'message': 'Message',
+        'enterMessage': 'Entrez votre message...',
+        'recipientType': 'Type de Destinataire',
+        'directMessage': 'Message Direct',
+        'groupMessage': 'Message de Groupe',
+        'compoundMessage': 'Message à Toute la Résidence',
+        'recipient': 'Destinataire',
+        'selectRecipient': 'Sélectionnez le destinataire...',
+        'scheduledFor': 'Planifié pour',
+        'repeatType': 'Répétition',
+        'noRepeat': 'Pas de Répétition',
+        'daily': 'Quotidien',
+        'weekly': 'Hebdomadaire',
+        'monthly': 'Mensuel',
+        'updateMessage': 'Mettre à jour le Message',
+        'noScheduledMessages': 'Aucun message planifié',
+        'scheduleFirstMessage': 'Planifiez votre premier message pour commencer',
+        'status': 'Statut',
+        'actions': 'Actions',
+        'pending': 'En attente',
+        'sent': 'Envoyé',
+        'failed': 'Échec',
+        'cancelled': 'Annulé',
+        'confirmDelete': 'Êtes-vous sûr de vouloir supprimer ce message planifié?'
+      },
+      
       // Search
       'search': {
         'searchMessages': 'Rechercher des Messages',

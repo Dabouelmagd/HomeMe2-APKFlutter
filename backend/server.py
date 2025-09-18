@@ -4600,8 +4600,7 @@ async def get_service_bookings(
 @api_router.put("/service-bookings/{booking_id}/status")
 async def update_booking_status(
     booking_id: str,
-    status: str,
-    completion_notes: Optional[str] = None,
+    status_update: BookingStatusUpdate,
     current_user: User = Depends(get_current_user)
 ):
     """Update booking status"""
@@ -4619,23 +4618,26 @@ async def update_booking_status(
             raise HTTPException(status_code=403, detail="Not authorized")
         
         update_data = {
-            "status": status,
+            "status": status_update.status,
             "updated_at": datetime.now(timezone.utc)
         }
         
-        if completion_notes:
-            update_data["completion_notes"] = completion_notes
+        if status_update.notes:
+            update_data["completion_notes"] = status_update.notes
         
-        if status == "completed":
+        if status_update.final_cost:
+            update_data["final_cost"] = status_update.final_cost
+        
+        if status_update.status == "completed":
             update_data["completed_at"] = datetime.now(timezone.utc)
         
         await db.service_bookings.update_one(
             {"id": booking_id},
-            {"$set": update_data}
+            {"$set": serialize_datetime(update_data)}
         )
         
         # Update provider stats if completed
-        if status == "completed":
+        if status_update.status == "completed":
             await db.service_providers.update_one(
                 {"id": booking["provider_id"]},
                 {"$inc": {"total_jobs_completed": 1}}

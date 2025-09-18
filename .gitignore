@@ -230,3 +230,4 @@ android-sdk/ -e
 *.env
 *.env.*
 frontend/node_modules/electron/dist/electron
+HomeMe-Windows-Electron-Project.tar.gz

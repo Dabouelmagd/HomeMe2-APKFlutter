@@ -93,7 +93,7 @@ const Layout = () => {
       show: true
     },
     {
-      name: 'Message Scheduling',
+      name: t('schedule.title'),
       href: '/schedule',
       icon: ClockIcon,
       show: true

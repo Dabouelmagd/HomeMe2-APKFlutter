@@ -4057,5 +4057,5 @@ class ResidenceAccountCreationTestSuite:
         print("\n" + "=" * 50)
 
 if __name__ == "__main__":
-    test_suite = CompoundManagementTestSuite()
-    test_suite.run_all_tests()
+    test_suite = ResidenceAccountCreationTestSuite()
+    test_suite.run_residence_workflow_tests()

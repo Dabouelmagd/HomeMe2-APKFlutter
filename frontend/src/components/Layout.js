@@ -59,7 +59,7 @@ const Layout = () => {
     {
       name: t('service_booking'),
       href: '/service-booking',
-      icon: CurrencyDollarIcon,
+      icon: CreditCardIcon,
       show: true
     },
     {

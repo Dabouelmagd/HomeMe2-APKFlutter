@@ -766,6 +766,71 @@ class PaymentRequest(BaseModel):
     currency: str = "USD"
     metadata: Dict[str, Any] = {}
 
+# Family Management Models
+class FamilyMember(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    unit_id: str
+    compound_id: str
+    primary_resident_id: str  # The account holder who manages this family member
+    full_name: str
+    age: int
+    relationship: str  # father, mother, son, daughter, brother, sister, spouse, etc.
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    id_number: Optional[str] = None  # Government ID/Passport number
+    unit_number: str
+    profile_image: Optional[str] = None
+    is_active: bool = True
+    qr_code: Optional[str] = None  # QR code for gate access
+    qr_code_expires: Optional[datetime] = None  # Optional expiry for QR codes
+    emergency_contact_name: Optional[str] = None
+    emergency_contact_phone: Optional[str] = None
+    move_in_date: Optional[date] = None
+    move_out_date: Optional[date] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class GateAccess(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    family_member_id: str
+    unit_id: str
+    compound_id: str
+    access_type: str = "entry"  # entry, exit
+    gate_location: Optional[str] = None
+    access_granted: bool = True
+    access_time: datetime = Field(default_factory=datetime.utcnow)
+    security_guard_id: Optional[str] = None
+    notes: Optional[str] = None
+
+# Request/Response Models for Family Management
+class FamilyMemberCreate(BaseModel):
+    full_name: str
+    age: int
+    relationship: str
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    id_number: Optional[str] = None
+    emergency_contact_name: Optional[str] = None
+    emergency_contact_phone: Optional[str] = None
+    move_in_date: Optional[date] = None
+
+class FamilyMemberUpdate(BaseModel):
+    full_name: Optional[str] = None
+    age: Optional[int] = None
+    relationship: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[str] = None
+    id_number: Optional[str] = None
+    emergency_contact_name: Optional[str] = None
+    emergency_contact_phone: Optional[str] = None
+    move_in_date: Optional[date] = None
+    move_out_date: Optional[date] = None
+    is_active: Optional[bool] = None
+
+class QRCodeRequest(BaseModel):
+    family_member_id: str
+    expires_in_hours: int = 24  # Default 24 hours validity
+
 def serialize_datetime(obj):
     """Convert datetime objects, date objects, and ObjectIds to JSON serializable format"""
     if isinstance(obj, datetime):

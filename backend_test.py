@@ -155,7 +155,24 @@ class CompoundManagementTestSuite:
         
         try:
             headers = self.setup_auth_headers(self.admin_token)
+            
+            # First, let's check if the compound exists by trying to create it if it doesn't exist
             response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}", headers=headers)
+            
+            if response.status_code == 404:
+                # Try to create the compound first
+                compound_data = {
+                    "name": "Test Compound",
+                    "address": "123 Test Street, Test City"
+                }
+                create_response = self.session.post(f"{BASE_URL}/compounds", json=compound_data, headers=headers)
+                
+                if create_response.status_code == 200:
+                    # Now try to get the compound again
+                    response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}", headers=headers)
+                else:
+                    self.log_result("Get Compound Details", False, f"Could not create compound: {create_response.status_code} - {create_response.text}")
+                    return False
             
             if response.status_code == 200:
                 data = response.json()
@@ -166,7 +183,7 @@ class CompoundManagementTestSuite:
                     self.log_result("Get Compound Details", False, "Invalid compound data structure")
                     return False
             elif response.status_code == 404:
-                self.log_result("Get Compound Details", False, f"Compound not found (404) - compound_id: {self.compound_id}")
+                self.log_result("Get Compound Details", False, f"Compound not found (404) - compound_id: {self.compound_id}. This indicates the compound referenced in the frontend error does not exist.")
                 return False
             else:
                 self.log_result("Get Compound Details", False, f"Failed with status {response.status_code}", response.text)

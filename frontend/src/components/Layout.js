@@ -72,7 +72,7 @@ const Layout = () => {
       name: t('family_management'),
       href: '/family',
       icon: UsersIcon,
-      show: user?.role === 'resident'
+      show: true
     },
     {
       name: t('financial_management'),

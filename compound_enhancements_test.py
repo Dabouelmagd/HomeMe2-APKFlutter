@@ -80,7 +80,7 @@ class CompoundEnhancementsTestSuite(CompoundManagementTestSuite):
                 'compound_id': self.compound_id
             }
             
-            first_response = self.session.post(f"{self.BASE_URL}/admin/residences", 
+            first_response = self.session.post(f"{BASE_URL}/admin/residences", 
                                              data=data1, headers=headers)
             
             if first_response.status_code == 200:

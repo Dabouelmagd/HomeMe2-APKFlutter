@@ -3932,14 +3932,55 @@ class ResidenceAccountCreationTestSuite:
             self.log_result("Schedule Message Access Control", False, f"Exception occurred: {str(e)}")
             return False
 
-    def run_all_tests(self):
-        """Run all compound management system tests"""
-        print("🏠 Starting Compound Management System Test Suite")
-        print("=" * 60)
+    def run_residence_workflow_tests(self):
+        """Run residence account creation and family management workflow tests"""
+        print("🏠 Starting Residence Account Creation and Family Management Workflow Test Suite")
+        print("=" * 80)
         
         # Authentication setup
-        if not self.test_authentication():
-            print("\n❌ Authentication failed. Cannot proceed with other tests.")
+        if not self.test_admin_authentication():
+            print("\n❌ Admin authentication failed. Cannot proceed with other tests.")
+            return False
+        
+        # Residence workflow tests in sequence
+        test_methods = [
+            self.test_create_new_residence_account,
+            self.test_new_user_login,
+            self.test_family_management_access,
+            self.test_add_family_member_with_photo,
+            self.test_family_photo_management,
+            self.test_complete_workflow_verification
+        ]
+        
+        passed_tests = 0
+        total_tests = len(test_methods)
+        
+        for test_method in test_methods:
+            try:
+                if test_method():
+                    passed_tests += 1
+            except Exception as e:
+                print(f"❌ Test {test_method.__name__} failed with exception: {str(e)}")
+        
+        # Print summary
+        print("\n" + "=" * 80)
+        print("🏠 RESIDENCE WORKFLOW TEST SUMMARY")
+        print("=" * 80)
+        
+        success_rate = (passed_tests / total_tests) * 100
+        
+        for result in self.results:
+            print(f"{result['status']} - {result['test']}: {result['message']}")
+            if result['details']:
+                print(f"    Details: {result['details']}")
+        
+        print(f"\n📊 OVERALL RESULTS: {passed_tests}/{total_tests} tests passed ({success_rate:.1f}% success rate)")
+        
+        if success_rate >= 80:
+            print("✅ RESIDENCE WORKFLOW TEST SUITE: PASSED")
+            return True
+        else:
+            print("❌ RESIDENCE WORKFLOW TEST SUITE: FAILED")
             return False
         
         # Compound Management tests

@@ -167,7 +167,7 @@ class CompoundEnhancementsTestSuite(CompoundManagementTestSuite):
             headers = {"Authorization": f"Bearer {self.admin_token}"}
             
             # Step 1: Get available compounds
-            compounds_response = self.session.get(f"{self.BASE_URL}/compounds", headers=headers)
+            compounds_response = self.session.get(f"{BASE_URL}/compounds", headers=headers)
             if compounds_response.status_code != 200:
                 self.log_result("Complete Flow Integration", False, "Failed to get available compounds")
                 return False

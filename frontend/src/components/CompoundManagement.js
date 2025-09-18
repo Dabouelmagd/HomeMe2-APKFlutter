@@ -45,6 +45,16 @@ const CompoundManagement = () => {
     expires_in_hours: 72
   });
 
+  // Form for adding new residence directly
+  const [newResidenceForm, setNewResidenceForm] = useState({
+    unit_number: '',
+    full_name: '',
+    email: '',
+    phone: '',
+    profile_picture: null,
+    profile_picture_preview: null
+  });
+
   useEffect(() => {
     fetchCompound();
     fetchResidences();

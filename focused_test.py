@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://homeme-connect.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-platform.preview.emergentagent.com/api"
 
 class FocusedTestSuite:
     def __init__(self):

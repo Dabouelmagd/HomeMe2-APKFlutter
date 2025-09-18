@@ -16,7 +16,7 @@ from typing import Dict, List, Optional
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://homeme-connect.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-platform.preview.emergentagent.com/api"
 WS_URL = "wss://compound-hub.preview.emergentagent.com/ws/chat"
 
 class ChatTestSuite:
@@ -825,7 +825,7 @@ class ChatTestSuite:
                     
                     if file_url:
                         # Test file access
-                        file_response = self.session.get(f"https://homeme-connect.preview.emergentagent.com{file_url}")
+                        file_response = self.session.get(f"https://homeme-platform.preview.emergentagent.com{file_url}")
                         
                         if file_response.status_code == 200:
                             self.log_result("File Serving", True, "File served successfully")
@@ -1719,7 +1719,7 @@ class ChatTestSuite:
                     
                     if file_url:
                         # Test file access
-                        file_response = self.session.get(f"https://homeme-connect.preview.emergentagent.com{file_url}")
+                        file_response = self.session.get(f"https://homeme-platform.preview.emergentagent.com{file_url}")
                         
                         if file_response.status_code == 200:
                             # Check if it's actually audio data

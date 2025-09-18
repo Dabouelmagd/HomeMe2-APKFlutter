@@ -5430,8 +5430,11 @@ async def verify_registration_token(token: str):
 
 @api_router.post("/register/complete")
 async def complete_registration(
-    token: str,
-    registration_data: dict
+    token: str = Form(...),
+    username: str = Form(...),
+    password: str = Form(...),
+    phone: str = Form(None),
+    profile_picture: UploadFile = File(None)
 ):
     """Complete user registration using the token"""
     try:
@@ -5447,18 +5450,41 @@ async def complete_registration(
         if not reg_link:
             raise HTTPException(status_code=404, detail="Registration link not found or already used")
         
+        # Handle profile picture upload
+        profile_picture_url = None
+        if profile_picture and profile_picture.filename:
+            if not profile_picture.content_type.startswith('image/'):
+                raise HTTPException(status_code=400, detail="Profile picture must be an image")
+            
+            # Create user uploads directory
+            user_uploads_dir = f"{UPLOADS_DIR}/users"
+            os.makedirs(user_uploads_dir, exist_ok=True)
+            
+            # Generate unique filename
+            file_extension = profile_picture.filename.split('.')[-1].lower()
+            unique_filename = f"profile_{str(uuid.uuid4())}.{file_extension}"
+            file_path = os.path.join(user_uploads_dir, unique_filename)
+            
+            # Save file
+            content = await profile_picture.read()
+            async with aiofiles.open(file_path, 'wb') as f:
+                await f.write(content)
+            
+            profile_picture_url = f"/uploads/users/{unique_filename}"
+        
         # Create the user account
-        hashed_password = pwd_context.hash(registration_data["password"])
+        hashed_password = pwd_context.hash(password)
         
         new_user = User(
-            username=registration_data["username"],
+            username=username,
             email=reg_link["email"],
             password_hash=hashed_password,
             full_name=reg_link["full_name"],
-            phone=registration_data.get("phone", reg_link["phone"]),
+            phone=phone or reg_link["phone"],
             role="resident",
             compound_id=reg_link["compound_id"],
-            unit_number=reg_link["unit_number"]
+            unit_number=reg_link["unit_number"],
+            profile_picture_url=profile_picture_url
         )
         
         await db.users.insert_one(new_user.dict())
@@ -5477,7 +5503,8 @@ async def complete_registration(
         
         return {
             "message": "Registration completed successfully",
-            "user_id": new_user.id
+            "user_id": new_user.id,
+            "profile_picture_url": profile_picture_url
         }
         
     except HTTPException:

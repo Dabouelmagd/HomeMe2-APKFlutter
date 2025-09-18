@@ -466,10 +466,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Compound Management System - Registration Link Management"
-    - "Compound Management System - Compound Data APIs"
-    - "Compound Management System - Enhanced Registration Process"
-    - "Compound Management System - Authentication & Authorization"
+    - "Compound Management Frontend - Residence Management Features"
   stuck_tasks:
     - "Compound Management System - Compound Data APIs"
   test_all: false

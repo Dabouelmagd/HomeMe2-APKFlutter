@@ -220,14 +220,14 @@ const FileGallery = () => {
                     {formatFileSize(file.file_size)} • {formatDate(file.uploaded_at)}
                   </p>
                   <p className="text-xs text-gray-400 truncate mb-2">
-                    From: {file.sender?.full_name}
+                    {t('gallery.from')}: {file.sender?.full_name}
                   </p>
                   <button
                     onClick={() => downloadFile(file)}
                     className="w-full flex items-center justify-center space-x-1 py-1 px-2 bg-blue-50 text-blue-600 rounded text-xs hover:bg-blue-100"
                   >
                     <ArrowDownTrayIcon className="h-3 w-3" />
-                    <span>Download</span>
+                    <span>{t('gallery.download')}</span>
                   </button>
                 </div>
               </div>

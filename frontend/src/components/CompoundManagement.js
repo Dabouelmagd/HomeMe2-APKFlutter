@@ -23,14 +23,17 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const CompoundManagement = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [compound, setCompound] = useState(null);
   const [residences, setResidences] = useState([]);
   const [registrationLinks, setRegistrationLinks] = useState([]);
+  const [availableCompounds, setAvailableCompounds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [showAddResidence, setShowAddResidence] = useState(false);
+  const [showCompoundSelection, setShowCompoundSelection] = useState(false);
+  const [compoundNotFound, setCompoundNotFound] = useState(false);
 
   // Form for adding new residence registration link
   const [residenceForm, setResidenceForm] = useState({

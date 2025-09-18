@@ -1231,10 +1231,10 @@ async def get_file_gallery(
             file_info["chat"] = chats_dict.get(file_info["chat_id"])
         
         return {
-            "files": files,
+            "files": serialize_datetime(files),
             "total_count": total_count,
             "has_more": total_count > (gallery_filter.skip + len(files)),
-            "stats": await get_file_stats(user_chat_ids)
+            "stats": serialize_datetime(await get_file_stats(user_chat_ids))
         }
         
     except Exception as e:

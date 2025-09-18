@@ -90,8 +90,12 @@ const ServicesManagement = () => {
     { value: 'digital_wallet', label: 'Digital Wallet', icon: '👛' },
     { value: 'qr_code', label: 'QR Code Payment', icon: '📊' }
   ];
-    notes: ''
-  });
+
+  useEffect(() => {
+    loadServices();
+    loadServiceProviders();
+    loadBookings();
+  }, []);
 
   const serviceCategories = {
     medical: { name: t('medical'), icon: UserIcon, color: 'bg-red-500' },

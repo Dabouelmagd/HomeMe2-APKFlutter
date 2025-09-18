@@ -3954,7 +3954,7 @@ async def get_scheduled_messages(
             msg["chat"] = chats_dict.get(msg["chat_id"])
         
         return {
-            "scheduled_messages": scheduled_messages,
+            "scheduled_messages": serialize_datetime(scheduled_messages),
             "total_count": total_count,
             "has_more": total_count > (skip + len(scheduled_messages))
         }

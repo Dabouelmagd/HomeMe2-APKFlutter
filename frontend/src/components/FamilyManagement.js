@@ -102,7 +102,7 @@ const FamilyManagement = () => {
   };
 
   const handleUpdateMember = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
     try {
       const memberData = {
         ...memberForm,

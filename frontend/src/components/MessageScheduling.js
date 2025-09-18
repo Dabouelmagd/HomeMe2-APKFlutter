@@ -214,14 +214,14 @@ const MessageScheduling = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Message
+                    {t('schedule.message')}
                   </label>
                   <textarea
                     value={formData.message_content}
                     onChange={(e) => setFormData({...formData, message_content: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                     rows="3"
-                    placeholder="Enter your message..."
+                    placeholder={t('schedule.enterMessage')}
                     required
                   />
                 </div>

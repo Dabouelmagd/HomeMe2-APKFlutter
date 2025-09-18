@@ -193,7 +193,7 @@ class CompoundEnhancementsTestSuite(CompoundManagementTestSuite):
                 'compound_id': self.compound_id
             }
             
-            create_response = self.session.post(f"{self.BASE_URL}/admin/residences", 
+            create_response = self.session.post(f"{BASE_URL}/admin/residences", 
                                               files=files, data=data, headers=headers)
             
             if create_response.status_code != 200:

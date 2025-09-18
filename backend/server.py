@@ -4043,6 +4043,248 @@ async def process_scheduled_messages_endpoint(current_user: User = Depends(get_c
         logging.error(f"Error processing scheduled messages: {e}")
         raise HTTPException(status_code=500, detail="Failed to process scheduled messages")
 
+# ============ ENHANCED MESSAGE SCHEDULING ENDPOINTS ============
+
+class MessageScheduleRequest(BaseModel):
+    message_content: str
+    recipient_type: str  # "direct", "group", "compound"
+    recipient_id: Optional[str] = None  # Not needed for compound-wide
+    scheduled_for: datetime
+    repeat_type: str = "none"  # "none", "daily", "weekly", "monthly"
+
+@api_router.post("/messages/schedule")
+async def schedule_message_enhanced(
+    schedule_request: MessageScheduleRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Enhanced message scheduling with recipient type support"""
+    try:
+        # Validate scheduled time is in the future
+        if schedule_request.scheduled_for <= datetime.now(timezone.utc):
+            raise HTTPException(status_code=400, detail="Scheduled time must be in the future")
+        
+        chat_id = None
+        
+        if schedule_request.recipient_type == "compound":
+            # Create or find compound-wide chat
+            compound_chat = await db.chats.find_one({
+                "compound_id": current_user.compound_id,
+                "chat_type": "compound_wide",
+                "is_active": True
+            })
+            
+            if not compound_chat:
+                # Create compound-wide chat
+                compound_users = await db.users.find({"compound_id": current_user.compound_id}).to_list(length=None)
+                participant_ids = [user["id"] for user in compound_users]
+                
+                compound_chat = Chat(
+                    compound_id=current_user.compound_id,
+                    chat_type="compound_wide",
+                    name="Compound Announcements",
+                    participants=participant_ids,
+                    created_by=current_user.id
+                )
+                await db.chats.insert_one(compound_chat.dict())
+                chat_id = compound_chat.id
+            else:
+                chat_id = compound_chat["id"]
+                
+        elif schedule_request.recipient_type == "direct":
+            if not schedule_request.recipient_id:
+                raise HTTPException(status_code=400, detail="Recipient ID required for direct messages")
+            
+            # Find or create direct chat
+            direct_chat = await db.chats.find_one({
+                "compound_id": current_user.compound_id,
+                "chat_type": "direct",
+                "participants": {"$all": [current_user.id, schedule_request.recipient_id]},
+                "is_active": True
+            })
+            
+            if not direct_chat:
+                # Create direct chat
+                direct_chat = Chat(
+                    compound_id=current_user.compound_id,
+                    chat_type="direct",
+                    participants=[current_user.id, schedule_request.recipient_id],
+                    created_by=current_user.id
+                )
+                await db.chats.insert_one(direct_chat.dict())
+                chat_id = direct_chat.id
+            else:
+                chat_id = direct_chat["id"]
+                
+        elif schedule_request.recipient_type == "group":
+            if not schedule_request.recipient_id:
+                raise HTTPException(status_code=400, detail="Group ID required for group messages")
+            
+            # Verify group chat exists and user is participant
+            group_chat = await db.chats.find_one({
+                "id": schedule_request.recipient_id,
+                "compound_id": current_user.compound_id,
+                "participants": current_user.id,
+                "is_active": True
+            })
+            
+            if not group_chat:
+                raise HTTPException(status_code=404, detail="Group chat not found")
+            
+            chat_id = schedule_request.recipient_id
+        else:
+            raise HTTPException(status_code=400, detail="Invalid recipient type")
+        
+        # Create scheduled message
+        scheduled_message = ScheduledMessage(
+            chat_id=chat_id,
+            sender_id=current_user.id,
+            content=schedule_request.message_content,
+            message_type="text",
+            scheduled_for=schedule_request.scheduled_for,
+            timezone="UTC",
+            is_recurring=schedule_request.repeat_type != "none",
+            recurrence_pattern=schedule_request.repeat_type if schedule_request.repeat_type != "none" else None
+        )
+        
+        await db.scheduled_messages.insert_one(scheduled_message.dict())
+        
+        return {"message": "Message scheduled successfully", "scheduled_message": scheduled_message}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error scheduling enhanced message: {e}")
+        raise HTTPException(status_code=500, detail="Failed to schedule message")
+
+@api_router.get("/messages/scheduled")
+async def get_scheduled_messages_enhanced(
+    current_user: User = Depends(get_current_user)
+):
+    """Get scheduled messages with enhanced recipient information"""
+    try:
+        # Get user's accessible chats
+        user_chats = await db.chats.find({
+            "compound_id": current_user.compound_id,
+            "participants": current_user.id,
+            "is_active": True
+        }).to_list(length=None)
+        
+        user_chat_ids = [chat["id"] for chat in user_chats]
+        
+        # Get scheduled messages for these chats
+        scheduled_messages = await db.scheduled_messages.find({
+            "chat_id": {"$in": user_chat_ids},
+            "sender_id": current_user.id
+        }).to_list(length=None)
+        
+        # Enhance with recipient information
+        enhanced_messages = []
+        for msg in scheduled_messages:
+            chat = next((c for c in user_chats if c["id"] == msg["chat_id"]), None)
+            if chat:
+                # Determine recipient type and info
+                if chat["chat_type"] == "compound_wide":
+                    recipient_type = "compound"
+                    recipient_id = None
+                elif chat["chat_type"] == "direct":
+                    recipient_type = "direct"
+                    other_participant = next(p for p in chat["participants"] if p != current_user.id)
+                    recipient_id = other_participant
+                else:  # group
+                    recipient_type = "group"
+                    recipient_id = chat["id"]
+                
+                enhanced_msg = {
+                    **msg,
+                    "recipient_type": recipient_type,
+                    "recipient_id": recipient_id,
+                    "message_content": msg["content"],
+                    "repeat_type": msg["recurrence_pattern"] or "none"
+                }
+                enhanced_messages.append(enhanced_msg)
+        
+        return {"messages": enhanced_messages}
+        
+    except Exception as e:
+        logging.error(f"Error getting enhanced scheduled messages: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get scheduled messages")
+
+@api_router.put("/messages/scheduled/{message_id}")
+async def update_scheduled_message_enhanced(
+    message_id: str,
+    update_request: MessageScheduleRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a scheduled message with enhanced support"""
+    try:
+        # Find the scheduled message
+        scheduled_message = await db.scheduled_messages.find_one({
+            "id": message_id,
+            "sender_id": current_user.id
+        })
+        
+        if not scheduled_message:
+            raise HTTPException(status_code=404, detail="Scheduled message not found")
+        
+        if scheduled_message["status"] != "pending":
+            raise HTTPException(status_code=400, detail="Cannot update non-pending message")
+        
+        # Validate new scheduled time is in the future
+        if update_request.scheduled_for <= datetime.now(timezone.utc):
+            raise HTTPException(status_code=400, detail="Scheduled time must be in the future")
+        
+        # Update the message
+        update_data = {
+            "content": update_request.message_content,
+            "scheduled_for": update_request.scheduled_for,
+            "is_recurring": update_request.repeat_type != "none",
+            "recurrence_pattern": update_request.repeat_type if update_request.repeat_type != "none" else None,
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        await db.scheduled_messages.update_one(
+            {"id": message_id},
+            {"$set": update_data}
+        )
+        
+        return {"message": "Scheduled message updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating enhanced scheduled message: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update scheduled message")
+
+@api_router.delete("/messages/scheduled/{message_id}")
+async def delete_scheduled_message_enhanced(
+    message_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a scheduled message"""
+    try:
+        # Find and verify ownership
+        scheduled_message = await db.scheduled_messages.find_one({
+            "id": message_id,
+            "sender_id": current_user.id
+        })
+        
+        if not scheduled_message:
+            raise HTTPException(status_code=404, detail="Scheduled message not found")
+        
+        if scheduled_message["status"] != "pending":
+            raise HTTPException(status_code=400, detail="Cannot delete non-pending message")
+        
+        # Delete the message
+        await db.scheduled_messages.delete_one({"id": message_id})
+        
+        return {"message": "Scheduled message deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting enhanced scheduled message: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete scheduled message")
+
 # WebSocket endpoint for real-time chat
 @app.websocket("/ws/chat/{user_id}")
 async def websocket_chat_endpoint(websocket: WebSocket, user_id: str):

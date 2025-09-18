@@ -15,7 +15,8 @@ import {
   XMarkIcon,
   WrenchScrewdriverIcon,
   BoltIcon,
-  CogIcon
+  CogIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 

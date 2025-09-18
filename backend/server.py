@@ -767,8 +767,10 @@ class PaymentRequest(BaseModel):
     metadata: Dict[str, Any] = {}
 
 def serialize_datetime(obj):
-    """Convert datetime objects and ObjectIds to JSON serializable format"""
+    """Convert datetime objects, date objects, and ObjectIds to JSON serializable format"""
     if isinstance(obj, datetime):
+        return obj.isoformat()
+    elif isinstance(obj, date):
         return obj.isoformat()
     elif hasattr(obj, '__class__') and obj.__class__.__name__ == 'ObjectId':
         return str(obj)

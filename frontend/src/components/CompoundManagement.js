@@ -56,10 +56,60 @@ const CompoundManagement = () => {
     try {
       const response = await axios.get(`${API}/compounds/${user.compound_id}`);
       setCompound(response.data);
+      setCompoundNotFound(false);
     } catch (error) {
-      toast.error('Failed to load compound data');
+      if (error.response?.status === 404) {
+        console.log('Compound not found, loading available compounds for selection');
+        setCompoundNotFound(true);
+        await loadAvailableCompounds();
+      } else {
+        toast.error('Failed to load compound data');
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAvailableCompounds = async () => {
+    try {
+      const response = await axios.get(`${API}/compounds`);
+      setAvailableCompounds(response.data.compounds || []);
+      setShowCompoundSelection(true);
+    } catch (error) {
+      console.error('Failed to load available compounds:', error);
+      toast.error('Failed to load available compounds');
+    }
+  };
+
+  const handleCompoundSelection = async (selectedCompoundId) => {
+    try {
+      // Update user's compound_id
+      const updateResponse = await axios.put(`${API}/users/${user.id}/compound`, {
+        compound_id: selectedCompoundId
+      });
+      
+      if (updateResponse.status === 200) {
+        // Update user context
+        const updatedUser = { ...user, compound_id: selectedCompoundId };
+        updateUser(updatedUser);
+        
+        // Fetch the selected compound data
+        const compoundResponse = await axios.get(`${API}/compounds/${selectedCompoundId}`);
+        setCompound(compoundResponse.data);
+        setShowCompoundSelection(false);
+        setCompoundNotFound(false);
+        
+        // Reload data for the new compound
+        await fetchResidences();
+        if (user?.role === 'admin') {
+          await fetchRegistrationLinks();
+        }
+        
+        toast.success('Compound selected successfully!');
+      }
+    } catch (error) {
+      console.error('Failed to update compound selection:', error);
+      toast.error('Failed to update compound selection');
     }
   };
 

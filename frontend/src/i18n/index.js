@@ -996,6 +996,27 @@ const resources = {
         'waveformPlaceholder': 'La forme d\'onde vocale apparaîtra ici'
       },
       
+      // File Gallery
+      'gallery': {
+        'title': 'Galerie de Fichiers',
+        'description': 'Parcourir et gérer tous les fichiers partagés de vos discussions',
+        'allFiles': 'Tous les Fichiers',
+        'images': 'Images',
+        'videos': 'Vidéos',
+        'voice': 'Voix',
+        'audio': 'Audio',
+        'documents': 'Documents',
+        'newestFirst': 'Plus récent d\'abord',
+        'largestFirst': 'Plus gros d\'abord',
+        'nameAZ': 'Nom A-Z',
+        'noFilesFound': 'Aucun fichier trouvé',
+        'filesSharedInChats': 'Les fichiers partagés dans les discussions apparaîtront ici',
+        'download': 'Télécharger',
+        'from': 'De',
+        'gridView': 'Vue grille',
+        'listView': 'Vue liste'
+      },
+      
       // Search
       'search': {
         'searchMessages': 'Rechercher des Messages',

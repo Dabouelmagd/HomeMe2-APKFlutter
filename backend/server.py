@@ -29,6 +29,7 @@ from io import BytesIO
 from PIL import Image
 from datetime import timezone
 import httpx
+from passlib.context import CryptContext
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent

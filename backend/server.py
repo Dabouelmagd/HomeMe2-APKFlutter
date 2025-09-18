@@ -1153,7 +1153,6 @@ async def get_file_gallery(
         
         # Build query for messages with attachments
         query = {
-            "compound_id": compound_id,
             "chat_id": {"$in": user_chat_ids if not gallery_filter.chat_ids else list(set(user_chat_ids) & set(gallery_filter.chat_ids))},
             "attachments": {"$exists": True, "$not": {"$size": 0}},
             "is_deleted": False

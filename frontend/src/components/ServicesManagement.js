@@ -15,7 +15,12 @@ import {
   EnvelopeIcon,
   ClockIcon,
   StarIcon,
-  CalendarIcon
+  CalendarIcon,
+  CurrencyDollarIcon,
+  CreditCardIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  XCircleIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -25,12 +30,16 @@ const ServicesManagement = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [services, setServices] = useState([]);
+  const [serviceProviders, setServiceProviders] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('services');
   const [showAddService, setShowAddService] = useState(false);
   const [showBookService, setShowBookService] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [selectedBooking, setSelectedBooking] = useState(null);
   const [editingService, setEditingService] = useState(null);
 
   const [serviceForm, setServiceForm] = useState({
@@ -43,11 +52,44 @@ const ServicesManagement = () => {
     working_hours: '9:00 AM - 6:00 PM'
   });
 
+  // Enhanced booking form with payment options
   const [bookingForm, setBookingForm] = useState({
-    service_id: '',
-    issue_description: '',
-    preferred_date: '',
-    preferred_time: '09:00',
+    provider_id: '',
+    service_category: 'maintenance',
+    service_specialty: '',
+    title: '',
+    description: '',
+    priority: 'standard',
+    scheduled_date: '',
+    scheduled_time: '',
+    estimated_duration: 60,
+    payment_method: 'cash',
+    booking_notes: ''
+  });
+
+  // Payment form
+  const [paymentForm, setPaymentForm] = useState({
+    payment_method: 'cash',
+    amount: 0,
+    currency: 'USD'
+  });
+
+  const priorityOptions = [
+    { value: 'emergency', label: 'Emergency', color: 'bg-red-100 text-red-800', description: 'Immediate response within 1 hour' },
+    { value: 'urgent', label: 'Urgent', color: 'bg-orange-100 text-orange-800', description: 'Same day service' },
+    { value: 'standard', label: 'Standard', color: 'bg-blue-100 text-blue-800', description: 'Next available slot' },
+    { value: 'scheduled', label: 'Scheduled', color: 'bg-green-100 text-green-800', description: 'Future date/time' }
+  ];
+
+  const paymentMethods = [
+    { value: 'cash', label: 'Cash on Service', icon: '💵' },
+    { value: 'card', label: 'Credit/Debit Card', icon: '💳' },
+    { value: 'bank_transfer', label: 'Bank Transfer', icon: '🏦' },
+    { value: 'instapay', label: 'InstaPay', icon: '⚡' },
+    { value: 'mobile_pay', label: 'Mobile Payment', icon: '📱' },
+    { value: 'digital_wallet', label: 'Digital Wallet', icon: '👛' },
+    { value: 'qr_code', label: 'QR Code Payment', icon: '📊' }
+  ];
     notes: ''
   });
 

@@ -93,7 +93,7 @@ class CompoundEnhancementsTestSuite(CompoundManagementTestSuite):
                     'compound_id': self.compound_id
                 }
                 
-                second_response = self.session.post(f"{self.BASE_URL}/admin/residences", 
+                second_response = self.session.post(f"{BASE_URL}/admin/residences", 
                                                   data=data2, headers=headers)
                 
                 if second_response.status_code == 400:

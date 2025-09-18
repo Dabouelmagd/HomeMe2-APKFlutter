@@ -3065,6 +3065,20 @@ class ChatTestSuite:
             self.test_search_access_control,
             self.test_search_unauthorized_access,
             self.test_search_edge_cases,
+            # File Gallery tests
+            self.test_file_gallery_basic,
+            self.test_file_gallery_filters,
+            self.test_file_gallery_stats,
+            self.test_file_gallery_access_control,
+            self.test_file_gallery_pagination,
+            # Message Scheduling tests
+            self.test_schedule_message_basic,
+            self.test_schedule_message_recurring,
+            self.test_get_scheduled_messages,
+            self.test_update_scheduled_message,
+            self.test_delete_scheduled_message,
+            self.test_schedule_message_validation,
+            self.test_schedule_message_access_control,
             # Push notification tests
             self.test_push_subscription_subscribe,
             self.test_get_notification_preferences,

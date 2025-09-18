@@ -92,26 +92,8 @@ const ServicesManagement = () => {
   ];
 
   useEffect(() => {
-    loadServices();
-    loadServiceProviders();
-    loadBookings();
-  }, []);
-
-  const serviceCategories = {
-    medical: { name: t('medical'), icon: UserIcon, color: 'bg-red-500' },
-    maintenance: { name: t('maintenance'), icon: WrenchScrewdriverIcon, color: 'bg-blue-500' },
-    security: { name: t('security'), icon: ShieldCheckIcon, color: 'bg-green-500' },
-    cleaning: { name: t('cleaning'), icon: SparklesIcon, color: 'bg-purple-500' },
-    other: { name: t('other'), icon: WrenchScrewdriverIcon, color: 'bg-gray-500' }
-  };
-
-  const maintenanceSpecialties = [
-    'carpenter', 'plumber', 'electrician', 'gardener', 'painter', 
-    'hvac_technician', 'locksmith', 'appliance_repair', 'general_maintenance'
-  ];
-
-  useEffect(() => {
     fetchServices();
+    fetchServiceProviders();
     if (user?.role === 'admin') {
       fetchBookings();
     } else {
@@ -127,6 +109,15 @@ const ServicesManagement = () => {
       toast.error('Failed to load services');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchServiceProviders = async () => {
+    try {
+      const response = await axios.get(`${API}/service-providers`);
+      setServiceProviders(response.data.providers || []);
+    } catch (error) {
+      console.error('Failed to load service providers:', error);
     }
   };
 

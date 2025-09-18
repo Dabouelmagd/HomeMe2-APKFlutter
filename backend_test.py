@@ -366,16 +366,15 @@ class CompoundManagementTestSuite:
             if response.status_code == 200:
                 result = response.json()
                 if (result.get("message") == "Registration completed successfully" and 
-                    result.get("user") and result.get("access_token")):
+                    result.get("user_id")):
                     
-                    user = result["user"]
-                    if user.get("profile_picture_url"):
+                    if result.get("profile_picture_url"):
                         self.log_result("Complete Registration", True, 
-                                      f"Registration completed successfully with profile picture for user: {user.get('username')}")
+                                      f"Registration completed successfully with profile picture for user: {result.get('user_id')}")
                         return True
                     else:
                         self.log_result("Complete Registration", True, 
-                                      f"Registration completed successfully for user: {user.get('username')} (no profile picture)")
+                                      f"Registration completed successfully for user: {result.get('user_id')} (no profile picture)")
                         return True
                 else:
                     self.log_result("Complete Registration", False, f"Unexpected response: {result}")

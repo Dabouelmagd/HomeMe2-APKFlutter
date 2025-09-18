@@ -669,6 +669,119 @@ const ServicesManagement = () => {
         </div>
       )}
 
+      {/* Service Booking & Payments Tab */}
+      {activeTab === 'service-booking' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Service Booking & Payments</h2>
+            <p className="text-gray-600 mb-6">Book services with multiple payment options and priority levels</p>
+            
+            {/* Service Providers Grid */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Service Providers</h3>
+              {serviceProviders.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {serviceProviders.map((provider) => (
+                    <div key={provider.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                      <div className="flex items-center space-x-4 mb-4">
+                        <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                          <span className="text-lg font-medium text-white">
+                            {provider.full_name.charAt(0)}
+                          </span>
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-medium text-gray-900">{provider.full_name}</h4>
+                          <div className="flex items-center space-x-2">
+                            <div className="flex items-center">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <StarIcon
+                                  key={star}
+                                  className={`h-4 w-4 ${
+                                    star <= Math.floor(provider.average_rating) 
+                                      ? 'text-yellow-400 fill-current' 
+                                      : 'text-gray-300'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-sm text-gray-500">
+                              ({provider.total_reviews} reviews)
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 mb-4">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <UserIcon className="h-4 w-4 mr-2" />
+                          {provider.services.join(', ')}
+                        </div>
+                        {provider.hourly_rate && (
+                          <div className="flex items-center text-sm text-gray-600">
+                            <CurrencyDollarIcon className="h-4 w-4 mr-2" />
+                            ${provider.hourly_rate}/hour
+                          </div>
+                        )}
+                        <div className="flex items-center text-sm text-gray-600">
+                          <CheckCircleIcon className="h-4 w-4 mr-2" />
+                          {provider.total_jobs_completed} jobs completed
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setSelectedProvider(provider);
+                          setBookingForm({...bookingForm, provider_id: provider.id});
+                          setShowBookService(true);
+                        }}
+                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                      >
+                        <CreditCardIcon className="h-4 w-4" />
+                        <span>Book Service</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <CurrencyDollarIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p className="text-gray-500">No service providers available</p>
+                  <p className="text-gray-400 text-sm">Service providers will appear here when added</p>
+                </div>
+              )}
+            </div>
+
+            {/* Payment Methods Info */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Supported Payment Methods</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                {paymentMethods.map((method) => (
+                  <div key={method.value} className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
+                    <span className="text-2xl mb-2">{method.icon}</span>
+                    <span className="text-xs text-center text-gray-600">{method.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Priority Levels Info */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Service Priority Levels</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {priorityOptions.map((option) => (
+                  <div key={option.value} className={`p-4 rounded-lg border-2 ${option.color} border-opacity-20`}>
+                    <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${option.color} mb-2`}>
+                      {option.label}
+                    </div>
+                    <p className="text-sm text-gray-600">{option.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Book Service Modal */}
       {showBookService && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">

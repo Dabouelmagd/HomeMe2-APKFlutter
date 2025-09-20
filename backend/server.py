@@ -6264,6 +6264,30 @@ async def initialize_default_services(
         logging.error(f"Error initializing default services: {e}")
         raise HTTPException(status_code=500, detail="Failed to initialize default services")
 
+@api_router.delete("/admin/services/clear")
+async def clear_all_services(
+    request_data: dict,
+    current_user: User = Depends(require_admin)
+):
+    """Clear all services for a compound (Admin only)"""
+    try:
+        compound_id = request_data.get("compound_id")
+        if not compound_id:
+            raise HTTPException(status_code=400, detail="compound_id is required")
+        
+        # Delete all services for the compound
+        result = await db.services.delete_many({"compound_id": compound_id})
+        
+        return {
+            "success": True,
+            "message": f"Cleared {result.deleted_count} services",
+            "deleted_count": result.deleted_count
+        }
+        
+    except Exception as e:
+        logging.error(f"Error clearing services: {e}")
+        raise HTTPException(status_code=500, detail="Failed to clear services")
+
 def create_registration_token(unit_number: str, email: str, compound_id: str, expires_at: datetime) -> str:
     """Create a secure token for resident registration"""
     token_data = {

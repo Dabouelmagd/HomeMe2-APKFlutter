@@ -154,6 +154,28 @@ const CompoundManagement = () => {
     }
   };
 
+  const handleSaveCompoundSettings = async () => {
+    try {
+      const response = await axios.put(`${API}/compounds/${user.compound_id}`, {
+        name: editableCompound.name,
+        address: editableCompound.address
+      });
+      
+      setCompound(response.data);
+      toast.success('Compound settings updated successfully!');
+    } catch (error) {
+      console.error('Failed to update compound settings:', error);
+      toast.error('Failed to update compound settings');
+    }
+  };
+
+  const handleCancelCompoundSettings = () => {
+    setEditableCompound({
+      name: compound?.name || '',
+      address: compound?.address || ''
+    });
+  };
+
   useEffect(() => {
     fetchCompound();
     fetchResidences();

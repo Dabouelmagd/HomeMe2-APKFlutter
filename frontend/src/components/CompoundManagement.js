@@ -1228,37 +1228,60 @@ const CompoundManagement = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Compound Name
+                Compound Name *
               </label>
               <input
                 type="text"
-                value={compound?.name || ''}
-                className="form-input"
+                value={editableCompound.name}
+                onChange={(e) => setEditableCompound(prev => ({ ...prev, name: e.target.value }))}
+                className="form-input w-full"
                 placeholder="Enter compound name"
-                readOnly
+                required
               />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Address
+                Address *
               </label>
               <input
                 type="text"
-                value={compound?.address || ''}
-                className="form-input"
+                value={editableCompound.address}
+                onChange={(e) => setEditableCompound(prev => ({ ...prev, address: e.target.value }))}
+                className="form-input w-full"
                 placeholder="Enter compound address"
-                readOnly
+                required
+              />
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                value={editableCompound.description || ''}
+                onChange={(e) => setEditableCompound(prev => ({ ...prev, description: e.target.value }))}
+                className="form-input w-full"
+                rows="3"
+                placeholder="Enter compound description (optional)"
               />
             </div>
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="flex justify-end space-x-4">
-              <button className="btn btn-secondary">
+              <button 
+                onClick={handleCancelCompoundSettings}
+                className="btn btn-secondary"
+              >
                 Cancel
               </button>
-              <button className="btn btn-primary">
+              <button 
+                onClick={handleSaveCompoundSettings}
+                className="btn btn-primary"
+              >
                 Save Changes
               </button>
             </div>

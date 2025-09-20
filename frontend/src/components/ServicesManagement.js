@@ -523,7 +523,6 @@ const ServicesManagement = () => {
       {activeTab === 'services' && (
         <div className="space-y-6">
           {user?.role === 'admin' && (
-            {/* Header Section */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
                 <div className="flex-1">

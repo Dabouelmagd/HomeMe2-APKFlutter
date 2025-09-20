@@ -875,6 +875,294 @@ const CompoundManagement = () => {
         </div>
       )}
 
+      {/* Manage Users Tab - Admin Only */}
+      {activeTab === 'manage-users' && user?.role === 'admin' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Manage Users</h3>
+                <p className="text-gray-600">View and manage all users in your compound</p>
+              </div>
+              <div className="text-sm text-gray-600">
+                Total Users: <span className="font-semibold">{allUsers.length}</span>
+              </div>
+            </div>
+
+            {allUsers.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        User
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Role
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Contact
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {allUsers.map((userItem) => (
+                      <tr key={userItem.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0">
+                              {userItem.profile_picture_url ? (
+                                <img
+                                  src={userItem.profile_picture_url}
+                                  alt={userItem.full_name}
+                                  className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
+                                />
+                              ) : (
+                                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                                  <span className="text-sm font-medium text-white">
+                                    {userItem.full_name?.charAt(0) || 'U'}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900">
+                                {userItem.full_name}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                @{userItem.username}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            userItem.role === 'admin' 
+                              ? 'bg-purple-100 text-purple-800'
+                              : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {userItem.role}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {userItem.email}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {userItem.phone || 'No phone'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            userItem.is_active 
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {userItem.is_active ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleToggleUserStatus(userItem.id, userItem.is_active)}
+                              className={`px-3 py-1 rounded text-xs font-medium ${
+                                userItem.is_active
+                                  ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+                              }`}
+                            >
+                              {userItem.is_active ? 'Deactivate' : 'Activate'}
+                            </button>
+                            {userItem.id !== user.id && (
+                              <button
+                                onClick={() => handleDeleteUser(userItem.id)}
+                                className="px-3 py-1 rounded text-xs font-medium bg-red-100 text-red-700 hover:bg-red-200"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <UsersIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+                <p className="text-gray-600">
+                  Users will appear here once they register in your compound.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Add Admin Tab - Admin Only */}
+      {activeTab === 'add-admin' && user?.role === 'admin' && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Add New Admin</h3>
+              <p className="text-gray-600">Create a new administrator account for your compound</p>
+            </div>
+
+            <form onSubmit={handleCreateAdmin} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Username *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={adminForm.username}
+                    onChange={(e) => setAdminForm(prev => ({ ...prev, username: e.target.value }))}
+                    className="form-input w-full"
+                    placeholder="Enter username"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={adminForm.full_name}
+                    onChange={(e) => setAdminForm(prev => ({ ...prev, full_name: e.target.value }))}
+                    className="form-input w-full"
+                    placeholder="Enter full name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={adminForm.email}
+                    onChange={(e) => setAdminForm(prev => ({ ...prev, email: e.target.value }))}
+                    className="form-input w-full"
+                    placeholder="admin@email.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password *
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    value={adminForm.password}
+                    onChange={(e) => setAdminForm(prev => ({ ...prev, password: e.target.value }))}
+                    className="form-input w-full"
+                    placeholder="Enter password"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={adminForm.phone}
+                    onChange={(e) => setAdminForm(prev => ({ ...prev, phone: e.target.value }))}
+                    className="form-input w-full"
+                    placeholder="+1 (555) 123-4567"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Profile Picture
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        if (!file.type.startsWith('image/')) {
+                          toast.error('Please select an image file');
+                          return;
+                        }
+                        
+                        setAdminForm(prev => ({ ...prev, profile_picture: file }));
+                        
+                        // Create preview
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                          setAdminForm(prev => ({ ...prev, profile_picture_preview: e.target.result }));
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="form-input w-full"
+                  />
+                  {adminForm.profile_picture_preview && (
+                    <div className="mt-2">
+                      <img
+                        src={adminForm.profile_picture_preview}
+                        alt="Profile preview"
+                        className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <UserPlusIcon className="h-5 w-5 text-purple-400" />
+                  </div>
+                  <div className="ml-3">
+                    <h4 className="text-sm font-medium text-purple-800">
+                      Admin Account Creation
+                    </h4>
+                    <p className="text-sm text-purple-700 mt-1">
+                      This will create a new administrator account with full access to compound management features. The admin will be able to log in immediately with the provided credentials.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  onClick={resetAdminForm}
+                  className="btn btn-secondary"
+                >
+                  Reset Form
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary flex items-center space-x-2"
+                >
+                  <UserPlusIcon className="h-4 w-4" />
+                  <span>Create Admin Account</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Settings Tab */}
       {activeTab === 'settings' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

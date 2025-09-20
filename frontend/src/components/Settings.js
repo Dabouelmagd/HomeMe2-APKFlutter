@@ -26,7 +26,7 @@ const Settings = () => {
       id: 'profile',
       name: t('settings.profile'),
       icon: UserIcon,
-      component: () => <div className="p-4">Profile settings coming soon...</div>
+      component: ProfileSettings
     },
     {
       id: 'privacy',

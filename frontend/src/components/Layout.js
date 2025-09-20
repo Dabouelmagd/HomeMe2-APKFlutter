@@ -211,6 +211,12 @@ const Layout = () => {
       href: '/settings',
       icon: CogIcon,
       show: true
+    },
+    {
+      name: '💎 Pricing Plans',
+      href: '/pricing',
+      icon: CurrencyDollarIcon,
+      show: true
     }
   ];
 

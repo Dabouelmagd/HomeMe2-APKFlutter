@@ -395,10 +395,16 @@ class ServicesManagementTestSuite:
             
             if response.status_code == 200:
                 result = response.json()
-                if result.get("message") == "Service provider created successfully" and result.get("provider_id"):
-                    self.test_provider_id = result.get("provider_id")
-                    self.log_result("Create Service Provider", True, f"Service provider created successfully with ID: {self.test_provider_id}")
-                    return True
+                if result.get("message") == "Service provider created successfully":
+                    # Check for provider_id or provider.id
+                    provider_id = result.get("provider_id") or (result.get("provider", {}).get("id"))
+                    if provider_id:
+                        self.test_provider_id = provider_id
+                        self.log_result("Create Service Provider", True, f"Service provider created successfully with ID: {self.test_provider_id}")
+                        return True
+                    else:
+                        self.log_result("Create Service Provider", False, f"No provider ID in response: {result}")
+                        return False
                 else:
                     self.log_result("Create Service Provider", False, f"Unexpected response: {result}")
                     return False

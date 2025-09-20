@@ -193,6 +193,50 @@ const ServicesManagement = () => {
     }
   };
 
+  const addTestServices = () => {
+    const testServices = [
+      {
+        id: 'test-1',
+        name: 'Plumbing Services',
+        category: 'maintenance',
+        specialty: 'Emergency plumbing, pipe repairs',
+        description: 'Professional plumbing services including emergency repairs',
+        phone: '+1-555-PLUMB-01',
+        email: 'plumbing@compound-services.com',
+        working_hours: '24/7 Emergency Service',
+        base_price: 75.00,
+        availability: 'available'
+      },
+      {
+        id: 'test-2',
+        name: 'House Cleaning',
+        category: 'cleaning',
+        specialty: 'Regular cleaning, deep cleaning',
+        description: 'Professional house cleaning services',
+        phone: '+1-555-CLEAN-01',
+        email: 'cleaning@compound-services.com',
+        working_hours: '7:00 AM - 6:00 PM',
+        base_price: 80.00,
+        availability: 'available'
+      },
+      {
+        id: 'test-3',
+        name: 'Security Guard',
+        category: 'security',
+        specialty: '24/7 security, patrol services',
+        description: 'Professional security services',
+        phone: '+1-555-SECURE-01',
+        email: 'security@compound-services.com',
+        working_hours: '24/7 Service Available',
+        base_price: 25.00,
+        availability: 'available'
+      }
+    ];
+    
+    setServices(testServices);
+    toast.success('3 test services added to display!');
+  };
+
   const fetchServiceProviders = async () => {
     try {
       const response = await axios.get(`${API}/service-providers`);

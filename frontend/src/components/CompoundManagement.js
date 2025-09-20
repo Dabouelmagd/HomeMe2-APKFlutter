@@ -471,7 +471,7 @@ const CompoundManagement = () => {
               }`}
             >
               <UsersIcon className="h-4 w-4" />
-              <span>Manage Users</span>
+              <span>👥 Manage Users</span>
             </button>
           )}
           {user?.role === 'admin' && (

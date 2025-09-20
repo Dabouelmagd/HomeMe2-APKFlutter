@@ -115,68 +115,108 @@ const AdminDashboard = () => {
     }
   ];
 
-  return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Welcome back, {user?.full_name}
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Here's what's happening in {dashboardData?.compound?.name || 'your compound'} today.
-        </p>
-      </div>
+  const quickActions = [
+    {
+      id: 'add_resident',
+      name: 'Add Resident',
+      description: 'Create new residence account',
+      icon: UsersIcon,
+      color: 'text-blue-600 bg-blue-50 hover:bg-blue-100'
+    },
+    {
+      id: 'manage_units',
+      name: 'Manage Units',
+      description: 'View all residence units',
+      icon: HomeIcon,
+      color: 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
+    },
+    {
+      id: 'send_notice',
+      name: 'Send Notice',
+      description: 'Broadcast to all residents',
+      icon: BellIcon,
+      color: 'text-purple-600 bg-purple-50 hover:bg-purple-100'
+    },
+    {
+      id: 'view_payments',
+      name: 'View Payments',
+      description: 'Check financial status',
+      icon: CurrencyDollarIcon,
+      color: 'text-orange-600 bg-orange-50 hover:bg-orange-100'
+    }
+  ];
 
-      {/* Compound Info */}
-      {dashboardData?.compound && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="flex items-center space-x-4">
-            {dashboardData.compound.logo_url && (
-              <img
-                src={dashboardData.compound.logo_url}
-                alt="Compound Logo"
-                className="h-16 w-16 rounded-lg object-cover"
-              />
-            )}
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {/* Header Section - Redesigned */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                {dashboardData.compound.name}
-              </h2>
-              <p className="text-gray-600">{dashboardData.compound.address}</p>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                Welcome back, {user?.full_name} 👋
+              </h1>
+              <p className="text-lg text-gray-600">
+                Here's what's happening in your compound today
+              </p>
+            </div>
+            <div className="mt-4 md:mt-0 flex items-center space-x-4">
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Current Time</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {new Date().toLocaleTimeString()}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Statistics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat) => (
-          <div
-            key={stat.name}
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">{stat.name}</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</p>
+        {/* Stats Grid - Redesigned */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {stats.map((stat, index) => {
+            const IconComponent = stat.icon;
+            return (
+              <div key={index} className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color}`}>
+                    <IconComponent className="h-7 w-7 text-white" />
+                  </div>
+                  <div className={`flex items-center text-sm font-medium ${
+                    stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    <span>{stat.change}</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</h3>
+                  <p className="text-sm text-gray-600">{stat.name}</p>
+                </div>
               </div>
-              <div className={`p-3 rounded-lg ${stat.color}`}>
-                <stat.icon className="h-6 w-6 text-white" />
-              </div>
-            </div>
-            <div className="mt-4">
-              <span
-                className={`text-sm font-medium ${
-                  stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
-                }`}
-              >
-                {stat.change}
-              </span>
-              <span className="text-sm text-gray-600 ml-1">from last month</span>
-            </div>
+            );
+          })}
+        </div>
+
+        {/* Quick Actions - Redesigned with Working Buttons */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {quickActions.map((action) => {
+              const IconComponent = action.icon;
+              return (
+                <button
+                  key={action.id}
+                  onClick={() => handleQuickAction(action.id)}
+                  className={`p-6 rounded-xl border border-gray-200 hover:shadow-md transition-all text-left ${action.color} group`}
+                >
+                  <IconComponent className="h-8 w-8 mb-4 group-hover:scale-110 transition-transform" />
+                  <h3 className="font-semibold text-gray-900 mb-2">{action.name}</h3>
+                  <p className="text-sm text-gray-600">{action.description}</p>
+                </button>
+              );
+            })}
           </div>
-        ))}
-      </div>
+        </div>
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

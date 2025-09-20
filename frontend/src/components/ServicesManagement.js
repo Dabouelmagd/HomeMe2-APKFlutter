@@ -661,7 +661,7 @@ const ServicesManagement = () => {
                     type="button"
                     onClick={() => {
                       setShowAddService(false);
-                      setEditingService(null);
+                      resetForm();
                     }}
                     className="btn btn-secondary flex-1"
                   >

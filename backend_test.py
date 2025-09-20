@@ -54,7 +54,7 @@ class ServicesManagementTestSuite:
         }
     
     def test_admin_authentication(self):
-        """Test admin authentication for residence creation"""
+        """Test admin authentication for services management"""
         print("\n=== Testing Admin Authentication ===")
         
         try:
@@ -78,6 +78,79 @@ class ServicesManagementTestSuite:
                 
         except Exception as e:
             self.log_result("Admin Authentication", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_resident_authentication(self):
+        """Test resident authentication for services booking"""
+        print("\n=== Testing Resident Authentication ===")
+        
+        try:
+            # Try to find a resident user or create one
+            resident_login_data = {
+                "username": "testuser",
+                "password": "password123"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/auth/login", json=resident_login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.resident_token = data["access_token"]
+                self.resident_user = data["user"]
+                self.log_result("Resident Authentication", True, "Resident authenticated successfully")
+                return True
+            else:
+                # Try to create a resident user if login fails
+                return self.create_test_resident()
+                
+        except Exception as e:
+            self.log_result("Resident Authentication", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def create_test_resident(self):
+        """Create a test resident user"""
+        try:
+            if not self.admin_token:
+                self.log_result("Create Test Resident", False, "No admin token available")
+                return False
+            
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            unique_id = str(uuid.uuid4())[:8]
+            
+            data = {
+                'unit_number': f"TEST{unique_id[:4]}",
+                'full_name': f"Test Resident {unique_id}",
+                'email': f"testres{unique_id}@example.com",
+                'phone': "+1234567890",
+                'compound_id': self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/residences", data=data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                username = result.get("username")
+                password = result.get("temporary_password")
+                
+                # Now login with the new resident
+                login_data = {"username": username, "password": password}
+                login_response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+                
+                if login_response.status_code == 200:
+                    data = login_response.json()
+                    self.resident_token = data["access_token"]
+                    self.resident_user = data["user"]
+                    self.log_result("Create Test Resident", True, f"Test resident created and authenticated: {username}")
+                    return True
+                else:
+                    self.log_result("Create Test Resident", False, f"Failed to login with new resident: {login_response.status_code}")
+                    return False
+            else:
+                self.log_result("Create Test Resident", False, f"Failed to create resident: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Test Resident", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_get_compound_details(self):

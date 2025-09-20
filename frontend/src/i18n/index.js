@@ -479,6 +479,7 @@ const resources = {
       // Services
       'services_management': 'إدارة الخدمات',
       'service_booking': 'حجز الخدمات والمدفوعات',
+      'search_placeholder': 'البحث عن المستخدمين والمساكن والخدمات...',
       'services': 'الخدمات',
       'add_service': 'إضافة خدمة',
       'edit_service': 'تعديل الخدمة',

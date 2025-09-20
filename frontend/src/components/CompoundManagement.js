@@ -38,6 +38,10 @@ const CompoundManagement = () => {
   const [compoundNotFound, setCompoundNotFound] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [showAddAdmin, setShowAddAdmin] = useState(false);
+  const [editableCompound, setEditableCompound] = useState({
+    name: '',
+    address: ''
+  });
 
   // Form for adding new residence registration link
   const [residenceForm, setResidenceForm] = useState({

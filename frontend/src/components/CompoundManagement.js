@@ -155,6 +155,7 @@ const CompoundManagement = () => {
     fetchResidences();
     if (user?.role === 'admin') {
       fetchRegistrationLinks();
+      fetchAllUsers();
     }
   }, []);
 

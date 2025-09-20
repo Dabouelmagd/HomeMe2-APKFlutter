@@ -537,7 +537,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Compound Management Frontend - Residence Management Features"
+    - "Services Management System - Core Services APIs"
+    - "Services Management System - Initialize Default Services"
+    - "Services Management System - Service Provider Management"
+    - "Services Management System - Service Booking System"
+    - "Services Management System - Authentication & Authorization"
   stuck_tasks:
     - "Compound Management System - Compound Data APIs"
   test_all: false

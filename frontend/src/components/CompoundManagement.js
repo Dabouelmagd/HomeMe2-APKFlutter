@@ -484,7 +484,7 @@ const CompoundManagement = () => {
               }`}
             >
               <UserPlusIcon className="h-4 w-4" />
-              <span>Add Admin</span>
+              <span>👤+ Add Admin</span>
             </button>
           )}
           <button

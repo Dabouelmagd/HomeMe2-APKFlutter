@@ -1179,7 +1179,8 @@ const resources = {
       'privacy': 'Confidentialité',
       'terms': 'Conditions',
       'language': 'Langue',
-      'theme': 'Thème'
+      'theme': 'Thème',
+      'search_placeholder': 'Rechercher utilisateurs, résidences, services...'
     }
   }
 };

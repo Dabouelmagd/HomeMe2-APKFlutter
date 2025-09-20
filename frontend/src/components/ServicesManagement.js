@@ -120,6 +120,62 @@ const ServicesManagement = () => {
     }
   };
 
+  const forceRefreshServices = async () => {
+    try {
+      setLoading(true);
+      console.log('🔄 Force refreshing services...');
+      
+      // Clear current services
+      setServices([]);
+      
+      // Wait a moment
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Fetch fresh services
+      await fetchServices();
+      
+      toast.success('Services refreshed successfully!');
+    } catch (error) {
+      console.error('Failed to refresh services:', error);
+      toast.error('Failed to refresh services');
+    }
+  };
+
+  const clearAndReinitializeServices = async () => {
+    try {
+      console.log('🗑️ Clearing and reinitializing services...');
+      
+      // First, clear existing services
+      const clearResponse = await axios.delete(`${API}/admin/services/clear`, {
+        data: { compound_id: user.compound_id }
+      });
+      
+      console.log('Clear response:', clearResponse.data);
+      
+      // Then initialize fresh services
+      const response = await axios.post(`${API}/admin/initialize-services`, {
+        compound_id: user.compound_id
+      });
+      
+      console.log('Initialize response:', response.data);
+      
+      if (response.data.success) {
+        toast.success(`Services cleared and ${response.data.added_count} new services added!`);
+        await fetchServices();
+      } else {
+        toast.error('Failed to add services after clearing');
+      }
+    } catch (error) {
+      console.error('Failed to clear and reinitialize services:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        toast.error(error.response.data.detail || 'Failed to reinitialize services');
+      } else {
+        toast.error('Failed to clear and reinitialize services');
+      }
+    }
+  };
+
   const fetchServiceProviders = async () => {
     try {
       const response = await axios.get(`${API}/service-providers`);

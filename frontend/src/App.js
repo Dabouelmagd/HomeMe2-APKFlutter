@@ -267,6 +267,10 @@ function App() {
                   <FamilyManagement />
                 } />
                 
+                <Route path="pricing" element={
+                  <Pricing />
+                } />
+                
                 <Route path="finances" element={
                   <FinancialManagement />
                 } />

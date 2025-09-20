@@ -307,6 +307,7 @@ const CompoundManagement = () => {
       setNewResidenceForm(prev => ({ ...prev, profile_picture: file }));
       
       // Create preview
+      // eslint-disable-next-line no-undef
       const reader = new FileReader();
       reader.onload = (e) => {
         setNewResidenceForm(prev => ({ ...prev, profile_picture_preview: e.target.result }));

@@ -223,6 +223,8 @@ const ServicesManagement = () => {
         await fetchServices();
       } else {
         toast.info(`${response.data.message || 'Services already exist'} - Found ${services.length} services in your compound.`);
+        // Still refresh services to make sure they display
+        await fetchServices();
       }
     } catch (error) {
       console.error('Failed to initialize services:', error);

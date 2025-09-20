@@ -520,6 +520,84 @@ class ServicesManagementTestSuite:
         
         return success_count == total_tests
     
+    def create_test_image(self, filename: str, size: tuple = (100, 100)) -> io.BytesIO:
+        """Create a test image for upload testing"""
+        img = Image.new('RGB', size, color='red')
+        img_bytes = io.BytesIO()
+        img.save(img_bytes, format='JPEG')
+        img_bytes.seek(0)
+        return img_bytes
+    
+    def run_all_tests(self):
+        """Run all services management tests"""
+        print("🔧 STARTING SERVICES MANAGEMENT BACKEND TESTING")
+        print("=" * 60)
+        
+        # Authentication tests
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        if not self.test_resident_authentication():
+            print("⚠️ Resident authentication failed - some tests may be skipped")
+        
+        # Services API tests
+        self.test_get_compound_services()
+        self.test_create_service()
+        self.test_update_service()
+        self.test_delete_service()
+        
+        # Initialize services test
+        self.test_initialize_default_services()
+        
+        # Service providers tests
+        self.test_create_service_provider()
+        self.test_get_service_providers()
+        
+        # Service booking tests
+        self.test_create_service_booking()
+        self.test_get_service_bookings()
+        
+        # Authentication issues test
+        self.test_authentication_issues()
+        
+        return self.print_summary()
+    
+    def print_summary(self):
+        """Print test results summary"""
+        print("\n" + "=" * 60)
+        print("🔧 SERVICES MANAGEMENT BACKEND TEST RESULTS")
+        print("=" * 60)
+        
+        passed = sum(1 for result in self.results if "✅ PASS" in result["status"])
+        failed = sum(1 for result in self.results if "❌ FAIL" in result["status"])
+        total = len(self.results)
+        
+        success_rate = (passed / total * 100) if total > 0 else 0
+        
+        print(f"📊 OVERALL RESULTS: {passed}/{total} tests passed ({success_rate:.1f}% success rate)")
+        print()
+        
+        # Print failed tests first
+        failed_tests = [r for r in self.results if "❌ FAIL" in r["status"]]
+        if failed_tests:
+            print("❌ FAILED TESTS:")
+            for result in failed_tests:
+                print(f"   • {result['test']}: {result['message']}")
+                if result['details']:
+                    print(f"     Details: {result['details']}")
+            print()
+        
+        # Print passed tests
+        passed_tests = [r for r in self.results if "✅ PASS" in r["status"]]
+        if passed_tests:
+            print("✅ PASSED TESTS:")
+            for result in passed_tests:
+                print(f"   • {result['test']}: {result['message']}")
+            print()
+        
+        return success_rate >= 80  # Consider 80%+ as success
+    
     def test_create_new_residence_account(self):
         """Test POST /api/admin/residences - Create new residence account with profile picture"""
         print("\n=== Testing Create New Residence Account ===")

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend Residence Account Creation and Family Management Test Suite
-Tests the complete residence account creation and family management workflow
+Backend Services Management Test Suite
+Tests the Services Management backend APIs and initialize services functionality
 """
 
 import asyncio
@@ -12,7 +12,7 @@ import uuid
 import io
 import os
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional
 from PIL import Image
 

@@ -153,8 +153,372 @@ class ServicesManagementTestSuite:
             self.log_result("Create Test Resident", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_get_compound_details(self):
-        """Test GET /api/compounds/{compound_id} - Get compound details"""
+    def test_get_compound_services(self):
+        """Test GET /api/compounds/{compound_id}/services - Get all services"""
+        print("\n=== Testing Get Compound Services ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Get Compound Services", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/services", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                services = data.get("services", [])
+                self.log_result("Get Compound Services", True, f"Retrieved {len(services)} services successfully")
+                return True
+            else:
+                self.log_result("Get Compound Services", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Compound Services", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_service(self):
+        """Test POST /api/compounds/{compound_id}/services - Create new service"""
+        print("\n=== Testing Create Service ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Create Service", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            service_data = {
+                "name": "Test Plumbing Service",
+                "category": "maintenance",
+                "specialty": "plumber",
+                "description": "Professional plumbing services for all your needs",
+                "phone": "+1234567890",
+                "email": "plumber@example.com",
+                "working_hours": "8:00 AM - 6:00 PM"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/compounds/{self.compound_id}/services", 
+                                       json=service_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service created successfully" and result.get("service_id"):
+                    self.test_service_id = result.get("service_id")
+                    self.log_result("Create Service", True, f"Service created successfully with ID: {self.test_service_id}")
+                    return True
+                else:
+                    self.log_result("Create Service", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Create Service", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Service", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_update_service(self):
+        """Test PUT /api/compounds/{compound_id}/services/{service_id} - Update service"""
+        print("\n=== Testing Update Service ===")
+        
+        if not self.test_service_id:
+            self.log_result("Update Service", False, "No test service ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            update_data = {
+                "name": "Updated Test Plumbing Service",
+                "description": "Updated professional plumbing services",
+                "working_hours": "9:00 AM - 5:00 PM"
+            }
+            
+            response = self.session.put(f"{BASE_URL}/compounds/{self.compound_id}/services/{self.test_service_id}", 
+                                      json=update_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service updated successfully":
+                    self.log_result("Update Service", True, "Service updated successfully")
+                    return True
+                else:
+                    self.log_result("Update Service", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Update Service", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Update Service", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_initialize_default_services(self):
+        """Test POST /api/admin/initialize-services - Initialize default services"""
+        print("\n=== Testing Initialize Default Services ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Initialize Default Services", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            init_data = {
+                "compound_id": self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/initialize-services", 
+                                       json=init_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Default services initialized successfully":
+                    added_count = result.get("added_count", 0)
+                    self.log_result("Initialize Default Services", True, f"Default services initialized successfully. Added {added_count} services")
+                    return True
+                else:
+                    self.log_result("Initialize Default Services", False, f"Unexpected response: {result}")
+                    return False
+            elif response.status_code == 400:
+                # Check if it's already initialized
+                result = response.json()
+                if "already initialized" in result.get("detail", "").lower():
+                    self.log_result("Initialize Default Services", True, "Default services already initialized (expected behavior)")
+                    return True
+                else:
+                    self.log_result("Initialize Default Services", False, f"Bad request: {result}")
+                    return False
+            else:
+                self.log_result("Initialize Default Services", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Initialize Default Services", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_service_providers(self):
+        """Test GET /api/service-providers - Get service providers"""
+        print("\n=== Testing Get Service Providers ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Service Providers", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/service-providers", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                providers = data.get("providers", [])
+                self.log_result("Get Service Providers", True, f"Retrieved {len(providers)} service providers successfully")
+                return True
+            else:
+                self.log_result("Get Service Providers", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Service Providers", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_service_provider(self):
+        """Test POST /api/service-providers - Create service provider (Admin only)"""
+        print("\n=== Testing Create Service Provider ===")
+        
+        if not self.admin_token:
+            self.log_result("Create Service Provider", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            provider_data = {
+                "full_name": "John Smith",
+                "email": "johnsmith@example.com",
+                "phone": "+1234567890",
+                "services": ["maintenance", "cleaning"],
+                "specialties": ["plumber", "electrician"],
+                "bio": "Experienced maintenance professional",
+                "hourly_rate": 50.0
+            }
+            
+            response = self.session.post(f"{BASE_URL}/service-providers", 
+                                       json=provider_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service provider created successfully" and result.get("provider_id"):
+                    self.test_provider_id = result.get("provider_id")
+                    self.log_result("Create Service Provider", True, f"Service provider created successfully with ID: {self.test_provider_id}")
+                    return True
+                else:
+                    self.log_result("Create Service Provider", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Create Service Provider", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Service Provider", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_service_booking(self):
+        """Test POST /api/service-bookings - Create booking"""
+        print("\n=== Testing Create Service Booking ===")
+        
+        if not self.resident_token or not self.test_provider_id:
+            self.log_result("Create Service Booking", False, "No resident token or provider ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            booking_data = {
+                "provider_id": self.test_provider_id,
+                "service_category": "maintenance",
+                "service_specialty": "plumber",
+                "title": "Fix Kitchen Sink",
+                "description": "Kitchen sink is leaking and needs repair",
+                "priority": "standard",
+                "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat(),
+                "scheduled_time": "10:00",
+                "scheduled_end_time": "12:00",
+                "payment_method": "cash",
+                "booking_notes": "Please call before arriving"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                       json=booking_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service booking created successfully" and result.get("booking_id"):
+                    self.test_booking_id = result.get("booking_id")
+                    self.log_result("Create Service Booking", True, f"Service booking created successfully with ID: {self.test_booking_id}")
+                    return True
+                else:
+                    self.log_result("Create Service Booking", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Create Service Booking", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Service Booking", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_service_bookings(self):
+        """Test GET /api/service-bookings - Get bookings"""
+        print("\n=== Testing Get Service Bookings ===")
+        
+        if not self.resident_token:
+            self.log_result("Get Service Bookings", False, "No resident token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            response = self.session.get(f"{BASE_URL}/service-bookings", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                bookings = data.get("bookings", [])
+                self.log_result("Get Service Bookings", True, f"Retrieved {len(bookings)} service bookings successfully")
+                return True
+            else:
+                self.log_result("Get Service Bookings", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Service Bookings", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_delete_service(self):
+        """Test DELETE /api/compounds/{compound_id}/services/{service_id} - Delete service"""
+        print("\n=== Testing Delete Service ===")
+        
+        if not self.test_service_id:
+            self.log_result("Delete Service", False, "No test service ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            response = self.session.delete(f"{BASE_URL}/compounds/{self.compound_id}/services/{self.test_service_id}", 
+                                         headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service deleted successfully":
+                    self.log_result("Delete Service", True, "Service deleted successfully")
+                    return True
+                else:
+                    self.log_result("Delete Service", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Delete Service", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Delete Service", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_authentication_issues(self):
+        """Test authentication issues - 401 Unauthorized errors"""
+        print("\n=== Testing Authentication Issues ===")
+        
+        success_count = 0
+        total_tests = 0
+        
+        # Test 1: Access services without token
+        try:
+            total_tests += 1
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/services")
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Auth Test - No Token", True, f"Correctly rejected request without token (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Auth Test - No Token", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Auth Test - No Token", False, f"Exception occurred: {str(e)}")
+        
+        # Test 2: Access admin endpoint with invalid token
+        try:
+            total_tests += 1
+            invalid_headers = {"Authorization": "Bearer invalid_token_12345"}
+            response = self.session.post(f"{BASE_URL}/admin/initialize-services", 
+                                       json={"compound_id": self.compound_id}, 
+                                       headers=invalid_headers)
+            
+            if response.status_code == 401:
+                self.log_result("Auth Test - Invalid Token", True, "Correctly rejected request with invalid token")
+                success_count += 1
+            else:
+                self.log_result("Auth Test - Invalid Token", False, f"Expected 401, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Auth Test - Invalid Token", False, f"Exception occurred: {str(e)}")
+        
+        # Test 3: Access admin endpoint with resident token
+        if self.resident_token:
+            try:
+                total_tests += 1
+                resident_headers = self.setup_auth_headers(self.resident_token)
+                response = self.session.post(f"{BASE_URL}/admin/initialize-services", 
+                                           json={"compound_id": self.compound_id}, 
+                                           headers=resident_headers)
+                
+                if response.status_code == 403:
+                    self.log_result("Auth Test - Resident Access Admin", True, "Correctly denied resident access to admin endpoint")
+                    success_count += 1
+                else:
+                    self.log_result("Auth Test - Resident Access Admin", False, f"Expected 403, got {response.status_code}")
+            except Exception as e:
+                self.log_result("Auth Test - Resident Access Admin", False, f"Exception occurred: {str(e)}")
+        
+        return success_count == total_tests
     
     def test_create_new_residence_account(self):
         """Test POST /api/admin/residences - Create new residence account with profile picture"""

@@ -170,16 +170,7 @@ const ServicesManagement = () => {
     try {
       await axios.put(`${API}/compounds/${user.compound_id}/services/${editingService.id}`, serviceForm);
       toast.success('Service updated successfully!');
-      setEditingService(null);
-      setServiceForm({
-        name: '',
-        category: 'maintenance',
-        specialty: '',
-        description: '',
-        phone: '',
-        email: '',
-        working_hours: '9:00 AM - 6:00 PM'
-      });
+      resetForm();
       fetchServices();
     } catch (error) {
       toast.error('Failed to update service');

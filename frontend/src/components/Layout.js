@@ -19,7 +19,9 @@ import {
   PhotoIcon,
   ClockIcon,
   ShoppingBagIcon,
-  CreditCardIcon
+  CreditCardIcon,
+  MagnifyingGlassIcon,
+  CommandLineIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 

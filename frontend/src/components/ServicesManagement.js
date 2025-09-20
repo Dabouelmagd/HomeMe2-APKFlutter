@@ -446,6 +446,13 @@ const ServicesManagement = () => {
                       <ArrowPathIcon className="h-4 w-4" />
                       <span>Refresh</span>
                     </button>
+                    <button
+                      onClick={testDirectAPI}
+                      className="btn btn-primary flex items-center space-x-2"
+                      title="Test API directly"
+                    >
+                      <span>🔍 Test API</span>
+                    </button>
                   </div>
                 )}
                 <button

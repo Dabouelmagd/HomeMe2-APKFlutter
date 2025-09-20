@@ -5680,6 +5680,159 @@ async def create_residence_directly(
         logging.error(f"Error creating residence: {e}")
         raise HTTPException(status_code=500, detail="Failed to create residence")
 
+@api_router.post("/admin/create-admin")
+async def create_admin_account(
+    username: str = Form(...),
+    email: str = Form(...), 
+    password: str = Form(...),
+    full_name: str = Form(...),
+    phone: str = Form(None),
+    compound_id: str = Form(...),
+    role: str = Form("admin"),
+    profile_picture: UploadFile = File(None),
+    current_user: User = Depends(require_admin)
+):
+    """Create a new admin account (Super Admin only)"""
+    try:
+        # Check if user already exists
+        existing_user = await db.users.find_one({
+            "$or": [
+                {"email": email},
+                {"username": username}
+            ]
+        })
+        
+        if existing_user:
+            raise HTTPException(status_code=400, detail="User with this email or username already exists")
+        
+        # Handle profile picture upload
+        profile_picture_url = None
+        if profile_picture and profile_picture.filename:
+            if not profile_picture.content_type.startswith('image/'):
+                raise HTTPException(status_code=400, detail="Profile picture must be an image")
+            
+            # Create user uploads directory
+            user_uploads_dir = f"{UPLOADS_DIR}/users"
+            os.makedirs(user_uploads_dir, exist_ok=True)
+            
+            # Generate unique filename
+            file_extension = profile_picture.filename.split('.')[-1].lower()
+            unique_filename = f"admin_{str(uuid.uuid4())}.{file_extension}"
+            file_path = os.path.join(user_uploads_dir, unique_filename)
+            
+            # Save file
+            content = await profile_picture.read()
+            async with aiofiles.open(file_path, 'wb') as f:
+                await f.write(content)
+            
+            profile_picture_url = f"/uploads/users/{unique_filename}"
+        
+        # Hash password
+        hashed_password = pwd_context.hash(password)
+        
+        # Create admin user
+        new_admin = User(
+            username=username,
+            email=email,
+            password_hash=hashed_password,
+            full_name=full_name,
+            phone=phone,
+            role=role,
+            compound_id=compound_id,
+            profile_picture_url=profile_picture_url
+        )
+        
+        await db.users.insert_one(new_admin.dict())
+        
+        return {
+            "message": "Admin account created successfully",
+            "user_id": new_admin.id,
+            "username": username,
+            "profile_picture_url": profile_picture_url
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating admin: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create admin account")
+
+@api_router.get("/admin/users")
+async def get_all_users(current_user: User = Depends(require_admin)):
+    """Get all users in the system (Admin only)"""
+    try:
+        users = await db.users.find({}).to_list(None)
+        
+        # Serialize datetime objects and remove sensitive data
+        safe_users = []
+        for user in users:
+            safe_user = serialize_datetime(user)
+            # Remove password hash from response
+            safe_user.pop('password_hash', None)
+            safe_users.append(safe_user)
+        
+        return {"users": safe_users}
+        
+    except Exception as e:
+        logging.error(f"Error getting users: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get users")
+
+@api_router.put("/admin/users/{user_id}/status")
+async def update_user_status(
+    user_id: str,
+    status_data: dict,
+    current_user: User = Depends(require_admin)
+):
+    """Update user active/inactive status (Admin only)"""
+    try:
+        is_active = status_data.get("is_active")
+        if is_active is None:
+            raise HTTPException(status_code=400, detail="is_active field is required")
+        
+        result = await db.users.update_one(
+            {"id": user_id},
+            {"$set": {"is_active": is_active}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {"message": f"User {'activated' if is_active else 'deactivated'} successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating user status: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update user status")
+
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    current_user: User = Depends(require_admin)
+):
+    """Delete a user account (Admin only)"""
+    try:
+        # Prevent admin from deleting themselves
+        if user_id == current_user.id:
+            raise HTTPException(status_code=400, detail="Cannot delete your own account")
+        
+        # Delete user
+        result = await db.users.delete_one({"id": user_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Also delete associated family if exists
+        await db.families.delete_many({"head_id": user_id})
+        
+        return {"message": "User deleted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting user: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete user")
+
 def create_registration_token(unit_number: str, email: str, compound_id: str, expires_at: datetime) -> str:
     """Create a secure token for resident registration"""
     token_data = {

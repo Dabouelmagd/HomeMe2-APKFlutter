@@ -468,10 +468,16 @@ class ServicesManagementTestSuite:
             
             if response.status_code == 200:
                 result = response.json()
-                if result.get("message") == "Service booking created successfully" and result.get("booking_id"):
-                    self.test_booking_id = result.get("booking_id")
-                    self.log_result("Create Service Booking", True, f"Service booking created successfully with ID: {self.test_booking_id}")
-                    return True
+                if result.get("message") == "Service booking created successfully":
+                    # Check for booking_id or booking.id
+                    booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
+                    if booking_id:
+                        self.test_booking_id = booking_id
+                        self.log_result("Create Service Booking", True, f"Service booking created successfully with ID: {self.test_booking_id}")
+                        return True
+                    else:
+                        self.log_result("Create Service Booking", False, f"No booking ID in response: {result}")
+                        return False
                 else:
                     self.log_result("Create Service Booking", False, f"Unexpected response: {result}")
                     return False

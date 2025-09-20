@@ -8,6 +8,7 @@ import {
   UserIcon,
   ShieldCheckIcon,
   SparklesIcon,
+  ArrowPathIcon,
   PlusIcon,
   PencilIcon,
   TrashIcon,

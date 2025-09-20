@@ -209,12 +209,11 @@ const ServicesManagement = () => {
     setServiceForm({
       name: '',
       category: 'maintenance',
+      specialty: '',
       description: '',
-      price: '',
-      provider_name: '',
-      provider_phone: '',
-      provider_email: '',
-      availability: 'available'
+      phone: '',
+      email: '',
+      working_hours: '9:00 AM - 6:00 PM'
     });
     setEditingService(null);
   };

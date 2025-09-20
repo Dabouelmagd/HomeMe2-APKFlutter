@@ -142,37 +142,30 @@ const ServicesManagement = () => {
   };
 
   const clearAndReinitializeServices = async () => {
+    if (!window.confirm('This will clear all existing services and add 17 default services. Continue?')) {
+      return;
+    }
+    
     try {
-      console.log('🗑️ Clearing and reinitializing services...');
-      
-      // First, clear existing services
-      const clearResponse = await axios.delete(`${API}/admin/services/clear`, {
-        data: { compound_id: user.compound_id }
-      });
-      
-      console.log('Clear response:', clearResponse.data);
-      
-      // Then initialize fresh services
+      // Simple direct initialization
       const response = await axios.post(`${API}/admin/initialize-services`, {
         compound_id: user.compound_id
       });
       
-      console.log('Initialize response:', response.data);
-      
       if (response.data.success) {
-        toast.success(`Services cleared and ${response.data.added_count} new services added!`);
+        toast.success(`${response.data.added_count} services added successfully!`);
+      } else {
+        toast.info('Services already exist, refreshing...');
+      }
+      
+      // Always refresh after
+      setTimeout(async () => {
         await fetchServices();
-      } else {
-        toast.error('Failed to add services after clearing');
-      }
+      }, 1000);
+      
     } catch (error) {
-      console.error('Failed to clear and reinitialize services:', error);
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-        toast.error(error.response.data.detail || 'Failed to reinitialize services');
-      } else {
-        toast.error('Failed to clear and reinitialize services');
-      }
+      console.error('Error:', error);
+      toast.error('Failed to add services');
     }
   };
 

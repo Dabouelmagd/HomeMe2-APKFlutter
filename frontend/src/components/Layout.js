@@ -328,10 +328,76 @@ const Layout = () => {
               <Bars3Icon className="h-6 w-6 text-gray-500" />
             </button>
 
-            <div className="flex-1 min-w-0">
-              <h1 className="text-lg font-semibold text-gray-900 truncate">
-                {navigation.find(item => isActive(item.href))?.name || 'HomeMe'}
-              </h1>
+            <div className="flex-1 min-w-0 mx-4">
+              <div className="search-container relative max-w-lg">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <MagnifyingGlassIcon 
+                      className={`h-5 w-5 ${isSearching ? 'text-blue-500' : 'text-gray-400'}`} 
+                    />
+                  </div>
+                  <input
+                    id="global-search-input"
+                    type="text"
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    placeholder={t('search_placeholder', 'Search users, residences, services...')}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <kbd className="inline-flex items-center px-2 py-1 border border-gray-200 rounded text-xs font-sans font-medium text-gray-400 bg-gray-50">
+                      <CommandLineIcon className="h-3 w-3 mr-1" />
+                      K
+                    </kbd>
+                  </div>
+                </div>
+
+                {/* Search Results Dropdown */}
+                {showSearchResults && (
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50">
+                    {isSearching ? (
+                      <div className="px-4 py-6 text-center">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+                        <p className="text-sm text-gray-500 mt-2">Searching...</p>
+                      </div>
+                    ) : searchResults.length > 0 ? (
+                      <div className="py-2">
+                        {searchResults.map((result, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleSearchResultClick(result)}
+                            className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                          >
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0">
+                                {result.type === 'user' && <UsersIcon className="h-5 w-5 text-gray-400" />}
+                                {result.type === 'residence' && <HomeIcon className="h-5 w-5 text-gray-400" />}
+                                {result.type === 'service' && <WrenchScrewdriverIcon className="h-5 w-5 text-gray-400" />}
+                                {result.type === 'message' && <ChatBubbleLeftEllipsisIcon className="h-5 w-5 text-gray-400" />}
+                              </div>
+                              <div className="ml-3 flex-1">
+                                <p className="text-sm font-medium text-gray-900">{result.title}</p>
+                                <p className="text-sm text-gray-500">{result.description}</p>
+                              </div>
+                              <div className="ml-3 flex-shrink-0">
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
+                                  {result.type}
+                                </span>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    ) : searchQuery ? (
+                      <div className="px-4 py-6 text-center">
+                        <MagnifyingGlassIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-sm font-medium text-gray-900">No results found</p>
+                        <p className="text-sm text-gray-500">Try different keywords or check spelling</p>
+                      </div>
+                    ) : null}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center space-x-4">

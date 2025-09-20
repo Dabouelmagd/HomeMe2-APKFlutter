@@ -285,6 +285,26 @@ const CompoundManagement = () => {
     });
   };
 
+  const handleAdminProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      
+      setAdminForm(prev => ({ ...prev, profile_picture: file }));
+      
+      // Create preview
+      // eslint-disable-next-line no-undef
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setAdminForm(prev => ({ ...prev, profile_picture_preview: e.target.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const resetNewResidenceForm = () => {
     setNewResidenceForm({
       unit_number: '',

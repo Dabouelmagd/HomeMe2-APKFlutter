@@ -94,6 +94,7 @@ const resources = {
       // Services
       'services_management': 'Services Management',
       'service_booking': 'Service Booking & Payments',
+      'search_placeholder': 'Search users, residences, services...',
       'services': 'Services',
       'add_service': 'Add Service',
       'edit_service': 'Edit Service',

@@ -103,10 +103,17 @@ const ServicesManagement = () => {
 
   const fetchServices = async () => {
     try {
+      console.log('Fetching services for compound:', user.compound_id);
+      console.log('API URL:', `${API}/compounds/${user.compound_id}/services`);
+      
       const response = await axios.get(`${API}/compounds/${user.compound_id}/services`);
-      setServices(response.data.services);
+      console.log('Services response:', response.data);
+      
+      setServices(response.data.services || []);
     } catch (error) {
-      toast.error('Failed to load services');
+      console.error('Failed to load services:', error);
+      console.error('Error response:', error.response?.data);
+      toast.error(`Failed to load services: ${error.response?.data?.detail || error.message}`);
     } finally {
       setLoading(false);
     }

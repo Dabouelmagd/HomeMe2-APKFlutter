@@ -579,7 +579,7 @@ const ServicesManagement = () => {
                   
                   {/* View/Filter Toggle */}
                   <button
-                    onClick={() => setActiveTab(activeTab === 'services' ? 'booking' : 'services')}
+                    onClick={() => setActiveTab(activeTab === 'services' ? 'bookings' : 'services')}
                     className="btn-redesign btn-redesign-outline"
                     title="Switch view"
                   >

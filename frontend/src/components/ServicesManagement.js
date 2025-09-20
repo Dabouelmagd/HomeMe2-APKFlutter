@@ -109,12 +109,30 @@ const ServicesManagement = () => {
       
       const response = await axios.get(`${API}/compounds/${user.compound_id}/services`);
       console.log('Services response:', response.data);
+      console.log('Services count:', response.data.services?.length);
       
-      setServices(response.data.services || []);
+      if (response.data.services && Array.isArray(response.data.services)) {
+        // Map status to availability for frontend compatibility
+        const servicesWithAvailability = response.data.services.map(service => ({
+          ...service,
+          availability: service.status || service.availability || 'available'
+        }));
+        
+        console.log('Setting services:', servicesWithAvailability.length);
+        setServices(servicesWithAvailability);
+        
+        if (servicesWithAvailability.length > 0) {
+          toast.success(`Loaded ${servicesWithAvailability.length} services successfully!`);
+        }
+      } else {
+        console.log('No services array in response');
+        setServices([]);
+      }
     } catch (error) {
       console.error('Failed to load services:', error);
       console.error('Error response:', error.response?.data);
       toast.error(`Failed to load services: ${error.response?.data?.detail || error.message}`);
+      setServices([]);
     } finally {
       setLoading(false);
     }

@@ -5882,6 +5882,104 @@ async def delete_user(
         logging.error(f"Error deleting user: {e}")
         raise HTTPException(status_code=500, detail="Failed to delete user")
 
+@api_router.get("/search")
+async def global_search(
+    q: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Global search across users, residences, services, and messages"""
+    try:
+        if len(q.strip()) < 2:
+            return {"results": []}
+        
+        search_term = q.strip().lower()
+        results = []
+        
+        # Search Users (only if admin or searching own compound)
+        if current_user.role == "admin":
+            users = await db.users.find({
+                "$or": [
+                    {"full_name": {"$regex": search_term, "$options": "i"}},
+                    {"email": {"$regex": search_term, "$options": "i"}},
+                    {"username": {"$regex": search_term, "$options": "i"}},
+                    {"unit_number": {"$regex": search_term, "$options": "i"}}
+                ],
+                "compound_id": current_user.compound_id
+            }).to_list(10)
+            
+            for user in users:
+                results.append({
+                    "id": user["id"],
+                    "type": "user",
+                    "title": user["full_name"],
+                    "description": f"Unit {user.get('unit_number', 'N/A')} • {user['email']}",
+                    "url": "/family"
+                })
+        
+        # Search Services
+        services = await db.services.find({
+            "$or": [
+                {"name": {"$regex": search_term, "$options": "i"}},
+                {"description": {"$regex": search_term, "$options": "i"}},
+                {"category": {"$regex": search_term, "$options": "i"}}
+            ],
+            "compound_id": current_user.compound_id
+        }).to_list(10)
+        
+        for service in services:
+            results.append({
+                "id": service["id"],
+                "type": "service",
+                "title": service["name"],
+                "description": f"{service.get('category', 'Service')} • ${service.get('base_price', 0)}",
+                "url": "/services"
+            })
+        
+        # Search Messages (own messages only)
+        messages = await db.messages.find({
+            "$or": [
+                {"content": {"$regex": search_term, "$options": "i"}},
+                {"subject": {"$regex": search_term, "$options": "i"}}
+            ],
+            "$or": [
+                {"sender_id": current_user.id},
+                {"receiver_id": current_user.id}
+            ]
+        }).to_list(5)
+        
+        for message in messages:
+            results.append({
+                "id": message["id"],
+                "type": "message",
+                "title": message.get("subject", "Message"),
+                "description": message["content"][:100] + ("..." if len(message["content"]) > 100 else ""),
+                "url": "/messages"
+            })
+        
+        # Search Family Members (own family only)
+        if current_user.family_id:
+            family = await db.families.find_one({"id": current_user.family_id})
+            if family and "members" in family:
+                for member in family["members"]:
+                    if (search_term in member.get("full_name", "").lower() or 
+                        search_term in member.get("relationship", "").lower()):
+                        results.append({
+                            "id": member["id"],
+                            "type": "family",
+                            "title": member["full_name"],
+                            "description": f"{member.get('relationship', 'Family Member')} • Age {member.get('age', 'N/A')}",
+                            "url": "/family"
+                        })
+        
+        # Limit total results
+        results = results[:20]
+        
+        return {"results": results}
+        
+    except Exception as e:
+        logging.error(f"Search error: {e}")
+        raise HTTPException(status_code=500, detail="Search failed")
+
 def create_registration_token(unit_number: str, email: str, compound_id: str, expires_at: datetime) -> str:
     """Create a secure token for resident registration"""
     token_data = {

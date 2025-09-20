@@ -167,6 +167,10 @@ const CompoundManagement = () => {
     try {
       const response = await axios.get(`${API}/compounds/${user.compound_id}`);
       setCompound(response.data);
+      setEditableCompound({
+        name: response.data.name || '',
+        address: response.data.address || ''
+      });
       setCompoundNotFound(false);
     } catch (error) {
       if (error.response?.status === 404) {

@@ -176,8 +176,58 @@ const CompoundManagement = () => {
   const handleCancelCompoundSettings = () => {
     setEditableCompound({
       name: compound?.name || '',
-      address: compound?.address || ''
+      address: compound?.address || '',
+      description: compound?.description || '',
+      logo_url: compound?.logo_url || ''
     });
+    setLogoFile(null);
+    setLogoPreview(compound?.logo_url || null);
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      
+      setLogoFile(file);
+      
+      // Create preview
+      // eslint-disable-next-line no-undef
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setLogoPreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadLogo = async () => {
+    if (!logoFile) {
+      toast.error('Please select a logo file first');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('logo', logoFile);
+
+      const response = await axios.put(`${API}/compounds/${user.compound_id}/logo`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setEditableCompound(prev => ({ ...prev, logo_url: response.data.logo_url }));
+      setCompound(prev => ({ ...prev, logo_url: response.data.logo_url }));
+      toast.success('Logo uploaded successfully!');
+      setLogoFile(null);
+    } catch (error) {
+      console.error('Failed to upload logo:', error);
+      toast.error('Failed to upload logo');
+    }
   };
 
   useEffect(() => {

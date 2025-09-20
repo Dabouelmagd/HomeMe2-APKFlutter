@@ -205,6 +205,35 @@ const ServicesManagement = () => {
       }
     }
   };
+  const resetForm = () => {
+    setServiceForm({
+      name: '',
+      category: 'maintenance',
+      description: '',
+      price: '',
+      provider_name: '',
+      provider_phone: '',
+      provider_email: '',
+      availability: 'available'
+    });
+    setEditingService(null);
+  };
+
+  const initializeDefaultServices = async () => {
+    try {
+      const response = await axios.post(`${API}/admin/initialize-services`, {
+        compound_id: user.compound_id
+      });
+      
+      if (response.data.success) {
+        toast.success(`${response.data.added_count} default services added successfully!`);
+        fetchServices();
+      }
+    } catch (error) {
+      console.error('Failed to initialize services:', error);
+      toast.error('Failed to initialize default services');
+    }
+  };
 
   const handleBookService = async (e) => {
     e.preventDefault();

@@ -57,38 +57,61 @@ const AdminDashboard = () => {
     );
   }
 
+  const handleQuickAction = (action) => {
+    switch (action) {
+      case 'add_resident':
+        window.location.href = '/compound';
+        toast.success('Navigating to Compound Management...');
+        break;
+      case 'manage_units':
+        window.location.href = '/compound';
+        toast.success('Opening residence management...');
+        break;
+      case 'send_notice':
+        window.location.href = '/messages';
+        toast.success('Opening message center...');
+        break;
+      case 'view_payments':
+        window.location.href = '/financial';
+        toast.success('Opening financial management...');
+        break;
+      default:
+        break;
+    }
+  };
+
   const stats = [
     {
       name: 'Total Residents',
       value: dashboardData?.statistics?.total_residents || 0,
       icon: UsersIcon,
-      color: 'bg-blue-500',
+      color: 'from-blue-500 to-blue-600',
       change: '+12%',
-      changeType: 'increase'
+      trend: 'up'
     },
     {
-      name: 'Total Families',
-      value: dashboardData?.statistics?.total_families || 0,
+      name: 'Total Residences',
+      value: dashboardData?.statistics?.total_residences || 0,
       icon: HomeIcon,
-      color: 'bg-green-500',
-      change: '+8%',
-      changeType: 'increase'
+      color: 'from-emerald-500 to-emerald-600',
+      change: '+3%',
+      trend: 'up'
     },
     {
-      name: 'Pending Payments',
-      value: dashboardData?.statistics?.pending_payments || 0,
+      name: 'Active Services',
+      value: dashboardData?.statistics?.total_services || 0,
       icon: CurrencyDollarIcon,
-      color: 'bg-yellow-500',
-      change: '-5%',
-      changeType: 'decrease'
+      color: 'from-purple-500 to-purple-600',
+      change: '+8%',
+      trend: 'up'
     },
     {
-      name: 'Open Messages',
-      value: dashboardData?.statistics?.open_messages || 0,
+      name: 'Messages Today',
+      value: dashboardData?.statistics?.total_messages || 0,
       icon: ChatBubbleLeftEllipsisIcon,
-      color: 'bg-purple-500',
-      change: '+2%',
-      changeType: 'increase'
+      color: 'from-orange-500 to-orange-600',
+      change: '+15%',
+      trend: 'up'
     }
   ];
 

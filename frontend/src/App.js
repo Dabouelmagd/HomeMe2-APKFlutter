@@ -22,6 +22,7 @@ import Settings from './components/Settings';
 import FileGallery from './components/FileGallery';
 import MessageScheduling from './components/MessageScheduling';
 import ServiceBooking from './components/ServiceBooking';
+import Pricing from './components/Pricing';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
 import { Toaster } from './components/ui/sonner';

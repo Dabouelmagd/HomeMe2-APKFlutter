@@ -1857,6 +1857,48 @@ async def get_compound(compound_id: str, current_user: User = Depends(get_curren
         logging.error(f"Error getting compound: {e}")
         raise HTTPException(status_code=500, detail="Failed to get compound")
 
+@api_router.put("/compounds/{compound_id}")
+async def update_compound(
+    compound_id: str,
+    compound_data: dict,
+    current_user: User = Depends(require_admin)
+):
+    """Update compound information (Admin only)"""
+    try:
+        # Update compound data
+        update_data = {
+            "name": compound_data.get("name"),
+            "address": compound_data.get("address"),
+            "description": compound_data.get("description")
+        }
+        
+        # Remove None values
+        update_data = {k: v for k, v in update_data.items() if v is not None}
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No valid update data provided")
+        
+        result = await db.compounds.update_one(
+            {"id": compound_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Compound not found")
+        
+        # Get updated compound
+        updated_compound = await db.compounds.find_one({"id": compound_id})
+        if not updated_compound:
+            raise HTTPException(status_code=404, detail="Compound not found after update")
+        
+        return serialize_datetime(updated_compound)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating compound: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update compound")
+
 @api_router.put("/compounds/{compound_id}/logo")
 async def upload_compound_logo(
     compound_id: str,

@@ -421,7 +421,12 @@ const ServicesManagement = () => {
         <div className="space-y-6">
           {user?.role === 'admin' && (
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Available Services</h3>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">Available Services</h3>
+                <p className="text-sm text-gray-500">
+                  Debug: {services.length} services loaded | User: {user?.compound_id} | Loading: {loading.toString()}
+                </p>
+              </div>
               <div className="flex space-x-3">
                 {user?.role === 'admin' && (
                   <div className="flex space-x-2">

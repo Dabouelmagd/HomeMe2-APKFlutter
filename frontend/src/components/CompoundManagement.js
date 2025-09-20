@@ -1279,68 +1279,169 @@ const CompoundManagement = () => {
 
       {/* Settings Tab */}
       {activeTab === 'settings' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">Compound Settings</h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Compound Name *
-              </label>
-              <input
-                type="text"
-                value={editableCompound.name}
-                onChange={(e) => setEditableCompound(prev => ({ ...prev, name: e.target.value }))}
-                className="form-input w-full"
-                placeholder="Enter compound name"
-                required
-              />
-            </div>
+        <div className="space-y-6">
+          {/* Basic Information */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Basic Information</h3>
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Address *
-              </label>
-              <input
-                type="text"
-                value={editableCompound.address}
-                onChange={(e) => setEditableCompound(prev => ({ ...prev, address: e.target.value }))}
-                className="form-input w-full"
-                placeholder="Enter compound address"
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Compound Name *
+                </label>
+                <input
+                  type="text"
+                  value={editableCompound.name}
+                  onChange={(e) => setEditableCompound(prev => ({ ...prev, name: e.target.value }))}
+                  className="form-input w-full"
+                  placeholder="Enter compound name"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Address *
+                </label>
+                <input
+                  type="text"
+                  value={editableCompound.address}
+                  onChange={(e) => setEditableCompound(prev => ({ ...prev, address: e.target.value }))}
+                  className="form-input w-full"
+                  placeholder="Enter compound address"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  value={editableCompound.description || ''}
+                  onChange={(e) => setEditableCompound(prev => ({ ...prev, description: e.target.value }))}
+                  className="form-input w-full"
+                  rows="3"
+                  placeholder="Enter compound description (optional)"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="flex justify-end space-x-4">
+                <button 
+                  onClick={handleCancelCompoundSettings}
+                  className="btn btn-secondary"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleSaveCompoundSettings}
+                  className="btn btn-primary"
+                >
+                  Save Changes
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="mt-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                value={editableCompound.description || ''}
-                onChange={(e) => setEditableCompound(prev => ({ ...prev, description: e.target.value }))}
-                className="form-input w-full"
-                rows="3"
-                placeholder="Enter compound description (optional)"
-              />
-            </div>
-          </div>
+          {/* Logo Management */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">Compound Logo</h3>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Current Logo Display */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Current Logo
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  {logoPreview ? (
+                    <div className="space-y-4">
+                      <img
+                        src={logoPreview}
+                        alt="Compound Logo"
+                        className="mx-auto h-32 w-32 object-contain rounded-lg border border-gray-200"
+                      />
+                      <p className="text-sm text-gray-600">Current compound logo</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <PhotoIcon className="mx-auto h-16 w-16 text-gray-400" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">No logo uploaded</p>
+                        <p className="text-sm text-gray-500">Upload a logo to brand your compound</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <div className="flex justify-end space-x-4">
-              <button 
-                onClick={handleCancelCompoundSettings}
-                className="btn btn-secondary"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleSaveCompoundSettings}
-                className="btn btn-primary"
-              >
-                Save Changes
-              </button>
+              {/* Logo Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload New Logo
+                </label>
+                <div className="space-y-4">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoChange}
+                    className="form-input w-full"
+                  />
+                  
+                  {logoFile && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-center">
+                        <PhotoIcon className="h-5 w-5 text-blue-400 mr-2" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-blue-800">
+                            {logoFile.name}
+                          </p>
+                          <p className="text-xs text-blue-600">
+                            {(logoFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={handleUploadLogo}
+                      disabled={!logoFile}
+                      className={`btn flex items-center space-x-2 flex-1 ${
+                        logoFile 
+                          ? 'btn-primary' 
+                          : 'btn-secondary opacity-50 cursor-not-allowed'
+                      }`}
+                    >
+                      <PhotoIcon className="h-4 w-4" />
+                      <span>Upload Logo</span>
+                    </button>
+                    
+                    {logoFile && (
+                      <button
+                        onClick={() => {
+                          setLogoFile(null);
+                          setLogoPreview(editableCompound.logo_url || null);
+                        }}
+                        className="btn btn-secondary"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="text-xs text-gray-500">
+                    <p>• Recommended size: 200x200px or larger</p>
+                    <p>• Supported formats: JPG, PNG, GIF</p>
+                    <p>• Maximum file size: 5MB</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

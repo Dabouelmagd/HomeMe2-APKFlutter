@@ -218,148 +218,27 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Messages */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Messages</h3>
-              <ChatBubbleLeftEllipsisIcon className="h-5 w-5 text-gray-400" />
-            </div>
-          </div>
-          <div className="p-6">
-            {dashboardData?.recent_messages?.length > 0 ? (
-              <div className="space-y-4">
-                {dashboardData.recent_messages.map((message, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                        <ChatBubbleLeftEllipsisIcon className="h-4 w-4 text-gray-600" />
-                      </div>
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        {message.subject}
-                      </p>
-                      <p className="text-sm text-gray-600 truncate">
-                        {message.content}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        {new Date(message.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        message.status === 'open' 
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {message.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+        {/* Recent Activity - Redesigned */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
+          <div className="space-y-4">
+            {dashboardData?.recent_activities?.map((activity, index) => (
+              <div key={index} className="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                <div className="flex-shrink-0">
+                  <CheckCircleIcon className="h-6 w-6 text-green-500 mt-1" />
+                </div>
+                <div className="ml-4 flex-1">
+                  <p className="text-sm font-medium text-gray-900">{activity.message}</p>
+                  <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                </div>
               </div>
-            ) : (
-              <p className="text-gray-500 text-center py-4">No recent messages</p>
+            )) || (
+              <div className="text-center py-8">
+                <BellIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No recent activity</p>
+              </div>
             )}
           </div>
-        </div>
-
-        {/* Recent Payments */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Payments</h3>
-              <CurrencyDollarIcon className="h-5 w-5 text-gray-400" />
-            </div>
-          </div>
-          <div className="p-6">
-            {dashboardData?.recent_payments?.length > 0 ? (
-              <div className="space-y-4">
-                {dashboardData.recent_payments.map((payment, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <div className="flex-shrink-0">
-                      <CheckCircleIcon className="h-8 w-8 text-green-500" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        ${payment.amount}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Transaction ID: {payment.transaction_id}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        {new Date(payment.paid_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Paid
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-center py-4">No recent payments</p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow text-left">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <BellIcon className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Send Notification</p>
-                <p className="text-sm text-gray-600">Notify all residents</p>
-              </div>
-            </div>
-          </button>
-
-          <button className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow text-left">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CurrencyDollarIcon className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Create Invoice</p>
-                <p className="text-sm text-gray-600">Bill maintenance fees</p>
-              </div>
-            </div>
-          </button>
-
-          <button className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow text-left">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <UsersIcon className="h-5 w-5 text-purple-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Manage Users</p>
-                <p className="text-sm text-gray-600">Add new residents</p>
-              </div>
-            </div>
-          </button>
-
-          <button className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow text-left">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <HomeIcon className="h-5 w-5 text-yellow-600" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Compound Settings</p>
-                <p className="text-sm text-gray-600">Update compound info</p>
-              </div>
-            </div>
-          </button>
         </div>
       </div>
     </div>

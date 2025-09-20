@@ -346,13 +346,14 @@ const ServicesManagement = () => {
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Available Services</h3>
               <div className="flex space-x-3">
-                {user?.role === 'admin' && services.length === 0 && (
+                {user?.role === 'admin' && (
                   <button
                     onClick={initializeDefaultServices}
                     className="btn btn-secondary flex items-center space-x-2"
+                    title={services.length > 0 ? "Add more default services" : "Initialize default services"}
                   >
                     <SparklesIcon className="h-4 w-4" />
-                    <span>Add Default Services</span>
+                    <span>{services.length > 0 ? "Add More Services" : "Add Default Services"}</span>
                   </button>
                 )}
                 <button

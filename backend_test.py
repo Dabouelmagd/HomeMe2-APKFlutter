@@ -20,7 +20,7 @@ from PIL import Image
 BASE_URL = "https://homeme-platform.preview.emergentagent.com/api"
 WS_URL = "wss://compound-hub.preview.emergentagent.com/ws/chat"
 
-class ResidenceAccountCreationTestSuite:
+class ServicesManagementTestSuite:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None

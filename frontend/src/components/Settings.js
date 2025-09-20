@@ -2,13 +2,23 @@ import React, { useState } from 'react';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import PushNotifications from './PushNotifications';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import {
   BellIcon,
   UserIcon,
   CogIcon,
   LanguageIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  PhotoIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  KeyIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const Settings = () => {
   const { user } = useAuth();

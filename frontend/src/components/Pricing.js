@@ -6,12 +6,14 @@ import {
   CheckIcon, 
   XMarkIcon,
   SparklesIcon,
-  CrownIcon,
+  TrophyIcon,
   BuildingOfficeIcon,
   GiftIcon,
   UserGroupIcon,
   ClockIcon,
-  TagIcon
+  TagIcon,
+  UserIcon,
+  PlusIcon
 } from '@heroicons/react/24/outline';
 
 const Pricing = () => {

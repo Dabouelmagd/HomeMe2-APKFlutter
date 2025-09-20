@@ -238,8 +238,11 @@ class ServicesManagementTestSuite:
         try:
             headers = self.setup_auth_headers(self.admin_token)
             
+            # Include all required fields for update
             update_data = {
                 "name": "Updated Test Plumbing Service",
+                "category": "maintenance",
+                "specialty": "plumber",
                 "description": "Updated professional plumbing services",
                 "working_hours": "9:00 AM - 5:00 PM"
             }

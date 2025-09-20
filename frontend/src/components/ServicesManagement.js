@@ -203,17 +203,28 @@ const ServicesManagement = () => {
 
   const initializeDefaultServices = async () => {
     try {
+      console.log('Initializing default services for compound:', user.compound_id);
+      
       const response = await axios.post(`${API}/admin/initialize-services`, {
         compound_id: user.compound_id
       });
       
+      console.log('Initialize services response:', response.data);
+      
       if (response.data.success) {
         toast.success(`${response.data.added_count} default services added successfully!`);
-        fetchServices();
+        await fetchServices();
+      } else {
+        toast.info(response.data.message || 'Services already exist');
       }
     } catch (error) {
       console.error('Failed to initialize services:', error);
-      toast.error('Failed to initialize default services');
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        toast.error(error.response.data.detail || 'Failed to initialize default services');
+      } else {
+        toast.error('Failed to initialize default services');
+      }
     }
   };
 

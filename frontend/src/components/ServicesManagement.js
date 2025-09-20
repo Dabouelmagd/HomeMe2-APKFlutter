@@ -367,14 +367,24 @@ const ServicesManagement = () => {
               <h3 className="text-lg font-semibold text-gray-900">Available Services</h3>
               <div className="flex space-x-3">
                 {user?.role === 'admin' && (
-                  <button
-                    onClick={initializeDefaultServices}
-                    className="btn btn-secondary flex items-center space-x-2"
-                    title={services.length > 0 ? "Add more default services" : "Initialize default services"}
-                  >
-                    <SparklesIcon className="h-4 w-4" />
-                    <span>{services.length > 0 ? "Add More Services" : "Add Default Services"}</span>
-                  </button>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={clearAndReinitializeServices}
+                      className="btn btn-warning flex items-center space-x-2"
+                      title="Clear existing services and add fresh default services"
+                    >
+                      <SparklesIcon className="h-4 w-4" />
+                      <span>Reset & Add Services</span>
+                    </button>
+                    <button
+                      onClick={forceRefreshServices}
+                      className="btn btn-secondary flex items-center space-x-2"
+                      title="Force refresh services from server"
+                    >
+                      <ArrowPathIcon className="h-4 w-4" />
+                      <span>Refresh</span>
+                    </button>
+                  </div>
                 )}
                 <button
                   onClick={() => setShowAddService(true)}

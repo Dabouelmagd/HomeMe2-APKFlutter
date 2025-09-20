@@ -343,14 +343,26 @@ const ServicesManagement = () => {
       {activeTab === 'services' && (
         <div className="space-y-6">
           {user?.role === 'admin' && (
-            <div className="flex justify-end">
-              <button
-                onClick={() => setShowAddService(true)}
-                className="btn btn-primary flex items-center space-x-2"
-              >
-                <PlusIcon className="h-4 w-4" />
-                <span>{t('add_service')}</span>
-              </button>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">Available Services</h3>
+              <div className="flex space-x-3">
+                {user?.role === 'admin' && services.length === 0 && (
+                  <button
+                    onClick={initializeDefaultServices}
+                    className="btn btn-secondary flex items-center space-x-2"
+                  >
+                    <SparklesIcon className="h-4 w-4" />
+                    <span>Add Default Services</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowAddService(true)}
+                  className="btn btn-primary flex items-center space-x-2"
+                >
+                  <PlusIcon className="h-4 w-4" />
+                  <span>{t('add_service')}</span>
+                </button>
+              </div>
             </div>
           )}
 

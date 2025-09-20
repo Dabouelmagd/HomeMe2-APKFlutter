@@ -550,7 +550,6 @@ metadata:
 test_plan:
   current_focus:
     - "Services Management System - Core Services APIs"
-    - "Services Management System - Initialize Default Services"
     - "Services Management System - Service Provider Management"
     - "Services Management System - Service Booking System"
     - "Services Management System - Authentication & Authorization"

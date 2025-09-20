@@ -195,8 +195,11 @@ const CompoundManagement = () => {
       setCompound(response.data);
       setEditableCompound({
         name: response.data.name || '',
-        address: response.data.address || ''
+        address: response.data.address || '',
+        description: response.data.description || '',
+        logo_url: response.data.logo_url || ''
       });
+      setLogoPreview(response.data.logo_url || null);
       setCompoundNotFound(false);
     } catch (error) {
       if (error.response?.status === 404) {

@@ -40,8 +40,12 @@ const CompoundManagement = () => {
   const [showAddAdmin, setShowAddAdmin] = useState(false);
   const [editableCompound, setEditableCompound] = useState({
     name: '',
-    address: ''
+    address: '',
+    description: '',
+    logo_url: ''
   });
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
 
   // Form for adding new residence registration link
   const [residenceForm, setResidenceForm] = useState({

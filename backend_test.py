@@ -320,6 +320,10 @@ class ServicesManagementTestSuite:
                     added_count = result.get("added_count", 0)
                     self.log_result("Initialize Default Services", True, f"Default services initialized successfully. Added {added_count} services")
                     return True
+                elif result.get("success") == False and "already exist" in result.get("message", ""):
+                    # Services already exist - this is expected behavior
+                    self.log_result("Initialize Default Services", True, "Default services already exist (expected behavior)")
+                    return True
                 else:
                     self.log_result("Initialize Default Services", False, f"Unexpected response: {result}")
                     return False

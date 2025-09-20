@@ -58,6 +58,98 @@ const CompoundManagement = () => {
     profile_picture_preview: null
   });
 
+  // Form for adding new admin
+  const [adminForm, setAdminForm] = useState({
+    username: '',
+    email: '',
+    password: '',
+    full_name: '',
+    phone: '',
+    profile_picture: null,
+    profile_picture_preview: null
+  });
+
+  const resetAdminForm = () => {
+    setAdminForm({
+      username: '',
+      email: '',
+      password: '',
+      full_name: '',
+      phone: '',
+      profile_picture: null,
+      profile_picture_preview: null
+    });
+  };
+
+  const fetchAllUsers = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/users`);
+      setAllUsers(response.data.users || []);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+      toast.error('Failed to load users');
+    }
+  };
+
+  const handleCreateAdmin = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('username', adminForm.username);
+      formData.append('email', adminForm.email);
+      formData.append('password', adminForm.password);
+      formData.append('full_name', adminForm.full_name);
+      formData.append('phone', adminForm.phone || '');
+      formData.append('compound_id', user.compound_id);
+      formData.append('role', 'admin');
+      
+      if (adminForm.profile_picture) {
+        formData.append('profile_picture', adminForm.profile_picture);
+      }
+
+      const response = await axios.post(`${API}/admin/create-admin`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      toast.success('Admin account created successfully!');
+      setShowAddAdmin(false);
+      resetAdminForm();
+      await fetchAllUsers();
+    } catch (error) {
+      console.error('Failed to create admin:', error);
+      toast.error(error.response?.data?.detail || 'Failed to create admin account');
+    }
+  };
+
+  const handleToggleUserStatus = async (userId, currentStatus) => {
+    try {
+      const response = await axios.put(`${API}/admin/users/${userId}/status`, {
+        is_active: !currentStatus
+      });
+      
+      toast.success(`User ${!currentStatus ? 'activated' : 'deactivated'} successfully`);
+      await fetchAllUsers();
+    } catch (error) {
+      console.error('Failed to update user status:', error);
+      toast.error('Failed to update user status');
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      try {
+        await axios.delete(`${API}/admin/users/${userId}`);
+        toast.success('User deleted successfully');
+        await fetchAllUsers();
+      } catch (error) {
+        console.error('Failed to delete user:', error);
+        toast.error('Failed to delete user');
+      }
+    }
+  };
+
   useEffect(() => {
     fetchCompound();
     fetchResidences();

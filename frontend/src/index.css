@@ -131,22 +131,22 @@ code {
   }
 
   .btn-redesign-primary {
-    @apply btn-redesign bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-500 hover:scale-105;
+    @apply btn-redesign bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 focus:ring-emerald-500 hover:scale-105;
   }
 
   .btn-redesign-secondary {
-    @apply btn-redesign bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500 border border-gray-300;
+    @apply btn-redesign bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-600 hover:to-blue-600 focus:ring-cyan-500 hover:scale-105;
   }
 
   .btn-redesign-warning {
-    @apply btn-redesign bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 focus:ring-orange-500 hover:scale-105;
+    @apply btn-redesign bg-gradient-to-r from-rose-500 to-pink-600 text-white hover:from-rose-600 hover:to-pink-700 focus:ring-rose-500 hover:scale-105;
   }
 
   .btn-redesign-accent {
-    @apply btn-redesign bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 focus:ring-purple-500 hover:scale-105;
+    @apply btn-redesign bg-gradient-to-r from-violet-500 to-purple-600 text-white hover:from-violet-600 hover:to-purple-700 focus:ring-violet-500 hover:scale-105;
   }
 
   .btn-redesign-outline {
-    @apply btn-redesign bg-white text-gray-700 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 focus:ring-gray-500;
+    @apply btn-redesign bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600 focus:ring-amber-500 hover:scale-105;
   }
 }

@@ -87,7 +87,7 @@ const Pricing = () => {
       subtitle: 'For multiple communities',
       price: { monthly: 40, yearly: 400 },
       originalPrice: { monthly: 40, yearly: 480 },
-      icon: CrownIcon,
+      icon: TrophyIcon,
       gradient: 'from-purple-500 to-indigo-600',
       popular: false,
       features: {

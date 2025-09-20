@@ -38,6 +38,102 @@ const Layout = () => {
   const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
 
+  // Search functionality
+  const handleSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/search?q=${encodeURIComponent(query)}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.results || []);
+        setShowSearchResults(true);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchInputChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    
+    // Debounce search
+    const timeoutId = setTimeout(() => {
+      handleSearch(query);
+    }, 300);
+    
+    // Clear previous timeout
+    if (window.searchTimeout) {
+      clearTimeout(window.searchTimeout);
+    }
+    window.searchTimeout = timeoutId;
+  };
+
+  const handleSearchResultClick = (result) => {
+    setShowSearchResults(false);
+    setSearchQuery('');
+    
+    // Navigate based on result type
+    switch (result.type) {
+      case 'user':
+        navigate('/family');
+        break;
+      case 'residence':
+        navigate('/compound');
+        break;
+      case 'service':
+        navigate('/services');
+        break;
+      case 'message':
+        navigate('/messages');
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Keyboard shortcut for search (Cmd+K or Ctrl+K)
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('global-search-input')?.focus();
+      }
+      if (e.key === 'Escape') {
+        setShowSearchResults(false);
+        document.getElementById('global-search-input')?.blur();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Close search results when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.search-container')) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     logout();
     navigate('/login');

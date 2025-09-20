@@ -464,25 +464,27 @@ const CompoundManagement = () => {
           {user?.role === 'admin' && (
             <button
               onClick={() => setActiveTab('manage-users')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-1 ${
                 activeTab === 'manage-users'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Manage Users
+              <UsersIcon className="h-4 w-4" />
+              <span>Manage Users</span>
             </button>
           )}
           {user?.role === 'admin' && (
             <button
               onClick={() => setActiveTab('add-admin')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-1 ${
                 activeTab === 'add-admin'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Add Admin
+              <UserPlusIcon className="h-4 w-4" />
+              <span>Add Admin</span>
             </button>
           )}
           <button

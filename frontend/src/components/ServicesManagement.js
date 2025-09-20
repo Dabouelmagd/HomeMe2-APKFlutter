@@ -538,7 +538,7 @@ const ServicesManagement = () => {
                 <button
                   onClick={() => {
                     setShowAddService(false);
-                    setEditingService(null);
+                    resetForm();
                   }}
                   className="text-gray-400 hover:text-gray-600"
                 >

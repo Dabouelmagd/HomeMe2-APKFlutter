@@ -171,39 +171,25 @@ const ServicesManagement = () => {
 
   const testDirectAPI = async () => {
     try {
-      console.log('🧪 Testing direct API call...');
-      console.log('User compound_id:', user?.compound_id);
-      console.log('API URL:', API);
-      console.log('Full URL:', `${API}/compounds/${user.compound_id}/services`);
+      const token = localStorage.getItem('token');
+      const apiUrl = `${API}/compounds/${user.compound_id}/services`;
       
-      const response = await fetch(`${API}/compounds/${user.compound_id}/services`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      console.log('Testing API:', apiUrl);
+      console.log('Token exists:', !!token);
       
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
+      const response = await axios.get(apiUrl);
+      console.log('API Response:', response.data);
       
-      const data = await response.json();
-      console.log('Raw API response:', data);
-      
-      if (data.services) {
-        console.log('Services count:', data.services.length);
-        console.log('First service:', data.services[0]);
-        
-        // Manually set services to test
-        setServices(data.services);
-        toast.success(`Found ${data.services.length} services - manually set to state`);
+      if (response.data && response.data.services) {
+        setServices(response.data.services);
+        toast.success(`Found ${response.data.services.length} services!`);
       } else {
-        console.log('No services in response');
-        toast.error('No services found in API response');
+        toast.error('No services in response');
       }
       
     } catch (error) {
-      console.error('Direct API test failed:', error);
-      toast.error('Direct API test failed: ' + error.message);
+      console.error('API Error:', error);
+      toast.error(`API Error: ${error.response?.status || error.message}`);
     }
   };
 

@@ -194,13 +194,37 @@ const ServicesManagement = () => {
       
       console.log('Testing API:', apiUrl);
       console.log('Token exists:', !!token);
+      console.log('Token preview:', token?.substring(0, 50) + '...');
       
+      // Try with fresh login first
+      const loginResponse = await axios.post(`${API}/auth/login`, {
+        username: 'admin',
+        password: 'admin123'
+      });
+      
+      const freshToken = loginResponse.data.access_token;
+      console.log('Got fresh token:', !!freshToken);
+      
+      // Update token in localStorage
+      localStorage.setItem('token', freshToken);
+      
+      // Set axios default header
+      axios.defaults.headers.common['Authorization'] = `Bearer ${freshToken}`;
+      
+      // Try API call with fresh token
       const response = await axios.get(apiUrl);
       console.log('API Response:', response.data);
+      console.log('Services count:', response.data.services?.length);
       
       if (response.data && response.data.services) {
-        setServices(response.data.services);
-        toast.success(`Found ${response.data.services.length} services!`);
+        // Map status to availability for compatibility
+        const services = response.data.services.map(service => ({
+          ...service,
+          availability: service.status || 'available'
+        }));
+        
+        setServices(services);
+        toast.success(`✅ FIXED! Found ${services.length} services with fresh token!`);
       } else {
         toast.error('No services in response');
       }

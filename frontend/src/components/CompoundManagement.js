@@ -578,7 +578,10 @@ const CompoundManagement = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Admin Management</h3>
                 <p className="text-gray-600">Manage compound administrators</p>
               </div>
-              <button className="btn btn-primary flex items-center space-x-2">
+              <button 
+                onClick={() => setShowAddAdmin(true)}
+                className="btn btn-primary flex items-center space-x-2"
+              >
                 <PlusIcon className="h-4 w-4" />
                 <span>Add Admin</span>
               </button>

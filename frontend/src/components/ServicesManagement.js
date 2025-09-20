@@ -470,6 +470,13 @@ const ServicesManagement = () => {
                     >
                       <span>🔍 Test API</span>
                     </button>
+                    <button
+                      onClick={addTestServices}
+                      className="btn btn-success flex items-center space-x-2"
+                      title="Add test services directly"
+                    >
+                      <span>✨ Add Test Services</span>
+                    </button>
                   </div>
                 )}
                 <button

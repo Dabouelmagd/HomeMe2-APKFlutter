@@ -483,7 +483,7 @@ const CompoundManagement = () => {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <UserPlusIcon className="h-4 w-4" />
+              <UserPlusIcon className="h-4 w-4 text-current" style={{minWidth: '16px', minHeight: '16px'}} />
               <span>👤+ Add Admin</span>
             </button>
           )}
@@ -785,7 +785,7 @@ const CompoundManagement = () => {
                 onClick={() => setShowAddResidence(true)}
                 className="btn btn-primary flex items-center space-x-2"
               >
-                <UserPlusIcon className="h-4 w-4" />
+                <UserPlusIcon className="h-4 w-4 text-current" style={{minWidth: '16px', minHeight: '16px'}} />
                 <span>Create New Link</span>
               </button>
             </div>
@@ -889,7 +889,7 @@ const CompoundManagement = () => {
                   onClick={() => setShowAddResidence(true)}
                   className="btn btn-primary inline-flex items-center space-x-2"
                 >
-                  <UserPlusIcon className="h-4 w-4" />
+                  <UserPlusIcon className="h-4 w-4 text-current" style={{minWidth: '16px', minHeight: '16px'}} />
                   <span>Create First Link</span>
                 </button>
               </div>
@@ -1178,7 +1178,7 @@ const CompoundManagement = () => {
                   type="submit"
                   className="btn btn-primary flex items-center space-x-2"
                 >
-                  <UserPlusIcon className="h-4 w-4" />
+                  <UserPlusIcon className="h-4 w-4 text-current" style={{minWidth: '16px', minHeight: '16px'}} />
                   <span>Create Admin Account</span>
                 </button>
               </div>

@@ -158,15 +158,7 @@ const ServicesManagement = () => {
       await axios.post(`${API}/compounds/${user.compound_id}/services`, serviceForm);
       toast.success('Service created successfully!');
       setShowAddService(false);
-      setServiceForm({
-        name: '',
-        category: 'maintenance',
-        specialty: '',
-        description: '',
-        phone: '',
-        email: '',
-        working_hours: '9:00 AM - 6:00 PM'
-      });
+      resetForm();
       fetchServices();
     } catch (error) {
       toast.error('Failed to create service');

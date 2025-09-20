@@ -523,55 +523,99 @@ const ServicesManagement = () => {
       {activeTab === 'services' && (
         <div className="space-y-6">
           {user?.role === 'admin' && (
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Available Services</h3>
-                <p className="text-sm text-gray-500">
-                  Debug: {services.length} services loaded | User: {user?.compound_id} | Loading: {loading.toString()}
-                </p>
+            {/* Header Section */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-gray-900">Services Management</h3>
+                  <p className="text-gray-600 mt-1">
+                    Manage and organize all compound services • {services.length} services available
+                  </p>
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-3">
+                  {user?.role === 'admin' && (
+                    <>
+                      {/* Primary Action - Add Default Services */}
+                      <button
+                        onClick={testDirectAPI}
+                        className="btn-redesign btn-redesign-primary"
+                        title="Load all default services"
+                      >
+                        <SparklesIcon className="h-5 w-5" />
+                        <span>Load Services</span>
+                      </button>
+                      
+                      {/* Secondary Actions */}
+                      <button
+                        onClick={forceRefreshServices}
+                        className="btn-redesign btn-redesign-secondary"
+                        title="Refresh services list"
+                      >
+                        <ArrowPathIcon className="h-5 w-5" />
+                        <span>Refresh</span>
+                      </button>
+                      
+                      <button
+                        onClick={clearAndReinitializeServices}
+                        className="btn-redesign btn-redesign-warning"
+                        title="Reset all services"
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                        <span>Reset</span>
+                      </button>
+                    </>
+                  )}
+                  
+                  {/* Add Custom Service */}
+                  <button
+                    onClick={() => setShowAddService(true)}
+                    className="btn-redesign btn-redesign-accent"
+                    title="Add custom service"
+                  >
+                    <PlusIcon className="h-5 w-5" />
+                    <span>Add Service</span>
+                  </button>
+                  
+                  {/* View/Filter Toggle */}
+                  <button
+                    onClick={() => setActiveTab(activeTab === 'services' ? 'booking' : 'services')}
+                    className="btn-redesign btn-redesign-outline"
+                    title="Switch view"
+                  >
+                    {activeTab === 'services' ? <UserIcon className="h-5 w-5" /> : <WrenchScrewdriverIcon className="h-5 w-5" />}
+                    <span>{activeTab === 'services' ? 'Bookings' : 'Services'}</span>
+                  </button>
+                </div>
               </div>
-              <div className="flex space-x-3">
-                {user?.role === 'admin' && (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={clearAndReinitializeServices}
-                      className="btn btn-warning flex items-center space-x-2"
-                      title="Clear existing services and add fresh default services"
-                    >
-                      <SparklesIcon className="h-4 w-4" />
-                      <span>Reset & Add Services</span>
-                    </button>
-                    <button
-                      onClick={forceRefreshServices}
-                      className="btn btn-secondary flex items-center space-x-2"
-                      title="Force refresh services from server"
-                    >
-                      <ArrowPathIcon className="h-4 w-4" />
-                      <span>Refresh</span>
-                    </button>
-                    <button
-                      onClick={testDirectAPI}
-                      className="btn btn-primary flex items-center space-x-2"
-                      title="Test API directly"
-                    >
-                      <span>🔍 Test API</span>
-                    </button>
-                    <button
-                      onClick={addTestServices}
-                      className="btn btn-success flex items-center space-x-2"
-                      title="Add test services directly"
-                    >
-                      <span>✨ Add Test Services</span>
-                    </button>
-                  </div>
-                )}
-                <button
-                  onClick={() => setShowAddService(true)}
-                  className="btn btn-primary flex items-center space-x-2"
-                >
-                  <PlusIcon className="h-4 w-4" />
-                  <span>{t('add_service')}</span>
-                </button>
+              
+              {/* Stats Bar */}
+              <div className="flex items-center space-x-6 mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-gray-600">
+                    {services.filter(s => s.availability === 'available').length} Available
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
+                  <span className="text-sm text-gray-600">
+                    {services.filter(s => s.availability === 'busy').length} Busy
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                  <span className="text-sm text-gray-600">
+                    {services.filter(s => s.availability === 'unavailable').length} Unavailable
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2 ml-auto">
+                  <ClockIcon className="h-4 w-4 text-gray-400" />
+                  <span className="text-sm text-gray-500">
+                    Last updated: {new Date().toLocaleTimeString()}
+                  </span>
+                </div>
               </div>
             </div>
           )}

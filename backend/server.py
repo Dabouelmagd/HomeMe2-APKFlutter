@@ -1841,14 +1841,21 @@ async def create_compound(compound_data: CompoundCreate, current_user: User = De
 
 @api_router.get("/compounds/{compound_id}")
 async def get_compound(compound_id: str, current_user: User = Depends(get_current_user)):
-    if current_user.compound_id != compound_id:
-        raise HTTPException(status_code=403, detail="Access denied")
-    
-    compound = await db.compounds.find_one({"id": compound_id})
-    if not compound:
-        raise HTTPException(status_code=404, detail="Compound not found")
-    
-    return compound
+    try:
+        if current_user.compound_id != compound_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        compound = await db.compounds.find_one({"id": compound_id})
+        if not compound:
+            raise HTTPException(status_code=404, detail="Compound not found")
+        
+        return serialize_datetime(compound)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting compound: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get compound")
 
 @api_router.put("/compounds/{compound_id}/logo")
 async def upload_compound_logo(

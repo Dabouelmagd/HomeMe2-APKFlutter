@@ -1024,6 +1024,42 @@ class ServicesManagementTestSuite:
         
         return self.print_summary()
     
+    def run_free_trial_tests(self):
+        """Run Free Trial System tests"""
+        print("\n🆓 STARTING FREE TRIAL SYSTEM BACKEND TESTING")
+        print("=" * 60)
+        
+        # Authentication tests
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Create trial test user
+        if not self.create_trial_test_user():
+            print("❌ Failed to create trial test user - stopping trial tests")
+            return self.print_summary()
+        
+        # Trial activation tests
+        self.test_trial_activation_new_user()
+        self.test_trial_activation_duplicate_prevention()
+        
+        # Trial status tests
+        self.test_trial_status_active()
+        self.test_trial_status_no_trial()
+        
+        # Trial limit check tests
+        self.test_trial_limit_check_users()
+        self.test_trial_limit_check_families()
+        self.test_trial_limit_check_services()
+        self.test_trial_limit_check_storage()
+        self.test_trial_limit_check_messages()
+        self.test_trial_limit_check_no_trial()
+        
+        # Authentication tests
+        self.test_trial_authentication_required()
+        
+        return self.print_summary()
+    
     def print_summary(self):
         """Print test results summary"""
         print("\n" + "=" * 60)

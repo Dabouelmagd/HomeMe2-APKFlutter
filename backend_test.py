@@ -571,6 +571,424 @@ class ServicesManagementTestSuite:
         
         return success_count == total_tests
     
+    # ============ FREE TRIAL SYSTEM TESTS ============
+    
+    def create_trial_test_user(self):
+        """Create a new user specifically for trial testing"""
+        try:
+            if not self.admin_token:
+                self.log_result("Create Trial Test User", False, "No admin token available")
+                return False
+            
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            unique_id = str(uuid.uuid4())[:8]
+            
+            data = {
+                'unit_number': f"TRIAL{unique_id[:4]}",
+                'full_name': f"Trial Test User {unique_id}",
+                'email': f"trial{unique_id}@example.com",
+                'phone': "+1234567890",
+                'compound_id': self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/residences", data=data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                username = result.get("username")
+                password = result.get("temporary_password")
+                
+                # Login with the new trial user
+                login_data = {"username": username, "password": password}
+                login_response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+                
+                if login_response.status_code == 200:
+                    data = login_response.json()
+                    self.trial_user_token = data["access_token"]
+                    self.trial_user = data["user"]
+                    self.log_result("Create Trial Test User", True, f"Trial test user created and authenticated: {username}")
+                    return True
+                else:
+                    self.log_result("Create Trial Test User", False, f"Failed to login with trial user: {login_response.status_code}")
+                    return False
+            else:
+                self.log_result("Create Trial Test User", False, f"Failed to create trial user: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Trial Test User", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_activation_new_user(self):
+        """Test POST /api/trial/activate - Trial activation for new user"""
+        print("\n=== Testing Trial Activation for New User ===")
+        
+        if not self.trial_user_token:
+            self.log_result("Trial Activation - New User", False, "No trial user token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.trial_user_token)
+            response = self.session.post(f"{BASE_URL}/trial/activate", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("message") == "Free trial activated successfully":
+                    trial_info = data.get("trial", {})
+                    if trial_info.get("duration_days") == 14:
+                        self.log_result("Trial Activation - New User", True, f"Trial activated successfully for 14 days")
+                        return True
+                    else:
+                        self.log_result("Trial Activation - New User", False, f"Incorrect trial duration: {trial_info.get('duration_days')}")
+                        return False
+                else:
+                    self.log_result("Trial Activation - New User", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Trial Activation - New User", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Activation - New User", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_activation_duplicate_prevention(self):
+        """Test POST /api/trial/activate - Prevent multiple trial activation"""
+        print("\n=== Testing Trial Activation Duplicate Prevention ===")
+        
+        if not self.trial_user_token:
+            self.log_result("Trial Activation - Duplicate Prevention", False, "No trial user token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.trial_user_token)
+            response = self.session.post(f"{BASE_URL}/trial/activate", headers=headers)
+            
+            if response.status_code == 400:
+                data = response.json()
+                if "already active" in data.get("detail", "").lower() or "already used" in data.get("detail", "").lower():
+                    self.log_result("Trial Activation - Duplicate Prevention", True, "Correctly prevented duplicate trial activation")
+                    return True
+                else:
+                    self.log_result("Trial Activation - Duplicate Prevention", False, f"Unexpected error message: {data.get('detail')}")
+                    return False
+            else:
+                self.log_result("Trial Activation - Duplicate Prevention", False, f"Expected 400 status, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Activation - Duplicate Prevention", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_status_active(self):
+        """Test GET /api/trial/status - Get trial status for active trial"""
+        print("\n=== Testing Trial Status for Active Trial ===")
+        
+        if not self.trial_user_token:
+            self.log_result("Trial Status - Active", False, "No trial user token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.trial_user_token)
+            response = self.session.get(f"{BASE_URL}/trial/status", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if (data.get("is_trial") == True and 
+                    data.get("trial_active") == True and 
+                    data.get("days_remaining") > 0):
+                    
+                    # Check usage statistics
+                    usage = data.get("usage", {})
+                    limits = data.get("limits", {})
+                    
+                    expected_limits = {"users": 10, "families": 5, "services": 3, "storage_mb": 100, "messages": 50}
+                    
+                    if limits == expected_limits:
+                        self.log_result("Trial Status - Active", True, 
+                                      f"Trial status retrieved successfully. Days remaining: {data.get('days_remaining')}, "
+                                      f"Usage: {usage}, Limits: {limits}")
+                        return True
+                    else:
+                        self.log_result("Trial Status - Active", False, f"Incorrect limits: expected {expected_limits}, got {limits}")
+                        return False
+                else:
+                    self.log_result("Trial Status - Active", False, f"Unexpected trial status: {data}")
+                    return False
+            else:
+                self.log_result("Trial Status - Active", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Status - Active", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_status_no_trial(self):
+        """Test GET /api/trial/status - Get status for user without trial"""
+        print("\n=== Testing Trial Status for User Without Trial ===")
+        
+        if not self.admin_token:
+            self.log_result("Trial Status - No Trial", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/trial/status", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if (data.get("is_trial") == False and 
+                    data.get("trial_active") == False and 
+                    data.get("days_remaining") == 0):
+                    self.log_result("Trial Status - No Trial", True, "Correctly returned no trial status for admin user")
+                    return True
+                else:
+                    self.log_result("Trial Status - No Trial", False, f"Unexpected response for non-trial user: {data}")
+                    return False
+            else:
+                self.log_result("Trial Status - No Trial", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Status - No Trial", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_limit_check_users(self):
+        """Test POST /api/trial/check-limit/users - Check user limit"""
+        print("\n=== Testing Trial Limit Check - Users ===")
+        
+        if not self.trial_user_token:
+            self.log_result("Trial Limit Check - Users", False, "No trial user token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.trial_user_token)
+            response = self.session.post(f"{BASE_URL}/trial/check-limit/users", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if ("allowed" in data and 
+                    "current_usage" in data and 
+                    "limit" in data and 
+                    "remaining" in data):
+                    
+                    # Should be allowed since we're under the limit
+                    if data.get("limit") == 10:
+                        self.log_result("Trial Limit Check - Users", True, 
+                                      f"User limit check successful. Usage: {data.get('current_usage')}/10, "
+                                      f"Allowed: {data.get('allowed')}, Remaining: {data.get('remaining')}")
+                        return True
+                    else:
+                        self.log_result("Trial Limit Check - Users", False, f"Incorrect user limit: expected 10, got {data.get('limit')}")
+                        return False
+                else:
+                    self.log_result("Trial Limit Check - Users", False, f"Missing required fields in response: {data}")
+                    return False
+            else:
+                self.log_result("Trial Limit Check - Users", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Limit Check - Users", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_limit_check_families(self):
+        """Test POST /api/trial/check-limit/families - Check family limit"""
+        print("\n=== Testing Trial Limit Check - Families ===")
+        
+        if not self.trial_user_token:
+            self.log_result("Trial Limit Check - Families", False, "No trial user token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.trial_user_token)
+            response = self.session.post(f"{BASE_URL}/trial/check-limit/families", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("limit") == 5:
+                    self.log_result("Trial Limit Check - Families", True, 
+                                  f"Family limit check successful. Usage: {data.get('current_usage')}/5, "
+                                  f"Allowed: {data.get('allowed')}, Remaining: {data.get('remaining')}")
+                    return True
+                else:
+                    self.log_result("Trial Limit Check - Families", False, f"Incorrect family limit: expected 5, got {data.get('limit')}")
+                    return False
+            else:
+                self.log_result("Trial Limit Check - Families", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Limit Check - Families", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_limit_check_services(self):
+        """Test POST /api/trial/check-limit/services - Check service limit"""
+        print("\n=== Testing Trial Limit Check - Services ===")
+        
+        if not self.trial_user_token:
+            self.log_result("Trial Limit Check - Services", False, "No trial user token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.trial_user_token)
+            response = self.session.post(f"{BASE_URL}/trial/check-limit/services", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("limit") == 3:
+                    self.log_result("Trial Limit Check - Services", True, 
+                                  f"Service limit check successful. Usage: {data.get('current_usage')}/3, "
+                                  f"Allowed: {data.get('allowed')}, Remaining: {data.get('remaining')}")
+                    return True
+                else:
+                    self.log_result("Trial Limit Check - Services", False, f"Incorrect service limit: expected 3, got {data.get('limit')}")
+                    return False
+            else:
+                self.log_result("Trial Limit Check - Services", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Limit Check - Services", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_limit_check_storage(self):
+        """Test POST /api/trial/check-limit/storage_mb - Check storage limit"""
+        print("\n=== Testing Trial Limit Check - Storage ===")
+        
+        if not self.trial_user_token:
+            self.log_result("Trial Limit Check - Storage", False, "No trial user token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.trial_user_token)
+            response = self.session.post(f"{BASE_URL}/trial/check-limit/storage_mb", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("limit") == 100:
+                    self.log_result("Trial Limit Check - Storage", True, 
+                                  f"Storage limit check successful. Usage: {data.get('current_usage')}/100 MB, "
+                                  f"Allowed: {data.get('allowed')}, Remaining: {data.get('remaining')}")
+                    return True
+                else:
+                    self.log_result("Trial Limit Check - Storage", False, f"Incorrect storage limit: expected 100, got {data.get('limit')}")
+                    return False
+            else:
+                self.log_result("Trial Limit Check - Storage", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Limit Check - Storage", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_limit_check_messages(self):
+        """Test POST /api/trial/check-limit/messages - Check message limit"""
+        print("\n=== Testing Trial Limit Check - Messages ===")
+        
+        if not self.trial_user_token:
+            self.log_result("Trial Limit Check - Messages", False, "No trial user token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.trial_user_token)
+            response = self.session.post(f"{BASE_URL}/trial/check-limit/messages", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("limit") == 50:
+                    self.log_result("Trial Limit Check - Messages", True, 
+                                  f"Message limit check successful. Usage: {data.get('current_usage')}/50, "
+                                  f"Allowed: {data.get('allowed')}, Remaining: {data.get('remaining')}")
+                    return True
+                else:
+                    self.log_result("Trial Limit Check - Messages", False, f"Incorrect message limit: expected 50, got {data.get('limit')}")
+                    return False
+            else:
+                self.log_result("Trial Limit Check - Messages", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Limit Check - Messages", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_limit_check_no_trial(self):
+        """Test POST /api/trial/check-limit/users - Check limit for user without trial"""
+        print("\n=== Testing Trial Limit Check - No Trial User ===")
+        
+        if not self.admin_token:
+            self.log_result("Trial Limit Check - No Trial", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.post(f"{BASE_URL}/trial/check-limit/users", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if (data.get("allowed") == True and 
+                    "No trial restrictions" in data.get("message", "")):
+                    self.log_result("Trial Limit Check - No Trial", True, "Correctly allowed unlimited access for non-trial user")
+                    return True
+                else:
+                    self.log_result("Trial Limit Check - No Trial", False, f"Unexpected response for non-trial user: {data}")
+                    return False
+            else:
+                self.log_result("Trial Limit Check - No Trial", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Trial Limit Check - No Trial", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_trial_authentication_required(self):
+        """Test that trial endpoints require authentication"""
+        print("\n=== Testing Trial Endpoints Authentication ===")
+        
+        success_count = 0
+        total_tests = 0
+        
+        # Test trial activation without token
+        try:
+            total_tests += 1
+            response = self.session.post(f"{BASE_URL}/trial/activate")
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Trial Auth - Activate No Token", True, f"Correctly rejected trial activation without token (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Trial Auth - Activate No Token", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Trial Auth - Activate No Token", False, f"Exception occurred: {str(e)}")
+        
+        # Test trial status without token
+        try:
+            total_tests += 1
+            response = self.session.get(f"{BASE_URL}/trial/status")
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Trial Auth - Status No Token", True, f"Correctly rejected trial status without token (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Trial Auth - Status No Token", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Trial Auth - Status No Token", False, f"Exception occurred: {str(e)}")
+        
+        # Test trial limit check without token
+        try:
+            total_tests += 1
+            response = self.session.post(f"{BASE_URL}/trial/check-limit/users")
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Trial Auth - Limit Check No Token", True, f"Correctly rejected limit check without token (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Trial Auth - Limit Check No Token", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Trial Auth - Limit Check No Token", False, f"Exception occurred: {str(e)}")
+        
+        return success_count == total_tests
+    
     def run_all_tests(self):
         """Run all services management tests"""
         print("🔧 STARTING SERVICES MANAGEMENT BACKEND TESTING")

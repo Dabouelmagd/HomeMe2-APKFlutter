@@ -7401,6 +7401,9 @@ async def check_trial_limit(
         logging.error(f"Error checking trial limit: {e}")
         raise HTTPException(status_code=500, detail="Failed to check trial limit")
 
+# Include router after all endpoints are defined
+app.include_router(api_router)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,

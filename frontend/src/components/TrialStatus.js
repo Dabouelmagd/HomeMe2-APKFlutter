@@ -7,7 +7,7 @@ import {
   ClockIcon,
   ExclamationTriangleIcon,
   SparklesIcon,
-  CrownIcon,
+  TrophyIcon,
   CheckCircleIcon,
   XMarkIcon,
   ChartBarIcon,

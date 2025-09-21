@@ -841,6 +841,51 @@ class FamilyMemberUpdate(BaseModel):
     move_out_date: Optional[date] = None
     is_active: Optional[bool] = None
 
+# Free Trial System Models
+class TrialPlan(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    duration_days: int
+    max_users: int
+    max_families: int
+    max_services: int
+    max_storage_mb: int
+    features: List[str] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class UserTrial(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    compound_id: str
+    trial_plan_id: str
+    start_date: datetime = Field(default_factory=datetime.utcnow)
+    end_date: datetime
+    is_active: bool = True
+    is_expired: bool = False
+    usage_stats: Dict[str, Any] = {}
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class TrialUsage(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_trial_id: str
+    feature: str  # users, families, services, storage, messages, etc.
+    current_usage: int
+    limit: int
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
+
+# Request/Response Models for Free Trial
+class TrialActivationRequest(BaseModel):
+    trial_plan_id: str
+
+class TrialStatusResponse(BaseModel):
+    is_trial: bool
+    trial_active: bool
+    days_remaining: int
+    trial_plan: Optional[Dict[str, Any]] = None
+    usage: Dict[str, Any] = {}
+    limits: Dict[str, Any] = {}
+
 class QRCodeRequest(BaseModel):
     family_member_id: str
     expires_in_hours: int = 24  # Default 24 hours validity

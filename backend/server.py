@@ -6512,8 +6512,7 @@ async def serve_file(filename: str):
 async def root():
     return {"message": "HomeMe API is running", "status": "healthy"}
 
-# Include router
-app.include_router(api_router)
+# Router will be included after all endpoints are defined
 
 # CORS middleware
 app.add_middleware(

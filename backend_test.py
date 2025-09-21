@@ -1097,11 +1097,14 @@ class ServicesManagementTestSuite:
 
 if __name__ == "__main__":
     test_suite = ServicesManagementTestSuite()
-    success = test_suite.run_all_tests()
+    
+    # Run Free Trial System tests as requested
+    print("🆓 RUNNING FREE TRIAL SYSTEM TESTS")
+    success = test_suite.run_free_trial_tests()
     
     if success:
-        print("\n🎉 SERVICES MANAGEMENT TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 FREE TRIAL SYSTEM TESTING COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ SERVICES MANAGEMENT TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ FREE TRIAL SYSTEM TESTING COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

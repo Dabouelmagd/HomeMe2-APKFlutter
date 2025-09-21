@@ -8,6 +8,7 @@ import './i18n'; // Initialize i18n
 // Components
 import Login from './components/Login';
 import Register from './components/Register';
+import DebugLogin from './components/DebugLogin';
 import AdminDashboard from './components/AdminDashboard';
 import ResidentDashboard from './components/ResidentDashboard';
 import CompoundManagement from './components/CompoundManagement';

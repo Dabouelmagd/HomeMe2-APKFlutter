@@ -31,6 +31,8 @@ class ServicesManagementTestSuite:
         self.test_service_id = None
         self.test_provider_id = None
         self.test_booking_id = None
+        self.trial_user_token = None
+        self.trial_user = None
         self.results = []
         
     def log_result(self, test_name: str, success: bool, message: str, details: str = ""):

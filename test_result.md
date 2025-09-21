@@ -585,7 +585,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Settings Page Functionality - Complete Settings Management System"
+    - "Free Trial System Backend API Endpoints"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

@@ -173,6 +173,11 @@ const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* Trial Status - New Feature */}
+        <div className="mb-8">
+          <TrialStatus showFull={true} />
+        </div>
+
         {/* Stats Grid - Redesigned */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => {

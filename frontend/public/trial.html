@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Trial Access - HomeMe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: white;
+        }
+        .container {
+            background: white;
+            color: #333;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 600px;
+        }
+        .btn {
+            background: #28a745;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: #218838;
+        }
+        .btn-blue {
+            background: #007bff;
+        }
+        .btn-blue:hover {
+            background: #0056b3;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .features {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .features li {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏠 HomeMe Free Trial</h1>
+        <p>Welcome to your 14-day free trial of HomeMe compound management system!</p>
+        
+        <div class="features">
+            <h3>🎯 Free Trial Includes:</h3>
+            <ul>
+                <li>✅ <strong>14 Days Full Access</strong></li>
+                <li>✅ <strong>Up to 10 Users</strong></li>
+                <li>✅ <strong>Up to 5 Families</strong></li>
+                <li>✅ <strong>Up to 3 Services</strong></li>
+                <li>✅ <strong>100MB Storage</strong></li>
+                <li>✅ <strong>50 Messages</strong></li>
+                <li>✅ <strong>All Premium Features</strong></li>
+            </ul>
+        </div>
+        
+        <div class="status" id="status">
+            Ready to start your free trial!
+        </div>
+        
+        <button class="btn btn-blue" onclick="testConnection()">Test Connection</button>
+        <button class="btn" onclick="activateTrial()">Start Free Trial</button>
+        <button class="btn" onclick="goToDashboard()">Go to Dashboard</button>
+        
+        <p style="margin-top: 30px; font-size: 14px; color: #666;">
+            Having issues? <a href="http://localhost:3000/login">Try regular login</a>
+        </p>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:8001';
+        
+        function updateStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.innerHTML = message;
+            status.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
+            status.style.borderColor = isError ? '#f5c6cb' : '#c3e6cb';
+            status.style.color = isError ? '#721c24' : '#155724';
+        }
+        
+        async function testConnection() {
+            updateStatus('Testing backend connection...');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/`);
+                const data = await response.json();
+                updateStatus(`✅ Backend connected: ${data.message}`);
+            } catch (error) {
+                updateStatus(`❌ Connection failed: ${error.message}`, true);
+            }
+        }
+        
+        async function activateTrial() {
+            updateStatus('Logging in and activating trial...');
+            
+            try {
+                // First login
+                const loginResponse = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'admin123'
+                    })
+                });
+                
+                if (!loginResponse.ok) {
+                    throw new Error('Login failed');
+                }
+                
+                const loginData = await loginResponse.json();
+                
+                // Store token
+                localStorage.setItem('token', loginData.access_token);
+                localStorage.setItem('user', JSON.stringify(loginData.user));
+                
+                updateStatus('✅ Logged in successfully! Activating trial...');
+                
+                // Activate trial
+                const trialResponse = await fetch(`${BACKEND_URL}/api/trial/activate`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${loginData.access_token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (trialResponse.ok) {
+                    const trialData = await trialResponse.json();
+                    updateStatus(`🎉 ${trialData.message} Redirecting to dashboard...`);
+                    setTimeout(() => {
+                        window.location.href = 'http://localhost:3000/dashboard';
+                    }, 2000);
+                } else {
+                    // Trial might already be active, just go to dashboard
+                    updateStatus('✅ Login successful! Redirecting to dashboard...');
+                    setTimeout(() => {
+                        window.location.href = 'http://localhost:3000/dashboard';
+                    }, 2000);
+                }
+                
+            } catch (error) {
+                updateStatus(`❌ Error: ${error.message}`, true);
+            }
+        }
+        
+        async function goToDashboard() {
+            updateStatus('Checking login status...');
+            
+            const token = localStorage.getItem('token');
+            if (token) {
+                updateStatus('✅ Already logged in! Redirecting...');
+                window.location.href = 'http://localhost:3000/dashboard';
+            } else {
+                updateStatus('⚠️ Please activate trial first to get logged in.');
+            }
+        }
+    </script>
+</body>
+</html>

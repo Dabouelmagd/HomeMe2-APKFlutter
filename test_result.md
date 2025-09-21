@@ -573,12 +573,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Services Management System - Core Services APIs"
-    - "Services Management System - Service Provider Management"
-    - "Services Management System - Service Booking System"
-    - "Services Management System - Authentication & Authorization"
-  stuck_tasks:
-    - "Compound Management System - Compound Data APIs"
+    - "Settings Page Functionality - Complete Settings Management System"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 

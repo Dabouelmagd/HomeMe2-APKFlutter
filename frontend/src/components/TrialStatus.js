@@ -74,7 +74,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
           <div className="flex items-center space-x-4">
             <div className="p-3 rounded-full bg-green-100">
-              <CrownIcon className="h-6 w-6 text-green-600" />
+              <TrophyIcon className="h-6 w-6 text-green-600" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-green-900">Premium Account</h3>

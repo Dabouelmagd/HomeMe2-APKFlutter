@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { toast } from 'sonner';
+import TrialStatus from './TrialStatus';
 import {
   UsersIcon,
   HomeIcon,

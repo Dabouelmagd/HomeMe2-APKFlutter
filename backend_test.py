@@ -69,8 +69,8 @@ class ServicesManagementTestSuite:
         
         try:
             admin_login_data = {
-                "username": "johndoe",
-                "password": "password123"
+                "username": "admin",
+                "password": "admin123"
             }
             
             response = self.session.post(f"{BASE_URL}/auth/login", json=admin_login_data)

@@ -1767,6 +1767,137 @@ async def require_admin(current_user: User = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
+def is_trial_feature_allowed(user_trial: Dict[str, Any], feature: str, current_usage: int) -> bool:
+    """Check if a trial feature is within limits"""
+    if not user_trial or not user_trial.get("is_active"):
+        return True  # No trial restrictions for paid users
+    
+    # Check if trial is expired
+    if datetime.utcnow() > user_trial.get("end_date", datetime.utcnow()):
+        return False
+    
+    limits = {
+        "users": 10,
+        "families": 5,
+        "services": 3,
+        "storage_mb": 100,
+        "messages": 50
+    }
+    
+    limit = limits.get(feature, float('inf'))
+    return current_usage < limit
+
+async def get_user_trial_status(user_id: str, compound_id: str) -> Dict[str, Any]:
+    """Get comprehensive trial status for a user"""
+    try:
+        # Find active trial
+        trial = await db.user_trials.find_one({
+            "user_id": user_id,
+            "compound_id": compound_id,
+            "is_active": True
+        })
+        
+        if not trial:
+            return {
+                "is_trial": False,
+                "trial_active": False,
+                "days_remaining": 0,
+                "usage": {},
+                "limits": {}
+            }
+        
+        # Check if expired
+        now = datetime.utcnow()
+        end_date = trial["end_date"]
+        days_remaining = max(0, (end_date - now).days)
+        
+        if days_remaining <= 0:
+            # Mark trial as expired
+            await db.user_trials.update_one(
+                {"id": trial["id"]},
+                {"$set": {"is_expired": True, "is_active": False, "updated_at": now}}
+            )
+            return {
+                "is_trial": True,
+                "trial_active": False,
+                "days_remaining": 0,
+                "usage": {},
+                "limits": {}
+            }
+        
+        # Get current usage stats
+        usage_stats = {
+            "users": await db.users.count_documents({"compound_id": compound_id}),
+            "families": await db.families.count_documents({"compound_id": compound_id}),
+            "services": await db.services.count_documents({"compound_id": compound_id}),
+            "messages": await db.chat_messages.count_documents({
+                "chat_id": {"$in": await get_compound_chat_ids(compound_id)}
+            }),
+        }
+        
+        # Calculate storage usage
+        storage_usage = await calculate_storage_usage(compound_id)
+        usage_stats["storage_mb"] = round(storage_usage / (1024 * 1024), 2)
+        
+        # Define limits
+        limits = {
+            "users": 10,
+            "families": 5,
+            "services": 3,
+            "storage_mb": 100,
+            "messages": 50
+        }
+        
+        return {
+            "is_trial": True,
+            "trial_active": True,
+            "days_remaining": days_remaining,
+            "trial_plan": {
+                "name": "Free Trial",
+                "duration_days": (trial["end_date"] - trial["start_date"]).days
+            },
+            "usage": usage_stats,
+            "limits": limits
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting trial status: {e}")
+        return {
+            "is_trial": False,
+            "trial_active": False,
+            "days_remaining": 0,
+            "usage": {},
+            "limits": {}
+        }
+
+async def get_compound_chat_ids(compound_id: str) -> List[str]:
+    """Get all chat IDs for a compound"""
+    chats = await db.chats.find({"compound_id": compound_id}).to_list(None)
+    return [chat["id"] for chat in chats]
+
+async def calculate_storage_usage(compound_id: str) -> int:
+    """Calculate total storage usage for a compound in bytes"""
+    try:
+        # Get all chats for compound
+        chat_ids = await get_compound_chat_ids(compound_id)
+        
+        # Get all messages with attachments
+        messages = await db.chat_messages.find({
+            "chat_id": {"$in": chat_ids},
+            "attachments": {"$exists": True, "$not": {"$size": 0}}
+        }).to_list(None)
+        
+        total_size = 0
+        for message in messages:
+            for attachment in message.get("attachments", []):
+                total_size += attachment.get("file_size", 0)
+        
+        return total_size
+        
+    except Exception as e:
+        logging.error(f"Error calculating storage usage: {e}")
+        return 0
+
 def process_image(file_content: bytes) -> str:
     """Process and encode image to base64"""
     try:

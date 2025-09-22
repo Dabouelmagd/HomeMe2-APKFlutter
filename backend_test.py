@@ -2964,16 +2964,486 @@ class ServicesManagementTestSuite:
         
         return success_rate >= 80  # Consider 80%+ as success
 
+    # ============ COMPREHENSIVE SERVICE BOOKING WITH PRIORITY LEVELS AND PAYMENT METHODS TESTS ============
+    
+    def test_booking_with_emergency_priority(self):
+        """Test booking creation with emergency priority"""
+        print("\n=== Testing Booking Creation with Emergency Priority ===")
+        
+        if not self.resident_token or not self.test_provider_id:
+            self.log_result("Booking - Emergency Priority", False, "No resident token or provider ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            booking_data = {
+                "provider_id": self.test_provider_id,
+                "service_category": "maintenance",
+                "service_specialty": "plumber",
+                "title": "Emergency Plumbing Issue",
+                "description": "Burst pipe causing flooding - urgent repair needed",
+                "priority": "emergency",
+                "scheduled_date": (datetime.now() + timedelta(hours=2)).date().isoformat(),
+                "scheduled_time": "14:00",
+                "estimated_duration": 60,
+                "payment_method": "card"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                       json=booking_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service booking created successfully":
+                    booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
+                    if booking_id:
+                        self.log_result("Booking - Emergency Priority", True, f"Emergency priority booking created successfully with ID: {booking_id}")
+                        return True
+                    else:
+                        self.log_result("Booking - Emergency Priority", False, f"No booking ID in response: {result}")
+                        return False
+                else:
+                    self.log_result("Booking - Emergency Priority", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Booking - Emergency Priority", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Booking - Emergency Priority", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_booking_with_urgent_priority(self):
+        """Test booking creation with urgent priority"""
+        print("\n=== Testing Booking Creation with Urgent Priority ===")
+        
+        if not self.resident_token or not self.test_provider_id:
+            self.log_result("Booking - Urgent Priority", False, "No resident token or provider ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            booking_data = {
+                "provider_id": self.test_provider_id,
+                "service_category": "maintenance",
+                "service_specialty": "electrician",
+                "title": "Urgent Electrical Repair",
+                "description": "Power outage in main bedroom - needs urgent attention",
+                "priority": "urgent",
+                "scheduled_date": (datetime.now() + timedelta(hours=6)).date().isoformat(),
+                "scheduled_time": "16:00",
+                "estimated_duration": 90,
+                "payment_method": "bank_transfer"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                       json=booking_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service booking created successfully":
+                    booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
+                    if booking_id:
+                        self.log_result("Booking - Urgent Priority", True, f"Urgent priority booking created successfully with ID: {booking_id}")
+                        return True
+                    else:
+                        self.log_result("Booking - Urgent Priority", False, f"No booking ID in response: {result}")
+                        return False
+                else:
+                    self.log_result("Booking - Urgent Priority", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Booking - Urgent Priority", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Booking - Urgent Priority", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_booking_with_standard_priority(self):
+        """Test booking creation with standard priority"""
+        print("\n=== Testing Booking Creation with Standard Priority ===")
+        
+        if not self.resident_token or not self.test_provider_id:
+            self.log_result("Booking - Standard Priority", False, "No resident token or provider ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            booking_data = {
+                "provider_id": self.test_provider_id,
+                "service_category": "cleaning",
+                "service_specialty": "house_cleaning",
+                "title": "Regular House Cleaning",
+                "description": "Weekly house cleaning service",
+                "priority": "standard",
+                "scheduled_date": (datetime.now() + timedelta(days=2)).date().isoformat(),
+                "scheduled_time": "10:00",
+                "estimated_duration": 180,
+                "payment_method": "instapay"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                       json=booking_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service booking created successfully":
+                    booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
+                    if booking_id:
+                        self.log_result("Booking - Standard Priority", True, f"Standard priority booking created successfully with ID: {booking_id}")
+                        return True
+                    else:
+                        self.log_result("Booking - Standard Priority", False, f"No booking ID in response: {result}")
+                        return False
+                else:
+                    self.log_result("Booking - Standard Priority", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Booking - Standard Priority", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Booking - Standard Priority", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_booking_with_scheduled_priority(self):
+        """Test booking creation with scheduled priority"""
+        print("\n=== Testing Booking Creation with Scheduled Priority ===")
+        
+        if not self.resident_token or not self.test_provider_id:
+            self.log_result("Booking - Scheduled Priority", False, "No resident token or provider ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            booking_data = {
+                "provider_id": self.test_provider_id,
+                "service_category": "maintenance",
+                "service_specialty": "gardener",
+                "title": "Monthly Garden Maintenance",
+                "description": "Scheduled monthly garden maintenance and landscaping",
+                "priority": "scheduled",
+                "scheduled_date": (datetime.now() + timedelta(days=7)).date().isoformat(),
+                "scheduled_time": "08:00",
+                "estimated_duration": 240,
+                "payment_method": "mobile_pay"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                       json=booking_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service booking created successfully":
+                    booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
+                    if booking_id:
+                        self.log_result("Booking - Scheduled Priority", True, f"Scheduled priority booking created successfully with ID: {booking_id}")
+                        return True
+                    else:
+                        self.log_result("Booking - Scheduled Priority", False, f"No booking ID in response: {result}")
+                        return False
+                else:
+                    self.log_result("Booking - Scheduled Priority", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Booking - Scheduled Priority", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Booking - Scheduled Priority", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_all_payment_methods(self):
+        """Test booking creation with all 7 payment methods"""
+        print("\n=== Testing All Payment Methods ===")
+        
+        if not self.resident_token or not self.test_provider_id:
+            self.log_result("All Payment Methods", False, "No resident token or provider ID available")
+            return False
+        
+        payment_methods = ["cash", "card", "bank_transfer", "instapay", "mobile_pay", "digital_wallet", "qr_code"]
+        successful_bookings = []
+        
+        for i, payment_method in enumerate(payment_methods):
+            try:
+                headers = self.setup_auth_headers(self.resident_token)
+                
+                booking_data = {
+                    "provider_id": self.test_provider_id,
+                    "service_category": "maintenance",
+                    "service_specialty": "plumber",
+                    "title": f"Payment Method Test - {payment_method.title()}",
+                    "description": f"Testing booking with {payment_method} payment method",
+                    "priority": "standard",
+                    "scheduled_date": (datetime.now() + timedelta(days=1+i)).date().isoformat(),
+                    "scheduled_time": f"{10+i}:00",
+                    "estimated_duration": 60,
+                    "payment_method": payment_method
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                           json=booking_data, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("message") == "Service booking created successfully":
+                        booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
+                        if booking_id:
+                            successful_bookings.append(f"{payment_method}: {booking_id}")
+                        else:
+                            self.log_result(f"Payment Method - {payment_method}", False, f"No booking ID in response: {result}")
+                    else:
+                        self.log_result(f"Payment Method - {payment_method}", False, f"Unexpected response: {result}")
+                else:
+                    self.log_result(f"Payment Method - {payment_method}", False, f"Failed with status {response.status_code}", response.text)
+                    
+            except Exception as e:
+                self.log_result(f"Payment Method - {payment_method}", False, f"Exception occurred: {str(e)}")
+        
+        if len(successful_bookings) == len(payment_methods):
+            self.log_result("All Payment Methods", True, f"All {len(payment_methods)} payment methods tested successfully: {', '.join(successful_bookings)}")
+            return True
+        else:
+            self.log_result("All Payment Methods", False, f"Only {len(successful_bookings)}/{len(payment_methods)} payment methods successful")
+            return False
+    
+    def test_priority_level_persistence(self):
+        """Test that priority levels are properly stored and retrieved"""
+        print("\n=== Testing Priority Level Persistence ===")
+        
+        if not self.resident_token:
+            self.log_result("Priority Level Persistence", False, "No resident token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Get all bookings to verify priority levels are stored
+            response = self.session.get(f"{BASE_URL}/service-bookings", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                bookings = data.get("bookings", [])
+                
+                if bookings:
+                    priority_found = {}
+                    for booking in bookings:
+                        priority = booking.get("priority")
+                        if priority:
+                            priority_found[priority] = priority_found.get(priority, 0) + 1
+                    
+                    expected_priorities = ["emergency", "urgent", "standard", "scheduled"]
+                    found_priorities = list(priority_found.keys())
+                    
+                    if any(p in found_priorities for p in expected_priorities):
+                        self.log_result("Priority Level Persistence", True, 
+                                      f"Priority levels properly stored and retrieved. Found priorities: {priority_found}")
+                        return True
+                    else:
+                        self.log_result("Priority Level Persistence", False, f"No expected priority levels found in bookings: {found_priorities}")
+                        return False
+                else:
+                    self.log_result("Priority Level Persistence", False, "No bookings found to verify priority persistence")
+                    return False
+            else:
+                self.log_result("Priority Level Persistence", False, f"Failed to retrieve bookings: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Priority Level Persistence", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_payment_method_persistence(self):
+        """Test that payment methods are properly stored and retrieved"""
+        print("\n=== Testing Payment Method Persistence ===")
+        
+        if not self.resident_token:
+            self.log_result("Payment Method Persistence", False, "No resident token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Get all bookings to verify payment methods are stored
+            response = self.session.get(f"{BASE_URL}/service-bookings", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                bookings = data.get("bookings", [])
+                
+                if bookings:
+                    payment_methods_found = {}
+                    for booking in bookings:
+                        payment_method = booking.get("payment_method")
+                        if payment_method:
+                            payment_methods_found[payment_method] = payment_methods_found.get(payment_method, 0) + 1
+                    
+                    expected_methods = ["cash", "card", "bank_transfer", "instapay", "mobile_pay", "digital_wallet", "qr_code"]
+                    found_methods = list(payment_methods_found.keys())
+                    
+                    if any(m in found_methods for m in expected_methods):
+                        self.log_result("Payment Method Persistence", True, 
+                                      f"Payment methods properly stored and retrieved. Found methods: {payment_methods_found}")
+                        return True
+                    else:
+                        self.log_result("Payment Method Persistence", False, f"No expected payment methods found in bookings: {found_methods}")
+                        return False
+                else:
+                    self.log_result("Payment Method Persistence", False, "No bookings found to verify payment method persistence")
+                    return False
+            else:
+                self.log_result("Payment Method Persistence", False, f"Failed to retrieve bookings: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Payment Method Persistence", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_complete_booking_data(self):
+        """Test complete booking creation with all required fields"""
+        print("\n=== Testing Complete Booking Data ===")
+        
+        if not self.resident_token or not self.test_provider_id:
+            self.log_result("Complete Booking Data", False, "No resident token or provider ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Create booking with all specified fields from the review request
+            booking_data = {
+                "provider_id": self.test_provider_id,
+                "service_category": "maintenance",
+                "service_specialty": "plumber",
+                "title": "Emergency Priority Payment Test",
+                "description": "Testing priority levels and payment methods integration",
+                "priority": "emergency",
+                "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat(),
+                "estimated_duration": 120,
+                "payment_method": "card"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                       json=booking_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Service booking created successfully":
+                    booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
+                    if booking_id:
+                        # Now retrieve the booking to verify all fields are stored correctly
+                        get_response = self.session.get(f"{BASE_URL}/service-bookings", headers=headers)
+                        
+                        if get_response.status_code == 200:
+                            get_data = get_response.json()
+                            bookings = get_data.get("bookings", [])
+                            
+                            # Find our booking
+                            test_booking = None
+                            for booking in bookings:
+                                if booking.get("id") == booking_id:
+                                    test_booking = booking
+                                    break
+                            
+                            if test_booking:
+                                # Verify all fields are correctly stored
+                                checks = {
+                                    "service_category": test_booking.get("service_category") == "maintenance",
+                                    "service_specialty": test_booking.get("service_specialty") == "plumber",
+                                    "priority": test_booking.get("priority") == "emergency",
+                                    "payment_method": test_booking.get("payment_method") == "card",
+                                    "title": test_booking.get("title") == "Emergency Priority Payment Test",
+                                    "description": "Testing priority levels and payment methods integration" in test_booking.get("description", ""),
+                                    "estimated_duration": test_booking.get("estimated_duration") == 120
+                                }
+                                
+                                passed_checks = sum(checks.values())
+                                total_checks = len(checks)
+                                
+                                if passed_checks == total_checks:
+                                    self.log_result("Complete Booking Data", True, 
+                                                  f"All booking fields correctly stored and retrieved ({passed_checks}/{total_checks} checks passed)")
+                                    return True
+                                else:
+                                    failed_checks = [k for k, v in checks.items() if not v]
+                                    self.log_result("Complete Booking Data", False, 
+                                                  f"Some fields not correctly stored ({passed_checks}/{total_checks} checks passed). Failed: {failed_checks}")
+                                    return False
+                            else:
+                                self.log_result("Complete Booking Data", False, f"Could not find created booking with ID: {booking_id}")
+                                return False
+                        else:
+                            self.log_result("Complete Booking Data", False, f"Failed to retrieve bookings for verification: {get_response.status_code}")
+                            return False
+                    else:
+                        self.log_result("Complete Booking Data", False, f"No booking ID in response: {result}")
+                        return False
+                else:
+                    self.log_result("Complete Booking Data", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Complete Booking Data", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Complete Booking Data", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def run_service_booking_priority_payment_tests(self):
+        """Run comprehensive Service Booking workflow with Priority Levels and Payment Methods tests"""
+        print("\n🚀 STARTING SERVICE BOOKING WORKFLOW WITH PRIORITY LEVELS AND PAYMENT METHODS TESTING")
+        print("=" * 80)
+        
+        # Authentication tests
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        if not self.test_resident_authentication():
+            print("❌ Resident authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Ensure we have service providers
+        print("\n👥 Setting up Service Providers...")
+        self.test_create_service_provider()
+        
+        # Priority Level Tests
+        print("\n🚨 Testing Priority Levels...")
+        self.test_booking_with_emergency_priority()
+        self.test_booking_with_urgent_priority()
+        self.test_booking_with_standard_priority()
+        self.test_booking_with_scheduled_priority()
+        
+        # Payment Methods Tests
+        print("\n💳 Testing Payment Methods...")
+        self.test_all_payment_methods()
+        
+        # Persistence Tests
+        print("\n💾 Testing Data Persistence...")
+        self.test_priority_level_persistence()
+        self.test_payment_method_persistence()
+        
+        # Complete Booking Data Test
+        print("\n📋 Testing Complete Booking Data...")
+        self.test_complete_booking_data()
+        
+        return self.print_summary()
+
 if __name__ == "__main__":
     test_suite = ServicesManagementTestSuite()
     
-    # Run Booking Creation Focus tests as requested
-    print("🎯 RUNNING FOCUSED BOOKING CREATION FUNCTIONALITY TESTS")
-    success = test_suite.run_booking_creation_focus_tests()
+    # Run Service Booking Priority and Payment Methods tests as requested
+    print("🎯 RUNNING SERVICE BOOKING WORKFLOW WITH PRIORITY LEVELS AND PAYMENT METHODS TESTS")
+    success = test_suite.run_service_booking_priority_payment_tests()
     
     if success:
-        print("\n🎉 BOOKING CREATION TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 SERVICE BOOKING PRIORITY AND PAYMENT METHODS TESTING COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ BOOKING CREATION TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ SERVICE BOOKING PRIORITY AND PAYMENT METHODS TESTING COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

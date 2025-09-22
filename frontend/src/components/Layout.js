@@ -6,6 +6,7 @@ import {
   HomeIcon,
   BuildingOfficeIcon,
   UsersIcon,
+  UserPlusIcon,
   CurrencyDollarIcon,
   ChatBubbleLeftEllipsisIcon,
   BellIcon,

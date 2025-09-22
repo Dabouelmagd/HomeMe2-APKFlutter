@@ -24,7 +24,10 @@ import {
   ShoppingBagIcon,
   CreditCardIcon,
   MagnifyingGlassIcon,
-  CommandLineIcon
+  CommandLineIcon,
+  DocumentTextIcon,
+  HandRaisedIcon,
+  HomeModernIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 

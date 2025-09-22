@@ -1106,105 +1106,187 @@ const CompoundManagement = () => {
             </div>
 
             {residences.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Unit Number
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Family Head
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Members
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Contact
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Move-in Date
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {residences.map((residence, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                              <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                                <HomeIcon className="h-5 w-5 text-blue-600" />
+              <div className="space-y-4">
+                {getSortedResidences().map((residence) => (
+                  <div key={residence.id || residence.family_head?.id} className="bg-white border border-gray-200 rounded-lg shadow-sm">
+                    {/* Unit Header */}
+                    <div className="p-4 border-b border-gray-100">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          {/* Unit Head Photo */}
+                          <div className="flex-shrink-0">
+                            {residence.family_head?.profile_picture_url ? (
+                              <img
+                                src={`${BACKEND_URL}${residence.family_head.profile_picture_url}`}
+                                alt={residence.family_head.full_name}
+                                className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                              />
+                            ) : (
+                              <div className="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center">
+                                <HomeIcon className="h-8 w-8 text-gray-600" />
                               </div>
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
+                            )}
+                          </div>
+                          
+                          {/* Unit Info */}
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <h3 className="text-lg font-semibold text-gray-900">
                                 Unit {residence.unit_number}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                Family ID: {residence.family_id.slice(0, 8)}...
-                              </div>
+                              </h3>
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Active
+                              </span>
                             </div>
+                            <p className="text-gray-600 font-medium">{residence.family_head?.full_name}</p>
+                            <p className="text-sm text-gray-500">{residence.family_head?.email}</p>
+                            {residence.family_head?.phone && (
+                              <p className="text-sm text-gray-500">{residence.family_head?.phone}</p>
+                            )}
+                            {residence.family_head?.created_at && (
+                              <p className="text-xs text-gray-400">
+                                Joined: {new Date(residence.family_head.created_at).toLocaleDateString()}
+                              </p>
+                            )}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                              {residence.family_head?.profile_picture_url ? (
-                                <img
-                                  src={residence.family_head.profile_picture_url}
-                                  alt={residence.family_head.full_name}
-                                  className="h-10 w-10 rounded-full object-cover border-2 border-gray-200"
-                                />
-                              ) : (
-                                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                                  <span className="text-sm font-medium text-white">
-                                    {residence.family_head?.full_name?.charAt(0) || 'R'}
-                                  </span>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleEditUnit(residence)}
+                            className="btn btn-secondary btn-sm flex items-center space-x-1"
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClick('unit', residence)}
+                            className="btn btn-danger btn-sm flex items-center space-x-1"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                            <span>Delete</span>
+                          </button>
+                          <button
+                            onClick={() => toggleUnitExpansion(residence.family_head?.id || residence.id)}
+                            className="btn btn-outline btn-sm flex items-center space-x-1"
+                          >
+                            {expandedUnits.has(residence.family_head?.id || residence.id) ? (
+                              <>
+                                <ChevronUpIcon className="h-4 w-4" />
+                                <span>Hide Family</span>
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDownIcon className="h-4 w-4" />
+                                <span>View Family</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Expanded Family Members */}
+                    {expandedUnits.has(residence.family_head?.id || residence.id) && (
+                      <div className="p-4 bg-gray-50">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-sm font-medium text-gray-900">Family Members</h4>
+                          <Link
+                            to="/add-family-member"
+                            className="btn btn-primary btn-sm flex items-center space-x-1"
+                          >
+                            <UserPlusIcon className="h-4 w-4" />
+                            <span>Add Member</span>
+                          </Link>
+                        </div>
+
+                        {unitFamilyMembers[residence.family_head?.id || residence.id]?.length > 0 ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {unitFamilyMembers[residence.family_head?.id || residence.id].map((member) => (
+                              <div key={member.id} className="bg-white rounded-lg p-4 border border-gray-200">
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="flex items-start space-x-3">
+                                    {member.profile_picture_url ? (
+                                      <img
+                                        src={`${BACKEND_URL}${member.profile_picture_url}`}
+                                        alt={member.full_name}
+                                        className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                                      />
+                                    ) : (
+                                      <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                        <UsersIcon className="h-6 w-6 text-gray-600" />
+                                      </div>
+                                    )}
+                                    <div>
+                                      <h5 className="font-medium text-gray-900">{member.full_name}</h5>
+                                      <p className="text-sm text-gray-600 capitalize">{member.relationship}</p>
+                                      {member.age && <p className="text-xs text-gray-500">Age: {member.age}</p>}
+                                    </div>
+                                  </div>
+                                  <div className="flex space-x-1">
+                                    <button
+                                      onClick={() => handleEditMember(member)}
+                                      className="text-blue-600 hover:text-blue-800 p-1"
+                                      title="Edit member"
+                                    >
+                                      <PencilIcon className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteClick('member', member)}
+                                      className="text-red-600 hover:text-red-800 p-1"
+                                      title="Delete member"
+                                    >
+                                      <TrashIcon className="h-4 w-4" />
+                                    </button>
+                                  </div>
                                 </div>
-                              )}
-                            </div>
-                            <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900">
-                                {residence.family_head?.full_name || 'N/A'}
+                                
+                                <div className="space-y-1">
+                                  {member.email && (
+                                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                      <EnvelopeIcon className="h-4 w-4" />
+                                      <span>{member.email}</span>
+                                    </div>
+                                  )}
+                                  {member.phone && (
+                                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                      <PhoneIcon className="h-4 w-4" />
+                                      <span>{member.phone}</span>
+                                    </div>
+                                  )}
+                                  {member.birthday && (
+                                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                      <CalendarIcon className="h-4 w-4" />
+                                      <span>{new Date(member.birthday).toLocaleDateString()}</span>
+                                    </div>
+                                  )}
+                                  {member.id_number && (
+                                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                      <IdentificationIcon className="h-4 w-4" />
+                                      <span>{member.id_number}</span>
+                                    </div>
+                                  )}
+                                </div>
                               </div>
-                              <div className="text-sm text-gray-500">
-                                @{residence.family_head?.username || 'N/A'}
-                              </div>
-                            </div>
+                            ))}
                           </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {residence.member_count} member{residence.member_count !== 1 ? 's' : ''}
+                        ) : (
+                          <div className="text-center py-6">
+                            <UsersIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                            <p className="text-gray-500 text-sm">No family members added yet</p>
+                            <Link
+                              to="/add-family-member"
+                              className="text-blue-600 hover:text-blue-800 text-sm"
+                            >
+                              Add the first family member
+                            </Link>
                           </div>
-                          <div className="text-sm text-gray-500">
-                            {residence.family_members.map(member => member.full_name).join(', ')}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
-                            {residence.family_head?.email || 'N/A'}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {residence.family_head?.phone || 'No phone'}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {new Date(residence.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Occupied
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="text-center py-12">

@@ -233,5 +233,5 @@ async def periodic_cleanup():
         except Exception as e:
             logger.error(f"Error in periodic cleanup: {e}")
 
-# Start the cleanup task when the module is imported
-asyncio.create_task(periodic_cleanup())
+# Note: The cleanup task should be started manually in the main application
+# Example: asyncio.create_task(periodic_cleanup())

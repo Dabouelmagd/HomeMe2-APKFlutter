@@ -7709,9 +7709,21 @@ async def get_maintenance_stats(current_user: User = Depends(get_current_user)):
         }
         
         for request in all_requests:
+            # Count by status
             status = request.get("status", "pending")
             if status in stats:
                 stats[status] += 1
+            
+            # Count by priority
+            priority = request.get("priority", "normal")
+            priority_key = f"{priority}_priority"
+            if priority_key in stats:
+                stats[priority_key] += 1
+            
+            # Count by category
+            category = request.get("category", "general")
+            if category in stats:
+                stats[category] += 1
         
         return {"stats": stats}
         

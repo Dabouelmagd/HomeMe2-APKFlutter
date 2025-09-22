@@ -111,7 +111,7 @@ const MobileOptimized = ({ children }) => {
         {isStandalone() && (
           <DevicePhoneMobileIcon className="w-3 h-3 text-blue-400" />
         )}
-        <BatteryIcon className="w-3 h-3" />
+        <BoltIcon className="w-3 h-3" />
       </div>
     </div>
   );

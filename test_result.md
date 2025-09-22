@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the enhanced Compound Management frontend functionality that I just implemented: 1. Login and Navigation to Compound Management page and Residence List tab, 2. Enhanced Sorting Functionality with 6 options (Newest First, Oldest First, Unit Number, Name A-Z, Name Z-A, Family Size), 3. Detailed Viewing Features (View Family button to expand/collapse family member details, profile pictures display), 4. Edit Functionality (unit editing modal with read-only fields, family member editing modal, profile picture upload), 5. Delete Functionality (unit and family member deletion with confirmation modals), 6. Form Validation and UI/UX testing, 7. Integration with Backend APIs"
+user_problem_statement: "Test the invoice functionality in the HomeMe application: 1. Authentication Setup: Login with admin credentials (admin/admin123) to get a valid JWT token, 2. Invoice System Testing: Test GET /api/invoices/my endpoint to see what invoices exist, Check if there are any invoices in the database, If no invoices exist, create some sample invoices for testing, 3. Payment System Testing: Test the payment processing endpoints, Verify the invoice payment workflow, 4. Data Investigation: Check what user/family data exists to understand invoice relationships, Verify the invoice data structure and fields"
 
 backend:
   - task: "Services Management System - Core Services APIs"

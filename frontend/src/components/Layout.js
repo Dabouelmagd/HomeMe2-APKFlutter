@@ -160,6 +160,12 @@ const Layout = () => {
       show: true
     },
     {
+      name: t('maintenance_system'),
+      href: '/maintenance',
+      icon: CogIcon,
+      show: true
+    },
+    {
       name: t('government_utility_gateway'),
       href: '/utilities',
       icon: BoltIcon,

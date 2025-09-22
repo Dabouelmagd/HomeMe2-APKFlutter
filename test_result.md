@@ -654,8 +654,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Cross-Unit Family Member Management System"
-  stuck_tasks: []
+    - "Enhanced Service Management System - Payment Processing"
+  stuck_tasks: 
+    - "Enhanced Service Management System - Payment Processing"
   test_all: false
   test_priority: "high_first"
 

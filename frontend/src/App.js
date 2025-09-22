@@ -313,6 +313,10 @@ function App() {
                 <Route path="service-booking" element={
                   <ServiceBooking />
                 } />
+                
+                <Route path="maintenance" element={
+                  <MaintenanceSystem />
+                } />
               </Route>
             </Routes>
             <Toaster />

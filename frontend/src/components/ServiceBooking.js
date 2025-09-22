@@ -1089,48 +1089,50 @@ const ServiceBooking = () => {
                           {paymentMethods.map(method => {
                             const IconComponent = method.icon;
                             return (
-                              <label key={method.value} className="relative flex cursor-pointer">
+                              <div key={method.value} className="relative">
                                 <input
                                   type="radio"
                                   name="payment_method"
                                   value={method.value}
+                                  id={`payment_${method.value}`}
                                   checked={bookingForm.payment_method === method.value}
                                   onChange={(e) => setBookingForm({...bookingForm, payment_method: e.target.value})}
                                   className="sr-only"
                                 />
-                                <div className={`flex-1 p-3 rounded-lg border-2 transition-all duration-200 ${
-                                  bookingForm.payment_method === method.value
-                                    ? 'border-blue-500 bg-blue-50 shadow-md'
-                                    : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
-                                } ${method.color}`}>
-                                  <div className="flex items-center space-x-3">
-                                    <IconComponent className={`h-5 w-5 flex-shrink-0 ${
+                                <label 
+                                  htmlFor={`payment_${method.value}`}
+                                  className={`flex items-center p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                                    bookingForm.payment_method === method.value
+                                      ? 'border-blue-500 bg-blue-50 shadow-md'
+                                      : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                                  } ${method.color}`}
+                                >
+                                  <IconComponent className={`h-5 w-5 flex-shrink-0 mr-3 ${
+                                    bookingForm.payment_method === method.value 
+                                      ? 'text-blue-600' 
+                                      : 'text-gray-500'
+                                  }`} />
+                                  <div className="flex-1 min-w-0">
+                                    <div className={`font-medium text-sm ${
                                       bookingForm.payment_method === method.value 
-                                        ? 'text-blue-600' 
-                                        : 'text-gray-500'
-                                    }`} />
-                                    <div className="flex-1 min-w-0">
-                                      <div className={`font-medium text-sm ${
-                                        bookingForm.payment_method === method.value 
-                                          ? 'text-blue-900' 
-                                          : 'text-gray-900'
-                                      }`}>
-                                        {method.label}
-                                      </div>
-                                      <div className={`text-xs mt-1 ${
-                                        bookingForm.payment_method === method.value 
-                                          ? 'text-blue-700' 
-                                          : 'text-gray-600'
-                                      }`}>
-                                        {method.description}
-                                      </div>
+                                        ? 'text-blue-900' 
+                                        : 'text-gray-900'
+                                    }`}>
+                                      {method.label}
                                     </div>
-                                    {bookingForm.payment_method === method.value && (
-                                      <CheckCircleIcon className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                                    )}
+                                    <div className={`text-xs mt-1 ${
+                                      bookingForm.payment_method === method.value 
+                                        ? 'text-blue-700' 
+                                        : 'text-gray-600'
+                                    }`}>
+                                      {method.description}
+                                    </div>
                                   </div>
-                                </div>
-                              </label>
+                                  {bookingForm.payment_method === method.value && (
+                                    <CheckCircleIcon className="h-4 w-4 text-blue-500 flex-shrink-0 ml-2" />
+                                  )}
+                                </label>
+                              </div>
                             );
                           })}
                         </div>

@@ -1584,7 +1584,8 @@ class ServicesManagementTestSuite:
             if response.status_code == 200:
                 result = response.json()
                 if result.get("message") == "Review submitted successfully":
-                    review_id = result.get("review_id")
+                    review = result.get("review", {})
+                    review_id = review.get("id")
                     if review_id:
                         self.log_result("Review System", True, f"Multi-criteria review submitted successfully with ID: {review_id}")
                         return True

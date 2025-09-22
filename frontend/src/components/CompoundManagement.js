@@ -1163,8 +1163,8 @@ const CompoundManagement = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Admin Management</h3>
-                <p className="text-gray-600">Manage compound administrators</p>
+                <h3 className="text-lg font-semibold text-gray-900">{t('admin_management')}</h3>
+                <p className="text-gray-600">{t('manage_admins')}</p>
               </div>
               <button 
                 onClick={() => setShowAddAdmin(true)}

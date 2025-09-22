@@ -2221,6 +2221,12 @@ async def create_maintenance_fee(
 
 @api_router.get("/invoices/my")
 async def get_my_invoices(current_user: User = Depends(get_current_user)):
+    # Admin users can see all invoices in their compound
+    if current_user.role == "admin":
+        invoices = await db.invoices.find({"compound_id": current_user.compound_id}).to_list(None)
+        return serialize_datetime(invoices)
+    
+    # Regular users see only their family invoices
     if not current_user.family_id:
         return []
     

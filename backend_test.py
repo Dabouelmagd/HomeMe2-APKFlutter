@@ -146,6 +146,9 @@ class ServicesManagementTestSuite:
                 username = result.get("username")
                 password = result.get("temporary_password")
                 
+                # Store the unit number for later use
+                self.test_unit_number = data['unit_number']
+                
                 # Now login with the new resident
                 login_data = {"username": username, "password": password}
                 login_response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)

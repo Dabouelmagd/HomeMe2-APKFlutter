@@ -1,168 +1,178 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import {
-  DevicePhoneMobileIcon,
   XMarkIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  DevicePhoneMobileIcon,
+  WifiIcon,
+  BellIcon
 } from '@heroicons/react/24/outline';
 
 const PWAInstallPrompt = () => {
   const { t } = useTranslation();
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [installPrompt, setInstallPrompt] = useState(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
-    // Check if PWA is supported
-    setIsSupported('serviceWorker' in navigator && 'PushManager' in window);
-
-    // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true);
-      return;
-    }
-
-    // Listen for the beforeinstallprompt event
-    const handleBeforeInstallPrompt = (e) => {
-      console.log('PWA: beforeinstallprompt event fired');
-      e.preventDefault();
-      setDeferredPrompt(e);
-      
-      // Show install prompt after 5 seconds delay
-      setTimeout(() => {
-        if (!isInstalled) {
-          setShowPrompt(true);
-        }
-      }, 5000);
+    // Check if app is already installed/standalone
+    const checkInstallStatus = () => {
+      const standalone = window.matchMedia('(display-mode: standalone)').matches || 
+                        window.navigator.standalone === true;
+      setIsStandalone(standalone);
+      setIsInstalled(standalone);
     };
 
-    // Listen for app installed event
+    checkInstallStatus();
+
+    // Listen for install prompt
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+      
+      // Show prompt after a delay if not already shown
+      setTimeout(() => {
+        const lastPromptTime = localStorage.getItem('pwa-install-prompt-time');
+        const now = Date.now();
+        const oneDayMs = 24 * 60 * 60 * 1000;
+        
+        if (!lastPromptTime || (now - parseInt(lastPromptTime)) > oneDayMs) {
+          setShowPrompt(true);
+        }
+      }, 3000);
+    };
+
+    // Listen for successful installation
     const handleAppInstalled = () => {
-      console.log('PWA: App was installed');
       setIsInstalled(true);
       setShowPrompt(false);
-      setDeferredPrompt(null);
+      setInstallPrompt(null);
+      toast.success(t('app_installed_successfully'));
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
-    // Register service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then(registration => {
-          console.log('PWA: Service Worker registered:', registration);
-          
-          // Listen for service worker messages
-          navigator.serviceWorker.addEventListener('message', (event) => {
-            if (event.data && event.data.type === 'NAVIGATE_TO') {
-              window.location.href = event.data.url;
-            }
-          });
-        })
-        .catch(error => {
-          console.error('PWA: Service Worker registration failed:', error);
-        });
-    }
-
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, [isInstalled]);
+  }, [t]);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) {
-      // Fallback for browsers that don't support the install prompt
-      alert(t('pwa.installInstructions'));
-      return;
-    }
+    if (!installPrompt) return;
 
     try {
-      // Show the install prompt
-      const result = await deferredPrompt.prompt();
-      console.log('PWA: Install prompt result:', result.outcome);
-
-      if (result.outcome === 'accepted') {
-        setIsInstalled(true);
-        setShowPrompt(false);
+      installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        toast.success(t('installing_app'));
+      } else {
+        toast.info(t('installation_cancelled'));
       }
-
-      setDeferredPrompt(null);
+      
+      setShowPrompt(false);
+      setInstallPrompt(null);
+      localStorage.setItem('pwa-install-prompt-time', Date.now().toString());
     } catch (error) {
-      console.error('PWA: Install error:', error);
+      console.error('Installation error:', error);
+      toast.error(t('installation_failed'));
     }
   };
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    // Don't show again for this session
-    sessionStorage.setItem('pwa-prompt-dismissed', 'true');
+    localStorage.setItem('pwa-install-prompt-time', Date.now().toString());
   };
 
-  // Don't show if not supported, already installed, or dismissed
-  if (!isSupported || isInstalled || !showPrompt || sessionStorage.getItem('pwa-prompt-dismissed')) {
+  const handleRemindLater = () => {
+    setShowPrompt(false);
+    // Set reminder for 1 hour from now
+    const oneHourFromNow = Date.now() + (60 * 60 * 1000);
+    localStorage.setItem('pwa-install-prompt-time', (oneHourFromNow - 24 * 60 * 60 * 1000).toString());
+  };
+
+  // Don't show if already installed or no install prompt available
+  if (isInstalled || !installPrompt || !showPrompt) {
     return null;
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 animate-slide-up">
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl shadow-2xl p-4">
-        <button
-          onClick={handleDismiss}
-          className="absolute top-2 right-2 text-white/70 hover:text-white"
-        >
-          <XMarkIcon className="h-5 w-5" />
-        </button>
-        
-        <div className="flex items-start space-x-4">
-          <div className="flex-shrink-0">
-            <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-              <DevicePhoneMobileIcon className="h-7 w-7 text-white" />
+    <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50">
+      <div className="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <DevicePhoneMobileIcon className="w-6 h-6 text-white" />
+              <h3 className="text-lg font-semibold text-white">{t('install_homeme_app')}</h3>
             </div>
-          </div>
-          
-          <div className="flex-1">
-            <h3 className="font-semibold text-lg mb-1">
-              {t('pwa.installHomeMe')}
-            </h3>
-            <p className="text-white/90 text-sm mb-4">
-              {t('pwa.installDescription')}
-            </p>
-            
-            <div className="flex space-x-3">
-              <button
-                onClick={handleInstall}
-                className="flex items-center space-x-2 bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-white/90 transition-colors"
-              >
-                <ArrowDownTrayIcon className="h-4 w-4" />
-                <span>{t('pwa.install')}</span>
-              </button>
-              
-              <button
-                onClick={handleDismiss}
-                className="px-4 py-2 border border-white/30 rounded-lg text-white hover:bg-white/10 transition-colors"
-              >
-                {t('pwa.later')}
-              </button>
-            </div>
+            <button
+              onClick={handleDismiss}
+              className="text-white hover:text-gray-200 transition-colors"
+            >
+              <XMarkIcon className="w-5 h-5" />
+            </button>
           </div>
         </div>
-        
-        <div className="mt-4 flex items-center space-x-4 text-white/70 text-xs">
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span>{t('pwa.feature1')}</span>
+
+        {/* Content */}
+        <div className="p-4">
+          <p className="text-gray-600 text-sm mb-4">
+            {t('install_app_benefits_description')}
+          </p>
+
+          {/* Benefits List */}
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center space-x-2 text-sm text-gray-700">
+              <WifiIcon className="w-4 h-4 text-green-500" />
+              <span>{t('works_offline')}</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-700">
+              <BellIcon className="w-4 h-4 text-blue-500" />
+              <span>{t('instant_notifications')}</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-700">
+              <ArrowDownTrayIcon className="w-4 h-4 text-purple-500" />
+              <span>{t('faster_loading')}</span>
+            </div>
+            <div className="flex items-center space-x-2 text-sm text-gray-700">
+              <DevicePhoneMobileIcon className="w-4 h-4 text-orange-500" />
+              <span>{t('native_app_experience')}</span>
+            </div>
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span>{t('pwa.feature2')}</span>
+
+          {/* Actions */}
+          <div className="flex space-x-2">
+            <button
+              onClick={handleInstall}
+              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <ArrowDownTrayIcon className="w-4 h-4" />
+              <span>{t('install_now')}</span>
+            </button>
+            <button
+              onClick={handleRemindLater}
+              className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm"
+            >
+              {t('later')}
+            </button>
           </div>
-          <div className="flex items-center space-x-1">
-            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-            <span>{t('pwa.feature3')}</span>
-          </div>
+
+          {/* Installation Instructions for iOS Safari */}
+          {/iPad|iPhone|iPod/.test(navigator.userAgent) && (
+            <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+              <p className="text-xs text-blue-800 font-medium mb-1">
+                {t('ios_install_instructions')}:
+              </p>
+              <p className="text-xs text-blue-700">
+                {t('tap_share_button')} → {t('add_to_home_screen')}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -615,7 +615,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Free Trial System Backend API Endpoints"
+    - "Quick Actions Functionality - Admin Dashboard Features"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

@@ -713,50 +713,49 @@ class HomePhase1TestSuite:
     # ============ MAIN TEST RUNNER ============
     
     def run_phase1_tests(self):
-        """Create a new user specifically for trial testing"""
+        """Run HomeMe Phase 1 Enhancement Tests"""
+        print("\n🚀 STARTING HOMEME PHASE 1 ENHANCEMENT TESTING")
+        print("=" * 60)
+        print("Testing newly implemented maintenance and notification systems")
+        print("=" * 60)
+        
+        # Authentication tests
+        print("\n🔐 AUTHENTICATION SETUP")
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        if not self.test_resident_authentication():
+            print("❌ Resident authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Maintenance System Tests
+        print("\n🔧 MAINTENANCE SYSTEM TESTING")
+        self.test_create_maintenance_request()
+        self.test_get_maintenance_requests_resident()
+        self.test_get_maintenance_requests_admin()
+        self.test_get_maintenance_stats()
+        self.test_maintenance_data_validation()
+        
+        # Notification System Tests
+        print("\n🔔 NOTIFICATION SYSTEM TESTING")
+        self.test_get_notifications()
+        self.test_mark_notification_read()
+        self.test_mark_all_notifications_read()
+        self.test_delete_notification()
+        
+        # WebSocket Connectivity Tests
+        print("\n🌐 WEBSOCKET CONNECTIVITY TESTING")
         try:
-            if not self.admin_token:
-                self.log_result("Create Trial Test User", False, "No admin token available")
-                return False
-            
-            headers = {"Authorization": f"Bearer {self.admin_token}"}
-            unique_id = str(uuid.uuid4())[:8]
-            
-            data = {
-                'unit_number': f"TRIAL{unique_id[:4]}",
-                'full_name': f"Trial Test User {unique_id}",
-                'email': f"trial{unique_id}@example.com",
-                'phone': "+1234567890",
-                'compound_id': self.compound_id
-            }
-            
-            response = self.session.post(f"{BASE_URL}/admin/residences", data=data, headers=headers)
-            
-            if response.status_code == 200:
-                result = response.json()
-                username = result.get("username")
-                password = result.get("temporary_password")
-                
-                # Login with the new trial user
-                login_data = {"username": username, "password": password}
-                login_response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
-                
-                if login_response.status_code == 200:
-                    data = login_response.json()
-                    self.trial_user_token = data["access_token"]
-                    self.trial_user = data["user"]
-                    self.log_result("Create Trial Test User", True, f"Trial test user created and authenticated: {username}")
-                    return True
-                else:
-                    self.log_result("Create Trial Test User", False, f"Failed to login with trial user: {login_response.status_code}")
-                    return False
-            else:
-                self.log_result("Create Trial Test User", False, f"Failed to create trial user: {response.status_code}")
-                return False
-                
+            # Run WebSocket test in async context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(self.test_websocket_connection())
+            loop.close()
         except Exception as e:
-            self.log_result("Create Trial Test User", False, f"Exception occurred: {str(e)}")
-            return False
+            self.log_result("WebSocket Test Setup", False, f"Failed to run WebSocket test: {str(e)}")
+        
+        return self.print_summary()
     
     def test_trial_activation_new_user(self):
         """Test POST /api/trial/activate - Trial activation for new user"""

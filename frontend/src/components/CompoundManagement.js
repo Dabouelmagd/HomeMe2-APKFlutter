@@ -2693,14 +2693,11 @@ const CompoundManagement = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Date of Birth
-                          </label>
-                          <input
-                            type="date"
+                          <DateInput
+                            label={t('date_of_birth')}
                             value={comprehensiveFamilyForm.head_date_of_birth}
                             onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_date_of_birth: e.target.value }))}
-                            className="form-input w-full"
+                            className="w-full"
                           />
                         </div>
 

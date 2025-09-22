@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the complete Service Booking workflow with Priority Levels and Payment Methods to verify they're working end-to-end"
+user_problem_statement: "Test the Compound Management enhancements that I just implemented: 1. Test Family Member Update with Profile Picture (PUT /api/family-members/{member_id}/profile endpoint), 2. Test Enhanced Residence Data Retrieval (GET /api/compounds/{compound_id}/residences), 3. Test User Profile Update for Unit Head (PUT /users/{user_id}/profile endpoint), 4. Authentication and Authorization testing"
 
 backend:
   - task: "Services Management System - Core Services APIs"

@@ -725,7 +725,10 @@ metadata:
 test_plan:
   current_focus: 
     - "Invoice Functionality System - Complete Invoice Management and Payment Processing"
-  stuck_tasks: []
+    - "Financial Management Frontend - Invoice Display and Payment Processing"
+  stuck_tasks: 
+    - "Invoice Functionality System - Complete Invoice Management and Payment Processing"
+    - "Financial Management Frontend - Invoice Display and Payment Processing"
   test_all: false
   test_priority: "high_first"
 
@@ -738,6 +741,8 @@ agent_communication:
       message: "🏠 COMPOUND MANAGEMENT ENHANCEMENT IN PROGRESS: Working on completing CompoundManagement.js component with admin features for residence management and registration links. Added profile picture support to User model and registration completion endpoint. Enhanced registration links tab with comprehensive UI for creating, managing, and monitoring registration links. Fixed navigation visibility issues by removing duplicate service booking entries and adding proper i18n translations."
     - agent: "main"
       message: "✅ COMPOUND MANAGEMENT & FAMILY MANAGEMENT COMPLETED: Successfully implemented complete residence management workflow: Admin creates residence accounts → Residents login → Residents manage family with photos. Added robust compound selection system, profile pictures in residence list, New Residence button functionality, and birthday field to Family Management. All backend APIs working (100% success rate). Frontend fully functional with proper error handling and user experience."
+    - agent: "testing"
+      message: "🚨 CRITICAL INVOICE SYSTEM ISSUE IDENTIFIED: Admin users cannot see invoices in Financial Management page because they have family_id: null, but GET /api/invoices/my filters by family_id. This is a fundamental design flaw that makes the invoice system unusable for admin users. Backend needs either: 1) Admin-specific endpoint GET /api/admin/invoices to show all invoices, 2) Modified GET /api/invoices/my logic to show all invoices for admin role, or 3) Assign admin users to a family_id. Frontend is working correctly but cannot display data due to backend filtering issue. Payment functionality is untestable without visible invoices."
     - agent: "testing"
       message: "🎯 CRITICAL BOOKING CREATION ISSUE IDENTIFIED AND RESOLVED: The root cause of booking services not working was a missing required field 'service_specialty' in the booking creation requests. Frontend forms need to include this field. Backend API requires: provider_id, service_category, service_specialty, title, description, scheduled_date. All booking functionality is now working perfectly with 95.7% test success rate (22/23 tests passed). The booking system is fully operational and production-ready. Main agent should update frontend booking forms to include the service_specialty field."
     - agent: "testing"

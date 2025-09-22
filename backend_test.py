@@ -710,7 +710,7 @@ class HomePhase1TestSuite:
         
         return success_count == total_tests
     
-    # ============ FREE TRIAL SYSTEM TESTS ============
+    # ============ MAIN TEST RUNNER ============
     
     def create_trial_test_user(self):
         """Create a new user specifically for trial testing"""

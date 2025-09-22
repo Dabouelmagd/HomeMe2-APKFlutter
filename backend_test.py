@@ -2726,6 +2726,7 @@ class ServicesManagementTestSuite:
                 booking_data = {
                     "provider_id": self.test_provider_id,
                     "service_category": "maintenance",
+                    "service_specialty": "general",
                     "title": f"{priority.title()} Priority Service",
                     "description": f"This is a {priority} priority service request",
                     "priority": priority,

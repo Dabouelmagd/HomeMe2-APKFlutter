@@ -1115,6 +1115,20 @@ const resources = {
       'family_members': 'Membres de la famille',
       'review': 'Révision',
       
+      // Step 2 Family Head
+      'step_2_family_head_details': 'Étape 2: Détails du chef de famille',
+      'enter_complete_information_primary': 'Entrez les informations complètes pour le résident principal',
+      'full_name_required': 'Nom complet *',
+      'enter_full_name': 'Entrez le nom complet',
+      'email_address_required': 'Adresse e-mail *',
+      'enter_email': 'Entrez l\'adresse e-mail',
+      'phone_number_optional': 'Numéro de téléphone',
+      'enter_phone': 'Entrez le numéro de téléphone',
+      'enter_id_number': 'Entrez le numéro d\'ID ou de passeport',
+      'profile_picture_optional': 'Photo de profil',
+      'choose_file': 'Choisir le fichier',
+      'no_file_chosen': 'Aucun fichier choisi',
+      
       // Compound Management
       'manage_compound': 'Gérez les paramètres et l\'image de marque de votre résidence',
       'overview': 'Aperçu',

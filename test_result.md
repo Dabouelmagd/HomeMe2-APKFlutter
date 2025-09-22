@@ -450,15 +450,18 @@ backend:
 
   - task: "Invoice Functionality System - Complete Invoice Management and Payment Processing"
     implemented: true
-    working: true
+    working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
         - working: true
           agent: "testing"
           comment: "INVOICE FUNCTIONALITY SYSTEM TESTING COMPLETED SUCCESSFULLY - 100% SUCCESS RATE (11/11 tests passed). All invoice management and payment processing features working perfectly: ✅ AUTHENTICATION SETUP: Admin authentication (admin/admin123) working correctly, JWT token generation and validation functional ✅ INVOICE SYSTEM TESTING: GET /api/invoices/my endpoint working correctly with proper ObjectId serialization (FIXED: Added serialize_datetime function to handle MongoDB ObjectId serialization issues), Invoice creation through maintenance fee system working (POST /api/maintenance-fees creates both maintenance fee and associated invoice), Invoice data structure verification complete with all required fields (id, compound_id, family_id, unit_number, amount, description, due_date, status, created_by, created_at) ✅ PAYMENT SYSTEM TESTING: POST /api/payments endpoint working perfectly for payment processing, Complete payment workflow functional (invoice creation → payment processing → status update), Payment transaction creation with unique IDs and mock payment method working ✅ DATA INVESTIGATION: User/family data relationships verified and working correctly, Invoice-family associations properly established through family_id, Data persistence and retrieval working across all entities ✅ SECURITY & AUTHENTICATION: All endpoints properly protected with JWT authentication, Admin-only endpoints (maintenance fee creation) correctly restricted, Unauthorized access properly rejected with 403/401 status codes ✅ END-TO-END WORKFLOW: Complete invoice lifecycle tested - Admin creates maintenance fee → Invoice automatically created for family → Resident user can view invoices → Payment processing updates invoice status to 'paid'. CRITICAL FIX APPLIED: Fixed ObjectId serialization issue in GET /api/invoices/my endpoint that was causing 500 Internal Server Error. All invoice functionality is fully operational and production-ready."
+        - working: false
+          agent: "testing"
+          comment: "CRITICAL INVOICE DISPLAY ISSUE IDENTIFIED - FRONTEND TESTING REVEALS MAJOR PROBLEM: ❌ ADMIN USER CANNOT SEE INVOICES: Admin user (admin/admin123) has family_id: null in user data, causing GET /api/invoices/my endpoint to return empty array [] because it filters by family_id. This explains why Financial Management page shows 'No invoices found' message and all summary cards show 0 values (Pending: 0, Paid: 0, Overdue: 0, Total Due: $0.00). ❌ INVOICE VISIBILITY DESIGN FLAW: The current system design only allows users with family_id to see invoices, but admin users don't have family_id assigned. This creates a fundamental issue where admins cannot view or manage invoices through the frontend interface. ✅ FRONTEND UI WORKING CORRECTLY: Financial Management page loads properly, summary cards display correctly, table structure is correct, payment functionality is implemented correctly, but no data is shown due to backend filtering issue. ✅ BACKEND API WORKING: GET /api/invoices/my returns HTTP 200 with empty array (correct behavior given the family_id filter), maintenance fee creation works (POST /api/maintenance-fees), invoice creation logic works when families exist. ROOT CAUSE: Admin users need either: 1) A separate admin endpoint to view all invoices (GET /api/admin/invoices), or 2) Modified logic in GET /api/invoices/my to show all invoices for admin users, or 3) Admin users should be assigned to a family_id. IMPACT: Financial Management functionality is completely unusable for admin users, which is a critical business requirement failure."
 
   - task: "Login Functionality and Authentication System"
     implemented: true

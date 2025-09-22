@@ -164,29 +164,53 @@ class HomePhase1TestSuite:
             self.log_result("Create Test Resident", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_get_compound_services(self):
-        """Test GET /api/compounds/{compound_id}/services - Get all services"""
-        print("\n=== Testing Get Compound Services ===")
+    def test_create_maintenance_request(self):
+        """Test POST /api/maintenance/requests - Create maintenance request"""
+        print("\n=== Testing Create Maintenance Request ===")
         
-        if not self.admin_token or not self.compound_id:
-            self.log_result("Get Compound Services", False, "No admin token or compound ID available")
+        if not self.resident_token:
+            self.log_result("Create Maintenance Request", False, "No resident token available")
             return False
         
         try:
-            headers = self.setup_auth_headers(self.admin_token)
-            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/services", headers=headers)
+            headers = {"Authorization": f"Bearer {self.resident_token}"}
+            
+            # Create test image for upload
+            test_image = self.create_test_image("test_maintenance.jpg")
+            
+            # Prepare form data
+            files = {
+                'images': ('test_maintenance.jpg', test_image, 'image/jpeg')
+            }
+            
+            data = {
+                'title': 'Kitchen Sink Leak',
+                'description': 'The kitchen sink is leaking water from the faucet and needs immediate repair',
+                'category': 'plumbing',
+                'priority': 'high',
+                'location': 'Kitchen',
+                'contact_method': 'app',
+                'preferred_time': (datetime.now() + timedelta(days=1)).isoformat()
+            }
+            
+            response = self.session.post(f"{BASE_URL}/maintenance/requests", 
+                                       data=data, files=files, headers={"Authorization": f"Bearer {self.resident_token}"})
             
             if response.status_code == 200:
-                data = response.json()
-                services = data.get("services", [])
-                self.log_result("Get Compound Services", True, f"Retrieved {len(services)} services successfully")
-                return True
+                result = response.json()
+                if result.get("message") == "Maintenance request created successfully":
+                    self.test_maintenance_request_id = result.get("request_id")
+                    self.log_result("Create Maintenance Request", True, f"Maintenance request created successfully with ID: {self.test_maintenance_request_id}")
+                    return True
+                else:
+                    self.log_result("Create Maintenance Request", False, f"Unexpected response: {result}")
+                    return False
             else:
-                self.log_result("Get Compound Services", False, f"Failed with status {response.status_code}", response.text)
+                self.log_result("Create Maintenance Request", False, f"Failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_result("Get Compound Services", False, f"Exception occurred: {str(e)}")
+            self.log_result("Create Maintenance Request", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_create_service(self):

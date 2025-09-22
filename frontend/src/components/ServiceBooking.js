@@ -1298,5 +1298,9 @@ const ServiceBooking = () => {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
 
 export default ServiceBooking;

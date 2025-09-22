@@ -5182,12 +5182,21 @@ async def process_payment(
         await db.payment_transactions.insert_one(serialize_datetime(transaction.dict()))
         
         # Update booking payment status
+        # Map transaction status to booking payment status
+        booking_payment_status = "pending"
+        if transaction.status == "completed":
+            booking_payment_status = "paid"
+        elif transaction.status == "processing":
+            booking_payment_status = "processing" 
+        elif transaction.status == "pending":
+            booking_payment_status = "pending"
+        
         await db.service_bookings.update_one(
             {"id": booking_id},
             {
                 "$set": serialize_datetime({
                     "payment_method": payment_request.payment_method,
-                    "payment_status": transaction.status,
+                    "payment_status": booking_payment_status,
                     "payment_id": transaction.id,
                     "final_cost": payment_request.amount,
                     "updated_at": datetime.now(timezone.utc)

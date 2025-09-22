@@ -864,8 +864,7 @@ const ServiceBooking = () => {
 
 
 
-        {/* All Modals */}
-        <>
+        {/* Enhanced Modals */}
         {/* Booking Form Modal - Enhanced */}
         {showBookingForm && (
           <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="booking-modal-title" role="dialog" aria-modal="true">
@@ -1299,10 +1298,5 @@ const ServiceBooking = () => {
             </div>
           </div>
         )}
-        </>
-      </div>
-    </div>
-  );
-};
 
 export default ServiceBooking;

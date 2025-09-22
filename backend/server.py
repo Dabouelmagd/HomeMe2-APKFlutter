@@ -5356,7 +5356,7 @@ async def add_family_member_to_unit(
         
         return {
             "message": f"Family member {full_name} added successfully to unit {target_resident['unit_number']}",
-            "family_member": family_member_data,
+            "family_member": serialize_datetime(family_member_data),
             "added_by": current_user.full_name,
             "added_by_role": current_user.role
         }

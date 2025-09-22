@@ -52,7 +52,7 @@ class MaintenanceRequest(BaseModel):
     feedback: Optional[str] = None
 
 class MaintenanceStatusUpdate(BaseModel):
-    status: str = Field(..., regex="^(pending|assigned|in_progress|completed|cancelled)$")
+    status: str = Field(..., pattern="^(pending|assigned|in_progress|completed|cancelled)$")
     notes: Optional[str] = None
     estimated_cost: Optional[float] = None
 

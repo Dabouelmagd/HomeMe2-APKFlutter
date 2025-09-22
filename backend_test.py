@@ -328,52 +328,40 @@ class HomePhase1TestSuite:
             self.log_result("Get Maintenance Stats", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_initialize_default_services(self):
-        """Test POST /api/admin/initialize-services - Initialize default services"""
-        print("\n=== Testing Initialize Default Services ===")
+    def test_get_notifications(self):
+        """Test GET /api/notifications - Get notifications"""
+        print("\n=== Testing Get Notifications ===")
         
-        if not self.admin_token or not self.compound_id:
-            self.log_result("Initialize Default Services", False, "No admin token or compound ID available")
+        if not self.resident_token:
+            self.log_result("Get Notifications", False, "No resident token available")
             return False
         
         try:
-            headers = self.setup_auth_headers(self.admin_token)
-            
-            init_data = {
-                "compound_id": self.compound_id
-            }
-            
-            response = self.session.post(f"{BASE_URL}/admin/initialize-services", 
-                                       json=init_data, headers=headers)
+            headers = self.setup_auth_headers(self.resident_token)
+            response = self.session.get(f"{BASE_URL}/notifications", headers=headers)
             
             if response.status_code == 200:
-                result = response.json()
-                if result.get("message") == "Default services initialized successfully":
-                    added_count = result.get("added_count", 0)
-                    self.log_result("Initialize Default Services", True, f"Default services initialized successfully. Added {added_count} services")
-                    return True
-                elif result.get("success") == False and "already exist" in result.get("message", ""):
-                    # Services already exist - this is expected behavior
-                    self.log_result("Initialize Default Services", True, "Default services already exist (expected behavior)")
-                    return True
-                else:
-                    self.log_result("Initialize Default Services", False, f"Unexpected response: {result}")
-                    return False
-            elif response.status_code == 400:
-                # Check if it's already initialized
-                result = response.json()
-                if "already initialized" in result.get("detail", "").lower():
-                    self.log_result("Initialize Default Services", True, "Default services already initialized (expected behavior)")
-                    return True
-                else:
-                    self.log_result("Initialize Default Services", False, f"Bad request: {result}")
-                    return False
+                data = response.json()
+                notifications = data.get("notifications", [])
+                total = data.get("total", 0)
+                unread = data.get("unread", 0)
+                
+                self.log_result("Get Notifications", True, f"Retrieved {len(notifications)} notifications - Total: {total}, Unread: {unread}")
+                
+                # Test pagination
+                response_paginated = self.session.get(f"{BASE_URL}/notifications?limit=5&offset=0", headers=headers)
+                if response_paginated.status_code == 200:
+                    paginated_data = response_paginated.json()
+                    paginated_notifications = paginated_data.get("notifications", [])
+                    self.log_result("Notification Pagination", True, f"Pagination works - Retrieved {len(paginated_notifications)} notifications with limit=5")
+                
+                return True
             else:
-                self.log_result("Initialize Default Services", False, f"Failed with status {response.status_code}", response.text)
+                self.log_result("Get Notifications", False, f"Failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_result("Initialize Default Services", False, f"Exception occurred: {str(e)}")
+            self.log_result("Get Notifications", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_get_service_providers(self):

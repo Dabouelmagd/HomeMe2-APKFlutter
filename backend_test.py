@@ -1824,13 +1824,13 @@ class ServicesManagementTestSuite:
 if __name__ == "__main__":
     test_suite = ServicesManagementTestSuite()
     
-    # Run Quick Actions functionality tests as requested
-    print("🚀 RUNNING QUICK ACTIONS FUNCTIONALITY TESTS")
-    success = test_suite.run_quick_actions_tests()
+    # Run Family Member Management tests as requested
+    print("👨‍👩‍👧‍👦 RUNNING FAMILY MEMBER MANAGEMENT TESTS")
+    success = test_suite.run_family_member_management_tests()
     
     if success:
-        print("\n🎉 QUICK ACTIONS FUNCTIONALITY TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 FAMILY MEMBER MANAGEMENT TESTING COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ QUICK ACTIONS FUNCTIONALITY TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ FAMILY MEMBER MANAGEMENT TESTING COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

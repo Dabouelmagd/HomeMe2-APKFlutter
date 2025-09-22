@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the complete residence account creation and family management workflow"
+user_problem_statement: "Test the complete Service Booking workflow with Priority Levels and Payment Methods to verify they're working end-to-end"
 
 backend:
   - task: "Services Management System - Core Services APIs"

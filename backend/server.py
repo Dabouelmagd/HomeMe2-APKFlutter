@@ -3156,13 +3156,24 @@ async def get_compound_bookings(compound_id: str, current_user: User = Depends(r
     # Get detailed information for each booking
     booking_list = []
     for booking in bookings:
-        service = await db.services.find_one({"id": booking["service_id"]})
+        # Use provider_id instead of service_id for enhanced booking model
+        provider = None
+        service_name = "Unknown Service"
+        service_category = booking.get("service_category", "unknown")
+        
+        if booking.get("provider_id"):
+            provider = await db.service_providers.find_one({"id": booking["provider_id"]})
+            if provider:
+                service_name = f"{booking.get('service_category', 'Service')} - {provider.get('full_name', 'Provider')}"
+        elif booking.get("service_category"):
+            service_name = booking.get("title", booking.get("service_category", "Service").title())
+        
         resident = await db.users.find_one({"id": booking["resident_id"]})
         
         booking_data = {
             "id": booking.get("id"),
-            "service_name": service.get("name") if service else "Unknown Service",
-            "service_category": service.get("category") if service else "unknown",
+            "service_name": service_name,
+            "service_category": service_category,
             "resident_name": resident.get("full_name") if resident else "Unknown Resident",
             "unit_number": booking.get("unit_number"),
             "issue_description": booking.get("issue_description"),

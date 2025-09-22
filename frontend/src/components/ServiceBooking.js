@@ -378,25 +378,6 @@ const ServiceBooking = () => {
     }
   };
 
-  const resetBookingForm = () => {
-    setBookingForm({
-      provider_id: '',
-      service_category: 'maintenance',
-      service_specialty: '',
-      title: '',
-      description: '',
-      priority: 'standard',
-      scheduled_date: '',
-      scheduled_time: '',
-      scheduled_end_time: '',
-      is_recurring: false,
-      recurrence_pattern: '',
-      estimated_duration: 60,
-      payment_method: 'cash',
-      booking_notes: ''
-    });
-  };
-
   const getStatusIcon = (status) => {
     switch (status) {
       case 'pending': return <ClockIcon className="h-5 w-5 text-yellow-500" />;

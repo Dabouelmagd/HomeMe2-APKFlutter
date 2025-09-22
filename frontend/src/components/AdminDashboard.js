@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../App';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import TrialStatus from './TrialStatus';
 import {

@@ -68,6 +68,10 @@ const resources = {
       'new_resident': 'New Resident',
       'service_booked': 'Service Booked',
       'payment': 'Payment',
+      'create_residence_account': 'Create new residence account',
+      'view_all_units': 'View all residence units',
+      'broadcast_residents': 'Broadcast to all residents',
+      'check_financial_status': 'Check financial status',
       
       // Compound Management
       'manage_compound': 'Manage your compound settings and branding',

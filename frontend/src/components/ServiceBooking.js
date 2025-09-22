@@ -974,6 +974,30 @@ const ServiceBooking = () => {
                           </select>
                         </div>
                         <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Service Specialty *</label>
+                          <select
+                            value={bookingForm.service_specialty}
+                            onChange={(e) => setBookingForm({...bookingForm, service_specialty: e.target.value})}
+                            className="form-input w-full"
+                            required
+                          >
+                            <option value="">Select specialty</option>
+                            <option value="general">General Service</option>
+                            <option value="plumber">Plumber</option>
+                            <option value="electrician">Electrician</option>
+                            <option value="hvac">HVAC Technician</option>
+                            <option value="cleaner">Professional Cleaner</option>
+                            <option value="handyman">Handyman</option>
+                            <option value="gardener">Gardener</option>
+                            <option value="security">Security</option>
+                            <option value="painter">Painter</option>
+                            <option value="carpenter">Carpenter</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">Priority Level</label>
                           <select
                             value={bookingForm.priority}
@@ -986,6 +1010,22 @@ const ServiceBooking = () => {
                                 {priority.label} - {priority.description}
                               </option>
                             ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Estimated Duration</label>
+                          <select
+                            value={bookingForm.estimated_duration}
+                            onChange={(e) => setBookingForm({...bookingForm, estimated_duration: parseInt(e.target.value)})}
+                            className="form-input w-full"
+                          >
+                            <option value={30}>30 minutes</option>
+                            <option value={60}>1 hour</option>
+                            <option value={90}>1.5 hours</option>
+                            <option value={120}>2 hours</option>
+                            <option value={180}>3 hours</option>
+                            <option value={240}>4 hours</option>
+                            <option value={480}>Full day (8 hours)</option>
                           </select>
                         </div>
                       </div>

@@ -629,6 +629,20 @@ const resources = {
       'family_members': 'أفراد الأسرة',
       'review': 'مراجعة',
       
+      // Step 2 Family Head
+      'step_2_family_head_details': 'الخطوة 2: تفاصيل رب الأسرة',
+      'enter_complete_information_primary': 'أدخل المعلومات الكاملة للمقيم الأساسي',
+      'full_name_required': 'الاسم الكامل *',
+      'enter_full_name': 'أدخل الاسم الكامل',
+      'email_address_required': 'عنوان البريد الإلكتروني *',
+      'enter_email': 'أدخل عنوان البريد الإلكتروني',
+      'phone_number_optional': 'رقم الهاتف',
+      'enter_phone': 'أدخل رقم الهاتف',
+      'enter_id_number': 'أدخل رقم الهوية أو جواز السفر',
+      'profile_picture_optional': 'الصورة الشخصية',
+      'choose_file': 'اختر ملف',
+      'no_file_chosen': 'لم يتم اختيار ملف',
+      
       // Compound Management
       'manage_compound': 'إدارة إعدادات وهوية مجمعك السكني',
       'overview': 'نظرة عامة',

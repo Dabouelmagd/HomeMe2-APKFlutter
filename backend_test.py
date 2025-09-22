@@ -1283,6 +1283,433 @@ class ServicesManagementTestSuite:
         
         return self.print_summary()
     
+    # ============ INVOICE FUNCTIONALITY TESTS ============
+    
+    def test_invoice_system_authentication(self):
+        """Test authentication for invoice system"""
+        print("\n=== Testing Invoice System Authentication ===")
+        
+        try:
+            admin_login_data = {
+                "username": "admin",
+                "password": "admin123"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/auth/login", json=admin_login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.admin_token = data["access_token"]
+                self.admin_user = data["user"]
+                self.compound_id = self.admin_user["compound_id"]
+                self.log_result("Invoice System Authentication", True, "Admin authenticated successfully for invoice testing")
+                return True
+            else:
+                self.log_result("Invoice System Authentication", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Invoice System Authentication", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_my_invoices_empty(self):
+        """Test GET /api/invoices/my - Check existing invoices"""
+        print("\n=== Testing Get My Invoices (Initial Check) ===")
+        
+        if not self.admin_token:
+            self.log_result("Get My Invoices - Initial", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Handle both list and dict responses
+                if isinstance(data, list):
+                    invoices = data
+                else:
+                    invoices = data.get("invoices", [])
+                
+                self.log_result("Get My Invoices - Initial", True, f"Retrieved {len(invoices)} existing invoices")
+                return True
+            else:
+                self.log_result("Get My Invoices - Initial", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get My Invoices - Initial", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_maintenance_fee_and_invoice(self):
+        """Test POST /api/maintenance-fees - Create maintenance fee which generates invoice"""
+        print("\n=== Testing Create Maintenance Fee and Invoice ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Create Maintenance Fee and Invoice", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # First, get a family/unit to create invoice for
+            residences_response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences", headers=headers)
+            
+            if residences_response.status_code != 200:
+                self.log_result("Create Maintenance Fee and Invoice", False, "Failed to get residences for invoice creation")
+                return False
+            
+            residences_data = residences_response.json()
+            residences = residences_data.get("residences", [])
+            
+            if not residences:
+                # Create a test residence first
+                unique_id = str(uuid.uuid4())[:8]
+                residence_data = {
+                    'unit_number': f"INV{unique_id[:4]}",
+                    'full_name': f"Invoice Test User {unique_id}",
+                    'email': f"invtest{unique_id}@example.com",
+                    'phone': "+1234567890",
+                    'compound_id': self.compound_id
+                }
+                
+                residence_response = self.session.post(f"{BASE_URL}/admin/residences", data=residence_data, headers={"Authorization": f"Bearer {self.admin_token}"})
+                
+                if residence_response.status_code != 200:
+                    self.log_result("Create Maintenance Fee and Invoice", False, "Failed to create test residence for invoice")
+                    return False
+                
+                # Get the unit number from the created residence
+                unit_number = residence_data['unit_number']
+            else:
+                # Use existing residence
+                unit_number = residences[0].get("unit_number")
+            
+            # Create maintenance fee data
+            from datetime import datetime, timedelta
+            
+            fee_data = {
+                "unit_number": unit_number,
+                "amount": 150.00,
+                "due_date": (datetime.now() + timedelta(days=30)).isoformat(),
+                "description": "Monthly maintenance fee for invoice testing"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/maintenance-fees", json=fee_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Maintenance fee created successfully":
+                    fee_id = result.get("fee_id")
+                    self.log_result("Create Maintenance Fee and Invoice", True, f"Maintenance fee and invoice created successfully with fee ID: {fee_id}")
+                    return True
+                else:
+                    self.log_result("Create Maintenance Fee and Invoice", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Create Maintenance Fee and Invoice", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Maintenance Fee and Invoice", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_my_invoices_with_data(self):
+        """Test GET /api/invoices/my - Check invoices after creation"""
+        print("\n=== Testing Get My Invoices (After Creation) ===")
+        
+        if not self.admin_token:
+            self.log_result("Get My Invoices - After Creation", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Handle both list and dict responses
+                if isinstance(data, list):
+                    invoices = data
+                else:
+                    invoices = data.get("invoices", [])
+                
+                if invoices:
+                    # Check invoice structure
+                    invoice = invoices[0]
+                    required_fields = ["id", "compound_id", "family_id", "unit_number", "amount", "description", "due_date", "status", "created_by", "created_at"]
+                    missing_fields = [field for field in required_fields if field not in invoice]
+                    
+                    if not missing_fields:
+                        self.log_result("Get My Invoices - After Creation", True, 
+                                      f"Retrieved {len(invoices)} invoices with proper structure. "
+                                      f"Sample invoice: Amount=${invoice.get('amount')}, Status={invoice.get('status')}, Unit={invoice.get('unit_number')}")
+                        return True
+                    else:
+                        self.log_result("Get My Invoices - After Creation", False, f"Invoice missing required fields: {missing_fields}")
+                        return False
+                else:
+                    self.log_result("Get My Invoices - After Creation", False, "No invoices found after creation")
+                    return False
+            else:
+                self.log_result("Get My Invoices - After Creation", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get My Invoices - After Creation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_payment_processing_workflow(self):
+        """Test POST /api/payments - Complete payment processing workflow"""
+        print("\n=== Testing Payment Processing Workflow ===")
+        
+        if not self.admin_token:
+            self.log_result("Payment Processing Workflow", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # First, get invoices to pay
+            invoices_response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)
+            
+            if invoices_response.status_code != 200:
+                self.log_result("Payment Processing Workflow", False, "Failed to get invoices for payment")
+                return False
+            
+            invoices_data = invoices_response.json()
+            if isinstance(invoices_data, list):
+                invoices = invoices_data
+            else:
+                invoices = invoices_data.get("invoices", [])
+            
+            if not invoices:
+                self.log_result("Payment Processing Workflow", False, "No invoices available for payment testing")
+                return False
+            
+            # Find a pending invoice
+            pending_invoice = None
+            for invoice in invoices:
+                if invoice.get("status") == "pending":
+                    pending_invoice = invoice
+                    break
+            
+            if not pending_invoice:
+                self.log_result("Payment Processing Workflow", False, "No pending invoices found for payment testing")
+                return False
+            
+            # Process payment
+            payment_data = {
+                "invoice_id": pending_invoice["id"],
+                "payment_method": "mock"
+            }
+            
+            payment_response = self.session.post(f"{BASE_URL}/payments", json=payment_data, headers=headers)
+            
+            if payment_response.status_code == 200:
+                result = payment_response.json()
+                if result.get("message") == "Payment processed successfully":
+                    payment_id = result.get("payment_id")
+                    transaction_id = result.get("transaction_id")
+                    
+                    if payment_id and transaction_id:
+                        self.log_result("Payment Processing Workflow", True, 
+                                      f"Payment processed successfully. Payment ID: {payment_id}, Transaction ID: {transaction_id}")
+                        return True
+                    else:
+                        self.log_result("Payment Processing Workflow", False, "Missing payment ID or transaction ID in response")
+                        return False
+                else:
+                    self.log_result("Payment Processing Workflow", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Payment Processing Workflow", False, f"Failed with status {payment_response.status_code}", payment_response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Payment Processing Workflow", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_invoice_status_after_payment(self):
+        """Test that invoice status updates to 'paid' after payment"""
+        print("\n=== Testing Invoice Status After Payment ===")
+        
+        if not self.admin_token:
+            self.log_result("Invoice Status After Payment", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list):
+                    invoices = data
+                else:
+                    invoices = data.get("invoices", [])
+                
+                if invoices:
+                    # Check for paid invoices
+                    paid_invoices = [inv for inv in invoices if inv.get("status") == "paid"]
+                    pending_invoices = [inv for inv in invoices if inv.get("status") == "pending"]
+                    
+                    self.log_result("Invoice Status After Payment", True, 
+                                  f"Invoice status verification complete. Total: {len(invoices)}, Paid: {len(paid_invoices)}, Pending: {len(pending_invoices)}")
+                    return True
+                else:
+                    self.log_result("Invoice Status After Payment", False, "No invoices found for status verification")
+                    return False
+            else:
+                self.log_result("Invoice Status After Payment", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Invoice Status After Payment", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_invoice_data_investigation(self):
+        """Test data investigation - check user/family data relationships"""
+        print("\n=== Testing Invoice Data Investigation ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Invoice Data Investigation", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Get families data
+            families_response = self.session.get(f"{BASE_URL}/families/my", headers=headers)
+            families_data = []
+            if families_response.status_code == 200:
+                families_data = families_response.json()
+            
+            # Get residences data
+            residences_response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences", headers=headers)
+            residences_data = []
+            if residences_response.status_code == 200:
+                res_data = residences_response.json()
+                residences_data = res_data.get("residences", [])
+            
+            # Get invoices data
+            invoices_response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)
+            invoices_data = []
+            if invoices_response.status_code == 200:
+                inv_data = invoices_response.json()
+                if isinstance(inv_data, list):
+                    invoices_data = inv_data
+                else:
+                    invoices_data = inv_data.get("invoices", [])
+            
+            # Analyze relationships
+            family_count = len(families_data) if isinstance(families_data, list) else 1 if families_data else 0
+            residence_count = len(residences_data)
+            invoice_count = len(invoices_data)
+            
+            # Check invoice-family relationships
+            invoice_family_ids = [inv.get("family_id") for inv in invoices_data if inv.get("family_id")]
+            unique_families_with_invoices = len(set(invoice_family_ids))
+            
+            self.log_result("Invoice Data Investigation", True, 
+                          f"Data investigation complete. Families: {family_count}, Residences: {residence_count}, "
+                          f"Invoices: {invoice_count}, Families with invoices: {unique_families_with_invoices}")
+            return True
+                
+        except Exception as e:
+            self.log_result("Invoice Data Investigation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_invoice_authentication_security(self):
+        """Test invoice endpoints authentication and security"""
+        print("\n=== Testing Invoice Authentication Security ===")
+        
+        success_count = 0
+        total_tests = 0
+        
+        # Test 1: Access invoices without token
+        try:
+            total_tests += 1
+            response = self.session.get(f"{BASE_URL}/invoices/my")
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Invoice Auth - No Token", True, f"Correctly rejected invoice access without token (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Invoice Auth - No Token", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Invoice Auth - No Token", False, f"Exception occurred: {str(e)}")
+        
+        # Test 2: Access payment endpoint without token
+        try:
+            total_tests += 1
+            payment_data = {"invoice_id": "test", "payment_method": "mock"}
+            response = self.session.post(f"{BASE_URL}/payments", json=payment_data)
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Payment Auth - No Token", True, f"Correctly rejected payment without token (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Payment Auth - No Token", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Payment Auth - No Token", False, f"Exception occurred: {str(e)}")
+        
+        # Test 3: Access maintenance fee creation without admin token
+        if self.resident_token:
+            try:
+                total_tests += 1
+                resident_headers = self.setup_auth_headers(self.resident_token)
+                fee_data = {
+                    "unit_number": "TEST",
+                    "amount": 100.0,
+                    "due_date": datetime.now().isoformat(),
+                    "description": "Test fee"
+                }
+                response = self.session.post(f"{BASE_URL}/maintenance-fees", json=fee_data, headers=resident_headers)
+                
+                if response.status_code == 403:
+                    self.log_result("Maintenance Fee Auth - Resident Access", True, "Correctly denied resident access to maintenance fee creation")
+                    success_count += 1
+                else:
+                    self.log_result("Maintenance Fee Auth - Resident Access", False, f"Expected 403, got {response.status_code}")
+            except Exception as e:
+                self.log_result("Maintenance Fee Auth - Resident Access", False, f"Exception occurred: {str(e)}")
+        
+        return success_count == total_tests
+    
+    def run_invoice_functionality_tests(self):
+        """Run comprehensive invoice functionality tests"""
+        print("\n💰 STARTING INVOICE FUNCTIONALITY TESTING")
+        print("=" * 60)
+        
+        # Authentication setup
+        if not self.test_invoice_system_authentication():
+            print("❌ Invoice system authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Create resident for testing if needed
+        if not self.resident_token:
+            self.test_resident_authentication()
+        
+        # Invoice system tests
+        print("\n📋 Testing Invoice System...")
+        self.test_get_my_invoices_empty()
+        self.test_create_maintenance_fee_and_invoice()
+        self.test_get_my_invoices_with_data()
+        
+        print("\n💳 Testing Payment System...")
+        self.test_payment_processing_workflow()
+        self.test_invoice_status_after_payment()
+        
+        print("\n🔍 Testing Data Investigation...")
+        self.test_invoice_data_investigation()
+        
+        print("\n🔒 Testing Security...")
+        self.test_invoice_authentication_security()
+        
+        return self.print_summary()
+    
     # ============ ENHANCED SERVICE BOOKING & PAYMENTS SYSTEM TESTS ============
     
     def test_enhanced_get_service_providers(self):

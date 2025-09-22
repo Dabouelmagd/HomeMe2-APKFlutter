@@ -287,34 +287,45 @@ class HomePhase1TestSuite:
             self.log_result("Get Maintenance Requests (Admin)", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_delete_service(self):
-        """Test DELETE /api/compounds/{compound_id}/services/{service_id} - Delete service"""
-        print("\n=== Testing Delete Service ===")
+    def test_get_maintenance_stats(self):
+        """Test GET /api/maintenance/stats - Get maintenance statistics"""
+        print("\n=== Testing Get Maintenance Stats ===")
         
-        if not self.test_service_id:
-            self.log_result("Delete Service", False, "No test service ID available")
+        if not self.admin_token:
+            self.log_result("Get Maintenance Stats", False, "No admin token available")
             return False
         
         try:
             headers = self.setup_auth_headers(self.admin_token)
-            
-            response = self.session.delete(f"{BASE_URL}/compounds/{self.compound_id}/services/{self.test_service_id}", 
-                                         headers=headers)
+            response = self.session.get(f"{BASE_URL}/maintenance/stats", headers=headers)
             
             if response.status_code == 200:
-                result = response.json()
-                if result.get("message") == "Service deleted successfully":
-                    self.log_result("Delete Service", True, "Service deleted successfully")
+                data = response.json()
+                stats = data.get("stats", {})
+                
+                # Verify required stats fields
+                required_fields = ["total", "pending", "assigned", "in_progress", "completed", "cancelled"]
+                priority_fields = ["low_priority", "normal_priority", "high_priority", "urgent_priority"]
+                category_fields = ["plumbing", "electrical", "hvac", "appliance", "general", "cleaning", "landscaping", "security"]
+                
+                all_fields_present = True
+                for field in required_fields + priority_fields + category_fields:
+                    if field not in stats:
+                        all_fields_present = False
+                        break
+                
+                if all_fields_present:
+                    self.log_result("Get Maintenance Stats", True, f"Maintenance stats retrieved successfully - Total: {stats.get('total')}, Pending: {stats.get('pending')}")
                     return True
                 else:
-                    self.log_result("Delete Service", False, f"Unexpected response: {result}")
+                    self.log_result("Get Maintenance Stats", False, f"Missing required stats fields: {stats}")
                     return False
             else:
-                self.log_result("Delete Service", False, f"Failed with status {response.status_code}", response.text)
+                self.log_result("Get Maintenance Stats", False, f"Failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_result("Delete Service", False, f"Exception occurred: {str(e)}")
+            self.log_result("Get Maintenance Stats", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_initialize_default_services(self):

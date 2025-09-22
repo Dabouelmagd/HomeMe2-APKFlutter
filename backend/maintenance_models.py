@@ -7,10 +7,10 @@ import uuid
 class MaintenanceRequestCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     description: str = Field(..., min_length=1, max_length=2000)
-    category: str = Field(..., regex="^(plumbing|electrical|hvac|appliance|general|cleaning|landscaping|security)$")
-    priority: str = Field(..., regex="^(low|normal|high|urgent)$")
+    category: str = Field(..., pattern="^(plumbing|electrical|hvac|appliance|general|cleaning|landscaping|security)$")
+    priority: str = Field(..., pattern="^(low|normal|high|urgent)$")
     location: Optional[str] = Field(None, max_length=500)
-    contact_method: str = Field(default="app", regex="^(phone|email|app)$")
+    contact_method: str = Field(default="app", pattern="^(phone|email|app)$")
     preferred_time: Optional[datetime] = None
 
 class MaintenanceRequest(BaseModel):

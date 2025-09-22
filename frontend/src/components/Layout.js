@@ -166,6 +166,24 @@ const Layout = () => {
       show: true
     },
     {
+      name: t('guest_management'),
+      href: '/guests',
+      icon: UsersIcon,
+      show: true
+    },
+    {
+      name: t('events_announcements'),
+      href: '/events',
+      icon: SpeakerWaveIcon,
+      show: true
+    },
+    {
+      name: t('advanced_analytics'),
+      href: '/analytics',
+      icon: ChartBarIcon,
+      show: user?.role === 'admin'
+    },
+    {
       name: t('government_utility_gateway'),
       href: '/utilities',
       icon: BoltIcon,

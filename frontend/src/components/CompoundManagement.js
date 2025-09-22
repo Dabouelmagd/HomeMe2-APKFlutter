@@ -1171,7 +1171,7 @@ const CompoundManagement = () => {
                 className="btn btn-primary flex items-center space-x-2"
               >
                 <PlusIcon className="h-4 w-4" />
-                <span>Add Admin</span>
+                <span>{t('add_admin')}</span>
               </button>
             </div>
 

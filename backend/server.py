@@ -2225,7 +2225,7 @@ async def get_my_invoices(current_user: User = Depends(get_current_user)):
         return []
     
     invoices = await db.invoices.find({"family_id": current_user.family_id}).to_list(None)
-    return invoices
+    return serialize_datetime(invoices)
 
 @api_router.post("/payments")
 async def create_payment(

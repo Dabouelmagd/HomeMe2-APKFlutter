@@ -364,29 +364,50 @@ class HomePhase1TestSuite:
             self.log_result("Get Notifications", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_get_service_providers(self):
-        """Test GET /api/service-providers - Get service providers"""
-        print("\n=== Testing Get Service Providers ===")
+    def test_mark_notification_read(self):
+        """Test PATCH /api/notifications/{id}/read - Mark notification as read"""
+        print("\n=== Testing Mark Notification Read ===")
         
-        if not self.admin_token:
-            self.log_result("Get Service Providers", False, "No admin token available")
+        if not self.resident_token:
+            self.log_result("Mark Notification Read", False, "No resident token available")
             return False
         
         try:
-            headers = self.setup_auth_headers(self.admin_token)
-            response = self.session.get(f"{BASE_URL}/service-providers", headers=headers)
+            # First get notifications to find one to mark as read
+            headers = self.setup_auth_headers(self.resident_token)
+            response = self.session.get(f"{BASE_URL}/notifications", headers=headers)
             
             if response.status_code == 200:
                 data = response.json()
-                providers = data.get("providers", [])
-                self.log_result("Get Service Providers", True, f"Retrieved {len(providers)} service providers successfully")
-                return True
+                notifications = data.get("notifications", [])
+                
+                if notifications:
+                    # Use the first notification
+                    notification_id = notifications[0].get("id")
+                    
+                    # Mark it as read
+                    read_response = self.session.patch(f"{BASE_URL}/notifications/{notification_id}/read", headers=headers)
+                    
+                    if read_response.status_code == 200:
+                        result = read_response.json()
+                        if result.get("message") == "Notification marked as read":
+                            self.log_result("Mark Notification Read", True, f"Notification {notification_id} marked as read successfully")
+                            return True
+                        else:
+                            self.log_result("Mark Notification Read", False, f"Unexpected response: {result}")
+                            return False
+                    else:
+                        self.log_result("Mark Notification Read", False, f"Failed to mark as read with status {read_response.status_code}")
+                        return False
+                else:
+                    # Create a test notification first
+                    return self.create_test_notification_and_mark_read()
             else:
-                self.log_result("Get Service Providers", False, f"Failed with status {response.status_code}", response.text)
+                self.log_result("Mark Notification Read", False, f"Failed to get notifications: {response.status_code}")
                 return False
                 
         except Exception as e:
-            self.log_result("Get Service Providers", False, f"Exception occurred: {str(e)}")
+            self.log_result("Mark Notification Read", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_create_service_provider(self):

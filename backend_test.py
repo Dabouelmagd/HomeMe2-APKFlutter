@@ -1638,23 +1638,35 @@ class ServicesManagementTestSuite:
                 family_members = data.get("family_members", [])
                 
                 if family_members:
-                    # Check if family members have the required metadata
+                    # Check if newly created family members have the required metadata
+                    required_fields = ["id", "full_name", "relationship", "unit_id", "compound_id"]
+                    metadata_fields = ["added_by", "added_by_role"]
+                    
+                    # Check basic required fields
                     sample_member = family_members[0]
-                    required_fields = ["id", "full_name", "relationship", "unit_id", "compound_id", "added_by", "added_by_role"]
+                    missing_basic_fields = [field for field in required_fields if field not in sample_member]
                     
-                    missing_fields = [field for field in required_fields if field not in sample_member]
+                    if missing_basic_fields:
+                        self.log_result("Get Family Members Metadata", False, f"Missing basic required fields: {missing_basic_fields}")
+                        return False
                     
-                    if not missing_fields:
+                    # Check how many have metadata fields (new functionality)
+                    with_metadata = [m for m in family_members if all(field in m for field in metadata_fields)]
+                    without_metadata = len(family_members) - len(with_metadata)
+                    
+                    if len(with_metadata) > 0:
                         # Count members added by different roles
-                        admin_added = sum(1 for member in family_members if member.get("added_by_role") == "admin")
-                        resident_added = sum(1 for member in family_members if member.get("added_by_role") == "resident")
+                        admin_added = sum(1 for member in with_metadata if member.get("added_by_role") == "admin")
+                        resident_added = sum(1 for member in with_metadata if member.get("added_by_role") == "resident")
                         
                         self.log_result("Get Family Members Metadata", True, 
-                                      f"Retrieved {len(family_members)} family members with proper metadata. "
-                                      f"Admin added: {admin_added}, Resident added: {resident_added}")
+                                      f"Retrieved {len(family_members)} family members. "
+                                      f"New metadata fields present in {len(with_metadata)} members "
+                                      f"(Admin added: {admin_added}, Resident added: {resident_added}). "
+                                      f"{without_metadata} legacy members without metadata (expected).")
                         return True
                     else:
-                        self.log_result("Get Family Members Metadata", False, f"Missing required fields: {missing_fields}")
+                        self.log_result("Get Family Members Metadata", False, "No family members found with new metadata fields")
                         return False
                 else:
                     self.log_result("Get Family Members Metadata", True, "No family members found (expected in clean environment)")

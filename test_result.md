@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the newly implemented Phase 2 backend endpoints for the HomeMe application. I need comprehensive testing of: 1. GUEST MANAGEMENT ENDPOINTS (Visit Request Management, Access Control Testing), 2. EVENTS & ANNOUNCEMENTS ENDPOINTS (Announcement Management, Event Management, Combined Statistics), 3. ANALYTICS ENDPOINTS (Dashboard Analytics), 4. DATA VALIDATION & ERROR HANDLING (Guest Management, Events & Announcements), 5. INTEGRATION TESTING (Cross-System Integration)"
+user_problem_statement: "Implement Phase 3 features for the HomeMe application: 1. DOCUMENT MANAGEMENT SYSTEM (File upload/download with categories, version control, permissions, integration with compound/family structure), 2. VOTING & POLLING SYSTEM (Community decision-making tools with secure voting), 3. SMART HOME INTEGRATION (IoT device control with basic device management, advanced automation/scheduling, natural language control using Emergent LLM key)"
 
 backend:
   - task: "Services Management System - Core Services APIs"

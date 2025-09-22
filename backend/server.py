@@ -7693,7 +7693,19 @@ async def get_maintenance_stats(current_user: User = Depends(get_current_user)):
             "assigned": 0,
             "in_progress": 0,
             "completed": 0,
-            "cancelled": 0
+            "cancelled": 0,
+            "low_priority": 0,
+            "normal_priority": 0,
+            "high_priority": 0,
+            "urgent_priority": 0,
+            "plumbing": 0,
+            "electrical": 0,
+            "hvac": 0,
+            "appliance": 0,
+            "general": 0,
+            "cleaning": 0,
+            "landscaping": 0,
+            "security": 0
         }
         
         for request in all_requests:

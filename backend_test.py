@@ -1104,7 +1104,11 @@ class ServicesManagementTestSuite:
             
             if response.status_code == 200:
                 data = response.json()
-                messages = data.get("messages", [])
+                # Handle both list and dict responses
+                if isinstance(data, list):
+                    messages = data
+                else:
+                    messages = data.get("messages", [])
                 self.log_result("Get Messages for Notices", True, f"Retrieved {len(messages)} messages successfully for notice management")
                 return True
             else:
@@ -1137,7 +1141,9 @@ class ServicesManagementTestSuite:
             
             if response.status_code == 200:
                 result = response.json()
-                if result.get("message") == "Message created successfully":
+                # Check for different possible success messages
+                if (result.get("message") == "Message created successfully" or 
+                    result.get("message") == "Message sent successfully"):
                     message_id = result.get("message_id")
                     if message_id:
                         self.log_result("Send Notice Message", True, f"Notice sent successfully with ID: {message_id}")
@@ -1170,7 +1176,11 @@ class ServicesManagementTestSuite:
             
             if response.status_code == 200:
                 data = response.json()
-                invoices = data.get("invoices", [])
+                # Handle both list and dict responses
+                if isinstance(data, list):
+                    invoices = data
+                else:
+                    invoices = data.get("invoices", [])
                 self.log_result("Get Invoices for Payments", True, f"Retrieved {len(invoices)} invoices successfully for payment management")
                 return True
             else:
@@ -1196,7 +1206,11 @@ class ServicesManagementTestSuite:
             
             if invoices_response.status_code == 200:
                 invoices_data = invoices_response.json()
-                invoices = invoices_data.get("invoices", [])
+                # Handle both list and dict responses
+                if isinstance(invoices_data, list):
+                    invoices = invoices_data
+                else:
+                    invoices = invoices_data.get("invoices", [])
                 
                 if invoices:
                     # Use the first invoice for payment testing

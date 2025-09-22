@@ -7578,6 +7578,135 @@ async def check_trial_limit(
         logging.error(f"Error checking trial limit: {e}")
         raise HTTPException(status_code=500, detail="Failed to check trial limit")
 
+# ============ MAINTENANCE REQUEST ENDPOINTS ============
+
+@api_router.post("/maintenance/requests")
+async def create_maintenance_request(
+    title: str = Form(...),
+    description: str = Form(...),
+    category: str = Form(...),
+    priority: str = Form(...),
+    location: str = Form(None),
+    contact_method: str = Form("app"),
+    preferred_time: str = Form(None),
+    images: List[UploadFile] = File(None),
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new maintenance request"""
+    try:
+        # Handle image uploads
+        image_urls = []
+        if images:
+            maintenance_uploads_dir = f"{UPLOAD_DIR}/maintenance"
+            os.makedirs(maintenance_uploads_dir, exist_ok=True)
+            
+            for image in images:
+                if not image.content_type.startswith('image/'):
+                    continue
+                    
+                file_extension = image.filename.split('.')[-1].lower()
+                unique_filename = f"maintenance_{str(uuid.uuid4())}.{file_extension}"
+                file_path = os.path.join(maintenance_uploads_dir, unique_filename)
+                
+                content = await image.read()
+                async with aiofiles.open(file_path, 'wb') as f:
+                    await f.write(content)
+                
+                image_urls.append(f"/uploads/maintenance/{unique_filename}")
+        
+        # Create maintenance request
+        maintenance_request = {
+            "id": str(uuid.uuid4()),
+            "title": title,
+            "description": description,
+            "category": category,
+            "priority": priority,
+            "status": "pending",
+            "location": location,
+            "contact_method": contact_method,
+            "preferred_time": preferred_time,
+            "requester_id": current_user.id,
+            "requester_name": current_user.full_name,
+            "compound_id": current_user.compound_id,
+            "unit_number": current_user.unit_number,
+            "family_id": current_user.family_id,
+            "images": image_urls,
+            "notes": [],
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        await db.maintenance_requests.insert_one(maintenance_request)
+        
+        return {"message": "Maintenance request created successfully", "request_id": maintenance_request["id"]}
+        
+    except Exception as e:
+        logging.error(f"Error creating maintenance request: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create maintenance request")
+
+@api_router.get("/maintenance/requests")
+async def get_maintenance_requests(
+    status: Optional[str] = None,
+    category: Optional[str] = None,
+    priority: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get maintenance requests based on user role"""
+    try:
+        query = {"compound_id": current_user.compound_id}
+        
+        # Residents can only see their own requests
+        if current_user.role != "admin":
+            query["requester_id"] = current_user.id
+        
+        # Apply filters
+        if status:
+            query["status"] = status
+        if category:
+            query["category"] = category
+        if priority:
+            query["priority"] = priority
+        
+        requests = await db.maintenance_requests.find(query).sort("created_at", -1).to_list(None)
+        
+        return {"requests": serialize_datetime(requests)}
+        
+    except Exception as e:
+        logging.error(f"Error fetching maintenance requests: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch maintenance requests")
+
+@api_router.get("/maintenance/stats")
+async def get_maintenance_stats(current_user: User = Depends(get_current_user)):
+    """Get maintenance statistics"""
+    try:
+        query = {"compound_id": current_user.compound_id}
+        
+        # Residents can only see their own stats
+        if current_user.role != "admin":
+            query["requester_id"] = current_user.id
+        
+        all_requests = await db.maintenance_requests.find(query).to_list(None)
+        
+        stats = {
+            "total": len(all_requests),
+            "pending": 0,
+            "assigned": 0,
+            "in_progress": 0,
+            "completed": 0,
+            "cancelled": 0
+        }
+        
+        for request in all_requests:
+            status = request.get("status", "pending")
+            if status in stats:
+                stats[status] += 1
+        
+        return {"stats": stats}
+        
+    except Exception as e:
+        logging.error(f"Error fetching maintenance stats: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch maintenance stats")
+
 # Include router after all endpoints are defined
 app.include_router(api_router)
 

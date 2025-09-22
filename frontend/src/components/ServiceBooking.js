@@ -131,6 +131,8 @@ const ServiceBooking = () => {
     } catch (error) {
       console.error('Failed to load service providers:', error);
       toast.error('Failed to load service providers');
+      // Set empty providers array to allow component to render
+      setProviders([]);
     }
   };
 
@@ -144,7 +146,10 @@ const ServiceBooking = () => {
     } catch (error) {
       console.error('Failed to load bookings:', error);
       toast.error('Failed to load bookings');
+      // Set empty bookings array to allow component to render
+      setBookings([]);
     } finally {
+      // Always set loading to false, regardless of success or failure
       setLoading(false);
     }
   };

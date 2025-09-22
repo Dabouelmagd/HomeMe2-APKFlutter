@@ -2651,7 +2651,7 @@ const CompoundManagement = () => {
                       <div className="grid grid-cols-1 gap-6">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Unit Number *
+                            {t('unit_number')} *
                           </label>
                           <input
                             type="text"
@@ -2659,9 +2659,9 @@ const CompoundManagement = () => {
                             value={comprehensiveFamilyForm.unit_number}
                             onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, unit_number: e.target.value }))}
                             className="form-input w-full"
-                            placeholder="e.g., A-101, B-205, Villa-15"
+                            placeholder={t('unit_number_example')}
                           />
-                          <p className="text-xs text-gray-500 mt-1">Enter the unit number or villa identifier</p>
+                          <p className="text-xs text-gray-500 mt-1">{t('enter_unit_number_identifier')}</p>
                         </div>
                       </div>
                     </div>

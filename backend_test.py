@@ -712,7 +712,7 @@ class HomePhase1TestSuite:
     
     # ============ MAIN TEST RUNNER ============
     
-    def create_trial_test_user(self):
+    def run_phase1_tests(self):
         """Create a new user specifically for trial testing"""
         try:
             if not self.admin_token:

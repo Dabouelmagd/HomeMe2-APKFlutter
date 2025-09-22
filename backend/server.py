@@ -7941,6 +7941,368 @@ async def websocket_notifications_endpoint(websocket: WebSocket, user_id: str):
         logging.error(f"WebSocket connection error: {e}")
         await websocket.close(code=1011, reason="Internal server error")
 
+# ============ GUEST MANAGEMENT ENDPOINTS ============
+
+@api_router.post("/visit-requests")
+async def create_visit_request(
+    visitor_name: str = Form(...),
+    visitor_phone: str = Form(...),
+    visitor_email: str = Form(None),
+    visitor_id_number: str = Form(None),
+    visit_purpose: str = Form(...),
+    visit_date: str = Form(...),
+    unit_number: str = Form(...),
+    host_name: str = Form(...),
+    host_phone: str = Form(...),
+    special_instructions: str = Form(None),
+    vehicle_plate: str = Form(None),
+    escort_required: bool = Form(False),
+    pre_approved: bool = Form(False),
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new visit request"""
+    try:
+        visit_request = {
+            "id": str(uuid.uuid4()),
+            "visitor_name": visitor_name,
+            "visitor_phone": visitor_phone,
+            "visitor_email": visitor_email,
+            "visitor_id_number": visitor_id_number,
+            "visit_purpose": visit_purpose,
+            "visit_date": visit_date,
+            "unit_number": unit_number,
+            "host_name": host_name,
+            "host_phone": host_phone,
+            "special_instructions": special_instructions,
+            "vehicle_plate": vehicle_plate,
+            "escort_required": escort_required,
+            "status": "approved" if pre_approved and current_user.role == "admin" else "pending",
+            "requested_by": current_user.id,
+            "compound_id": current_user.compound_id,
+            "family_id": current_user.family_id,
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        await db.visit_requests.insert_one(visit_request)
+        
+        return {"message": "Visit request created successfully", "request_id": visit_request["id"]}
+        
+    except Exception as e:
+        logging.error(f"Error creating visit request: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create visit request")
+
+@api_router.get("/visit-requests")
+async def get_visit_requests(current_user: User = Depends(get_current_user)):
+    """Get visit requests"""
+    try:
+        query = {"compound_id": current_user.compound_id}
+        
+        # Regular users see only their requests
+        if current_user.role != "admin":
+            query["requested_by"] = current_user.id
+        
+        requests = await db.visit_requests.find(query).sort("created_at", -1).to_list(None)
+        return {"requests": serialize_datetime(requests)}
+        
+    except Exception as e:
+        logging.error(f"Error fetching visit requests: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch visit requests")
+
+@api_router.get("/guests")
+async def get_guests(current_user: User = Depends(get_current_user)):
+    """Get approved guests/visitors"""
+    try:
+        query = {"compound_id": current_user.compound_id, "status": {"$in": ["approved", "checked_in", "checked_out"]}}
+        
+        guests = await db.visit_requests.find(query).sort("created_at", -1).to_list(None)
+        return {"guests": serialize_datetime(guests)}
+        
+    except Exception as e:
+        logging.error(f"Error fetching guests: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch guests")
+
+@api_router.get("/guests/stats")
+async def get_guest_stats(current_user: User = Depends(get_current_user)):
+    """Get guest management statistics"""
+    try:
+        query = {"compound_id": current_user.compound_id}
+        
+        all_requests = await db.visit_requests.find(query).to_list(None)
+        
+        stats = {
+            "total_visitors": len(all_requests),
+            "pending_approvals": len([r for r in all_requests if r["status"] == "pending"]),
+            "active_visits": len([r for r in all_requests if r["status"] == "checked_in"]),
+            "todays_visits": len([r for r in all_requests if r["visit_date"].startswith(datetime.now().strftime("%Y-%m-%d"))])
+        }
+        
+        return {"stats": stats}
+        
+    except Exception as e:
+        logging.error(f"Error fetching guest stats: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch guest stats")
+
+# ============ EVENTS & ANNOUNCEMENTS ENDPOINTS ============
+
+@api_router.post("/announcements")
+async def create_announcement(
+    title: str = Form(...),
+    content: str = Form(...),
+    category: str = Form(...),
+    priority: str = Form("normal"),
+    scheduled_for: str = Form(None),
+    expires_at: str = Form(None),
+    send_push: bool = Form(True),
+    send_email: bool = Form(False),
+    is_emergency: bool = Form(False),
+    target_audience: str = Form("all"),
+    current_user: User = Depends(require_admin)
+):
+    """Create a new announcement"""
+    try:
+        announcement = {
+            "id": str(uuid.uuid4()),
+            "title": title,
+            "content": content,
+            "category": category,
+            "priority": priority,
+            "author_id": current_user.id,
+            "author_name": current_user.full_name,
+            "compound_id": current_user.compound_id,
+            "status": "published",
+            "is_published": True,
+            "is_emergency": is_emergency,
+            "target_audience": target_audience,
+            "scheduled_for": scheduled_for,
+            "expires_at": expires_at,
+            "published_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
+            "views_count": 0,
+            "likes_count": 0,
+            "comments_count": 0,
+            "shares_count": 0,
+            "bookmarks_count": 0,
+            "unique_views": [],
+            "liked_by": [],
+            "bookmarked_by": [],
+            "images": [],
+            "attachments": [],
+            "tags": []
+        }
+        
+        await db.announcements.insert_one(announcement)
+        
+        return {"message": "Announcement created successfully", "announcement_id": announcement["id"]}
+        
+    except Exception as e:
+        logging.error(f"Error creating announcement: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create announcement")
+
+@api_router.post("/events")
+async def create_event(
+    title: str = Form(...),
+    content: str = Form(...),
+    category: str = Form(...),
+    priority: str = Form("normal"),
+    event_date: str = Form(...),
+    event_time: str = Form(...),
+    event_location: str = Form(None),
+    max_attendees: int = Form(None),
+    send_push: bool = Form(True),
+    send_email: bool = Form(False),
+    target_audience: str = Form("all"),
+    current_user: User = Depends(require_admin)
+):
+    """Create a new event"""
+    try:
+        event = {
+            "id": str(uuid.uuid4()),
+            "title": title,
+            "content": content,
+            "category": category,
+            "priority": priority,
+            "event_date": event_date,
+            "event_time": event_time,
+            "event_location": event_location,
+            "max_attendees": max_attendees,
+            "author_id": current_user.id,
+            "author_name": current_user.full_name,
+            "compound_id": current_user.compound_id,
+            "status": "published",
+            "is_published": True,
+            "target_audience": target_audience,
+            "published_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
+            "views_count": 0,
+            "likes_count": 0,
+            "comments_count": 0,
+            "shares_count": 0,
+            "bookmarks_count": 0,
+            "attendees_count": 0,
+            "unique_views": [],
+            "liked_by": [],
+            "bookmarked_by": [],
+            "attendees": [],
+            "maybe_attending": [],
+            "not_attending": [],
+            "images": [],
+            "attachments": [],
+            "tags": []
+        }
+        
+        await db.events.insert_one(event)
+        
+        return {"message": "Event created successfully", "event_id": event["id"]}
+        
+    except Exception as e:
+        logging.error(f"Error creating event: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create event")
+
+@api_router.get("/announcements")
+async def get_announcements(current_user: User = Depends(get_current_user)):
+    """Get announcements"""
+    try:
+        query = {"compound_id": current_user.compound_id, "is_published": True}
+        
+        announcements = await db.announcements.find(query).sort("created_at", -1).to_list(None)
+        return {"announcements": serialize_datetime(announcements)}
+        
+    except Exception as e:
+        logging.error(f"Error fetching announcements: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch announcements")
+
+@api_router.get("/events")
+async def get_events(current_user: User = Depends(get_current_user)):
+    """Get events"""
+    try:
+        query = {"compound_id": current_user.compound_id, "is_published": True}
+        
+        events = await db.events.find(query).sort("event_date", 1).to_list(None)
+        return {"events": serialize_datetime(events)}
+        
+    except Exception as e:
+        logging.error(f"Error fetching events: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch events")
+
+@api_router.get("/events/stats")
+async def get_events_stats(current_user: User = Depends(get_current_user)):
+    """Get events and announcements statistics"""
+    try:
+        query = {"compound_id": current_user.compound_id}
+        
+        announcements = await db.announcements.find(query).to_list(None)
+        events = await db.events.find(query).to_list(None)
+        
+        stats = {
+            "total_announcements": len(announcements),
+            "upcoming_events": len([e for e in events if e["event_date"] >= datetime.now().strftime("%Y-%m-%d")]),
+            "total_participants": sum([e.get("attendees_count", 0) for e in events]),
+            "engagement_rate": 75  # Mock calculation
+        }
+        
+        return {"stats": stats}
+        
+    except Exception as e:
+        logging.error(f"Error fetching events stats: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch events stats")
+
+# ============ ANALYTICS ENDPOINTS ============
+
+@api_router.get("/analytics/dashboard")
+async def get_analytics_dashboard(
+    date_range: str = "last_30_days",
+    current_user: User = Depends(require_admin)
+):
+    """Get comprehensive analytics dashboard"""
+    try:
+        # Mock analytics data - in production, this would aggregate real data
+        analytics = {
+            "residents": {
+                "total": 125,
+                "active": 98,
+                "growth_rate": 12.5
+            },
+            "maintenance": {
+                "total": 45,
+                "pending": 8,
+                "growth_rate": -5.2
+            },
+            "revenue": {
+                "total": 125000,
+                "collection_rate": 94.5,
+                "growth_rate": 8.3
+            },
+            "engagement": {
+                "rate": 76,
+                "active_users": 87,
+                "growth_rate": 15.7
+            },
+            "charts": {
+                "resident_growth": [
+                    {"label": "Jan", "value": 110},
+                    {"label": "Feb", "value": 115},
+                    {"label": "Mar", "value": 120},
+                    {"label": "Apr", "value": 125}
+                ],
+                "maintenance_trend": [
+                    {"label": "Week 1", "value": 12},
+                    {"label": "Week 2", "value": 8},
+                    {"label": "Week 3", "value": 15},
+                    {"label": "Week 4", "value": 10}
+                ],
+                "revenue_trend": [
+                    {"label": "Jan", "value": 118000},
+                    {"label": "Feb", "value": 122000},
+                    {"label": "Mar", "value": 119000},
+                    {"label": "Apr", "value": 125000}
+                ],
+                "activity_trend": [
+                    {"label": "Mon", "value": 45},
+                    {"label": "Tue", "value": 52},
+                    {"label": "Wed", "value": 48},
+                    {"label": "Thu", "value": 61},
+                    {"label": "Fri", "value": 38}
+                ]
+            },
+            "recent_activity": [
+                {
+                    "title": "New Resident Registration",
+                    "description": "John Smith registered in Unit 4B",
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                },
+                {
+                    "title": "Maintenance Request Completed",
+                    "description": "Plumbing repair in Unit 2A completed",
+                    "timestamp": (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
+                }
+            ],
+            "summary": {
+                "achievements": [
+                    "12.5% increase in resident registrations",
+                    "94.5% payment collection rate achieved",
+                    "76% user engagement maintained"
+                ],
+                "improvements": [
+                    "Maintenance response time increased by 5%",
+                    "3 pending high-priority requests"
+                ],
+                "recommendations": [
+                    "Focus on reducing maintenance response time",
+                    "Implement resident feedback system",
+                    "Increase community event frequency"
+                ]
+            }
+        }
+        
+        return analytics
+        
+    except Exception as e:
+        logging.error(f"Error fetching analytics: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch analytics")
+
 # Include router after all endpoints are defined
 app.include_router(api_router)
 

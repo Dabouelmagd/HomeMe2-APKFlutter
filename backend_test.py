@@ -2668,13 +2668,13 @@ class ServicesManagementTestSuite:
 if __name__ == "__main__":
     test_suite = ServicesManagementTestSuite()
     
-    # Run Service Booking & Payments tests as requested
-    print("🔧 RUNNING SERVICE BOOKING & PAYMENTS SYSTEM TESTS")
-    success = test_suite.run_service_booking_payments_tests()
+    # Run Payment Processing tests as requested
+    print("💳 RUNNING PAYMENT PROCESSING FUNCTIONALITY TESTS")
+    success = test_suite.run_payment_processing_tests()
     
     if success:
-        print("\n🎉 SERVICE BOOKING & PAYMENTS TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 PAYMENT PROCESSING TESTING COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ SERVICE BOOKING & PAYMENTS TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ PAYMENT PROCESSING TESTING COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

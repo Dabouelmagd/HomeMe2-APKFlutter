@@ -109,7 +109,7 @@ class BulkNotificationCreate(BaseModel):
     priority: str = Field(default="normal", pattern="^(low|normal|high|urgent)$")
     
     # Targeting
-    target_type: str = Field(..., regex="^(all|compound|family|unit|role|specific)$")
+    target_type: str = Field(..., pattern="^(all|compound|family|unit|role|specific)$")
     target_ids: List[str] = Field(default_factory=list)  # IDs based on target_type
     
     # Scheduling

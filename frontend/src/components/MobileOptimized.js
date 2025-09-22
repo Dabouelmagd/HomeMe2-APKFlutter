@@ -15,7 +15,7 @@ import {
   XMarkIcon,
   WifiIcon,
   SignalSlashIcon,
-  BatteryIcon,
+  BoltIcon,
   DevicePhoneMobileIcon
 } from '@heroicons/react/24/outline';
 

@@ -860,7 +860,6 @@ const ServiceBooking = () => {
               </div>
             </div>
           )}
-        </div>
 
 
 

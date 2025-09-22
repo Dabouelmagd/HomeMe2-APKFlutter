@@ -33,6 +33,10 @@ class ServicesManagementTestSuite:
         self.test_booking_id = None
         self.trial_user_token = None
         self.trial_user = None
+        self.unit_ids = []
+        self.unit_numbers = []
+        self.test_family_member_id = None
+        self.test_family_member_id_2 = None
         self.results = []
         
     def log_result(self, test_name: str, success: bool, message: str, details: str = ""):

@@ -32,6 +32,11 @@ import httpx
 import shutil
 from passlib.context import CryptContext
 
+# Import our new models and utilities
+from maintenance_models import *
+from notification_models import *
+from websocket_manager import manager
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')

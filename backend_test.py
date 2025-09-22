@@ -989,6 +989,282 @@ class ServicesManagementTestSuite:
         
         return success_count == total_tests
     
+    # ============ QUICK ACTIONS FUNCTIONALITY TESTS ============
+    
+    def test_get_compounds_for_selection(self):
+        """Test GET /api/compounds - Get compounds for selection (Add Resident functionality)"""
+        print("\n=== Testing Get Compounds for Selection ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Compounds for Selection", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/compounds", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                compounds = data.get("compounds", [])
+                if compounds:
+                    self.log_result("Get Compounds for Selection", True, f"Retrieved {len(compounds)} compounds successfully for selection")
+                    return True
+                else:
+                    self.log_result("Get Compounds for Selection", False, "No compounds found in response")
+                    return False
+            else:
+                self.log_result("Get Compounds for Selection", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Compounds for Selection", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_residence_direct(self):
+        """Test POST /api/admin/residences - Direct residence creation (Add Resident functionality)"""
+        print("\n=== Testing Direct Residence Creation ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Create Residence Direct", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            unique_id = str(uuid.uuid4())[:8]
+            
+            # Create test data for residence creation
+            data = {
+                'unit_number': f"QA{unique_id[:4]}",
+                'full_name': f"Quick Action Test User {unique_id}",
+                'email': f"qatest{unique_id}@example.com",
+                'phone': "+1234567890",
+                'compound_id': self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/residences", data=data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Residence created successfully":
+                    username = result.get("username")
+                    temp_password = result.get("temporary_password")
+                    if username and temp_password:
+                        self.log_result("Create Residence Direct", True, f"Residence created successfully. Username: {username}, Temp Password: {temp_password}")
+                        return True
+                    else:
+                        self.log_result("Create Residence Direct", False, "Missing username or temporary password in response")
+                        return False
+                else:
+                    self.log_result("Create Residence Direct", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Create Residence Direct", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Residence Direct", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_compound_residences(self):
+        """Test GET /api/compounds/{compound_id}/residences - View residences (Manage Units functionality)"""
+        print("\n=== Testing Get Compound Residences ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Get Compound Residences", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                residences = data.get("residences", [])
+                self.log_result("Get Compound Residences", True, f"Retrieved {len(residences)} residences successfully for management")
+                return True
+            else:
+                self.log_result("Get Compound Residences", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Compound Residences", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_messages_for_notices(self):
+        """Test GET /api/messages - View messages (Send Notice functionality)"""
+        print("\n=== Testing Get Messages for Notices ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Messages for Notices", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/messages", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                messages = data.get("messages", [])
+                self.log_result("Get Messages for Notices", True, f"Retrieved {len(messages)} messages successfully for notice management")
+                return True
+            else:
+                self.log_result("Get Messages for Notices", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Messages for Notices", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_send_notice_message(self):
+        """Test POST /api/messages - Send notice/message (Send Notice functionality)"""
+        print("\n=== Testing Send Notice Message ===")
+        
+        if not self.admin_token:
+            self.log_result("Send Notice Message", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Create test notice data
+            notice_data = {
+                "message_type": "general",
+                "subject": "Quick Action Test Notice",
+                "content": "This is a test notice sent via Quick Actions functionality testing."
+            }
+            
+            response = self.session.post(f"{BASE_URL}/messages", json=notice_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Message created successfully":
+                    message_id = result.get("message_id")
+                    if message_id:
+                        self.log_result("Send Notice Message", True, f"Notice sent successfully with ID: {message_id}")
+                        return True
+                    else:
+                        self.log_result("Send Notice Message", False, "No message ID in response")
+                        return False
+                else:
+                    self.log_result("Send Notice Message", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Send Notice Message", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Send Notice Message", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_invoices_for_payments(self):
+        """Test GET /api/invoices/my - View invoices (View Payments functionality)"""
+        print("\n=== Testing Get Invoices for Payments ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Invoices for Payments", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                invoices = data.get("invoices", [])
+                self.log_result("Get Invoices for Payments", True, f"Retrieved {len(invoices)} invoices successfully for payment management")
+                return True
+            else:
+                self.log_result("Get Invoices for Payments", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Invoices for Payments", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_process_payment(self):
+        """Test POST /api/payments - Process payment (View Payments functionality)"""
+        print("\n=== Testing Process Payment ===")
+        
+        if not self.admin_token:
+            self.log_result("Process Payment", False, "No admin token available")
+            return False
+        
+        try:
+            # First, try to get an invoice to pay
+            headers = self.setup_auth_headers(self.admin_token)
+            invoices_response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)
+            
+            if invoices_response.status_code == 200:
+                invoices_data = invoices_response.json()
+                invoices = invoices_data.get("invoices", [])
+                
+                if invoices:
+                    # Use the first invoice for payment testing
+                    invoice_id = invoices[0].get("id")
+                    
+                    payment_data = {
+                        "invoice_id": invoice_id,
+                        "payment_method": "mock"
+                    }
+                    
+                    response = self.session.post(f"{BASE_URL}/payments", json=payment_data, headers=headers)
+                    
+                    if response.status_code == 200:
+                        result = response.json()
+                        if result.get("message") == "Payment processed successfully":
+                            payment_id = result.get("payment_id")
+                            if payment_id:
+                                self.log_result("Process Payment", True, f"Payment processed successfully with ID: {payment_id}")
+                                return True
+                            else:
+                                self.log_result("Process Payment", False, "No payment ID in response")
+                                return False
+                        else:
+                            self.log_result("Process Payment", False, f"Unexpected response: {result}")
+                            return False
+                    else:
+                        self.log_result("Process Payment", False, f"Failed with status {response.status_code}", response.text)
+                        return False
+                else:
+                    # No invoices available, create a test scenario
+                    self.log_result("Process Payment", True, "No invoices available for payment testing (expected in clean environment)")
+                    return True
+            else:
+                self.log_result("Process Payment", False, f"Failed to get invoices: {invoices_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Process Payment", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def run_quick_actions_tests(self):
+        """Run Quick Actions functionality tests"""
+        print("\n🚀 STARTING QUICK ACTIONS FUNCTIONALITY TESTING")
+        print("=" * 60)
+        
+        # Authentication test
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Quick Actions tests
+        print("\n📋 Testing Add Resident functionality...")
+        self.test_get_compounds_for_selection()
+        self.test_create_residence_direct()
+        
+        print("\n🏠 Testing Manage Units functionality...")
+        self.test_get_compound_residences()
+        
+        print("\n📢 Testing Send Notice functionality...")
+        self.test_get_messages_for_notices()
+        self.test_send_notice_message()
+        
+        print("\n💰 Testing View Payments functionality...")
+        self.test_get_invoices_for_payments()
+        self.test_process_payment()
+        
+        return self.print_summary()
+    
     def run_all_tests(self):
         """Run all services management tests"""
         print("🔧 STARTING SERVICES MANAGEMENT BACKEND TESTING")

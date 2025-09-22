@@ -588,58 +588,125 @@ class HomePhase1TestSuite:
             self.log_result("WebSocket Connection", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_authentication_issues(self):
-        """Test authentication issues - 401 Unauthorized errors"""
-        print("\n=== Testing Authentication Issues ===")
+    def test_maintenance_data_validation(self):
+        """Test maintenance request data validation"""
+        print("\n=== Testing Maintenance Data Validation ===")
+        
+        if not self.resident_token:
+            self.log_result("Maintenance Data Validation", False, "No resident token available")
+            return False
         
         success_count = 0
         total_tests = 0
         
-        # Test 1: Access services without token
+        headers = {"Authorization": f"Bearer {self.resident_token}"}
+        
+        # Test 1: Invalid category
         try:
             total_tests += 1
-            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/services")
+            data = {
+                'title': 'Test Request',
+                'description': 'Test description',
+                'category': 'invalid_category',  # Invalid category
+                'priority': 'high',
+                'location': 'Kitchen'
+            }
             
-            if response.status_code == 401 or response.status_code == 403:
-                self.log_result("Auth Test - No Token", True, f"Correctly rejected request without token (status: {response.status_code})")
+            response = self.session.post(f"{BASE_URL}/maintenance/requests", data=data, headers=headers)
+            
+            if response.status_code == 422:  # Validation error
+                self.log_result("Invalid Category Validation", True, "Correctly rejected invalid category")
                 success_count += 1
             else:
-                self.log_result("Auth Test - No Token", False, f"Expected 401/403, got {response.status_code}")
+                self.log_result("Invalid Category Validation", False, f"Expected 422, got {response.status_code}")
         except Exception as e:
-            self.log_result("Auth Test - No Token", False, f"Exception occurred: {str(e)}")
+            self.log_result("Invalid Category Validation", False, f"Exception occurred: {str(e)}")
         
-        # Test 2: Access admin endpoint with invalid token
+        # Test 2: Invalid priority
         try:
             total_tests += 1
-            invalid_headers = {"Authorization": "Bearer invalid_token_12345"}
-            response = self.session.post(f"{BASE_URL}/admin/initialize-services", 
-                                       json={"compound_id": self.compound_id}, 
-                                       headers=invalid_headers)
+            data = {
+                'title': 'Test Request',
+                'description': 'Test description',
+                'category': 'plumbing',
+                'priority': 'invalid_priority',  # Invalid priority
+                'location': 'Kitchen'
+            }
             
-            if response.status_code == 401:
-                self.log_result("Auth Test - Invalid Token", True, "Correctly rejected request with invalid token")
+            response = self.session.post(f"{BASE_URL}/maintenance/requests", data=data, headers=headers)
+            
+            if response.status_code == 422:  # Validation error
+                self.log_result("Invalid Priority Validation", True, "Correctly rejected invalid priority")
                 success_count += 1
             else:
-                self.log_result("Auth Test - Invalid Token", False, f"Expected 401, got {response.status_code}")
+                self.log_result("Invalid Priority Validation", False, f"Expected 422, got {response.status_code}")
         except Exception as e:
-            self.log_result("Auth Test - Invalid Token", False, f"Exception occurred: {str(e)}")
+            self.log_result("Invalid Priority Validation", False, f"Exception occurred: {str(e)}")
         
-        # Test 3: Access admin endpoint with resident token
-        if self.resident_token:
+        # Test 3: Missing required fields
+        try:
+            total_tests += 1
+            data = {
+                'title': 'Test Request',
+                # Missing description, category, priority
+                'location': 'Kitchen'
+            }
+            
+            response = self.session.post(f"{BASE_URL}/maintenance/requests", data=data, headers=headers)
+            
+            if response.status_code == 422:  # Validation error
+                self.log_result("Missing Fields Validation", True, "Correctly rejected missing required fields")
+                success_count += 1
+            else:
+                self.log_result("Missing Fields Validation", False, f"Expected 422, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Missing Fields Validation", False, f"Exception occurred: {str(e)}")
+        
+        # Test 4: Valid categories
+        valid_categories = ["plumbing", "electrical", "hvac", "appliance", "general", "cleaning", "landscaping", "security"]
+        for category in valid_categories:
             try:
                 total_tests += 1
-                resident_headers = self.setup_auth_headers(self.resident_token)
-                response = self.session.post(f"{BASE_URL}/admin/initialize-services", 
-                                           json={"compound_id": self.compound_id}, 
-                                           headers=resident_headers)
+                data = {
+                    'title': f'Test {category.title()} Request',
+                    'description': f'Test {category} maintenance request',
+                    'category': category,
+                    'priority': 'normal',
+                    'location': 'Test Location'
+                }
                 
-                if response.status_code == 403:
-                    self.log_result("Auth Test - Resident Access Admin", True, "Correctly denied resident access to admin endpoint")
+                response = self.session.post(f"{BASE_URL}/maintenance/requests", data=data, headers=headers)
+                
+                if response.status_code == 200:
+                    self.log_result(f"Valid Category - {category.title()}", True, f"Successfully created {category} request")
                     success_count += 1
                 else:
-                    self.log_result("Auth Test - Resident Access Admin", False, f"Expected 403, got {response.status_code}")
+                    self.log_result(f"Valid Category - {category.title()}", False, f"Failed to create {category} request: {response.status_code}")
             except Exception as e:
-                self.log_result("Auth Test - Resident Access Admin", False, f"Exception occurred: {str(e)}")
+                self.log_result(f"Valid Category - {category.title()}", False, f"Exception occurred: {str(e)}")
+        
+        # Test 5: Valid priorities
+        valid_priorities = ["low", "normal", "high", "urgent"]
+        for priority in valid_priorities:
+            try:
+                total_tests += 1
+                data = {
+                    'title': f'Test {priority.title()} Priority Request',
+                    'description': f'Test maintenance request with {priority} priority',
+                    'category': 'general',
+                    'priority': priority,
+                    'location': 'Test Location'
+                }
+                
+                response = self.session.post(f"{BASE_URL}/maintenance/requests", data=data, headers=headers)
+                
+                if response.status_code == 200:
+                    self.log_result(f"Valid Priority - {priority.title()}", True, f"Successfully created {priority} priority request")
+                    success_count += 1
+                else:
+                    self.log_result(f"Valid Priority - {priority.title()}", False, f"Failed to create {priority} priority request: {response.status_code}")
+            except Exception as e:
+                self.log_result(f"Valid Priority - {priority.title()}", False, f"Exception occurred: {str(e)}")
         
         return success_count == total_tests
     

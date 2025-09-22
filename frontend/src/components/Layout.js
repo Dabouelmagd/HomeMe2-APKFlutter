@@ -171,6 +171,12 @@ const Layout = () => {
       show: true
     },
     {
+      name: 'Add Family Member',
+      href: '/add-family-member',
+      icon: UserPlusIcon,
+      show: true
+    },
+    {
       name: t('financial_management'),
       href: '/finances',
       icon: CurrencyDollarIcon,

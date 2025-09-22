@@ -35,6 +35,7 @@ from passlib.context import CryptContext
 # Import our new models and utilities
 from maintenance_models import *
 from notification_models import *
+from document_models import *
 from websocket_manager import manager
 
 # Load environment variables

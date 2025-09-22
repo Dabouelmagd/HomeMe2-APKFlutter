@@ -15,7 +15,7 @@ from PIL import Image
 from backend_test import CompoundManagementTestSuite
 
 # Configuration
-BASE_URL = "https://resident-portal-11.preview.emergentagent.com/api"
+BASE_URL = "https://property-pulse-48.preview.emergentagent.com/api"
 
 class CompoundEnhancementsTestSuite(CompoundManagementTestSuite):
     def __init__(self):

@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = "https://resident-portal-11.preview.emergentagent.com/api"
+BASE_URL = "https://property-pulse-48.preview.emergentagent.com/api"
 
 def test_invoice_with_resident():
     """Test invoice system with resident user"""

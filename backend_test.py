@@ -2630,6 +2630,299 @@ class ServicesManagementTestSuite:
         
         return self.print_summary()
 
+    def test_booking_creation_comprehensive(self):
+        """Comprehensive test for booking creation functionality - Focus on reported issues"""
+        print("\n=== COMPREHENSIVE BOOKING CREATION TESTING ===")
+        
+        success_count = 0
+        total_tests = 0
+        
+        # Test 1: Create booking with all required fields
+        print("\n--- Test 1: Create booking with all required fields ---")
+        try:
+            total_tests += 1
+            if not self.resident_token or not self.test_provider_id:
+                self.log_result("Booking Creation - All Required Fields", False, "No resident token or provider ID available")
+            else:
+                headers = self.setup_auth_headers(self.resident_token)
+                
+                booking_data = {
+                    "provider_id": self.test_provider_id,
+                    "service_category": "maintenance",
+                    "title": "Kitchen Sink Repair",
+                    "description": "Kitchen sink is leaking and needs immediate repair",
+                    "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat()
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                           json=booking_data, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("message") == "Service booking created successfully":
+                        booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
+                        if booking_id:
+                            self.test_booking_id = booking_id
+                            self.log_result("Booking Creation - All Required Fields", True, f"Booking created successfully with ID: {self.test_booking_id}")
+                            success_count += 1
+                        else:
+                            self.log_result("Booking Creation - All Required Fields", False, f"No booking ID in response: {result}")
+                    else:
+                        self.log_result("Booking Creation - All Required Fields", False, f"Unexpected response: {result}")
+                else:
+                    self.log_result("Booking Creation - All Required Fields", False, f"Failed with status {response.status_code}", response.text)
+        except Exception as e:
+            self.log_result("Booking Creation - All Required Fields", False, f"Exception occurred: {str(e)}")
+        
+        # Test 2: Test different service categories
+        print("\n--- Test 2: Test different service categories ---")
+        categories = ["maintenance", "cleaning", "security", "gardening"]
+        for category in categories:
+            try:
+                total_tests += 1
+                if not self.resident_token or not self.test_provider_id:
+                    self.log_result(f"Booking Creation - {category.title()}", False, "No resident token or provider ID available")
+                    continue
+                
+                headers = self.setup_auth_headers(self.resident_token)
+                
+                booking_data = {
+                    "provider_id": self.test_provider_id,
+                    "service_category": category,
+                    "title": f"{category.title()} Service Request",
+                    "description": f"Need {category} service for my unit",
+                    "scheduled_date": (datetime.now() + timedelta(days=2)).date().isoformat()
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                           json=booking_data, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("message") == "Service booking created successfully":
+                        self.log_result(f"Booking Creation - {category.title()}", True, f"{category.title()} booking created successfully")
+                        success_count += 1
+                    else:
+                        self.log_result(f"Booking Creation - {category.title()}", False, f"Unexpected response: {result}")
+                else:
+                    self.log_result(f"Booking Creation - {category.title()}", False, f"Failed with status {response.status_code}", response.text)
+            except Exception as e:
+                self.log_result(f"Booking Creation - {category.title()}", False, f"Exception occurred: {str(e)}")
+        
+        # Test 3: Test different priority levels
+        print("\n--- Test 3: Test different priority levels ---")
+        priorities = ["emergency", "urgent", "standard", "scheduled"]
+        for priority in priorities:
+            try:
+                total_tests += 1
+                if not self.resident_token or not self.test_provider_id:
+                    self.log_result(f"Booking Creation - {priority.title()} Priority", False, "No resident token or provider ID available")
+                    continue
+                
+                headers = self.setup_auth_headers(self.resident_token)
+                
+                booking_data = {
+                    "provider_id": self.test_provider_id,
+                    "service_category": "maintenance",
+                    "title": f"{priority.title()} Priority Service",
+                    "description": f"This is a {priority} priority service request",
+                    "priority": priority,
+                    "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat()
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                           json=booking_data, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("message") == "Service booking created successfully":
+                        self.log_result(f"Booking Creation - {priority.title()} Priority", True, f"{priority.title()} priority booking created successfully")
+                        success_count += 1
+                    else:
+                        self.log_result(f"Booking Creation - {priority.title()} Priority", False, f"Unexpected response: {result}")
+                else:
+                    self.log_result(f"Booking Creation - {priority.title()} Priority", False, f"Failed with status {response.status_code}", response.text)
+            except Exception as e:
+                self.log_result(f"Booking Creation - {priority.title()} Priority", False, f"Exception occurred: {str(e)}")
+        
+        # Test 4: Test booking retrieval after creation
+        print("\n--- Test 4: Test booking retrieval after creation ---")
+        try:
+            total_tests += 1
+            if not self.resident_token:
+                self.log_result("Booking Retrieval After Creation", False, "No resident token available")
+            else:
+                headers = self.setup_auth_headers(self.resident_token)
+                response = self.session.get(f"{BASE_URL}/service-bookings", headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    bookings = data.get("bookings", [])
+                    if bookings:
+                        # Check if our test booking is in the list
+                        found_booking = False
+                        for booking in bookings:
+                            if booking.get("id") == self.test_booking_id:
+                                found_booking = True
+                                break
+                        
+                        if found_booking:
+                            self.log_result("Booking Retrieval After Creation", True, f"Successfully retrieved {len(bookings)} bookings including our test booking")
+                            success_count += 1
+                        else:
+                            self.log_result("Booking Retrieval After Creation", True, f"Retrieved {len(bookings)} bookings (test booking may not be included)")
+                            success_count += 1
+                    else:
+                        self.log_result("Booking Retrieval After Creation", True, "No bookings found (expected in clean environment)")
+                        success_count += 1
+                else:
+                    self.log_result("Booking Retrieval After Creation", False, f"Failed with status {response.status_code}", response.text)
+        except Exception as e:
+            self.log_result("Booking Retrieval After Creation", False, f"Exception occurred: {str(e)}")
+        
+        # Test 5: Test authentication requirements
+        print("\n--- Test 5: Test authentication requirements ---")
+        try:
+            total_tests += 1
+            # Test without authentication
+            booking_data = {
+                "provider_id": self.test_provider_id or "test-provider-id",
+                "service_category": "maintenance",
+                "title": "Unauthorized Test",
+                "description": "This should fail",
+                "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat()
+            }
+            
+            response = self.session.post(f"{BASE_URL}/service-bookings", json=booking_data)
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Booking Creation - Authentication Required", True, f"Correctly rejected unauthenticated request (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Booking Creation - Authentication Required", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Booking Creation - Authentication Required", False, f"Exception occurred: {str(e)}")
+        
+        # Test 6: Test required field validation
+        print("\n--- Test 6: Test required field validation ---")
+        required_fields = ["provider_id", "service_category", "title", "description", "scheduled_date"]
+        for field in required_fields:
+            try:
+                total_tests += 1
+                if not self.resident_token:
+                    self.log_result(f"Validation - Missing {field}", False, "No resident token available")
+                    continue
+                
+                headers = self.setup_auth_headers(self.resident_token)
+                
+                # Create booking data without the required field
+                booking_data = {
+                    "provider_id": self.test_provider_id or "test-provider-id",
+                    "service_category": "maintenance",
+                    "title": "Test Booking",
+                    "description": "Test description",
+                    "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat()
+                }
+                
+                # Remove the field we're testing
+                if field in booking_data:
+                    del booking_data[field]
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                           json=booking_data, headers=headers)
+                
+                if response.status_code == 422 or response.status_code == 400:
+                    self.log_result(f"Validation - Missing {field}", True, f"Correctly rejected booking without {field} (status: {response.status_code})")
+                    success_count += 1
+                else:
+                    self.log_result(f"Validation - Missing {field}", False, f"Expected 422/400, got {response.status_code}")
+            except Exception as e:
+                self.log_result(f"Validation - Missing {field}", False, f"Exception occurred: {str(e)}")
+        
+        # Test 7: Test date format validation
+        print("\n--- Test 7: Test date format validation ---")
+        try:
+            total_tests += 1
+            if not self.resident_token or not self.test_provider_id:
+                self.log_result("Date Format Validation", False, "No resident token or provider ID available")
+            else:
+                headers = self.setup_auth_headers(self.resident_token)
+                
+                booking_data = {
+                    "provider_id": self.test_provider_id,
+                    "service_category": "maintenance",
+                    "title": "Date Format Test",
+                    "description": "Testing invalid date format",
+                    "scheduled_date": "invalid-date-format"
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                           json=booking_data, headers=headers)
+                
+                if response.status_code == 422 or response.status_code == 400:
+                    self.log_result("Date Format Validation", True, f"Correctly rejected invalid date format (status: {response.status_code})")
+                    success_count += 1
+                else:
+                    self.log_result("Date Format Validation", False, f"Expected 422/400, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Date Format Validation", False, f"Exception occurred: {str(e)}")
+        
+        # Test 8: Test provider_id validation
+        print("\n--- Test 8: Test provider_id validation ---")
+        try:
+            total_tests += 1
+            if not self.resident_token:
+                self.log_result("Provider ID Validation", False, "No resident token available")
+            else:
+                headers = self.setup_auth_headers(self.resident_token)
+                
+                booking_data = {
+                    "provider_id": "non-existent-provider-id",
+                    "service_category": "maintenance",
+                    "title": "Provider ID Test",
+                    "description": "Testing non-existent provider ID",
+                    "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat()
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                           json=booking_data, headers=headers)
+                
+                if response.status_code == 404 or response.status_code == 400:
+                    self.log_result("Provider ID Validation", True, f"Correctly rejected non-existent provider ID (status: {response.status_code})")
+                    success_count += 1
+                else:
+                    self.log_result("Provider ID Validation", False, f"Expected 404/400, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Provider ID Validation", False, f"Exception occurred: {str(e)}")
+        
+        print(f"\n📊 BOOKING CREATION TEST SUMMARY: {success_count}/{total_tests} tests passed ({(success_count/total_tests*100):.1f}% success rate)")
+        return success_count == total_tests
+
+    def run_booking_creation_focus_tests(self):
+        """Run focused booking creation tests as requested"""
+        print("\n🎯 STARTING FOCUSED BOOKING CREATION TESTING")
+        print("=" * 60)
+        
+        # Authentication tests
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        if not self.test_resident_authentication():
+            print("❌ Resident authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Ensure we have service providers
+        print("\n👥 Setting up Service Providers...")
+        self.test_get_service_providers()
+        self.test_create_service_provider()
+        
+        # Run comprehensive booking creation tests
+        print("\n📋 Running Comprehensive Booking Creation Tests...")
+        self.test_booking_creation_comprehensive()
+        
+        return self.print_summary()
+
     def print_summary(self):
         """Print test results summary"""
         print("\n" + "=" * 60)

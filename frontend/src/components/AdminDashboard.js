@@ -101,7 +101,7 @@ const AdminDashboard = () => {
       trend: 'up'
     },
     {
-      name: 'Active Services',
+      name: t('total_services'),
       value: dashboardData?.statistics?.total_services || 0,
       icon: CurrencyDollarIcon,
       color: 'from-purple-500 to-purple-600',
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
       trend: 'up'
     },
     {
-      name: 'Messages Today',
+      name: t('open_messages'),
       value: dashboardData?.statistics?.total_messages || 0,
       icon: ChatBubbleLeftEllipsisIcon,
       color: 'from-orange-500 to-orange-600',

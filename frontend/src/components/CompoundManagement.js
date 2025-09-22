@@ -664,6 +664,24 @@ const CompoundManagement = () => {
     }
   };
 
+  const handleFamilyMemberProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      
+      setNewFamilyMember(prev => ({ ...prev, profile_picture: file }));
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setNewFamilyMember(prev => ({ ...prev, profile_picture_preview: e.target.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleEditUnitProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {

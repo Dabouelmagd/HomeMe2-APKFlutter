@@ -870,39 +870,184 @@ const ServiceBooking = () => {
             <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowBookingForm(false)}></div>
               <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full max-h-screen overflow-y-auto">
                 <form onSubmit={handleBookService}>
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900">Book Service</h3>
+                      <div>
+                        <h3 className="text-lg leading-6 font-medium text-gray-900">Book Service</h3>
+                        {selectedProvider && (
+                          <p className="text-sm text-gray-600 mt-1">with {selectedProvider.full_name}</p>
+                        )}
+                      </div>
                       <button type="button" onClick={() => setShowBookingForm(false)} className="text-gray-400 hover:text-gray-600">
                         <XCircleIcon className="h-6 w-6" />
                       </button>
                     </div>
-                    <div className="space-y-4">
+                    
+                    <div className="space-y-6">
+                      {/* Service Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Service Category</label>
+                          <select
+                            value={bookingForm.service_category}
+                            onChange={(e) => setBookingForm({...bookingForm, service_category: e.target.value})}
+                            className="form-input w-full"
+                            required
+                          >
+                            {serviceCategories.map(category => (
+                              <option key={category.value} value={category.value}>{category.label}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Priority Level</label>
+                          <select
+                            value={bookingForm.priority}
+                            onChange={(e) => setBookingForm({...bookingForm, priority: e.target.value})}
+                            className="form-input w-full"
+                            required
+                          >
+                            {priorityOptions.map(priority => (
+                              <option key={priority.value} value={priority.value}>
+                                {priority.label} - {priority.description}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Service Title</label>
-                        <input type="text" required value={bookingForm.title} onChange={(e) => setBookingForm({...bookingForm, title: e.target.value})} className="form-input w-full" />
+                        <input 
+                          type="text" 
+                          required 
+                          value={bookingForm.title} 
+                          onChange={(e) => setBookingForm({...bookingForm, title: e.target.value})} 
+                          className="form-input w-full"
+                          placeholder="e.g., Fix leaky faucet, Deep cleaning, Garden maintenance"
+                        />
                       </div>
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                        <textarea rows={3} required value={bookingForm.description} onChange={(e) => setBookingForm({...bookingForm, description: e.target.value})} className="form-input w-full" />
+                        <textarea 
+                          rows={3} 
+                          required 
+                          value={bookingForm.description} 
+                          onChange={(e) => setBookingForm({...bookingForm, description: e.target.value})} 
+                          className="form-input w-full"
+                          placeholder="Describe the service needed in detail..."
+                        />
                       </div>
+                      
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                          <input type="date" required value={bookingForm.scheduled_date} onChange={(e) => setBookingForm({...bookingForm, scheduled_date: e.target.value})} className="form-input w-full" />
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Date</label>
+                          <input 
+                            type="date" 
+                            required 
+                            value={bookingForm.scheduled_date} 
+                            onChange={(e) => setBookingForm({...bookingForm, scheduled_date: e.target.value})} 
+                            className="form-input w-full"
+                            min={new Date().toISOString().split('T')[0]}
+                          />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
-                          <input type="time" value={bookingForm.scheduled_time} onChange={(e) => setBookingForm({...bookingForm, scheduled_time: e.target.value})} className="form-input w-full" />
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Time</label>
+                          <input 
+                            type="time" 
+                            value={bookingForm.scheduled_time} 
+                            onChange={(e) => setBookingForm({...bookingForm, scheduled_time: e.target.value})} 
+                            className="form-input w-full"
+                          />
                         </div>
+                      </div>
+
+                      {/* Enhanced Payment Method Selection */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-4">Preferred Payment Method</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {paymentMethods.map(method => {
+                            const IconComponent = method.icon;
+                            return (
+                              <label key={method.value} className="relative flex cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name="payment_method"
+                                  value={method.value}
+                                  checked={bookingForm.payment_method === method.value}
+                                  onChange={(e) => setBookingForm({...bookingForm, payment_method: e.target.value})}
+                                  className="sr-only"
+                                />
+                                <div className={`flex-1 p-3 rounded-lg border-2 transition-all duration-200 ${
+                                  bookingForm.payment_method === method.value
+                                    ? 'border-blue-500 bg-blue-50 shadow-md'
+                                    : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                                } ${method.color}`}>
+                                  <div className="flex items-center space-x-3">
+                                    <IconComponent className={`h-5 w-5 flex-shrink-0 ${
+                                      bookingForm.payment_method === method.value 
+                                        ? 'text-blue-600' 
+                                        : 'text-gray-500'
+                                    }`} />
+                                    <div className="flex-1 min-w-0">
+                                      <div className={`font-medium text-sm ${
+                                        bookingForm.payment_method === method.value 
+                                          ? 'text-blue-900' 
+                                          : 'text-gray-900'
+                                      }`}>
+                                        {method.label}
+                                      </div>
+                                      <div className={`text-xs mt-1 ${
+                                        bookingForm.payment_method === method.value 
+                                          ? 'text-blue-700' 
+                                          : 'text-gray-600'
+                                      }`}>
+                                        {method.description}
+                                      </div>
+                                    </div>
+                                    {bookingForm.payment_method === method.value && (
+                                      <CheckCircleIcon className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                                    )}
+                                  </div>
+                                </div>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Additional Notes */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes (Optional)</label>
+                        <textarea 
+                          rows={2} 
+                          value={bookingForm.booking_notes} 
+                          onChange={(e) => setBookingForm({...bookingForm, booking_notes: e.target.value})} 
+                          className="form-input w-full"
+                          placeholder="Any specific requirements or instructions..."
+                        />
                       </div>
                     </div>
                   </div>
+                  
                   <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm">Book Service</button>
-                    <button type="button" onClick={() => setShowBookingForm(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+                    <button 
+                      type="submit" 
+                      className="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-base font-medium text-white hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm transition-all duration-200"
+                    >
+                      <CalendarIcon className="h-5 w-5 mr-2" />
+                      Book Service
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setShowBookingForm(false)} 
+                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </form>
               </div>

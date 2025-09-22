@@ -1022,6 +1022,20 @@ const resources = {
       'date_format_short': 'jj/mm/aaaa',
       'date_format_long': 'd MMMM yyyy',
       
+      // Missing translations
+      'frontend_update_successful': 'Mise à jour de l\'interface réussie',
+      'frontend_updates_working': 'Si vous pouvez voir cette bannière rouge, les mises à jour de l\'interface fonctionnent',
+      'updated_compound_management': 'MIS À JOUR - Gestion de la résidence',
+      'new_features_added': 'NOUVELLES FONCTIONNALITÉS AJOUTÉES: Gestion des résidences avec photos de profil et création de compte directe',
+      'created': 'Créé',
+      'compound_id': 'ID de la résidence',
+      'click_to_upload_logo': 'Cliquez pour télécharger le logo',
+      'primary_admin': 'Administrateur principal',
+      'test_admin': 'Administrateur test',
+      'add_residence': 'Ajouter une résidence',
+      'create_new_residence': 'Créer une nouvelle résidence',
+      'residence_management': 'Gestion des résidences',
+      
       // Compound Management
       'manage_compound': 'Gérez les paramètres et l\'image de marque de votre résidence',
       'overview': 'Aperçu',

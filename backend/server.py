@@ -29,6 +29,7 @@ from io import BytesIO
 from PIL import Image
 from datetime import timezone
 import httpx
+import shutil
 from passlib.context import CryptContext
 
 # Load environment variables

@@ -709,7 +709,7 @@ metadata:
 
 test_plan:
   current_focus: 
-    - "Compound Management Enhancements - Family Member Profile Updates and Enhanced Residence Data"
+    - "Invoice Functionality System - Complete Invoice Management and Payment Processing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

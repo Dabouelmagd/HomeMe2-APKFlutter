@@ -28,16 +28,9 @@ class HomePhase1TestSuite:
         self.admin_user = None
         self.resident_user = None
         self.compound_id = None
-        self.test_service_id = None
-        self.test_provider_id = None
-        self.test_booking_id = None
-        self.trial_user_token = None
-        self.trial_user = None
-        self.unit_ids = []
-        self.unit_numbers = []
-        self.test_family_member_id = None
-        self.test_family_member_id_2 = None
-        self.test_unit_number = None
+        self.test_maintenance_request_id = None
+        self.test_notification_id = None
+        self.websocket_connection = None
         self.results = []
         
     def log_result(self, test_name: str, success: bool, message: str, details: str = ""):

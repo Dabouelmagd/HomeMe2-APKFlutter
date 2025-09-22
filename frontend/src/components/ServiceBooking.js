@@ -124,22 +124,84 @@ const ServiceBooking = () => {
 
   const loadProviders = async () => {
     try {
-      const response = await axios.get(`${API}/service-providers`);
+      const response = await axios.get(`${API}/service-providers`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
       setProviders(response.data.providers || []);
     } catch (error) {
       console.error('Failed to load service providers:', error);
+      toast.error('Failed to load service providers');
     }
   };
 
   const loadBookings = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/service-bookings`);
+      const response = await axios.get(`${API}/service-bookings`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
       setBookings(response.data.bookings || []);
     } catch (error) {
       console.error('Failed to load bookings:', error);
+      toast.error('Failed to load bookings');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const toggleFavorite = (providerId) => {
+    const newFavorites = new Set(favoriteProviders);
+    if (newFavorites.has(providerId)) {
+      newFavorites.delete(providerId);
+      toast.success('Removed from favorites');
+    } else {
+      newFavorites.add(providerId);
+      toast.success('Added to favorites');
+    }
+    setFavoriteProviders(newFavorites);
+  };
+
+  const getFilteredProviders = () => {
+    let filtered = providers.filter(provider => {
+      const matchesSearch = provider.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           provider.services.some(service => service.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesCategory = filterCategory === 'all' || provider.services.includes(filterCategory);
+      return matchesSearch && matchesCategory;
+    });
+
+    // Sort providers
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'rating':
+          return (b.average_rating || 0) - (a.average_rating || 0);
+        case 'price':
+          return (a.hourly_rate || Infinity) - (b.hourly_rate || Infinity);
+        case 'availability':
+          return (b.is_available === true ? 1 : 0) - (a.is_available === true ? 1 : 0);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'confirmed':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'in_progress':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'completed':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'paid':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 

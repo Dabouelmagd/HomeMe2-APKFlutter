@@ -2599,10 +2599,10 @@ const CompoundManagement = () => {
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h3 className="text-lg leading-6 font-medium text-gray-900" id="comprehensive-family-modal-title">
-                      Add New Resident & Family
+                      {t('add_new_resident_family')}
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      Complete family setup with all member details and photos
+                      {t('complete_family_setup')}
                     </p>
                   </div>
                   <button

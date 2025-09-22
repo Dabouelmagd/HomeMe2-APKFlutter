@@ -470,6 +470,10 @@ const resources = {
       'new_resident': 'مقيم جديد',
       'service_booked': 'خدمة محجوزة',
       'payment': 'دفعة',
+      'create_residence_account': 'إنشاء حساب إقامة جديد',
+      'view_all_units': 'عرض جميع الوحدات السكنية',
+      'broadcast_residents': 'بث لجميع المقيمين',
+      'check_financial_status': 'التحقق من الوضع المالي',
       
       // Compound Management
       'manage_compound': 'إدارة إعدادات وهوية مجمعك السكني',

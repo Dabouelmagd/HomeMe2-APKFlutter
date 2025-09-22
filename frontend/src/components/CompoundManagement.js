@@ -1008,9 +1008,9 @@ const CompoundManagement = () => {
     <div className="p-6">
       <TestUpdate />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-red-600">🔴 UPDATED - Compound Management</h1>
+        <h1 className="text-3xl font-bold text-red-600">🔴 {t('updated_compound_management')}</h1>
         <p className="text-gray-600 mt-2">
-          🚀 NEW FEATURES ADDED: Residence management with profile pictures and direct account creation!
+          🚀 {t('new_features_added')}
         </p>
       </div>
 

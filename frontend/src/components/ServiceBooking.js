@@ -370,83 +370,400 @@ const ServiceBooking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Service Booking</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Book services, manage payments, and leave reviews
-            </p>
+        {/* Enhanced Header */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Booking & Payments</h1>
+              <p className="text-lg text-gray-600">
+                Book services, manage payments, and leave reviews with ease
+              </p>
+            </div>
+            <div className="flex items-center space-x-4 mt-4 lg:mt-0">
+              <button
+                onClick={() => setShowBookingForm(true)}
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <PlusIcon className="h-5 w-5 mr-2" />
+                Book New Service
+              </button>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="inline-flex items-center px-4 py-3 bg-white text-gray-700 rounded-xl border border-gray-300 hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2" />
+                Filters
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => setShowBookingForm(true)}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <PlusIcon className="h-5 w-5 mr-2" />
-            Book Service
-          </button>
+
+          {/* Enhanced Tab Navigation */}
+          <div className="border-b border-gray-200 bg-white rounded-t-xl">
+            <nav className="flex space-x-8 px-6">
+              {[
+                { key: 'providers', label: 'Service Providers', icon: UserIcon },
+                { key: 'bookings', label: 'My Bookings', icon: CalendarIcon },
+                { key: 'history', label: 'History', icon: ClockIcon }
+              ].map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveTab(key)}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 transition-colors ${
+                    activeTab === key
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
         </div>
 
-        {/* Service Providers */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Available Service Providers</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {providers.map((provider) => (
-              <div key={provider.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                    <span className="text-lg font-medium text-white">
-                      {provider.full_name.charAt(0)}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">{provider.full_name}</h3>
-                    <div className="flex items-center space-x-2">
-                      {renderStars(Math.floor(provider.average_rating))}
-                      <span className="text-sm text-gray-500">
-                        ({provider.total_reviews} reviews)
-                      </span>
-                    </div>
-                  </div>
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="mb-6 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Search */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <div className="relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search providers or services..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="form-input pl-10 w-full"
+                  />
                 </div>
-                
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <UserIcon className="h-4 w-4 mr-2" />
-                    {provider.services.join(', ')}
-                  </div>
-                  {provider.hourly_rate && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <CurrencyDollarIcon className="h-4 w-4 mr-2" />
-                      ${provider.hourly_rate}/hour
+              </div>
+
+              {/* Category Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                  className="form-input w-full"
+                >
+                  <option value="all">All Categories</option>
+                  {serviceCategories.map(category => (
+                    <option key={category.value} value={category.value}>
+                      {category.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sort By */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="form-input w-full"
+                >
+                  <option value="rating">Highest Rating</option>
+                  <option value="price">Lowest Price</option>
+                  <option value="availability">Most Available</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Content based on active tab */}
+        {activeTab === 'providers' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {getFilteredProviders().map((provider) => (
+              <div key={provider.id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                {/* Provider Header */}
+                <div className="relative p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+                        <span className="text-2xl font-bold text-white">
+                          {provider.full_name.charAt(0)}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-white">{provider.full_name}</h3>
+                        <div className="flex items-center space-x-1 mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <StarIconSolid
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < Math.floor(provider.average_rating || 0)
+                                  ? 'text-yellow-300'
+                                  : 'text-white/30'
+                              }`}
+                            />
+                          ))}
+                          <span className="text-white/90 text-sm ml-2">
+                            ({provider.total_reviews || 0})
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                  <div className="flex items-center text-sm text-gray-600">
-                    <CheckCircleIcon className="h-4 w-4 mr-2" />
-                    {provider.total_jobs_completed} jobs completed
+                    <button
+                      onClick={() => toggleFavorite(provider.id)}
+                      className="p-2 rounded-full bg-white/20 backdrop-blur-sm hover:bg-white/30 transition-colors"
+                    >
+                      <HeartIcon 
+                        className={`h-5 w-5 ${
+                          favoriteProviders.has(provider.id) 
+                            ? 'text-red-300 fill-current' 
+                            : 'text-white/70'
+                        }`} 
+                      />
+                    </button>
                   </div>
                 </div>
 
-                <button
-                  onClick={() => {
-                    setSelectedProvider(provider);
-                    setBookingForm({...bookingForm, provider_id: provider.id});
-                    setShowBookingForm(true);
-                  }}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Book Service
-                </button>
+                {/* Provider Details */}
+                <div className="p-6">
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <SparklesIcon className="h-4 w-4 mr-3 text-blue-500" />
+                      <span className="font-medium">Services:</span>
+                      <span className="ml-2">{provider.services?.join(', ') || 'Various services'}</span>
+                    </div>
+                    
+                    {provider.hourly_rate && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <CurrencyDollarIcon className="h-4 w-4 mr-3 text-green-500" />
+                        <span className="font-medium">Rate:</span>
+                        <span className="ml-2 text-green-600 font-semibold">${provider.hourly_rate}/hour</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center text-sm text-gray-600">
+                      <CheckCircleIcon className="h-4 w-4 mr-3 text-emerald-500" />
+                      <span className="font-medium">Completed:</span>
+                      <span className="ml-2">{provider.total_jobs_completed || 0} jobs</span>
+                    </div>
+
+                    {provider.location && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <MapPinIcon className="h-4 w-4 mr-3 text-red-500" />
+                        <span className="font-medium">Location:</span>
+                        <span className="ml-2">{provider.location}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => {
+                        setSelectedProvider(provider);
+                        setShowProviderDetails(true);
+                      }}
+                      className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center space-x-2"
+                    >
+                      <EyeIcon className="h-4 w-4" />
+                      <span>View Details</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedProvider(provider);
+                        setBookingForm({...bookingForm, provider_id: provider.id});
+                        setShowBookingForm(true);
+                      }}
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center space-x-2 shadow-md"
+                    >
+                      <CalendarIcon className="h-4 w-4" />
+                      <span>Book Now</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Availability Badge */}
+                {provider.is_available && (
+                  <div className="absolute top-4 right-4">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                      Available Now
+                    </span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
-        </div>
+        )}
 
-        {/* My Bookings */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">My Bookings</h2>
+        {activeTab === 'bookings' && (
+          <div className="space-y-6">
+            {bookings.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+                <CalendarIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
+                <p className="text-gray-600 mb-6">Start by booking your first service!</p>
+                <button
+                  onClick={() => setShowBookingForm(true)}
+                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <PlusIcon className="h-5 w-5 mr-2" />
+                  Book Service
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {bookings.map((booking) => (
+                  <div key={booking.id} className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    {/* Booking Header */}
+                    <div className="p-6 bg-gray-50 border-b border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">{booking.title}</h3>
+                          <p className="text-sm text-gray-600 mt-1">{booking.provider_name}</p>
+                        </div>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
+                          {booking.status?.replace('_', ' ').toUpperCase() || 'PENDING'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Booking Details */}
+                    <div className="p-6">
+                      <div className="space-y-3 mb-6">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <CalendarIcon className="h-4 w-4 mr-3 text-blue-500" />
+                          <span>{new Date(booking.scheduled_date).toLocaleDateString()}</span>
+                          {booking.scheduled_time && (
+                            <>
+                              <ClockIcon className="h-4 w-4 ml-4 mr-2 text-green-500" />
+                              <span>{booking.scheduled_time}</span>
+                            </>
+                          )}
+                        </div>
+                        
+                        {booking.estimated_cost && (
+                          <div className="flex items-center text-sm text-gray-600">
+                            <CurrencyDollarIcon className="h-4 w-4 mr-3 text-green-500" />
+                            <span>Estimated Cost: <strong className="text-green-600">${booking.estimated_cost}</strong></span>
+                          </div>
+                        )}
+
+                        <div className="flex items-center text-sm text-gray-600">
+                          <SparklesIcon className="h-4 w-4 mr-3 text-purple-500" />
+                          <span className="capitalize">{booking.priority} Priority</span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedBooking(booking);
+                            setShowBookingDetails(true);
+                          }}
+                          className="flex items-center px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                        >
+                          <EyeIcon className="h-4 w-4 mr-2" />
+                          View Details
+                        </button>
+
+                        {booking.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => handleRescheduleBooking(booking.id)}
+                              className="flex items-center px-3 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors text-sm"
+                            >
+                              <PencilIcon className="h-4 w-4 mr-2" />
+                              Reschedule
+                            </button>
+                            <button
+                              onClick={() => handleCancelBooking(booking.id)}
+                              className="flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm"
+                            >
+                              <XCircleIcon className="h-4 w-4 mr-2" />
+                              Cancel
+                            </button>
+                          </>
+                        )}
+
+                        {booking.status === 'completed' && !booking.payment_status && (
+                          <button
+                            onClick={() => {
+                              setSelectedBooking(booking);
+                              setPaymentForm({...paymentForm, amount: booking.estimated_cost || 0});
+                              setShowPaymentModal(true);
+                            }}
+                            className="flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm"
+                          >
+                            <CreditCardIcon className="h-4 w-4 mr-2" />
+                            Pay Now
+                          </button>
+                        )}
+
+                        {booking.status === 'completed' && booking.payment_status === 'paid' && !booking.review_submitted && (
+                          <button
+                            onClick={() => {
+                              setSelectedBooking(booking);
+                              setShowReviewModal(true);
+                            }}
+                            className="flex items-center px-3 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors text-sm"
+                          >
+                            <StarIcon className="h-4 w-4 mr-2" />
+                            Leave Review
+                          </button>
+                        )}
+
+                        <button
+                          onClick={() => {
+                            // Contact provider functionality
+                            toast.info('Contact functionality coming soon!');
+                          }}
+                          className="flex items-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                        >
+                          <ChatBubbleLeftEllipsisIcon className="h-4 w-4 mr-2" />
+                          Contact
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'history' && (
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking History</h3>
+            <div className="space-y-4">
+              {bookings.filter(booking => booking.status === 'completed' || booking.status === 'cancelled').map((booking) => (
+                <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">{booking.title}</h4>
+                    <p className="text-sm text-gray-600">{booking.provider_name} • {new Date(booking.scheduled_date).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(booking.status)}`}>
+                      {booking.status?.replace('_', ' ').toUpperCase()}
+                    </span>
+                    {booking.status === 'completed' && (
+                      <button
+                        onClick={() => {
+                          setSelectedBooking(booking);
+                          setShowReviewModal(true);
+                        }}
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      >
+                        {booking.review_submitted ? 'View Review' : 'Leave Review'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
           {bookings.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
               <CalendarIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />

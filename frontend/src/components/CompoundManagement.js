@@ -2141,6 +2141,502 @@ const CompoundManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Comprehensive Family Creation Modal */}
+      {showComprehensiveFamilyModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="comprehensive-family-modal-title" role="dialog" aria-modal="true">
+          <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowComprehensiveFamilyModal(false)}></div>
+            
+            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full max-h-screen overflow-y-auto">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="comprehensive-family-modal-title">
+                      Add New Resident & Family
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Complete family setup with all member details and photos
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowComprehensiveFamilyModal(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <span className="sr-only">Close</span>
+                    ×
+                  </button>
+                </div>
+
+                {/* Progress Steps */}
+                <div className="mb-8">
+                  <div className="flex items-center justify-between">
+                    {[1, 2, 3, 4].map((step) => (
+                      <div key={step} className="flex items-center">
+                        <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
+                          familyCreationStep >= step 
+                            ? 'bg-blue-600 border-blue-600 text-white' 
+                            : 'border-gray-300 text-gray-500'
+                        }`}>
+                          {step}
+                        </div>
+                        <div className="ml-2 text-sm font-medium">
+                          {step === 1 && 'Unit Info'}
+                          {step === 2 && 'Family Head'}
+                          {step === 3 && 'Family Members'}
+                          {step === 4 && 'Review'}
+                        </div>
+                        {step < 4 && <div className={`ml-4 w-12 h-0.5 ${familyCreationStep > step ? 'bg-blue-600' : 'bg-gray-300'}`}></div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Step Content */}
+                <div className="min-h-96">
+                  {/* Step 1: Unit Information */}
+                  {familyCreationStep === 1 && (
+                    <div className="space-y-6">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h4 className="font-medium text-blue-900 mb-2">Step 1: Unit Information</h4>
+                        <p className="text-sm text-blue-700">Enter the basic residence unit details</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Unit Number *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={comprehensiveFamilyForm.unit_number}
+                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, unit_number: e.target.value }))}
+                            className="form-input w-full"
+                            placeholder="e.g., A-101, B-205, Villa-15"
+                          />
+                          <p className="text-xs text-gray-500 mt-1">Enter the unit number or villa identifier</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Family Head Information */}
+                  {familyCreationStep === 2 && (
+                    <div className="space-y-6">
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h4 className="font-medium text-green-900 mb-2">Step 2: Family Head Details</h4>
+                        <p className="text-sm text-green-700">Enter complete information for the primary resident</p>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Full Name *
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={comprehensiveFamilyForm.head_full_name}
+                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_full_name: e.target.value }))}
+                            className="form-input w-full"
+                            placeholder="Enter full name"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address *
+                          </label>
+                          <input
+                            type="email"
+                            required
+                            value={comprehensiveFamilyForm.head_email}
+                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_email: e.target.value }))}
+                            className="form-input w-full"
+                            placeholder="resident@email.com"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Phone Number
+                          </label>
+                          <input
+                            type="tel"
+                            value={comprehensiveFamilyForm.head_phone}
+                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_phone: e.target.value }))}
+                            className="form-input w-full"
+                            placeholder="+1 (555) 123-4567"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Date of Birth
+                          </label>
+                          <input
+                            type="date"
+                            value={comprehensiveFamilyForm.head_date_of_birth}
+                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_date_of_birth: e.target.value }))}
+                            className="form-input w-full"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            ID Number
+                          </label>
+                          <input
+                            type="text"
+                            value={comprehensiveFamilyForm.head_id_number}
+                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_id_number: e.target.value }))}
+                            className="form-input w-full"
+                            placeholder="Enter ID/Passport number"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Profile Picture
+                          </label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFamilyHeadProfilePictureChange}
+                            className="form-input w-full"
+                          />
+                          {comprehensiveFamilyForm.head_profile_picture_preview && (
+                            <div className="mt-2">
+                              <img
+                                src={comprehensiveFamilyForm.head_profile_picture_preview}
+                                alt="Family head preview"
+                                className="h-20 w-20 rounded-full object-cover border-2 border-gray-200"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3: Family Members */}
+                  {familyCreationStep === 3 && (
+                    <div className="space-y-6">
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h4 className="font-medium text-purple-900 mb-2">Step 3: Family Members</h4>
+                        <p className="text-sm text-purple-700">Add all family members with their complete information</p>
+                      </div>
+
+                      {/* Existing Family Members */}
+                      {comprehensiveFamilyForm.family_members.length > 0 && (
+                        <div className="space-y-4">
+                          <h5 className="font-medium text-gray-900">Added Family Members ({comprehensiveFamilyForm.family_members.length})</h5>
+                          {comprehensiveFamilyForm.family_members.map((member) => (
+                            <div key={member.id} className="bg-gray-50 rounded-lg p-4 flex items-start justify-between">
+                              <div className="flex items-start space-x-4">
+                                {member.profile_picture_preview ? (
+                                  <img
+                                    src={member.profile_picture_preview}
+                                    alt={member.full_name}
+                                    className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                                  />
+                                ) : (
+                                  <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                    <UsersIcon className="h-6 w-6 text-gray-600" />
+                                  </div>
+                                )}
+                                <div>
+                                  <h6 className="font-medium text-gray-900">{member.full_name}</h6>
+                                  <p className="text-sm text-gray-600">{member.relationship}</p>
+                                  {member.age && <p className="text-sm text-gray-500">Age: {member.age}</p>}
+                                  {member.email && <p className="text-sm text-gray-500">{member.email}</p>}
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => removeFamilyMember(member.id)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Add New Family Member Form */}
+                      <div className="border border-gray-200 rounded-lg p-4">
+                        <h5 className="font-medium text-gray-900 mb-4">Add Family Member</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Full Name *
+                            </label>
+                            <input
+                              type="text"
+                              value={newFamilyMember.full_name}
+                              onChange={(e) => setNewFamilyMember(prev => ({ ...prev, full_name: e.target.value }))}
+                              className="form-input w-full"
+                              placeholder="Enter full name"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Relationship *
+                            </label>
+                            <select
+                              value={newFamilyMember.relationship}
+                              onChange={(e) => setNewFamilyMember(prev => ({ ...prev, relationship: e.target.value }))}
+                              className="form-input w-full"
+                            >
+                              <option value="">Select relationship</option>
+                              <option value="Spouse">Spouse</option>
+                              <option value="Son">Son</option>
+                              <option value="Daughter">Daughter</option>
+                              <option value="Father">Father</option>
+                              <option value="Mother">Mother</option>
+                              <option value="Brother">Brother</option>
+                              <option value="Sister">Sister</option>
+                              <option value="Other">Other</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Age
+                            </label>
+                            <input
+                              type="number"
+                              value={newFamilyMember.age}
+                              onChange={(e) => setNewFamilyMember(prev => ({ ...prev, age: e.target.value }))}
+                              className="form-input w-full"
+                              placeholder="Enter age"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Phone Number
+                            </label>
+                            <input
+                              type="tel"
+                              value={newFamilyMember.phone}
+                              onChange={(e) => setNewFamilyMember(prev => ({ ...prev, phone: e.target.value }))}
+                              className="form-input w-full"
+                              placeholder="+1 (555) 123-4567"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              value={newFamilyMember.email}
+                              onChange={(e) => setNewFamilyMember(prev => ({ ...prev, email: e.target.value }))}
+                              className="form-input w-full"
+                              placeholder="member@email.com (optional)"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Date of Birth
+                            </label>
+                            <input
+                              type="date"
+                              value={newFamilyMember.date_of_birth}
+                              onChange={(e) => setNewFamilyMember(prev => ({ ...prev, date_of_birth: e.target.value }))}
+                              className="form-input w-full"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              ID Number
+                            </label>
+                            <input
+                              type="text"
+                              value={newFamilyMember.id_number}
+                              onChange={(e) => setNewFamilyMember(prev => ({ ...prev, id_number: e.target.value }))}
+                              className="form-input w-full"
+                              placeholder="Enter ID number (optional)"
+                            />
+                          </div>
+
+                          <div className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Profile Picture
+                            </label>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFamilyMemberProfilePictureChange}
+                              className="form-input w-full"
+                            />
+                            {newFamilyMember.profile_picture_preview && (
+                              <div className="mt-2">
+                                <img
+                                  src={newFamilyMember.profile_picture_preview}
+                                  alt="Member preview"
+                                  className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="mt-4">
+                          <button
+                            type="button"
+                            onClick={addFamilyMember}
+                            className="btn btn-secondary flex items-center space-x-2"
+                          >
+                            <PlusIcon className="h-4 w-4" />
+                            <span>Add Family Member</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                        <p className="text-sm text-yellow-800">
+                          <strong>Note:</strong> You can skip adding family members now and add them later through the Family Management section.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 4: Review */}
+                  {familyCreationStep === 4 && (
+                    <div className="space-y-6">
+                      <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                        <h4 className="font-medium text-indigo-900 mb-2">Step 4: Review & Confirm</h4>
+                        <p className="text-sm text-indigo-700">Review all information before creating the residence and family</p>
+                      </div>
+
+                      {/* Unit Info */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-4">
+                        <h5 className="font-medium text-gray-900 mb-3">Unit Information</h5>
+                        <p className="text-sm text-gray-600">Unit Number: <span className="font-medium">{comprehensiveFamilyForm.unit_number}</span></p>
+                      </div>
+
+                      {/* Family Head Info */}
+                      <div className="bg-white border border-gray-200 rounded-lg p-4">
+                        <h5 className="font-medium text-gray-900 mb-3">Family Head</h5>
+                        <div className="flex items-start space-x-4">
+                          {comprehensiveFamilyForm.head_profile_picture_preview ? (
+                            <img
+                              src={comprehensiveFamilyForm.head_profile_picture_preview}
+                              alt="Family head"
+                              className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                            />
+                          ) : (
+                            <div className="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center">
+                              <UsersIcon className="h-8 w-8 text-gray-600" />
+                            </div>
+                          )}
+                          <div className="space-y-1">
+                            <p className="font-medium text-gray-900">{comprehensiveFamilyForm.head_full_name}</p>
+                            <p className="text-sm text-gray-600">{comprehensiveFamilyForm.head_email}</p>
+                            {comprehensiveFamilyForm.head_phone && <p className="text-sm text-gray-600">{comprehensiveFamilyForm.head_phone}</p>}
+                            {comprehensiveFamilyForm.head_date_of_birth && <p className="text-sm text-gray-600">DOB: {comprehensiveFamilyForm.head_date_of_birth}</p>}
+                            {comprehensiveFamilyForm.head_id_number && <p className="text-sm text-gray-600">ID: {comprehensiveFamilyForm.head_id_number}</p>}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Family Members */}
+                      {comprehensiveFamilyForm.family_members.length > 0 && (
+                        <div className="bg-white border border-gray-200 rounded-lg p-4">
+                          <h5 className="font-medium text-gray-900 mb-3">Family Members ({comprehensiveFamilyForm.family_members.length})</h5>
+                          <div className="space-y-3">
+                            {comprehensiveFamilyForm.family_members.map((member, index) => (
+                              <div key={member.id} className="flex items-start space-x-4 p-3 bg-gray-50 rounded-lg">
+                                {member.profile_picture_preview ? (
+                                  <img
+                                    src={member.profile_picture_preview}
+                                    alt={member.full_name}
+                                    className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                                  />
+                                ) : (
+                                  <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                    <UsersIcon className="h-6 w-6 text-gray-600" />
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="font-medium text-gray-900">{member.full_name}</p>
+                                  <p className="text-sm text-gray-600">{member.relationship}</p>
+                                  {member.age && <p className="text-xs text-gray-500">Age: {member.age}</p>}
+                                  {member.email && <p className="text-xs text-gray-500">{member.email}</p>}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h5 className="font-medium text-green-900 mb-2">What happens next?</h5>
+                        <ul className="text-sm text-green-800 space-y-1">
+                          <li>• Residence account will be created for Unit {comprehensiveFamilyForm.unit_number}</li>
+                          <li>• Family head will receive login credentials (username and temporary password)</li>
+                          <li>• Family members will be added to the family profile</li>
+                          <li>• All profile pictures will be uploaded and available</li>
+                          <li>• The family can start using the HomeMe system immediately</li>
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse mt-6">
+                  {familyCreationStep === 4 ? (
+                    <button
+                      onClick={handleCreateComprehensiveFamily}
+                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                    >
+                      Create Residence & Family
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setFamilyCreationStep(prev => prev + 1)}
+                      disabled={
+                        (familyCreationStep === 1 && !comprehensiveFamilyForm.unit_number) ||
+                        (familyCreationStep === 2 && (!comprehensiveFamilyForm.head_full_name || !comprehensiveFamilyForm.head_email))
+                      }
+                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next Step
+                    </button>
+                  )}
+                  
+                  {familyCreationStep > 1 && (
+                    <button
+                      onClick={() => setFamilyCreationStep(prev => prev - 1)}
+                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    >
+                      Previous
+                    </button>
+                  )}
+                  
+                  <button
+                    onClick={() => setShowComprehensiveFamilyModal(false)}
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

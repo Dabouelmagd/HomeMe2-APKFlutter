@@ -275,7 +275,7 @@ const ServiceBooking = () => {
     setBookingForm({
       provider_id: '',
       service_category: 'maintenance',
-      service_specialty: '',
+      service_specialty: 'general',
       title: '',
       description: '',
       priority: 'standard',

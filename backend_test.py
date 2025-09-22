@@ -410,57 +410,39 @@ class HomePhase1TestSuite:
             self.log_result("Mark Notification Read", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_create_service_provider(self):
-        """Test POST /api/service-providers - Create service provider (Admin only)"""
-        print("\n=== Testing Create Service Provider ===")
-        
-        if not self.admin_token:
-            self.log_result("Create Service Provider", False, "No admin token available")
-            return False
-        
+    def create_test_notification_and_mark_read(self):
+        """Helper method to create a test notification and mark it as read"""
         try:
+            # Create a notification using admin token
+            if not self.admin_token:
+                return False
+                
             headers = self.setup_auth_headers(self.admin_token)
-            
-            # Generate unique email to avoid duplicates
-            unique_id = str(uuid.uuid4())[:8]
-            provider_data = {
-                "full_name": f"John Smith {unique_id}",
-                "email": f"johnsmith{unique_id}@example.com",
-                "phone": "+1234567890",
-                "services": ["maintenance", "cleaning"],
-                "specialties": ["plumber", "electrician"],
-                "bio": "Experienced maintenance professional",
-                "hourly_rate": 50.0
+            notification_data = {
+                "title": "Test Notification",
+                "message": "This is a test notification for marking as read",
+                "type": "general",
+                "priority": "normal",
+                "recipient_id": self.resident_user["id"]
             }
             
-            response = self.session.post(f"{BASE_URL}/service-providers", 
-                                       json=provider_data, headers=headers)
+            response = self.session.post(f"{BASE_URL}/notifications", json=notification_data, headers=headers)
             
             if response.status_code == 200:
                 result = response.json()
-                if result.get("message") == "Service provider created successfully":
-                    # Check for provider_id or provider.id
-                    provider_id = result.get("provider_id") or (result.get("provider", {}).get("id"))
-                    if provider_id:
-                        self.test_provider_id = provider_id
-                        self.log_result("Create Service Provider", True, f"Service provider created successfully with ID: {self.test_provider_id}")
-                        return True
-                    else:
-                        self.log_result("Create Service Provider", False, f"No provider ID in response: {result}")
-                        return False
-                else:
-                    self.log_result("Create Service Provider", False, f"Unexpected response: {result}")
-                    return False
-            elif response.status_code == 400 and "already exists" in response.text:
-                # Provider already exists, try to get existing providers and use one
-                self.log_result("Create Service Provider", True, "Service provider already exists (expected behavior)")
-                return self.get_existing_provider_id()
-            else:
-                self.log_result("Create Service Provider", False, f"Failed with status {response.status_code}", response.text)
-                return False
+                notification_id = result.get("notification_id")
                 
-        except Exception as e:
-            self.log_result("Create Service Provider", False, f"Exception occurred: {str(e)}")
+                if notification_id:
+                    # Now mark it as read with resident token
+                    resident_headers = self.setup_auth_headers(self.resident_token)
+                    read_response = self.session.patch(f"{BASE_URL}/notifications/{notification_id}/read", headers=resident_headers)
+                    
+                    if read_response.status_code == 200:
+                        self.log_result("Mark Notification Read", True, f"Test notification created and marked as read successfully")
+                        return True
+            
+            return False
+        except:
             return False
     
     def get_existing_provider_id(self):

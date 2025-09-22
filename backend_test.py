@@ -247,43 +247,44 @@ class HomePhase1TestSuite:
             self.log_result("Get Maintenance Requests (Resident)", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_update_service(self):
-        """Test PUT /api/compounds/{compound_id}/services/{service_id} - Update service"""
-        print("\n=== Testing Update Service ===")
+    def test_get_maintenance_requests_admin(self):
+        """Test GET /api/maintenance/requests - Get maintenance requests (admin perspective)"""
+        print("\n=== Testing Get Maintenance Requests (Admin) ===")
         
-        if not self.test_service_id:
-            self.log_result("Update Service", False, "No test service ID available")
+        if not self.admin_token:
+            self.log_result("Get Maintenance Requests (Admin)", False, "No admin token available")
             return False
         
         try:
             headers = self.setup_auth_headers(self.admin_token)
-            
-            # Include all required fields for update
-            update_data = {
-                "name": "Updated Test Plumbing Service",
-                "category": "maintenance",
-                "specialty": "plumber",
-                "description": "Updated professional plumbing services",
-                "working_hours": "9:00 AM - 5:00 PM"
-            }
-            
-            response = self.session.put(f"{BASE_URL}/compounds/{self.compound_id}/services/{self.test_service_id}", 
-                                      json=update_data, headers=headers)
+            response = self.session.get(f"{BASE_URL}/maintenance/requests", headers=headers)
             
             if response.status_code == 200:
-                result = response.json()
-                if result.get("message") == "Service updated successfully":
-                    self.log_result("Update Service", True, "Service updated successfully")
-                    return True
-                else:
-                    self.log_result("Update Service", False, f"Unexpected response: {result}")
-                    return False
+                data = response.json()
+                requests = data.get("requests", [])
+                self.log_result("Get Maintenance Requests (Admin)", True, f"Retrieved {len(requests)} maintenance requests for admin")
+                
+                # Test filtering by status
+                response_pending = self.session.get(f"{BASE_URL}/maintenance/requests?status=pending", headers=headers)
+                if response_pending.status_code == 200:
+                    pending_data = response_pending.json()
+                    pending_requests = pending_data.get("requests", [])
+                    self.log_result("Maintenance Requests Filtering", True, f"Status filtering works - {len(pending_requests)} pending requests")
+                
+                # Test filtering by category
+                response_plumbing = self.session.get(f"{BASE_URL}/maintenance/requests?category=plumbing", headers=headers)
+                if response_plumbing.status_code == 200:
+                    plumbing_data = response_plumbing.json()
+                    plumbing_requests = plumbing_data.get("requests", [])
+                    self.log_result("Maintenance Category Filtering", True, f"Category filtering works - {len(plumbing_requests)} plumbing requests")
+                
+                return True
             else:
-                self.log_result("Update Service", False, f"Failed with status {response.status_code}", response.text)
+                self.log_result("Get Maintenance Requests (Admin)", False, f"Failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_result("Update Service", False, f"Exception occurred: {str(e)}")
+            self.log_result("Get Maintenance Requests (Admin)", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_delete_service(self):

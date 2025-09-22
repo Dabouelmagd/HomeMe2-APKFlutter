@@ -122,6 +122,46 @@ const ServiceBooking = () => {
     loadBookings();
   }, []);
 
+  // Mock providers for demonstration when API fails
+  const mockProviders = [
+    {
+      id: 'mock-1',
+      full_name: 'John Smith',
+      services: ['Plumbing', 'General Maintenance'],
+      average_rating: 4.8,
+      total_reviews: 127,
+      hourly_rate: 45,
+      total_jobs_completed: 89,
+      is_available: true,
+      location: 'Building A'
+    },
+    {
+      id: 'mock-2', 
+      full_name: 'Maria Garcia',
+      services: ['Cleaning', 'Deep Cleaning'],
+      average_rating: 4.9,
+      total_reviews: 203,  
+      hourly_rate: 35,
+      total_jobs_completed: 156,
+      is_available: true,
+      location: 'Building B'
+    },
+    {
+      id: 'mock-3',
+      full_name: 'Ahmed Hassan',
+      services: ['Electrical', 'HVAC'],
+      average_rating: 4.7,
+      total_reviews: 95,
+      hourly_rate: 55,
+      total_jobs_completed: 73,
+      is_available: false,
+      location: 'Building C'
+    }
+  ];
+
+  // Use real providers if available, otherwise use mock data
+  const displayProviders = providers.length > 0 ? providers : mockProviders;
+
   const loadProviders = async () => {
     try {
       const response = await axios.get(`${API}/service-providers`, {

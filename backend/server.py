@@ -2253,9 +2253,11 @@ async def create_payment(
             raise HTTPException(status_code=403, detail="Access denied")
     
     # Create mock payment
+    # Use the invoice's family_id to properly associate the payment
+    payment_family_id = invoice["family_id"] if current_user.role == "admin" else current_user.family_id
     payment = Payment(
         invoice_id=payment_data.invoice_id,
-        family_id=current_user.family_id,
+        family_id=payment_family_id,
         amount=invoice["amount"],
         payment_method=payment_data.payment_method,
         transaction_id=f"mock_{uuid.uuid4().hex[:8]}"

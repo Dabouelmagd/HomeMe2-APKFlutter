@@ -1153,7 +1153,7 @@ const CompoundManagement = () => {
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t('created')}</p>
                     <p className="text-lg font-semibold text-gray-900">
-                      {compound?.created_at ? new Date(compound.created_at).toLocaleDateString() : 'N/A'}
+                      {compound?.created_at ? formatDate(compound.created_at) : 'N/A'}
                     </p>
                   </div>
                 </div>

@@ -191,15 +191,18 @@ backend:
 
   - task: "Enhanced Service Management System - Payment Processing"
     implemented: true
-    working: true
+    working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
         - working: true
           agent: "testing"
           comment: "PAYMENT PROCESSING TESTING COMPLETED SUCCESSFULLY - 100% SUCCESS RATE (2/2 tests passed). All payment processing features working perfectly: ✅ POST /api/service-bookings/{id}/payment endpoint with all payment methods (cash on service, credit/debit card, bank transfer, InstaPay, mobile payment, digital wallet, QR code payment all supported) ✅ Payment transaction creation and status tracking (transactions properly created with unique IDs, status tracking working) ✅ Payment status updates in bookings (booking payment_status and payment_id properly updated) ✅ Payment failure handling (proper error responses for invalid payments). All payment processing REST API endpoints are fully functional and production-ready."
+        - working: false
+          agent: "testing"
+          comment: "PAYMENT PROCESSING CRITICAL ISSUES IDENTIFIED - 80% SUCCESS RATE (8/10 tests passed). DETAILED DEBUGGING COMPLETED: ✅ All 7 payment methods working correctly (cash, card, bank_transfer, instapay, mobile_pay, digital_wallet, qr_code) ✅ Payment transactions created successfully with proper transaction IDs ✅ Payment API endpoints responding correctly (HTTP 200) ❌ CRITICAL ISSUE 1: Missing 'service_id' field in booking records causing KeyError in get_compound_bookings endpoint (HTTP 500 errors) - booking model uses provider_id/service_category instead of service_id ❌ CRITICAL ISSUE 2: Payment status mapping inconsistency - payment processing sets status to 'completed'/'pending'/'processing' but booking model expects 'paid' status, causing booking payment_status to remain 'pending' even after successful payment. ROOT CAUSE: Mismatch between old service booking model (service_id) and new enhanced model (provider_id + service_category). Payment processing works but status updates are inconsistent."
 
   - task: "Enhanced Service Management System - Review System"
     implemented: true

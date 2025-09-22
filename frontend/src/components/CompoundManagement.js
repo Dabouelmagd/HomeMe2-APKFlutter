@@ -1075,8 +1075,22 @@ const CompoundManagement = () => {
             </div>
 
             <div className="flex items-center justify-between mb-4">
-              <div className="text-sm text-gray-600">
-                Total Units: <span className="font-semibold">{residences.length}</span>
+              <div className="flex items-center space-x-4">
+                <div className="text-sm text-gray-600">
+                  Total Units: <span className="font-semibold">{residences.length}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm font-medium text-gray-700">Sort by:</label>
+                  <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                    className="form-input text-sm"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="unit_number">Unit Number</option>
+                  </select>
+                </div>
               </div>
               <div className="text-xs text-gray-500">
                 Use "Add Resident + Family" to set up complete family profiles with photos

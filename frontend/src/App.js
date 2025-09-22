@@ -27,7 +27,10 @@ import ServiceBooking from './components/ServiceBooking';
 import Pricing from './components/Pricing';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
+import MaintenanceSystem from './components/MaintenanceSystem';
+import MobileOptimized from './components/MobileOptimized';
 import { Toaster } from './components/ui/sonner';
+import useNotifications from './hooks/useNotifications';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;

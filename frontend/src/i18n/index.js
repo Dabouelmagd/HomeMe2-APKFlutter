@@ -598,6 +598,23 @@ const resources = {
       'create_new_residence': 'إنشاء مسكن جديد',
       'residence_management': 'إدارة المساكن',
       
+      // Comprehensive Family Modal
+      'add_new_resident_family': 'إضافة مقيم وأسرة جديدة',
+      'complete_family_setup': 'إعداد عائلي شامل مع تفاصيل جميع الأعضاء والصور',
+      'step_1_unit_information': 'الخطوة 1: معلومات الوحدة',
+      'step_2_family_head': 'الخطوة 2: رب الأسرة',
+      'step_3_family_members': 'الخطوة 3: أفراد الأسرة',
+      'step_4_review': 'الخطوة 4: المراجعة',
+      'enter_basic_residence_details': 'أدخل تفاصيل الوحدة السكنية الأساسية',
+      'unit_number_example': 'مثال: أ-101، ب-205، فيلا-15',
+      'enter_unit_number_identifier': 'أدخل رقم الوحدة أو معرف الفيلا',
+      'next_step': 'الخطوة التالية',
+      'previous_step': 'الخطوة السابقة',
+      'unit_info': 'معلومات الوحدة',
+      'family_head': 'رب الأسرة',
+      'family_members': 'أفراد الأسرة',
+      'review': 'مراجعة',
+      
       // Compound Management
       'manage_compound': 'إدارة إعدادات وهوية مجمعك السكني',
       'overview': 'نظرة عامة',

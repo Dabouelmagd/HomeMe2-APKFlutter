@@ -1145,11 +1145,11 @@ const CompoundManagement = () => {
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Compound ID</p>
+                    <p className="text-sm font-medium text-gray-500">{t('compound_id')}</p>
                     <p className="text-lg font-semibold text-gray-900">{compound?.id}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Created</p>
+                    <p className="text-sm font-medium text-gray-500">{t('created')}</p>
                     <p className="text-lg font-semibold text-gray-900">
                       {compound?.created_at ? new Date(compound.created_at).toLocaleDateString() : 'N/A'}
                     </p>

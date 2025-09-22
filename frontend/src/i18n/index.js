@@ -126,6 +126,23 @@ const resources = {
       'create_new_residence': 'Create new residence',
       'residence_management': 'Residence Management',
       
+      // Comprehensive Family Modal
+      'add_new_resident_family': 'Add New Resident & Family',
+      'complete_family_setup': 'Complete family setup with all member details and photos',
+      'step_1_unit_information': 'Step 1: Unit Information',
+      'step_2_family_head': 'Step 2: Family Head',
+      'step_3_family_members': 'Step 3: Family Members',
+      'step_4_review': 'Step 4: Review',
+      'enter_basic_residence_details': 'Enter the basic residence unit details',
+      'unit_number_example': 'e.g., A-101, B-205, Villa-15',
+      'enter_unit_number_identifier': 'Enter the unit number or villa identifier',
+      'next_step': 'Next Step',
+      'previous_step': 'Previous Step',
+      'unit_info': 'Unit Info',
+      'family_head': 'Family Head',
+      'family_members': 'Family Members',
+      'review': 'Review',
+      
       // Compound Management
       'manage_compound': 'Manage your compound settings and branding',
       'overview': 'Overview',

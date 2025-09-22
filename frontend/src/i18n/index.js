@@ -872,6 +872,10 @@ const resources = {
       'new_resident': 'Nouveau résident',
       'service_booked': 'Service réservé',
       'payment': 'Paiement',
+      'create_residence_account': 'Créer un nouveau compte de résidence',
+      'view_all_units': 'Voir toutes les unités résidentielles',
+      'broadcast_residents': 'Diffuser à tous les résidents',
+      'check_financial_status': 'Vérifier le statut financier',
       
       // Compound Management
       'manage_compound': 'Gérez les paramètres et l\'image de marque de votre résidence',

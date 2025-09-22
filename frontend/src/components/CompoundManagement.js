@@ -518,6 +518,17 @@ const CompoundManagement = () => {
         case 'unit_number':
           // Sort by unit number alphabetically
           return (a.unit_number || '').localeCompare(b.unit_number || '');
+        case 'name_asc':
+          // Sort by family head name A-Z
+          return (a.family_head?.full_name || '').localeCompare(b.family_head?.full_name || '');
+        case 'name_desc':
+          // Sort by family head name Z-A
+          return (b.family_head?.full_name || '').localeCompare(a.family_head?.full_name || '');
+        case 'family_size':
+          // Sort by family size (family head + members)
+          const aSize = 1 + (unitFamilyMembers[a.family_head?.id || a.id]?.length || 0);
+          const bSize = 1 + (unitFamilyMembers[b.family_head?.id || b.id]?.length || 0);
+          return bSize - aSize; // Larger families first
         default:
           return 0;
       }

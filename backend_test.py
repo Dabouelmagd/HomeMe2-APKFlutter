@@ -37,6 +37,7 @@ class ServicesManagementTestSuite:
         self.unit_numbers = []
         self.test_family_member_id = None
         self.test_family_member_id_2 = None
+        self.test_unit_number = None
         self.results = []
         
     def log_result(self, test_name: str, success: bool, message: str, details: str = ""):

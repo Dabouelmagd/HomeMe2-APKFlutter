@@ -2243,8 +2243,14 @@ async def create_payment(
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
     
-    if invoice["family_id"] != current_user.family_id:
-        raise HTTPException(status_code=403, detail="Access denied")
+    # Admin users can pay invoices for any family in their compound
+    if current_user.role == "admin":
+        if invoice["compound_id"] != current_user.compound_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+    else:
+        # Regular users can only pay their own family's invoices
+        if invoice["family_id"] != current_user.family_id:
+            raise HTTPException(status_code=403, detail="Access denied")
     
     # Create mock payment
     payment = Payment(

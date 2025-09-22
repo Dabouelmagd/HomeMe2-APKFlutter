@@ -2627,10 +2627,10 @@ const CompoundManagement = () => {
                           {step}
                         </div>
                         <div className="ml-2 text-sm font-medium">
-                          {step === 1 && 'Unit Info'}
-                          {step === 2 && 'Family Head'}
-                          {step === 3 && 'Family Members'}
-                          {step === 4 && 'Review'}
+                          {step === 1 && t('unit_info')}
+                          {step === 2 && t('family_head')}
+                          {step === 3 && t('family_members')}
+                          {step === 4 && t('review')}
                         </div>
                         {step < 4 && <div className={`ml-4 w-12 h-0.5 ${familyCreationStep > step ? 'bg-blue-600' : 'bg-gray-300'}`}></div>}
                       </div>

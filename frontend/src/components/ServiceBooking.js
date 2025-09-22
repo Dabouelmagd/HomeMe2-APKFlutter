@@ -865,439 +865,441 @@ const ServiceBooking = () => {
 
 
         {/* Enhanced Modals */}
-        {/* Booking Form Modal - Enhanced */}
-        {showBookingForm && (
-          <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="booking-modal-title" role="dialog" aria-modal="true">
-            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowBookingForm(false)}></div>
-              
-              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-              
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-                <form onSubmit={handleBookService}>
-                  <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900" id="booking-modal-title">
-                        Book Service {selectedProvider && `- ${selectedProvider.full_name}`}
-                      </h3>
+        <>
+          {/* Booking Form Modal - Enhanced */}
+          {showBookingForm && (
+            <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="booking-modal-title" role="dialog" aria-modal="true">
+              <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowBookingForm(false)}></div>
+                
+                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                
+                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                  <form onSubmit={handleBookService}>
+                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900" id="booking-modal-title">
+                          Book Service {selectedProvider && `- ${selectedProvider.full_name}`}
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setShowBookingForm(false)}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <XCircleIcon className="h-6 w-6" />
+                        </button>
+                      </div>
+
+                      <div className="space-y-6">
+                        {/* Service Details */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Service Category *</label>
+                            <select
+                              required
+                              value={bookingForm.service_category}
+                              onChange={(e) => setBookingForm({...bookingForm, service_category: e.target.value})}
+                              className="form-input w-full"
+                            >
+                              {serviceCategories.map(category => (
+                                <option key={category.value} value={category.value}>{category.label}</option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Service Title *</label>
+                            <input
+                              type="text"
+                              required
+                              value={bookingForm.title}
+                              onChange={(e) => setBookingForm({...bookingForm, title: e.target.value})}
+                              className="form-input w-full"
+                              placeholder="e.g., Fix leaky faucet"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                          <textarea
+                            required
+                            rows={3}
+                            value={bookingForm.description}
+                            onChange={(e) => setBookingForm({...bookingForm, description: e.target.value})}
+                            className="form-input w-full"
+                            placeholder="Describe the service needed in detail..."
+                          />
+                        </div>
+
+                        {/* Schedule */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Date *</label>
+                            <input
+                              type="date"
+                              required
+                              value={bookingForm.scheduled_date}
+                              onChange={(e) => setBookingForm({...bookingForm, scheduled_date: e.target.value})}
+                              className="form-input w-full"
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Time</label>
+                            <input
+                              type="time"
+                              value={bookingForm.scheduled_time}
+                              onChange={(e) => setBookingForm({...bookingForm, scheduled_time: e.target.value})}
+                              className="form-input w-full"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Priority */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-3">Priority Level</label>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {priorityOptions.map(priority => (
+                              <label key={priority.value} className="relative flex cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name="priority"
+                                  value={priority.value}
+                                  checked={bookingForm.priority === priority.value}
+                                  onChange={(e) => setBookingForm({...bookingForm, priority: e.target.value})}
+                                  className="sr-only"
+                                />
+                                <div className={`flex-1 p-3 rounded-lg border-2 text-center transition-all ${
+                                  bookingForm.priority === priority.value
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-200 hover:border-gray-300'
+                                }`}>
+                                  <div className={`text-xs font-medium ${priority.color} inline-block px-2 py-1 rounded-full mb-1`}>
+                                    {priority.label}
+                                  </div>
+                                  <p className="text-xs text-gray-600">{priority.description}</p>
+                                </div>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Payment Method */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-3">Preferred Payment Method</label>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {paymentMethods.map(method => {
+                              const IconComponent = method.icon;
+                              return (
+                                <label key={method.value} className="relative flex cursor-pointer">
+                                  <input
+                                    type="radio"
+                                    name="payment_method"
+                                    value={method.value}
+                                    checked={bookingForm.payment_method === method.value}
+                                    onChange={(e) => setBookingForm({...bookingForm, payment_method: e.target.value})}
+                                    className="sr-only"
+                                  />
+                                  <div className={`flex-1 p-3 rounded-lg border-2 transition-all ${
+                                    bookingForm.payment_method === method.value
+                                      ? 'border-blue-500 bg-blue-50'
+                                      : 'border-gray-200 hover:border-gray-300'
+                                  } ${method.color}`}>
+                                    <div className="flex items-center space-x-3">
+                                      <IconComponent className="h-5 w-5 text-gray-600" />
+                                      <div>
+                                        <div className="font-medium text-gray-900">{method.label}</div>
+                                        <div className="text-xs text-gray-600">{method.description}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Additional Notes */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes</label>
+                          <textarea
+                            rows={2}
+                            value={bookingForm.booking_notes}
+                            onChange={(e) => setBookingForm({...bookingForm, booking_notes: e.target.value})}
+                            className="form-input w-full"
+                            placeholder="Any specific requirements or instructions..."
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                      <button
+                        type="submit"
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                      >
+                        Book Service
+                      </button>
                       <button
                         type="button"
                         onClick={() => setShowBookingForm(false)}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                       >
-                        <XCircleIcon className="h-6 w-6" />
+                        Cancel
                       </button>
                     </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
 
-                    <div className="space-y-6">
-                      {/* Service Details */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Payment Modal - Enhanced */}
+          {showPaymentModal && selectedBooking && (
+            <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="payment-modal-title" role="dialog" aria-modal="true">
+              <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowPaymentModal(false)}></div>
+                
+                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                
+                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                  <form onSubmit={handlePayment}>
+                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900" id="payment-modal-title">
+                          Process Payment
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setShowPaymentModal(false)}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <XCircleIcon className="h-6 w-6" />
+                        </button>
+                      </div>
+
+                      {/* Booking Summary */}
+                      <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h4 className="font-medium text-gray-900 mb-2">Booking Summary</h4>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Service:</span>
+                            <span className="font-medium">{selectedBooking.title}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Provider:</span>
+                            <span className="font-medium">{selectedBooking.provider_name}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Date:</span>
+                            <span>{new Date(selectedBooking.scheduled_date).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex justify-between border-t pt-2 mt-2">
+                            <span className="font-medium text-gray-900">Total Amount:</span>
+                            <span className="font-bold text-green-600">${paymentForm.amount}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Service Category *</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
                           <select
-                            required
-                            value={bookingForm.service_category}
-                            onChange={(e) => setBookingForm({...bookingForm, service_category: e.target.value})}
+                            value={paymentForm.payment_method}
+                            onChange={(e) => setPaymentForm({...paymentForm, payment_method: e.target.value})}
                             className="form-input w-full"
                           >
-                            {serviceCategories.map(category => (
-                              <option key={category.value} value={category.value}>{category.label}</option>
+                            {paymentMethods.map(method => (
+                              <option key={method.value} value={method.value}>{method.label}</option>
                             ))}
                           </select>
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Service Title *</label>
-                          <input
-                            type="text"
-                            required
-                            value={bookingForm.title}
-                            onChange={(e) => setBookingForm({...bookingForm, title: e.target.value})}
-                            className="form-input w-full"
-                            placeholder="e.g., Fix leaky faucet"
-                          />
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
+                          <div className="relative">
+                            <CurrencyDollarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={paymentForm.amount}
+                              onChange={(e) => setPaymentForm({...paymentForm, amount: parseFloat(e.target.value)})}
+                              className="form-input pl-10 w-full"
+                              placeholder="0.00"
+                            />
+                          </div>
                         </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
-                        <textarea
-                          required
-                          rows={3}
-                          value={bookingForm.description}
-                          onChange={(e) => setBookingForm({...bookingForm, description: e.target.value})}
-                          className="form-input w-full"
-                          placeholder="Describe the service needed in detail..."
-                        />
-                      </div>
-
-                      {/* Schedule */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Date *</label>
-                          <input
-                            type="date"
-                            required
-                            value={bookingForm.scheduled_date}
-                            onChange={(e) => setBookingForm({...bookingForm, scheduled_date: e.target.value})}
-                            className="form-input w-full"
-                            min={new Date().toISOString().split('T')[0]}
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Time</label>
-                          <input
-                            type="time"
-                            value={bookingForm.scheduled_time}
-                            onChange={(e) => setBookingForm({...bookingForm, scheduled_time: e.target.value})}
-                            className="form-input w-full"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Priority */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Priority Level</label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {priorityOptions.map(priority => (
-                            <label key={priority.value} className="relative flex cursor-pointer">
-                              <input
-                                type="radio"
-                                name="priority"
-                                value={priority.value}
-                                checked={bookingForm.priority === priority.value}
-                                onChange={(e) => setBookingForm({...bookingForm, priority: e.target.value})}
-                                className="sr-only"
-                              />
-                              <div className={`flex-1 p-3 rounded-lg border-2 text-center transition-all ${
-                                bookingForm.priority === priority.value
-                                  ? 'border-blue-500 bg-blue-50'
-                                  : 'border-gray-200 hover:border-gray-300'
-                              }`}>
-                                <div className={`text-xs font-medium ${priority.color} inline-block px-2 py-1 rounded-full mb-1`}>
-                                  {priority.label}
-                                </div>
-                                <p className="text-xs text-gray-600">{priority.description}</p>
-                              </div>
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Payment Method */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Preferred Payment Method</label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {paymentMethods.map(method => {
-                            const IconComponent = method.icon;
-                            return (
-                              <label key={method.value} className="relative flex cursor-pointer">
-                                <input
-                                  type="radio"
-                                  name="payment_method"
-                                  value={method.value}
-                                  checked={bookingForm.payment_method === method.value}
-                                  onChange={(e) => setBookingForm({...bookingForm, payment_method: e.target.value})}
-                                  className="sr-only"
-                                />
-                                <div className={`flex-1 p-3 rounded-lg border-2 transition-all ${
-                                  bookingForm.payment_method === method.value
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-200 hover:border-gray-300'
-                                } ${method.color}`}>
-                                  <div className="flex items-center space-x-3">
-                                    <IconComponent className="h-5 w-5 text-gray-600" />
-                                    <div>
-                                      <div className="font-medium text-gray-900">{method.label}</div>
-                                      <div className="text-xs text-gray-600">{method.description}</div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Additional Notes */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes</label>
-                        <textarea
-                          rows={2}
-                          value={bookingForm.booking_notes}
-                          onChange={(e) => setBookingForm({...bookingForm, booking_notes: e.target.value})}
-                          className="form-input w-full"
-                          placeholder="Any specific requirements or instructions..."
-                        />
                       </div>
                     </div>
-                  </div>
 
-                  <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button
-                      type="submit"
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                    >
-                      Book Service
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowBookingForm(false)}
-                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Payment Modal - Enhanced */}
-        {showPaymentModal && selectedBooking && (
-          <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="payment-modal-title" role="dialog" aria-modal="true">
-            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowPaymentModal(false)}></div>
-              
-              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-              
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form onSubmit={handlePayment}>
-                  <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900" id="payment-modal-title">
+                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                      <button
+                        type="submit"
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                      >
                         Process Payment
-                      </h3>
+                      </button>
                       <button
                         type="button"
                         onClick={() => setShowPaymentModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                       >
-                        <XCircleIcon className="h-6 w-6" />
+                        Cancel
                       </button>
                     </div>
-
-                    {/* Booking Summary */}
-                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                      <h4 className="font-medium text-gray-900 mb-2">Booking Summary</h4>
-                      <div className="space-y-1 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Service:</span>
-                          <span className="font-medium">{selectedBooking.title}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Provider:</span>
-                          <span className="font-medium">{selectedBooking.provider_name}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Date:</span>
-                          <span>{new Date(selectedBooking.scheduled_date).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex justify-between border-t pt-2 mt-2">
-                          <span className="font-medium text-gray-900">Total Amount:</span>
-                          <span className="font-bold text-green-600">${paymentForm.amount}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                        <select
-                          value={paymentForm.payment_method}
-                          onChange={(e) => setPaymentForm({...paymentForm, payment_method: e.target.value})}
-                          className="form-input w-full"
-                        >
-                          {paymentMethods.map(method => (
-                            <option key={method.value} value={method.value}>{method.label}</option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
-                        <div className="relative">
-                          <CurrencyDollarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={paymentForm.amount}
-                            onChange={(e) => setPaymentForm({...paymentForm, amount: parseFloat(e.target.value)})}
-                            className="form-input pl-10 w-full"
-                            placeholder="0.00"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button
-                      type="submit"
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
-                    >
-                      Process Payment
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowPaymentModal(false)}
-                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Review Modal - Enhanced */}
-        {showReviewModal && selectedBooking && (
-          <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="review-modal-title" role="dialog" aria-modal="true">
-            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowReviewModal(false)}></div>
-              
-              <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-              
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form onSubmit={handleReview}>
-                  <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg leading-6 font-medium text-gray-900" id="review-modal-title">
-                        Leave a Review
-                      </h3>
+          {/* Review Modal - Enhanced */}
+          {showReviewModal && selectedBooking && (
+            <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="review-modal-title" role="dialog" aria-modal="true">
+              <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={() => setShowReviewModal(false)}></div>
+                
+                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                
+                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                  <form onSubmit={handleReview}>
+                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900" id="review-modal-title">
+                          Leave a Review
+                        </h3>
+                        <button
+                          type="button"
+                          onClick={() => setShowReviewModal(false)}
+                          className="text-gray-400 hover:text-gray-600"
+                        >
+                          <XCircleIcon className="h-6 w-6" />
+                        </button>
+                      </div>
+
+                      <div className="space-y-6">
+                        {/* Overall Rating */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-3">Overall Rating</label>
+                          <div className="flex items-center space-x-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setReviewForm({...reviewForm, overall_rating: star})}
+                                className="focus:outline-none"
+                              >
+                                <StarIconSolid
+                                  className={`h-8 w-8 ${
+                                    star <= reviewForm.overall_rating
+                                      ? 'text-yellow-400'
+                                      : 'text-gray-300'
+                                  } hover:text-yellow-400 transition-colors`}
+                                />
+                              </button>
+                            ))}
+                            <span className="ml-2 text-sm text-gray-600">
+                              ({reviewForm.overall_rating} star{reviewForm.overall_rating !== 1 ? 's' : ''})
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Detailed Ratings */}
+                        <div className="grid grid-cols-1 gap-4">
+                          {[
+                            { key: 'quality_rating', label: 'Quality of Work' },
+                            { key: 'punctuality_rating', label: 'Punctuality' },
+                            { key: 'professionalism_rating', label: 'Professionalism' },
+                            { key: 'value_rating', label: 'Value for Money' }
+                          ].map(({ key, label }) => (
+                            <div key={key}>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+                              <div className="flex items-center space-x-1">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => setReviewForm({...reviewForm, [key]: star})}
+                                    className="focus:outline-none"
+                                  >
+                                    <StarIconSolid
+                                      className={`h-5 w-5 ${
+                                        star <= reviewForm[key]
+                                          ? 'text-yellow-400'
+                                          : 'text-gray-300'
+                                      } hover:text-yellow-400 transition-colors`}
+                                    />
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Written Review */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Written Review</label>
+                          <textarea
+                            rows={4}
+                            value={reviewForm.written_review}
+                            onChange={(e) => setReviewForm({...reviewForm, written_review: e.target.value})}
+                            className="form-input w-full"
+                            placeholder="Share your experience with this service provider..."
+                          />
+                        </div>
+
+                        {/* Recommendation */}
+                        <div>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={reviewForm.would_recommend}
+                              onChange={(e) => setReviewForm({...reviewForm, would_recommend: e.target.checked})}
+                              className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">I would recommend this service provider</span>
+                          </label>
+                        </div>
+
+                        {/* Public Review */}
+                        <div>
+                          <label className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={reviewForm.is_public}
+                              onChange={(e) => setReviewForm({...reviewForm, is_public: e.target.checked})}
+                              className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                            />
+                            <span className="ml-2 text-sm text-gray-700">Make this review public</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                      <button
+                        type="submit"
+                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                      >
+                        Submit Review
+                      </button>
                       <button
                         type="button"
                         onClick={() => setShowReviewModal(false)}
-                        className="text-gray-400 hover:text-gray-600"
+                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                       >
-                        <XCircleIcon className="h-6 w-6" />
+                        Cancel
                       </button>
                     </div>
-
-                    <div className="space-y-6">
-                      {/* Overall Rating */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Overall Rating</label>
-                        <div className="flex items-center space-x-2">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <button
-                              key={star}
-                              type="button"
-                              onClick={() => setReviewForm({...reviewForm, overall_rating: star})}
-                              className="focus:outline-none"
-                            >
-                              <StarIconSolid
-                                className={`h-8 w-8 ${
-                                  star <= reviewForm.overall_rating
-                                    ? 'text-yellow-400'
-                                    : 'text-gray-300'
-                                } hover:text-yellow-400 transition-colors`}
-                              />
-                            </button>
-                          ))}
-                          <span className="ml-2 text-sm text-gray-600">
-                            ({reviewForm.overall_rating} star{reviewForm.overall_rating !== 1 ? 's' : ''})
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Detailed Ratings */}
-                      <div className="grid grid-cols-1 gap-4">
-                        {[
-                          { key: 'quality_rating', label: 'Quality of Work' },
-                          { key: 'punctuality_rating', label: 'Punctuality' },
-                          { key: 'professionalism_rating', label: 'Professionalism' },
-                          { key: 'value_rating', label: 'Value for Money' }
-                        ].map(({ key, label }) => (
-                          <div key={key}>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-                            <div className="flex items-center space-x-1">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                  key={star}
-                                  type="button"
-                                  onClick={() => setReviewForm({...reviewForm, [key]: star})}
-                                  className="focus:outline-none"
-                                >
-                                  <StarIconSolid
-                                    className={`h-5 w-5 ${
-                                      star <= reviewForm[key]
-                                        ? 'text-yellow-400'
-                                        : 'text-gray-300'
-                                    } hover:text-yellow-400 transition-colors`}
-                                  />
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Written Review */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Written Review</label>
-                        <textarea
-                          rows={4}
-                          value={reviewForm.written_review}
-                          onChange={(e) => setReviewForm({...reviewForm, written_review: e.target.value})}
-                          className="form-input w-full"
-                          placeholder="Share your experience with this service provider..."
-                        />
-                      </div>
-
-                      {/* Recommendation */}
-                      <div>
-                        <label className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={reviewForm.would_recommend}
-                            onChange={(e) => setReviewForm({...reviewForm, would_recommend: e.target.checked})}
-                            className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                          />
-                          <span className="ml-2 text-sm text-gray-700">I would recommend this service provider</span>
-                        </label>
-                      </div>
-
-                      {/* Public Review */}
-                      <div>
-                        <label className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={reviewForm.is_public}
-                            onChange={(e) => setReviewForm({...reviewForm, is_public: e.target.checked})}
-                            className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                          />
-                          <span className="ml-2 text-sm text-gray-700">Make this review public</span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button
-                      type="submit"
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
-                    >
-                      Submit Review
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowReviewModal(false)}
-                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </>
       </div>
     </div>
   );

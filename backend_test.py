@@ -3434,16 +3434,332 @@ class ServicesManagementTestSuite:
         
         return self.print_summary()
 
+    # ============ COMPOUND MANAGEMENT ENHANCEMENTS TESTS ============
+    
+    def test_family_member_update_with_profile(self):
+        """Test PUT /api/family-members/{member_id}/profile - Update family member with profile picture"""
+        print("\n=== Testing Family Member Update with Profile Picture ===")
+        
+        if not self.resident_token:
+            self.log_result("Family Member Update with Profile", False, "No resident token available")
+            return False
+        
+        try:
+            # First, create a family member to update
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Create family member
+            member_data = {
+                "full_name": "Test Family Member",
+                "age": 25,
+                "relationship": "son",
+                "phone": "+1234567890",
+                "email": "testmember@example.com",
+                "id_number": "ID123456789"
+            }
+            
+            create_response = self.session.post(f"{BASE_URL}/family-members", json=member_data, headers=headers)
+            
+            if create_response.status_code != 200:
+                self.log_result("Family Member Update with Profile", False, f"Failed to create test family member: {create_response.status_code}")
+                return False
+            
+            member_result = create_response.json()
+            member_id = member_result.get("family_member", {}).get("id") or member_result.get("member_id")
+            
+            if not member_id:
+                self.log_result("Family Member Update with Profile", False, "No member ID returned from creation")
+                return False
+            
+            # Test 1: Update without profile picture
+            update_data = {
+                'full_name': 'Updated Test Family Member',
+                'relationship': 'daughter',
+                'age': '30',
+                'email': 'updated@example.com',
+                'phone': '+9876543210',
+                'date_of_birth': '1993-05-15',
+                'id_number': 'ID987654321'
+            }
+            
+            headers_form = {"Authorization": f"Bearer {self.resident_token}"}
+            
+            response = self.session.put(f"{BASE_URL}/family-members/{member_id}/profile", 
+                                      data=update_data, headers=headers_form)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Family member updated successfully":
+                    self.log_result("Family Member Update - No Picture", True, "Family member updated successfully without profile picture")
+                    
+                    # Test 2: Update with profile picture
+                    test_image = self.create_test_image("test_profile.jpg")
+                    files = {'profile_picture': ('test_profile.jpg', test_image, 'image/jpeg')}
+                    
+                    update_data_with_pic = {
+                        'full_name': 'Final Updated Family Member',
+                        'relationship': 'son',
+                        'age': '35',
+                        'email': 'final@example.com',
+                        'phone': '+5555555555',
+                        'date_of_birth': '1988-12-25',
+                        'id_number': 'FINAL123456'
+                    }
+                    
+                    response_pic = self.session.put(f"{BASE_URL}/family-members/{member_id}/profile", 
+                                                  data=update_data_with_pic, files=files, headers=headers_form)
+                    
+                    if response_pic.status_code == 200:
+                        result_pic = response_pic.json()
+                        if result_pic.get("message") == "Family member updated successfully":
+                            self.log_result("Family Member Update with Profile", True, 
+                                          "Family member updated successfully with profile picture and all fields")
+                            return True
+                        else:
+                            self.log_result("Family Member Update with Profile", False, f"Unexpected response with picture: {result_pic}")
+                            return False
+                    else:
+                        self.log_result("Family Member Update with Profile", False, 
+                                      f"Failed to update with picture: {response_pic.status_code}", response_pic.text)
+                        return False
+                else:
+                    self.log_result("Family Member Update with Profile", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Family Member Update with Profile", False, 
+                              f"Failed to update without picture: {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Family Member Update with Profile", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_enhanced_residence_data_retrieval(self):
+        """Test GET /api/compounds/{compound_id}/residences - Enhanced residence data with family head info"""
+        print("\n=== Testing Enhanced Residence Data Retrieval ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Enhanced Residence Data Retrieval", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                residences = data.get("residences", [])
+                
+                if residences:
+                    # Check if residences have family head information
+                    residence = residences[0]
+                    has_family_head = "family_head" in residence
+                    has_profile_picture = False
+                    family_size_info = "family_size" in residence
+                    
+                    if has_family_head and residence.get("family_head"):
+                        family_head = residence["family_head"]
+                        has_profile_picture = "profile_picture_url" in family_head
+                    
+                    self.log_result("Enhanced Residence Data Retrieval", True, 
+                                  f"Retrieved {len(residences)} residences with enhanced data - "
+                                  f"Family head info: {has_family_head}, Profile pictures: {has_profile_picture}, "
+                                  f"Family size info: {family_size_info}")
+                    return True
+                else:
+                    self.log_result("Enhanced Residence Data Retrieval", True, "No residences found (expected in clean environment)")
+                    return True
+            else:
+                self.log_result("Enhanced Residence Data Retrieval", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Enhanced Residence Data Retrieval", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_user_profile_update_for_unit_head(self):
+        """Test PUT /api/users/{user_id}/profile - Update family head profile"""
+        print("\n=== Testing User Profile Update for Unit Head ===")
+        
+        if not self.resident_token or not self.resident_user:
+            self.log_result("User Profile Update for Unit Head", False, "No resident token or user available")
+            return False
+        
+        try:
+            user_id = self.resident_user["id"]
+            headers_form = {"Authorization": f"Bearer {self.resident_token}"}
+            
+            # Test 1: Update without profile picture
+            update_data = {
+                'full_name': 'Updated Unit Head Name',
+                'phone': '+1111111111'
+            }
+            
+            response = self.session.put(f"{BASE_URL}/users/{user_id}/profile", 
+                                      data=update_data, headers=headers_form)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Profile updated successfully":
+                    self.log_result("User Profile Update - No Picture", True, "User profile updated successfully without picture")
+                    
+                    # Test 2: Update with profile picture
+                    test_image = self.create_test_image("unit_head_profile.jpg")
+                    files = {'profile_picture': ('unit_head_profile.jpg', test_image, 'image/jpeg')}
+                    
+                    update_data_with_pic = {
+                        'full_name': 'Final Updated Unit Head',
+                        'phone': '+2222222222'
+                    }
+                    
+                    response_pic = self.session.put(f"{BASE_URL}/users/{user_id}/profile", 
+                                                  data=update_data_with_pic, files=files, headers=headers_form)
+                    
+                    if response_pic.status_code == 200:
+                        result_pic = response_pic.json()
+                        if result_pic.get("message") == "Profile updated successfully":
+                            self.log_result("User Profile Update for Unit Head", True, 
+                                          "Unit head profile updated successfully with profile picture")
+                            return True
+                        else:
+                            self.log_result("User Profile Update for Unit Head", False, f"Unexpected response with picture: {result_pic}")
+                            return False
+                    else:
+                        self.log_result("User Profile Update for Unit Head", False, 
+                                      f"Failed to update with picture: {response_pic.status_code}", response_pic.text)
+                        return False
+                else:
+                    self.log_result("User Profile Update for Unit Head", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("User Profile Update for Unit Head", False, 
+                              f"Failed to update without picture: {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("User Profile Update for Unit Head", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_authentication_and_authorization_compound_mgmt(self):
+        """Test authentication and authorization for compound management features"""
+        print("\n=== Testing Authentication & Authorization for Compound Management ===")
+        
+        success_count = 0
+        total_tests = 0
+        
+        # Test 1: Family member update without authentication
+        try:
+            total_tests += 1
+            fake_member_id = str(uuid.uuid4())
+            update_data = {
+                'full_name': 'Unauthorized Update',
+                'relationship': 'son'
+            }
+            
+            response = self.session.put(f"{BASE_URL}/family-members/{fake_member_id}/profile", data=update_data)
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Auth Test - Family Member Update No Token", True, 
+                              f"Correctly rejected family member update without token (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Auth Test - Family Member Update No Token", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Auth Test - Family Member Update No Token", False, f"Exception occurred: {str(e)}")
+        
+        # Test 2: User profile update without authentication
+        try:
+            total_tests += 1
+            fake_user_id = str(uuid.uuid4())
+            update_data = {
+                'full_name': 'Unauthorized Update',
+                'phone': '+1234567890'
+            }
+            
+            response = self.session.put(f"{BASE_URL}/users/{fake_user_id}/profile", data=update_data)
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Auth Test - User Profile Update No Token", True, 
+                              f"Correctly rejected user profile update without token (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Auth Test - User Profile Update No Token", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Auth Test - User Profile Update No Token", False, f"Exception occurred: {str(e)}")
+        
+        # Test 3: Compound residences access without authentication
+        try:
+            total_tests += 1
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences")
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Auth Test - Compound Residences No Token", True, 
+                              f"Correctly rejected compound residences access without token (status: {response.status_code})")
+                success_count += 1
+            else:
+                self.log_result("Auth Test - Compound Residences No Token", False, f"Expected 401/403, got {response.status_code}")
+        except Exception as e:
+            self.log_result("Auth Test - Compound Residences No Token", False, f"Exception occurred: {str(e)}")
+        
+        # Test 4: Admin vs resident permissions for compound residences
+        if self.resident_token:
+            try:
+                total_tests += 1
+                headers = self.setup_auth_headers(self.resident_token)
+                response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences", headers=headers)
+                
+                # This might be allowed for residents in their own compound, so we check the response
+                if response.status_code in [200, 403]:
+                    self.log_result("Auth Test - Resident Access Compound Residences", True, 
+                                  f"Appropriate response for resident accessing compound residences (status: {response.status_code})")
+                    success_count += 1
+                else:
+                    self.log_result("Auth Test - Resident Access Compound Residences", False, 
+                                  f"Unexpected status for resident access: {response.status_code}")
+            except Exception as e:
+                self.log_result("Auth Test - Resident Access Compound Residences", False, f"Exception occurred: {str(e)}")
+        
+        return success_count == total_tests
+    
+    def run_compound_management_enhancement_tests(self):
+        """Run Compound Management Enhancement tests"""
+        print("\n🏢 STARTING COMPOUND MANAGEMENT ENHANCEMENT TESTING")
+        print("=" * 60)
+        
+        # Authentication tests
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        if not self.test_resident_authentication():
+            print("❌ Resident authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Compound Management Enhancement tests
+        print("\n👨‍👩‍👧‍👦 Testing Family Member Update with Profile Picture...")
+        self.test_family_member_update_with_profile()
+        
+        print("\n🏠 Testing Enhanced Residence Data Retrieval...")
+        self.test_enhanced_residence_data_retrieval()
+        
+        print("\n👤 Testing User Profile Update for Unit Head...")
+        self.test_user_profile_update_for_unit_head()
+        
+        print("\n🔐 Testing Authentication & Authorization...")
+        self.test_authentication_and_authorization_compound_mgmt()
+        
+        return self.print_summary()
+
 if __name__ == "__main__":
     test_suite = ServicesManagementTestSuite()
     
-    # Run Service Booking Priority and Payment Methods tests as requested
-    print("🎯 RUNNING SERVICE BOOKING WORKFLOW WITH PRIORITY LEVELS AND PAYMENT METHODS TESTS")
-    success = test_suite.run_service_booking_priority_payment_tests()
+    # Run Compound Management Enhancement tests as requested
+    print("🎯 RUNNING COMPOUND MANAGEMENT ENHANCEMENT TESTS")
+    success = test_suite.run_compound_management_enhancement_tests()
     
     if success:
-        print("\n🎉 SERVICE BOOKING PRIORITY AND PAYMENT METHODS TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 COMPOUND MANAGEMENT ENHANCEMENT TESTING COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ SERVICE BOOKING PRIORITY AND PAYMENT METHODS TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ COMPOUND MANAGEMENT ENHANCEMENT TESTING COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

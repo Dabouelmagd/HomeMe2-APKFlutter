@@ -38,6 +38,15 @@ const CompoundManagement = () => {
   const [compoundNotFound, setCompoundNotFound] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [showAddAdmin, setShowAddAdmin] = useState(false);
+  const [expandedUnits, setExpandedUnits] = useState(new Set());
+  const [unitFamilyMembers, setUnitFamilyMembers] = useState({});
+  const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest', 'unit_number'
+  const [showEditUnit, setShowEditUnit] = useState(false);
+  const [showEditMember, setShowEditMember] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [editingUnit, setEditingUnit] = useState(null);
+  const [editingMember, setEditingMember] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null); // {type: 'unit'|'member', id: string, name: string}
   const [editableCompound, setEditableCompound] = useState({
     name: '',
     address: '',

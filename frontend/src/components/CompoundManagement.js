@@ -35,6 +35,7 @@ const API = `${BACKEND_URL}/api`;
 
 const CompoundManagement = () => {
   const { user, updateUser } = useAuth();
+  const { t } = useTranslation();
   const [compound, setCompound] = useState(null);
   const [residences, setResidences] = useState([]);
   const [registrationLinks, setRegistrationLinks] = useState([]);

@@ -17,7 +17,12 @@ import {
   TrashIcon,
   EnvelopeIcon,
   PhoneIcon,
-  DocumentDuplicateIcon
+  DocumentDuplicateIcon,
+  PencilIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  CalendarIcon,
+  IdentificationIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;

@@ -89,7 +89,7 @@ class HomePhase1TestSuite:
             return False
     
     def test_resident_authentication(self):
-        """Test resident authentication for services booking"""
+        """Test resident authentication for maintenance requests"""
         print("\n=== Testing Resident Authentication ===")
         
         try:
@@ -105,7 +105,7 @@ class HomePhase1TestSuite:
                 data = response.json()
                 self.resident_token = data["access_token"]
                 self.resident_user = data["user"]
-                self.log_result("Resident Authentication", True, "Resident authenticated successfully")
+                self.log_result("Resident Authentication", True, f"Resident authenticated successfully - Role: {self.resident_user.get('role')}")
                 return True
             else:
                 # Try to create a resident user if login fails

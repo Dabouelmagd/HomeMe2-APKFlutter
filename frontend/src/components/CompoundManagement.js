@@ -528,11 +528,30 @@ const CompoundManagement = () => {
 
   const handleEditUnit = (unit) => {
     setEditingUnit(unit);
+    setEditUnitForm({
+      unit_number: unit.unit_number || '',
+      full_name: unit.family_head?.full_name || '',
+      email: unit.family_head?.email || '',
+      phone: unit.family_head?.phone || '',
+      profile_picture: null,
+      profile_picture_preview: unit.family_head?.profile_picture_url ? `${BACKEND_URL}${unit.family_head.profile_picture_url}` : null
+    });
     setShowEditUnit(true);
   };
 
   const handleEditMember = (member) => {
     setEditingMember(member);
+    setEditMemberForm({
+      full_name: member.full_name || '',
+      relationship: member.relationship || '',
+      age: member.age || '',
+      email: member.email || '',
+      phone: member.phone || '',
+      date_of_birth: member.birthday || member.date_of_birth || '',
+      id_number: member.id_number || '',
+      profile_picture: null,
+      profile_picture_preview: member.profile_picture_url ? `${BACKEND_URL}${member.profile_picture_url}` : null
+    });
     setShowEditMember(true);
   };
 

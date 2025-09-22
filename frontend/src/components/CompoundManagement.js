@@ -3189,12 +3189,7 @@ const CompoundManagement = () => {
                   </button>
                 </div>
 
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  // TODO: Implement member edit functionality
-                  toast.success('Family member edit functionality coming soon!');
-                  setShowEditMember(false);
-                }}>
+                <form onSubmit={handleUpdateMember}>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -3202,9 +3197,11 @@ const CompoundManagement = () => {
                       </label>
                       <input
                         type="text"
-                        defaultValue={editingMember.full_name}
+                        value={editMemberForm.full_name}
+                        onChange={(e) => setEditMemberForm(prev => ({ ...prev, full_name: e.target.value }))}
                         className="form-input w-full"
                         placeholder="Full name"
+                        required
                       />
                     </div>
 
@@ -3213,9 +3210,12 @@ const CompoundManagement = () => {
                         Relationship
                       </label>
                       <select
-                        defaultValue={editingMember.relationship}
+                        value={editMemberForm.relationship}
+                        onChange={(e) => setEditMemberForm(prev => ({ ...prev, relationship: e.target.value }))}
                         className="form-input w-full"
+                        required
                       >
+                        <option value="">Select relationship</option>
                         <option value="spouse">Spouse</option>
                         <option value="son">Son</option>
                         <option value="daughter">Daughter</option>
@@ -3233,9 +3233,11 @@ const CompoundManagement = () => {
                       </label>
                       <input
                         type="number"
-                        defaultValue={editingMember.age || ''}
+                        value={editMemberForm.age}
+                        onChange={(e) => setEditMemberForm(prev => ({ ...prev, age: e.target.value }))}
                         className="form-input w-full"
                         placeholder="Age"
+                        min="0"
                       />
                     </div>
 
@@ -3245,7 +3247,8 @@ const CompoundManagement = () => {
                       </label>
                       <input
                         type="email"
-                        defaultValue={editingMember.email || ''}
+                        value={editMemberForm.email}
+                        onChange={(e) => setEditMemberForm(prev => ({ ...prev, email: e.target.value }))}
                         className="form-input w-full"
                         placeholder="email@example.com"
                       />
@@ -3257,7 +3260,8 @@ const CompoundManagement = () => {
                       </label>
                       <input
                         type="tel"
-                        defaultValue={editingMember.phone || ''}
+                        value={editMemberForm.phone}
+                        onChange={(e) => setEditMemberForm(prev => ({ ...prev, phone: e.target.value }))}
                         className="form-input w-full"
                         placeholder="+1 (555) 123-4567"
                       />
@@ -3269,9 +3273,44 @@ const CompoundManagement = () => {
                       </label>
                       <input
                         type="date"
-                        defaultValue={editingMember.birthday || ''}
+                        value={editMemberForm.date_of_birth}
+                        onChange={(e) => setEditMemberForm(prev => ({ ...prev, date_of_birth: e.target.value }))}
                         className="form-input w-full"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        ID Number
+                      </label>
+                      <input
+                        type="text"
+                        value={editMemberForm.id_number}
+                        onChange={(e) => setEditMemberForm(prev => ({ ...prev, id_number: e.target.value }))}
+                        className="form-input w-full"
+                        placeholder="Government ID or Passport Number"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Profile Picture
+                      </label>
+                      <div className="flex items-center space-x-4">
+                        {editMemberForm.profile_picture_preview && (
+                          <img
+                            src={editMemberForm.profile_picture_preview}
+                            alt="Profile preview"
+                            className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                          />
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleEditMemberProfilePictureChange}
+                          className="form-input"
+                        />
+                      </div>
                     </div>
                   </div>
 

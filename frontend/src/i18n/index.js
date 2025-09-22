@@ -112,6 +112,20 @@ const resources = {
       'date_format_short': 'MM/dd/yyyy',
       'date_format_long': 'MMMM d, yyyy',
       
+      // Missing translations
+      'frontend_update_successful': 'Frontend Update Successful',
+      'frontend_updates_working': 'If you can see this red banner, the frontend updates are working',
+      'updated_compound_management': 'UPDATED - Compound Management',
+      'new_features_added': 'NEW FEATURES ADDED: Residence management with profile pictures and direct account creation',
+      'created': 'Created',
+      'compound_id': 'Compound ID',
+      'click_to_upload_logo': 'Click to upload logo',
+      'primary_admin': 'Primary Admin',
+      'test_admin': 'Test Admin',
+      'add_residence': 'Add Residence',
+      'create_new_residence': 'Create new residence',
+      'residence_management': 'Residence Management',
+      
       // Compound Management
       'manage_compound': 'Manage your compound settings and branding',
       'overview': 'Overview',

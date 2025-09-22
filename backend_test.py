@@ -1372,21 +1372,22 @@ class ServicesManagementTestSuite:
                 data = response.json()
                 residences = data.get("residences", [])
                 if len(residences) >= 2:
-                    # Store unit IDs for testing - handle different possible field names
+                    # Store unit IDs for testing - extract from family_head
                     self.unit_ids = []
                     self.unit_numbers = []
                     
                     for res in residences[:3]:  # Get first 3 units
-                        # Try different possible field names for ID
-                        unit_id = res.get("id") or res.get("user_id") or res.get("_id")
-                        unit_number = res.get("unit_number") or res.get("unit") or "Unknown"
+                        # Extract unit ID from family_head
+                        family_head = res.get("family_head", {})
+                        unit_id = family_head.get("id")
+                        unit_number = res.get("unit_number", "Unknown")
                         
                         if unit_id:
                             self.unit_ids.append(str(unit_id))
                             self.unit_numbers.append(str(unit_number))
                     
                     if len(self.unit_ids) >= 2:
-                        self.log_result("Get Existing Units", True, f"Found {len(residences)} units for testing. Using units: {self.unit_numbers}")
+                        self.log_result("Get Existing Units", True, f"Found {len(residences)} units for testing. Using units: {self.unit_numbers} with IDs: {self.unit_ids}")
                         return True
                     else:
                         self.log_result("Get Existing Units", False, f"Could not extract unit IDs from residences. Sample residence: {residences[0] if residences else 'None'}")

@@ -4512,17 +4512,402 @@ class AuthenticationInvestigationSuite:
         
         return self.print_summary()
 
-if __name__ == "__main__":
-    test_suite = ServicesManagementTestSuite()
+    # ============ AUTHENTICATION INVESTIGATION METHODS ============
     
-    # Run Admin Invoice Fix tests as requested
-    print("🎯 RUNNING ADMIN INVOICE FIX TESTS")
-    print("Testing the fix for admin users (family_id: null) being able to see compound invoices")
-    success = test_suite.run_admin_invoice_fix_tests()
+    def investigate_admin_login(self):
+        """1. Admin Login Testing - Login with admin credentials and check user data"""
+        print("\n=== 1. ADMIN LOGIN INVESTIGATION ===")
+        
+        try:
+            admin_login_data = {
+                "username": "admin",
+                "password": "admin123"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/auth/login", json=admin_login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                self.admin_token = data["access_token"]
+                self.admin_user = data["user"]
+                self.compound_id = self.admin_user.get("compound_id")
+                
+                # Detailed analysis of admin user data
+                admin_details = {
+                    "username": self.admin_user.get("username"),
+                    "email": self.admin_user.get("email"),
+                    "role": self.admin_user.get("role"),
+                    "compound_id": self.admin_user.get("compound_id"),
+                    "family_id": self.admin_user.get("family_id"),
+                    "full_name": self.admin_user.get("full_name"),
+                    "phone": self.admin_user.get("phone"),
+                    "unit_number": self.admin_user.get("unit_number"),
+                    "is_family_head": self.admin_user.get("is_family_head"),
+                    "profile_picture_url": self.admin_user.get("profile_picture_url"),
+                    "is_active": self.admin_user.get("is_active"),
+                    "created_at": self.admin_user.get("created_at")
+                }
+                
+                self.log_result("Admin Login Investigation", True, 
+                              f"Admin authenticated successfully. Admin User Data: {json.dumps(admin_details, indent=2)}")
+                return True
+            else:
+                self.log_result("Admin Login Investigation", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Admin Login Investigation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def find_resident_credentials(self):
+        """2. Find Resident Credentials - Look for existing resident users"""
+        print("\n=== 2. RESIDENT CREDENTIALS INVESTIGATION ===")
+        
+        if not self.admin_token:
+            self.log_result("Find Resident Credentials", False, "No admin token available")
+            return False
+        
+        try:
+            # First, try to get compound residences to see existing users
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                residences = data.get("residences", [])
+                
+                resident_info = []
+                for residence in residences:
+                    if residence.get("role") == "resident":
+                        resident_info.append({
+                            "username": residence.get("username"),
+                            "email": residence.get("email"),
+                            "unit_number": residence.get("unit_number"),
+                            "full_name": residence.get("full_name"),
+                            "is_family_head": residence.get("is_family_head"),
+                            "family_id": residence.get("family_id")
+                        })
+                
+                if resident_info:
+                    self.log_result("Find Resident Credentials", True, 
+                                  f"Found {len(resident_info)} resident users. Details: {json.dumps(resident_info, indent=2)}")
+                    
+                    # Try to login with the first resident (if we can guess password)
+                    return self.attempt_resident_login(resident_info[0])
+                else:
+                    self.log_result("Find Resident Credentials", True, 
+                                  "No existing resident users found. Will create test resident.")
+                    return self.create_test_resident_for_investigation()
+            else:
+                self.log_result("Find Resident Credentials", False, 
+                              f"Failed to get residences: {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Find Resident Credentials", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def attempt_resident_login(self, resident_info):
+        """Attempt to login with resident credentials"""
+        try:
+            # Common password patterns to try
+            username = resident_info.get("username")
+            password_attempts = ["password123", "123456", "password", username, "resident123"]
+            
+            for password in password_attempts:
+                login_data = {"username": username, "password": password}
+                response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    self.resident_token = data["access_token"]
+                    self.resident_user = data["user"]
+                    
+                    self.log_result("Resident Login Attempt", True, 
+                                  f"Successfully logged in resident: {username} with password: {password}")
+                    return True
+            
+            self.log_result("Resident Login Attempt", False, 
+                          f"Could not login with resident {username} using common passwords")
+            return self.create_test_resident_for_investigation()
+            
+        except Exception as e:
+            self.log_result("Resident Login Attempt", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def create_test_resident_for_investigation(self):
+        """Create a test resident for investigation purposes"""
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            unique_id = str(uuid.uuid4())[:8]
+            
+            data = {
+                'unit_number': f"INV{unique_id[:4]}",
+                'full_name': f"Investigation Test Resident {unique_id}",
+                'email': f"invtest{unique_id}@example.com",
+                'phone': "+1234567890",
+                'compound_id': self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/residences", data=data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                username = result.get("username")
+                password = result.get("temporary_password")
+                
+                # Login with the new resident
+                login_data = {"username": username, "password": password}
+                login_response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+                
+                if login_response.status_code == 200:
+                    data = login_response.json()
+                    self.resident_token = data["access_token"]
+                    self.resident_user = data["user"]
+                    
+                    self.log_result("Create Test Resident for Investigation", True, 
+                                  f"Created and logged in test resident: {username} with temp password: {password}")
+                    return True
+                else:
+                    self.log_result("Create Test Resident for Investigation", False, 
+                                  f"Failed to login with new resident: {login_response.status_code}")
+                    return False
+            else:
+                self.log_result("Create Test Resident for Investigation", False, 
+                              f"Failed to create resident: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Test Resident for Investigation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def analyze_user_models(self):
+        """3. User Model Analysis - Compare admin vs resident user fields"""
+        print("\n=== 3. USER MODEL ANALYSIS ===")
+        
+        if not self.admin_user or not self.resident_user:
+            self.log_result("User Model Analysis", False, "Missing admin or resident user data")
+            return False
+        
+        try:
+            # Compare user model fields
+            admin_fields = {
+                "id": self.admin_user.get("id"),
+                "username": self.admin_user.get("username"),
+                "email": self.admin_user.get("email"),
+                "role": self.admin_user.get("role"),
+                "compound_id": self.admin_user.get("compound_id"),
+                "family_id": self.admin_user.get("family_id"),
+                "full_name": self.admin_user.get("full_name"),
+                "phone": self.admin_user.get("phone"),
+                "unit_number": self.admin_user.get("unit_number"),
+                "is_family_head": self.admin_user.get("is_family_head"),
+                "profile_picture_url": self.admin_user.get("profile_picture_url"),
+                "is_active": self.admin_user.get("is_active"),
+                "created_at": self.admin_user.get("created_at")
+            }
+            
+            resident_fields = {
+                "id": self.resident_user.get("id"),
+                "username": self.resident_user.get("username"),
+                "email": self.resident_user.get("email"),
+                "role": self.resident_user.get("role"),
+                "compound_id": self.resident_user.get("compound_id"),
+                "family_id": self.resident_user.get("family_id"),
+                "full_name": self.resident_user.get("full_name"),
+                "phone": self.resident_user.get("phone"),
+                "unit_number": self.resident_user.get("unit_number"),
+                "is_family_head": self.resident_user.get("is_family_head"),
+                "profile_picture_url": self.resident_user.get("profile_picture_url"),
+                "is_active": self.resident_user.get("is_active"),
+                "created_at": self.resident_user.get("created_at")
+            }
+            
+            # Identify differences
+            differences = {}
+            for field in admin_fields:
+                admin_val = admin_fields[field]
+                resident_val = resident_fields[field]
+                if admin_val != resident_val:
+                    differences[field] = {
+                        "admin": admin_val,
+                        "resident": resident_val
+                    }
+            
+            comparison_result = {
+                "admin_user_fields": admin_fields,
+                "resident_user_fields": resident_fields,
+                "key_differences": differences
+            }
+            
+            self.log_result("User Model Analysis", True, 
+                          f"User model comparison completed. Analysis: {json.dumps(comparison_result, indent=2)}")
+            return True
+            
+        except Exception as e:
+            self.log_result("User Model Analysis", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_authentication_flow(self):
+        """4. Authentication Flow - Test login endpoint with both user types"""
+        print("\n=== 4. AUTHENTICATION FLOW TESTING ===")
+        
+        try:
+            # Test admin authentication flow
+            admin_login_data = {
+                "username": "admin",
+                "password": "admin123"
+            }
+            
+            admin_response = self.session.post(f"{BASE_URL}/auth/login", json=admin_login_data)
+            admin_success = admin_response.status_code == 200
+            admin_data = admin_response.json() if admin_success else {}
+            
+            # Test resident authentication flow (if we have resident credentials)
+            resident_success = False
+            resident_data = {}
+            
+            if hasattr(self, 'resident_user') and self.resident_user:
+                # We already have resident login from previous steps
+                resident_success = True
+                resident_data = {"user": self.resident_user, "access_token": self.resident_token}
+            
+            # Compare authentication responses
+            auth_flow_analysis = {
+                "admin_auth": {
+                    "success": admin_success,
+                    "status_code": admin_response.status_code,
+                    "response_structure": list(admin_data.keys()) if admin_data else [],
+                    "user_data_fields": list(admin_data.get("user", {}).keys()) if admin_data.get("user") else [],
+                    "token_length": len(admin_data.get("access_token", "")) if admin_data.get("access_token") else 0
+                },
+                "resident_auth": {
+                    "success": resident_success,
+                    "response_structure": list(resident_data.keys()) if resident_data else [],
+                    "user_data_fields": list(resident_data.get("user", {}).keys()) if resident_data.get("user") else [],
+                    "token_length": len(resident_data.get("access_token", "")) if resident_data.get("access_token") else 0
+                }
+            }
+            
+            self.log_result("Authentication Flow Testing", True, 
+                          f"Authentication flow analysis completed. Results: {json.dumps(auth_flow_analysis, indent=2)}")
+            return True
+            
+        except Exception as e:
+            self.log_result("Authentication Flow Testing", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_residence_creation_process(self):
+        """5. Residence Creation Process - Test how new residents are created"""
+        print("\n=== 5. RESIDENCE CREATION PROCESS INVESTIGATION ===")
+        
+        if not self.admin_token:
+            self.log_result("Residence Creation Process", False, "No admin token available")
+            return False
+        
+        try:
+            headers = {"Authorization": f"Bearer {self.admin_token}"}
+            unique_id = str(uuid.uuid4())[:8]
+            
+            # Test residence creation
+            creation_data = {
+                'unit_number': f"PROC{unique_id[:4]}",
+                'full_name': f"Process Test User {unique_id}",
+                'email': f"proctest{unique_id}@example.com",
+                'phone': "+1234567890",
+                'compound_id': self.compound_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/residences", data=creation_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                
+                # Analyze the creation process
+                creation_analysis = {
+                    "creation_endpoint": "/api/admin/residences",
+                    "required_fields": list(creation_data.keys()),
+                    "response_structure": list(result.keys()),
+                    "generated_username": result.get("username"),
+                    "temporary_password": result.get("temporary_password"),
+                    "user_id": result.get("user_id"),
+                    "family_id": result.get("family_id"),
+                    "message": result.get("message")
+                }
+                
+                # Test login with generated credentials
+                if result.get("username") and result.get("temporary_password"):
+                    login_test_data = {
+                        "username": result.get("username"),
+                        "password": result.get("temporary_password")
+                    }
+                    
+                    login_response = self.session.post(f"{BASE_URL}/auth/login", json=login_test_data)
+                    
+                    if login_response.status_code == 200:
+                        login_data = login_response.json()
+                        created_user = login_data.get("user", {})
+                        
+                        creation_analysis["login_test"] = {
+                            "success": True,
+                            "user_role": created_user.get("role"),
+                            "is_family_head": created_user.get("is_family_head"),
+                            "family_id": created_user.get("family_id"),
+                            "unit_number": created_user.get("unit_number")
+                        }
+                    else:
+                        creation_analysis["login_test"] = {
+                            "success": False,
+                            "error": f"Login failed with status {login_response.status_code}"
+                        }
+                
+                self.log_result("Residence Creation Process", True, 
+                              f"Residence creation process analyzed. Details: {json.dumps(creation_analysis, indent=2)}")
+                return True
+            else:
+                self.log_result("Residence Creation Process", False, 
+                              f"Failed to create residence: {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Residence Creation Process", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def run_authentication_investigation(self):
+        """Run the complete authentication system investigation"""
+        print("\n🔍 STARTING AUTHENTICATION SYSTEM INVESTIGATION")
+        print("=" * 60)
+        
+        # 1. Admin Login Testing
+        if not self.investigate_admin_login():
+            print("❌ Admin login investigation failed - continuing with other tests")
+        
+        # 2. Find Resident Credentials
+        self.find_resident_credentials()
+        
+        # 3. User Model Analysis
+        self.analyze_user_models()
+        
+        # 4. Authentication Flow Testing
+        self.test_authentication_flow()
+        
+        # 5. Residence Creation Process
+        self.test_residence_creation_process()
+        
+        return self.print_summary()
+
+if __name__ == "__main__":
+    test_suite = AuthenticationInvestigationSuite()
+    
+    # Run Authentication Investigation as requested
+    print("🔍 RUNNING AUTHENTICATION SYSTEM INVESTIGATION")
+    print("Investigating the user authentication system and differences between admin and resident users")
+    success = test_suite.run_authentication_investigation()
     
     if success:
-        print("\n🎉 ADMIN INVOICE FIX TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 AUTHENTICATION INVESTIGATION COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ ADMIN INVOICE FIX TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ AUTHENTICATION INVESTIGATION COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

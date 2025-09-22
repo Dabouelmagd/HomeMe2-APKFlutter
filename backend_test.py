@@ -1346,45 +1346,19 @@ class ServicesManagementTestSuite:
         """Test POST /api/maintenance-fees - Create maintenance fee which generates invoice"""
         print("\n=== Testing Create Maintenance Fee and Invoice ===")
         
-        if not self.admin_token or not self.compound_id:
-            self.log_result("Create Maintenance Fee and Invoice", False, "No admin token or compound ID available")
+        if not self.admin_token or not self.compound_id or not self.resident_user:
+            self.log_result("Create Maintenance Fee and Invoice", False, "No admin token, compound ID, or resident user available")
             return False
         
         try:
             headers = self.setup_auth_headers(self.admin_token)
             
-            # First, get a family/unit to create invoice for
-            residences_response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residences", headers=headers)
+            # Use the resident user's unit number for creating the maintenance fee
+            unit_number = self.resident_user.get("unit_number")
             
-            if residences_response.status_code != 200:
-                self.log_result("Create Maintenance Fee and Invoice", False, "Failed to get residences for invoice creation")
+            if not unit_number:
+                self.log_result("Create Maintenance Fee and Invoice", False, "No unit number available for resident user")
                 return False
-            
-            residences_data = residences_response.json()
-            residences = residences_data.get("residences", [])
-            
-            if not residences:
-                # Create a test residence first
-                unique_id = str(uuid.uuid4())[:8]
-                residence_data = {
-                    'unit_number': f"INV{unique_id[:4]}",
-                    'full_name': f"Invoice Test User {unique_id}",
-                    'email': f"invtest{unique_id}@example.com",
-                    'phone': "+1234567890",
-                    'compound_id': self.compound_id
-                }
-                
-                residence_response = self.session.post(f"{BASE_URL}/admin/residences", data=residence_data, headers={"Authorization": f"Bearer {self.admin_token}"})
-                
-                if residence_response.status_code != 200:
-                    self.log_result("Create Maintenance Fee and Invoice", False, "Failed to create test residence for invoice")
-                    return False
-                
-                # Get the unit number from the created residence
-                unit_number = residence_data['unit_number']
-            else:
-                # Use existing residence
-                unit_number = residences[0].get("unit_number")
             
             # Create maintenance fee data
             from datetime import datetime, timedelta
@@ -1402,7 +1376,7 @@ class ServicesManagementTestSuite:
                 result = response.json()
                 if result.get("message") == "Maintenance fee created successfully":
                     fee_id = result.get("fee_id")
-                    self.log_result("Create Maintenance Fee and Invoice", True, f"Maintenance fee and invoice created successfully with fee ID: {fee_id}")
+                    self.log_result("Create Maintenance Fee and Invoice", True, f"Maintenance fee and invoice created successfully with fee ID: {fee_id} for unit: {unit_number}")
                     return True
                 else:
                     self.log_result("Create Maintenance Fee and Invoice", False, f"Unexpected response: {result}")

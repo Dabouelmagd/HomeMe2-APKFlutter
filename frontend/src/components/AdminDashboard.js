@@ -18,6 +18,7 @@ const API = `${BACKEND_URL}/api`;
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [dashboardData, setDashboardData] = useState({
     statistics: {
       total_residents: 125,

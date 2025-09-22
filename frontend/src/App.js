@@ -332,6 +332,18 @@ function App() {
                 <Route path="analytics" element={
                   <AdvancedAnalytics />
                 } />
+                
+                <Route path="documents" element={
+                  <DocumentManagement />
+                } />
+                
+                <Route path="voting" element={
+                  <VotingSystem />
+                } />
+                
+                <Route path="smart-home" element={
+                  <SmartHomeIntegration />
+                } />
               </Route>
             </Routes>
             <Toaster />

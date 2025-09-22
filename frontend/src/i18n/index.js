@@ -88,6 +88,30 @@ const resources = {
       'unlimited_users_families': 'Unlimited users and families',
       'unlimited_services': 'Unlimited services',
       
+      // Date & Time
+      'date_of_birth': 'Date of Birth',
+      'move_in_date': 'Move-in Date',
+      'preferred_date': 'Preferred Date',
+      'preferred_time': 'Preferred Time',
+      'scheduled_date': 'Scheduled Date',
+      'created_date': 'Created Date',
+      'updated_date': 'Updated Date',
+      
+      // Relative Time
+      'now': 'now',
+      'minute_ago': '1 minute ago',
+      'minutes_ago_count': '{{count}} minutes ago',
+      'hour_ago': '1 hour ago', 
+      'hours_ago_count': '{{count}} hours ago',
+      'day_ago': '1 day ago',
+      'days_ago_count': '{{count}} days ago',
+      'week_ago': '1 week ago',
+      'weeks_ago_count': '{{count}} weeks ago',
+      
+      // Date Formats
+      'date_format_short': 'MM/dd/yyyy',
+      'date_format_long': 'MMMM d, yyyy',
+      
       // Compound Management
       'manage_compound': 'Manage your compound settings and branding',
       'overview': 'Overview',

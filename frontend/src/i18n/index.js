@@ -529,6 +529,30 @@ const resources = {
       'unlimited_users_families': 'مستخدمون وعائلات غير محدودة',
       'unlimited_services': 'خدمات غير محدودة',
       
+      // Date & Time
+      'date_of_birth': 'تاريخ الميلاد',
+      'move_in_date': 'تاريخ الانتقال',
+      'preferred_date': 'التاريخ المفضل',
+      'preferred_time': 'الوقت المفضل',
+      'scheduled_date': 'التاريخ المجدول',
+      'created_date': 'تاريخ الإنشاء',
+      'updated_date': 'تاريخ التحديث',
+      
+      // Relative Time
+      'now': 'الآن',
+      'minute_ago': 'دقيقة واحدة مضت',
+      'minutes_ago_count': '{{count}} دقائق مضت',
+      'hour_ago': 'ساعة واحدة مضت',
+      'hours_ago_count': '{{count}} ساعات مضت',
+      'day_ago': 'يوم واحد مضى',
+      'days_ago_count': '{{count}} أيام مضت',
+      'week_ago': 'أسبوع واحد مضى',
+      'weeks_ago_count': '{{count}} أسابيع مضت',
+      
+      // Date Formats
+      'date_format_short': 'يوم/شهر/سنة',
+      'date_format_long': 'd MMMM yyyy',
+      
       // Compound Management
       'manage_compound': 'إدارة إعدادات وهوية مجمعك السكني',
       'overview': 'نظرة عامة',

@@ -1518,7 +1518,8 @@ class ServicesManagementTestSuite:
                 if response.status_code == 200:
                     result = response.json()
                     if result.get("message") == "Payment processed successfully":
-                        transaction_id = result.get("transaction_id")
+                        transaction = result.get("transaction", {})
+                        transaction_id = transaction.get("id")
                         if transaction_id:
                             success_count += 1
                         else:

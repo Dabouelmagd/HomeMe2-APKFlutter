@@ -85,7 +85,7 @@ const AdminDashboard = () => {
 
   const stats = [
     {
-      name: 'Total Residents',
+      name: t('total_residents'),
       value: dashboardData?.statistics?.total_residents || 0,
       icon: UsersIcon,
       color: 'from-blue-500 to-blue-600',
@@ -93,7 +93,7 @@ const AdminDashboard = () => {
       trend: 'up'
     },
     {
-      name: 'Total Residences',
+      name: t('total_families'),
       value: dashboardData?.statistics?.total_residences || 0,
       icon: HomeIcon,
       color: 'from-emerald-500 to-emerald-600',

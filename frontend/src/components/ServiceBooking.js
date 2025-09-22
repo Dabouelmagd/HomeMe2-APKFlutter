@@ -295,6 +295,18 @@ const ServiceBooking = () => {
 
   const handlePayment = async (e) => {
     e.preventDefault();
+    
+    // Validate payment form
+    if (!paymentForm.amount || paymentForm.amount <= 0) {
+      toast.error('Please enter a valid payment amount');
+      return;
+    }
+    
+    if (!paymentForm.payment_method) {
+      toast.error('Please select a payment method');
+      return;
+    }
+    
     try {
       const response = await axios.post(`${API}/service-bookings/${selectedBooking.id}/payment`, paymentForm, {
         headers: { 
@@ -303,8 +315,16 @@ const ServiceBooking = () => {
         }
       });
       
-      toast.success('Payment processed successfully!');
+      toast.success(`Payment of $${paymentForm.amount} processed successfully using ${paymentForm.payment_method}!`);
       setShowPaymentModal(false);
+      
+      // Reset payment form
+      setPaymentForm({
+        payment_method: 'cash',
+        amount: 0,
+        currency: 'USD'
+      });
+      
       await loadBookings();
     } catch (error) {
       console.error('Failed to process payment:', error);

@@ -100,13 +100,13 @@ const ServiceBooking = () => {
   ];
 
   const paymentMethods = [
-    { value: 'cash', label: 'Cash on Service', icon: '💵' },
-    { value: 'card', label: 'Credit/Debit Card', icon: '💳' },
-    { value: 'bank_transfer', label: 'Bank Transfer', icon: '🏦' },
-    { value: 'instapay', label: 'InstaPay', icon: '⚡' },
-    { value: 'mobile_pay', label: 'Mobile Payment', icon: '📱' },
-    { value: 'digital_wallet', label: 'Digital Wallet', icon: '👛' },
-    { value: 'qr_code', label: 'QR Code Payment', icon: '📊' }
+    { value: 'cash', label: 'Cash on Service', icon: BanknotesIcon, color: 'bg-green-50 border-green-200', description: 'Pay when service is completed' },
+    { value: 'card', label: 'Credit/Debit Card', icon: CreditCardIcon, color: 'bg-blue-50 border-blue-200', description: 'Secure online payment' },
+    { value: 'bank_transfer', label: 'Bank Transfer', icon: BuildingLibraryIcon, color: 'bg-purple-50 border-purple-200', description: 'Direct bank transfer' },
+    { value: 'instapay', label: 'InstaPay', icon: BoltIcon, color: 'bg-yellow-50 border-yellow-200', description: 'Instant payment processing' },
+    { value: 'mobile_pay', label: 'Mobile Payment', icon: DevicePhoneMobileIcon, color: 'bg-pink-50 border-pink-200', description: 'Pay using mobile wallet' },
+    { value: 'digital_wallet', label: 'Digital Wallet', icon: WalletIcon, color: 'bg-indigo-50 border-indigo-200', description: 'Apple Pay, Google Pay, etc.' },
+    { value: 'qr_code', label: 'QR Code Payment', icon: QrCodeIcon, color: 'bg-gray-50 border-gray-200', description: 'Scan and pay instantly' }
   ];
 
   const serviceCategories = [

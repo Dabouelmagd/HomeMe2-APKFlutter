@@ -208,34 +208,93 @@ const ServiceBooking = () => {
   const handleBookService = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/service-bookings`, bookingForm);
+      const response = await axios.post(`${API}/service-bookings`, bookingForm, {
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}` 
+        }
+      });
+      
+      toast.success('Service booked successfully!');
       setShowBookingForm(false);
       resetBookingForm();
       await loadBookings();
     } catch (error) {
       console.error('Failed to book service:', error);
+      toast.error(error.response?.data?.detail || 'Failed to book service');
     }
   };
 
   const handlePayment = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/service-bookings/${selectedBooking.id}/payment`, paymentForm);
+      const response = await axios.post(`${API}/service-bookings/${selectedBooking.id}/payment`, paymentForm, {
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}` 
+        }
+      });
+      
+      toast.success('Payment processed successfully!');
       setShowPaymentModal(false);
       await loadBookings();
     } catch (error) {
       console.error('Failed to process payment:', error);
+      toast.error(error.response?.data?.detail || 'Failed to process payment');
     }
   };
 
   const handleReview = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/service-bookings/${selectedBooking.id}/review`, reviewForm);
+      const response = await axios.post(`${API}/service-bookings/${selectedBooking.id}/review`, reviewForm, {
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}` 
+        }
+      });
+      
+      toast.success('Review submitted successfully!');
       setShowReviewModal(false);
       await loadBookings();
     } catch (error) {
       console.error('Failed to submit review:', error);
+      toast.error(error.response?.data?.detail || 'Failed to submit review');
+    }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!confirm('Are you sure you want to cancel this booking?')) return;
+    
+    try {
+      await axios.put(`${API}/service-bookings/${bookingId}/status`, 
+        { status: 'cancelled' },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }}
+      );
+      
+      toast.success('Booking cancelled successfully');
+      await loadBookings();
+    } catch (error) {
+      console.error('Failed to cancel booking:', error);
+      toast.error('Failed to cancel booking');
+    }
+  };
+
+  const handleRescheduleBooking = async (bookingId) => {
+    // Open booking form with existing data for rescheduling
+    const booking = bookings.find(b => b.id === bookingId);
+    if (booking) {
+      setBookingForm({
+        ...bookingForm,
+        provider_id: booking.provider_id,
+        service_category: booking.service_category,
+        scheduled_date: '',
+        scheduled_time: '',
+        title: booking.title,
+        description: booking.description
+      });
+      setSelectedBooking(booking);
+      setShowBookingForm(true);
     }
   };
 

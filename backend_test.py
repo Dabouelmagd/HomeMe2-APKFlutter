@@ -2690,6 +2690,7 @@ class ServicesManagementTestSuite:
                 booking_data = {
                     "provider_id": self.test_provider_id,
                     "service_category": category,
+                    "service_specialty": "general",
                     "title": f"{category.title()} Service Request",
                     "description": f"Need {category} service for my unit",
                     "scheduled_date": (datetime.now() + timedelta(days=2)).date().isoformat()

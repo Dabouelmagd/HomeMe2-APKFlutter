@@ -2064,7 +2064,7 @@ const CompoundManagement = () => {
                         }}
                         className="btn btn-secondary"
                       >
-                        Cancel
+                        {t('cancel')}
                       </button>
                     )}
                   </div>

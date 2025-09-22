@@ -189,6 +189,24 @@ const Layout = () => {
       show: user?.role === 'admin'
     },
     {
+      name: t('document_management'),
+      href: '/documents',
+      icon: DocumentTextIcon,
+      show: true
+    },
+    {
+      name: t('voting_system'),
+      href: '/voting',
+      icon: HandRaisedIcon,
+      show: true
+    },
+    {
+      name: t('smart_home'),
+      href: '/smart-home',
+      icon: HomeModernIcon,
+      show: true
+    },
+    {
       name: t('government_utility_gateway'),
       href: '/utilities',
       icon: BoltIcon,

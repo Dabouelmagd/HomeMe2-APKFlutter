@@ -143,6 +143,20 @@ const resources = {
       'family_members': 'Family Members',
       'review': 'Review',
       
+      // Step 2 Family Head
+      'step_2_family_head_details': 'Step 2: Family Head Details',
+      'enter_complete_information_primary': 'Enter complete information for the primary resident',
+      'full_name_required': 'Full Name *',
+      'enter_full_name': 'Enter full name',
+      'email_address_required': 'Email Address *',
+      'enter_email': 'Enter email address',
+      'phone_number_optional': 'Phone Number',
+      'enter_phone': 'Enter phone number',
+      'enter_id_number': 'Enter ID or passport number',
+      'profile_picture_optional': 'Profile Picture',
+      'choose_file': 'Choose file',
+      'no_file_chosen': 'No file chosen',
+      
       // Compound Management
       'manage_compound': 'Manage your compound settings and branding',
       'overview': 'Overview',

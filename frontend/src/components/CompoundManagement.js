@@ -560,6 +560,8 @@ const CompoundManagement = () => {
       toast.error(error.response?.data?.detail || `Failed to delete ${deleteTarget.type}`);
     }
   };
+
+  const resetNewResidenceForm = () => {
     setNewResidenceForm({
       unit_number: '',
       full_name: '',

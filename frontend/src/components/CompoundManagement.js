@@ -1453,7 +1453,7 @@ const CompoundManagement = () => {
                                   {member.birthday && (
                                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                                       <CalendarIcon className="h-4 w-4" />
-                                      <span>{new Date(member.birthday).toLocaleDateString()}</span>
+                                      <span>{formatDate(member.birthday)}</span>
                                     </div>
                                   )}
                                   {member.id_number && (

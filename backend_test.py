@@ -213,45 +213,38 @@ class HomePhase1TestSuite:
             self.log_result("Create Maintenance Request", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_create_service(self):
-        """Test POST /api/compounds/{compound_id}/services - Create new service"""
-        print("\n=== Testing Create Service ===")
+    def test_get_maintenance_requests_resident(self):
+        """Test GET /api/maintenance/requests - Get maintenance requests (resident perspective)"""
+        print("\n=== Testing Get Maintenance Requests (Resident) ===")
         
-        if not self.admin_token or not self.compound_id:
-            self.log_result("Create Service", False, "No admin token or compound ID available")
+        if not self.resident_token:
+            self.log_result("Get Maintenance Requests (Resident)", False, "No resident token available")
             return False
         
         try:
-            headers = self.setup_auth_headers(self.admin_token)
-            
-            service_data = {
-                "name": "Test Plumbing Service",
-                "category": "maintenance",
-                "specialty": "plumber",
-                "description": "Professional plumbing services for all your needs",
-                "phone": "+1234567890",
-                "email": "plumber@example.com",
-                "working_hours": "8:00 AM - 6:00 PM"
-            }
-            
-            response = self.session.post(f"{BASE_URL}/compounds/{self.compound_id}/services", 
-                                       json=service_data, headers=headers)
+            headers = self.setup_auth_headers(self.resident_token)
+            response = self.session.get(f"{BASE_URL}/maintenance/requests", headers=headers)
             
             if response.status_code == 200:
-                result = response.json()
-                if result.get("message") == "Service created successfully" and result.get("service_id"):
-                    self.test_service_id = result.get("service_id")
-                    self.log_result("Create Service", True, f"Service created successfully with ID: {self.test_service_id}")
-                    return True
-                else:
-                    self.log_result("Create Service", False, f"Unexpected response: {result}")
-                    return False
+                data = response.json()
+                requests = data.get("requests", [])
+                self.log_result("Get Maintenance Requests (Resident)", True, f"Retrieved {len(requests)} maintenance requests for resident")
+                
+                # Verify resident only sees their own requests
+                if requests:
+                    for req in requests:
+                        if req.get("requester_id") != self.resident_user["id"]:
+                            self.log_result("Get Maintenance Requests (Resident)", False, "Resident can see other users' requests - security issue")
+                            return False
+                    self.log_result("Role-based Access Control", True, "Resident correctly sees only their own requests")
+                
+                return True
             else:
-                self.log_result("Create Service", False, f"Failed with status {response.status_code}", response.text)
+                self.log_result("Get Maintenance Requests (Resident)", False, f"Failed with status {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_result("Create Service", False, f"Exception occurred: {str(e)}")
+            self.log_result("Get Maintenance Requests (Resident)", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_update_service(self):

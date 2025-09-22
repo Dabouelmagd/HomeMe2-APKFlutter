@@ -8304,6 +8304,736 @@ async def get_analytics_dashboard(
         logging.error(f"Error fetching analytics: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch analytics")
 
+# ============ PHASE 3: DOCUMENT MANAGEMENT ENDPOINTS ============
+
+@api_router.get("/documents")
+async def get_documents(
+    category: Optional[str] = None,
+    folder_id: Optional[str] = None,
+    tags: Optional[str] = None,
+    access_level: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = 50,
+    skip: int = 0,
+    current_user: User = Depends(get_current_user)
+):
+    """Get documents with filtering and access control"""
+    try:
+        query = {
+            "compound_id": current_user.compound_id,
+            "is_active": True
+        }
+        
+        # Apply filters
+        if category:
+            query["category"] = category
+        if folder_id:
+            query["folder_id"] = folder_id
+        if access_level:
+            query["access_level"] = access_level
+        
+        # Search functionality
+        if search:
+            query["$or"] = [
+                {"title": {"$regex": search, "$options": "i"}},
+                {"description": {"$regex": search, "$options": "i"}},
+                {"tags": {"$in": [search]}},
+                {"subcategory": {"$regex": search, "$options": "i"}}
+            ]
+        
+        # Tag filtering
+        if tags:
+            tag_list = [tag.strip() for tag in tags.split(",")]
+            query["tags"] = {"$in": tag_list}
+        
+        # Access control filtering
+        access_filter = []
+        
+        # Public documents
+        access_filter.append({"access_level": "public"})
+        
+        # Admin-only documents for admins
+        if current_user.role == "admin":
+            access_filter.append({"access_level": "admin_only"})
+        
+        # Family-specific documents
+        if current_user.family_id:
+            access_filter.append({
+                "$and": [
+                    {"access_level": "family_only"},
+                    {"allowed_families": {"$in": [current_user.family_id]}}
+                ]
+            })
+        
+        # User-specific documents
+        access_filter.append({
+            "$and": [
+                {"access_level": "custom"},
+                {"allowed_users": {"$in": [current_user.id]}}
+            ]
+        })
+        
+        if len(access_filter) > 1:
+            if "$and" not in query:
+                query["$and"] = []
+            query["$and"].append({"$or": access_filter})
+        
+        # Get documents with pagination
+        documents = await db.documents.find(query).sort("updated_at", -1).skip(skip).limit(limit).to_list(length=None)
+        total_count = await db.documents.count_documents(query)
+        
+        return {
+            "documents": [serialize_datetime(doc) for doc in documents],
+            "total_count": total_count,
+            "has_more": skip + len(documents) < total_count
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting documents: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get documents")
+
+@api_router.post("/documents")
+async def create_document(
+    document_data: DocumentCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new document"""
+    try:
+        # Validate access level permissions
+        if document_data.access_level == "admin_only" and current_user.role != "admin":
+            raise HTTPException(status_code=403, detail="Only admins can create admin-only documents")
+        
+        document = Document(
+            **document_data.dict(),
+            compound_id=current_user.compound_id,
+            created_by=current_user.id,
+            updated_by=current_user.id
+        )
+        
+        document_dict = serialize_datetime(document.dict())
+        await db.documents.insert_one(document_dict)
+        
+        return {"message": "Document created successfully", "document_id": document.id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating document: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create document")
+
+@api_router.post("/documents/{document_id}/upload")
+async def upload_document_version(
+    document_id: str,
+    file: UploadFile = File(...),
+    changelog: Optional[str] = Form(None),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload a new version of a document"""
+    try:
+        # Verify document exists and user has access to edit
+        document = await db.documents.find_one({
+            "id": document_id,
+            "compound_id": current_user.compound_id,
+            "is_active": True
+        })
+        
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found")
+        
+        # Check edit permissions
+        if document["access_level"] == "admin_only" and current_user.role != "admin":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Save file
+        file_metadata = await save_uploaded_file(file, "document")
+        
+        # Create new version
+        new_version_number = document.get("current_version", 0) + 1
+        
+        new_version = DocumentVersion(
+            version_number=new_version_number,
+            file_url=file_metadata["file_url"],
+            file_name=file_metadata["original_filename"],
+            file_size=file_metadata["file_size"],
+            mime_type=file_metadata["mime_type"],
+            uploaded_by=current_user.id,
+            changelog=changelog
+        )
+        
+        # Update document
+        await db.documents.update_one(
+            {"id": document_id},
+            {
+                "$push": {"versions": serialize_datetime(new_version.dict())},
+                "$set": {
+                    "current_version": new_version_number,
+                    "updated_by": current_user.id,
+                    "updated_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        return {"message": "Document version uploaded successfully", "version_number": new_version_number}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error uploading document version: {e}")
+        raise HTTPException(status_code=500, detail="Failed to upload document version")
+
+@api_router.get("/documents/{document_id}")
+async def get_document_details(
+    document_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get detailed document information with access control"""
+    try:
+        document = await db.documents.find_one({
+            "id": document_id,
+            "compound_id": current_user.compound_id,
+            "is_active": True
+        })
+        
+        if not document:
+            raise HTTPException(status_code=404, detail="Document not found")
+        
+        # Check access permissions
+        has_access = False
+        
+        if document["access_level"] == "public":
+            has_access = True
+        elif document["access_level"] == "admin_only" and current_user.role == "admin":
+            has_access = True
+        elif document["access_level"] == "family_only" and current_user.family_id in document.get("allowed_families", []):
+            has_access = True
+        elif current_user.id in document.get("allowed_users", []):
+            has_access = True
+        
+        if not has_access:
+            raise HTTPException(status_code=403, detail="Access denied to this document")
+        
+        # Update view count and last accessed
+        await db.documents.update_one(
+            {"id": document_id},
+            {
+                "$inc": {"view_count": 1},
+                "$set": {"last_accessed": datetime.utcnow()}
+            }
+        )
+        
+        # Log access
+        access_log = DocumentAccess(
+            document_id=document_id,
+            user_id=current_user.id,
+            access_type="view"
+        )
+        await db.document_access.insert_one(serialize_datetime(access_log.dict()))
+        
+        return {"document": serialize_datetime(document)}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting document details: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get document details")
+
+@api_router.get("/documents/folders")
+async def get_document_folders(current_user: User = Depends(get_current_user)):
+    """Get document folders hierarchy"""
+    try:
+        folders = await db.document_folders.find({
+            "compound_id": current_user.compound_id,
+            "is_active": True
+        }).sort("path", 1).to_list(length=None)
+        
+        return {"folders": [serialize_datetime(folder) for folder in folders]}
+        
+    except Exception as e:
+        logging.error(f"Error getting document folders: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get document folders")
+
+@api_router.post("/documents/folders")
+async def create_document_folder(
+    folder_data: DocumentFolderCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new document folder"""
+    try:
+        # Build folder path
+        path = f"/{folder_data.name}"
+        if folder_data.parent_folder_id:
+            parent_folder = await db.document_folders.find_one({
+                "id": folder_data.parent_folder_id,
+                "compound_id": current_user.compound_id
+            })
+            if parent_folder:
+                path = f"{parent_folder['path']}/{folder_data.name}"
+        
+        folder = DocumentFolder(
+            **folder_data.dict(),
+            compound_id=current_user.compound_id,
+            path=path,
+            created_by=current_user.id
+        )
+        
+        folder_dict = serialize_datetime(folder.dict())
+        await db.document_folders.insert_one(folder_dict)
+        
+        return {"message": "Folder created successfully", "folder_id": folder.id}
+        
+    except Exception as e:
+        logging.error(f"Error creating document folder: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create document folder")
+
+# ============ PHASE 3: VOTING & POLLING SYSTEM ENDPOINTS ============
+
+@api_router.get("/polls")
+async def get_polls(
+    status: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get polls with filtering"""
+    try:
+        query = {"compound_id": current_user.compound_id}
+        
+        if status:
+            query["status"] = status
+        
+        polls = await db.polls.find(query).sort("created_at", -1).to_list(length=None)
+        
+        # Check user voting eligibility and status for each poll
+        enhanced_polls = []
+        for poll in polls:
+            # Check if user is eligible to vote
+            eligible = True
+            if poll.get("eligible_families") and current_user.family_id not in poll.get("eligible_families", []):
+                eligible = False
+            if poll.get("eligible_users") and current_user.id not in poll.get("eligible_users", []):
+                eligible = False
+            if poll.get("require_family_head_only", True) and not current_user.is_family_head:
+                eligible = False
+            
+            # Check if user has already voted
+            existing_vote = await db.votes.find_one({
+                "poll_id": poll["id"],
+                "user_id": current_user.id
+            })
+            
+            poll_data = serialize_datetime(poll)
+            poll_data["user_eligible"] = eligible
+            poll_data["user_has_voted"] = existing_vote is not None
+            
+            enhanced_polls.append(poll_data)
+        
+        return {"polls": enhanced_polls}
+        
+    except Exception as e:
+        logging.error(f"Error getting polls: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get polls")
+
+@api_router.post("/polls")
+async def create_poll(
+    poll_data: PollCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new poll (admin only)"""
+    try:
+        if current_user.role != "admin":
+            raise HTTPException(status_code=403, detail="Admin access required")
+        
+        # Convert options to PollOption objects
+        options = []
+        for i, option_data in enumerate(poll_data.options):
+            option = PollOption(
+                text=option_data["text"],
+                description=option_data.get("description"),
+                image_url=option_data.get("image_url"),
+                sort_order=i
+            )
+            options.append(option)
+        
+        # Calculate total eligible voters
+        if poll_data.eligible_families:
+            eligible_count = await db.families.count_documents({
+                "compound_id": current_user.compound_id,
+                "id": {"$in": poll_data.eligible_families}
+            })
+        else:
+            # All families in compound
+            eligible_count = await db.families.count_documents({
+                "compound_id": current_user.compound_id
+            })
+        
+        poll = Poll(
+            **poll_data.dict(exclude={"options"}),
+            compound_id=current_user.compound_id,
+            options=options,
+            total_eligible_voters=eligible_count,
+            created_by=current_user.id,
+            updated_by=current_user.id
+        )
+        
+        poll_dict = serialize_datetime(poll.dict())
+        await db.polls.insert_one(poll_dict)
+        
+        return {"message": "Poll created successfully", "poll_id": poll.id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating poll: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create poll")
+
+@api_router.post("/polls/{poll_id}/vote")
+async def submit_vote(
+    poll_id: str,
+    vote_data: VoteCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Submit a vote for a poll"""
+    try:
+        # Get poll
+        poll = await db.polls.find_one({
+            "id": poll_id,
+            "compound_id": current_user.compound_id,
+            "status": "active"
+        })
+        
+        if not poll:
+            raise HTTPException(status_code=404, detail="Poll not found or not active")
+        
+        # Check if poll is still open
+        if datetime.utcnow() > poll["end_date"]:
+            raise HTTPException(status_code=400, detail="Poll has ended")
+        
+        # Check eligibility
+        if poll.get("require_family_head_only", True) and not current_user.is_family_head:
+            raise HTTPException(status_code=403, detail="Only family heads can vote")
+        
+        if poll.get("eligible_families") and current_user.family_id not in poll.get("eligible_families", []):
+            raise HTTPException(status_code=403, detail="You are not eligible to vote in this poll")
+        
+        # Check if already voted
+        existing_vote = await db.votes.find_one({
+            "poll_id": poll_id,
+            "user_id": current_user.id
+        })
+        
+        if existing_vote and not poll.get("allow_vote_change", False):
+            raise HTTPException(status_code=400, detail="You have already voted in this poll")
+        
+        # Validate vote data based on poll type
+        if poll["vote_type"] == "single_choice" and len(vote_data.selected_options) != 1:
+            raise HTTPException(status_code=400, detail="Single choice polls require exactly one selection")
+        
+        if poll["vote_type"] == "multiple_choice":
+            max_selections = poll.get("max_selections", len(poll["options"]))
+            if len(vote_data.selected_options) > max_selections:
+                raise HTTPException(status_code=400, detail=f"Too many selections. Maximum allowed: {max_selections}")
+        
+        # Create or update vote
+        vote = Vote(
+            **vote_data.dict(),
+            poll_id=poll_id,
+            user_id=current_user.id,
+            family_id=current_user.family_id,
+            unit_number=current_user.unit_number
+        )
+        
+        if existing_vote:
+            # Update existing vote
+            await db.votes.update_one(
+                {"poll_id": poll_id, "user_id": current_user.id},
+                {"$set": serialize_datetime(vote.dict())}
+            )
+        else:
+            # Insert new vote
+            await db.votes.insert_one(serialize_datetime(vote.dict()))
+            
+            # Update poll vote count
+            await db.polls.update_one(
+                {"id": poll_id},
+                {"$inc": {"total_votes": 1}}
+            )
+        
+        # Update option vote counts
+        for option_id in vote_data.selected_options:
+            await db.polls.update_one(
+                {"id": poll_id, "options.id": option_id},
+                {"$inc": {"options.$.vote_count": 1}}
+            )
+        
+        return {"message": "Vote submitted successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error submitting vote: {e}")
+        raise HTTPException(status_code=500, detail="Failed to submit vote")
+
+@api_router.get("/polls/{poll_id}/results")
+async def get_poll_results(
+    poll_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get poll results"""
+    try:
+        poll = await db.polls.find_one({
+            "id": poll_id,
+            "compound_id": current_user.compound_id
+        })
+        
+        if not poll:
+            raise HTTPException(status_code=404, detail="Poll not found")
+        
+        # Check if results are visible
+        if not poll.get("results_visible_before_end", False) and poll["status"] == "active":
+            if current_user.role != "admin":
+                raise HTTPException(status_code=403, detail="Results not yet available")
+        
+        # Get vote statistics
+        votes = await db.votes.find({"poll_id": poll_id}).to_list(length=None)
+        
+        # Calculate participation rate
+        participation_rate = (len(votes) / poll["total_eligible_voters"]) * 100 if poll["total_eligible_voters"] > 0 else 0
+        
+        # Prepare results
+        results = {
+            "poll": serialize_datetime(poll),
+            "total_votes": len(votes),
+            "participation_rate": round(participation_rate, 2),
+            "votes": [serialize_datetime(vote) for vote in votes] if current_user.role == "admin" else []
+        }
+        
+        return results
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting poll results: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get poll results")
+
+# ============ PHASE 3: SMART HOME INTEGRATION ENDPOINTS ============
+
+@api_router.get("/smart-devices")
+async def get_smart_devices(
+    device_type: Optional[str] = None,
+    location: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get smart devices with filtering"""
+    try:
+        query = {"compound_id": current_user.compound_id, "is_active": True}
+        
+        # Family-specific devices or shared devices
+        if current_user.role != "admin":
+            query["$or"] = [
+                {"family_id": current_user.family_id},
+                {"is_shared": True},
+                {"family_id": None}  # Common area devices
+            ]
+        
+        if device_type:
+            query["device_type"] = device_type
+        if location:
+            query["location"] = {"$regex": location, "$options": "i"}
+        
+        devices = await db.smart_devices.find(query).sort("location", 1).to_list(length=None)
+        
+        return {"devices": [serialize_datetime(device) for device in devices]}
+        
+    except Exception as e:
+        logging.error(f"Error getting smart devices: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get smart devices")
+
+@api_router.post("/smart-devices")
+async def create_smart_device(
+    device_data: SmartDeviceCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Add a new smart device"""
+    try:
+        # Only admins or family heads can add devices
+        if current_user.role != "admin" and not current_user.is_family_head:
+            raise HTTPException(status_code=403, detail="Only admins or family heads can add devices")
+        
+        # Set family_id if not admin
+        if current_user.role != "admin":
+            device_data.family_id = current_user.family_id
+            device_data.unit_number = current_user.unit_number
+        
+        device = SmartDevice(
+            **device_data.dict(),
+            compound_id=current_user.compound_id,
+            installed_by=current_user.id,
+            controlled_by=[current_user.id],
+            viewable_by=[current_user.id]
+        )
+        
+        device_dict = serialize_datetime(device.dict())
+        await db.smart_devices.insert_one(device_dict)
+        
+        return {"message": "Smart device added successfully", "device_id": device.id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating smart device: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create smart device")
+
+@api_router.post("/smart-devices/{device_id}/command")
+async def send_device_command(
+    device_id: str,
+    command_data: DeviceCommand,
+    current_user: User = Depends(get_current_user)
+):
+    """Send command to a smart device"""
+    try:
+        # Get device
+        device = await db.smart_devices.find_one({
+            "id": device_id,
+            "compound_id": current_user.compound_id,
+            "is_active": True
+        })
+        
+        if not device:
+            raise HTTPException(status_code=404, detail="Device not found")
+        
+        # Check control permissions
+        if (current_user.role != "admin" and 
+            current_user.id not in device.get("controlled_by", []) and
+            device.get("family_id") != current_user.family_id):
+            raise HTTPException(status_code=403, detail="You don't have permission to control this device")
+        
+        # For now, simulate device command (in real implementation, this would send to actual device)
+        # Update target state
+        new_target_state = device.get("target_state", {}).copy()
+        new_target_state.update(command_data.parameters)
+        
+        # Simulate successful command execution
+        new_current_state = new_target_state.copy()
+        
+        # Update device state
+        await db.smart_devices.update_one(
+            {"id": device_id},
+            {
+                "$set": {
+                    "target_state": new_target_state,
+                    "current_state": new_current_state,
+                    "last_seen": datetime.utcnow(),
+                    "status": "online",
+                    "updated_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        # Log the command
+        device_log = DeviceLog(
+            device_id=device_id,
+            compound_id=current_user.compound_id,
+            event_type="command",
+            old_state=device.get("current_state", {}),
+            new_state=new_current_state,
+            command=command_data.command,
+            triggered_by=current_user.id,
+            success=True
+        )
+        
+        await db.device_logs.insert_one(serialize_datetime(device_log.dict()))
+        
+        return {
+            "message": "Command sent successfully",
+            "device_state": new_current_state
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error sending device command: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send device command")
+
+@api_router.get("/smart-devices/{device_id}/logs")
+async def get_device_logs(
+    device_id: str,
+    limit: int = 50,
+    current_user: User = Depends(get_current_user)
+):
+    """Get device activity logs"""
+    try:
+        # Verify device access
+        device = await db.smart_devices.find_one({
+            "id": device_id,
+            "compound_id": current_user.compound_id
+        })
+        
+        if not device:
+            raise HTTPException(status_code=404, detail="Device not found")
+        
+        # Check view permissions
+        if (current_user.role != "admin" and 
+            current_user.id not in device.get("viewable_by", []) and
+            device.get("family_id") != current_user.family_id):
+            raise HTTPException(status_code=403, detail="You don't have permission to view this device")
+        
+        logs = await db.device_logs.find({
+            "device_id": device_id
+        }).sort("timestamp", -1).limit(limit).to_list(length=None)
+        
+        return {"logs": [serialize_datetime(log) for log in logs]}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting device logs: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get device logs")
+
+@api_router.get("/automations")
+async def get_automations(current_user: User = Depends(get_current_user)):
+    """Get device automations"""
+    try:
+        query = {"compound_id": current_user.compound_id}
+        
+        # Family-specific automations for non-admins
+        if current_user.role != "admin":
+            query["$or"] = [
+                {"family_id": current_user.family_id},
+                {"family_id": None}  # Common automations
+            ]
+        
+        automations = await db.device_automations.find(query).sort("created_at", -1).to_list(length=None)
+        
+        return {"automations": [serialize_datetime(automation) for automation in automations]}
+        
+    except Exception as e:
+        logging.error(f"Error getting automations: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get automations")
+
+@api_router.post("/automations")
+async def create_automation(
+    automation_data: DeviceAutomationCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new device automation"""
+    try:
+        # Set family_id if not admin
+        if current_user.role != "admin":
+            automation_data.family_id = current_user.family_id
+        
+        automation = DeviceAutomation(
+            **automation_data.dict(),
+            compound_id=current_user.compound_id,
+            created_by=current_user.id
+        )
+        
+        automation_dict = serialize_datetime(automation.dict())
+        await db.device_automations.insert_one(automation_dict)
+        
+        return {"message": "Automation created successfully", "automation_id": automation.id}
+        
+    except Exception as e:
+        logging.error(f"Error creating automation: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create automation")
+
 # Include router after all endpoints are defined
 app.include_router(api_router)
 

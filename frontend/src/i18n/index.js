@@ -567,6 +567,20 @@ const resources = {
       'date_format_short': 'يوم/شهر/سنة',
       'date_format_long': 'd MMMM yyyy',
       
+      // Missing translations
+      'frontend_update_successful': 'تم تحديث الواجهة الأمامية بنجاح',
+      'frontend_updates_working': 'إذا كان بإمكانك رؤية هذا الشريط الأحمر، فإن تحديثات الواجهة الأمامية تعمل',
+      'updated_compound_management': 'محدث - إدارة المجمع',
+      'new_features_added': 'ميزات جديدة مضافة: إدارة المساكن مع الصور الشخصية وإنشاء الحسابات المباشر',
+      'created': 'تاريخ الإنشاء',
+      'compound_id': 'رقم المجمع',
+      'click_to_upload_logo': 'انقر لرفع الشعار',
+      'primary_admin': 'المدير الرئيسي',
+      'test_admin': 'مدير تجريبي',
+      'add_residence': 'إضافة مسكن',
+      'create_new_residence': 'إنشاء مسكن جديد',
+      'residence_management': 'إدارة المساكن',
+      
       // Compound Management
       'manage_compound': 'إدارة إعدادات وهوية مجمعك السكني',
       'overview': 'نظرة عامة',

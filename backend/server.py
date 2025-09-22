@@ -3177,11 +3177,11 @@ async def get_compound_bookings(compound_id: str, current_user: User = Depends(r
             "resident_name": resident.get("full_name") if resident else "Unknown Resident",
             "unit_number": booking.get("unit_number"),
             "issue_description": booking.get("issue_description"),
-            "preferred_date": booking.get("preferred_date").isoformat() if booking.get("preferred_date") else None,
+            "preferred_date": booking.get("preferred_date").isoformat() if booking.get("preferred_date") and hasattr(booking.get("preferred_date"), 'isoformat') else booking.get("preferred_date"),
             "preferred_time": booking.get("preferred_time"),
             "status": booking.get("status"),
             "notes": booking.get("notes"),
-            "created_at": booking.get("created_at").isoformat() if booking.get("created_at") else None
+            "created_at": booking.get("created_at").isoformat() if booking.get("created_at") and hasattr(booking.get("created_at"), 'isoformat') else booking.get("created_at")
         }
         booking_list.append(booking_data)
     

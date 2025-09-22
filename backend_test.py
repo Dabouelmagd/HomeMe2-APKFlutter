@@ -2649,6 +2649,7 @@ class ServicesManagementTestSuite:
                 booking_data = {
                     "provider_id": self.test_provider_id,
                     "service_category": "maintenance",
+                    "service_specialty": "plumber",
                     "title": "Kitchen Sink Repair",
                     "description": "Kitchen sink is leaking and needs immediate repair",
                     "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat()

@@ -1217,8 +1217,8 @@ const CompoundManagement = () => {
               ) : (
                 <div className="text-center py-8">
                   <UsersIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No additional admins added</p>
-                  <p className="text-sm text-gray-400">Add more admins to help manage the compound</p>
+                  <p className="text-gray-500">{t('no_additional_admins')}</p>
+                  <p className="text-sm text-gray-400">{t('help_manage')}</p>
                 </div>
               )}
             </div>

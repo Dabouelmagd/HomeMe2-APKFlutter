@@ -8,7 +8,7 @@ class NotificationCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=1000)
     type: str = Field(..., pattern="^(maintenance|payment|system|community|general)$")
-    priority: str = Field(default="normal", regex="^(low|normal|high|urgent)$")
+    priority: str = Field(default="normal", pattern="^(low|normal|high|urgent)$")
     recipient_id: Optional[str] = None  # If None, it's a broadcast
     action_url: Optional[str] = None
     action_text: Optional[str] = None
@@ -106,7 +106,7 @@ class BulkNotificationCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=1000)
     type: str = Field(..., pattern="^(maintenance|payment|system|community|general)$")
-    priority: str = Field(default="normal", regex="^(low|normal|high|urgent)$")
+    priority: str = Field(default="normal", pattern="^(low|normal|high|urgent)$")
     
     # Targeting
     target_type: str = Field(..., regex="^(all|compound|family|unit|role|specific)$")

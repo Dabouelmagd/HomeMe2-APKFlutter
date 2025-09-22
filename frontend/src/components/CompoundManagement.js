@@ -1969,7 +1969,7 @@ const CompoundManagement = () => {
                   onClick={handleCancelCompoundSettings}
                   className="btn btn-secondary"
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button 
                   onClick={handleSaveCompoundSettings}

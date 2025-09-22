@@ -4515,13 +4515,14 @@ class ServicesManagementTestSuite:
 if __name__ == "__main__":
     test_suite = ServicesManagementTestSuite()
     
-    # Run Invoice Functionality tests as requested
-    print("🎯 RUNNING INVOICE FUNCTIONALITY TESTS")
-    success = test_suite.run_invoice_functionality_tests()
+    # Run Admin Invoice Fix tests as requested
+    print("🎯 RUNNING ADMIN INVOICE FIX TESTS")
+    print("Testing the fix for admin users (family_id: null) being able to see compound invoices")
+    success = test_suite.run_admin_invoice_fix_tests()
     
     if success:
-        print("\n🎉 INVOICE FUNCTIONALITY TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 ADMIN INVOICE FIX TESTING COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ INVOICE FUNCTIONALITY TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ ADMIN INVOICE FIX TESTING COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

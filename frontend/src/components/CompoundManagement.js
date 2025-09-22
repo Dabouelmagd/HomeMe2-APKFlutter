@@ -2885,14 +2885,11 @@ const CompoundManagement = () => {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Date of Birth
-                            </label>
-                            <input
-                              type="date"
+                            <DateInput
+                              label={t('date_of_birth')}
                               value={newFamilyMember.date_of_birth}
                               onChange={(e) => setNewFamilyMember(prev => ({ ...prev, date_of_birth: e.target.value }))}
-                              className="form-input w-full"
+                              className="w-full"
                             />
                           </div>
 

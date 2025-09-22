@@ -664,7 +664,117 @@ const CompoundManagement = () => {
     }
   };
 
-  const handleFamilyMemberProfilePictureChange = (e) => {
+  const handleEditUnitProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      
+      setEditUnitForm(prev => ({ ...prev, profile_picture: file }));
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setEditUnitForm(prev => ({ ...prev, profile_picture_preview: e.target.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditMemberProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      
+      setEditMemberForm(prev => ({ ...prev, profile_picture: file }));
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setEditMemberForm(prev => ({ ...prev, profile_picture_preview: e.target.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUpdateUnit = async (e) => {
+    e.preventDefault();
+    if (!editingUnit) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('full_name', editUnitForm.full_name);
+      formData.append('phone', editUnitForm.phone || '');
+      
+      if (editUnitForm.profile_picture) {
+        formData.append('profile_picture', editUnitForm.profile_picture);
+      }
+
+      // Update user profile
+      await axios.put(`${API}/users/${editingUnit.family_head.id}/profile`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+      });
+
+      // Note: Unit number and email updates would need additional backend endpoints
+      // For now, we'll focus on the fields that can be updated
+
+      toast.success('Unit updated successfully!');
+      setShowEditUnit(false);
+      setEditingUnit(null);
+      await fetchResidences();
+    } catch (error) {
+      console.error('Failed to update unit:', error);
+      toast.error(error.response?.data?.detail || 'Failed to update unit');
+    }
+  };
+
+  const handleUpdateMember = async (e) => {
+    e.preventDefault();
+    if (!editingMember) return;
+
+    try {
+      const formData = new FormData();
+      formData.append('full_name', editMemberForm.full_name);
+      formData.append('relationship', editMemberForm.relationship);
+      formData.append('age', editMemberForm.age || '');
+      formData.append('email', editMemberForm.email || '');
+      formData.append('phone', editMemberForm.phone || '');
+      formData.append('date_of_birth', editMemberForm.date_of_birth || '');
+      formData.append('id_number', editMemberForm.id_number || '');
+      
+      if (editMemberForm.profile_picture) {
+        formData.append('profile_picture', editMemberForm.profile_picture);
+      }
+
+      await axios.put(`${API}/family-members/${editingMember.id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+      });
+
+      toast.success('Family member updated successfully!');
+      setShowEditMember(false);
+      setEditingMember(null);
+      
+      // Refresh family members for the affected unit
+      const affectedUnitId = Object.keys(unitFamilyMembers).find(unitId =>
+        unitFamilyMembers[unitId].some(member => member.id === editingMember.id)
+      );
+      if (affectedUnitId) {
+        await fetchFamilyMembersForUnit(affectedUnitId);
+      }
+    } catch (error) {
+      console.error('Failed to update family member:', error);
+      toast.error(error.response?.data?.detail || 'Failed to update family member');
+    }
+  };
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {

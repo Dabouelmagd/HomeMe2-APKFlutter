@@ -5449,6 +5449,89 @@ async def update_family_member(
         logging.error(f"Error updating family member: {e}")
         raise HTTPException(status_code=500, detail="Failed to update family member")
 
+@api_router.put("/family-members/{member_id}/profile")
+async def update_family_member_with_profile(
+    member_id: str,
+    full_name: str = Form(...),
+    relationship: str = Form(...),
+    age: int = Form(None),
+    email: str = Form(None),
+    phone: str = Form(None),
+    date_of_birth: str = Form(None),
+    id_number: str = Form(None),
+    profile_picture: UploadFile = File(None),
+    current_user: User = Depends(get_current_user)
+):
+    """Update a family member with profile picture support"""
+    try:
+        # Find the family member
+        family_member = await db.family_members.find_one({
+            "id": member_id,
+            "primary_resident_id": current_user.id
+        })
+        
+        if not family_member:
+            raise HTTPException(status_code=404, detail="Family member not found")
+        
+        # Build update data
+        update_dict = {
+            "full_name": full_name,
+            "relationship": relationship,
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        if age is not None:
+            update_dict["age"] = age
+        if email:
+            update_dict["email"] = email
+        if phone:
+            update_dict["phone"] = phone
+        if id_number:
+            update_dict["id_number"] = id_number
+        if date_of_birth:
+            try:
+                # Convert string date to date object
+                parsed_date = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+                update_dict["birthday"] = parsed_date
+            except ValueError:
+                pass  # Skip invalid date format
+        
+        # Handle profile picture upload
+        if profile_picture and profile_picture.filename:
+            if not profile_picture.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+                raise HTTPException(status_code=400, detail="Invalid image format")
+            
+            # Create uploads directory for family members
+            family_upload_dir = UPLOAD_DIR / "family_members"
+            family_upload_dir.mkdir(exist_ok=True)
+            
+            # Generate unique filename
+            file_ext = Path(profile_picture.filename).suffix
+            unique_filename = f"{member_id}_{uuid.uuid4().hex[:8]}{file_ext}"
+            file_path = family_upload_dir / unique_filename
+            
+            # Save file
+            content = await profile_picture.read()
+            async with aiofiles.open(file_path, 'wb') as f:
+                await f.write(content)
+            
+            # Update profile image path
+            update_dict["profile_image"] = f"/uploads/family_members/{unique_filename}"
+        
+        # Update the family member
+        await db.family_members.update_one(
+            {"id": member_id},
+            {"$set": update_dict}
+        )
+        
+        return {"message": "Family member updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating family member profile: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update family member profile")
+
 @api_router.delete("/family-members/{member_id}")
 async def delete_family_member(
     member_id: str,

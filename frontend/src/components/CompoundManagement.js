@@ -435,6 +435,165 @@ const CompoundManagement = () => {
     });
   };
 
+  const resetComprehensiveFamilyForm = () => {
+    setComprehensiveFamilyForm({
+      unit_number: '',
+      head_full_name: '',
+      head_email: '',
+      head_phone: '',
+      head_date_of_birth: '',
+      head_id_number: '',
+      head_profile_picture: null,
+      head_profile_picture_preview: null,
+      family_members: []
+    });
+    setNewFamilyMember({
+      full_name: '',
+      relationship: '',
+      age: '',
+      phone: '',
+      email: '',
+      id_number: '',
+      date_of_birth: '',
+      profile_picture: null,
+      profile_picture_preview: null
+    });
+    setFamilyCreationStep(1);
+  };
+
+  const handleFamilyHeadProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      
+      setComprehensiveFamilyForm(prev => ({ ...prev, head_profile_picture: file }));
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setComprehensiveFamilyForm(prev => ({ ...prev, head_profile_picture_preview: e.target.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleFamilyMemberProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      
+      setNewFamilyMember(prev => ({ ...prev, profile_picture: file }));
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setNewFamilyMember(prev => ({ ...prev, profile_picture_preview: e.target.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addFamilyMember = () => {
+    if (!newFamilyMember.full_name || !newFamilyMember.relationship) {
+      toast.error('Please fill in required fields (Name and Relationship)');
+      return;
+    }
+
+    setComprehensiveFamilyForm(prev => ({
+      ...prev,
+      family_members: [...prev.family_members, { ...newFamilyMember, id: Date.now() }]
+    }));
+
+    setNewFamilyMember({
+      full_name: '',
+      relationship: '',
+      age: '',
+      phone: '',
+      email: '',
+      id_number: '',
+      date_of_birth: '',
+      profile_picture: null,
+      profile_picture_preview: null
+    });
+  };
+
+  const removeFamilyMember = (memberId) => {
+    setComprehensiveFamilyForm(prev => ({
+      ...prev,
+      family_members: prev.family_members.filter(member => member.id !== memberId)
+    }));
+  };
+
+  const handleCreateComprehensiveFamily = async () => {
+    try {
+      // First create the residence and family head
+      const formData = new FormData();
+      formData.append('unit_number', comprehensiveFamilyForm.unit_number);
+      formData.append('full_name', comprehensiveFamilyForm.head_full_name);
+      formData.append('email', comprehensiveFamilyForm.head_email);
+      formData.append('phone', comprehensiveFamilyForm.head_phone || '');
+      formData.append('compound_id', user.compound_id);
+      formData.append('date_of_birth', comprehensiveFamilyForm.head_date_of_birth);
+      formData.append('id_number', comprehensiveFamilyForm.head_id_number || '');
+      
+      if (comprehensiveFamilyForm.head_profile_picture) {
+        formData.append('profile_picture', comprehensiveFamilyForm.head_profile_picture);
+      }
+
+      const residenceResponse = await axios.post(`${API}/admin/residences`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      toast.success('Residence and family head created successfully!');
+      
+      if (residenceResponse.data.temporary_password) {
+        toast.success(`Family Head Login - Username: ${residenceResponse.data.username}, Password: ${residenceResponse.data.temporary_password}`, { duration: 15000 });
+      }
+
+      // Now add family members if any
+      if (comprehensiveFamilyForm.family_members.length > 0) {
+        const familyHeadId = residenceResponse.data.user_id;
+        
+        for (const member of comprehensiveFamilyForm.family_members) {
+          const memberFormData = new FormData();
+          memberFormData.append('full_name', member.full_name);
+          memberFormData.append('relationship', member.relationship);
+          memberFormData.append('age', member.age || '');
+          memberFormData.append('phone', member.phone || '');
+          memberFormData.append('email', member.email || '');
+          memberFormData.append('id_number', member.id_number || '');
+          memberFormData.append('date_of_birth', member.date_of_birth || '');
+          
+          if (member.profile_picture) {
+            memberFormData.append('profile_picture', member.profile_picture);
+          }
+
+          await axios.post(`${API}/family-members`, memberFormData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+          });
+        }
+        
+        toast.success(`Added ${comprehensiveFamilyForm.family_members.length} family members successfully!`);
+      }
+
+      setShowComprehensiveFamilyModal(false);
+      resetComprehensiveFamilyForm();
+      await fetchResidences();
+    } catch (error) {
+      console.error('Failed to create comprehensive family:', error);
+      toast.error(error.response?.data?.detail || 'Failed to create residence and family');
+    }
+  };
+
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
     if (file) {

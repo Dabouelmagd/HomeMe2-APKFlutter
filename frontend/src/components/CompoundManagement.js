@@ -2265,7 +2265,7 @@ const CompoundManagement = () => {
                                   <div className="flex items-center mt-1 text-xs text-gray-500">
                                     <span>ID: {compound.id.slice(0, 8)}...</span>
                                     <span className="mx-2">•</span>
-                                    <span>Created: {new Date(compound.created_at).toLocaleDateString()}</span>
+                                    <span>Created: {formatDate(compound.created_at)}</span>
                                   </div>
                                 </div>
                                 <div className="flex-shrink-0">

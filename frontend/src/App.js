@@ -271,6 +271,10 @@ function App() {
                   <FamilyManagement />
                 } />
                 
+                <Route path="add-family-member" element={
+                  <AddFamilyMemberToUnit />
+                } />
+                
                 <Route path="pricing" element={
                   <Pricing />
                 } />

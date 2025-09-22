@@ -2644,8 +2644,8 @@ const CompoundManagement = () => {
                   {familyCreationStep === 1 && (
                     <div className="space-y-6">
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h4 className="font-medium text-blue-900 mb-2">Step 1: Unit Information</h4>
-                        <p className="text-sm text-blue-700">Enter the basic residence unit details</p>
+                        <h4 className="font-medium text-blue-900 mb-2">{t('step_1_unit_information')}</h4>
+                        <p className="text-sm text-blue-700">{t('enter_basic_residence_details')}</p>
                       </div>
                       
                       <div className="grid grid-cols-1 gap-6">

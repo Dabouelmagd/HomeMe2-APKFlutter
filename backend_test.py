@@ -2855,6 +2855,7 @@ class ServicesManagementTestSuite:
                 booking_data = {
                     "provider_id": self.test_provider_id,
                     "service_category": "maintenance",
+                    "service_specialty": "general",
                     "title": "Date Format Test",
                     "description": "Testing invalid date format",
                     "scheduled_date": "invalid-date-format"

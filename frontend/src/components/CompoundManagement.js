@@ -771,17 +771,17 @@ const CompoundManagement = () => {
       const formData = new FormData();
       formData.append('full_name', editMemberForm.full_name);
       formData.append('relationship', editMemberForm.relationship);
-      formData.append('age', editMemberForm.age || '');
-      formData.append('email', editMemberForm.email || '');
-      formData.append('phone', editMemberForm.phone || '');
-      formData.append('date_of_birth', editMemberForm.date_of_birth || '');
-      formData.append('id_number', editMemberForm.id_number || '');
+      if (editMemberForm.age) formData.append('age', editMemberForm.age);
+      if (editMemberForm.email) formData.append('email', editMemberForm.email);
+      if (editMemberForm.phone) formData.append('phone', editMemberForm.phone);
+      if (editMemberForm.date_of_birth) formData.append('date_of_birth', editMemberForm.date_of_birth);
+      if (editMemberForm.id_number) formData.append('id_number', editMemberForm.id_number);
       
       if (editMemberForm.profile_picture) {
         formData.append('profile_picture', editMemberForm.profile_picture);
       }
 
-      await axios.put(`${API}/family-members/${editingMember.id}`, formData, {
+      await axios.put(`${API}/family-members/${editingMember.id}/profile`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${localStorage.getItem('token')}`

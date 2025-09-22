@@ -5269,6 +5269,104 @@ async def create_family_member(
         logging.error(f"Error creating family member: {e}")
         raise HTTPException(status_code=500, detail="Failed to create family member")
 
+@api_router.post("/family-members/add-to-unit")
+async def add_family_member_to_unit(
+    unit_id: str = Form(...),
+    full_name: str = Form(...),
+    relationship: str = Form(...),
+    age: str = Form(None),
+    birthday: str = Form(None),
+    phone: str = Form(None),
+    email: str = Form(None),
+    id_number: str = Form(None),
+    emergency_contact_name: str = Form(None),
+    emergency_contact_phone: str = Form(None),
+    move_in_date: str = Form(None),
+    profile_picture: UploadFile = File(None),
+    current_user: User = Depends(get_current_user)
+):
+    """Allow both residents and admins to add family members to any unit in their compound"""
+    try:
+        # Get the target unit/resident
+        target_resident = await db.users.find_one({"id": unit_id, "compound_id": current_user.compound_id})
+        if not target_resident:
+            raise HTTPException(status_code=404, detail="Target resident not found in your compound")
+        
+        # Authorization check:
+        # 1. Admins can add family members to any unit in their compound
+        # 2. Residents can add family members to any unit in their compound
+        # 3. Both must be in the same compound
+        if current_user.compound_id != target_resident["compound_id"]:
+            raise HTTPException(status_code=403, detail="Cannot add family members to residents outside your compound")
+        
+        profile_picture_url = None
+        if profile_picture:
+            try:
+                # Upload profile picture
+                os.makedirs(UPLOAD_DIR, exist_ok=True)
+                file_extension = profile_picture.filename.split('.')[-1] if '.' in profile_picture.filename else 'jpg'
+                filename = f"family_member_{uuid.uuid4()}.{file_extension}"
+                file_path = os.path.join(UPLOAD_DIR, filename)
+                
+                with open(file_path, "wb") as buffer:
+                    shutil.copyfileobj(profile_picture.file, buffer)
+                
+                profile_picture_url = f"/uploads/{filename}"
+            except Exception as e:
+                logging.error(f"Error uploading profile picture: {e}")
+                # Continue without profile picture if upload fails
+        
+        # Create family member with proper data conversion
+        family_member_data = {
+            "id": str(uuid.uuid4()),
+            "full_name": full_name,
+            "relationship": relationship,
+            "age": int(age) if age else None,
+            "birthday": birthday if birthday else None,
+            "phone": phone if phone else None,
+            "email": email if email else None,
+            "id_number": id_number if id_number else None,
+            "emergency_contact_name": emergency_contact_name if emergency_contact_name else None,
+            "emergency_contact_phone": emergency_contact_phone if emergency_contact_phone else None,
+            "move_in_date": move_in_date if move_in_date else None,
+            "profile_picture_url": profile_picture_url,
+            "unit_id": unit_id,
+            "compound_id": current_user.compound_id,
+            "primary_resident_id": unit_id,
+            "unit_number": target_resident["unit_number"],
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
+            "added_by": current_user.id,  # Track who added the family member
+            "added_by_role": current_user.role  # Track the role of who added them
+        }
+        
+        await db.family_members.insert_one(family_member_data)
+        
+        # Log the action
+        await db.activity_logs.insert_one({
+            "id": str(uuid.uuid4()),
+            "compound_id": current_user.compound_id,
+            "user_id": current_user.id,
+            "action": "add_family_member",
+            "target_user_id": unit_id,
+            "details": f"{current_user.full_name} ({current_user.role}) added family member {full_name} to unit {target_resident['unit_number']}",
+            "timestamp": datetime.now(timezone.utc)
+        })
+        
+        return {
+            "message": f"Family member {full_name} added successfully to unit {target_resident['unit_number']}",
+            "family_member": family_member_data,
+            "added_by": current_user.full_name,
+            "added_by_role": current_user.role
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error adding family member to unit: {e}")
+        raise HTTPException(status_code=500, detail="Failed to add family member to unit")
+
 @api_router.get("/family-members")
 async def get_family_members(
     current_user: User = Depends(get_current_user)

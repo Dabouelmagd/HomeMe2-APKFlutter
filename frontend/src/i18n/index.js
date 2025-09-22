@@ -1070,6 +1070,23 @@ const resources = {
       'create_new_residence': 'Créer une nouvelle résidence',
       'residence_management': 'Gestion des résidences',
       
+      // Comprehensive Family Modal
+      'add_new_resident_family': 'Ajouter un nouveau résident et sa famille',
+      'complete_family_setup': 'Configuration familiale complète avec tous les détails des membres et photos',
+      'step_1_unit_information': 'Étape 1: Informations de l\'unité',
+      'step_2_family_head': 'Étape 2: Chef de famille',
+      'step_3_family_members': 'Étape 3: Membres de la famille',
+      'step_4_review': 'Étape 4: Révision',
+      'enter_basic_residence_details': 'Entrez les détails de base de l\'unité résidentielle',
+      'unit_number_example': 'ex: A-101, B-205, Villa-15',
+      'enter_unit_number_identifier': 'Entrez le numéro d\'unité ou l\'identifiant de la villa',
+      'next_step': 'Étape suivante',
+      'previous_step': 'Étape précédente',
+      'unit_info': 'Info unité',
+      'family_head': 'Chef de famille',
+      'family_members': 'Membres de la famille',
+      'review': 'Révision',
+      
       // Compound Management
       'manage_compound': 'Gérez les paramètres et l\'image de marque de votre résidence',
       'overview': 'Aperçu',

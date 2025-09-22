@@ -1223,6 +1223,29 @@ const CompoundManagement = () => {
               )}
             </div>
           </div>
+
+          {/* Residence Management */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{t('residence_management')}</h3>
+                <p className="text-gray-600">{t('create_new_residence')}</p>
+              </div>
+              <button 
+                onClick={() => setShowComprehensiveFamilyModal(true)}
+                className="btn btn-primary flex items-center space-x-2"
+              >
+                <PlusIcon className="h-4 w-4" />
+                <span>{t('add_residence')}</span>
+              </button>
+            </div>
+
+            <div className="text-center py-8">
+              <HomeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-500">{t('no_residences')}</p>
+              <p className="text-sm text-gray-400">{t('residences_appear')}</p>
+            </div>
+          </div>
         </div>
       )}
 

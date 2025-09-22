@@ -970,6 +970,30 @@ const resources = {
       'unlimited_users_families': 'Utilisateurs et familles illimités',
       'unlimited_services': 'Services illimités',
       
+      // Date & Time
+      'date_of_birth': 'Date de naissance',
+      'move_in_date': 'Date d\'emménagement',
+      'preferred_date': 'Date préférée',
+      'preferred_time': 'Heure préférée',
+      'scheduled_date': 'Date programmée',
+      'created_date': 'Date de création',
+      'updated_date': 'Date de mise à jour',
+      
+      // Relative Time
+      'now': 'maintenant',
+      'minute_ago': 'il y a 1 minute',
+      'minutes_ago_count': 'il y a {{count}} minutes',
+      'hour_ago': 'il y a 1 heure',
+      'hours_ago_count': 'il y a {{count}} heures',
+      'day_ago': 'il y a 1 jour',
+      'days_ago_count': 'il y a {{count}} jours',
+      'week_ago': 'il y a 1 semaine',
+      'weeks_ago_count': 'il y a {{count}} semaines',
+      
+      // Date Formats
+      'date_format_short': 'jj/mm/aaaa',
+      'date_format_long': 'd MMMM yyyy',
+      
       // Compound Management
       'manage_compound': 'Gérez les paramètres et l\'image de marque de votre résidence',
       'overview': 'Aperçu',

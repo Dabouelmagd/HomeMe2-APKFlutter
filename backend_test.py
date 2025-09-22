@@ -1416,15 +1416,15 @@ class ServicesManagementTestSuite:
             return False
     
     def test_get_my_invoices_with_data(self):
-        """Test GET /api/invoices/my - Check invoices after creation"""
+        """Test GET /api/invoices/my - Check invoices after creation (using resident user)"""
         print("\n=== Testing Get My Invoices (After Creation) ===")
         
-        if not self.admin_token:
-            self.log_result("Get My Invoices - After Creation", False, "No admin token available")
+        if not self.resident_token:
+            self.log_result("Get My Invoices - After Creation", False, "No resident token available")
             return False
         
         try:
-            headers = self.setup_auth_headers(self.admin_token)
+            headers = self.setup_auth_headers(self.resident_token)
             response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)
             
             if response.status_code == 200:

@@ -275,11 +275,16 @@ const ServiceBooking = () => {
     setBookingForm({
       provider_id: '',
       service_category: 'maintenance',
+      service_specialty: '',
       title: '',
       description: '',
+      priority: 'standard',
       scheduled_date: '',
       scheduled_time: '',
-      priority: 'standard',
+      scheduled_end_time: '',
+      is_recurring: false,
+      recurrence_pattern: '',
+      estimated_duration: 60,
       payment_method: 'cash',
       booking_notes: ''
     });

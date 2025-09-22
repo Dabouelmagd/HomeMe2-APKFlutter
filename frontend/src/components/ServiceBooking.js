@@ -285,14 +285,6 @@ const ServiceBooking = () => {
     });
   };
 
-  const resetPaymentForm = () => {
-    setPaymentForm({
-      payment_method: 'cash',
-      amount: 0,
-      currency: 'USD'
-    });
-  };
-
   const handlePayment = async (e) => {
     e.preventDefault();
     

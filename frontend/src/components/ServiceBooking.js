@@ -1082,51 +1082,145 @@ const ServiceBooking = () => {
                         </div>
                       </div>
 
-                      {/* Fixed Payment Method Selection */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-4">Preferred Payment Method</label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {paymentMethods.map(method => {
-                            const IconComponent = method.icon;
-                            const isSelected = bookingForm.payment_method === method.value;
-                            return (
-                              <label 
-                                key={method.value}
-                                className={`cursor-pointer flex items-center p-4 rounded-lg border-2 transition-all duration-200 ${
-                                  isSelected
-                                    ? 'border-blue-500 bg-blue-50 shadow-md'
-                                    : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
-                                }`}
-                              >
-                                <input
-                                  type="radio"
-                                  name="payment_method"
-                                  value={method.value}
-                                  checked={isSelected}
-                                  onChange={(e) => setBookingForm({...bookingForm, payment_method: e.target.value})}
-                                  className="sr-only"
-                                />
-                                <IconComponent className={`h-6 w-6 flex-shrink-0 mr-3 ${
-                                  isSelected ? 'text-blue-600' : 'text-gray-500'
-                                }`} />
-                                <div className="flex-1">
-                                  <div className={`font-medium ${
-                                    isSelected ? 'text-blue-900' : 'text-gray-900'
-                                  }`}>
-                                    {method.label}
-                                  </div>
-                                  <div className={`text-sm mt-1 ${
-                                    isSelected ? 'text-blue-700' : 'text-gray-600'
-                                  }`}>
-                                    {method.description}
-                                  </div>
-                                </div>
-                                {isSelected && (
-                                  <CheckCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0 ml-2" />
-                                )}
-                              </label>
-                            );
-                          })}
+                      {/* Fixed Payment Method Selection - Always Visible */}
+                      <div className="border-t pt-6 mt-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-4">Preferred Payment Method *</label>
+                        <div className="space-y-3">
+                          {/* Cash Payment */}
+                          <label className={`cursor-pointer flex items-center p-4 rounded-lg border-2 transition-all duration-200 ${
+                            bookingForm.payment_method === 'cash'
+                              ? 'border-blue-500 bg-blue-50 shadow-md'
+                              : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="payment_method"
+                              value="cash"
+                              checked={bookingForm.payment_method === 'cash'}
+                              onChange={(e) => setBookingForm({...bookingForm, payment_method: e.target.value})}
+                              className="sr-only"
+                            />
+                            <BanknotesIcon className={`h-6 w-6 flex-shrink-0 mr-3 ${
+                              bookingForm.payment_method === 'cash' ? 'text-blue-600' : 'text-gray-500'
+                            }`} />
+                            <div className="flex-1">
+                              <div className={`font-medium ${
+                                bookingForm.payment_method === 'cash' ? 'text-blue-900' : 'text-gray-900'
+                              }`}>
+                                Cash on Service
+                              </div>
+                              <div className={`text-sm mt-1 ${
+                                bookingForm.payment_method === 'cash' ? 'text-blue-700' : 'text-gray-600'
+                              }`}>
+                                Pay when service is completed
+                              </div>
+                            </div>
+                            {bookingForm.payment_method === 'cash' && (
+                              <CheckCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0 ml-2" />
+                            )}
+                          </label>
+
+                          {/* Credit Card Payment */}
+                          <label className={`cursor-pointer flex items-center p-4 rounded-lg border-2 transition-all duration-200 ${
+                            bookingForm.payment_method === 'card'
+                              ? 'border-blue-500 bg-blue-50 shadow-md'
+                              : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="payment_method"
+                              value="card"
+                              checked={bookingForm.payment_method === 'card'}
+                              onChange={(e) => setBookingForm({...bookingForm, payment_method: e.target.value})}
+                              className="sr-only"
+                            />
+                            <CreditCardIcon className={`h-6 w-6 flex-shrink-0 mr-3 ${
+                              bookingForm.payment_method === 'card' ? 'text-blue-600' : 'text-gray-500'
+                            }`} />
+                            <div className="flex-1">
+                              <div className={`font-medium ${
+                                bookingForm.payment_method === 'card' ? 'text-blue-900' : 'text-gray-900'
+                              }`}>
+                                Credit/Debit Card
+                              </div>
+                              <div className={`text-sm mt-1 ${
+                                bookingForm.payment_method === 'card' ? 'text-blue-700' : 'text-gray-600'
+                              }`}>
+                                Secure online payment
+                              </div>
+                            </div>
+                            {bookingForm.payment_method === 'card' && (
+                              <CheckCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0 ml-2" />
+                            )}
+                          </label>
+
+                          {/* Bank Transfer Payment */}
+                          <label className={`cursor-pointer flex items-center p-4 rounded-lg border-2 transition-all duration-200 ${
+                            bookingForm.payment_method === 'bank_transfer'
+                              ? 'border-blue-500 bg-blue-50 shadow-md'
+                              : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="payment_method"
+                              value="bank_transfer"
+                              checked={bookingForm.payment_method === 'bank_transfer'}
+                              onChange={(e) => setBookingForm({...bookingForm, payment_method: e.target.value})}
+                              className="sr-only"
+                            />
+                            <BuildingLibraryIcon className={`h-6 w-6 flex-shrink-0 mr-3 ${
+                              bookingForm.payment_method === 'bank_transfer' ? 'text-blue-600' : 'text-gray-500'
+                            }`} />
+                            <div className="flex-1">
+                              <div className={`font-medium ${
+                                bookingForm.payment_method === 'bank_transfer' ? 'text-blue-900' : 'text-gray-900'
+                              }`}>
+                                Bank Transfer
+                              </div>
+                              <div className={`text-sm mt-1 ${
+                                bookingForm.payment_method === 'bank_transfer' ? 'text-blue-700' : 'text-gray-600'
+                              }`}>
+                                Direct bank transfer
+                              </div>
+                            </div>
+                            {bookingForm.payment_method === 'bank_transfer' && (
+                              <CheckCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0 ml-2" />
+                            )}
+                          </label>
+
+                          {/* Mobile Payment */}
+                          <label className={`cursor-pointer flex items-center p-4 rounded-lg border-2 transition-all duration-200 ${
+                            bookingForm.payment_method === 'mobile_pay'
+                              ? 'border-blue-500 bg-blue-50 shadow-md'
+                              : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                          }`}>
+                            <input
+                              type="radio"
+                              name="payment_method"
+                              value="mobile_pay"
+                              checked={bookingForm.payment_method === 'mobile_pay'}
+                              onChange={(e) => setBookingForm({...bookingForm, payment_method: e.target.value})}
+                              className="sr-only"
+                            />
+                            <DevicePhoneMobileIcon className={`h-6 w-6 flex-shrink-0 mr-3 ${
+                              bookingForm.payment_method === 'mobile_pay' ? 'text-blue-600' : 'text-gray-500'
+                            }`} />
+                            <div className="flex-1">
+                              <div className={`font-medium ${
+                                bookingForm.payment_method === 'mobile_pay' ? 'text-blue-900' : 'text-gray-900'
+                              }`}>
+                                Mobile Payment
+                              </div>
+                              <div className={`text-sm mt-1 ${
+                                bookingForm.payment_method === 'mobile_pay' ? 'text-blue-700' : 'text-gray-600'
+                              }`}>
+                                Pay using mobile wallet
+                              </div>
+                            </div>
+                            {bookingForm.payment_method === 'mobile_pay' && (
+                              <CheckCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0 ml-2" />
+                            )}
+                          </label>
                         </div>
                       </div>
 

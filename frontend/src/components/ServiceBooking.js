@@ -271,6 +271,28 @@ const ServiceBooking = () => {
     }
   };
 
+  const resetBookingForm = () => {
+    setBookingForm({
+      provider_id: '',
+      service_category: 'maintenance',
+      title: '',
+      description: '',
+      scheduled_date: '',
+      scheduled_time: '',
+      priority: 'standard',
+      payment_method: 'cash',
+      booking_notes: ''
+    });
+  };
+
+  const resetPaymentForm = () => {
+    setPaymentForm({
+      payment_method: 'cash',
+      amount: 0,
+      currency: 'USD'
+    });
+  };
+
   const handlePayment = async (e) => {
     e.preventDefault();
     try {

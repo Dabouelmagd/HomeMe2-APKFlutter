@@ -109,13 +109,6 @@ const ServiceBooking = () => {
     { value: 'qr_code', label: 'QR Code Payment', icon: QrCodeIcon, color: 'bg-gray-50 border-gray-200', description: 'Scan and pay instantly' }
   ];
 
-  const priorityOptions = [
-    { value: 'emergency', label: 'Emergency', color: 'bg-red-100 text-red-800', description: 'Urgent issue requiring immediate attention' },
-    { value: 'urgent', label: 'Urgent', color: 'bg-orange-100 text-orange-800', description: 'Needs attention within 24 hours' },
-    { value: 'standard', label: 'Standard', color: 'bg-blue-100 text-blue-800', description: 'Regular service request' },
-    { value: 'scheduled', label: 'Scheduled', color: 'bg-green-100 text-green-800', description: 'Planned maintenance or service' }
-  ];
-
   const serviceCategories = [
     { value: 'maintenance', label: 'Maintenance', specialties: ['Plumber', 'Electrician', 'Carpenter', 'HVAC', 'General'] },
     { value: 'cleaning', label: 'Cleaning', specialties: ['Deep Cleaning', 'Regular Cleaning', 'Carpet Cleaning', 'Window Cleaning'] },

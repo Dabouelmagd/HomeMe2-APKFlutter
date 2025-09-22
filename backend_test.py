@@ -2329,13 +2329,13 @@ class ServicesManagementTestSuite:
 if __name__ == "__main__":
     test_suite = ServicesManagementTestSuite()
     
-    # Run Family Member Management tests as requested
-    print("👨‍👩‍👧‍👦 RUNNING FAMILY MEMBER MANAGEMENT TESTS")
-    success = test_suite.run_family_member_management_tests()
+    # Run Service Booking & Payments tests as requested
+    print("🔧 RUNNING SERVICE BOOKING & PAYMENTS SYSTEM TESTS")
+    success = test_suite.run_service_booking_payments_tests()
     
     if success:
-        print("\n🎉 FAMILY MEMBER MANAGEMENT TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 SERVICE BOOKING & PAYMENTS TESTING COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ FAMILY MEMBER MANAGEMENT TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ SERVICE BOOKING & PAYMENTS TESTING COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

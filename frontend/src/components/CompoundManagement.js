@@ -3282,7 +3282,7 @@ const CompoundManagement = () => {
 
                     <div>
                       <DateInput
-                        label="Date of Birth"
+                        label={t('date_of_birth')}
                         value={editMemberForm.date_of_birth}
                         onChange={(e) => setEditMemberForm(prev => ({ ...prev, date_of_birth: e.target.value }))}
                         className="w-full"

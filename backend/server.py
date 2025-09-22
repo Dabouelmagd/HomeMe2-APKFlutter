@@ -87,51 +87,7 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 # Security
 security = HTTPBearer()
 
-# WebSocket connections manager
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: Dict[str, WebSocket] = {}
-    
-    async def connect(self, websocket: WebSocket, user_id: str):
-        await websocket.accept()
-        self.active_connections[user_id] = websocket
-    
-    def disconnect(self, user_id: str):
-        if user_id in self.active_connections:
-            del self.active_connections[user_id]
-    
-    async def send_personal_message(self, message: str, user_id: str):
-        if user_id in self.active_connections:
-            try:
-                await self.active_connections[user_id].send_text(message)
-            except:
-                self.disconnect(user_id)
-    
-    async def broadcast_to_compound(self, message: str, compound_id: str):
-        # Get all users in compound and send message
-        users = await db.users.find({"compound_id": compound_id}).to_list(None)
-        for user in users:
-            await self.send_personal_message(message, str(user["_id"]))
-    
-    async def send_chat_message(self, chat_message: dict, participants: List[str]):
-        """Send chat message to all participants"""
-        message = json.dumps(serialize_datetime(chat_message))
-        for participant_id in participants:
-            await self.send_personal_message(message, participant_id)
-    
-    async def notify_chat_update(self, chat_id: str, update_type: str, data: dict, participants: List[str]):
-        """Send chat updates (new participants, chat settings, etc.)"""
-        notification = {
-            "type": "chat_update",
-            "chat_id": chat_id,
-            "update_type": update_type,
-            "data": serialize_datetime(data)
-        }
-        message = json.dumps(notification)
-        for participant_id in participants:
-            await self.send_personal_message(message, participant_id)
-
-manager = ConnectionManager()
+# WebSocket connections manager is imported from websocket_manager
 
 # Pydantic Models
 class UserRole(str):

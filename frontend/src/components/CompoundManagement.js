@@ -54,6 +54,28 @@ const CompoundManagement = () => {
   const [editingUnit, setEditingUnit] = useState(null);
   const [editingMember, setEditingMember] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null); // {type: 'unit'|'member', id: string, name: string}
+  
+  // Edit forms state
+  const [editUnitForm, setEditUnitForm] = useState({
+    unit_number: '',
+    full_name: '',
+    email: '',
+    phone: '',
+    profile_picture: null,
+    profile_picture_preview: null
+  });
+  
+  const [editMemberForm, setEditMemberForm] = useState({
+    full_name: '',
+    relationship: '',
+    age: '',
+    email: '',
+    phone: '',
+    date_of_birth: '',
+    id_number: '',
+    profile_picture: null,
+    profile_picture_preview: null
+  });
   const [editableCompound, setEditableCompound] = useState({
     name: '',
     address: '',

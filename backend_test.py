@@ -757,7 +757,7 @@ class HomePhase1TestSuite:
         
         return self.print_summary()
     
-    def test_trial_activation_new_user(self):
+    def print_summary(self):
         """Test POST /api/trial/activate - Trial activation for new user"""
         print("\n=== Testing Trial Activation for New User ===")
         

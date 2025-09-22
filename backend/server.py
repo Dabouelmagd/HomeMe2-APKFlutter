@@ -7707,6 +7707,159 @@ async def get_maintenance_stats(current_user: User = Depends(get_current_user)):
         logging.error(f"Error fetching maintenance stats: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch maintenance stats")
 
+# ============ NOTIFICATION ENDPOINTS ============
+
+@api_router.get("/notifications")
+async def get_notifications(
+    limit: int = 50,
+    offset: int = 0,
+    unread_only: bool = False,
+    current_user: User = Depends(get_current_user)
+):
+    """Get user notifications"""
+    try:
+        query = {
+            "$or": [
+                {"recipient_id": current_user.id},
+                {"recipient_id": None, "compound_id": current_user.compound_id}  # Broadcast notifications
+            ]
+        }
+        
+        if unread_only:
+            query["is_read"] = False
+        
+        notifications = await db.notifications.find(query)\
+            .sort("created_at", -1)\
+            .skip(offset)\
+            .limit(limit)\
+            .to_list(None)
+        
+        return {"notifications": serialize_datetime(notifications)}
+        
+    except Exception as e:
+        logging.error(f"Error fetching notifications: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch notifications")
+
+@api_router.patch("/notifications/{notification_id}/read")
+async def mark_notification_read(
+    notification_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Mark notification as read"""
+    try:
+        result = await db.notifications.update_one(
+            {
+                "id": notification_id,
+                "$or": [
+                    {"recipient_id": current_user.id},
+                    {"recipient_id": None, "compound_id": current_user.compound_id}
+                ]
+            },
+            {
+                "$set": {
+                    "is_read": True,
+                    "read_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Notification not found")
+        
+        return {"message": "Notification marked as read"}
+        
+    except Exception as e:
+        logging.error(f"Error marking notification as read: {e}")
+        raise HTTPException(status_code=500, detail="Failed to mark notification as read")
+
+@api_router.patch("/notifications/mark-all-read")
+async def mark_all_notifications_read(current_user: User = Depends(get_current_user)):
+    """Mark all user notifications as read"""
+    try:
+        result = await db.notifications.update_many(
+            {
+                "$or": [
+                    {"recipient_id": current_user.id},
+                    {"recipient_id": None, "compound_id": current_user.compound_id}
+                ],
+                "is_read": False
+            },
+            {
+                "$set": {
+                    "is_read": True,
+                    "read_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        return {"message": f"Marked {result.modified_count} notifications as read"}
+        
+    except Exception as e:
+        logging.error(f"Error marking all notifications as read: {e}")
+        raise HTTPException(status_code=500, detail="Failed to mark all notifications as read")
+
+@api_router.delete("/notifications/{notification_id}")
+async def delete_notification(
+    notification_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a notification"""
+    try:
+        result = await db.notifications.delete_one({
+            "id": notification_id,
+            "$or": [
+                {"recipient_id": current_user.id},
+                {"recipient_id": None, "compound_id": current_user.compound_id}
+            ]
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Notification not found")
+        
+        return {"message": "Notification deleted successfully"}
+        
+    except Exception as e:
+        logging.error(f"Error deleting notification: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete notification")
+
+# ============ WEBSOCKET ENDPOINTS ============
+
+@app.websocket("/ws/notifications/{user_id}")
+async def websocket_notifications_endpoint(websocket: WebSocket, user_id: str):
+    """WebSocket endpoint for real-time notifications"""
+    try:
+        # Verify user
+        user = await db.users.find_one({"id": user_id})
+        if not user:
+            await websocket.close(code=1008, reason="User not found")
+            return
+        
+        connection_id = str(uuid.uuid4())
+        await manager.connect(websocket, connection_id, user_id, user["compound_id"])
+        
+        try:
+            while True:
+                # Keep connection alive and handle incoming messages
+                data = await websocket.receive_text()
+                message = json.loads(data)
+                
+                # Handle different message types
+                if message.get("type") == "ping":
+                    await manager.send_to_connection(connection_id, {
+                        "type": "pong",
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    })
+                
+        except WebSocketDisconnect:
+            manager.disconnect(connection_id)
+        except Exception as e:
+            logging.error(f"WebSocket error: {e}")
+            manager.disconnect(connection_id)
+            
+    except Exception as e:
+        logging.error(f"WebSocket connection error: {e}")
+        await websocket.close(code=1011, reason="Internal server error")
+
 # Include router after all endpoints are defined
 app.include_router(api_router)
 

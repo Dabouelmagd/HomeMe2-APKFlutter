@@ -15,6 +15,7 @@ import CompoundManagement from './components/CompoundManagement';
 import ServicesManagement from './components/ServicesManagement';
 import UtilityBills from './components/UtilityBills';
 import FamilyManagement from './components/FamilyManagement';
+import AddFamilyMemberToUnit from './components/AddFamilyMemberToUnit';
 import FinancialManagement from './components/FinancialManagement';
 import MessageCenter from './components/MessageCenter';
 import NotificationCenter from './components/NotificationCenter';

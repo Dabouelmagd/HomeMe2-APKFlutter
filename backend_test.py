@@ -2961,13 +2961,13 @@ class ServicesManagementTestSuite:
 if __name__ == "__main__":
     test_suite = ServicesManagementTestSuite()
     
-    # Run Payment Processing tests as requested
-    print("💳 RUNNING PAYMENT PROCESSING FUNCTIONALITY TESTS")
-    success = test_suite.run_payment_processing_tests()
+    # Run Booking Creation Focus tests as requested
+    print("🎯 RUNNING FOCUSED BOOKING CREATION FUNCTIONALITY TESTS")
+    success = test_suite.run_booking_creation_focus_tests()
     
     if success:
-        print("\n🎉 PAYMENT PROCESSING TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 BOOKING CREATION TESTING COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ PAYMENT PROCESSING TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ BOOKING CREATION TESTING COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

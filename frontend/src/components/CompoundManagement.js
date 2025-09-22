@@ -66,6 +66,38 @@ const CompoundManagement = () => {
     profile_picture_preview: null
   });
 
+  // Comprehensive Family Creation State
+  const [showComprehensiveFamilyModal, setShowComprehensiveFamilyModal] = useState(false);
+  const [familyCreationStep, setFamilyCreationStep] = useState(1); // 1: Basic Info, 2: Family Head, 3: Family Members, 4: Review
+  const [comprehensiveFamilyForm, setComprehensiveFamilyForm] = useState({
+    // Basic residence info
+    unit_number: '',
+    
+    // Family head info
+    head_full_name: '',
+    head_email: '',
+    head_phone: '',
+    head_date_of_birth: '',
+    head_id_number: '',
+    head_profile_picture: null,
+    head_profile_picture_preview: null,
+    
+    // Family members
+    family_members: []
+  });
+
+  const [newFamilyMember, setNewFamilyMember] = useState({
+    full_name: '',
+    relationship: '',
+    age: '',
+    phone: '',
+    email: '',
+    id_number: '',
+    date_of_birth: '',
+    profile_picture: null,
+    profile_picture_preview: null
+  });
+
   // Form for adding new admin
   const [adminForm, setAdminForm] = useState({
     username: '',

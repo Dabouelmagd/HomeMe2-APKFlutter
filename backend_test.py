@@ -1372,11 +1372,25 @@ class ServicesManagementTestSuite:
                 data = response.json()
                 residences = data.get("residences", [])
                 if len(residences) >= 2:
-                    # Store unit IDs for testing
-                    self.unit_ids = [res["id"] for res in residences[:3]]  # Get first 3 units
-                    self.unit_numbers = [res["unit_number"] for res in residences[:3]]
-                    self.log_result("Get Existing Units", True, f"Found {len(residences)} units for testing. Using units: {self.unit_numbers}")
-                    return True
+                    # Store unit IDs for testing - handle different possible field names
+                    self.unit_ids = []
+                    self.unit_numbers = []
+                    
+                    for res in residences[:3]:  # Get first 3 units
+                        # Try different possible field names for ID
+                        unit_id = res.get("id") or res.get("user_id") or res.get("_id")
+                        unit_number = res.get("unit_number") or res.get("unit") or "Unknown"
+                        
+                        if unit_id:
+                            self.unit_ids.append(str(unit_id))
+                            self.unit_numbers.append(str(unit_number))
+                    
+                    if len(self.unit_ids) >= 2:
+                        self.log_result("Get Existing Units", True, f"Found {len(residences)} units for testing. Using units: {self.unit_numbers}")
+                        return True
+                    else:
+                        self.log_result("Get Existing Units", False, f"Could not extract unit IDs from residences. Sample residence: {residences[0] if residences else 'None'}")
+                        return False
                 else:
                     self.log_result("Get Existing Units", False, f"Need at least 2 units for cross-unit testing, found {len(residences)}")
                     return False

@@ -445,20 +445,33 @@ class HomePhase1TestSuite:
         except:
             return False
     
-    def get_existing_provider_id(self):
-        """Get an existing provider ID for testing"""
+    def test_mark_all_notifications_read(self):
+        """Test PATCH /api/notifications/mark-all-read - Mark all notifications as read"""
+        print("\n=== Testing Mark All Notifications Read ===")
+        
+        if not self.resident_token:
+            self.log_result("Mark All Notifications Read", False, "No resident token available")
+            return False
+        
         try:
-            headers = self.setup_auth_headers(self.admin_token)
-            response = self.session.get(f"{BASE_URL}/service-providers", headers=headers)
+            headers = self.setup_auth_headers(self.resident_token)
+            response = self.session.patch(f"{BASE_URL}/notifications/mark-all-read", headers=headers)
             
             if response.status_code == 200:
-                data = response.json()
-                providers = data.get("providers", [])
-                if providers:
-                    self.test_provider_id = providers[0]["id"]
+                result = response.json()
+                if "marked as read" in result.get("message", "").lower():
+                    marked_count = result.get("marked_count", 0)
+                    self.log_result("Mark All Notifications Read", True, f"All notifications marked as read successfully - {marked_count} notifications marked")
                     return True
-            return False
-        except:
+                else:
+                    self.log_result("Mark All Notifications Read", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Mark All Notifications Read", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Mark All Notifications Read", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_create_service_booking(self):

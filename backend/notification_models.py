@@ -7,7 +7,7 @@ import uuid
 class NotificationCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=1000)
-    type: str = Field(..., regex="^(maintenance|payment|system|community|general)$")
+    type: str = Field(..., pattern="^(maintenance|payment|system|community|general)$")
     priority: str = Field(default="normal", regex="^(low|normal|high|urgent)$")
     recipient_id: Optional[str] = None  # If None, it's a broadcast
     action_url: Optional[str] = None
@@ -105,7 +105,7 @@ class PushSubscription(BaseModel):
 class BulkNotificationCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     message: str = Field(..., min_length=1, max_length=1000)
-    type: str = Field(..., regex="^(maintenance|payment|system|community|general)$")
+    type: str = Field(..., pattern="^(maintenance|payment|system|community|general)$")
     priority: str = Field(default="normal", regex="^(low|normal|high|urgent)$")
     
     # Targeting

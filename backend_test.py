@@ -1350,19 +1350,15 @@ class ServicesManagementTestSuite:
         """Test POST /api/maintenance-fees - Create maintenance fee which generates invoice"""
         print("\n=== Testing Create Maintenance Fee and Invoice ===")
         
-        if not self.admin_token or not self.compound_id or not self.resident_user:
-            self.log_result("Create Maintenance Fee and Invoice", False, "No admin token, compound ID, or resident user available")
+        if not self.admin_token or not self.compound_id or not self.test_unit_number:
+            self.log_result("Create Maintenance Fee and Invoice", False, "No admin token, compound ID, or test unit number available")
             return False
         
         try:
             headers = self.setup_auth_headers(self.admin_token)
             
-            # Use the resident user's unit number for creating the maintenance fee
-            unit_number = self.resident_user.get("unit_number")
-            
-            if not unit_number:
-                self.log_result("Create Maintenance Fee and Invoice", False, "No unit number available for resident user")
-                return False
+            # Use the test unit number for creating the maintenance fee
+            unit_number = self.test_unit_number
             
             # Create maintenance fee data
             from datetime import datetime, timedelta

@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the Compound Management enhancements that I just implemented: 1. Test Family Member Update with Profile Picture (PUT /api/family-members/{member_id}/profile endpoint), 2. Test Enhanced Residence Data Retrieval (GET /api/compounds/{compound_id}/residences), 3. Test User Profile Update for Unit Head (PUT /users/{user_id}/profile endpoint), 4. Authentication and Authorization testing"
+user_problem_statement: "Test the enhanced Compound Management frontend functionality that I just implemented: 1. Login and Navigation to Compound Management page and Residence List tab, 2. Enhanced Sorting Functionality with 6 options (Newest First, Oldest First, Unit Number, Name A-Z, Name Z-A, Family Size), 3. Detailed Viewing Features (View Family button to expand/collapse family member details, profile pictures display), 4. Edit Functionality (unit editing modal with read-only fields, family member editing modal, profile picture upload), 5. Delete Functionality (unit and family member deletion with confirmation modals), 6. Form Validation and UI/UX testing, 7. Integration with Backend APIs"
 
 backend:
   - task: "Services Management System - Core Services APIs"

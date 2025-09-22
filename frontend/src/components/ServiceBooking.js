@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import {
   CalendarIcon,
   ClockIcon,
@@ -12,8 +13,27 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   PhotoIcon,
-  PlusIcon
+  PlusIcon,
+  MagnifyingGlassIcon,
+  AdjustmentsHorizontalIcon,
+  HeartIcon,
+  MapPinIcon,
+  PhoneIcon,
+  ShieldCheckIcon,
+  CreditCardIcon,
+  BanknotesIcon,
+  QrCodeIcon,
+  DevicePhoneMobileIcon,
+  BuildingLibraryIcon,
+  BoltIcon,
+  WalletIcon,
+  EyeIcon,
+  PencilIcon,
+  TrashIcon,
+  SparklesIcon,
+  ChatBubbleLeftEllipsisIcon
 } from '@heroicons/react/24/outline';
+import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;

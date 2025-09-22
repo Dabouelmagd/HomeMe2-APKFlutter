@@ -730,6 +730,17 @@ const ServiceBooking = () => {
                               <XCircleIcon className="h-4 w-4 mr-2" />
                               Cancel
                             </button>
+                            <button
+                              onClick={() => {
+                                setSelectedBooking(booking);
+                                setPaymentForm({...paymentForm, amount: booking.estimated_cost || 100});
+                                setShowPaymentModal(true);
+                              }}
+                              className="flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm"
+                            >
+                              <CreditCardIcon className="h-4 w-4 mr-2" />
+                              Pay Now
+                            </button>
                           </>
                         )}
 
@@ -737,7 +748,7 @@ const ServiceBooking = () => {
                           <button
                             onClick={() => {
                               setSelectedBooking(booking);
-                              setPaymentForm({...paymentForm, amount: booking.estimated_cost || 0});
+                              setPaymentForm({...paymentForm, amount: booking.estimated_cost || 100});
                               setShowPaymentModal(true);
                             }}
                             className="flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm"

@@ -2981,7 +2981,7 @@ const CompoundManagement = () => {
                             <p className="font-medium text-gray-900">{comprehensiveFamilyForm.head_full_name}</p>
                             <p className="text-sm text-gray-600">{comprehensiveFamilyForm.head_email}</p>
                             {comprehensiveFamilyForm.head_phone && <p className="text-sm text-gray-600">{comprehensiveFamilyForm.head_phone}</p>}
-                            {comprehensiveFamilyForm.head_date_of_birth && <p className="text-sm text-gray-600">DOB: {comprehensiveFamilyForm.head_date_of_birth}</p>}
+                            {comprehensiveFamilyForm.head_date_of_birth && <p className="text-sm text-gray-600">DOB: {formatDate(comprehensiveFamilyForm.head_date_of_birth)}</p>}
                             {comprehensiveFamilyForm.head_id_number && <p className="text-sm text-gray-600">ID: {comprehensiveFamilyForm.head_id_number}</p>}
                           </div>
                         </div>

@@ -1374,13 +1374,13 @@ class ServicesManagementTestSuite:
 if __name__ == "__main__":
     test_suite = ServicesManagementTestSuite()
     
-    # Run Free Trial System tests as requested
-    print("🆓 RUNNING FREE TRIAL SYSTEM TESTS")
-    success = test_suite.run_free_trial_tests()
+    # Run Quick Actions functionality tests as requested
+    print("🚀 RUNNING QUICK ACTIONS FUNCTIONALITY TESTS")
+    success = test_suite.run_quick_actions_tests()
     
     if success:
-        print("\n🎉 FREE TRIAL SYSTEM TESTING COMPLETED SUCCESSFULLY!")
+        print("\n🎉 QUICK ACTIONS FUNCTIONALITY TESTING COMPLETED SUCCESSFULLY!")
     else:
-        print("\n⚠️ FREE TRIAL SYSTEM TESTING COMPLETED WITH ISSUES")
+        print("\n⚠️ QUICK ACTIONS FUNCTIONALITY TESTING COMPLETED WITH ISSUES")
     
     exit(0 if success else 1)

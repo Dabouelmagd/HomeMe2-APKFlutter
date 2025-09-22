@@ -2808,7 +2808,7 @@ class ServicesManagementTestSuite:
         
         # Test 6: Test required field validation
         print("\n--- Test 6: Test required field validation ---")
-        required_fields = ["provider_id", "service_category", "title", "description", "scheduled_date"]
+        required_fields = ["provider_id", "service_category", "service_specialty", "title", "description", "scheduled_date"]
         for field in required_fields:
             try:
                 total_tests += 1

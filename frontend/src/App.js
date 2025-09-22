@@ -32,6 +32,9 @@ import MaintenanceSystem from './components/MaintenanceSystem';
 import GuestManagement from './components/GuestManagement';
 import EventsAnnouncements from './components/EventsAnnouncements';
 import AdvancedAnalytics from './components/AdvancedAnalytics';
+import DocumentManagement from './components/DocumentManagement';
+import VotingSystem from './components/VotingSystem';
+import SmartHomeIntegration from './components/SmartHomeIntegration';
 import MobileOptimized from './components/MobileOptimized';
 import { Toaster } from './components/ui/sonner';
 

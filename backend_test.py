@@ -62,7 +62,7 @@ class HomePhase1TestSuite:
         return img_bytes
     
     def test_admin_authentication(self):
-        """Test admin authentication for services management"""
+        """Test admin authentication for maintenance and notification systems"""
         print("\n=== Testing Admin Authentication ===")
         
         try:
@@ -78,7 +78,7 @@ class HomePhase1TestSuite:
                 self.admin_token = data["access_token"]
                 self.admin_user = data["user"]
                 self.compound_id = self.admin_user["compound_id"]
-                self.log_result("Admin Authentication", True, "Admin authenticated successfully")
+                self.log_result("Admin Authentication", True, f"Admin authenticated successfully - Role: {self.admin_user.get('role')}, Compound: {self.compound_id}")
                 return True
             else:
                 self.log_result("Admin Authentication", False, f"Failed with status {response.status_code}", response.text)

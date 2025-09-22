@@ -29,6 +29,9 @@ import Pricing from './components/Pricing';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
 import MaintenanceSystem from './components/MaintenanceSystem';
+import GuestManagement from './components/GuestManagement';
+import EventsAnnouncements from './components/EventsAnnouncements';
+import AdvancedAnalytics from './components/AdvancedAnalytics';
 import MobileOptimized from './components/MobileOptimized';
 import { Toaster } from './components/ui/sonner';
 

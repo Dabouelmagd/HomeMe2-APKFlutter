@@ -17,7 +17,7 @@ from typing import Dict, List, Optional
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://homeme-portal.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-portal-1.preview.emergentagent.com/api"
 WS_URL = "wss://compound-hub.preview.emergentagent.com/ws/chat"
 
 class ServicesManagementTestSuite:

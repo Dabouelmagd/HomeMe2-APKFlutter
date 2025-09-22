@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the invoice functionality in the HomeMe application: 1. Authentication Setup: Login with admin credentials (admin/admin123) to get a valid JWT token, 2. Invoice System Testing: Test GET /api/invoices/my endpoint to see what invoices exist, Check if there are any invoices in the database, If no invoices exist, create some sample invoices for testing, 3. Payment System Testing: Test the payment processing endpoints, Verify the invoice payment workflow, 4. Data Investigation: Check what user/family data exists to understand invoice relationships, Verify the invoice data structure and fields"
+user_problem_statement: "Test the newly implemented Phase 2 backend endpoints for the HomeMe application. I need comprehensive testing of: 1. GUEST MANAGEMENT ENDPOINTS (Visit Request Management, Access Control Testing), 2. EVENTS & ANNOUNCEMENTS ENDPOINTS (Announcement Management, Event Management, Combined Statistics), 3. ANALYTICS ENDPOINTS (Dashboard Analytics), 4. DATA VALIDATION & ERROR HANDLING (Guest Management, Events & Announcements), 5. INTEGRATION TESTING (Cross-System Integration)"
 
 backend:
   - task: "Services Management System - Core Services APIs"

@@ -20,7 +20,7 @@ from PIL import Image
 BASE_URL = "https://resident-portal-11.preview.emergentagent.com/api"
 WS_URL = "wss://resident-portal-11.preview.emergentagent.com/ws/notifications"
 
-class AuthenticationInvestigationSuite:
+class HomePhase1TestSuite:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None

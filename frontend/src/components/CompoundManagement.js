@@ -3009,6 +3009,7 @@ const CompoundManagement = () => {
                                   <p className="font-medium text-gray-900">{member.full_name}</p>
                                   <p className="text-sm text-gray-600">{member.relationship}</p>
                                   {member.age && <p className="text-xs text-gray-500">Age: {member.age}</p>}
+                                  {member.date_of_birth && <p className="text-xs text-gray-500">DOB: {formatDate(member.date_of_birth)}</p>}
                                   {member.email && <p className="text-xs text-gray-500">{member.email}</p>}
                                 </div>
                               </div>

@@ -793,22 +793,6 @@ const CompoundManagement = () => {
       toast.error(error.response?.data?.detail || 'Failed to update family member');
     }
   };
-    const file = e.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
-        return;
-      }
-      
-      setNewFamilyMember(prev => ({ ...prev, profile_picture: file }));
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setNewFamilyMember(prev => ({ ...prev, profile_picture_preview: e.target.result }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const addFamilyMember = () => {
     if (!newFamilyMember.full_name || !newFamilyMember.relationship) {

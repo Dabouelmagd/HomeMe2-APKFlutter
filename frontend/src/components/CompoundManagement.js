@@ -930,11 +930,11 @@ const CompoundManagement = () => {
                   Total Units: <span className="font-semibold">{residences.length}</span>
                 </div>
                 <button
-                  onClick={() => setShowAddNewResidence(true)}
+                  onClick={() => setShowComprehensiveFamilyModal(true)}
                   className="btn btn-primary flex items-center space-x-2"
                 >
                   <PlusIcon className="h-4 w-4" />
-                  <span>New Residence</span>
+                  <span>Add Resident + Family</span>
                 </button>
               </div>
             </div>

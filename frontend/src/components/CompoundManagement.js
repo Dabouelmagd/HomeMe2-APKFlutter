@@ -1251,6 +1251,9 @@ const CompoundManagement = () => {
                     <option value="newest">Newest First</option>
                     <option value="oldest">Oldest First</option>
                     <option value="unit_number">Unit Number</option>
+                    <option value="name_asc">Name A-Z</option>
+                    <option value="name_desc">Name Z-A</option>
+                    <option value="family_size">Family Size</option>
                   </select>
                 </div>
               </div>

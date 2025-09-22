@@ -320,6 +320,18 @@ function App() {
                 <Route path="maintenance" element={
                   <MaintenanceSystem />
                 } />
+                
+                <Route path="guests" element={
+                  <GuestManagement />
+                } />
+                
+                <Route path="events" element={
+                  <EventsAnnouncements />
+                } />
+                
+                <Route path="analytics" element={
+                  <AdvancedAnalytics />
+                } />
               </Route>
             </Routes>
             <Toaster />

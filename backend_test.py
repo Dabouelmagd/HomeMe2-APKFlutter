@@ -2884,6 +2884,7 @@ class ServicesManagementTestSuite:
                 booking_data = {
                     "provider_id": "non-existent-provider-id",
                     "service_category": "maintenance",
+                    "service_specialty": "general",
                     "title": "Provider ID Test",
                     "description": "Testing non-existent provider ID",
                     "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat()

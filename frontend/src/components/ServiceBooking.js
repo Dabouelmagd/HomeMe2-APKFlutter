@@ -47,8 +47,16 @@ const ServiceBooking = () => {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showProviderDetails, setShowProviderDetails] = useState(false);
+  const [showBookingDetails, setShowBookingDetails] = useState(false); 
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [activeTab, setActiveTab] = useState('providers'); // 'providers', 'bookings', 'history'
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [sortBy, setSortBy] = useState('rating'); // 'rating', 'price', 'availability'
+  const [favoriteProviders, setFavoriteProviders] = useState(new Set());
+  const [showFilters, setShowFilters] = useState(false);
 
   const [bookingForm, setBookingForm] = useState({
     provider_id: '',

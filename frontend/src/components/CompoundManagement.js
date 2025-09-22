@@ -433,7 +433,133 @@ const CompoundManagement = () => {
     }
   };
 
-  const resetNewResidenceForm = () => {
+  const fetchFamilyMembersForUnit = async (unitId) => {
+    try {
+      const response = await axios.get(`${API}/family-members`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      
+      // Filter family members for this specific unit
+      const allMembers = response.data.family_members || response.data || [];
+      const unitMembers = allMembers.filter(member => 
+        member.primary_resident_id === unitId || member.unit_id === unitId
+      );
+      
+      setUnitFamilyMembers(prev => ({
+        ...prev,
+        [unitId]: unitMembers
+      }));
+      
+      return unitMembers;
+    } catch (error) {
+      console.error('Error fetching family members for unit:', error);
+      return [];
+    }
+  };
+
+  const toggleUnitExpansion = async (unitId) => {
+    const newExpanded = new Set(expandedUnits);
+    
+    if (expandedUnits.has(unitId)) {
+      newExpanded.delete(unitId);
+    } else {
+      newExpanded.add(unitId);
+      // Fetch family members if not already loaded
+      if (!unitFamilyMembers[unitId]) {
+        await fetchFamilyMembersForUnit(unitId);
+      }
+    }
+    
+    setExpandedUnits(newExpanded);
+  };
+
+  const getSortedResidences = () => {
+    if (!residences || residences.length === 0) return [];
+    
+    const sorted = [...residences].sort((a, b) => {
+      switch (sortOrder) {
+        case 'newest':
+          // Sort by created date, newest first
+          return new Date(b.created_at || b.family_head?.created_at || '1970-01-01') - 
+                 new Date(a.created_at || a.family_head?.created_at || '1970-01-01');
+        case 'oldest':
+          // Sort by created date, oldest first
+          return new Date(a.created_at || a.family_head?.created_at || '1970-01-01') - 
+                 new Date(b.created_at || b.family_head?.created_at || '1970-01-01');
+        case 'unit_number':
+          // Sort by unit number alphabetically
+          return (a.unit_number || '').localeCompare(b.unit_number || '');
+        default:
+          return 0;
+      }
+    });
+    
+    return sorted;
+  };
+
+  const handleEditUnit = (unit) => {
+    setEditingUnit(unit);
+    setShowEditUnit(true);
+  };
+
+  const handleEditMember = (member) => {
+    setEditingMember(member);
+    setShowEditMember(true);
+  };
+
+  const handleDeleteClick = (type, item) => {
+    setDeleteTarget({
+      type,
+      id: type === 'unit' ? item.family_head?.id || item.id : item.id,
+      name: type === 'unit' ? `Unit ${item.unit_number}` : item.full_name,
+      unitNumber: type === 'unit' ? item.unit_number : undefined
+    });
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    
+    try {
+      let endpoint = '';
+      let successMessage = '';
+      
+      if (deleteTarget.type === 'unit') {
+        // Delete the family head user (which represents the unit)
+        endpoint = `/admin/residences/${deleteTarget.id}`;
+        successMessage = `Unit ${deleteTarget.unitNumber} deleted successfully`;
+      } else {
+        // Delete family member
+        endpoint = `/family-members/${deleteTarget.id}`;
+        successMessage = `Family member ${deleteTarget.name} deleted successfully`;
+      }
+      
+      await axios.delete(`${API}${endpoint}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      
+      toast.success(successMessage);
+      
+      // Refresh data
+      if (deleteTarget.type === 'unit') {
+        await fetchResidences();
+      } else {
+        // Refresh family members for the affected unit
+        const affectedUnitId = Object.keys(unitFamilyMembers).find(unitId =>
+          unitFamilyMembers[unitId].some(member => member.id === deleteTarget.id)
+        );
+        if (affectedUnitId) {
+          await fetchFamilyMembersForUnit(affectedUnitId);
+        }
+      }
+      
+      setShowDeleteConfirm(false);
+      setDeleteTarget(null);
+    } catch (error) {
+      console.error('Error deleting:', error);
+      toast.error(error.response?.data?.detail || `Failed to delete ${deleteTarget.type}`);
+    }
+  };
     setNewResidenceForm({
       unit_number: '',
       full_name: '',

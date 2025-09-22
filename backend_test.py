@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Authentication System Investigation Test Suite
-Investigates the user authentication system and differences between admin and resident users
+HomeMe Phase 1 Enhancement Testing Suite
+Tests the newly implemented maintenance and notification systems
 """
 
 import asyncio
@@ -18,7 +18,7 @@ from PIL import Image
 
 # Configuration
 BASE_URL = "https://resident-portal-11.preview.emergentagent.com/api"
-WS_URL = "wss://compound-hub.preview.emergentagent.com/ws/chat"
+WS_URL = "wss://resident-portal-11.preview.emergentagent.com/ws/notifications"
 
 class AuthenticationInvestigationSuite:
     def __init__(self):

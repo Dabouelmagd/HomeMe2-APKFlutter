@@ -925,22 +925,26 @@ const CompoundManagement = () => {
                 <h3 className="text-lg font-semibold text-gray-900">Residence List</h3>
                 <p className="text-gray-600">View all residential units and their occupancy</p>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  Total Units: <span className="font-semibold">{residences.length}</span>
-                </div>
-                <div className="text-right">
-                  <button
-                    onClick={() => setShowComprehensiveFamilyModal(true)}
-                    className="btn btn-primary flex items-center space-x-2"
-                  >
-                    <PlusIcon className="h-4 w-4" />
-                    <span>Add Resident + Family</span>
-                  </button>
-                  <p className="text-xs text-gray-500 mt-1 max-w-xs">
-                    Create new resident account with complete family management setup
-                  </p>
-                </div>
+              <div className="text-right">
+                <button
+                  onClick={() => setShowComprehensiveFamilyModal(true)}
+                  className="btn btn-primary flex items-center space-x-2 mb-2"
+                >
+                  <PlusIcon className="h-4 w-4" />
+                  <span>Add Resident + Family</span>
+                </button>
+                <p className="text-xs text-gray-500 max-w-xs">
+                  Create new resident account with complete family management setup
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-sm text-gray-600">
+                Total Units: <span className="font-semibold">{residences.length}</span>
+              </div>
+              <div className="text-xs text-gray-500">
+                Use "Add Resident + Family" to set up complete family profiles with photos
               </div>
             </div>
 

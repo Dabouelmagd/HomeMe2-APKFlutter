@@ -1546,7 +1546,7 @@ const CompoundManagement = () => {
                           <div className="flex items-center space-x-2">
                             <ClockIcon className="h-4 w-4 text-gray-400" />
                             <span className="text-sm text-gray-600">
-                              {link.is_used ? 'Used' : `Expires ${new Date(link.expires_at).toLocaleDateString()}`}
+                              {link.is_used ? 'Used' : `Expires ${formatDate(link.expires_at)}`}
                             </span>
                           </div>
                         </div>

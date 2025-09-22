@@ -7731,6 +7731,63 @@ async def get_maintenance_stats(current_user: User = Depends(get_current_user)):
         logging.error(f"Error fetching maintenance stats: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch maintenance stats")
 
+@api_router.patch("/maintenance/requests/{request_id}/status")
+async def update_maintenance_status(
+    request_id: str,
+    status: str = Form(...),
+    notes: str = Form(None),
+    current_user: User = Depends(require_admin)
+):
+    """Update maintenance request status (Admin only)"""
+    try:
+        # Validate status
+        valid_statuses = ["pending", "assigned", "in_progress", "completed", "cancelled"]
+        if status not in valid_statuses:
+            raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+        
+        request_doc = await db.maintenance_requests.find_one({"id": request_id})
+        if not request_doc:
+            raise HTTPException(status_code=404, detail="Maintenance request not found")
+        
+        update_data = {
+            "status": status,
+            "updated_at": datetime.now(timezone.utc)
+        }
+        
+        if status == "completed":
+            update_data["completed_at"] = datetime.now(timezone.utc)
+        
+        # Add notes if provided
+        if notes:
+            note = {
+                "author_id": current_user.id,
+                "author_name": current_user.full_name,
+                "note": notes,
+                "timestamp": datetime.now(timezone.utc),
+                "is_internal": False
+            }
+            # Use $push to add note to array
+            await db.maintenance_requests.update_one(
+                {"id": request_id},
+                {
+                    "$set": update_data,
+                    "$push": {"notes": note}
+                }
+            )
+        else:
+            await db.maintenance_requests.update_one(
+                {"id": request_id},
+                {"$set": update_data}
+            )
+        
+        return {"message": "Maintenance request status updated successfully"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error updating maintenance status: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update maintenance status")
+
 # ============ NOTIFICATION ENDPOINTS ============
 
 @api_router.get("/notifications")

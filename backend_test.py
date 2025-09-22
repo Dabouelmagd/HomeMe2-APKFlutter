@@ -1461,15 +1461,15 @@ class ServicesManagementTestSuite:
             return False
     
     def test_payment_processing_workflow(self):
-        """Test POST /api/payments - Complete payment processing workflow"""
+        """Test POST /api/payments - Complete payment processing workflow (using resident user)"""
         print("\n=== Testing Payment Processing Workflow ===")
         
-        if not self.admin_token:
-            self.log_result("Payment Processing Workflow", False, "No admin token available")
+        if not self.resident_token:
+            self.log_result("Payment Processing Workflow", False, "No resident token available")
             return False
         
         try:
-            headers = self.setup_auth_headers(self.admin_token)
+            headers = self.setup_auth_headers(self.resident_token)
             
             # First, get invoices to pay
             invoices_response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)

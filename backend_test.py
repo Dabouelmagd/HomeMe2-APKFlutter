@@ -1283,6 +1283,480 @@ class ServicesManagementTestSuite:
         
         return self.print_summary()
     
+    # ============ ENHANCED SERVICE BOOKING & PAYMENTS SYSTEM TESTS ============
+    
+    def test_enhanced_get_service_providers(self):
+        """Test GET /api/service-providers - Enhanced service providers with ratings and availability"""
+        print("\n=== Testing Enhanced Get Service Providers ===")
+        
+        if not self.admin_token:
+            self.log_result("Enhanced Get Service Providers", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test with various filters
+            params = {
+                "service_category": "maintenance",
+                "specialty": "plumber",
+                "availability": "available"
+            }
+            
+            response = self.session.get(f"{BASE_URL}/service-providers", headers=headers, params=params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                providers = data.get("providers", [])
+                
+                # Verify enhanced features
+                if providers:
+                    provider = providers[0]
+                    has_rating = "average_rating" in provider
+                    has_reviews = "total_reviews" in provider
+                    has_availability = "availability" in provider
+                    
+                    if has_rating and has_reviews:
+                        self.log_result("Enhanced Get Service Providers", True, 
+                                      f"Retrieved {len(providers)} providers with enhanced features (ratings: {has_rating}, reviews: {has_reviews}, availability: {has_availability})")
+                        return True
+                    else:
+                        self.log_result("Enhanced Get Service Providers", False, "Missing enhanced features in provider data")
+                        return False
+                else:
+                    self.log_result("Enhanced Get Service Providers", True, "No providers found (expected in clean environment)")
+                    return True
+            else:
+                self.log_result("Enhanced Get Service Providers", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Enhanced Get Service Providers", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_enhanced_create_service_booking(self):
+        """Test POST /api/service-bookings - Enhanced booking with multiple payment methods and priorities"""
+        print("\n=== Testing Enhanced Create Service Booking ===")
+        
+        if not self.resident_token:
+            self.log_result("Enhanced Create Service Booking", False, "No resident token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Ensure we have a provider
+            if not self.test_provider_id:
+                self.get_existing_provider_id()
+            
+            if not self.test_provider_id:
+                self.log_result("Enhanced Create Service Booking", False, "No provider ID available")
+                return False
+            
+            # Test different priority levels and payment methods
+            test_cases = [
+                {
+                    "priority": "emergency",
+                    "payment_method": "credit_card",
+                    "title": "Emergency Plumbing Repair"
+                },
+                {
+                    "priority": "urgent", 
+                    "payment_method": "bank_transfer",
+                    "title": "Urgent Electrical Issue"
+                },
+                {
+                    "priority": "standard",
+                    "payment_method": "instapay",
+                    "title": "Standard Maintenance"
+                },
+                {
+                    "priority": "scheduled",
+                    "payment_method": "mobile_pay",
+                    "title": "Scheduled Cleaning"
+                }
+            ]
+            
+            success_count = 0
+            
+            for i, test_case in enumerate(test_cases):
+                booking_data = {
+                    "provider_id": self.test_provider_id,
+                    "service_category": "maintenance",
+                    "service_specialty": "plumber",
+                    "title": test_case["title"],
+                    "description": f"Test booking with {test_case['priority']} priority and {test_case['payment_method']} payment",
+                    "priority": test_case["priority"],
+                    "scheduled_date": (datetime.now() + timedelta(days=i+1)).date().isoformat(),
+                    "scheduled_time": "10:00",
+                    "scheduled_end_time": "12:00",
+                    "payment_method": test_case["payment_method"],
+                    "booking_notes": f"Test booking #{i+1}"
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                           json=booking_data, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("message") == "Service booking created successfully":
+                        booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
+                        if booking_id:
+                            if i == 0:  # Store first booking ID for later tests
+                                self.test_booking_id = booking_id
+                            success_count += 1
+                        else:
+                            self.log_result(f"Enhanced Booking - {test_case['priority']}", False, "No booking ID in response")
+                    else:
+                        self.log_result(f"Enhanced Booking - {test_case['priority']}", False, f"Unexpected response: {result}")
+                else:
+                    self.log_result(f"Enhanced Booking - {test_case['priority']}", False, f"Failed with status {response.status_code}")
+            
+            if success_count == len(test_cases):
+                self.log_result("Enhanced Create Service Booking", True, f"Successfully created {success_count} bookings with different priorities and payment methods")
+                return True
+            else:
+                self.log_result("Enhanced Create Service Booking", False, f"Only {success_count}/{len(test_cases)} bookings created successfully")
+                return False
+                
+        except Exception as e:
+            self.log_result("Enhanced Create Service Booking", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_enhanced_get_service_bookings(self):
+        """Test GET /api/service-bookings - Enhanced bookings with filtering"""
+        print("\n=== Testing Enhanced Get Service Bookings ===")
+        
+        if not self.resident_token:
+            self.log_result("Enhanced Get Service Bookings", False, "No resident token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Test with various filters
+            test_filters = [
+                {"status": "pending"},
+                {"priority": "emergency"},
+                {"payment_method": "credit_card"},
+                {"service_category": "maintenance"}
+            ]
+            
+            success_count = 0
+            
+            for filter_params in test_filters:
+                response = self.session.get(f"{BASE_URL}/service-bookings", headers=headers, params=filter_params)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    bookings = data.get("bookings", [])
+                    success_count += 1
+                    
+                    # Verify enhanced fields in bookings
+                    if bookings:
+                        booking = bookings[0]
+                        has_priority = "priority" in booking
+                        has_payment_method = "payment_method" in booking
+                        has_status = "status" in booking
+                        
+                        if not (has_priority and has_payment_method and has_status):
+                            self.log_result("Enhanced Get Service Bookings", False, "Missing enhanced fields in booking data")
+                            return False
+                else:
+                    self.log_result("Enhanced Get Service Bookings", False, f"Failed with filter {filter_params}: {response.status_code}")
+                    return False
+            
+            if success_count == len(test_filters):
+                self.log_result("Enhanced Get Service Bookings", True, f"Successfully retrieved bookings with {len(test_filters)} different filters")
+                return True
+            else:
+                self.log_result("Enhanced Get Service Bookings", False, f"Only {success_count}/{len(test_filters)} filter tests passed")
+                return False
+                
+        except Exception as e:
+            self.log_result("Enhanced Get Service Bookings", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_payment_processing(self):
+        """Test POST /api/service-bookings/{id}/payment - Payment processing with various methods"""
+        print("\n=== Testing Payment Processing ===")
+        
+        if not self.resident_token or not self.test_booking_id:
+            self.log_result("Payment Processing", False, "No resident token or booking ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Test different payment methods
+            payment_methods = [
+                {"method": "cash", "amount": 150.00},
+                {"method": "credit_card", "amount": 200.00},
+                {"method": "bank_transfer", "amount": 175.00},
+                {"method": "instapay", "amount": 125.00},
+                {"method": "mobile_pay", "amount": 180.00},
+                {"method": "digital_wallet", "amount": 160.00},
+                {"method": "qr_code", "amount": 140.00}
+            ]
+            
+            success_count = 0
+            
+            for payment_data in payment_methods:
+                payment_request = {
+                    "payment_method": payment_data["method"],
+                    "amount": payment_data["amount"],
+                    "currency": "USD",
+                    "metadata": {
+                        "booking_id": self.test_booking_id,
+                        "test_payment": True
+                    }
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings/{self.test_booking_id}/payment", 
+                                           json=payment_request, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("message") == "Payment processed successfully":
+                        transaction_id = result.get("transaction_id")
+                        if transaction_id:
+                            success_count += 1
+                        else:
+                            self.log_result(f"Payment - {payment_data['method']}", False, "No transaction ID in response")
+                    else:
+                        self.log_result(f"Payment - {payment_data['method']}", False, f"Unexpected response: {result}")
+                else:
+                    self.log_result(f"Payment - {payment_data['method']}", False, f"Failed with status {response.status_code}")
+            
+            if success_count >= 1:  # At least one payment method should work
+                self.log_result("Payment Processing", True, f"Successfully processed payments with {success_count}/{len(payment_methods)} payment methods")
+                return True
+            else:
+                self.log_result("Payment Processing", False, "No payment methods worked successfully")
+                return False
+                
+        except Exception as e:
+            self.log_result("Payment Processing", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_review_system(self):
+        """Test POST /api/service-bookings/{id}/review - Multi-criteria review system"""
+        print("\n=== Testing Review System ===")
+        
+        if not self.resident_token or not self.test_booking_id:
+            self.log_result("Review System", False, "No resident token or booking ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # First, update booking status to completed (required for reviews)
+            status_update = {
+                "status": "completed",
+                "notes": "Service completed successfully"
+            }
+            
+            status_response = self.session.put(f"{BASE_URL}/service-bookings/{self.test_booking_id}/status", 
+                                             json=status_update, headers=headers)
+            
+            if status_response.status_code != 200:
+                # Try with admin token for status update
+                admin_headers = self.setup_auth_headers(self.admin_token)
+                status_response = self.session.put(f"{BASE_URL}/service-bookings/{self.test_booking_id}/status", 
+                                                 json=status_update, headers=admin_headers)
+            
+            # Now submit review with multi-criteria ratings
+            review_data = {
+                "overall_rating": 5,
+                "quality_rating": 4,
+                "punctuality_rating": 5,
+                "professionalism_rating": 4,
+                "value_rating": 4,
+                "would_recommend": True,
+                "written_review": "Excellent service! Very professional and completed the work on time. Would definitely recommend to others.",
+                "is_public": True
+            }
+            
+            response = self.session.post(f"{BASE_URL}/service-bookings/{self.test_booking_id}/review", 
+                                       json=review_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Review submitted successfully":
+                    review_id = result.get("review_id")
+                    if review_id:
+                        self.log_result("Review System", True, f"Multi-criteria review submitted successfully with ID: {review_id}")
+                        return True
+                    else:
+                        self.log_result("Review System", False, "No review ID in response")
+                        return False
+                else:
+                    self.log_result("Review System", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Review System", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Review System", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_booking_status_management(self):
+        """Test PUT /api/service-bookings/{id}/status - Booking status transitions"""
+        print("\n=== Testing Booking Status Management ===")
+        
+        if not self.resident_token or not self.test_booking_id:
+            self.log_result("Booking Status Management", False, "No resident token or booking ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Test different status transitions
+            status_transitions = [
+                {"status": "confirmed", "notes": "Booking confirmed by provider"},
+                {"status": "in_progress", "notes": "Service work has started"},
+                {"status": "completed", "notes": "Service completed successfully", "final_cost": 175.00},
+                {"status": "cancelled", "notes": "Booking cancelled by customer"}
+            ]
+            
+            success_count = 0
+            
+            for transition in status_transitions:
+                response = self.session.put(f"{BASE_URL}/service-bookings/{self.test_booking_id}/status", 
+                                          json=transition, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("message") == "Booking status updated successfully":
+                        success_count += 1
+                    else:
+                        self.log_result(f"Status Update - {transition['status']}", False, f"Unexpected response: {result}")
+                else:
+                    # Try with admin token if resident doesn't have permission
+                    admin_headers = self.setup_auth_headers(self.admin_token)
+                    admin_response = self.session.put(f"{BASE_URL}/service-bookings/{self.test_booking_id}/status", 
+                                                    json=transition, headers=admin_headers)
+                    
+                    if admin_response.status_code == 200:
+                        success_count += 1
+                    else:
+                        self.log_result(f"Status Update - {transition['status']}", False, f"Failed with status {response.status_code}")
+            
+            if success_count >= 2:  # At least 2 status transitions should work
+                self.log_result("Booking Status Management", True, f"Successfully updated booking status {success_count}/{len(status_transitions)} times")
+                return True
+            else:
+                self.log_result("Booking Status Management", False, f"Only {success_count}/{len(status_transitions)} status updates worked")
+                return False
+                
+        except Exception as e:
+            self.log_result("Booking Status Management", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_service_categories_and_specialties(self):
+        """Test various service categories and specialties"""
+        print("\n=== Testing Service Categories and Specialties ===")
+        
+        if not self.resident_token:
+            self.log_result("Service Categories and Specialties", False, "No resident token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Ensure we have a provider
+            if not self.test_provider_id:
+                self.get_existing_provider_id()
+            
+            if not self.test_provider_id:
+                self.log_result("Service Categories and Specialties", False, "No provider ID available")
+                return False
+            
+            # Test different service categories
+            categories = [
+                {"category": "maintenance", "specialty": "plumber", "title": "Fix Leaking Pipe"},
+                {"category": "cleaning", "specialty": "house_cleaning", "title": "Deep House Cleaning"},
+                {"category": "security", "specialty": "guard_service", "title": "Night Security Service"},
+                {"category": "gardening", "specialty": "landscaping", "title": "Garden Maintenance"}
+            ]
+            
+            success_count = 0
+            
+            for i, cat_data in enumerate(categories):
+                booking_data = {
+                    "provider_id": self.test_provider_id,
+                    "service_category": cat_data["category"],
+                    "service_specialty": cat_data["specialty"],
+                    "title": cat_data["title"],
+                    "description": f"Test booking for {cat_data['category']} - {cat_data['specialty']}",
+                    "priority": "standard",
+                    "scheduled_date": (datetime.now() + timedelta(days=i+5)).date().isoformat(),
+                    "scheduled_time": "14:00",
+                    "payment_method": "cash"
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                           json=booking_data, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("message") == "Service booking created successfully":
+                        success_count += 1
+                    else:
+                        self.log_result(f"Category - {cat_data['category']}", False, f"Unexpected response: {result}")
+                else:
+                    self.log_result(f"Category - {cat_data['category']}", False, f"Failed with status {response.status_code}")
+            
+            if success_count >= 2:  # At least 2 categories should work
+                self.log_result("Service Categories and Specialties", True, f"Successfully created bookings for {success_count}/{len(categories)} service categories")
+                return True
+            else:
+                self.log_result("Service Categories and Specialties", False, f"Only {success_count}/{len(categories)} categories worked")
+                return False
+                
+        except Exception as e:
+            self.log_result("Service Categories and Specialties", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def run_service_booking_payments_tests(self):
+        """Run comprehensive Service Booking & Payments system tests"""
+        print("\n🔧 STARTING SERVICE BOOKING & PAYMENTS SYSTEM TESTING")
+        print("=" * 70)
+        
+        # Authentication tests
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        if not self.test_resident_authentication():
+            print("⚠️ Resident authentication failed - some tests may be skipped")
+        
+        # Ensure we have service providers
+        self.test_create_service_provider()
+        
+        # Enhanced Service Booking & Payments Tests
+        print("\n🏪 Testing Enhanced Service Providers...")
+        self.test_enhanced_get_service_providers()
+        
+        print("\n📋 Testing Enhanced Service Bookings...")
+        self.test_enhanced_create_service_booking()
+        self.test_enhanced_get_service_bookings()
+        
+        print("\n💳 Testing Payment Processing...")
+        self.test_payment_processing()
+        
+        print("\n⭐ Testing Review System...")
+        self.test_review_system()
+        
+        print("\n📊 Testing Booking Management...")
+        self.test_booking_status_management()
+        
+        print("\n🏷️ Testing Service Categories...")
+        self.test_service_categories_and_specialties()
+        
+        return self.print_summary()
+
     def run_all_tests(self):
         """Run all services management tests"""
         print("🔧 STARTING SERVICES MANAGEMENT BACKEND TESTING")

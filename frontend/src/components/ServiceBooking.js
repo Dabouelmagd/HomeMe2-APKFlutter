@@ -207,10 +207,11 @@ const ServiceBooking = () => {
   };
 
   const getFilteredProviders = () => {
-    let filtered = providers.filter(provider => {
+    let filtered = displayProviders.filter(provider => {
       const matchesSearch = provider.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            provider.services.some(service => service.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesCategory = filterCategory === 'all' || provider.services.includes(filterCategory);
+      const matchesCategory = filterCategory === 'all' || provider.services.some(service => 
+        service.toLowerCase().includes(filterCategory.toLowerCase()));
       return matchesSearch && matchesCategory;
     });
 

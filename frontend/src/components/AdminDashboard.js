@@ -122,28 +122,28 @@ const AdminDashboard = () => {
     {
       id: 'add_resident',
       name: t('add_resident'),
-      description: 'Create new residence account',
+      description: t('create_residence_account'),
       icon: UsersIcon,
       color: 'text-blue-600 bg-blue-50 hover:bg-blue-100'
     },
     {
       id: 'manage_units',
       name: t('manage_units'),
-      description: 'View all residence units',
+      description: t('view_all_units'),
       icon: HomeIcon,
       color: 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
     },
     {
       id: 'send_notice',
       name: t('send_notice'),
-      description: 'Broadcast to all residents',
+      description: t('broadcast_residents'),
       icon: BellIcon,
       color: 'text-purple-600 bg-purple-50 hover:bg-purple-100'
     },
     {
       id: 'view_payments',
       name: t('view_payments'),
-      description: 'Check financial status',
+      description: t('check_financial_status'),
       icon: CurrencyDollarIcon,
       color: 'text-orange-600 bg-orange-50 hover:bg-orange-100'
     }

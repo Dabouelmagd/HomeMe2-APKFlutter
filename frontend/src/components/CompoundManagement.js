@@ -1340,7 +1340,7 @@ const CompoundManagement = () => {
                             )}
                             {residence.family_head?.created_at && (
                               <p className="text-xs text-gray-400">
-                                Joined: {new Date(residence.family_head.created_at).toLocaleDateString()}
+                                Joined: {formatDate(residence.family_head.created_at)}
                               </p>
                             )}
                           </div>

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend Services Management Test Suite
-Tests the Services Management backend APIs and initialize services functionality
+Authentication System Investigation Test Suite
+Investigates the user authentication system and differences between admin and resident users
 """
 
 import asyncio

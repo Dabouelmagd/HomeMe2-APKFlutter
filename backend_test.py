@@ -2293,6 +2293,343 @@ class ServicesManagementTestSuite:
         
         return self.print_summary()
     
+    # ============ PAYMENT PROCESSING TESTS ============
+    
+    def test_payment_processing_all_methods(self):
+        """Test POST /api/service-bookings/{booking_id}/payment with all payment methods"""
+        print("\n=== Testing Payment Processing - All Payment Methods ===")
+        
+        if not self.test_booking_id:
+            self.log_result("Payment Processing - All Methods", False, "No test booking ID available")
+            return False
+        
+        # Payment methods to test with expected booking payment_status
+        payment_methods = {
+            "card": "paid",
+            "mobile_pay": "paid", 
+            "cash": "pending",
+            "bank_transfer": "processing",
+            "instapay": "paid",
+            "digital_wallet": "paid",
+            "qr_code": "paid"
+        }
+        
+        success_count = 0
+        total_tests = len(payment_methods)
+        
+        for payment_method, expected_status in payment_methods.items():
+            try:
+                headers = self.setup_auth_headers(self.resident_token)
+                
+                payment_data = {
+                    "payment_method": payment_method,
+                    "amount": 150.0,
+                    "currency": "USD",
+                    "metadata": {"test": f"payment_method_{payment_method}"}
+                }
+                
+                response = self.session.post(f"{BASE_URL}/service-bookings/{self.test_booking_id}/payment", 
+                                           json=payment_data, headers=headers)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    if result.get("message") == "Payment processed successfully":
+                        transaction = result.get("transaction", {})
+                        transaction_status = result.get("status")
+                        
+                        # Verify transaction was created
+                        if transaction.get("id") and transaction_status:
+                            self.log_result(f"Payment Processing - {payment_method}", True, 
+                                          f"Payment processed successfully. Transaction status: {transaction_status}")
+                            success_count += 1
+                        else:
+                            self.log_result(f"Payment Processing - {payment_method}", False, 
+                                          f"Missing transaction data: {result}")
+                    else:
+                        self.log_result(f"Payment Processing - {payment_method}", False, 
+                                      f"Unexpected response: {result}")
+                else:
+                    self.log_result(f"Payment Processing - {payment_method}", False, 
+                                  f"Failed with status {response.status_code}", response.text)
+                    
+            except Exception as e:
+                self.log_result(f"Payment Processing - {payment_method}", False, f"Exception occurred: {str(e)}")
+        
+        # Overall result
+        if success_count == total_tests:
+            self.log_result("Payment Processing - All Methods", True, f"All {total_tests} payment methods processed successfully")
+            return True
+        else:
+            self.log_result("Payment Processing - All Methods", False, f"Only {success_count}/{total_tests} payment methods succeeded")
+            return False
+    
+    def test_payment_status_mapping(self):
+        """Test that payment status is correctly mapped from transaction status to booking status"""
+        print("\n=== Testing Payment Status Mapping ===")
+        
+        if not self.test_booking_id:
+            self.log_result("Payment Status Mapping", False, "No test booking ID available")
+            return False
+        
+        try:
+            # Test card payment (should result in "paid" booking status)
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            payment_data = {
+                "payment_method": "card",
+                "amount": 200.0,
+                "currency": "USD"
+            }
+            
+            # Process payment
+            payment_response = self.session.post(f"{BASE_URL}/service-bookings/{self.test_booking_id}/payment", 
+                                               json=payment_data, headers=headers)
+            
+            if payment_response.status_code == 200:
+                payment_result = payment_response.json()
+                transaction_status = payment_result.get("status")
+                
+                # Now check the booking to verify payment_status was updated correctly
+                booking_response = self.session.get(f"{BASE_URL}/service-bookings", headers=headers)
+                
+                if booking_response.status_code == 200:
+                    bookings_data = booking_response.json()
+                    bookings = bookings_data.get("bookings", [])
+                    
+                    # Find our test booking
+                    test_booking = None
+                    for booking in bookings:
+                        if booking.get("id") == self.test_booking_id:
+                            test_booking = booking
+                            break
+                    
+                    if test_booking:
+                        booking_payment_status = test_booking.get("payment_status")
+                        
+                        # Verify status mapping
+                        if transaction_status == "completed" and booking_payment_status == "paid":
+                            self.log_result("Payment Status Mapping", True, 
+                                          f"Status mapping correct: transaction '{transaction_status}' → booking '{booking_payment_status}'")
+                            return True
+                        else:
+                            self.log_result("Payment Status Mapping", False, 
+                                          f"Status mapping incorrect: transaction '{transaction_status}' → booking '{booking_payment_status}' (expected 'paid')")
+                            return False
+                    else:
+                        self.log_result("Payment Status Mapping", False, "Test booking not found in booking list")
+                        return False
+                else:
+                    self.log_result("Payment Status Mapping", False, f"Failed to get bookings: {booking_response.status_code}")
+                    return False
+            else:
+                self.log_result("Payment Status Mapping", False, f"Payment failed: {payment_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Payment Status Mapping", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_compound_bookings_no_service_id_error(self):
+        """Test GET /api/compounds/{compound_id}/bookings to ensure no KeyError for service_id"""
+        print("\n=== Testing Compound Bookings - No service_id KeyError ===")
+        
+        if not self.admin_token or not self.compound_id:
+            self.log_result("Compound Bookings - No service_id Error", False, "No admin token or compound ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/bookings", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                bookings = data.get("bookings", [])
+                
+                # Check that all bookings have proper data structure without service_id dependency
+                for booking in bookings:
+                    required_fields = ["id", "service_name", "service_category", "resident_name", "status"]
+                    missing_fields = [field for field in required_fields if field not in booking]
+                    
+                    if missing_fields:
+                        self.log_result("Compound Bookings - No service_id Error", False, 
+                                      f"Missing required fields in booking: {missing_fields}")
+                        return False
+                
+                self.log_result("Compound Bookings - No service_id Error", True, 
+                              f"Retrieved {len(bookings)} compound bookings successfully without service_id KeyError")
+                return True
+            else:
+                self.log_result("Compound Bookings - No service_id Error", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Compound Bookings - No service_id Error", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_end_to_end_payment_flow(self):
+        """Test complete end-to-end payment flow: Create booking → Process payment → Verify status updates"""
+        print("\n=== Testing End-to-End Payment Flow ===")
+        
+        if not self.resident_token or not self.test_provider_id:
+            self.log_result("End-to-End Payment Flow", False, "No resident token or provider ID available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.resident_token)
+            
+            # Step 1: Create a new booking for this test
+            booking_data = {
+                "provider_id": self.test_provider_id,
+                "service_category": "maintenance",
+                "service_specialty": "electrician",
+                "title": "Fix Electrical Outlet",
+                "description": "Electrical outlet in living room is not working",
+                "priority": "urgent",
+                "scheduled_date": (datetime.now() + timedelta(days=2)).date().isoformat(),
+                "scheduled_time": "14:00",
+                "scheduled_end_time": "16:00",
+                "payment_method": "pending",
+                "booking_notes": "End-to-end payment flow test"
+            }
+            
+            booking_response = self.session.post(f"{BASE_URL}/service-bookings", 
+                                               json=booking_data, headers=headers)
+            
+            if booking_response.status_code != 200:
+                self.log_result("End-to-End Payment Flow", False, f"Failed to create booking: {booking_response.status_code}")
+                return False
+            
+            booking_result = booking_response.json()
+            e2e_booking_id = booking_result.get("booking_id") or (booking_result.get("booking", {}).get("id"))
+            
+            if not e2e_booking_id:
+                self.log_result("End-to-End Payment Flow", False, "No booking ID returned from booking creation")
+                return False
+            
+            # Step 2: Process payment for the booking
+            payment_data = {
+                "payment_method": "card",
+                "amount": 175.0,
+                "currency": "USD",
+                "metadata": {"test": "end_to_end_flow"}
+            }
+            
+            payment_response = self.session.post(f"{BASE_URL}/service-bookings/{e2e_booking_id}/payment", 
+                                               json=payment_data, headers=headers)
+            
+            if payment_response.status_code != 200:
+                self.log_result("End-to-End Payment Flow", False, f"Failed to process payment: {payment_response.status_code}")
+                return False
+            
+            payment_result = payment_response.json()
+            transaction_status = payment_result.get("status")
+            
+            # Step 3: Verify booking status was updated
+            bookings_response = self.session.get(f"{BASE_URL}/service-bookings", headers=headers)
+            
+            if bookings_response.status_code != 200:
+                self.log_result("End-to-End Payment Flow", False, f"Failed to get updated bookings: {bookings_response.status_code}")
+                return False
+            
+            bookings_data = bookings_response.json()
+            bookings = bookings_data.get("bookings", [])
+            
+            # Find our test booking
+            updated_booking = None
+            for booking in bookings:
+                if booking.get("id") == e2e_booking_id:
+                    updated_booking = booking
+                    break
+            
+            if not updated_booking:
+                self.log_result("End-to-End Payment Flow", False, "Updated booking not found")
+                return False
+            
+            # Step 4: Verify all status updates are correct
+            booking_payment_status = updated_booking.get("payment_status")
+            booking_payment_method = updated_booking.get("payment_method")
+            booking_final_cost = updated_booking.get("final_cost")
+            
+            success_checks = []
+            
+            # Check transaction status
+            if transaction_status == "completed":
+                success_checks.append("✅ Transaction status: completed")
+            else:
+                success_checks.append(f"❌ Transaction status: {transaction_status} (expected: completed)")
+            
+            # Check booking payment status
+            if booking_payment_status == "paid":
+                success_checks.append("✅ Booking payment status: paid")
+            else:
+                success_checks.append(f"❌ Booking payment status: {booking_payment_status} (expected: paid)")
+            
+            # Check payment method was updated
+            if booking_payment_method == "card":
+                success_checks.append("✅ Booking payment method: card")
+            else:
+                success_checks.append(f"❌ Booking payment method: {booking_payment_method} (expected: card)")
+            
+            # Check final cost was updated
+            if booking_final_cost == 175.0:
+                success_checks.append("✅ Booking final cost: 175.0")
+            else:
+                success_checks.append(f"❌ Booking final cost: {booking_final_cost} (expected: 175.0)")
+            
+            # Determine overall success
+            failed_checks = [check for check in success_checks if check.startswith("❌")]
+            
+            if not failed_checks:
+                self.log_result("End-to-End Payment Flow", True, 
+                              f"Complete payment flow successful: {'; '.join(success_checks)}")
+                return True
+            else:
+                self.log_result("End-to-End Payment Flow", False, 
+                              f"Payment flow issues: {'; '.join(failed_checks)}")
+                return False
+                
+        except Exception as e:
+            self.log_result("End-to-End Payment Flow", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def run_payment_processing_tests(self):
+        """Run Payment Processing functionality tests"""
+        print("\n🚀 STARTING PAYMENT PROCESSING FUNCTIONALITY TESTING")
+        print("=" * 60)
+        
+        # Authentication tests
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        if not self.test_resident_authentication():
+            print("❌ Resident authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Setup: Create provider and booking for payment tests
+        print("\n🔧 Setting up test data...")
+        if not self.test_create_service_provider():
+            print("❌ Failed to create service provider - stopping tests")
+            return self.print_summary()
+        
+        if not self.test_create_service_booking():
+            print("❌ Failed to create service booking - stopping tests")
+            return self.print_summary()
+        
+        # Payment Processing tests
+        print("\n💳 Testing Payment Processing...")
+        self.test_payment_processing_all_methods()
+        self.test_payment_status_mapping()
+        
+        print("\n📋 Testing Booking Retrieval...")
+        self.test_compound_bookings_no_service_id_error()
+        
+        print("\n🔄 Testing End-to-End Payment Flow...")
+        self.test_end_to_end_payment_flow()
+        
+        return self.print_summary()
+
     def print_summary(self):
         """Print test results summary"""
         print("\n" + "=" * 60)

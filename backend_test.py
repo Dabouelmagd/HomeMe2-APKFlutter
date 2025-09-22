@@ -3501,7 +3501,6 @@ class ServicesManagementTestSuite:
                         'age': '35',
                         'email': 'final@example.com',
                         'phone': '+5555555555',
-                        'date_of_birth': '1988-12-25',
                         'id_number': 'FINAL123456'
                     }
                     

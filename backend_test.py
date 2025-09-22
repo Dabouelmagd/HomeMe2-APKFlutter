@@ -530,29 +530,62 @@ class HomePhase1TestSuite:
             self.log_result("Delete Notification", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_get_service_bookings(self):
-        """Test GET /api/service-bookings - Get bookings"""
-        print("\n=== Testing Get Service Bookings ===")
+    async def test_websocket_connection(self):
+        """Test WebSocket connection endpoint /ws/notifications/{user_id}"""
+        print("\n=== Testing WebSocket Connection ===")
         
-        if not self.resident_token:
-            self.log_result("Get Service Bookings", False, "No resident token available")
+        if not self.resident_user:
+            self.log_result("WebSocket Connection", False, "No resident user available")
             return False
         
         try:
-            headers = self.setup_auth_headers(self.resident_token)
-            response = self.session.get(f"{BASE_URL}/service-bookings", headers=headers)
+            user_id = self.resident_user["id"]
+            ws_url = f"{WS_URL}/{user_id}"
             
-            if response.status_code == 200:
-                data = response.json()
-                bookings = data.get("bookings", [])
-                self.log_result("Get Service Bookings", True, f"Retrieved {len(bookings)} service bookings successfully")
-                return True
-            else:
-                self.log_result("Get Service Bookings", False, f"Failed with status {response.status_code}", response.text)
-                return False
+            # Test WebSocket connection
+            async with websockets.connect(ws_url) as websocket:
+                self.log_result("WebSocket Connection Established", True, f"Successfully connected to {ws_url}")
                 
+                # Test ping/pong functionality
+                ping_message = {
+                    "type": "ping",
+                    "timestamp": datetime.now().isoformat()
+                }
+                
+                await websocket.send(json.dumps(ping_message))
+                
+                # Wait for response with timeout
+                try:
+                    response = await asyncio.wait_for(websocket.recv(), timeout=5.0)
+                    response_data = json.loads(response)
+                    
+                    if response_data.get("type") == "pong":
+                        self.log_result("WebSocket Ping/Pong", True, "Ping/pong functionality working correctly")
+                        return True
+                    elif response_data.get("type") == "connection_established":
+                        self.log_result("WebSocket Connection Confirmation", True, "Connection confirmation received")
+                        
+                        # Try ping again
+                        await websocket.send(json.dumps(ping_message))
+                        pong_response = await asyncio.wait_for(websocket.recv(), timeout=5.0)
+                        pong_data = json.loads(pong_response)
+                        
+                        if pong_data.get("type") == "pong":
+                            self.log_result("WebSocket Ping/Pong", True, "Ping/pong functionality working correctly")
+                            return True
+                        else:
+                            self.log_result("WebSocket Ping/Pong", False, f"Expected pong, got: {pong_data}")
+                            return False
+                    else:
+                        self.log_result("WebSocket Ping/Pong", False, f"Unexpected response: {response_data}")
+                        return False
+                        
+                except asyncio.TimeoutError:
+                    self.log_result("WebSocket Ping/Pong", False, "Timeout waiting for pong response")
+                    return False
+                    
         except Exception as e:
-            self.log_result("Get Service Bookings", False, f"Exception occurred: {str(e)}")
+            self.log_result("WebSocket Connection", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_authentication_issues(self):

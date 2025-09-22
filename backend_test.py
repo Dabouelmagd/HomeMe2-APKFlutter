@@ -474,55 +474,60 @@ class HomePhase1TestSuite:
             self.log_result("Mark All Notifications Read", False, f"Exception occurred: {str(e)}")
             return False
     
-    def test_create_service_booking(self):
-        """Test POST /api/service-bookings - Create booking"""
-        print("\n=== Testing Create Service Booking ===")
+    def test_delete_notification(self):
+        """Test DELETE /api/notifications/{id} - Delete notification"""
+        print("\n=== Testing Delete Notification ===")
         
-        if not self.resident_token or not self.test_provider_id:
-            self.log_result("Create Service Booking", False, "No resident token or provider ID available")
+        if not self.resident_token:
+            self.log_result("Delete Notification", False, "No resident token available")
             return False
         
         try:
-            headers = self.setup_auth_headers(self.resident_token)
-            
-            booking_data = {
-                "provider_id": self.test_provider_id,
-                "service_category": "maintenance",
-                "service_specialty": "plumber",
-                "title": "Fix Kitchen Sink",
-                "description": "Kitchen sink is leaking and needs repair",
-                "priority": "standard",
-                "scheduled_date": (datetime.now() + timedelta(days=1)).date().isoformat(),
-                "scheduled_time": "10:00",
-                "scheduled_end_time": "12:00",
-                "payment_method": "cash",
-                "booking_notes": "Please call before arriving"
+            # First create a test notification to delete
+            if not self.admin_token:
+                self.log_result("Delete Notification", False, "No admin token to create test notification")
+                return False
+                
+            headers = self.setup_auth_headers(self.admin_token)
+            notification_data = {
+                "title": "Test Notification for Deletion",
+                "message": "This notification will be deleted",
+                "type": "general",
+                "priority": "low",
+                "recipient_id": self.resident_user["id"]
             }
             
-            response = self.session.post(f"{BASE_URL}/service-bookings", 
-                                       json=booking_data, headers=headers)
+            response = self.session.post(f"{BASE_URL}/notifications", json=notification_data, headers=headers)
             
             if response.status_code == 200:
                 result = response.json()
-                if result.get("message") == "Service booking created successfully":
-                    # Check for booking_id or booking.id
-                    booking_id = result.get("booking_id") or (result.get("booking", {}).get("id"))
-                    if booking_id:
-                        self.test_booking_id = booking_id
-                        self.log_result("Create Service Booking", True, f"Service booking created successfully with ID: {self.test_booking_id}")
-                        return True
+                notification_id = result.get("notification_id")
+                
+                if notification_id:
+                    # Now delete it with resident token
+                    resident_headers = self.setup_auth_headers(self.resident_token)
+                    delete_response = self.session.delete(f"{BASE_URL}/notifications/{notification_id}", headers=resident_headers)
+                    
+                    if delete_response.status_code == 200:
+                        delete_result = delete_response.json()
+                        if "deleted" in delete_result.get("message", "").lower():
+                            self.log_result("Delete Notification", True, f"Notification {notification_id} deleted successfully")
+                            return True
+                        else:
+                            self.log_result("Delete Notification", False, f"Unexpected delete response: {delete_result}")
+                            return False
                     else:
-                        self.log_result("Create Service Booking", False, f"No booking ID in response: {result}")
+                        self.log_result("Delete Notification", False, f"Failed to delete with status {delete_response.status_code}")
                         return False
                 else:
-                    self.log_result("Create Service Booking", False, f"Unexpected response: {result}")
+                    self.log_result("Delete Notification", False, "No notification ID in create response")
                     return False
             else:
-                self.log_result("Create Service Booking", False, f"Failed with status {response.status_code}", response.text)
+                self.log_result("Delete Notification", False, f"Failed to create test notification: {response.status_code}")
                 return False
                 
         except Exception as e:
-            self.log_result("Create Service Booking", False, f"Exception occurred: {str(e)}")
+            self.log_result("Delete Notification", False, f"Exception occurred: {str(e)}")
             return False
     
     def test_get_service_bookings(self):

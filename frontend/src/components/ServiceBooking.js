@@ -915,28 +915,167 @@ const ServiceBooking = () => {
             <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
               <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onClick={() => setShowPaymentModal(false)}></div>
               <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
                 <form onSubmit={handlePayment}>
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Process Payment</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Amount</label>
-                        <input type="number" step="0.01" value={paymentForm.amount} onChange={(e) => setPaymentForm({...paymentForm, amount: parseFloat(e.target.value)})} className="form-input w-full" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                        <select value={paymentForm.payment_method} onChange={(e) => setPaymentForm({...paymentForm, payment_method: e.target.value})} className="form-input w-full">
-                          {paymentMethods.map(method => (
-                            <option key={method.value} value={method.value}>{method.label}</option>
-                          ))}
-                        </select>
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-medium text-gray-900">Process Payment</h3>
+                      <button type="button" onClick={() => setShowPaymentModal(false)} className="text-gray-400 hover:text-gray-600">
+                        <XCircleIcon className="h-6 w-6" />
+                      </button>
+                    </div>
+
+                    {/* Booking Summary */}
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-6 border border-blue-200">
+                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                        <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
+                        Booking Summary
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Service:</span>
+                            <span className="font-medium text-gray-900">{selectedBooking.title}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Provider:</span>
+                            <span className="font-medium text-gray-900">{selectedBooking.provider_name}</span>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Date:</span>
+                            <span className="font-medium">{new Date(selectedBooking.scheduled_date).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex justify-between border-t pt-2">
+                            <span className="font-semibold text-gray-900">Total Amount:</span>
+                            <span className="font-bold text-green-600 text-lg">${paymentForm.amount}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
+
+                    <div className="space-y-6">
+                      {/* Amount Input */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
+                        <div className="relative">
+                          <CurrencyDollarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                          <input 
+                            type="number" 
+                            step="0.01" 
+                            min="0"
+                            required
+                            value={paymentForm.amount} 
+                            onChange={(e) => setPaymentForm({...paymentForm, amount: parseFloat(e.target.value) || 0})} 
+                            className="form-input pl-10 w-full text-lg"
+                            placeholder="0.00"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Enhanced Payment Methods */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-4">Select Payment Method</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {paymentMethods.map(method => {
+                            const IconComponent = method.icon;
+                            return (
+                              <label key={method.value} className="relative flex cursor-pointer">
+                                <input
+                                  type="radio"
+                                  name="payment_method"
+                                  value={method.value}
+                                  checked={paymentForm.payment_method === method.value}
+                                  onChange={(e) => setPaymentForm({...paymentForm, payment_method: e.target.value})}
+                                  className="sr-only"
+                                />
+                                <div className={`flex-1 p-4 rounded-lg border-2 transition-all duration-200 ${
+                                  paymentForm.payment_method === method.value
+                                    ? 'border-blue-500 bg-blue-50 shadow-md'
+                                    : 'border-gray-200 hover:border-gray-300 bg-white hover:bg-gray-50'
+                                } ${method.color}`}>
+                                  <div className="flex items-start space-x-3">
+                                    <div className="flex-shrink-0">
+                                      <IconComponent className={`h-6 w-6 ${
+                                        paymentForm.payment_method === method.value 
+                                          ? 'text-blue-600' 
+                                          : 'text-gray-500'
+                                      }`} />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className={`font-medium ${
+                                        paymentForm.payment_method === method.value 
+                                          ? 'text-blue-900' 
+                                          : 'text-gray-900'
+                                      }`}>
+                                        {method.label}
+                                      </div>
+                                      <div className={`text-xs mt-1 ${
+                                        paymentForm.payment_method === method.value 
+                                          ? 'text-blue-700' 
+                                          : 'text-gray-600'
+                                      }`}>
+                                        {method.description}
+                                      </div>
+                                    </div>
+                                    {paymentForm.payment_method === method.value && (
+                                      <CheckCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0" />
+                                    )}
+                                  </div>
+                                </div>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Payment Method Specific Information */}
+                      {paymentForm.payment_method === 'card' && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <h5 className="font-medium text-blue-900 mb-2">Credit/Debit Card Payment</h5>
+                          <p className="text-sm text-blue-800">You will be redirected to our secure payment gateway to complete your card payment.</p>
+                        </div>
+                      )}
+
+                      {paymentForm.payment_method === 'bank_transfer' && (
+                        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                          <h5 className="font-medium text-purple-900 mb-2">Bank Transfer Details</h5>
+                          <p className="text-sm text-purple-800">Transfer instructions will be provided after confirming this payment method.</p>
+                        </div>
+                      )}
+
+                      {paymentForm.payment_method === 'qr_code' && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                          <h5 className="font-medium text-gray-900 mb-2">QR Code Payment</h5>
+                          <p className="text-sm text-gray-700">A QR code will be generated for you to scan with your mobile payment app.</p>
+                        </div>
+                      )}
+
+                      {paymentForm.payment_method === 'cash' && (
+                        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                          <h5 className="font-medium text-green-900 mb-2">Cash Payment</h5>
+                          <p className="text-sm text-green-800">Payment will be collected when the service is completed. Please have the exact amount ready.</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
+
                   <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 sm:ml-3 sm:w-auto sm:text-sm">Process Payment</button>
-                    <button type="button" onClick={() => setShowPaymentModal(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+                    <button 
+                      type="submit" 
+                      className="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-base font-medium text-white hover:from-green-700 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm transition-all duration-200"
+                    >
+                      <CreditCardIcon className="h-5 w-5 mr-2" />
+                      Process Payment (${paymentForm.amount})
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setShowPaymentModal(false)} 
+                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </form>
               </div>

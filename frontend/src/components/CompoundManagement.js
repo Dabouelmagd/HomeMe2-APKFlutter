@@ -3062,12 +3062,7 @@ const CompoundManagement = () => {
                   </button>
                 </div>
 
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  // TODO: Implement unit edit functionality
-                  toast.success('Unit edit functionality coming soon!');
-                  setShowEditUnit(false);
-                }}>
+                <form onSubmit={handleUpdateUnit}>
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -3075,10 +3070,14 @@ const CompoundManagement = () => {
                       </label>
                       <input
                         type="text"
-                        defaultValue={editingUnit.unit_number}
+                        value={editUnitForm.unit_number}
+                        onChange={(e) => setEditUnitForm(prev => ({ ...prev, unit_number: e.target.value }))}
                         className="form-input w-full"
                         placeholder="e.g., A-101, Villa-25"
+                        disabled
+                        title="Unit number cannot be changed"
                       />
+                      <p className="text-xs text-gray-500 mt-1">Unit number cannot be modified</p>
                     </div>
 
                     <div>
@@ -3087,9 +3086,11 @@ const CompoundManagement = () => {
                       </label>
                       <input
                         type="text"
-                        defaultValue={editingUnit.family_head?.full_name || ''}
+                        value={editUnitForm.full_name}
+                        onChange={(e) => setEditUnitForm(prev => ({ ...prev, full_name: e.target.value }))}
                         className="form-input w-full"
                         placeholder="Full name"
+                        required
                       />
                     </div>
 
@@ -3099,10 +3100,14 @@ const CompoundManagement = () => {
                       </label>
                       <input
                         type="email"
-                        defaultValue={editingUnit.family_head?.email || ''}
+                        value={editUnitForm.email}
+                        onChange={(e) => setEditUnitForm(prev => ({ ...prev, email: e.target.value }))}
                         className="form-input w-full"
                         placeholder="email@example.com"
+                        disabled
+                        title="Email cannot be changed"
                       />
+                      <p className="text-xs text-gray-500 mt-1">Email cannot be modified</p>
                     </div>
 
                     <div>
@@ -3111,10 +3116,32 @@ const CompoundManagement = () => {
                       </label>
                       <input
                         type="tel"
-                        defaultValue={editingUnit.family_head?.phone || ''}
+                        value={editUnitForm.phone}
+                        onChange={(e) => setEditUnitForm(prev => ({ ...prev, phone: e.target.value }))}
                         className="form-input w-full"
                         placeholder="+1 (555) 123-4567"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Profile Picture
+                      </label>
+                      <div className="flex items-center space-x-4">
+                        {editUnitForm.profile_picture_preview && (
+                          <img
+                            src={editUnitForm.profile_picture_preview}
+                            alt="Profile preview"
+                            className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                          />
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleEditUnitProfilePictureChange}
+                          className="form-input"
+                        />
+                      </div>
                     </div>
                   </div>
 

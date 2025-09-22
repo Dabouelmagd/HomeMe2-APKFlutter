@@ -1532,15 +1532,15 @@ class ServicesManagementTestSuite:
             return False
     
     def test_invoice_status_after_payment(self):
-        """Test that invoice status updates to 'paid' after payment"""
+        """Test that invoice status updates to 'paid' after payment (using resident user)"""
         print("\n=== Testing Invoice Status After Payment ===")
         
-        if not self.admin_token:
-            self.log_result("Invoice Status After Payment", False, "No admin token available")
+        if not self.resident_token:
+            self.log_result("Invoice Status After Payment", False, "No resident token available")
             return False
         
         try:
-            headers = self.setup_auth_headers(self.admin_token)
+            headers = self.setup_auth_headers(self.resident_token)
             response = self.session.get(f"{BASE_URL}/invoices/my", headers=headers)
             
             if response.status_code == 200:

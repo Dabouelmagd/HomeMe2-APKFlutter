@@ -360,7 +360,7 @@ class ContactUsBackendTestSuite:
                 "/compounds",
                 "/notifications", 
                 "/messages",
-                "/users"
+                f"/compounds/{self.compound_id}/residents"
             ]
             
             security_passed = True

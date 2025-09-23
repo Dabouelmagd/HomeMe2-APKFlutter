@@ -9038,9 +9038,12 @@ async def create_automation(
         logging.error(f"Error creating automation: {e}")
         raise HTTPException(status_code=500, detail="Failed to create automation")
 
+class NaturalLanguageCommand(BaseModel):
+    command: str
+
 @api_router.post("/smart-devices/natural-command")
 async def process_natural_language_command(
-    command_data: Dict[str, str],
+    command_data: NaturalLanguageCommand,
     current_user: User = Depends(get_current_user)
 ):
     """Process natural language commands for smart home devices using AI"""

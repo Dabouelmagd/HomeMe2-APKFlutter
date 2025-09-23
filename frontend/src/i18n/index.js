@@ -998,6 +998,7 @@ const resources = {
       // Dashboard
       'welcome_back_name': 'مرحباً بعودتك، {{name}}',
       'welcome_home_name': 'أهلاً وسهلاً، {{name}}',
+      'dashboard_welcome_subtitle': 'إليك ما يحدث في مجمعك اليوم',
       'happening_today': 'إليك ما يحدث في {{compound}} اليوم.',
       'everything_manage': 'كل ما تحتاجه لإدارة منزلك',
       'total_residents': 'إجمالي المقيمين',

@@ -9099,6 +9099,48 @@ async def get_poll_results(
         logging.error(f"Error getting poll results: {e}")
         raise HTTPException(status_code=500, detail="Failed to get poll results")
 
+@api_router.get("/polls/stats")
+async def get_polls_stats(
+    current_user: User = Depends(get_current_user)
+):
+    """Get polls statistics"""
+    try:
+        # Get compound filter
+        compound_filter = {"compound_id": current_user.compound_id} if current_user.compound_id else {}
+        
+        # Count polls by status
+        active_polls = await db.polls.count_documents({**compound_filter, "status": "active"})
+        completed_polls = await db.polls.count_documents({**compound_filter, "status": "ended"})
+        draft_polls = await db.polls.count_documents({**compound_filter, "status": "draft"})
+        cancelled_polls = await db.polls.count_documents({**compound_filter, "status": "cancelled"})
+        
+        # Get all votes for compound polls
+        compound_polls = await db.polls.find(compound_filter).to_list(length=None)
+        poll_ids = [poll["id"] for poll in compound_polls]
+        
+        total_votes = await db.votes.count_documents({"poll_id": {"$in": poll_ids}}) if poll_ids else 0
+        
+        # Calculate participation rate
+        total_eligible_voters = sum(poll.get("total_eligible_voters", 0) for poll in compound_polls)
+        participation_rate = round((total_votes / total_eligible_voters * 100), 2) if total_eligible_voters > 0 else 0
+        
+        stats = {
+            "active_polls": active_polls,
+            "completed_polls": completed_polls,
+            "draft_polls": draft_polls,
+            "cancelled_polls": cancelled_polls,
+            "total_polls": active_polls + completed_polls + draft_polls + cancelled_polls,
+            "total_votes": total_votes,
+            "participation_rate": participation_rate,
+            "total_eligible_voters": total_eligible_voters
+        }
+        
+        return {"stats": stats}
+        
+    except Exception as e:
+        logging.error(f"Error getting polls stats: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get polls stats")
+
 # ============ PHASE 3: SMART HOME INTEGRATION ENDPOINTS ============
 
 @api_router.get("/smart-devices")

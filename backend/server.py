@@ -9855,60 +9855,6 @@ async def delete_newsletter(
         logging.error(f"Error deleting newsletter: {e}")
         raise HTTPException(status_code=500, detail="Failed to delete newsletter")
 
-@api_router.get("/newsletters/stats", response_model=NewsletterStats)
-async def get_newsletter_stats(
-    current_user: User = Depends(require_admin)
-):
-    """Get newsletter statistics (Admin only)"""
-    try:
-        compound_id = current_user.compound_id
-        
-        # Get basic counts
-        total_newsletters = await db.newsletters.count_documents({"compound_id": compound_id})
-        published_count = await db.newsletters.count_documents({
-            "compound_id": compound_id,
-            "status": NewsletterStatus.PUBLISHED.value
-        })
-        draft_count = await db.newsletters.count_documents({
-            "compound_id": compound_id,
-            "status": NewsletterStatus.DRAFT.value
-        })
-        
-        # Get total views
-        pipeline = [
-            {"$match": {"compound_id": compound_id}},
-            {"$group": {"_id": None, "total_views": {"$sum": "$views_count"}}}
-        ]
-        views_result = await db.newsletters.aggregate(pipeline).to_list(None)
-        total_views = views_result[0]["total_views"] if views_result else 0
-        
-        # Get recent newsletters
-        recent_newsletters = await db.newsletters.find({
-            "compound_id": compound_id
-        }).sort("created_date", -1).limit(5).to_list(None)
-        
-        # Get popular categories
-        category_pipeline = [
-            {"$match": {"compound_id": compound_id}},
-            {"$group": {"_id": "$category", "count": {"$sum": 1}}},
-            {"$sort": {"count": -1}}
-        ]
-        category_result = await db.newsletters.aggregate(category_pipeline).to_list(None)
-        popular_categories = {item["_id"]: item["count"] for item in category_result}
-        
-        return NewsletterStats(
-            total_newsletters=total_newsletters,
-            published_count=published_count,
-            draft_count=draft_count,
-            total_views=total_views,
-            recent_newsletters=[Newsletter(**serialize_datetime(n)) for n in recent_newsletters],
-            popular_categories=popular_categories
-        )
-    
-    except Exception as e:
-        logging.error(f"Error getting newsletter stats: {e}")
-        raise HTTPException(status_code=500, detail="Failed to get newsletter statistics")
-
 # Include router after all endpoints are defined
 app.include_router(api_router)
 

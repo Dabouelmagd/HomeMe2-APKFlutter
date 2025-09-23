@@ -1088,7 +1088,7 @@ class SmartHomeTestSuite:
         self.test_natural_language_command_invalid()
         self.test_natural_language_authentication()
         
-        return self.print_summary()
+        return self.print_comprehensive_summary()
     
     def run_phase1_tests(self):
         """Run HomeMe Phase 1 Enhancement Tests"""

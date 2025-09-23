@@ -2020,8 +2020,8 @@ const resources = {
         'loading': 'Chargement...'
       },
       
-      // Notifications
-      'notifications': {
+      // Notification Center (French)
+      'notificationCenter': {
         'pushNotifications': 'Notifications Push',
         'subscribed': 'Vous êtes abonné aux notifications push',
         'notSubscribed': 'Les notifications push sont désactivées',

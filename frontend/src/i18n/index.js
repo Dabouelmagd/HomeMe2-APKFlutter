@@ -1970,6 +1970,11 @@ const resources = {
       'welcome_back_name': 'Bon retour, {{name}}',
       'welcome_home_name': 'Bienvenue chez vous, {{name}}',
       'dashboard_welcome_subtitle': 'Voici ce qui se passe dans votre résidence aujourd\'hui',
+      'dashboard': {
+        'welcome_home': 'Bienvenue chez vous',
+        'manage_home_subtitle': 'Tout ce dont vous avez besoin pour gérer votre domicile',
+        'compound_today_subtitle': 'Voici ce qui se passe dans votre résidence aujourd\'hui'
+      },
       'happening_today': 'Voici ce qui se passe dans {{compound}} aujourd\'hui.',
       'everything_manage': 'Tout ce dont vous avez besoin pour gérer votre domicile',
       'total_residents': 'Total des résidents',

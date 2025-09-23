@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """
-HomeMe Phase 1 Enhancement Testing Suite
-Tests the newly implemented maintenance and notification systems
+HomeMe Phase 3 Testing Suite
+Tests the newly implemented Phase 3 features:
+1. Document Management System
+2. Voting & Polling System  
+3. Smart Home Integration
+4. Natural Language AI Control
 """
 
 import asyncio

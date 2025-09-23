@@ -801,9 +801,9 @@ class SmartHomeTestSuite:
                 "description": "This is a test poll to verify the voting system functionality",
                 "vote_type": "single_choice",
                 "options": [
-                    "Option A - Improve Security",
-                    "Option B - Upgrade Facilities", 
-                    "Option C - Enhance Landscaping"
+                    {"text": "Option A - Improve Security", "value": "security"},
+                    {"text": "Option B - Upgrade Facilities", "value": "facilities"}, 
+                    {"text": "Option C - Enhance Landscaping", "value": "landscaping"}
                 ],
                 "eligibility": "all_residents",
                 "is_anonymous": True,

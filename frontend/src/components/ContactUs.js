@@ -4,7 +4,8 @@ import {
   EnvelopeIcon,
   MapPinIcon,
   PhoneIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 
 const ContactUs = () => {

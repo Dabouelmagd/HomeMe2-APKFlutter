@@ -108,9 +108,9 @@ const AdvancedAnalytics = () => {
       {change !== undefined && (
         <div className="mt-4 flex items-center">
           {change >= 0 ? (
-            <TrendingUpIcon className="w-4 h-4 text-green-500 mr-1" />
+            <ArrowTrendingUpIcon className="w-4 h-4 text-green-500 mr-1" />
           ) : (
-            <TrendingDownIcon className="w-4 h-4 text-red-500 mr-1" />
+            <ArrowTrendingDownIcon className="w-4 h-4 text-red-500 mr-1" />
           )}
           <span className={`text-sm font-medium ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {Math.abs(change)}%

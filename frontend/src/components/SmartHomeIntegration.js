@@ -142,7 +142,7 @@ const SmartHomeIntegration = () => {
   const handleAddDevice = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API}/smart-home/devices`, deviceForm);
+      const response = await axios.post(`${API}/smart-devices`, deviceForm);
       
       toast.success('Smart device added successfully!');
       setShowAddDeviceModal(false);

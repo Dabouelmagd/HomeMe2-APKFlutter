@@ -152,9 +152,29 @@
 
 ## 🎁 **Special Promotions**
 
-### **Annual Payment Discount**
-- **Professional**: 20% discount (2 months free)
-- **Enterprise**: 25% discount (3 months free)
+### **🚀 LAUNCH SPECIAL: 75% OFF FIRST YEAR** 
+**Limited Time Offer - Act Now!**
+
+Transform your community management at an incredible value:
+
+#### **Professional Tier - First Year Pricing:**
+- **1-50 units**: ~~$99/month~~ **$25/month** (Save $888/year)
+- **51-100 units**: ~~$179/month~~ **$45/month** (Save $1,608/year)  
+- **101-200 units**: ~~$299/month~~ **$75/month** (Save $2,688/year)
+- **200+ units**: Custom pricing with 75% first-year discount
+
+#### **Enterprise Tier - First Year Pricing:**
+- **1-100 units**: ~~$399/month~~ **$100/month** (Save $3,588/year)
+- **101-250 units**: ~~$699/month~~ **$175/month** (Save $6,288/year)
+- **251-500 units**: ~~$1,199/month~~ **$300/month** (Save $10,788/year)
+- **500+ units**: Custom enterprise pricing with 75% first-year discount
+
+**After Year 1:** Plans automatically renew at standard pricing. Cancel anytime with 30-day notice.
+
+### **Additional Annual Payment Bonus**
+Pay annually and get **2 extra months FREE** on top of the 75% discount!
+- **Professional**: Effective rate as low as $21/month first year
+- **Enterprise**: Effective rate as low as $83/month first year
 
 ### **Migration Assistance** - FREE
 - Data migration from existing systems

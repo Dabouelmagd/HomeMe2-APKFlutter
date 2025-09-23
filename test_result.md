@@ -127,18 +127,33 @@ user_problem_statement: "Address minor issues identified during earlier frontend
 backend:
   - task: "API Endpoint Mismatch Fix - Voting System"
     implemented: true
-    working: false
+    working: true
     file: "server.py, VotingSystem.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Fixed API endpoint mismatches between frontend and backend. Frontend was calling /api/voting/polls, /api/voting/stats but backend has /api/polls, /api/polls/stats. Updated VotingSystem.js to use correct endpoints. Added missing /api/polls/stats endpoint to backend server.py with comprehensive statistics including active_polls, completed_polls, total_votes, and participation_rate calculations."
         - working: true
           agent: "testing"
-          comment: "GUEST MANAGEMENT SYSTEM TESTING COMPLETED SUCCESSFULLY - 96.6% SUCCESS RATE (28/29 tests passed). All core QR visitor workflow features working perfectly: ✅ AUTHENTICATION: Admin (admin/admin123) and resident authentication working correctly ✅ VISIT REQUEST MANAGEMENT: POST /api/visit-requests creates visit requests successfully, GET /api/visit-requests retrieves requests with proper access control ✅ APPROVAL/REJECTION WORKFLOW: PATCH /api/visit-requests/{id}/approve generates QR data successfully, PATCH /api/visit-requests/{id}/reject works with rejection reasons ✅ GUEST MANAGEMENT: GET /api/guests retrieves approved guests correctly, GET /api/guests/stats provides comprehensive statistics (Total: 11, Pending: 8, Active: 0) ✅ QR CODE FUNCTIONALITY: GET /api/guests/{id}/qr-code generates QR codes successfully ✅ CHECK-IN/CHECK-OUT WORKFLOW: PATCH /api/guests/{id}/checkin and PATCH /api/guests/{id}/checkout work perfectly ✅ QR SCANNING WORKFLOW: POST /api/guests/scan-qr handles both check-in and check-out via QR scanning successfully ✅ SECURITY & AUTHORIZATION: All endpoints properly reject unauthenticated requests (403 status), proper access control implemented ✅ DATA VALIDATION: Missing fields validation working, all valid visit purposes (family_visit, business_meeting, delivery, maintenance, healthcare, social_event, other) accepted. Minor Issue: ❌ Invalid visit purpose validation not working (accepts invalid purposes instead of returning 422). The complete QR visitor workflow is fully functional and production-ready with proper authentication, authorization, QR code generation/scanning, and guest lifecycle management."
+          comment: "VOTING SYSTEM API ENDPOINTS TESTING COMPLETED SUCCESSFULLY - 100% SUCCESS RATE (4/4 tests passed). All voting system endpoint fixes working perfectly: ✅ GET /api/polls endpoint working correctly (retrieved 8 polls successfully) ✅ GET /api/polls/stats NEW ENDPOINT working perfectly (returns comprehensive statistics: active_polls: 0, completed_polls: 0, total_votes: 0, participation_rate: 0.0%) ✅ POST /api/polls endpoint working correctly (poll created successfully with proper option structure using dictionaries instead of strings) ✅ POST /api/polls/{poll_id}/vote endpoint working as expected (polls start as draft status, voting requires active status - this is correct behavior) ✅ Authentication and authorization working correctly (properly rejects unauthenticated requests with 403 status). The API endpoint mismatch fixes are fully functional and production-ready. The new /api/polls/stats endpoint provides compound-based filtering and comprehensive statistics as required."
+        
+  - task: "Natural Language Smart Home Control - AI Integration"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Integrated OpenAI GPT-4o-mini via Emergent LLM key for natural language smart home device control. Endpoint processes commands like 'set temperature to 72 degrees' and 'turn on living room lights' with AI intent recognition and device command execution."
+        - working: true
+          agent: "testing"
+          comment: "NATURAL LANGUAGE SMART HOME CONTROL TESTING COMPLETED SUCCESSFULLY - 100% SUCCESS RATE (4/4 tests passed). All natural language AI control features working perfectly: ✅ POST /api/smart-devices/natural-command endpoint working correctly with proper AI processing ✅ 'turn on living room lights' command processed successfully (Intent: device_control, 1 device targeted, 1 command executed) ✅ 'set temperature to 72 degrees' command processed successfully (Intent: device_control, 1 device targeted, 1 command executed) ✅ Invalid command handling working correctly ('make me a sandwich' returns error intent with appropriate message: 'I'm unable to make sandwiches, but I can help you with your smart home devices') ✅ Authentication and authorization working correctly (properly rejects unauthenticated requests with 403 status) ✅ AI integration with Emergent LLM key working correctly (OpenAI GPT-4o-mini responding properly with intent recognition and device command execution). The natural language smart home control system is fully functional and production-ready with proper AI processing and error handling."
 
 frontend:
   - task: "Natural Language UI Enhancement - Smart Home Integration"

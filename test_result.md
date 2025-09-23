@@ -124,7 +124,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the HomeMe application backend after adding Contact Us functionality. Specifically: 1. Test basic API endpoints to ensure the application is still functioning properly 2. Test that the existing authentication endpoints work correctly 3. Test that the app is serving the Contact Us page properly 4. Verify that no existing functionality was broken by the Contact Us addition. Focus on testing core functionality to ensure the new Contact Us feature integration didn't break existing services."
+user_problem_statement: "Fix translation issues across the HomeMe application. The user reported that translations are not working well on all pages, with text still showing in English instead of Arabic/French. Specifically need to: 1. Fix hardcoded English texts in AdminDashboard.js and other components 2. Fix TrialStatus.js component translations 3. Ensure all text uses proper i18n translation keys 4. Verify language switching works correctly 5. Test comprehensive translation coverage across English, Arabic, and French languages."
 
 backend:
   - task: "Contact Us Backend Integration Testing"

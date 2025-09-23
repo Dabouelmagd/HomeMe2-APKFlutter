@@ -2398,6 +2398,86 @@ const resources = {
       'unit': 'Unité',
       'attendees': 'Participants',
       
+      // Legal Documents (French)
+      legal: {
+        'title': 'Informations Légales',
+        'subtitle': 'Conditions d\'Utilisation et Politique de Confidentialité',
+        'termsOfUse': 'Conditions d\'Utilisation',
+        'privacyPolicy': 'Politique de Confidentialité',
+        'lastUpdated': 'Dernière Mise à Jour',
+        'acceptance': {
+          'title': 'Avis Important',
+          'content': 'En utilisant l\'application HomeMe, vous reconnaissez avoir lu, compris et accepté d\'être lié par ces conditions.'
+        },
+        'contact': {
+          'title': 'Nous Contacter',
+          'description': 'Si vous avez des questions concernant ces conditions ou la politique de confidentialité, veuillez nous contacter :',
+          'email': 'Email',
+          'address': 'Adresse',
+          'addressValue': 'Le Caire, République Arabe d\'Égypte'
+        },
+        'terms': {
+          'title': 'Conditions d\'Utilisation',
+          'description': 'Bienvenue dans l\'application HomeMe. Votre utilisation de cette application constitue votre accord avec les conditions suivantes.',
+          'acceptance': {
+            'title': '1. Acceptation des Conditions',
+            'content': 'En utilisant l\'application Home Me, vous acceptez de vous conformer à ces conditions. Si vous n\'êtes pas d\'accord, veuillez ne pas utiliser l\'application.'
+          },
+          'personalUse': {
+            'title': '2. Usage Personnel',
+            'content': 'L\'application est destinée à un usage personnel et non commercial uniquement. Il vous est interdit d\'utiliser l\'application à des fins illégales ou d\'une manière qui viole les droits d\'autrui.'
+          },
+          'content': {
+            'title': '3. Contenu',
+            'content': 'Tout le contenu associé à l\'application Home Me, y compris les textes, images et logos, est protégé par le droit d\'auteur. La reproduction, distribution ou modification du contenu sans autorisation écrite préalable est interdite.'
+          },
+          'liability': {
+            'title': '4. Responsabilité',
+            'content': 'Bien que nous nous efforcions de fournir des informations précises, nous n\'acceptons aucune responsabilité pour les dommages ou pertes résultant de l\'utilisation de l\'application ou de la dépendance à tout contenu disponible.'
+          },
+          'modifications': {
+            'title': '5. Modifications',
+            'content': 'Nous nous réservons le droit de modifier ces conditions à tout moment. La version modifiée sera publiée sur l\'application, et votre utilisation de l\'application après modification constituera une acceptation des nouvelles conditions.'
+          },
+          'governingLaw': {
+            'title': '6. Loi Applicable',
+            'content': 'Ces conditions sont régies par les lois de la République Arabe d\'Égypte, et tout litige découlant sera soumis à la juridiction des tribunaux de la République Arabe d\'Égypte.'
+          }
+        },
+        'privacy': {
+          'title': 'Politique de Confidentialité',
+          'description': 'HomeMe s\'engage à protéger votre vie privée conformément aux lois égyptiennes et internationales. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons les informations personnelles.',
+          'infoCollection': {
+            'title': '1. Informations que Nous Collectons',
+            'content': 'Nous collectons des informations personnelles telles que votre nom, adresse email et numéro de téléphone lorsque vous vous inscrivez ou utilisez nos services.'
+          },
+          'infoUse': {
+            'title': '2. Utilisation des Informations',
+            'content': 'Vos informations sont utilisées pour améliorer votre expérience, répondre à vos besoins et communiquer avec vous concernant les services et offres spéciales.'
+          },
+          'infoProtection': {
+            'title': '3. Protection des Informations',
+            'content': 'Nous prenons les mesures nécessaires pour protéger les informations personnelles contre l\'utilisation non autorisée, y compris l\'emploi de technologies de sécurité appropriées.'
+          },
+          'infoSharing': {
+            'title': '4. Partage d\'Informations',
+            'content': 'Nous ne partagerons pas vos informations personnelles avec des tiers sans votre consentement, sauf si requis par la loi ou les réglementations légales.'
+          },
+          'userRights': {
+            'title': '5. Droits des Utilisateurs',
+            'content': 'Vous avez le droit d\'accéder, corriger ou supprimer vos informations personnelles. Vous pouvez exercer ces droits en nous contactant via les méthodes de contact désignées dans l\'application.'
+          },
+          'policyChanges': {
+            'title': '6. Modifications de la Politique de Confidentialité',
+            'content': 'Nous nous réservons le droit de modifier cette politique de confidentialité. La version mise à jour sera publiée sur l\'application, et votre utilisation de l\'application après ces changements sera considérée comme une acceptation de la nouvelle politique.'
+          },
+          'applicableLaws': {
+            'title': '7. Lois Applicables',
+            'content': 'Cette politique de confidentialité est régie par les lois de la République Arabe d\'Égypte et toute législation de confidentialité pertinente dans le monde. En cas de conflit, la loi égyptienne prévaudra.'
+          }
+        }
+      },
+      
       // Legal Documents
       legal: {
         'title': 'Legal Information',

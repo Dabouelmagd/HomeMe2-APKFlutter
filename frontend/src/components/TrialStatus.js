@@ -295,11 +295,11 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
                     <span className={`font-medium ${
                       isAtLimit ? 'text-red-600' : isNearLimit ? 'text-yellow-600' : 'text-gray-500'
                     }`}>
-                      {percentage}% used
+                      {percentage}{t('percentage_used')}
                     </span>
                     {isNearLimit && (
                       <span className="text-yellow-600 font-medium">
-                        {isAtLimit ? 'Limit reached' : 'Near limit'}
+                        {isAtLimit ? t('limit_reached') : t('near_limit')}
                       </span>
                     )}
                   </div>

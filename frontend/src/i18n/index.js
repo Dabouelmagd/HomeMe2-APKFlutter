@@ -838,7 +838,87 @@ const resources = {
       // Common navigation
       'document_management': 'Document Management',
       'voting_system': 'Voting & Polls',
-      'smart_home': 'Smart Home'
+      'smart_home': 'Smart Home',
+      
+      // Legal Documents
+      legal: {
+        'title': 'Legal Information',
+        'subtitle': 'Terms of Use and Privacy Policy',
+        'termsOfUse': 'Terms of Use',
+        'privacyPolicy': 'Privacy Policy',
+        'lastUpdated': 'Last Updated',
+        'acceptance': {
+          'title': 'Important Notice',
+          'content': 'By using the HomeMe application, you acknowledge that you have read, understood, and agree to be bound by these terms.'
+        },
+        'contact': {
+          'title': 'Contact Us',
+          'description': 'If you have any questions about these terms or privacy policy, please contact us:',
+          'email': 'Email',
+          'address': 'Address',
+          'addressValue': 'Cairo, Arab Republic of Egypt'
+        },
+        'terms': {
+          'title': 'Terms of Use',
+          'description': 'Welcome to the HomeMe application. Your use of this application constitutes your agreement to the following terms and conditions.',
+          'acceptance': {
+            'title': '1. Acceptance of Terms',
+            'content': 'By using the Home Me application, you agree to comply with these terms and conditions. If you do not agree, please do not use the application.'
+          },
+          'personalUse': {
+            'title': '2. Personal Use',
+            'content': 'The application is intended for personal and non-commercial use only. You are prohibited from using the application for any illegal purpose or in a manner that violates the rights of others.'
+          },
+          'content': {
+            'title': '3. Content',
+            'content': 'All content associated with the Home Me application, including texts, images, and logos, is protected by copyright. Reproduction, distribution, or modification of content without prior written permission is prohibited.'
+          },
+          'liability': {
+            'title': '4. Liability',
+            'content': 'While we strive to provide accurate information, we accept no responsibility for any damages or losses resulting from the use of the application or reliance on any content available.'
+          },
+          'modifications': {
+            'title': '5. Modifications',
+            'content': 'We reserve the right to modify these terms and conditions at any time. The modified version will be posted on the application, and your use of the application after the modification will constitute acceptance of the new terms.'
+          },
+          'governingLaw': {
+            'title': '6. Governing Law',
+            'content': 'These terms are governed by the laws of the Arab Republic of Egypt, and any disputes arising will be subject to the jurisdiction of the courts of the Arab Republic of Egypt.'
+          }
+        },
+        'privacy': {
+          'title': 'Privacy Policy',
+          'description': 'HomeMe is committed to protecting your privacy in accordance with Egyptian and international laws. This privacy policy outlines how we collect, use, and safeguard personal information.',
+          'infoCollection': {
+            'title': '1. Information We Collect',
+            'content': 'We collect personal information such as your name, email address, and phone number when you register or use our services.'
+          },
+          'infoUse': {
+            'title': '2. Use of Information',
+            'content': 'Your information is used to enhance your experience, meet your needs, and communicate with you about services and special offers.'
+          },
+          'infoProtection': {
+            'title': '3. Information Protection',
+            'content': 'We take necessary measures to protect personal information from unauthorized use, including employing appropriate security technologies.'
+          },
+          'infoSharing': {
+            'title': '4. Information Sharing',
+            'content': 'We will not share your personal information with any third party without your consent, except as required by law or legal regulations.'
+          },
+          'userRights': {
+            'title': '5. User Rights',
+            'content': 'You have the right to access, correct, or delete your personal information. You can exercise these rights by contacting us through the designated contact methods in the application.'
+          },
+          'policyChanges': {
+            'title': '6. Changes to Privacy Policy',
+            'content': 'We reserve the right to modify this privacy policy. The updated version will be posted on the application, and your use of the application after such changes will be deemed as acceptance of the new policy.'
+          },
+          'applicableLaws': {
+            'title': '7. Applicable Laws',
+            'content': 'This privacy policy is governed by the laws of the Arab Republic of Egypt and any relevant privacy legislation worldwide. In case of any conflict, Egyptian law shall prevail.'
+          }
+        }
+      }
     }
   },
   ar: {

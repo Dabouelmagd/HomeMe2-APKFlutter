@@ -8048,6 +8048,222 @@ async def get_guest_stats(current_user: User = Depends(get_current_user)):
         logging.error(f"Error fetching guest stats: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch guest stats")
 
+@api_router.patch("/visit-requests/{request_id}/approve")
+async def approve_visit_request(request_id: str, current_user: User = Depends(require_admin)):
+    """Approve a visit request and generate QR code"""
+    try:
+        # Find the request
+        request = await db.visit_requests.find_one({"id": request_id, "compound_id": current_user.compound_id})
+        if not request:
+            raise HTTPException(status_code=404, detail="Visit request not found")
+        
+        # Generate QR code data
+        qr_data = {
+            "guest_id": request_id,
+            "visitor_name": request["visitor_name"],
+            "visit_date": request["visit_date"],
+            "unit_number": request["unit_number"],
+            "host_name": request["host_name"],
+            "compound_id": current_user.compound_id,
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Update request status
+        await db.visit_requests.update_one(
+            {"id": request_id},
+            {
+                "$set": {
+                    "status": "approved",
+                    "approved_by": current_user.id,
+                    "approved_at": datetime.now(timezone.utc),
+                    "updated_at": datetime.now(timezone.utc),
+                    "qr_code_data": json.dumps(qr_data)
+                }
+            }
+        )
+        
+        return {"message": "Visit request approved successfully", "qr_data": qr_data}
+        
+    except Exception as e:
+        logging.error(f"Error approving visit request: {e}")
+        raise HTTPException(status_code=500, detail="Failed to approve visit request")
+
+@api_router.patch("/visit-requests/{request_id}/reject")
+async def reject_visit_request(
+    request_id: str, 
+    reason: str = Form(None),
+    current_user: User = Depends(require_admin)
+):
+    """Reject a visit request"""
+    try:
+        # Find the request
+        request = await db.visit_requests.find_one({"id": request_id, "compound_id": current_user.compound_id})
+        if not request:
+            raise HTTPException(status_code=404, detail="Visit request not found")
+        
+        # Update request status
+        await db.visit_requests.update_one(
+            {"id": request_id},
+            {
+                "$set": {
+                    "status": "rejected",
+                    "rejected_by": current_user.id,
+                    "rejected_at": datetime.now(timezone.utc),
+                    "rejection_reason": reason,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        return {"message": "Visit request rejected successfully"}
+        
+    except Exception as e:
+        logging.error(f"Error rejecting visit request: {e}")
+        raise HTTPException(status_code=500, detail="Failed to reject visit request")
+
+@api_router.patch("/guests/{guest_id}/checkin")
+async def checkin_guest(guest_id: str, current_user: User = Depends(get_current_user)):
+    """Check in a guest"""
+    try:
+        # Find the guest/visit request
+        guest = await db.visit_requests.find_one({
+            "id": guest_id, 
+            "compound_id": current_user.compound_id, 
+            "status": "approved"
+        })
+        if not guest:
+            raise HTTPException(status_code=404, detail="Approved guest not found")
+        
+        # Update guest status to checked_in
+        await db.visit_requests.update_one(
+            {"id": guest_id},
+            {
+                "$set": {
+                    "status": "checked_in",
+                    "checked_in_at": datetime.now(timezone.utc),
+                    "checked_in_by": current_user.id,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        return {"message": "Guest checked in successfully"}
+        
+    except Exception as e:
+        logging.error(f"Error checking in guest: {e}")
+        raise HTTPException(status_code=500, detail="Failed to check in guest")
+
+@api_router.patch("/guests/{guest_id}/checkout")
+async def checkout_guest(guest_id: str, current_user: User = Depends(get_current_user)):
+    """Check out a guest"""
+    try:
+        # Find the guest/visit request
+        guest = await db.visit_requests.find_one({
+            "id": guest_id, 
+            "compound_id": current_user.compound_id, 
+            "status": "checked_in"
+        })
+        if not guest:
+            raise HTTPException(status_code=404, detail="Checked-in guest not found")
+        
+        # Update guest status to checked_out
+        await db.visit_requests.update_one(
+            {"id": guest_id},
+            {
+                "$set": {
+                    "status": "checked_out",
+                    "checked_out_at": datetime.now(timezone.utc),
+                    "checked_out_by": current_user.id,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        return {"message": "Guest checked out successfully"}
+        
+    except Exception as e:
+        logging.error(f"Error checking out guest: {e}")
+        raise HTTPException(status_code=500, detail="Failed to check out guest")
+
+@api_router.post("/guests/scan-qr")
+async def scan_qr_code(
+    qr_data: str = Form(...),
+    action: str = Form(...),  # checkin or checkout
+    current_user: User = Depends(get_current_user)
+):
+    """Scan QR code for guest check-in/check-out"""
+    try:
+        # Parse QR code data
+        try:
+            qr_info = json.loads(qr_data)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid QR code format")
+        
+        guest_id = qr_info.get("guest_id")
+        if not guest_id:
+            raise HTTPException(status_code=400, detail="Invalid QR code - missing guest ID")
+        
+        # Verify guest exists and belongs to compound
+        guest = await db.visit_requests.find_one({
+            "id": guest_id,
+            "compound_id": current_user.compound_id
+        })
+        if not guest:
+            raise HTTPException(status_code=404, detail="Guest not found")
+        
+        # Perform action based on request
+        if action == "checkin":
+            if guest["status"] != "approved":
+                raise HTTPException(status_code=400, detail="Guest not approved for check-in")
+            
+            await db.visit_requests.update_one(
+                {"id": guest_id},
+                {
+                    "$set": {
+                        "status": "checked_in",
+                        "checked_in_at": datetime.now(timezone.utc),
+                        "checked_in_by": current_user.id,
+                        "updated_at": datetime.now(timezone.utc)
+                    }
+                }
+            )
+            message = "Guest checked in successfully via QR scan"
+            
+        elif action == "checkout":
+            if guest["status"] != "checked_in":
+                raise HTTPException(status_code=400, detail="Guest not checked in")
+            
+            await db.visit_requests.update_one(
+                {"id": guest_id},
+                {
+                    "$set": {
+                        "status": "checked_out",
+                        "checked_out_at": datetime.now(timezone.utc),
+                        "checked_out_by": current_user.id,
+                        "updated_at": datetime.now(timezone.utc)
+                    }
+                }
+            )
+            message = "Guest checked out successfully via QR scan"
+        else:
+            raise HTTPException(status_code=400, detail="Invalid action. Use 'checkin' or 'checkout'")
+        
+        return {
+            "message": message,
+            "guest": {
+                "visitor_name": guest["visitor_name"],
+                "unit_number": guest["unit_number"],
+                "host_name": guest["host_name"],
+                "visit_date": guest["visit_date"]
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error processing QR scan: {e}")
+        raise HTTPException(status_code=500, detail="Failed to process QR scan")
+
 # ============ EVENTS & ANNOUNCEMENTS ENDPOINTS ============
 
 @api_router.post("/announcements")

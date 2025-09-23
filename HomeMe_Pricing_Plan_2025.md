@@ -1,7 +1,10 @@
 # HomeMe - Community Management Platform
 ## Pricing Plans 2025
 
-*Transform your community management with the most comprehensive platform for modern residential compounds.*
+> ### 🔥 **LIMITED TIME LAUNCH OFFER: 75% OFF FIRST YEAR!** 🔥
+> **Save up to $10,788 annually • Offer expires March 31, 2025**
+> 
+> *Transform your community management with the most comprehensive platform for modern residential compounds.*
 
 ---
 

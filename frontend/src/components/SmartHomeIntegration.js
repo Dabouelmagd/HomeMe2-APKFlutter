@@ -26,7 +26,11 @@ import {
   WifiIcon,
   SignalIcon,
   Battery100Icon,
-  SunIcon
+  SunIcon,
+  MicrophoneIcon,
+  ChatBubbleLeftRightIcon,
+  CommandLineIcon,
+  SparklesIcon
 } from '@heroicons/react/24/outline';
 import { 
   LightBulbIcon as LightBulbSolidIcon,

@@ -238,4 +238,19 @@ All plans include:
 
 ---
 
-*Pricing effective as of January 2025. All prices in USD. Custom enterprise solutions available for communities with unique requirements.*
+---
+
+## 📝 **Terms & Conditions - 75% First Year Discount**
+
+- **Eligibility**: Valid for new customers only (not existing or past customers)
+- **Offer Period**: Valid through March 31, 2025, 11:59 PM PST
+- **Commitment**: 12-month minimum commitment required for discount
+- **Renewal**: After Year 1, plans renew at standard pricing rates
+- **Cancellation**: 30-day written notice required; no refunds for unused time
+- **Payment**: Monthly or annual billing available (annual gets additional 2 months free)
+- **Transferability**: Discount non-transferable between accounts or communities
+- **Modifications**: HomeMe reserves right to modify or terminate offer at any time
+
+---
+
+*Pricing effective as of January 2025. All prices in USD. Custom enterprise solutions available for communities with unique requirements. 75% first-year discount offer subject to terms and conditions above.*

@@ -185,11 +185,13 @@ Pay annually and get **2 extra months FREE** on top of the 75% discount!
 
 ## 📞 **Ready to Transform Your Community?**
 
-**Start Your Free Trial Today!**
+**🔥 LIMITED TIME: 75% OFF FIRST YEAR + FREE TRIAL!**
 - ✅ 30-day free trial for Professional tier
 - ✅ 60-day free trial for Enterprise tier
+- ✅ **75% discount automatically applied for Year 1**
 - ✅ No setup fees or hidden costs
-- ✅ Cancel anytime with no penalties
+- ✅ Cancel anytime with 30-day notice
+- ⏰ **Offer expires March 31, 2025 - Act now!**
 
 **Contact Information:**
 - 📧 Email: sales@homeme.com

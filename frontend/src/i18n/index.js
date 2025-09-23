@@ -2152,7 +2152,7 @@ const resources = {
           'description': 'Si vous avez des questions concernant ces conditions ou la politique de confidentialité, veuillez nous contacter:',
           'email': 'Email',
           'address': 'Adresse',
-          'addressValue': 'Le Caire, République Arabe d\'Égypte'
+          'addressValue': 'Le Caire, Égypte'
         },
         'terms': {
           'title': 'Conditions d\'Utilisation',

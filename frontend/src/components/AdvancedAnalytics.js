@@ -249,7 +249,7 @@ const AdvancedAnalytics = () => {
           title={t('user_engagement')}
           value={`${analytics.engagement?.rate || 0}%`}
           change={analytics.engagement?.growth_rate}
-          icon={TrendingUpIcon}
+          icon={ArrowTrendingUpIcon}
           color="text-purple-600"
           subtitle={`${analytics.engagement?.active_users || 0} ${t('active_users')}`}
         />

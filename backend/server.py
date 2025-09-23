@@ -8264,6 +8264,65 @@ async def scan_qr_code(
         logging.error(f"Error processing QR scan: {e}")
         raise HTTPException(status_code=500, detail="Failed to process QR scan")
 
+@api_router.get("/guests/{guest_id}/qr-code")
+async def generate_qr_code(guest_id: str, current_user: User = Depends(get_current_user)):
+    """Generate QR code for an approved guest"""
+    try:
+        # Find the approved guest
+        guest = await db.visit_requests.find_one({
+            "id": guest_id, 
+            "compound_id": current_user.compound_id, 
+            "status": "approved"
+        })
+        if not guest:
+            raise HTTPException(status_code=404, detail="Approved guest not found")
+        
+        # Prepare QR code data
+        qr_data = {
+            "guest_id": guest_id,
+            "visitor_name": guest["visitor_name"],
+            "visit_date": guest["visit_date"],
+            "unit_number": guest["unit_number"],
+            "host_name": guest["host_name"],
+            "compound_id": current_user.compound_id,
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Generate QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(json.dumps(qr_data))
+        qr.make(fit=True)
+
+        # Create QR code image
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convert to base64
+        buffered = BytesIO()
+        img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        
+        return {
+            "qr_code": f"data:image/png;base64,{img_str}",
+            "qr_data": qr_data,
+            "guest_info": {
+                "visitor_name": guest["visitor_name"],
+                "unit_number": guest["unit_number"],
+                "visit_date": guest["visit_date"],
+                "host_name": guest["host_name"]
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error generating QR code: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate QR code")
+
 # ============ EVENTS & ANNOUNCEMENTS ENDPOINTS ============
 
 @api_router.post("/announcements")

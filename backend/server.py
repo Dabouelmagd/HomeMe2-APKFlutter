@@ -9040,11 +9040,15 @@ async def create_automation(
 
 @api_router.post("/smart-devices/natural-command")
 async def process_natural_language_command(
-    command: str = Form(...),
+    command_data: Dict[str, str],
     current_user: User = Depends(get_current_user)
 ):
     """Process natural language commands for smart home devices using AI"""
     try:
+        command = command_data.get("command", "").strip()
+        if not command:
+            raise HTTPException(status_code=400, detail="Command is required")
+            
         # Initialize LLM chat with device context
         llm_api_key = os.environ.get('EMERGENT_LLM_KEY')
         if not llm_api_key:

@@ -509,7 +509,7 @@ const AdvancedAnalytics = () => {
               <MetricCard
                 title={t('feature_adoption')}
                 value={`${analytics.engagement?.feature_adoption || 0}%`}
-                icon={TrendingUpIcon}
+                icon={ArrowTrendingUpIcon}
                 color="text-purple-600"
               />
             </div>

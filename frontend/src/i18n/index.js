@@ -596,8 +596,8 @@ const resources = {
         'save': 'Save'
       },
       
-      // Notifications
-      'notifications': {
+      // Notification Center
+      'notificationCenter': {
         'pushNotifications': 'Push Notifications',
         'subscribed': 'You are subscribed to push notifications',
         'notSubscribed': 'Push notifications are disabled',

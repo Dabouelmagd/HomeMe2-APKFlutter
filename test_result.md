@@ -125,13 +125,13 @@
 user_problem_statement: "Address minor issues identified during earlier frontend testing: cosmetic API endpoint mismatches and Natural Language UI enhancements. Fix the API endpoint mismatch where frontend calls /api/voting/polls but backend has /api/polls endpoints. Also enhance the Natural Language UI in Smart Home Integration with better user interface for AI commands. Test these fixes to ensure they work correctly."
 
 backend:
-  - task: "Guest Management System - Complete QR Visitor Workflow"
+  - task: "API Endpoint Mismatch Fix - Voting System"
     implemented: true
-    working: true
-    file: "server.py, guest_models.py"
+    working: false
+    file: "server.py, VotingSystem.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"

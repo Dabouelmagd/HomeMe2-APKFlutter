@@ -201,8 +201,8 @@ const PushNotifications = () => {
           <div>
             <p className="text-sm text-gray-600">
               {isSubscribed 
-                ? t('notifications.subscribed') 
-                : t('notifications.notSubscribed')
+                ? t('notificationCenter.subscribed') 
+                : t('notificationCenter.notSubscribed')
               }
             </p>
           </div>

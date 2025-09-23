@@ -285,6 +285,12 @@ const Layout = () => {
       href: '/contact',
       icon: EnvelopeIcon,
       show: true
+    },
+    {
+      name: 'Community Newsletter',
+      href: '/newsletter',
+      icon: NewspaperIcon,
+      show: true
     }
   ];
 

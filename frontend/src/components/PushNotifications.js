@@ -351,7 +351,7 @@ const PushNotifications = () => {
                   </div>
                   <div className="flex-1">
                     <label className="block text-xs font-medium text-gray-700">
-                      {t('notifications.to')}
+                      {t('notificationCenter.to')}
                     </label>
                     <input
                       type="time"

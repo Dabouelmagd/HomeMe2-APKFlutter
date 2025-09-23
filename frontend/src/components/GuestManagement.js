@@ -156,7 +156,11 @@ const GuestManagement = () => {
 
   const handleRejectRequest = async (requestId, reason = '') => {
     try {
-      await axios.patch(`${API}/visit-requests/${requestId}/reject`, { reason });
+      const formData = new FormData();
+      if (reason) {
+        formData.append('reason', reason);
+      }
+      await axios.patch(`${API}/visit-requests/${requestId}/reject`, formData);
       toast.success('Visit request rejected');
       fetchGuestData();
     } catch (error) {

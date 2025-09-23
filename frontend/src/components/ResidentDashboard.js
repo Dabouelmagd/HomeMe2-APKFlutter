@@ -87,11 +87,11 @@ const ResidentDashboard = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
-          Welcome home, {user?.full_name}
+          {t('welcome_home_name', { name: user?.full_name })}
         </h1>
         <p className="text-gray-600 mt-2">
           Unit {dashboardData?.family?.unit_number || user?.unit_number || 'N/A'} • 
-          Everything you need to manage your home
+          {t('everything_manage')}
         </p>
       </div>
 

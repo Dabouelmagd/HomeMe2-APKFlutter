@@ -962,12 +962,12 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Phase 3: Complete Frontend Testing Suite"
     - "Phase 3: Document Management - Frontend Testing"  
     - "Phase 3: Voting & Polling - Frontend Testing"
-    - "Phase 3: Complete Arabic and French Translations"
-    - "Phase 3: Comprehensive Frontend Testing"
+    - "Phase 3: Smart Home Integration - Frontend Testing"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:

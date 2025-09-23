@@ -219,13 +219,13 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               <h3 className={`text-lg font-semibold ${
                 isAlmostExpired ? 'text-orange-900' : 'text-blue-900'
               }`}>
-                {isAlmostExpired ? 'Trial Ending Soon!' : 'Free Trial Active'}
+                {isAlmostExpired ? t('trial_ending_soon') : t('free_trial_active')}
               </h3>
               <p className={`text-sm ${
                 isAlmostExpired ? 'text-orange-700' : 'text-blue-700'
               }`}>
-                {daysRemaining} day{daysRemaining === 1 ? '' : 's'} remaining
-                {isAlmostExpired && ' - Upgrade soon to avoid service interruption'}
+                {daysRemaining} {daysRemaining === 1 ? t('days_left') : t('days_left_plural')} {t('remaining')}
+                {isAlmostExpired && ' - ' + t('upgrade_soon_avoid_interruption')}
               </p>
             </div>
           </div>

@@ -102,10 +102,10 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
             <SparklesIcon className={showFull ? "h-6 w-6" : "h-5 w-5"} />
             <div>
               <h3 className={`font-semibold ${showFull ? 'text-lg' : 'text-sm'}`}>
-                Start Your Free Trial
+                {t('start_free_trial')}
               </h3>
               <p className={`text-blue-100 ${showFull ? 'text-sm' : 'text-xs'}`}>
-                Get 14 days of premium features
+                {t('get_14_days_premium')}
               </p>
             </div>
           </div>

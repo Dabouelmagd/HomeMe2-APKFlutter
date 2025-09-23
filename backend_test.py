@@ -716,7 +716,337 @@ class SmartHomeTestSuite:
         
         return success_count == total_tests
     
+    # ============ VOTING SYSTEM TESTS ============
+    
+    def test_get_polls(self):
+        """Test GET /api/polls - Retrieve polls successfully"""
+        print("\n=== Testing Get Polls ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Polls", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/polls", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                polls = data.get("polls", [])
+                self.log_result("Get Polls", True, f"Retrieved {len(polls)} polls successfully")
+                return True
+            else:
+                self.log_result("Get Polls", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Polls", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_polls_stats(self):
+        """Test GET /api/polls/stats - NEW endpoint that should return comprehensive statistics"""
+        print("\n=== Testing Get Polls Stats (NEW ENDPOINT) ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Polls Stats", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/polls/stats", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                stats = data.get("stats", {})
+                
+                # Verify required stats fields for comprehensive statistics
+                required_fields = ["active_polls", "completed_polls", "total_votes", "participation_rate"]
+                all_fields_present = True
+                for field in required_fields:
+                    if field not in stats:
+                        all_fields_present = False
+                        break
+                
+                if all_fields_present:
+                    self.log_result("Get Polls Stats", True, 
+                                  f"Polls stats retrieved successfully - Active: {stats.get('active_polls')}, "
+                                  f"Completed: {stats.get('completed_polls')}, Total Votes: {stats.get('total_votes')}, "
+                                  f"Participation Rate: {stats.get('participation_rate')}%")
+                    return True
+                else:
+                    self.log_result("Get Polls Stats", False, f"Missing required stats fields: {stats}")
+                    return False
+            else:
+                self.log_result("Get Polls Stats", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Polls Stats", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_poll(self):
+        """Test POST /api/polls - Test poll creation"""
+        print("\n=== Testing Create Poll ===")
+        
+        if not self.admin_token:
+            self.log_result("Create Poll", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Create test poll data
+            poll_data = {
+                "title": "Test Poll - Compound Improvement",
+                "description": "This is a test poll to verify the voting system functionality",
+                "vote_type": "single_choice",
+                "options": [
+                    "Option A - Improve Security",
+                    "Option B - Upgrade Facilities", 
+                    "Option C - Enhance Landscaping"
+                ],
+                "eligibility": "all_residents",
+                "is_anonymous": True,
+                "start_date": datetime.now().isoformat(),
+                "end_date": (datetime.now() + timedelta(days=7)).isoformat()
+            }
+            
+            response = self.session.post(f"{BASE_URL}/polls", json=poll_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Poll created successfully":
+                    self.test_poll_id = result.get("poll_id")
+                    self.log_result("Create Poll", True, f"Poll created successfully with ID: {self.test_poll_id}")
+                    return True
+                else:
+                    self.log_result("Create Poll", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Create Poll", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Poll", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_vote_on_poll(self):
+        """Test POST /api/polls/{poll_id}/vote - Test voting functionality"""
+        print("\n=== Testing Vote on Poll ===")
+        
+        if not self.admin_token:
+            self.log_result("Vote on Poll", False, "No admin token available")
+            return False
+        
+        # First create a poll if we don't have one
+        if not self.test_poll_id:
+            if not self.test_create_poll():
+                self.log_result("Vote on Poll", False, "Could not create test poll for voting")
+                return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Create vote data
+            vote_data = {
+                "selected_options": ["Option A - Improve Security"]
+            }
+            
+            response = self.session.post(f"{BASE_URL}/polls/{self.test_poll_id}/vote", json=vote_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") == "Vote recorded successfully":
+                    self.log_result("Vote on Poll", True, f"Vote recorded successfully for poll {self.test_poll_id}")
+                    return True
+                else:
+                    self.log_result("Vote on Poll", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Vote on Poll", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Vote on Poll", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    # ============ NATURAL LANGUAGE SMART HOME CONTROL TESTS ============
+    
+    def test_natural_language_command_lights(self):
+        """Test POST /api/smart-devices/natural-command - Turn on living room lights"""
+        print("\n=== Testing Natural Language Command - Turn on Living Room Lights ===")
+        
+        if not self.admin_token:
+            self.log_result("Natural Language - Lights On", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test natural language command
+            command_data = {
+                "command": "turn on living room lights"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/smart-devices/natural-command", json=command_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") == True:
+                    intent = result.get("intent")
+                    devices_targeted = result.get("devices_targeted", 0)
+                    commands_executed = result.get("commands_executed", 0)
+                    
+                    self.log_result("Natural Language - Lights On", True, 
+                                  f"Command processed successfully - Intent: {intent}, "
+                                  f"Devices targeted: {devices_targeted}, Commands executed: {commands_executed}")
+                    return True
+                else:
+                    self.log_result("Natural Language - Lights On", False, f"Command failed: {result}")
+                    return False
+            else:
+                self.log_result("Natural Language - Lights On", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Natural Language - Lights On", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_natural_language_command_temperature(self):
+        """Test POST /api/smart-devices/natural-command - Set temperature to 72 degrees"""
+        print("\n=== Testing Natural Language Command - Set Temperature ===")
+        
+        if not self.admin_token:
+            self.log_result("Natural Language - Temperature", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test natural language command
+            command_data = {
+                "command": "set temperature to 72 degrees"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/smart-devices/natural-command", json=command_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") == True:
+                    intent = result.get("intent")
+                    devices_targeted = result.get("devices_targeted", 0)
+                    commands_executed = result.get("commands_executed", 0)
+                    
+                    self.log_result("Natural Language - Temperature", True, 
+                                  f"Command processed successfully - Intent: {intent}, "
+                                  f"Devices targeted: {devices_targeted}, Commands executed: {commands_executed}")
+                    return True
+                else:
+                    self.log_result("Natural Language - Temperature", False, f"Command failed: {result}")
+                    return False
+            else:
+                self.log_result("Natural Language - Temperature", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Natural Language - Temperature", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_natural_language_command_invalid(self):
+        """Test POST /api/smart-devices/natural-command - Test error handling for invalid commands"""
+        print("\n=== Testing Natural Language Command - Invalid Command ===")
+        
+        if not self.admin_token:
+            self.log_result("Natural Language - Invalid Command", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test invalid/unrecognizable command
+            command_data = {
+                "command": "make me a sandwich please"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/smart-devices/natural-command", json=command_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                # Should handle gracefully with error intent or appropriate response
+                if result.get("success") == False or result.get("intent") == "error":
+                    self.log_result("Natural Language - Invalid Command", True, 
+                                  f"Invalid command handled correctly: {result.get('message', 'Command not recognized')}")
+                    return True
+                else:
+                    self.log_result("Natural Language - Invalid Command", False, f"Expected error handling, got: {result}")
+                    return False
+            else:
+                # Could also return 400 for invalid commands
+                if response.status_code == 400:
+                    self.log_result("Natural Language - Invalid Command", True, 
+                                  f"Invalid command correctly rejected with status 400")
+                    return True
+                else:
+                    self.log_result("Natural Language - Invalid Command", False, f"Unexpected status {response.status_code}", response.text)
+                    return False
+                
+        except Exception as e:
+            self.log_result("Natural Language - Invalid Command", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_natural_language_authentication(self):
+        """Test that natural language endpoint requires authentication"""
+        print("\n=== Testing Natural Language Authentication ===")
+        
+        try:
+            # Test without authentication token
+            command_data = {
+                "command": "turn on lights"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/smart-devices/natural-command", json=command_data)
+            
+            if response.status_code == 401 or response.status_code == 403:
+                self.log_result("Natural Language Authentication", True, f"Correctly rejected unauthenticated request (status: {response.status_code})")
+                return True
+            else:
+                self.log_result("Natural Language Authentication", False, f"Expected 401/403, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Natural Language Authentication", False, f"Exception occurred: {str(e)}")
+            return False
+
     # ============ MAIN TEST RUNNER ============
+    
+    def run_voting_and_smart_home_tests(self):
+        """Run Voting System and Natural Language Smart Home Control Tests"""
+        print("\n🚀 STARTING VOTING SYSTEM AND SMART HOME CONTROL TESTING")
+        print("=" * 70)
+        print("Testing fixed API endpoint mismatches and new functionality")
+        print("=" * 70)
+        
+        # Authentication tests
+        print("\n🔐 AUTHENTICATION SETUP")
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Voting System Tests
+        print("\n🗳️  VOTING SYSTEM API ENDPOINTS TESTING")
+        self.test_get_polls()
+        self.test_get_polls_stats()
+        self.test_create_poll()
+        self.test_vote_on_poll()
+        
+        # Natural Language Smart Home Control Tests
+        print("\n🏠 NATURAL LANGUAGE SMART HOME CONTROL TESTING")
+        self.test_natural_language_command_lights()
+        self.test_natural_language_command_temperature()
+        self.test_natural_language_command_invalid()
+        self.test_natural_language_authentication()
+        
+        return self.print_summary()
     
     def run_phase1_tests(self):
         """Run HomeMe Phase 1 Enhancement Tests"""

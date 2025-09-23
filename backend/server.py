@@ -8526,7 +8526,7 @@ async def get_document_details(
         )
         
         # Log access
-        access_log = DocumentAccess(
+        access_log = DocumentAccessLog(
             document_id=document_id,
             user_id=current_user.id,
             access_type="view"

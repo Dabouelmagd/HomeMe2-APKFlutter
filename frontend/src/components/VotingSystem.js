@@ -149,7 +149,7 @@ const VotingSystem = () => {
 
   const handleVote = async (pollId, selectedOptions, justification = '') => {
     try {
-      await axios.post(`${API}/voting/polls/${pollId}/vote`, {
+      await axios.post(`${API}/polls/${pollId}/vote`, {
         selected_options: selectedOptions,
         justification: justification
       });

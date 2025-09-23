@@ -57,8 +57,8 @@
 ##   test_priority: "high_first"  # or "sequential" or "stuck_first"
 ##
 ## agent_communication:
-##     -agent: "main"  # or "testing" or "user" 
-##     -message: "Communication message between agents"
+##     -agent: "main"
+##     -message: "✅ COSMETIC API ENDPOINT MISMATCHES FIXED: Updated VotingSystem.js to use correct API endpoints (/api/polls instead of /api/voting/polls, /api/voting/stats, etc.) and added missing /api/polls/stats endpoint to backend. ✅ NATURAL LANGUAGE UI ENHANCEMENTS COMPLETED: Added comprehensive Natural Language Control tab to Smart Home Integration with command input, history tracking, examples, processing feedback, and AI tips. Added complete trilingual translations (English, Arabic, French). Both fixes ready for testing."
 
 ## qr_visitor_investigation:
 ##   current_status: "backend_complete_frontend_pending"

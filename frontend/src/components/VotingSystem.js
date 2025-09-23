@@ -119,7 +119,7 @@ const VotingSystem = () => {
         options: pollForm.options.filter(option => option.trim() !== '')
       };
 
-      const response = await axios.post(`${API}/voting/polls`, formData);
+      const response = await axios.post(`${API}/polls`, formData);
 
       toast.success('Poll created successfully!');
       setShowCreateModal(false);

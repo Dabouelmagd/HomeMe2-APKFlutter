@@ -303,10 +303,10 @@ const PushNotifications = () => {
             <div className="flex items-center justify-between">
               <div>
                 <label className="text-sm font-medium text-gray-900">
-                  {t('notifications.compoundAnnouncements')}
+                  {t('notificationCenter.compoundAnnouncements')}
                 </label>
                 <p className="text-sm text-gray-500">
-                  {t('notifications.compoundAnnouncementsDesc')}
+                  {t('notificationCenter.compoundAnnouncementsDesc')}
                 </p>
               </div>
               <input

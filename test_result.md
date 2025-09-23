@@ -124,7 +124,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Address minor issues identified during earlier frontend testing: cosmetic API endpoint mismatches and Natural Language UI enhancements. Fix the API endpoint mismatch where frontend calls /api/voting/polls but backend has /api/polls endpoints. Also enhance the Natural Language UI in Smart Home Integration with better user interface for AI commands. Test these fixes to ensure they work correctly."
+user_problem_statement: "Test the HomeMe application backend after adding Contact Us functionality. Specifically: 1. Test basic API endpoints to ensure the application is still functioning properly 2. Test that the existing authentication endpoints work correctly 3. Test that the app is serving the Contact Us page properly 4. Verify that no existing functionality was broken by the Contact Us addition. Focus on testing core functionality to ensure the new Contact Us feature integration didn't break existing services."
 
 backend:
   - task: "API Endpoint Mismatch Fix - Voting System"

@@ -102,10 +102,10 @@
   - Custom feature development consultation
 
 ### **Monthly Pricing:**
-- **1-100 units**: $399/month
-- **101-250 units**: $699/month
-- **251-500 units**: $1,199/month
-- **500+ units**: Custom enterprise pricing
+- **1-100 units**: $399/month **(First year: $100/month - 75% OFF)**
+- **101-250 units**: $699/month **(First year: $175/month - 75% OFF)**
+- **251-500 units**: $1,199/month **(First year: $300/month - 75% OFF)**
+- **500+ units**: Custom enterprise pricing **(First year: 75% OFF applicable)**
 
 ---
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-HomeMe Guest Management System Testing Suite
-Tests the complete QR visitor workflow:
-1. Visit Request Management
-2. Guest Approval/Rejection
-3. QR Code Generation and Scanning
-4. Guest Check-in/Check-out
-5. Guest Statistics and Management
+HomeMe Backend API Testing Suite
+Tests core backend functionality after Contact Us feature addition:
+1. Authentication System
+2. Core API Endpoints
+3. Basic CRUD Operations
+4. Contact/Messaging Functionality
+5. System Health and Stability
 """
 
 import asyncio

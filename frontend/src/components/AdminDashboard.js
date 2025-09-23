@@ -161,7 +161,7 @@ const AdminDashboard = () => {
                 Welcome back, {user?.full_name} 👋
               </h1>
               <p className="text-lg text-gray-600">
-                Here's what's happening in your compound today
+                {t('dashboard_welcome_subtitle')}
               </p>
             </div>
             <div className="mt-4 md:mt-0 flex items-center space-x-4">

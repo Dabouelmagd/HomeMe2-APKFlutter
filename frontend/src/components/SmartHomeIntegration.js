@@ -420,6 +420,7 @@ const SmartHomeIntegration = () => {
           {[
             { key: 'devices', label: t('devices'), icon: HomeModernIcon },
             { key: 'automations', label: t('automations'), icon: CogIcon },
+            { key: 'natural-control', label: t('natural_language_control'), icon: ChatBubbleLeftRightIcon },
             { key: 'scenes', label: t('scenes'), icon: PlayIcon },
             { key: 'energy', label: t('energy_monitoring'), icon: ChartBarIcon }
           ].map(tab => {

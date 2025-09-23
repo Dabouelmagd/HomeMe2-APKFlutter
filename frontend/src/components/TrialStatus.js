@@ -117,7 +117,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
                 : 'text-blue-600 px-3 py-1 rounded text-xs'
             }`}
           >
-            Start Trial
+            {t('start_trial')}
           </button>
         </div>
       </div>

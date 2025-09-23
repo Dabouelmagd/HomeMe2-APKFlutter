@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
-HomeMe Phase 3 Testing Suite
-Tests the newly implemented Phase 3 features:
-1. Document Management System
-2. Voting & Polling System  
-3. Smart Home Integration
-4. Natural Language AI Control
+HomeMe Smart Home Device Testing Suite
+Tests the newly implemented smart home device initialization and natural language commands:
+1. Smart Home Device Initialization
+2. Natural Language Command Processing
+3. Device Management APIs
 """
 
 import asyncio
@@ -24,7 +23,7 @@ from PIL import Image
 BASE_URL = "https://homeme-smart.preview.emergentagent.com/api"
 WS_URL = "wss://resident-portal-11.preview.emergentagent.com/ws/notifications"
 
-class HomePhase1TestSuite:
+class SmartHomeTestSuite:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None

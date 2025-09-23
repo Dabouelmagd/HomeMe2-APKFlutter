@@ -322,10 +322,10 @@ const PushNotifications = () => {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <label className="text-sm font-medium text-gray-900">
-                    {t('notifications.quietHours')}
+                    {t('notificationCenter.quietHours')}
                   </label>
                   <p className="text-sm text-gray-500">
-                    {t('notifications.quietHoursDesc')}
+                    {t('notificationCenter.quietHoursDesc')}
                   </p>
                 </div>
                 <input

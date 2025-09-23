@@ -192,6 +192,22 @@ const resources = {
       'loading': 'Loading...',
       'language': 'Language',
       
+      // Newsletter
+      'newsletter': 'Newsletter',
+      'community_newsletter': 'Community Newsletter',
+      'create_newsletter': 'Create Newsletter',
+      'edit_newsletter': 'Edit Newsletter',
+      'newsletter_title': 'Title',
+      'newsletter_content': 'Content',
+      'newsletter_summary': 'Summary',
+      'newsletter_category': 'Category',
+      'newsletter_status': 'Status',
+      'featured_image': 'Featured Image',
+      'publish_newsletter': 'Publish Newsletter',
+      'draft': 'Draft',
+      'published': 'Published',
+      'archived': 'Archived',
+      
       // Services
       'services_management': 'Services Management',
       'maintenance_system': 'Maintenance System',

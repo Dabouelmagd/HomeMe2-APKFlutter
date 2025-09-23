@@ -932,11 +932,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 3: Document Management System - Backend Implementation"
-    - "Phase 3: Voting & Polling System - Backend Implementation"
-    - "Phase 3: Smart Home Integration - Backend Implementation"
     - "Phase 3: Natural Language Smart Home Control - AI Integration"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Phase 3: Natural Language Smart Home Control - AI Integration"
   test_all: false
   test_priority: "high_first"
 

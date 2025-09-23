@@ -455,7 +455,7 @@ const AdvancedAnalytics = () => {
               <MetricCard
                 title={t('collection_rate')}
                 value={`${analytics.revenue?.collection_rate || 0}%`}
-                icon={TrendingUpIcon}
+                icon={ArrowTrendingUpIcon}
                 color="text-blue-600"
               />
               <MetricCard

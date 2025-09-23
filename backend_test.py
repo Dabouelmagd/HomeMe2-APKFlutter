@@ -35,6 +35,7 @@ class SmartHomeTestSuite:
         self.compound_id = None
         self.test_maintenance_request_id = None
         self.test_notification_id = None
+        self.test_poll_id = None
         self.websocket_connection = None
         self.results = []
         

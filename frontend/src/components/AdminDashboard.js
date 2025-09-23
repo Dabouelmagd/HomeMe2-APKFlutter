@@ -166,7 +166,7 @@ const AdminDashboard = () => {
             </div>
             <div className="mt-4 md:mt-0 flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm text-gray-500">Current Time</p>
+                <p className="text-sm text-gray-500">{t('current_time')}</p>
                 <p className="text-lg font-semibold text-gray-900">
                   {new Date().toLocaleTimeString()}
                 </p>

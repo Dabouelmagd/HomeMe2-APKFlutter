@@ -5376,4 +5376,23 @@ if __name__ == "__main__":
     else:
         print("\n⚠️ AUTHENTICATION INVESTIGATION COMPLETED WITH ISSUES")
     
+if __name__ == "__main__":
+    # Run the voting system and smart home control tests
+    test_suite = SmartHomeTestSuite()
+    success_rate = test_suite.run_voting_and_smart_home_tests()
+    
+    print(f"\n🎯 Final Success Rate: {success_rate:.1f}%")
+    
+    if success_rate >= 90:
+        print("🎉 EXCELLENT! Voting system and smart home control are production ready!")
+        exit(0)
+    elif success_rate >= 75:
+        print("✅ GOOD! Systems are mostly functional with minor issues.")
+        exit(0)
+    elif success_rate >= 50:
+        print("⚠️  MODERATE! Systems have significant issues that need attention.")
+        exit(1)
+    else:
+        print("❌ CRITICAL! Systems have major failures and are not ready for production.")
+        exit(1)
     exit(0 if success else 1)

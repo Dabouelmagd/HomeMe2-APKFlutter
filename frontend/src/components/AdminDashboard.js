@@ -243,7 +243,7 @@ const AdminDashboard = () => {
             )) || (
               <div className="text-center py-8">
                 <BellIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">No recent activity</p>
+                <p className="text-gray-500">{t('no_recent_activity')}</p>
               </div>
             )}
           </div>

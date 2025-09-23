@@ -27,7 +27,8 @@ import {
   CommandLineIcon,
   DocumentTextIcon,
   HandRaisedIcon,
-  HomeModernIcon
+  HomeModernIcon,
+  EnvelopeIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 

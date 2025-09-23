@@ -187,17 +187,47 @@ const GuestManagement = () => {
     }
   };
 
-  const generateQRCode = (guest) => {
-    const qrData = {
-      guest_id: guest.id,
-      visitor_name: guest.visitor_name,
-      visit_date: guest.visit_date,
-      unit_number: guest.unit_number
-    };
-    
-    // In a real implementation, you would generate a QR code here
-    navigator.clipboard.writeText(JSON.stringify(qrData));
-    toast.success('Guest information copied to clipboard!');
+  const generateQRCode = async (guest) => {
+    try {
+      const response = await axios.get(`${API}/guests/${guest.id}/qr-code`);
+      
+      // Create a modal to display the QR code
+      const qrModal = document.createElement('div');
+      qrModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50';
+      qrModal.innerHTML = `
+        <div class="bg-white rounded-lg max-w-md w-full p-6">
+          <div class="text-center">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">${t('visitor_qr_code')}</h3>
+            <div class="mb-4">
+              <img src="${response.data.qr_code}" alt="QR Code" class="mx-auto" style="max-width: 200px;">
+            </div>
+            <div class="text-sm text-gray-600 mb-4">
+              <p><strong>${t('visitor_name')}:</strong> ${response.data.guest_info.visitor_name}</p>
+              <p><strong>${t('unit_number')}:</strong> ${response.data.guest_info.unit_number}</p>
+              <p><strong>${t('visit_date')}:</strong> ${formatDate(response.data.guest_info.visit_date)}</p>
+            </div>
+            <div class="flex justify-center space-x-3">
+              <button onclick="navigator.clipboard.writeText('${JSON.stringify(response.data.qr_data)}'); this.innerText='${t('copied')}!';" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                ${t('copy_data')}
+              </button>
+              <button onclick="window.print();" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+                ${t('print')}
+              </button>
+              <button onclick="document.body.removeChild(this.closest('.fixed'))" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                ${t('close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(qrModal);
+      
+      toast.success('QR Code generated successfully!');
+    } catch (error) {
+      toast.error('Failed to generate QR code');
+      console.error('QR generation error:', error);
+    }
   };
 
   const getStatusBadge = (status) => {

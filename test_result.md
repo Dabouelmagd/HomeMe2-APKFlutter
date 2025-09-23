@@ -950,14 +950,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Phase 3: Smart Home Integration - Frontend Testing"
     - "Phase 3: Document Management - Frontend Testing"  
     - "Phase 3: Voting & Polling - Frontend Testing"
-    - "Phase 3: Natural Language Smart Home Control - Fix and Retest"
-  stuck_tasks:
-    - "Phase 3: Natural Language Smart Home Control - AI Integration"
+    - "Phase 3: Complete Arabic and French Translations"
+    - "Phase 3: Comprehensive Frontend Testing"
+  stuck_tasks: []
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
 
 agent_communication:
     - agent: "main"

@@ -156,7 +156,7 @@ backend:
     file: "server.py"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
@@ -164,6 +164,9 @@ backend:
         - working: false
           agent: "testing"
           comment: "NATURAL LANGUAGE AI CONTROL TESTING COMPLETED - 0% SUCCESS RATE (0/4 tests passed). CRITICAL ISSUE IDENTIFIED: ❌ POST /api/smart-devices/natural-command endpoint returns HTTP 422 validation errors for all natural language commands tested: 'turn on the living room lights', 'set the temperature to 72 degrees', 'dim the bedroom lights to 50%', 'turn off all lights in the house'. ✅ Authentication working correctly (properly rejects unauthenticated requests with 403 status). ROOT CAUSE: The natural language processing endpoint appears to have validation issues preventing command processing. This is a critical feature that requires investigation and fixing for the AI-powered smart home control to function properly."
+        - working: "NA"
+          agent: "main"
+          comment: "FIXING VALIDATION ISSUE: Changed endpoint parameter from Dict[str, str] to NaturalLanguageCommand Pydantic model with proper command field validation. This should resolve the HTTP 422 validation errors. Also creating sample smart devices to populate database and resolve 404 errors."
   - task: "Services Management System - Core Services APIs"
     implemented: true
     working: true

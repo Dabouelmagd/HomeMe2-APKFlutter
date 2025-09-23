@@ -1419,8 +1419,8 @@ const resources = {
         'save': 'حفظ'
       },
       
-      // Notifications
-      'notifications': {
+      // Notification Center (Arabic)
+      'notificationCenter': {
         'pushNotifications': 'إشعارات الدفع',
         'subscribed': 'أنت مشترك في إشعارات الدفع',
         'notSubscribed': 'إشعارات الدفع معطلة',

@@ -79,8 +79,8 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               <TrophyIcon className="h-6 w-6 text-green-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-green-900">Premium Account</h3>
-              <p className="text-sm text-green-700">You have unlimited access to all HomeMe features</p>
+              <h3 className="text-lg font-semibold text-green-900">{t('premium_account')}</h3>
+              <p className="text-sm text-green-700">{t('unlimited_access_features')}</p>
             </div>
           </div>
         </div>

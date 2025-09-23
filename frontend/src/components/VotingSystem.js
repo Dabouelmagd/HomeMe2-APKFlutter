@@ -164,7 +164,7 @@ const VotingSystem = () => {
 
   const handlePollAction = async (pollId, action) => {
     try {
-      await axios.patch(`${API}/voting/polls/${pollId}/${action}`);
+      await axios.patch(`${API}/polls/${pollId}/${action}`);
       
       const actionMessages = {
         publish: 'Poll published successfully!',

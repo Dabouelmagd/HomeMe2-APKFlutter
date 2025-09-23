@@ -115,6 +115,10 @@ class ConnectionManager:
                 
         return sent_count
 
+    async def send_personal_message(self, message: dict, user_id: str):
+        """Send personal message to a specific user (alias for send_to_user)"""
+        return await self.send_to_user(user_id, message)
+
     async def send_to_compound(self, compound_id: str, message: dict, exclude_user_id: Optional[str] = None):
         """Send message to all connections in a compound"""
         if compound_id not in self.compound_connections:

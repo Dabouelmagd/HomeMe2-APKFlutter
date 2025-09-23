@@ -359,6 +359,10 @@ function App() {
                 <Route path="contact" element={
                   <ContactUs />
                 } />
+                
+                <Route path="newsletter" element={
+                  <Newsletter />
+                } />
               </Route>
             </Routes>
             <Toaster />

@@ -171,6 +171,13 @@ Transform your community management at an incredible value:
 
 **After Year 1:** Plans automatically renew at standard pricing. Cancel anytime with 30-day notice.
 
+### **💰 Incredible Savings Examples:**
+- **50-unit community**: Save $888/year = Only $300 total for entire first year!
+- **150-unit community**: Save $2,688/year = Only $900 total for entire first year!
+- **300-unit community (Enterprise)**: Save $6,288/year = Only $2,100 total for entire first year!
+
+*Compare this to hiring just one part-time admin at $15,000+/year!*
+
 ### **Additional Annual Payment Bonus**
 Pay annually and get **2 extra months FREE** on top of the 75% discount!
 - **Professional**: Effective rate as low as $21/month first year

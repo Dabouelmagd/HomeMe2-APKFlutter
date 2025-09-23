@@ -293,7 +293,7 @@ const SmartHomeIntegration = () => {
 
   const activateScene = async (sceneId) => {
     try {
-      await axios.post(`${API}/smart-home/scenes/${sceneId}/activate`);
+      await axios.post(`${API}/scenes/${sceneId}/activate`);
       
       toast.success('Scene activated successfully!');
       fetchSmartHomeData();

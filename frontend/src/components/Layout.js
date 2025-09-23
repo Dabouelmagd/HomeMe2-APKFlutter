@@ -278,6 +278,12 @@ const Layout = () => {
       href: '/terms-privacy',
       icon: DocumentTextIcon,
       show: true
+    },
+    {
+      name: t('legal.contact.title'),
+      href: '/contact',
+      icon: EnvelopeIcon,
+      show: true
     }
   ];
 

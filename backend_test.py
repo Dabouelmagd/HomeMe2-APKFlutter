@@ -801,14 +801,15 @@ class SmartHomeTestSuite:
                 "description": "This is a test poll to verify the voting system functionality",
                 "vote_type": "single_choice",
                 "options": [
-                    {"text": "Option A - Improve Security", "value": "security"},
-                    {"text": "Option B - Upgrade Facilities", "value": "facilities"}, 
-                    {"text": "Option C - Enhance Landscaping", "value": "landscaping"}
+                    {"text": "Option A - Improve Security"},
+                    {"text": "Option B - Upgrade Facilities"}, 
+                    {"text": "Option C - Enhance Landscaping"}
                 ],
-                "eligibility": "all_residents",
-                "is_anonymous": True,
+                "require_family_head_only": False,  # Allow any user to vote for testing
+                "allow_anonymous_voting": True,
                 "start_date": datetime.now().isoformat(),
-                "end_date": (datetime.now() + timedelta(days=7)).isoformat()
+                "end_date": (datetime.now() + timedelta(days=7)).isoformat(),
+                "eligible_families": []  # All families eligible
             }
             
             response = self.session.post(f"{BASE_URL}/polls", json=poll_data, headers=headers)

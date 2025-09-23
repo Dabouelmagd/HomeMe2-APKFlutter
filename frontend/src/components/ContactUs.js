@@ -20,6 +20,13 @@ const ContactUs = () => {
       description: 'Send us an email for general inquiries and support'
     },
     {
+      icon: GlobeAltIcon,
+      label: 'Website',
+      value: 'www.homemeapp.net',
+      href: 'https://www.homemeapp.net',
+      description: 'Visit our official website for more information'
+    },
+    {
       icon: MapPinIcon,
       label: t('legal.contact.address'),
       value: t('legal.contact.addressValue'),

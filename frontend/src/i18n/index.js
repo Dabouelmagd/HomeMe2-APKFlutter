@@ -1921,6 +1921,7 @@ const resources = {
       // Dashboard
       'welcome_back_name': 'Bon retour, {{name}}',
       'welcome_home_name': 'Bienvenue chez vous, {{name}}',
+      'dashboard_welcome_subtitle': 'Voici ce qui se passe dans votre résidence aujourd\'hui',
       'happening_today': 'Voici ce qui se passe dans {{compound}} aujourd\'hui.',
       'everything_manage': 'Tout ce dont vous avez besoin pour gérer votre domicile',
       'total_residents': 'Total des résidents',

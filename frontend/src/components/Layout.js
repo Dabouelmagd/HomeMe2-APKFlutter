@@ -271,6 +271,12 @@ const Layout = () => {
       href: '/pricing',
       icon: CurrencyDollarIcon,
       show: true
+    },
+    {
+      name: t('legal.title'),
+      href: '/terms-privacy',
+      icon: DocumentTextIcon,
+      show: true
     }
   ];
 

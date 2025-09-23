@@ -22,7 +22,7 @@ from typing import Dict, List, Optional
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://homeme-smartnest.preview.emergentagent.com/api"
+BASE_URL = "https://smart-living-app-4.preview.emergentagent.com/api"
 WS_URL = "wss://resident-portal-11.preview.emergentagent.com/ws/notifications"
 
 class SmartHomeTestSuite:

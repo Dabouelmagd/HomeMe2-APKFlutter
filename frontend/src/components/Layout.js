@@ -28,7 +28,8 @@ import {
   DocumentTextIcon,
   HandRaisedIcon,
   HomeModernIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  NewspaperIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 

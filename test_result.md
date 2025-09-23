@@ -57,8 +57,25 @@
 ##   test_priority: "high_first"  # or "sequential" or "stuck_first"
 ##
 ## agent_communication:
-##     -agent: "main"  # or "testing" or "user"
+##     -agent: "main"  # or "testing" or "user" 
 ##     -message: "Communication message between agents"
+
+## qr_visitor_investigation:
+##   current_status: "incomplete_implementation"
+##   findings:
+##     - backend_models: "Complete QR models exist in guest_models.py"
+##     - backend_endpoints: "Missing critical endpoints: approve, reject, checkin, checkout"
+##     - frontend_ui: "Complete UI exists but expects missing backend endpoints"
+##     - qr_generation: "Mock implementation - only copies JSON to clipboard"
+##     - qr_scanning: "Not implemented"
+##   workflow_gaps:
+##     - missing_endpoints: ["/api/visit-requests/{id}/approve", "/api/visit-requests/{id}/reject", "/api/guests/{id}/checkin", "/api/guests/{id}/checkout"]
+##     - qr_functionality: "No real QR code generation or scanning"
+##   next_actions:
+##     - "Implement missing backend endpoints"
+##     - "Add proper QR code generation library"  
+##     - "Add QR scanning capability"
+##     - "Test complete workflow"
 
 # Protocol Guidelines for Main agent
 #

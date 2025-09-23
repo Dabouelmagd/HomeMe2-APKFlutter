@@ -97,8 +97,8 @@ const VotingSystem = () => {
     try {
       setLoading(true);
       const [pollsRes, statsRes] = await Promise.all([
-        axios.get(`${API}/voting/polls`),
-        axios.get(`${API}/voting/stats`)
+        axios.get(`${API}/polls`),
+        axios.get(`${API}/polls/stats`)
       ]);
       
       setPolls(pollsRes.data.polls || []);

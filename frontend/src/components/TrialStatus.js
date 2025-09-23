@@ -313,24 +313,24 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
       {/* Upgrade Benefits */}
       <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-6">
         <h4 className="text-lg font-medium text-gray-900 mb-4">
-          Upgrade to unlock unlimited access
+          {t('upgrade_unlimited_access')}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-center space-x-2">
             <CheckCircleIcon className="h-5 w-5 text-green-500" />
-            <span className="text-sm text-gray-700">Unlimited users and families</span>
+            <span className="text-sm text-gray-700">{t('unlimited_users_families')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <CheckCircleIcon className="h-5 w-5 text-green-500" />
-            <span className="text-sm text-gray-700">Unlimited services</span>
+            <span className="text-sm text-gray-700">{t('unlimited_services')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <CheckCircleIcon className="h-5 w-5 text-green-500" />
-            <span className="text-sm text-gray-700">Unlimited storage</span>
+            <span className="text-sm text-gray-700">{t('unlimited_storage')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <CheckCircleIcon className="h-5 w-5 text-green-500" />
-            <span className="text-sm text-gray-700">Premium support</span>
+            <span className="text-sm text-gray-700">{t('premium_support')}</span>
           </div>
         </div>
       </div>

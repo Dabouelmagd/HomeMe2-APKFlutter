@@ -160,7 +160,7 @@ backend:
     implemented: true
     working: true
     file: "server.py"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:

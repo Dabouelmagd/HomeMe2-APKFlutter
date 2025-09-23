@@ -9038,6 +9038,111 @@ async def create_automation(
         logging.error(f"Error creating automation: {e}")
         raise HTTPException(status_code=500, detail="Failed to create automation")
 
+@api_router.post("/admin/initialize-smart-devices")
+async def initialize_smart_devices(
+    compound_id: str,
+    current_user: User = Depends(require_admin)
+):
+    """Initialize sample smart home devices for testing and demo purposes"""
+    if current_user.compound_id != compound_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Check if devices already exist
+    existing_devices = await db.smart_devices.find({"compound_id": compound_id}).limit(1).to_list(1)
+    if existing_devices:
+        return {"message": "Smart devices already exist"}
+    
+    # Sample smart home devices
+    sample_devices = [
+        {
+            "name": "Living Room Lights",
+            "device_type": "light",
+            "location": "Living Room",
+            "capabilities": ["on_off", "dimming", "color"],
+            "current_state": {"power": False, "brightness": 0, "color": "#ffffff"},
+            "target_state": {"power": False, "brightness": 0, "color": "#ffffff"},
+            "is_shared": True,
+            "family_id": None
+        },
+        {
+            "name": "Bedroom Lights",
+            "device_type": "light", 
+            "location": "Bedroom",
+            "capabilities": ["on_off", "dimming"],
+            "current_state": {"power": False, "brightness": 0},
+            "target_state": {"power": False, "brightness": 0},
+            "is_shared": True,
+            "family_id": None
+        },
+        {
+            "name": "Smart Thermostat",
+            "device_type": "thermostat",
+            "location": "Hallway",
+            "capabilities": ["temperature_control", "scheduling"],
+            "current_state": {"temperature": 72, "mode": "auto", "target_temp": 72},
+            "target_state": {"temperature": 72, "mode": "auto", "target_temp": 72},
+            "is_shared": True,
+            "family_id": None
+        },
+        {
+            "name": "Front Door Lock",
+            "device_type": "lock",
+            "location": "Front Door",
+            "capabilities": ["lock_unlock", "status"],
+            "current_state": {"locked": True, "battery": 85},
+            "target_state": {"locked": True},
+            "is_shared": True,
+            "family_id": None
+        },
+        {
+            "name": "Kitchen Lights",
+            "device_type": "light",
+            "location": "Kitchen",
+            "capabilities": ["on_off", "dimming"],
+            "current_state": {"power": False, "brightness": 0},
+            "target_state": {"power": False, "brightness": 0},
+            "is_shared": True,
+            "family_id": None
+        },
+        {
+            "name": "Security Camera",
+            "device_type": "camera",
+            "location": "Front Entrance",
+            "capabilities": ["recording", "motion_detection", "night_vision"],
+            "current_state": {"recording": True, "motion_detected": False, "battery": 92},
+            "target_state": {"recording": True},
+            "is_shared": True,
+            "family_id": None
+        }
+    ]
+    
+    # Create SmartDevice objects
+    devices_to_insert = []
+    for device_data in sample_devices:
+        device = SmartDevice(
+            compound_id=compound_id,
+            name=device_data["name"],
+            device_type=device_data["device_type"],
+            location=device_data["location"],
+            capabilities=device_data["capabilities"],
+            current_state=device_data["current_state"],
+            target_state=device_data["target_state"],
+            is_shared=device_data["is_shared"],
+            family_id=device_data["family_id"],
+            status="online",
+            last_seen=datetime.utcnow(),
+            controlled_by=[current_user.id]
+        )
+        devices_to_insert.append(serialize_datetime(device.dict()))
+    
+    # Insert all devices
+    await db.smart_devices.insert_many(devices_to_insert)
+    
+    return {
+        "message": "Smart devices initialized successfully", 
+        "devices_created": len(devices_to_insert)
+    }
+
 class NaturalLanguageCommand(BaseModel):
     command: str
 

@@ -554,7 +554,7 @@ const AdvancedAnalytics = () => {
             <ul className="space-y-1 text-sm text-gray-600">
               {(analytics.summary?.improvements || []).map((improvement, index) => (
                 <li key={index} className="flex items-center">
-                  <TrendingDownIcon className="w-4 h-4 text-orange-500 mr-2" />
+                  <ArrowTrendingDownIcon className="w-4 h-4 text-orange-500 mr-2" />
                   {improvement}
                 </li>
               ))}

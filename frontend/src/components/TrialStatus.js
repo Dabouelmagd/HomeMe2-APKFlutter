@@ -188,7 +188,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
             onClick={onUpgradeClick || upgradeToPaid}
             className="bg-white font-medium hover:bg-gray-50 transition-colors px-3 py-1 rounded text-xs text-blue-600"
           >
-            Upgrade
+            {t('upgrade_now')}
           </button>
         </div>
       </div>

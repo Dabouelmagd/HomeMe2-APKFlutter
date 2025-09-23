@@ -181,7 +181,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               <ClockIcon className="h-5 w-5" />
             )}
             <span className="text-sm font-medium">
-              {daysRemaining} day{daysRemaining === 1 ? '' : 's'} left
+              {daysRemaining} {daysRemaining === 1 ? t('days_left') : t('days_left_plural')} {t('remaining')}
             </span>
           </div>
           <button

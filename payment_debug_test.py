@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional
 
 # Configuration
-BASE_URL = "https://homeme-qr-visitor.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-smartnest.preview.emergentagent.com/api"
 
 class PaymentDebugTestSuite:
     def __init__(self):

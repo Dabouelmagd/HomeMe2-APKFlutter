@@ -1135,7 +1135,7 @@ class SmartHomeTestSuite:
         
         return self.print_summary()
     
-    def print_summary(self):
+    def print_comprehensive_summary(self):
         """Print comprehensive test results summary"""
         print("\n" + "=" * 70)
         print("🏁 TEST RESULTS SUMMARY")

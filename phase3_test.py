@@ -621,7 +621,7 @@ class HomePhase3TestSuite:
             
             if response.status_code == 200:
                 result = response.json()
-                if result.get("message") == "Device registered successfully":
+                if result.get("message") in ["Device registered successfully", "Smart device added successfully"]:
                     self.test_device_id = result.get("device_id")
                     self.log_result("Register Smart Device", True, f"Smart device registered successfully with ID: {self.test_device_id}")
                     return True

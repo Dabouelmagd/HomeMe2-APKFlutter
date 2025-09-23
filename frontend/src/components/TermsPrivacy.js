@@ -222,7 +222,7 @@ const TermsPrivacy = () => {
             <div className="space-y-2 text-sm text-gray-600">
               <div>
                 <span className="font-medium">{t('legal.contact.email')}: </span>
-                <span>support@homeme.com</span>
+                <span>info@datalifeai.com</span>
               </div>
               <div>
                 <span className="font-medium">{t('legal.contact.address')}: </span>

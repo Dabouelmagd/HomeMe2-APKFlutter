@@ -707,7 +707,134 @@ const resources = {
         'failed': 'Failed',
         'cancelled': 'Cancelled',
         'confirmDelete': 'Are you sure you want to delete this scheduled message?'
-      }
+      },
+      
+      // Phase 3: Document Management
+      documents: {
+        'title': 'Document Management',
+        'subtitle': 'Organize and share compound documents',
+        'upload': 'Upload Document',
+        'create_folder': 'New Folder',
+        'search': 'Search',
+        'search_placeholder': 'Search documents...',
+        'category': 'Category',
+        'folder': 'Folder',
+        'no_documents': 'No documents found',
+        'no_documents_desc': 'Get started by uploading a document.',
+        'upload_document': 'Upload Document',
+        'file': 'File',
+        'title': 'Title',
+        'description': 'Description',
+        'tags': 'Tags (comma-separated)',
+        'access_level': 'Access Level',
+        'folder_name': 'Folder Name',
+        'parent_folder': 'Parent Folder',
+        'root_folder': 'Root Folder',
+        'default_access': 'Default Access Level',
+        'version': 'Version',
+        'versions': 'Versions',
+        'no_description': 'No description available',
+        'select_file': 'Please select a file',
+        categories: {
+          'general': 'General',
+          'financial': 'Financial',
+          'legal': 'Legal',
+          'maintenance': 'Maintenance',
+          'governance': 'Governance',
+          'residents': 'Residents',
+          'contracts': 'Contracts',
+          'policies': 'Policies'
+        },
+        access: {
+          'public': 'All Residents',
+          'admin_only': 'Admin Only',
+          'family_only': 'Family Only',
+          'residents_only': 'Residents Only'
+        }
+      },
+      
+      // Phase 3: Voting & Polling System
+      voting: {
+        'title': 'Voting & Polls',
+        'subtitle': 'Community decision making and feedback collection',
+        'create_poll': 'Create Poll',
+        'vote': 'Vote',
+        'voted': 'Voted',
+        'results': 'Results',
+        'no_polls': 'No polls available',
+        'no_polls_admin': 'Get started by creating a poll.',
+        'no_polls_resident': 'Check back later for new polls.',
+        'poll_title': 'Poll Title',
+        'description': 'Description',
+        'vote_type': 'Vote Type',
+        'start_date': 'Start Date',
+        'end_date': 'End Date',
+        'options': 'Options',
+        'add_option': 'Add Option',
+        'family_head_only': 'Only family heads can vote',
+        'allow_anonymous': 'Allow anonymous voting',
+        'show_results_early': 'Show results before poll ends',
+        'select_options': 'Select your choice(s):',
+        'rating': 'Rating (1-5 stars)',
+        'comment': 'Comment (optional)',
+        'vote_anonymously': 'Vote anonymously',
+        'submit_vote': 'Submit Vote',
+        types: {
+          'single_choice': 'Single Choice',
+          'multiple_choice': 'Multiple Choice',
+          'yes_no': 'Yes/No',
+          'rating': 'Rating (1-5)'
+        }
+      },
+      
+      // Phase 3: Smart Home Integration
+      smart_home: {
+        'title': 'Smart Home',
+        'subtitle': 'Control and automate your smart devices',
+        'devices': 'Devices',
+        'automations': 'Automations',
+        'add_device': 'Add Device',
+        'add_automation': 'Create Automation',
+        'device_name': 'Device Name',
+        'device_type': 'Device Type',
+        'location': 'Location',
+        'brand': 'Brand',
+        'model': 'Model',
+        'protocol': 'Protocol',
+        'endpoint': 'Endpoint',
+        'capabilities': 'Capabilities',
+        'shared_device': 'Shared Device',
+        'automation_name': 'Automation Name',
+        'trigger_type': 'Trigger Type',
+        'device_actions': 'Device Actions',
+        'notifications': 'Notifications',
+        'schedule': 'Schedule',
+        'no_devices': 'No devices found',
+        'no_devices_desc': 'Add your first smart device to get started.',
+        'no_automations': 'No automations found',
+        'no_automations_desc': 'Create your first automation.',
+        'online': 'Online',
+        'offline': 'Offline',
+        'error': 'Error',
+        'send_command': 'Send Command',
+        'view_logs': 'View Logs',
+        'device_logs': 'Device Logs',
+        types: {
+          'light': 'Light',
+          'lock': 'Lock',
+          'thermostat': 'Thermostat',
+          'camera': 'Camera',
+          'sensor': 'Sensor',
+          'appliance': 'Appliance',
+          'switch': 'Switch',
+          'dimmer': 'Dimmer'
+        }
+      },
+      
+      // Common navigation
+      'document_management': 'Document Management',
+      'voting_system': 'Voting & Polls',
+      'smart_home': 'Smart Home'
     }
   },
   ar: {

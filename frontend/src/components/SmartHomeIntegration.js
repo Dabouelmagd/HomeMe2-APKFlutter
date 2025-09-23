@@ -185,21 +185,96 @@ const SmartHomeIntegration = () => {
       
       toast.success('Automation created successfully!');
       setShowAddAutomationModal(false);
-      setAutomationForm({
-        name: '',
-        trigger_type: 'time',
-        trigger_value: '',
-        action_type: 'device_control',
-        target_devices: [],
-        action_value: '',
-        conditions: [],
-        is_active: true
-      });
+      resetAutomationForm();
       fetchSmartHomeData();
     } catch (error) {
       toast.error('Failed to create automation');
       console.error('Create automation error:', error);
     }
+  };
+
+  const resetAutomationForm = () => {
+    setAutomationForm({
+      name: '',
+      trigger_type: 'time',
+      trigger_value: '',
+      action_type: 'device_control',
+      target_devices: [],
+      action_value: '',
+      conditions: [],
+      is_active: true
+    });
+  };
+
+  const handleNaturalLanguageCommand = async (e) => {
+    e.preventDefault();
+    if (!naturalCommand.trim()) return;
+
+    const commandEntry = {
+      id: Date.now(),
+      command: naturalCommand,
+      timestamp: new Date(),
+      status: 'processing',
+      response: null,
+      error: null
+    };
+
+    setNaturalCommandHistory(prev => [commandEntry, ...prev]);
+    setIsProcessingCommand(true);
+
+    try {
+      const response = await axios.post(`${API}/smart-devices/natural-command`, {
+        command: naturalCommand
+      });
+
+      // Update history with success response
+      setNaturalCommandHistory(prev => 
+        prev.map(entry => 
+          entry.id === commandEntry.id 
+            ? { 
+                ...entry, 
+                status: 'success', 
+                response: response.data,
+                devices_affected: response.data.devices_affected || 0,
+                commands_executed: response.data.commands_executed || 0
+              }
+            : entry
+        )
+      );
+
+      toast.success(
+        `Command executed successfully! ${response.data.commands_executed || 0} device(s) controlled.`
+      );
+      
+      // Refresh devices to show updated state
+      fetchSmartHomeData();
+
+    } catch (error) {
+      console.error('Natural language command error:', error);
+      
+      // Update history with error
+      setNaturalCommandHistory(prev => 
+        prev.map(entry => 
+          entry.id === commandEntry.id 
+            ? { 
+                ...entry, 
+                status: 'error', 
+                error: error.response?.data?.detail || 'Command failed to execute'
+              }
+            : entry
+        )
+      );
+
+      toast.error(error.response?.data?.detail || 'Failed to process command');
+    } finally {
+      setIsProcessingCommand(false);
+      setNaturalCommand('');
+    }
+  };
+
+  const clearCommandHistory = () => {
+    setNaturalCommandHistory([]);
+    toast.success('Command history cleared');
   };
 
   const toggleAutomation = async (automationId, isActive) => {

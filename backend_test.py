@@ -892,14 +892,15 @@ class SmartHomeTestSuite:
             
             if response.status_code == 200:
                 result = response.json()
-                if result.get("success") == True:
-                    intent = result.get("intent")
-                    devices_targeted = result.get("devices_targeted", 0)
-                    commands_executed = result.get("commands_executed", 0)
-                    
+                ai_response = result.get("ai_response", {})
+                intent = ai_response.get("intent")
+                devices = ai_response.get("devices", [])
+                executed_commands = ai_response.get("executed_commands", [])
+                
+                if intent == "device_control" and len(executed_commands) > 0:
                     self.log_result("Natural Language - Lights On", True, 
                                   f"Command processed successfully - Intent: {intent}, "
-                                  f"Devices targeted: {devices_targeted}, Commands executed: {commands_executed}")
+                                  f"Devices targeted: {len(devices)}, Commands executed: {len(executed_commands)}")
                     return True
                 else:
                     self.log_result("Natural Language - Lights On", False, f"Command failed: {result}")

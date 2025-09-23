@@ -158,7 +158,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
                 : 'px-3 py-1 rounded text-xs'
             }`}
           >
-            Upgrade Now
+            {t('upgrade_now')}
           </button>
         </div>
       </div>

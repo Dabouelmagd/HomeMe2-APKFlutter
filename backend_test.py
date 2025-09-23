@@ -5364,19 +5364,6 @@ class SmartHomeTestSuite:
         return self.print_summary()
 
 if __name__ == "__main__":
-    test_suite = AuthenticationInvestigationSuite()
-    
-    # Run Authentication Investigation as requested
-    print("🔍 RUNNING AUTHENTICATION SYSTEM INVESTIGATION")
-    print("Investigating the user authentication system and differences between admin and resident users")
-    success = test_suite.run_authentication_investigation()
-    
-    if success:
-        print("\n🎉 AUTHENTICATION INVESTIGATION COMPLETED SUCCESSFULLY!")
-    else:
-        print("\n⚠️ AUTHENTICATION INVESTIGATION COMPLETED WITH ISSUES")
-    
-if __name__ == "__main__":
     # Run the voting system and smart home control tests
     test_suite = SmartHomeTestSuite()
     success_rate = test_suite.run_voting_and_smart_home_tests()
@@ -5395,4 +5382,3 @@ if __name__ == "__main__":
     else:
         print("❌ CRITICAL! Systems have major failures and are not ready for production.")
         exit(1)
-    exit(0 if success else 1)

@@ -105,14 +105,27 @@ const ContactUs = () => {
               <h3 className="text-lg font-medium text-blue-900 mb-2">
                 Primary Contact
               </h3>
-              <div className="flex items-center">
-                <EnvelopeIcon className="h-5 w-5 text-blue-600 mr-2" />
-                <a 
-                  href="mailto:info@datalifeai.com"
-                  className="text-blue-700 hover:text-blue-800 font-medium"
-                >
-                  info@datalifeai.com
-                </a>
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <EnvelopeIcon className="h-5 w-5 text-blue-600 mr-2" />
+                  <a 
+                    href="mailto:info@datalifeai.com"
+                    className="text-blue-700 hover:text-blue-800 font-medium"
+                  >
+                    info@datalifeai.com
+                  </a>
+                </div>
+                <div className="flex items-center">
+                  <GlobeAltIcon className="h-5 w-5 text-blue-600 mr-2" />
+                  <a 
+                    href="https://www.homemeapp.net"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-700 hover:text-blue-800 font-medium"
+                  >
+                    www.homemeapp.net
+                  </a>
+                </div>
               </div>
               <p className="text-blue-800 text-sm mt-2">
                 We typically respond to emails within 24 hours during business days.

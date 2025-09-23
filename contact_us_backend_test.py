@@ -399,7 +399,7 @@ class ContactUsBackendTestSuite:
             # Test database read operations
             endpoints_requiring_db = [
                 ("/compounds", "compounds"),
-                (f"/compounds/{self.compound_id}/users", "users"),
+                (f"/compounds/{self.compound_id}/residents", "residents"),
             ]
             
             db_connectivity_passed = True

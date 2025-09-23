@@ -21,6 +21,7 @@ const API = `${BACKEND_URL}/api`;
 const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [trialData, setTrialData] = useState(null);
   const [loading, setLoading] = useState(true);
 

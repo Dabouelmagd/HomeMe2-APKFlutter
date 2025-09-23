@@ -165,7 +165,7 @@ const SmartHomeIntegration = () => {
 
   const handleDeviceControl = async (deviceId, action, value = null) => {
     try {
-      await axios.post(`${API}/smart-home/devices/${deviceId}/control`, {
+      await axios.post(`${API}/smart-devices/${deviceId}/command`, {
         action: action,
         value: value
       });

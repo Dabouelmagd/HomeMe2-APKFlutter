@@ -35,6 +35,7 @@ import AdvancedAnalytics from './components/AdvancedAnalytics';
 import DocumentManagement from './components/DocumentManagement';
 import VotingSystem from './components/VotingSystem';
 import SmartHomeIntegration from './components/SmartHomeIntegration';
+import TermsPrivacy from './components/TermsPrivacy';
 import ContactUs from './components/ContactUs';
 import MobileOptimized from './components/MobileOptimized';
 import { Toaster } from './components/ui/sonner';

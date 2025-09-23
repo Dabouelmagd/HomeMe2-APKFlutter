@@ -181,7 +181,7 @@ const SmartHomeIntegration = () => {
   const handleCreateAutomation = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${API}/smart-home/automations`, automationForm);
+      const response = await axios.post(`${API}/automations`, automationForm);
       
       toast.success('Automation created successfully!');
       setShowAddAutomationModal(false);

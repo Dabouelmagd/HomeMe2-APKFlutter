@@ -407,7 +407,7 @@ const AdvancedAnalytics = () => {
               <MetricCard
                 title={t('avg_satisfaction')}
                 value={analytics.maintenance?.avg_satisfaction || 0}
-                icon={TrendingUpIcon}
+                icon={ArrowTrendingUpIcon}
                 color="text-blue-600"
               />
               <MetricCard

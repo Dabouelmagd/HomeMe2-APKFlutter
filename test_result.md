@@ -141,13 +141,13 @@ backend:
           comment: "GUEST MANAGEMENT SYSTEM TESTING COMPLETED SUCCESSFULLY - 96.6% SUCCESS RATE (28/29 tests passed). All core QR visitor workflow features working perfectly: ✅ AUTHENTICATION: Admin (admin/admin123) and resident authentication working correctly ✅ VISIT REQUEST MANAGEMENT: POST /api/visit-requests creates visit requests successfully, GET /api/visit-requests retrieves requests with proper access control ✅ APPROVAL/REJECTION WORKFLOW: PATCH /api/visit-requests/{id}/approve generates QR data successfully, PATCH /api/visit-requests/{id}/reject works with rejection reasons ✅ GUEST MANAGEMENT: GET /api/guests retrieves approved guests correctly, GET /api/guests/stats provides comprehensive statistics (Total: 11, Pending: 8, Active: 0) ✅ QR CODE FUNCTIONALITY: GET /api/guests/{id}/qr-code generates QR codes successfully ✅ CHECK-IN/CHECK-OUT WORKFLOW: PATCH /api/guests/{id}/checkin and PATCH /api/guests/{id}/checkout work perfectly ✅ QR SCANNING WORKFLOW: POST /api/guests/scan-qr handles both check-in and check-out via QR scanning successfully ✅ SECURITY & AUTHORIZATION: All endpoints properly reject unauthenticated requests (403 status), proper access control implemented ✅ DATA VALIDATION: Missing fields validation working, all valid visit purposes (family_visit, business_meeting, delivery, maintenance, healthcare, social_event, other) accepted. Minor Issue: ❌ Invalid visit purpose validation not working (accepts invalid purposes instead of returning 422). The complete QR visitor workflow is fully functional and production-ready with proper authentication, authorization, QR code generation/scanning, and guest lifecycle management."
 
 frontend:
-  - task: "Guest Management System - Complete QR Visitor Workflow Frontend"
+  - task: "Natural Language UI Enhancement - Smart Home Integration"
     implemented: true
-    working: true
-    file: "GuestManagement.js"
+    working: false
+    file: "SmartHomeIntegration.js, i18n/index.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: true
           agent: "testing"

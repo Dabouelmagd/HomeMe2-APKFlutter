@@ -221,7 +221,10 @@ All plans include:
 - Faster payment collection (average 3x improvement)
 - Improved resident satisfaction scores by 40%
 
-**Typical ROI Timeline:** 3-6 months for Professional tier, 2-4 months for Enterprise tier
+**Typical ROI Timeline:** 
+- **With 75% First Year Discount:** Immediate ROI from Month 1
+- **Standard Pricing:** 3-6 months for Professional tier, 2-4 months for Enterprise tier
+- **Break-even:** Most communities save more in administrative costs than they spend on HomeMe
 
 ---
 

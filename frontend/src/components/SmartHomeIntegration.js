@@ -121,10 +121,10 @@ const SmartHomeIntegration = () => {
     try {
       setLoading(true);
       const [devicesRes, automationsRes, scenesRes, statsRes] = await Promise.all([
-        axios.get(`${API}/smart-home/devices`),
-        axios.get(`${API}/smart-home/automations`),
-        axios.get(`${API}/smart-home/scenes`),
-        axios.get(`${API}/smart-home/stats`)
+        axios.get(`${API}/smart-devices`),
+        axios.get(`${API}/automations`),
+        axios.get(`${API}/scenes`),
+        axios.get(`${API}/smart-devices/stats`)
       ]);
       
       setDevices(devicesRes.data.devices || []);

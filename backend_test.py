@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-HomeMe Smart Home Device Testing Suite
-Tests the newly implemented smart home device initialization and natural language commands:
-1. Smart Home Device Initialization
-2. Natural Language Command Processing
-3. Device Management APIs
+HomeMe Guest Management System Testing Suite
+Tests the complete QR visitor workflow:
+1. Visit Request Management
+2. Guest Approval/Rejection
+3. QR Code Generation and Scanning
+4. Guest Check-in/Check-out
+5. Guest Statistics and Management
 """
 
 import asyncio

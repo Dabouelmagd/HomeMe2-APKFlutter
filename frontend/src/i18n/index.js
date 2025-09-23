@@ -44,6 +44,11 @@ const resources = {
       'welcome_back_name': 'Welcome back, {{name}}',
       'welcome_home_name': 'Welcome home, {{name}}',
       'dashboard_welcome_subtitle': "Here's what's happening in your compound today",
+      'dashboard': {
+        'welcome_home': 'Welcome home',
+        'manage_home_subtitle': 'Everything you need to manage your home',
+        'compound_today_subtitle': "Here's what's happening in your compound today"
+      },
       'happening_today': "Here's what's happening in {{compound}} today.",
       'everything_manage': 'Everything you need to manage your home',
       'total_residents': 'Total Residents',

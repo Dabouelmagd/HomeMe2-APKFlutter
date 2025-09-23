@@ -974,10 +974,14 @@ class SmartHomeTestSuite:
             
             if response.status_code == 200:
                 result = response.json()
+                ai_response = result.get("ai_response", {})
+                intent = ai_response.get("intent")
+                
                 # Should handle gracefully with error intent or appropriate response
-                if result.get("success") == False or result.get("intent") == "error":
+                if intent == "error":
+                    response_message = ai_response.get("response_message", "Command not recognized")
                     self.log_result("Natural Language - Invalid Command", True, 
-                                  f"Invalid command handled correctly: {result.get('message', 'Command not recognized')}")
+                                  f"Invalid command handled correctly: {response_message}")
                     return True
                 else:
                     self.log_result("Natural Language - Invalid Command", False, f"Expected error handling, got: {result}")

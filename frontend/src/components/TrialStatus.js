@@ -143,10 +143,10 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
             <XMarkIcon className={showFull ? "h-6 w-6" : "h-5 w-5"} />
             <div>
               <h3 className={`font-semibold ${showFull ? 'text-lg' : 'text-sm'}`}>
-                Trial Expired
+                {t('trial_expired')}
               </h3>
               <p className={`text-red-100 ${showFull ? 'text-sm' : 'text-xs'}`}>
-                Upgrade now to continue using premium features
+                {t('upgrade_now_trial')}
               </p>
             </div>
           </div>

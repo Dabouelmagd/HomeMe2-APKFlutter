@@ -214,7 +214,7 @@ const PushNotifications = () => {
                 disabled={loading}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
-                {loading ? t('common.loading') : t('notifications.enable')}
+                {loading ? t('common.loading') : t('notificationCenter.enable')}
               </button>
             ) : (
               <>

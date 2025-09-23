@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = "https://homeme-smart.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-communityplus.preview.emergentagent.com/api"
 
 def test_invoice_with_resident():
     """Test invoice system with resident user"""

@@ -9038,6 +9038,159 @@ async def create_automation(
         logging.error(f"Error creating automation: {e}")
         raise HTTPException(status_code=500, detail="Failed to create automation")
 
+@api_router.post("/smart-devices/natural-command")
+async def process_natural_language_command(
+    command: str = Form(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Process natural language commands for smart home devices using AI"""
+    try:
+        # Initialize LLM chat with device context
+        llm_api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not llm_api_key:
+            raise HTTPException(status_code=500, detail="LLM service not configured")
+        
+        # Get user's devices for context
+        query = {"compound_id": current_user.compound_id, "is_active": True}
+        if current_user.role != "admin":
+            query["$or"] = [
+                {"family_id": current_user.family_id},
+                {"is_shared": True},
+                {"family_id": None}
+            ]
+        
+        devices = await db.smart_devices.find(query).to_list(length=None)
+        
+        # Create device context for LLM
+        device_context = []
+        for device in devices:
+            device_context.append({
+                "id": device["id"],
+                "name": device["name"],
+                "type": device["device_type"],
+                "location": device["location"],
+                "capabilities": device.get("capabilities", []),
+                "current_state": device.get("current_state", {})
+            })
+        
+        # Create system message with device context
+        system_message = f"""You are a smart home assistant. The user has the following devices available:
+{json.dumps(device_context, indent=2)}
+
+When the user gives a command, analyze it and return a JSON response with the following structure:
+{{
+    "intent": "device_control|device_query|automation|error",
+    "devices": [
+        {{
+            "device_id": "device_id_here",
+            "action": "command_to_execute",
+            "parameters": {{"key": "value"}}
+        }}
+    ],
+    "response_message": "Human-friendly response to the user",
+    "confidence": 0.95,
+    "errors": []
+}}
+
+Only respond with valid JSON. Match device names and locations as closely as possible.
+Support commands like: "turn on living room lights", "set temperature to 72", "dim bedroom lights to 50%", "show me all lights", etc.
+"""
+
+        # Initialize chat
+        chat = LlmChat(
+            api_key=llm_api_key,
+            session_id=f"smart_home_{current_user.id}",
+            system_message=system_message
+        ).with_model("openai", "gpt-4o-mini")
+        
+        # Send user command
+        user_message = UserMessage(text=command)
+        ai_response = await chat.send_message(user_message)
+        
+        # Parse AI response
+        try:
+            response_data = json.loads(ai_response)
+        except json.JSONDecodeError:
+            response_data = {
+                "intent": "error",
+                "devices": [],
+                "response_message": "I couldn't understand that command. Please try rephrasing it.",
+                "confidence": 0.0,
+                "errors": ["Failed to parse command"]
+            }
+        
+        # Execute device commands if intent is device_control
+        if response_data.get("intent") == "device_control":
+            executed_commands = []
+            for device_cmd in response_data.get("devices", []):
+                device_id = device_cmd.get("device_id")
+                action = device_cmd.get("action")
+                parameters = device_cmd.get("parameters", {})
+                
+                # Find and execute command on device
+                device = await db.smart_devices.find_one({
+                    "id": device_id,
+                    "compound_id": current_user.compound_id,
+                    "is_active": True
+                })
+                
+                if device:
+                    # Check control permissions
+                    if (current_user.role == "admin" or 
+                        current_user.id in device.get("controlled_by", []) or
+                        device.get("family_id") == current_user.family_id):
+                        
+                        # Update device state
+                        new_target_state = device.get("target_state", {}).copy()
+                        new_target_state.update(parameters)
+                        new_current_state = new_target_state.copy()
+                        
+                        await db.smart_devices.update_one(
+                            {"id": device_id},
+                            {
+                                "$set": {
+                                    "target_state": new_target_state,
+                                    "current_state": new_current_state,
+                                    "last_seen": datetime.utcnow(),
+                                    "status": "online",
+                                    "updated_at": datetime.utcnow()
+                                }
+                            }
+                        )
+                        
+                        # Log the command
+                        device_log = DeviceLog(
+                            device_id=device_id,
+                            compound_id=current_user.compound_id,
+                            event_type="command",
+                            old_state=device.get("current_state", {}),
+                            new_state=new_current_state,
+                            command=f"Natural language: {command}",
+                            triggered_by=current_user.id,
+                            success=True
+                        )
+                        
+                        await db.device_logs.insert_one(serialize_datetime(device_log.dict()))
+                        executed_commands.append(device_cmd)
+                    else:
+                        response_data["errors"].append(f"No permission to control {device['name']}")
+                else:
+                    response_data["errors"].append(f"Device not found: {device_id}")
+            
+            response_data["executed_commands"] = executed_commands
+        
+        return {
+            "ai_response": response_data,
+            "original_command": command,
+            "user_devices_count": len(devices)
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error processing natural language command: {e}")
+        raise HTTPException(status_code=500, detail="Failed to process natural language command")
+
 # Include router after all endpoints are defined
 app.include_router(api_router)
 

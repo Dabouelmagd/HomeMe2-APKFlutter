@@ -1374,6 +1374,22 @@ const resources = {
       'loading': 'جاري التحميل...',
       'language': 'اللغة',
       
+      // Newsletter
+      'newsletter': 'النشرة الإخبارية',
+      'community_newsletter': 'النشرة الإخبارية للمجتمع',
+      'create_newsletter': 'إنشاء نشرة إخبارية',
+      'edit_newsletter': 'تعديل النشرة الإخبارية',
+      'newsletter_title': 'العنوان',
+      'newsletter_content': 'المحتوى',
+      'newsletter_summary': 'الملخص',
+      'newsletter_category': 'الفئة',
+      'newsletter_status': 'الحالة',
+      'featured_image': 'الصورة المميزة',
+      'publish_newsletter': 'نشر النشرة الإخبارية',
+      'draft': 'مسودة',
+      'published': 'منشورة',
+      'archived': 'مؤرشفة',
+      
       // Services
       'services_management': 'إدارة الخدمات',
       'maintenance_system': 'نظام الصيانة',

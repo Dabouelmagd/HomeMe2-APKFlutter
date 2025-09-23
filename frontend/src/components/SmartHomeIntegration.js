@@ -52,6 +52,11 @@ const SmartHomeIntegration = () => {
   const [showAddAutomationModal, setShowAddAutomationModal] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [stats, setStats] = useState({});
+  
+  // Natural Language Control State
+  const [naturalCommand, setNaturalCommand] = useState('');
+  const [naturalCommandHistory, setNaturalCommandHistory] = useState([]);
+  const [isProcessingCommand, setIsProcessingCommand] = useState(false);
 
   // Form states
   const [deviceForm, setDeviceForm] = useState({

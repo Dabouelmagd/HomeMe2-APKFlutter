@@ -270,7 +270,12 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
                 <div key={key} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-gray-600 capitalize">
-                      {key.replace('_', ' ')}
+                      {key === 'users' ? t('users') : 
+                       key === 'families' ? t('families') : 
+                       key === 'services' ? t('services') : 
+                       key === 'messages' ? t('messages') : 
+                       key === 'storage' ? t('storage_mb') : 
+                       key.replace('_', ' ')}
                     </span>
                     <span className={`text-sm font-medium ${
                       isAtLimit ? 'text-red-600' : isNearLimit ? 'text-yellow-600' : 'text-gray-900'

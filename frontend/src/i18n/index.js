@@ -2661,6 +2661,23 @@ const resources = {
       'privacy': 'Confidentialité',
       'terms': 'Conditions',
       'language': 'Langue',
+      
+      // Newsletter
+      'newsletter': 'Newsletter',
+      'community_newsletter': 'Newsletter de la Communauté',
+      'create_newsletter': 'Créer Newsletter',
+      'edit_newsletter': 'Modifier Newsletter',
+      'newsletter_title': 'Titre',
+      'newsletter_content': 'Contenu',
+      'newsletter_summary': 'Résumé',
+      'newsletter_category': 'Catégorie',
+      'newsletter_status': 'Statut',
+      'featured_image': 'Image à la Une',
+      'publish_newsletter': 'Publier Newsletter',
+      'draft': 'Brouillon',
+      'published': 'Publié',
+      'archived': 'Archivé',
+      
       'theme': 'Thème',
       'search_placeholder': 'Rechercher utilisateurs, résidences, services...',
       

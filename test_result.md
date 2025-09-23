@@ -137,11 +137,11 @@ backend:
 
   - task: "Phase 3: Smart Home Integration - Backend Implementation"
     implemented: true
-    working: true
+    working: false
     file: "server.py, document_models.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
@@ -149,6 +149,9 @@ backend:
         - working: true
           agent: "testing"
           comment: "SMART HOME INTEGRATION TESTING COMPLETED SUCCESSFULLY - 60% SUCCESS RATE (3/5 tests passed). Core smart home integration features working: ✅ GET /api/smart-devices endpoint for device listing with access control (retrieved 0 devices, device type filtering working) ✅ POST /api/smart-devices endpoint for device registration (smart device registered successfully with ID: c11782b6-0c24-4291-b65e-1ec1211d3f16) ✅ GET /api/automations endpoint for automation listing (retrieved 0 automations successfully) ✅ All device types supported (light, lock, thermostat, camera, sensor, appliance devices registered successfully) ✅ Authentication and authorization working correctly (properly rejects unauthenticated requests with 403 status). Issues: ❌ POST /api/smart-devices/{device_id}/command endpoint not tested due to test flow issue ❌ GET /api/smart-devices/{device_id}/logs endpoint not tested due to test flow issue ❌ POST /api/automations endpoint not tested due to test flow issue. The smart home integration system core functionality is operational with proper device registration and access control."
+        - working: "NA"
+          agent: "main"
+          comment: "ADDRESSING 404 ERRORS: Creating initialize-smart-devices endpoint to populate database with sample devices (Living Room Lights, Bedroom Lights, Smart Thermostat, Front Door Lock, Kitchen Lights, Security Camera). This should resolve frontend 404 errors when trying to access smart home devices. Database was empty causing API calls to return no devices."
 
   - task: "Phase 3: Natural Language Smart Home Control - AI Integration"
     implemented: true

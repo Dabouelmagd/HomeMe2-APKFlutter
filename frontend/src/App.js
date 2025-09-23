@@ -348,6 +348,10 @@ function App() {
                 <Route path="smart-home" element={
                   <SmartHomeIntegration />
                 } />
+                
+                <Route path="terms-privacy" element={
+                  <TermsPrivacy />
+                } />
               </Route>
             </Routes>
             <Toaster />

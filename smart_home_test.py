@@ -113,9 +113,8 @@ class SmartHomeTestSuite:
         try:
             headers = self.setup_auth_headers(self.admin_token)
             
-            # Call the initialize endpoint with compound_id
-            response = self.session.post(f"{BASE_URL}/admin/initialize-smart-devices", 
-                                       json={"compound_id": self.compound_id}, 
+            # Call the initialize endpoint with compound_id as query parameter
+            response = self.session.post(f"{BASE_URL}/admin/initialize-smart-devices?compound_id={self.compound_id}", 
                                        headers=headers)
             
             if response.status_code == 200:

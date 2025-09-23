@@ -31,12 +31,16 @@ from datetime import timezone
 import httpx
 import shutil
 from passlib.context import CryptContext
+from dotenv import load_dotenv
 
 # Import our new models and utilities
 from maintenance_models import *
 from notification_models import *
 from document_models import *
 from websocket_manager import manager
+
+# Import emergent integrations for LLM
+from emergentintegrations.llm.chat import LlmChat, UserMessage
 
 # Load environment variables
 ROOT_DIR = Path(__file__).parent

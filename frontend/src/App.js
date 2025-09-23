@@ -354,6 +354,10 @@ function App() {
                 <Route path="terms-privacy" element={
                   <TermsPrivacy />
                 } />
+                
+                <Route path="contact" element={
+                  <ContactUs />
+                } />
               </Route>
             </Routes>
             <Toaster />

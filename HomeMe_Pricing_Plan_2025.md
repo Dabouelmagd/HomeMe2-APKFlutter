@@ -57,10 +57,10 @@
 - ✅ **Priority Support** - Phone and email support
 
 ### **Monthly Pricing:**
-- **1-50 units**: $99/month
-- **51-100 units**: $179/month  
-- **101-200 units**: $299/month
-- **200+ units**: Custom pricing
+- **1-50 units**: $99/month **(First year: $25/month - 75% OFF)**
+- **51-100 units**: $179/month **(First year: $45/month - 75% OFF)**
+- **101-200 units**: $299/month **(First year: $75/month - 75% OFF)**
+- **200+ units**: Custom pricing **(First year: 75% OFF applicable)**
 
 ---
 

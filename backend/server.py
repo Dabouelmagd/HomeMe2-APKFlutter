@@ -7967,6 +7967,11 @@ async def create_visit_request(
 ):
     """Create a new visit request"""
     try:
+        # Validate visit purpose
+        valid_purposes = ["family_visit", "business_meeting", "delivery", "maintenance", "healthcare", "social_event", "other"]
+        if visit_purpose not in valid_purposes:
+            raise HTTPException(status_code=422, detail=f"Invalid visit purpose. Must be one of: {', '.join(valid_purposes)}")
+        
         visit_request = {
             "id": str(uuid.uuid4()),
             "visitor_name": visitor_name,
@@ -7993,6 +7998,8 @@ async def create_visit_request(
         
         return {"message": "Visit request created successfully", "request_id": visit_request["id"]}
         
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Error creating visit request: {e}")
         raise HTTPException(status_code=500, detail="Failed to create visit request")

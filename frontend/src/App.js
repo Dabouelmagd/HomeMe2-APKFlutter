@@ -249,6 +249,7 @@ function App() {
           <NotificationProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
+        <Route path="/terms-privacy" element={<TermsPrivacy />} />
               <Route path="/register" element={<Register />} />
               <Route path="/debug-login" element={<DebugLogin />} />
               

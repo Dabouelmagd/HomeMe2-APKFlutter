@@ -18,6 +18,7 @@ const API = `${BACKEND_URL}/api`;
 
 const ResidentDashboard = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
 

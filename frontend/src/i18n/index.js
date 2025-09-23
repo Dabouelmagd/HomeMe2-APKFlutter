@@ -893,7 +893,7 @@ const resources = {
           'description': 'If you have any questions about these terms or privacy policy, please contact us:',
           'email': 'Email',
           'address': 'Address',
-          'addressValue': 'Cairo, Arab Republic of Egypt'
+          'addressValue': 'Cairo, Egypt'
         },
         'terms': {
           'title': 'Terms of Use',

@@ -1094,37 +1094,37 @@ class SmartHomeTestSuite:
         return self.print_summary()
     
     def print_summary(self):
-        """Test POST /api/trial/activate - Trial activation for new user"""
-        print("\n=== Testing Trial Activation for New User ===")
+        """Print comprehensive test results summary"""
+        print("\n" + "=" * 70)
+        print("🏁 TEST RESULTS SUMMARY")
+        print("=" * 70)
         
-        if not self.trial_user_token:
-            self.log_result("Trial Activation - New User", False, "No trial user token available")
-            return False
+        passed_tests = [r for r in self.results if "✅ PASS" in r["status"]]
+        failed_tests = [r for r in self.results if "❌ FAIL" in r["status"]]
         
-        try:
-            headers = self.setup_auth_headers(self.trial_user_token)
-            response = self.session.post(f"{BASE_URL}/trial/activate", headers=headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("message") == "Free trial activated successfully":
-                    trial_info = data.get("trial", {})
-                    if trial_info.get("duration_days") == 14:
-                        self.log_result("Trial Activation - New User", True, f"Trial activated successfully for 14 days")
-                        return True
-                    else:
-                        self.log_result("Trial Activation - New User", False, f"Incorrect trial duration: {trial_info.get('duration_days')}")
-                        return False
-                else:
-                    self.log_result("Trial Activation - New User", False, f"Unexpected response: {data}")
-                    return False
-            else:
-                self.log_result("Trial Activation - New User", False, f"Failed with status {response.status_code}", response.text)
-                return False
-                
-        except Exception as e:
-            self.log_result("Trial Activation - New User", False, f"Exception occurred: {str(e)}")
-            return False
+        total_tests = len(self.results)
+        success_rate = (len(passed_tests) / total_tests * 100) if total_tests > 0 else 0
+        
+        print(f"\n📊 OVERALL RESULTS:")
+        print(f"   Total Tests: {total_tests}")
+        print(f"   Passed: {len(passed_tests)} ✅")
+        print(f"   Failed: {len(failed_tests)} ❌")
+        print(f"   Success Rate: {success_rate:.1f}%")
+        
+        if failed_tests:
+            print(f"\n❌ FAILED TESTS ({len(failed_tests)}):")
+            for test in failed_tests:
+                print(f"   • {test['test']}: {test['message']}")
+                if test.get('details'):
+                    print(f"     Details: {test['details']}")
+        
+        if passed_tests:
+            print(f"\n✅ PASSED TESTS ({len(passed_tests)}):")
+            for test in passed_tests:
+                print(f"   • {test['test']}: {test['message']}")
+        
+        print("\n" + "=" * 70)
+        return success_rate
     
     def test_trial_activation_duplicate_prevention(self):
         """Test POST /api/trial/activate - Prevent multiple trial activation"""

@@ -404,7 +404,7 @@ const SmartHomeIntegration = () => {
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">{t('battery')}:</span>
                               <span className="text-gray-900 flex items-center">
-                                <BatteryIcon className="w-4 h-4 mr-1" />
+                                <Battery100Icon className="w-4 h-4 mr-1" />
                                 {device.battery_level}%
                               </span>
                             </div>

@@ -1083,7 +1083,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Guest Management System - Complete QR Visitor Workflow"
+    - "Newsletter Functionality Implementation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

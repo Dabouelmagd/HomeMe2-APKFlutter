@@ -256,7 +256,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
         <div className="bg-white border border-gray-200 rounded-xl p-6">
           <div className="flex items-center space-x-3 mb-6">
             <ChartBarIcon className="h-5 w-5 text-gray-600" />
-            <h4 className="text-lg font-medium text-gray-900">Usage & Limits</h4>
+            <h4 className="text-lg font-medium text-gray-900">{t('usage_limits')}</h4>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

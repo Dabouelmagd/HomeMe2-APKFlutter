@@ -99,7 +99,7 @@ class DocumentComment(BaseModel):
     is_edited: bool = False
     is_deleted: bool = False
 
-class DocumentAccess(BaseModel):
+class DocumentAccessLog(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     document_id: str
     user_id: str

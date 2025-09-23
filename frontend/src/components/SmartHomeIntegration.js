@@ -279,7 +279,7 @@ const SmartHomeIntegration = () => {
 
   const toggleAutomation = async (automationId, isActive) => {
     try {
-      await axios.patch(`${API}/smart-home/automations/${automationId}`, {
+      await axios.patch(`${API}/automations/${automationId}`, {
         is_active: !isActive
       });
       

@@ -542,7 +542,7 @@ const AdvancedAnalytics = () => {
             <ul className="space-y-1 text-sm text-gray-600">
               {(analytics.summary?.achievements || []).map((achievement, index) => (
                 <li key={index} className="flex items-center">
-                  <TrendingUpIcon className="w-4 h-4 text-green-500 mr-2" />
+                  <ArrowTrendingUpIcon className="w-4 h-4 text-green-500 mr-2" />
                   {achievement}
                 </li>
               ))}

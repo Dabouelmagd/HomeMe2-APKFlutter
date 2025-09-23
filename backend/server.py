@@ -37,6 +37,7 @@ from dotenv import load_dotenv
 from maintenance_models import *
 from notification_models import *
 from document_models import *
+from newsletter_models import *
 from websocket_manager import manager
 
 # Import emergent integrations for LLM

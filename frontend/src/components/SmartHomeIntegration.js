@@ -611,6 +611,162 @@ const SmartHomeIntegration = () => {
           </>
         )}
 
+        {activeTab === 'natural-control' && (
+          <div className="space-y-6">
+            {/* Natural Language Command Interface */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="p-2 rounded-lg bg-blue-100">
+                  <ChatBubbleLeftRightIcon className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{t('natural_language_control')}</h3>
+                  <p className="text-sm text-gray-500">{t('natural_control_description')}</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleNaturalLanguageCommand} className="mb-6">
+                <div className="flex space-x-3">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      value={naturalCommand}
+                      onChange={(e) => setNaturalCommand(e.target.value)}
+                      placeholder={t('natural_command_placeholder')}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-blue-500 focus:border-blue-500"
+                      disabled={isProcessingCommand}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isProcessingCommand || !naturalCommand.trim()}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                  >
+                    {isProcessingCommand ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        {t('processing')}
+                      </>
+                    ) : (
+                      <>
+                        <CommandLineIcon className="w-4 h-4 mr-2" />
+                        {t('execute')}
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+
+              {/* Command Examples */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">{t('example_commands')}</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {[
+                    t('example_turn_on_lights'),
+                    t('example_set_temperature'),
+                    t('example_lock_doors'),
+                    t('example_dim_bedroom_lights')
+                  ].map((example, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setNaturalCommand(example)}
+                      className="text-left p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-700"
+                      disabled={isProcessingCommand}
+                    >
+                      "{example}"
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Command History */}
+            {naturalCommandHistory.length > 0 && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">{t('command_history')}</h3>
+                  <button
+                    onClick={clearCommandHistory}
+                    className="text-sm text-gray-500 hover:text-red-600 transition-colors"
+                  >
+                    {t('clear_history')}
+                  </button>
+                </div>
+
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {naturalCommandHistory.map((entry) => (
+                    <div key={entry.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">"{entry.command}"</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {entry.timestamp.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="ml-4">
+                          {entry.status === 'processing' && (
+                            <div className="flex items-center text-blue-600">
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600 mr-1"></div>
+                              <span className="text-xs">{t('processing')}</span>
+                            </div>
+                          )}
+                          {entry.status === 'success' && (
+                            <div className="flex items-center text-green-600">
+                              <CheckCircleIcon className="w-4 h-4 mr-1" />
+                              <span className="text-xs">{t('success')}</span>
+                            </div>
+                          )}
+                          {entry.status === 'error' && (
+                            <div className="flex items-center text-red-600">
+                              <XCircleIcon className="w-4 h-4 mr-1" />
+                              <span className="text-xs">{t('error')}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {entry.status === 'success' && entry.response && (
+                        <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                          <p className="text-sm text-green-800">{entry.response.message}</p>
+                          {entry.devices_affected > 0 && (
+                            <p className="text-xs text-green-600 mt-1">
+                              {t('devices_affected')}: {entry.devices_affected} | {t('commands_executed')}: {entry.commands_executed}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {entry.status === 'error' && entry.error && (
+                        <div className="mt-3 p-3 bg-red-50 rounded-lg">
+                          <p className="text-sm text-red-800">{entry.error}</p>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* AI Assistant Tips */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6">
+              <div className="flex items-start space-x-3">
+                <div className="p-2 rounded-lg bg-blue-100">
+                  <SparklesIcon className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-2">{t('ai_tips_title')}</h4>
+                  <ul className="text-sm text-gray-700 space-y-1">
+                    <li>• {t('tip_be_specific')}</li>
+                    <li>• {t('tip_use_device_names')}</li>
+                    <li>• {t('tip_include_locations')}</li>
+                    <li>• {t('tip_try_natural_language')}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'scenes' && (
           <>
             {scenes.length === 0 ? (

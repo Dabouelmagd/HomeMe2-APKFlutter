@@ -849,7 +849,7 @@ class SmartHomeTestSuite:
             
             # Create vote data
             vote_data = {
-                "selected_options": ["Option A - Improve Security"]
+                "selected_options": ["security"]
             }
             
             response = self.session.post(f"{BASE_URL}/polls/{self.test_poll_id}/vote", json=vote_data, headers=headers)

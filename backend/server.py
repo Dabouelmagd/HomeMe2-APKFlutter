@@ -9048,7 +9048,7 @@ async def process_natural_language_command(
 ):
     """Process natural language commands for smart home devices using AI"""
     try:
-        command = command_data.get("command", "").strip()
+        command = command_data.command.strip()
         if not command:
             raise HTTPException(status_code=400, detail="Command is required")
             

@@ -222,13 +222,13 @@ class ContactUsBackendTestSuite:
         try:
             headers = self.setup_auth_headers(self.admin_token)
             
-            # Test getting compound users
-            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/users", headers=headers)
+            # Test getting compound residents (correct endpoint)
+            response = self.session.get(f"{BASE_URL}/compounds/{self.compound_id}/residents", headers=headers)
             
             if response.status_code == 200:
                 data = response.json()
-                users = data.get("users", [])
-                self.log_result("Users Endpoint", True, f"Retrieved {len(users)} users successfully")
+                residents = data.get("residents", [])
+                self.log_result("Users Endpoint", True, f"Retrieved {len(residents)} residents successfully")
                 return True
             else:
                 self.log_result("Users Endpoint", False, f"Failed with status {response.status_code}", response.text)

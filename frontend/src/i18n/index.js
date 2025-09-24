@@ -1440,6 +1440,22 @@ const resources = {
       'voting_system': 'التصويت والاستطلاعات',
       'smart_home': 'المنزل الذكي',
       
+      // Transliteration (Arabic)
+      transliteration: {
+        'toggle_label': 'نقحرة',
+        'toggle_tooltip': 'تبديل النقحرة العربية-الإنجليزية',
+        'mode_tooltip': 'اختر اتجاه النقحرة',
+        'arabic_to_latin': 'عربي ← إنجليزي',
+        'latin_to_arabic': 'إنجليزي ← عربي',
+        'status_ar_to_en': 'تحويل النص العربي إلى الإنجليزية',
+        'status_en_to_ar': 'تحويل النص الإنجليزي إلى العربية',
+        'status_inactive': 'غير نشط للغة الحالية',
+        'example_text': 'مرحباً بكم في HomeMe',
+        'example_transliterated': 'marḥaban bikum fī HomeMe',
+        'instructions': 'استخدم النقحرة للتحويل بين الأحرف العربية والإنجليزية',
+        'enable_description': 'فعل النقحرة لرؤية النص العربي بالأحرف اللاتينية أو العكس'
+      },
+      
       // Legal Documents (Arabic)
       legal: {
         'title': 'المعلومات القانونية',

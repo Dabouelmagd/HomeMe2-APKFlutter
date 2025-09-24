@@ -3155,6 +3155,22 @@ const resources = {
           }
         }
       },
+      
+      // Transliteration (French)
+      transliteration: {
+        'toggle_label': 'Translittération',
+        'toggle_tooltip': 'Basculer la translittération arabe-anglais',
+        'mode_tooltip': 'Sélectionner la direction de translittération',
+        'arabic_to_latin': 'Arabe → Anglais',
+        'latin_to_arabic': 'Anglais → Arabe',
+        'status_ar_to_en': 'Conversion du texte arabe en anglais',
+        'status_en_to_ar': 'Conversion du texte anglais en arabe',
+        'status_inactive': 'Non actif pour la langue actuelle',
+        'example_text': 'مرحباً بكم في HomeMe',
+        'example_transliterated': 'marḥaban bikum fī HomeMe',
+        'instructions': 'Utilisez la translittération pour convertir entre les scripts arabes et anglais',
+        'enable_description': 'Activez la translittération pour voir le texte arabe en caractères latins ou vice versa'
+      },
     }
   }
 };

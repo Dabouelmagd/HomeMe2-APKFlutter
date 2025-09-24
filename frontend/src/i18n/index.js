@@ -2488,6 +2488,29 @@ const resources = {
       'week_ago': 'il y a 1 semaine',
       'weeks_ago_count': 'il y a {{count}} semaines',
       
+      // Activity messages (French)
+      activity: {
+        'new_resident_joined': '{{name}} a rejoint l\'unité {{unit}}',
+        'service_booked': 'Service {{service}} réservé par {{name}}',
+        'monthly_fee_paid': 'Frais mensuels payés par l\'unité {{unit}}',
+      },
+      
+      // Time namespace (French)
+      time: {
+        'minutes_ago': 'il y a {{count}} minutes',
+        'hour_ago': 'il y a 1 heure',
+        'hours_ago': 'il y a {{count}} heures',
+        'days_ago': 'il y a {{count}} jours',
+      },
+      
+      // Services (French)
+      services: {
+        'plumbing': 'Plomberie',
+        'electrical': 'Électricité',
+        'cleaning': 'Nettoyage',
+        'maintenance': 'Maintenance',
+      },
+      
       // Date Formats
       'date_format_short': 'jj/mm/aaaa',
       'date_format_long': 'd MMMM yyyy',

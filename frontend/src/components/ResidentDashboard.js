@@ -90,7 +90,7 @@ const ResidentDashboard = () => {
           {t('welcome_home_name', { name: user?.full_name })}
         </h1>
         <p className="text-gray-600 mt-2">
-          Unit {dashboardData?.family?.unit_number || user?.unit_number || 'N/A'} • 
+          {t('unit')} {dashboardData?.family?.unit_number || user?.unit_number || 'N/A'} • 
           {t('everything_manage')}
         </p>
       </div>

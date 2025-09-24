@@ -1235,6 +1235,8 @@ const resources = {
       'management': 'الإدارة',
       'start_conversation': 'بدء محادثة مع {{role}}',
       'total_amount_due': 'إجمالي المبلغ المستحق: ${{amount}}',
+      'pending_payments_alert': 'لديك {{count}} دفعة معلقة',
+      'pending_payments_alert_plural': 'لديك {{count}} دفعة معلقة',
       
       // Date & Time
       'date_of_birth': 'تاريخ الميلاد',

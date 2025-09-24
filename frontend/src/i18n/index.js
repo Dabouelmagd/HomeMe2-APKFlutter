@@ -1363,6 +1363,29 @@ const resources = {
       'week_ago': 'أسبوع واحد مضى',
       'weeks_ago_count': '{{count}} أسابيع مضت',
       
+      // Activity messages (Arabic)
+      activity: {
+        'new_resident_joined': '{{name}} انضم إلى وحدة {{unit}}',
+        'service_booked': 'تم حجز خدمة {{service}} بواسطة {{name}}',
+        'monthly_fee_paid': 'تم دفع الرسوم الشهرية من وحدة {{unit}}',
+      },
+      
+      // Time namespace (Arabic)
+      time: {
+        'minutes_ago': '{{count}} دقيقة مضت',
+        'hour_ago': 'ساعة واحدة مضت',
+        'hours_ago': '{{count}} ساعات مضت',
+        'days_ago': '{{count}} أيام مضت',
+      },
+      
+      // Services (Arabic)
+      services: {
+        'plumbing': 'السباكة',
+        'electrical': 'الكهرباء',
+        'cleaning': 'التنظيف',
+        'maintenance': 'الصيانة',
+      },
+      
       // Date Formats
       'date_format_short': 'يوم/شهر/سنة',
       'date_format_long': 'd MMMM yyyy',

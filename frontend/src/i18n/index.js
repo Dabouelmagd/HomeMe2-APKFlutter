@@ -183,6 +183,8 @@ const resources = {
       'management': 'management',
       'start_conversation': 'Start a conversation with {{role}}',
       'total_amount_due': 'Total amount due: ${{amount}}',
+      'pending_payments_alert': 'You have {{count}} pending payment',
+      'pending_payments_alert_plural': 'You have {{count}} pending payments',
       
       // Date & Time
       'date_of_birth': 'Date of Birth',

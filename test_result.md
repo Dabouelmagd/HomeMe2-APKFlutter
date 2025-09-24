@@ -49,9 +49,9 @@
 ##
 test_plan:
   current_focus:
-    - "Translation System Verification"
     - "Transliteration Feature Implementation"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Transliteration Feature Implementation"
   test_all: false
   test_priority: "high_first"
 ##

@@ -17,6 +17,7 @@ const API = `${BACKEND_URL}/api`;
 
 const FinancialManagement = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(null);

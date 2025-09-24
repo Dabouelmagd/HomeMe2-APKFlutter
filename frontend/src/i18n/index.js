@@ -1780,6 +1780,7 @@ const resources = {
       // Common
       'loading': 'جاري التحميل...',
       'language': 'اللغة',
+      'unit': 'الوحدة',
       
       // Newsletter
       'newsletter': 'النشرة الإخبارية',

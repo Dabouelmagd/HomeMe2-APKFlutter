@@ -3190,6 +3190,7 @@ const resources = {
       'privacy': 'Confidentialité',
       'terms': 'Conditions',
       'language': 'Langue',
+      'unit': 'Unité',
       
       // Newsletter
       'newsletter': 'Newsletter',

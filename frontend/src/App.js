@@ -369,6 +369,7 @@ function App() {
             </Routes>
             <Toaster />
             <PWAInstallPrompt />
+            </TransliterationProvider>
           </NotificationProvider>
         </AuthProvider>
       </BrowserRouter>

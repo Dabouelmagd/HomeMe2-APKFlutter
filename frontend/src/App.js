@@ -367,6 +367,15 @@ function App() {
                 <Route path="newsletter" element={
                   <Newsletter />
                 } />
+                
+                {/* Enterprise Routes */}
+                <Route path="enterprise-register" element={
+                  <EnterpriseRegistration />
+                } />
+                
+                <Route path="enterprise-dashboard" element={
+                  <EnterpriseDashboard />
+                } />
               </Route>
             </Routes>
             <Toaster />

@@ -47,14 +47,13 @@
 ##   test_sequence: 0
 ##   run_ui: false
 ##
-## test_plan:
-##   current_focus:
-##     - "Task name 1"
-##     - "Task name 2"
-##   stuck_tasks:
-##     - "Task name with persistent issues"
-##   test_all: false
-##   test_priority: "high_first"  # or "sequential" or "stuck_first"
+test_plan:
+  current_focus:
+    - "Translation System Verification"
+    - "Transliteration Feature Implementation"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
 ##
 ## agent_communication:
 ##     -agent: "main"

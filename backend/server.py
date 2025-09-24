@@ -9857,8 +9857,6 @@ async def delete_newsletter(
         raise HTTPException(status_code=500, detail="Failed to delete newsletter")
 
 # Include router after all endpoints are defined
-app.include_router(api_router)
-
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,

@@ -159,10 +159,14 @@ const AdminDashboard = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                {t('welcome_back_name', { name: user?.full_name })} 👋
+                <TransliteratedText>
+                  {t('welcome_back_name', { name: user?.full_name })}
+                </TransliteratedText> 👋
               </h1>
               <p className="text-lg text-gray-600">
-                {t('dashboard_welcome_subtitle')}
+                <TransliteratedText>
+                  {t('dashboard_welcome_subtitle')}
+                </TransliteratedText>
               </p>
             </div>
             <div className="mt-4 md:mt-0 flex items-center space-x-4">

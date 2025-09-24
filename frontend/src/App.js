@@ -28,6 +28,7 @@ import ServiceBooking from './components/ServiceBooking';
 import Pricing from './components/Pricing';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
+import { TransliterationProvider } from './components/TransliterationToggle';
 import MaintenanceSystem from './components/MaintenanceSystem';
 import GuestManagement from './components/GuestManagement';
 import EventsAnnouncements from './components/EventsAnnouncements';

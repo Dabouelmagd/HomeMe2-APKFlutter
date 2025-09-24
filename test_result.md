@@ -124,7 +124,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix translation issues across the HomeMe application. The user reported that translations are not working well on all pages, with text still showing in English instead of Arabic/French. Specifically need to: 1. Fix hardcoded English texts in AdminDashboard.js and other components 2. Fix TrialStatus.js component translations 3. Ensure all text uses proper i18n translation keys 4. Verify language switching works correctly 5. Test comprehensive translation coverage across English, Arabic, and French languages."
+user_problem_statement: "Translation system verification and transliteration feature implementation for HomeMe application. Tasks: 1. Verify current translation system functionality across critical pages 2. Implement transliteration feature ('tranclit') for better Arabic-English text handling 3. Focus on priority screens as specified by user 4. Ensure all translation fixes remain stable and working correctly"
 
 backend:
   - task: "Contact Us Backend Integration Testing"

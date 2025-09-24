@@ -250,7 +250,8 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <NotificationProvider>
-            <Routes>
+            <TransliterationProvider>
+              <Routes>
               <Route path="/login" element={<Login />} />
         <Route path="/terms-privacy" element={<TermsPrivacy />} />
               <Route path="/register" element={<Register />} />

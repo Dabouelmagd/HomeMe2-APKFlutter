@@ -1,6 +1,6 @@
 import React, { useState, useContext, createContext, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import arabicTransliterate from 'arabic-transliterate';
+import { transliterate, slugify } from 'transliteration';
 
 // Create Transliteration Context
 const TransliterationContext = createContext();

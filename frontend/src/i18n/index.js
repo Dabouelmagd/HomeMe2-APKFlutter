@@ -206,6 +206,29 @@ const resources = {
       'week_ago': '1 week ago',
       'weeks_ago_count': '{{count}} weeks ago',
       
+      // Activity messages
+      activity: {
+        'new_resident_joined': '{{name}} joined {{unit}}',
+        'service_booked': '{{service}} service booked by {{name}}',
+        'monthly_fee_paid': 'Monthly fee paid by {{unit}}',
+      },
+      
+      // Time namespace
+      time: {
+        'minutes_ago': '{{count}} minutes ago',
+        'hour_ago': '1 hour ago',
+        'hours_ago': '{{count}} hours ago',
+        'days_ago': '{{count}} days ago',
+      },
+      
+      // Services
+      services: {
+        'plumbing': 'Plumbing',
+        'electrical': 'Electrical',
+        'cleaning': 'Cleaning',
+        'maintenance': 'Maintenance',
+      },
+      
       // Date Formats
       'date_format_short': 'MM/dd/yyyy',
       'date_format_long': 'MMMM d, yyyy',

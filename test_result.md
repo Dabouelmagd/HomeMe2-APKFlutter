@@ -49,7 +49,7 @@
 ##
 test_plan:
   current_focus:
-    - "Enterprise Company Management Backend API"
+    - "All high priority enterprise tasks completed and tested"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

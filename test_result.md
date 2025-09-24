@@ -49,7 +49,10 @@
 ##
 test_plan:
   current_focus:
-    - "All high priority enterprise tasks completed and tested"
+    - "Enterprise Registration Page Testing"
+    - "Enterprise Dashboard Access Testing"
+    - "Transliteration Feature Testing"
+    - "Enterprise Translation Keys Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

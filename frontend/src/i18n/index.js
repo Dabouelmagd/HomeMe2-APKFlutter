@@ -975,6 +975,22 @@ const resources = {
       'voting_system': 'Voting & Polls',
       'smart_home': 'Smart Home',
       
+      // Transliteration
+      transliteration: {
+        'toggle_label': 'Transliterate',
+        'toggle_tooltip': 'Toggle Arabic-English transliteration',
+        'mode_tooltip': 'Select transliteration direction',
+        'arabic_to_latin': 'Arabic → English',
+        'latin_to_arabic': 'English → Arabic',
+        'status_ar_to_en': 'Converting Arabic text to English',
+        'status_en_to_ar': 'Converting English text to Arabic',
+        'status_inactive': 'Not active for current language',
+        'example_text': 'مرحباً بكم في HomeMe',
+        'example_transliterated': 'marḥaban bikum fī HomeMe',
+        'instructions': 'Use transliteration to convert between Arabic and English scripts',
+        'enable_description': 'Enable transliteration to see Arabic text in Latin characters or vice versa'
+      },
+      
       // Legal Documents
       legal: {
         'title': 'Legal Information',

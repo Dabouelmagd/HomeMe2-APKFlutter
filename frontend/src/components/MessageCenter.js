@@ -115,7 +115,7 @@ const MessageCenter = () => {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{t('message_center')}</h1>
             <p className="text-gray-600 mt-2">
-              {t('communicate_with')} {user?.role === 'admin' ? t('residents') : t('management')}
+              {t('communicate_with', { role: user?.role === 'admin' ? t('residents') : t('management') })}
             </p>
           </div>
           <button

@@ -37,13 +37,15 @@ export const TransliterationProvider = ({ children }) => {
     
     try {
       // Only transliterate if current language is Arabic and mode is arabic2latin
-      // or if current language is English/French and mode is latin2arabic
       const currentLang = i18n.language;
       
       if (direction === 'arabic2latin' && currentLang === 'ar') {
-        return arabicTransliterate(text, direction);
+        // Use transliteration library to convert Arabic to Latin
+        return transliterate(text);
       } else if (direction === 'latin2arabic' && (currentLang === 'en' || currentLang === 'fr')) {
-        return arabicTransliterate(text, direction);
+        // For Latin to Arabic, we can only provide basic transliteration
+        // This is a simplified approach - a proper Arabic transliteration would need more complex handling
+        return text; // Keep original text for now, as reverse transliteration is complex
       }
       
       return text;

@@ -1227,6 +1227,12 @@ const resources = {
       'general_message': 'رسالة عامة',
       'maintenance_request': 'طلب صيانة',
       'complaint': 'شكوى',
+      'status': 'الحالة',
+      'communicate_with': 'التواصل مع {{role}}',
+      'residents': 'المقيمين',
+      'management': 'الإدارة',
+      'start_conversation': 'بدء محادثة مع {{role}}',
+      'total_amount_due': 'إجمالي المبلغ المستحق: ${{amount}}',
       
       // Date & Time
       'date_of_birth': 'تاريخ الميلاد',

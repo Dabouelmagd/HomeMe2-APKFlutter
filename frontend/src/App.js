@@ -30,6 +30,8 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
 import { TransliterationProvider } from './components/TransliterationToggle';
 import MaintenanceSystem from './components/MaintenanceSystem';
+import EnterpriseRegistration from './components/EnterpriseRegistration';
+import EnterpriseDashboard from './components/EnterpriseDashboard';
 import GuestManagement from './components/GuestManagement';
 import EventsAnnouncements from './components/EventsAnnouncements';
 import AdvancedAnalytics from './components/AdvancedAnalytics';

@@ -5,6 +5,7 @@ import { useAuth, useNotifications } from '../App';
 import {
   HomeIcon,
   BuildingOfficeIcon,
+  BuildingOffice2Icon,
   UsersIcon,
   UserPlusIcon,
   SpeakerWaveIcon,

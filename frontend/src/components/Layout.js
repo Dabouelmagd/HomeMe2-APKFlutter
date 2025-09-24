@@ -292,6 +292,12 @@ const Layout = () => {
       href: '/newsletter',
       icon: NewspaperIcon,
       show: true
+    },
+    {
+      name: t('enterprise.dashboard'),
+      href: '/enterprise-register',
+      icon: BuildingOffice2Icon,
+      show: user?.role === 'admin' // Only show for admins
     }
   ];
 

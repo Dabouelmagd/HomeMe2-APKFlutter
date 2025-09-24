@@ -177,6 +177,12 @@ const resources = {
       'general_message': 'General Message',
       'maintenance_request': 'Maintenance Request',
       'complaint': 'Complaint',
+      'status': 'Status',
+      'communicate_with': 'Communicate with {{role}}',
+      'residents': 'residents',
+      'management': 'management',
+      'start_conversation': 'Start a conversation with {{role}}',
+      'total_amount_due': 'Total amount due: ${{amount}}',
       
       // Date & Time
       'date_of_birth': 'Date of Birth',

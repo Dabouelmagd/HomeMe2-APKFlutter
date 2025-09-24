@@ -30,9 +30,24 @@ const AdminDashboard = () => {
       active_bookings: 8
     },
     recent_activities: [
-      { id: 1, type: 'new_resident', message: 'John Smith joined Unit A-101', time: '2 minutes ago' },
-      { id: 2, type: 'service_booked', message: 'Plumbing service booked by Jane Doe', time: '15 minutes ago' },
-      { id: 3, type: 'payment', message: 'Monthly fee paid by Unit B-205', time: '1 hour ago' }
+      { 
+        id: 1, 
+        type: 'new_resident', 
+        message: t('activity.new_resident_joined', { name: 'أحمد محمد', unit: 'أ-101' }), 
+        time: t('time.minutes_ago', { count: 2 })
+      },
+      { 
+        id: 2, 
+        type: 'service_booked', 
+        message: t('activity.service_booked', { service: t('services.plumbing'), name: 'فاطمة علي' }), 
+        time: t('time.minutes_ago', { count: 15 })
+      },
+      { 
+        id: 3, 
+        type: 'payment', 
+        message: t('activity.monthly_fee_paid', { unit: 'ب-205' }), 
+        time: t('time.hour_ago')
+      }
     ]
   });
   const [loading, setLoading] = useState(false);

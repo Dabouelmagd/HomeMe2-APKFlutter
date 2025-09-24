@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import TrialStatus from './TrialStatus';
+import { TransliteratedText, useTransliteration } from './TransliterationToggle';
 import {
   UsersIcon,
   HomeIcon,

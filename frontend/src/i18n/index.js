@@ -2255,6 +2255,8 @@ const resources = {
       'management': 'gestion',
       'start_conversation': 'Commencer une conversation avec {{role}}',
       'total_amount_due': 'Montant total dû: ${{amount}}',
+      'pending_payments_alert': 'Vous avez {{count}} paiement en attente',
+      'pending_payments_alert_plural': 'Vous avez {{count}} paiements en attente',
       
       // Date & Time
       'date_of_birth': 'Date de naissance',

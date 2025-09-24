@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../App';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
   ChatBubbleLeftEllipsisIcon,
@@ -16,6 +17,7 @@ const API = `${BACKEND_URL}/api`;
 
 const MessageCenter = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showNewMessage, setShowNewMessage] = useState(false);
@@ -111,9 +113,9 @@ const MessageCenter = () => {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Message Center</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t('message_center')}</h1>
             <p className="text-gray-600 mt-2">
-              Communicate with {user?.role === 'admin' ? 'residents' : 'management'}
+              {t('communicate_with')} {user?.role === 'admin' ? t('residents') : t('management')}
             </p>
           </div>
           <button
@@ -121,7 +123,7 @@ const MessageCenter = () => {
             className="btn btn-primary flex items-center space-x-2"
           >
             <PlusIcon className="h-4 w-4" />
-            <span>New Message</span>
+            <span>{t('new_message')}</span>
           </button>
         </div>
       </div>
@@ -142,10 +144,10 @@ const MessageCenter = () => {
                     </h3>
                     <div className="flex items-center space-x-2">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getMessageTypeColor(message.message_type)}`}>
-                        {message.message_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        {t(message.message_type)}
                       </span>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(message.status)}`}>
-                        {message.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        {t(message.status)}
                       </span>
                     </div>
                   </div>
@@ -154,7 +156,7 @@ const MessageCenter = () => {
                   </p>
                   <div className="flex items-center justify-between text-sm text-gray-500">
                     <span>
-                      Sent on {new Date(message.created_at).toLocaleString()}
+                      {t('sent_on')} {new Date(message.created_at).toLocaleString()}
                     </span>
                     <span>
                       ID: {message.id.slice(0, 8)}...
@@ -164,7 +166,7 @@ const MessageCenter = () => {
                   {/* Responses */}
                   {message.responses && message.responses.length > 0 && (
                     <div className="mt-4 pt-4 border-t border-gray-200">
-                      <h4 className="font-medium text-gray-900 mb-2">Responses:</h4>
+                      <h4 className="font-medium text-gray-900 mb-2">{t('responses')}:</h4>
                       <div className="space-y-2">
                         {message.responses.map((response, index) => (
                           <div key={index} className="bg-gray-50 rounded-lg p-3">
@@ -184,15 +186,15 @@ const MessageCenter = () => {
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <ChatBubbleLeftEllipsisIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No messages yet</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_messages_yet')}</h3>
             <p className="text-gray-600 mb-4">
-              Start a conversation with {user?.role === 'admin' ? 'residents' : 'management'}
+              {t('start_conversation')} {user?.role === 'admin' ? t('residents') : t('management')}
             </p>
             <button
               onClick={() => setShowNewMessage(true)}
               className="btn btn-primary"
             >
-              Send Your First Message
+              {t('send_first_message')}
             </button>
           </div>
         )}
@@ -204,7 +206,7 @@ const MessageCenter = () => {
           <div className="bg-white rounded-xl shadow-lg max-w-lg w-full max-h-90vh overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">New Message</h3>
+                <h3 className="text-lg font-semibold text-gray-900">{t('new_message')}</h3>
                 <button
                   onClick={() => setShowNewMessage(false)}
                   className="text-gray-400 hover:text-gray-600"
@@ -216,7 +218,7 @@ const MessageCenter = () => {
               <form onSubmit={handleSendMessage} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Message Type
+                    {t('message_type')}
                   </label>
                   <select
                     name="message_type"
@@ -225,15 +227,15 @@ const MessageCenter = () => {
                     className="form-input"
                     required
                   >
-                    <option value="general">General Message</option>
-                    <option value="maintenance_request">Maintenance Request</option>
-                    <option value="complaint">Complaint</option>
+                    <option value="general">{t('general_message')}</option>
+                    <option value="maintenance_request">{t('maintenance_request')}</option>
+                    <option value="complaint">{t('complaint')}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Subject
+                    {t('subject')}
                   </label>
                   <input
                     type="text"
@@ -242,13 +244,13 @@ const MessageCenter = () => {
                     onChange={handleInputChange}
                     className="form-input"
                     required
-                    placeholder="Enter message subject"
+                    placeholder={t('enter_message_subject')}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Message
+                    {t('message')}
                   </label>
                   <textarea
                     name="content"
@@ -257,7 +259,7 @@ const MessageCenter = () => {
                     rows={5}
                     className="form-input"
                     required
-                    placeholder="Enter your message here..."
+                    placeholder={t('enter_message_here')}
                   />
                 </div>
 
@@ -267,14 +269,14 @@ const MessageCenter = () => {
                     onClick={() => setShowNewMessage(false)}
                     className="btn btn-secondary flex-1"
                   >
-                    Cancel
+                    {t('cancel')}
                   </button>
                   <button
                     type="submit"
                     className="btn btn-primary flex-1 flex items-center justify-center space-x-2"
                   >
                     <PaperAirplaneIcon className="h-4 w-4" />
-                    <span>Send Message</span>
+                    <span>{t('send_message')}</span>
                   </button>
                 </div>
               </form>

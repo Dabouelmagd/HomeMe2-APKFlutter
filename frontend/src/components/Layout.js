@@ -384,6 +384,7 @@ const Layout = () => {
 
             <div className="mt-2 space-y-1">
               <LanguageSwitcher className="w-full justify-start" />
+              <TransliterationToggle className="px-2 py-1" />
               
               <button
                 onClick={handleLogout}

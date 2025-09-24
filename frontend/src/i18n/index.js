@@ -312,6 +312,7 @@ const resources = {
       // Common
       'loading': 'Loading...',
       'language': 'Language',
+      'unit': 'Unit',
       
       // Newsletter
       'newsletter': 'Newsletter',

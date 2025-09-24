@@ -289,7 +289,7 @@ const Layout = () => {
       show: true
     },
     {
-      name: 'Community Newsletter',
+      name: t('community_newsletter'),
       href: '/newsletter',
       icon: NewspaperIcon,
       show: true

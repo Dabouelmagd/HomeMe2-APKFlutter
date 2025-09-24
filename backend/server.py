@@ -10335,6 +10335,9 @@ async def get_company_analytics(
         logger.error(f"Error getting company analytics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Include the API router after all endpoints are defined
+app.include_router(api_router)
+
 @app.on_event("startup")
 async def startup_db_client():
     """Initialize database connection and indexes"""

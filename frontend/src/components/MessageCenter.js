@@ -188,7 +188,7 @@ const MessageCenter = () => {
             <ChatBubbleLeftEllipsisIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_messages_yet')}</h3>
             <p className="text-gray-600 mb-4">
-              {t('start_conversation')} {user?.role === 'admin' ? t('residents') : t('management')}
+              {t('start_conversation', { role: user?.role === 'admin' ? t('residents') : t('management') })}
             </p>
             <button
               onClick={() => setShowNewMessage(true)}

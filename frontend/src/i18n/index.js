@@ -544,6 +544,14 @@ const resources = {
       'government_utility_gateway': 'Passerelle gouvernementale et services',
       'community_newsletter': 'Bulletin communautaire',
       
+      // Descriptions
+      'guest_management_description': 'Gérer efficacement les invités et les demandes de visite',
+      'maintenance_system_description': 'Traiter les demandes de maintenance et suivre les progrès',
+      'smart_home_description': 'Contrôlez vos appareils domestiques intelligents avec le langage naturel',
+      'voting_system_description': 'Créer et participer aux sondages et votes communautaires',
+      'events_announcements_description': 'Restez informé des événements et annonces de la communauté',
+      'analytics_description': 'Voir des analyses détaillées et des informations sur votre résidence',
+      
       // Dashboard
       'welcome_back_name': 'Bienvenue, {{name}}',
       'welcome_home_name': 'Bon retour, {{name}}',

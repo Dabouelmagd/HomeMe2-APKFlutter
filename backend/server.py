@@ -10850,6 +10850,54 @@ async def super_admin_access_account(
         logger.error(f"Error accessing account: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Upload endpoints
+@api_router.post("/upload/logo")
+async def upload_company_logo(
+    logo: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload and process company logo"""
+    try:
+        # Validate file type
+        if not logo.content_type or not logo.content_type.startswith('image/'):
+            raise HTTPException(status_code=400, detail="Invalid image type")
+        
+        # Validate file size (max 5MB)
+        content = await logo.read()
+        if len(content) > 5 * 1024 * 1024:
+            raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB")
+        
+        # Create uploads directory if it doesn't exist
+        uploads_dir = Path("/app/backend/uploads/logos")
+        uploads_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Generate unique filename
+        file_extension = Path(logo.filename).suffix.lower()
+        if file_extension not in ['.jpg', '.jpeg', '.png', '.gif']:
+            raise HTTPException(status_code=400, detail="Invalid file extension")
+            
+        unique_filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}{file_extension}"
+        file_path = uploads_dir / unique_filename
+        
+        # Save file
+        async with aiofiles.open(file_path, 'wb') as f:
+            await f.write(content)
+        
+        # Create public URL (assuming served via static files)
+        logo_url = f"/uploads/logos/{unique_filename}"
+        
+        return {
+            "success": True,
+            "logo_url": logo_url,
+            "message": "Logo uploaded successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error uploading logo: {e}")
+        raise HTTPException(status_code=500, detail="Failed to upload logo")
+
 # Include the API router after all endpoints are defined
 app.include_router(api_router)
 

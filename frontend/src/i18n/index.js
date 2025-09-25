@@ -1069,7 +1069,59 @@ const resources = {
         'contact_support': 'Contacter le Support'
       },
       
-      // Common (French)
+      // Common Actions and Buttons
+      'view_details': 'Voir les détails',
+      'create_request': 'Créer une demande',
+      'add_visitor': 'Ajouter un visiteur', 
+      'generate_qr_code': 'Générer un code QR',
+      'edit_details': 'Modifier les détails',
+      'delete_item': 'Supprimer l\'élément',
+      'mark_complete': 'Marquer comme terminé',
+      'mark_incomplete': 'Marquer comme incomplet',
+      'approve_request': 'Approuver la demande',
+      'reject_request': 'Rejeter la demande',
+      'cancel_booking': 'Annuler la réservation',
+      'confirm_booking': 'Confirmer la réservation',
+      'reschedule_visit': 'Reprogrammer la visite',
+      'check_in': 'Enregistrer l\'arrivée',
+      'check_out': 'Enregistrer le départ',
+      'send_notification': 'Envoyer une notification',
+      
+      // Status Indicators
+      'in_progress': 'En cours',
+      'checked_in': 'Arrivé',
+      'checked_out': 'Parti',
+      'normal_priority': 'Priorité normale',
+      'high_priority': 'Priorité élevée',
+      'urgent_priority': 'Priorité urgente',
+      'low_priority': 'Priorité faible',
+      'under_review': 'En cours d\'examen',
+      'waiting_approval': 'En attente d\'approbation',
+      'on_hold': 'En suspens',
+      'in_queue': 'En file d\'attente',
+      
+      // Categories and Types
+      'general_maintenance': 'Maintenance générale',
+      'business_event': 'Événement d\'affaires',
+      'social_event': 'Événement social',
+      'religious_event': 'Événement religieux',
+      'community_event': 'Événement communautaire',
+      'private_event': 'Événement privé',
+      'emergency_maintenance': 'Maintenance d\'urgence',
+      'routine_maintenance': 'Maintenance de routine',
+      'guest_visitor': 'Visiteur invité',
+      'service_provider': 'Prestataire de services',
+      'delivery_person': 'Livreur',
+      
+      // Search and Filter
+      'all_categories': 'Toutes les catégories',
+      'all_statuses': 'Tous les statuts',
+      'search_visitors': 'Rechercher des visiteurs',
+      'date_range': 'Plage de dates',
+      'filter_by': 'Filtrer par',
+      'sort_by': 'Trier par',
+      'select_all': 'Sélectionner tout',
+      'clear_all': 'Tout effacer',
       'back_to_login': 'Retour à la Connexion',
     }
   }

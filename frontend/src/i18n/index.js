@@ -65,6 +65,34 @@ const resources = {
       'quick_actions': 'Quick Actions',
       'current_time': 'Current Time',
       
+      // Quick Actions
+      'add_resident': 'Add Resident',
+      'create_residence_account': 'Create Residence Account',
+      'manage_units': 'Manage Units',
+      'view_all_units': 'View All Units',
+      'send_notice': 'Send Notice',
+      'broadcast_residents': 'Broadcast to Residents',
+      'view_payments': 'View Payments',
+      'check_financial_status': 'Check Financial Status',
+      
+      // Trial Status
+      'start_free_trial': 'Start Free Trial',
+      'get_14_days_premium': 'Get 14 Days Premium',
+      'start_trial': 'Start Trial',
+      
+      // Activities
+      'activity': {
+        'new_resident_joined': 'New resident joined',
+        'service_booked': 'Service booked',
+        'monthly_fee_paid': 'Monthly fee paid'
+      },
+      
+      // Time
+      'time': {
+        'minutes_ago': 'minutes ago',
+        'hour_ago': 'hour ago'
+      },
+      
       // Common
       'loading': 'Loading...',
       'error': 'Error',

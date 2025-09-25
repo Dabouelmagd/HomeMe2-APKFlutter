@@ -22,8 +22,17 @@ const EnterpriseRegistration = () => {
     company_code: '',
     timezone: 'UTC',
     currency: 'USD',
-    language: 'en'
+    language: 'en',
+    logo_url: ''
   });
+
+  // Logo upload states
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [showCrop, setShowCrop] = useState(false);
+  const [crop, setCrop] = useState({ aspect: 1 });
+  const [completedCrop, setCompletedCrop] = useState(null);
+  const [logoUploading, setLogoUploading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

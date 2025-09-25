@@ -125,6 +125,7 @@ const resources = {
       'unlimited_users': 'Unlimited Users',
       'unlimited_storage': 'Unlimited Storage',
       'unlimited_access': 'Unlimited Access',
+      'unlimited_users_families': 'Unlimited Users & Families',
       'active_visitors': 'Active Visitors',
       'active_users': 'Active Users',
       'active_polls': 'Active Polls',

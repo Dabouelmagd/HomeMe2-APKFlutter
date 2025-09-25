@@ -147,6 +147,21 @@ const resources = {
       'premium_support': 'Priority customer support',
       'percentage_used': 'used',
       'near_limit': 'You are approaching your limit',
+      'start_free_trial': 'Start Free Trial',
+      'get_14_days_premium': 'Get 14 Days Premium',
+      'start_trial': 'Start Trial',
+      
+      // Transliteration System
+      'transliteration': {
+        'toggle_label': 'Transliteration',
+        'toggle_tooltip': 'Toggle Arabic transliteration',
+        'mode_tooltip': 'Change transliteration mode',
+        'arabic_to_latin': 'Arabic to Latin',
+        'latin_to_arabic': 'Latin to Arabic',
+        'status_ar_to_en': 'Arabic → English',
+        'status_en_to_ar': 'English → Arabic',
+        'status_inactive': 'Inactive'
+      },
       
       // Logo Upload System (English)
       logo_upload: {

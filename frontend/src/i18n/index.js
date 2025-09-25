@@ -233,6 +233,16 @@ const resources = {
       'message_center': 'مركز الرسائل',
       'notifications_nav': 'الإشعارات',
       'sign_out': 'تسجيل الخروج',
+      'services_management': 'إدارة الخدمات',
+      'maintenance_system': 'نظام الصيانة',
+      'guest_management': 'إدارة الضيوف',
+      'events_announcements': 'الأحداث والإعلانات',
+      'advanced_analytics': 'التحليلات المتقدمة',
+      'document_management': 'إدارة الوثائق',
+      'voting_system': 'نظام التصويت',
+      'smart_home': 'المنزل الذكي',
+      'government_utility_gateway': 'بوابة الحكومة والمرافق',
+      'community_newsletter': 'النشرة الإخبارية للمجتمع',
       
       // Dashboard
       'welcome_back_name': 'مرحباً بعودتك، {{name}}',

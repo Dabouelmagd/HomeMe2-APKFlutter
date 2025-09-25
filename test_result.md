@@ -149,7 +149,7 @@ agent_communication:
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Translation system verification and transliteration feature implementation for HomeMe application. Tasks: 1. Verify current translation system functionality across critical pages 2. Implement transliteration feature ('tranclit') for better Arabic-English text handling 3. Focus on priority screens as specified by user 4. Ensure all translation fixes remain stable and working correctly"
+user_problem_statement: "CRITICAL SYNTAX ERROR FIX: Resolve SyntaxError in /app/frontend/src/i18n/index.js preventing frontend compilation and loading. Error: 'Missing initializer in const declaration. (2444:3)' caused by UTF-8 encoding corruption of Arabic text. Secondary: Complete implementation of public account type selection feature for user registration flow as requested in Arabic (كمل - continue)."
 
 backend:
   - task: "Contact Us Backend Integration Testing"

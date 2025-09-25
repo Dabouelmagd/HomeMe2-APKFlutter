@@ -424,6 +424,16 @@ const resources = {
       'message_center': 'Centre de messages',
       'notifications_nav': 'Notifications',
       'sign_out': 'Se déconnecter',
+      'services_management': 'Gestion des services',
+      'maintenance_system': 'Système de maintenance',
+      'guest_management': 'Gestion des invités',
+      'events_announcements': 'Événements et annonces',
+      'advanced_analytics': 'Analyses avancées',
+      'document_management': 'Gestion des documents',
+      'voting_system': 'Système de vote',
+      'smart_home': 'Maison intelligente',
+      'government_utility_gateway': 'Passerelle gouvernementale et services',
+      'community_newsletter': 'Bulletin communautaire',
       
       // Dashboard
       'welcome_back_name': 'Bienvenue, {{name}}',

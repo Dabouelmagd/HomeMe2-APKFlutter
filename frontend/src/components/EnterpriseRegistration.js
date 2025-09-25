@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import axios from 'axios';
 import { toast } from 'sonner';
+import ReactCrop from 'react-image-crop';
+import Resizer from 'react-image-file-resizer';
+import 'react-image-crop/dist/ReactCrop.css';
 
 const EnterpriseRegistration = () => {
   const { t } = useTranslation();

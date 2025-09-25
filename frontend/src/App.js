@@ -33,6 +33,7 @@ import MaintenanceSystem from './components/MaintenanceSystem';
 import EnterpriseRegistration from './components/EnterpriseRegistration';
 import EnterpriseDashboard from './components/EnterpriseDashboard';
 import AccountTypeSelection from './components/AccountTypeSelection';
+import PublicAccountTypeSelection from './components/PublicAccountTypeSelection';
 import IndividualRegistration from './components/IndividualRegistration';
 import GuestManagement from './components/GuestManagement';
 import EventsAnnouncements from './components/EventsAnnouncements';

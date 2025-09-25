@@ -3566,7 +3566,20 @@ const resources = {
         'all_compounds': 'Tous les Complexes',
         'compounds_view_coming_soon': 'Vue de gestion des complexes bientôt',
         'analytics_view_coming_soon': 'Vue des analyses bientôt',
-        'settings_view_coming_soon': 'Vue des paramètres bientôt'
+        'settings_view_coming_soon': 'Vue des paramètres bientôt',
+        
+        // Logo Upload (French)
+        'company_logo': 'Logo de l\'Entreprise',
+        'upload_logo': 'Télécharger le logo',
+        'or_drag_and_drop': 'ou glisser-déposer',
+        'crop_logo': 'Recadrer le Logo',
+        'crop_and_upload': 'Recadrer et Télécharger',
+        'uploading': 'Téléchargement...',
+        'invalid_image_type': 'Veuillez sélectionner un fichier image valide',
+        'file_too_large': 'Fichier trop volumineux. Maximum 5 MB autorisé.',
+        'logo_uploaded_successfully': 'Logo téléchargé avec succès!',
+        'logo_upload_failed': 'Échec du téléchargement du logo. Veuillez réessayer.',
+        'logo_processing_failed': 'Échec du traitement du logo. Veuillez réessayer.'
       },
     }
   }

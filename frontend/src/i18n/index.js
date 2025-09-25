@@ -500,6 +500,7 @@ const resources = {
       'unlimited_users': 'مستخدمون غير محدودون',
       'unlimited_storage': 'مساحة تخزين غير محدودة',
       'unlimited_access': 'وصول غير محدود',
+      'unlimited_users_families': 'مستخدمون وأسر غير محدودة',
       'active_visitors': 'زوار نشطون',
       'active_users': 'مستخدمون نشطون',
       'active_polls': 'استطلاعات نشطة',

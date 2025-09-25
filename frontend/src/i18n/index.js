@@ -696,7 +696,59 @@ const resources = {
         'contact_support': 'اتصل بالدعم'
       },
       
-      // Common (Arabic)
+      // Common Actions and Buttons
+      'view_details': 'عرض التفاصيل',
+      'create_request': 'إنشاء طلب',
+      'add_visitor': 'إضافة زائر', 
+      'generate_qr_code': 'إنشاء رمز QR',
+      'edit_details': 'تحرير التفاصيل',
+      'delete_item': 'حذف العنصر',
+      'mark_complete': 'وضع علامة مكتمل',
+      'mark_incomplete': 'وضع علامة غير مكتمل',
+      'approve_request': 'الموافقة على الطلب',
+      'reject_request': 'رفض الطلب',
+      'cancel_booking': 'إلغاء الحجز',
+      'confirm_booking': 'تأكيد الحجز',
+      'reschedule_visit': 'إعادة جدولة الزيارة',
+      'check_in': 'تسجيل الدخول',
+      'check_out': 'تسجيل الخروج',
+      'send_notification': 'إرسال إشعار',
+      
+      // Status Indicators
+      'in_progress': 'قيد التنفيذ',
+      'checked_in': 'تم تسجيل الدخول',
+      'checked_out': 'تم تسجيل الخروج',
+      'normal_priority': 'أولوية عادية',
+      'high_priority': 'أولوية عالية',
+      'urgent_priority': 'أولوية عاجلة',
+      'low_priority': 'أولوية منخفضة',
+      'under_review': 'قيد المراجعة',
+      'waiting_approval': 'في انتظار الموافقة',
+      'on_hold': 'معلق',
+      'in_queue': 'في الطابور',
+      
+      // Categories and Types
+      'general_maintenance': 'صيانة عامة',
+      'business_event': 'حدث تجاري',
+      'social_event': 'حدث اجتماعي',
+      'religious_event': 'حدث ديني',
+      'community_event': 'حدث مجتمعي',
+      'private_event': 'حدث خاص',
+      'emergency_maintenance': 'صيانة طوارئ',
+      'routine_maintenance': 'صيانة روتينية',
+      'guest_visitor': 'زائر ضيف',
+      'service_provider': 'مقدم خدمة',
+      'delivery_person': 'عامل توصيل',
+      
+      // Search and Filter
+      'all_categories': 'جميع الفئات',
+      'all_statuses': 'جميع الحالات',
+      'search_visitors': 'البحث عن زوار',
+      'date_range': 'نطاق التاريخ',
+      'filter_by': 'تصفية حسب',
+      'sort_by': 'ترتيب حسب',
+      'select_all': 'تحديد الكل',
+      'clear_all': 'مسح الكل',
       'back_to_login': 'العودة لتسجيل الدخول',
     }
   },

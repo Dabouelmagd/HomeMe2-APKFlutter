@@ -110,7 +110,7 @@ const Login = () => {
           <p className="text-gray-600">
             {t('dont_have_account')}{' '}
             <Link
-              to="/register"
+              to="/account-type-selection"
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
               {t('register_here')}

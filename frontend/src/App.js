@@ -261,6 +261,7 @@ function App() {
         <Route path="/terms-privacy" element={<TermsPrivacy />} />
               <Route path="/register" element={<Register />} />
               <Route path="/debug-login" element={<DebugLogin />} />
+              <Route path="/account-type-selection" element={<PublicAccountTypeSelection />} />
               
               <Route path="/" element={
                 <ProtectedRoute>

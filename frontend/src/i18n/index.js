@@ -135,6 +135,27 @@ const resources = {
       'overdue_bills': 'Overdue Bills',
       'outstanding_payments': 'Outstanding Payments',
       
+      // Time and Status
+      'days_remaining': 'days remaining',
+      'days_left': 'days left',
+      'days_left_plural': 'days left',
+      'minutes_ago': 'minutes ago',
+      'hours_ago': 'hours ago',
+      'limit_reached': 'Limit Reached',
+      'unlimited_services': 'Unlimited Services',
+      'unlimited_users': 'Unlimited Users',
+      'unlimited_storage': 'Unlimited Storage',
+      'unlimited_access': 'Unlimited Access',
+      'active_visitors': 'Active Visitors',
+      'active_users': 'Active Users',
+      'active_polls': 'Active Polls',
+      'completed_polls': 'Completed Polls',
+      'draft_polls': 'Draft Polls',
+      'pending_requests': 'Pending Requests',
+      'pending_bills': 'Pending Bills',
+      'overdue_bills': 'Overdue Bills',
+      'outstanding_payments': 'Outstanding Payments',
+      
       // Trial Status
       'start_free_trial': 'Start Free Trial',
       'get_14_days_premium': 'Get 14 Days Premium',

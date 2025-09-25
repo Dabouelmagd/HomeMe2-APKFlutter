@@ -1530,10 +1530,11 @@ class SmartHomeTestSuite:
                 data = response.json()
                 
                 # Verify upgrade request structure
-                if ("upgrade_id" in data and "cost_analysis" in data and 
-                    data.get("message") == "Upgrade request submitted successfully"):
+                if ("upgrade_request" in data and "cost_analysis" in data and 
+                    data.get("success") == True and data.get("message") == "Upgrade request submitted successfully"):
                     
                     cost_analysis = data.get("cost_analysis", {})
+                    upgrade_request = data.get("upgrade_request", {})
                     
                     # Verify cost analysis fields
                     required_cost_fields = ["current_monthly_cost", "new_monthly_cost", 
@@ -1542,7 +1543,7 @@ class SmartHomeTestSuite:
                     if all(field in cost_analysis for field in required_cost_fields):
                         self.log_result("Individual Upgrade Request", True, 
                                       f"Upgrade request submitted successfully. "
-                                      f"ID: {data.get('upgrade_id')}, "
+                                      f"ID: {upgrade_request.get('id')}, "
                                       f"Cost increase: ${cost_analysis.get('cost_difference'):.2f}")
                         return True
                     else:

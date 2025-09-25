@@ -1214,15 +1214,18 @@ class SmartHomeTestSuite:
             
             if response.status_code == 200:
                 data = response.json()
-                if (data.get("message") == "Individual compound registered successfully" and 
-                    "compound_id" in data and "subscription_id" in data):
+                if (data.get("success") == True and 
+                    "compound" in data and "subscription" in data and "pricing" in data):
                     
                     # Store for later tests
-                    self.individual_compound_id = data.get("compound_id")
-                    self.individual_subscription_id = data.get("subscription_id")
+                    compound = data.get("compound", {})
+                    subscription = data.get("subscription", {})
+                    pricing = data.get("pricing", {})
+                    
+                    self.individual_compound_id = compound.get("id")
+                    self.individual_subscription_id = subscription.get("id")
                     
                     # Verify pricing calculation
-                    pricing = data.get("pricing", {})
                     expected_monthly = 85 * 0.5  # 85 units * $0.50
                     
                     if pricing.get("monthly_amount") == expected_monthly:

@@ -875,6 +875,7 @@ const resources = {
       'unlimited_users': 'Utilisateurs illimités',
       'unlimited_storage': 'Stockage illimité',
       'unlimited_access': 'Accès illimité',
+      'unlimited_users_families': 'Utilisateurs et familles illimités',
       'active_visitors': 'Visiteurs actifs',
       'active_users': 'Utilisateurs actifs',
       'active_polls': 'Sondages actifs',

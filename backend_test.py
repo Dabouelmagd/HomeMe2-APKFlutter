@@ -5984,21 +5984,38 @@ class SmartHomeTestSuite:
         return self.print_summary()
 
 if __name__ == "__main__":
-    # Run the voting system and smart home control tests
+    import sys
+    
     test_suite = SmartHomeTestSuite()
-    success_rate = test_suite.run_voting_and_smart_home_tests()
     
-    print(f"\n🎯 Final Success Rate: {success_rate:.1f}%")
-    
-    if success_rate >= 90:
-        print("🎉 EXCELLENT! Voting system and smart home control are production ready!")
-        exit(0)
-    elif success_rate >= 75:
-        print("✅ GOOD! Systems are mostly functional with minor issues.")
-        exit(0)
-    elif success_rate >= 50:
-        print("⚠️  MODERATE! Systems have significant issues that need attention.")
-        exit(1)
+    if len(sys.argv) > 1:
+        test_type = sys.argv[1].lower()
+        
+        if test_type == "maintenance":
+            success_rate = test_suite.run_phase1_tests()
+        elif test_type == "voting":
+            success_rate = test_suite.run_voting_and_smart_home_tests()
+        elif test_type == "individual_account_system":
+            success_rate = test_suite.run_individual_account_system_tests()
+        elif test_type == "auth_investigation":
+            success_rate = test_suite.run_authentication_investigation()
+        else:
+            print(f"Unknown test type: {test_type}")
+            print("Available types: maintenance, voting, individual_account_system, auth_investigation")
+            sys.exit(1)
     else:
-        print("❌ CRITICAL! Systems have major failures and are not ready for production.")
-        exit(1)
+        # Run voting tests by default
+        success_rate = test_suite.run_voting_and_smart_home_tests()
+    
+    # Exit with appropriate code
+    if success_rate >= 80:
+        print(f"\n🎯 Final Success Rate: {success_rate:.1f}%")
+        if success_rate == 100:
+            print("🎉 EXCELLENT! All systems are production ready!")
+        else:
+            print("✅ GOOD! Most systems are working correctly!")
+        sys.exit(0)
+    else:
+        print(f"\n⚠️ Final Success Rate: {success_rate:.1f}%")
+        print("❌ NEEDS ATTENTION! Some systems require fixes!")
+        sys.exit(1)

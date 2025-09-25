@@ -259,6 +259,46 @@ const resources = {
       'quick_actions': 'إجراءات سريعة',
       'current_time': 'الوقت الحالي',
       
+      // Quick Actions
+      'add_resident': 'إضافة مقيم',
+      'create_residence_account': 'إنشاء حساب سكني',
+      'manage_units': 'إدارة الوحدات',
+      'view_all_units': 'عرض جميع الوحدات',
+      'send_notice': 'إرسال إشعار',
+      'broadcast_residents': 'بث للمقيمين',
+      'view_payments': 'عرض المدفوعات',
+      'check_financial_status': 'فحص الوضع المالي',
+      
+      // Trial Status
+      'start_free_trial': 'بدء النسخة التجريبية المجانية',
+      'get_14_days_premium': 'احصل على 14 يوم مميز',
+      'start_trial': 'بدء التجربة',
+      
+      // Activities
+      'activity': {
+        'new_resident_joined': 'انضم مقيم جديد',
+        'service_booked': 'تم حجز خدمة',
+        'monthly_fee_paid': 'تم دفع الرسوم الشهرية'
+      },
+      
+      // Time
+      'time': {
+        'minutes_ago': 'دقائق مضت',
+        'hour_ago': 'ساعة مضت'
+      },
+      
+      // Transliteration System
+      'transliteration': {
+        'toggle_label': 'الكتابة بالحروف اللاتينية',
+        'toggle_tooltip': 'تبديل الكتابة العربية بالحروف اللاتينية',
+        'mode_tooltip': 'تغيير وضع الكتابة بالحروف اللاتينية',
+        'arabic_to_latin': 'عربي إلى لاتيني',
+        'latin_to_arabic': 'لاتيني إلى عربي',
+        'status_ar_to_en': 'عربي ← إنجليزي',
+        'status_en_to_ar': 'إنجليزي ← عربي',
+        'status_inactive': 'غير نشط'
+      },
+      
       // Common
       'loading': 'جاري التحميل...',
       'error': 'خطأ',

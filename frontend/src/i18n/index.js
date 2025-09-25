@@ -1078,7 +1078,20 @@ const resources = {
         'all_compounds': 'All Compounds',
         'compounds_view_coming_soon': 'Compounds management view coming soon',
         'analytics_view_coming_soon': 'Analytics view coming soon', 
-        'settings_view_coming_soon': 'Settings view coming soon'
+        'settings_view_coming_soon': 'Settings view coming soon',
+        
+        // Logo Upload
+        'company_logo': 'Company Logo',
+        'upload_logo': 'Upload logo',
+        'or_drag_and_drop': 'or drag and drop',
+        'crop_logo': 'Crop Logo',
+        'crop_and_upload': 'Crop & Upload',
+        'uploading': 'Uploading...',
+        'invalid_image_type': 'Please select a valid image file',
+        'file_too_large': 'File size too large. Maximum 5MB allowed.',
+        'logo_uploaded_successfully': 'Logo uploaded successfully!',
+        'logo_upload_failed': 'Logo upload failed. Please try again.',
+        'logo_processing_failed': 'Logo processing failed. Please try again.'
       },
       
       // Account Selection System

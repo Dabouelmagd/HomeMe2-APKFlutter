@@ -58,11 +58,12 @@ const resources = {
       'events_announcements_description': 'Stay updated with community events and announcements',
       'analytics_description': 'View detailed analytics and insights about your compound',
       
-      // Dashboard Statistics
+      // Dashboard
       'welcome_back_name': 'Welcome back, {{name}}',
       'welcome_home_name': 'Welcome home, {{name}}',
       'dashboard_welcome_subtitle': "Here's what's happening in your compound today",
       'happening_today': "Here's what's happening in {{compound}} today.",
+      'whats_happening_today': "Here's what's happening in your compound today",
       'everything_manage': 'Everything you need to manage your home',
       'total_residents': 'Total Residents',
       'total_families': 'Total Families',

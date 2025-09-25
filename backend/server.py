@@ -39,6 +39,7 @@ from notification_models import *
 from document_models import *
 from newsletter_models import *
 from enterprise_models import *
+from individual_models import *
 from websocket_manager import manager
 
 # Import emergent integrations for LLM

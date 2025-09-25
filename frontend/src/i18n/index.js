@@ -39,6 +39,16 @@ const resources = {
       'message_center': 'Message Center',
       'notifications_nav': 'Notifications',
       'sign_out': 'Sign Out',
+      'services_management': 'Services Management',
+      'maintenance_system': 'Maintenance System',
+      'guest_management': 'Guest Management',
+      'events_announcements': 'Events & Announcements',
+      'advanced_analytics': 'Advanced Analytics',
+      'document_management': 'Document Management',
+      'voting_system': 'Voting System',
+      'smart_home': 'Smart Home',
+      'government_utility_gateway': 'Government & Utility Gateway',
+      'community_newsletter': 'Community Newsletter',
       
       // Dashboard
       'welcome_back_name': 'Welcome back, {{name}}',

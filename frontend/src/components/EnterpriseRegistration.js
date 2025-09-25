@@ -50,6 +50,138 @@ const EnterpriseRegistration = () => {
     setFormData(prev => ({ ...prev, company_code: code }));
   };
 
+  // Logo upload functions
+  const handleLogoSelect = (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error(t('enterprise.invalid_image_type'));
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(t('enterprise.file_too_large'));
+        return;
+      }
+
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        setLogoPreview(reader.result);
+        setShowCrop(true);
+      });
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const resizeImage = (file, maxWidth = 200, maxHeight = 200, quality = 80) => {
+    return new Promise((resolve) => {
+      Resizer.imageFileResizer(
+        file,
+        maxWidth,
+        maxHeight,
+        'JPEG',
+        quality,
+        0,
+        (uri) => {
+          resolve(uri);
+        },
+        'base64'
+      );
+    });
+  };
+
+  const handleCropComplete = useCallback(async () => {
+    if (completedCrop && logoPreview) {
+      try {
+        setLogoUploading(true);
+        
+        // Create canvas for cropping
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const image = new Image();
+        
+        image.onload = async () => {
+          const scaleX = image.naturalWidth / image.width;
+          const scaleY = image.naturalHeight / image.height;
+          
+          canvas.width = completedCrop.width * scaleX;
+          canvas.height = completedCrop.height * scaleY;
+          
+          ctx.drawImage(
+            image,
+            completedCrop.x * scaleX,
+            completedCrop.y * scaleY,
+            completedCrop.width * scaleX,
+            completedCrop.height * scaleY,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+          );
+
+          // Convert canvas to blob
+          canvas.toBlob(async (blob) => {
+            if (blob) {
+              // Create file from blob
+              const croppedFile = new File([blob], logoFile.name, { type: 'image/jpeg' });
+              
+              // Resize the cropped image
+              const resizedBase64 = await resizeImage(croppedFile);
+              
+              // Upload to backend
+              const formDataUpload = new FormData();
+              
+              // Convert base64 to blob for upload
+              const base64Response = await fetch(resizedBase64);
+              const blob2 = await base64Response.blob();
+              formDataUpload.append('logo', blob2, 'company-logo.jpg');
+              
+              try {
+                const response = await axios.post(
+                  `${process.env.REACT_APP_BACKEND_URL}/api/upload/logo`,
+                  formDataUpload,
+                  {
+                    headers: {
+                      'Content-Type': 'multipart/form-data',
+                      'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                  }
+                );
+
+                if (response.data.success) {
+                  setFormData(prev => ({ ...prev, logo_url: response.data.logo_url }));
+                  toast.success(t('enterprise.logo_uploaded_successfully'));
+                  setShowCrop(false);
+                }
+              } catch (error) {
+                console.error('Logo upload error:', error);
+                toast.error(t('enterprise.logo_upload_failed'));
+              }
+            }
+            setLogoUploading(false);
+          }, 'image/jpeg', 0.8);
+        };
+        
+        image.src = logoPreview;
+      } catch (error) {
+        console.error('Error processing logo:', error);
+        toast.error(t('enterprise.logo_processing_failed'));
+        setLogoUploading(false);
+      }
+    }
+  }, [completedCrop, logoPreview, logoFile, t]);
+
+  const removeLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    setShowCrop(false);
+    setFormData(prev => ({ ...prev, logo_url: '' }));
+  };
+
   const validateStep = (currentStep) => {
     switch (currentStep) {
       case 1:

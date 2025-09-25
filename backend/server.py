@@ -10294,7 +10294,7 @@ async def get_company_analytics(
             "compounds": {
                 "total": len(compounds),
                 "active": len([c for c in compounds if c.get("status") == "active"]),
-                "total_units": sum(c.get("total_units", 0) for c in compounds)
+                "total_units": sum(c.get("total_units") or 0 for c in compounds if c)
             },
             "residents": {
                 "total": await db.users.count_documents({

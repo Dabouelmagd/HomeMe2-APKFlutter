@@ -10752,7 +10752,7 @@ async def get_all_platform_accounts(
                     "status": "active"
                 }).to_list(None)
                 
-                total_units = sum(c.get("total_units", 0) for c in compounds)
+                total_units = sum(c.get("total_units") or 0 for c in compounds if c)
                 
                 # Get subscription
                 subscription = await db.company_subscriptions.find_one({

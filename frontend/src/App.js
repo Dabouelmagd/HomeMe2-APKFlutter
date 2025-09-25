@@ -371,6 +371,14 @@ function App() {
                 } />
                 
                 {/* Enterprise Routes */}
+                <Route path="account-type-selection" element={
+                  <AccountTypeSelection />
+                } />
+                
+                <Route path="individual-register" element={
+                  <IndividualRegistration />
+                } />
+                
                 <Route path="enterprise-register" element={
                   <EnterpriseRegistration />
                 } />

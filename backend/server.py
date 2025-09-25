@@ -9954,7 +9954,7 @@ async def get_company_dashboard(
         
         # Calculate statistics
         total_compounds = len(compounds)
-        total_units = sum(c.get("total_units", 0) for c in compounds)
+        total_units = sum(c.get("total_units") or 0 for c in compounds if c)
         
         # Get resident statistics
         compound_ids = [c["id"] for c in compounds]

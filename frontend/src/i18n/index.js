@@ -413,6 +413,27 @@ const resources = {
       'view_payments': 'عرض المدفوعات',
       'check_financial_status': 'فحص الوضع المالي',
       
+      // Time and Status
+      'days_remaining': 'أيام متبقية',
+      'days_left': 'أيام متبقية',
+      'days_left_plural': 'أيام متبقية',
+      'minutes_ago': 'دقائق مضت',
+      'hours_ago': 'ساعات مضت',
+      'limit_reached': 'تم الوصول للحد الأقصى',
+      'unlimited_services': 'خدمات غير محدودة',
+      'unlimited_users': 'مستخدمون غير محدودون',
+      'unlimited_storage': 'مساحة تخزين غير محدودة',
+      'unlimited_access': 'وصول غير محدود',
+      'active_visitors': 'زوار نشطون',
+      'active_users': 'مستخدمون نشطون',
+      'active_polls': 'استطلاعات نشطة',
+      'completed_polls': 'استطلاعات مكتملة',
+      'draft_polls': 'مسودات استطلاعات',
+      'pending_requests': 'طلبات معلقة',
+      'pending_bills': 'فواتير معلقة',
+      'overdue_bills': 'فواتير متأخرة',
+      'outstanding_payments': 'مدفوعات مستحقة',
+      
       // Trial Status
       'start_free_trial': 'بدء النسخة التجريبية المجانية',
       'get_14_days_premium': 'احصل على 14 يوم مميز',

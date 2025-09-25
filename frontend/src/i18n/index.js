@@ -450,6 +450,46 @@ const resources = {
       'quick_actions': 'Actions rapides',
       'current_time': 'Heure actuelle',
       
+      // Quick Actions
+      'add_resident': 'Ajouter un résident',
+      'create_residence_account': 'Créer un compte de résidence',
+      'manage_units': 'Gérer les unités',
+      'view_all_units': 'Voir toutes les unités',
+      'send_notice': 'Envoyer un avis',
+      'broadcast_residents': 'Diffuser aux résidents',
+      'view_payments': 'Voir les paiements',
+      'check_financial_status': 'Vérifier le statut financier',
+      
+      // Trial Status
+      'start_free_trial': 'Commencer l\'essai gratuit',
+      'get_14_days_premium': 'Obtenez 14 jours premium',
+      'start_trial': 'Commencer l\'essai',
+      
+      // Activities
+      'activity': {
+        'new_resident_joined': 'Nouveau résident rejoint',
+        'service_booked': 'Service réservé',
+        'monthly_fee_paid': 'Frais mensuels payés'
+      },
+      
+      // Time
+      'time': {
+        'minutes_ago': 'il y a quelques minutes',
+        'hour_ago': 'il y a une heure'
+      },
+      
+      // Transliteration System
+      'transliteration': {
+        'toggle_label': 'Translittération',
+        'toggle_tooltip': 'Basculer la translittération arabe',
+        'mode_tooltip': 'Changer le mode de translittération',
+        'arabic_to_latin': 'Arabe vers Latin',
+        'latin_to_arabic': 'Latin vers Arabe',
+        'status_ar_to_en': 'Arabe → Anglais',
+        'status_en_to_ar': 'Anglais → Arabe',
+        'status_inactive': 'Inactif'
+      },
+      
       // Common
       'loading': 'Chargement...',
       'error': 'Erreur',

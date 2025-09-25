@@ -1309,13 +1309,12 @@ class SmartHomeTestSuite:
                 data = response.json()
                 
                 # Verify dashboard structure
-                required_fields = ["compound", "subscription", "statistics", "account_type"]
-                missing_fields = [field for field in required_fields if field not in data]
-                
-                if not missing_fields:
-                    compound = data.get("compound", {})
-                    subscription = data.get("subscription", {})
-                    statistics = data.get("statistics", {})
+                if data.get("success") == True and "dashboard" in data and data.get("account_type") == "individual":
+                    dashboard = data.get("dashboard", {})
+                    
+                    # Verify dashboard data structure
+                    compound = dashboard.get("compound", {})
+                    subscription = dashboard.get("subscription", {})
                     
                     # Verify compound data
                     if compound.get("account_type") == "individual":
@@ -1323,7 +1322,7 @@ class SmartHomeTestSuite:
                         if subscription.get("plan_type") == "individual":
                             # Verify statistics
                             stats_fields = ["total_residents", "total_families", "occupancy_rate"]
-                            if all(field in statistics for field in stats_fields):
+                            if all(field in dashboard for field in stats_fields):
                                 self.log_result("Individual Dashboard", True, 
                                               f"Dashboard retrieved successfully. "
                                               f"Compound: {compound.get('name')}, "
@@ -1344,7 +1343,7 @@ class SmartHomeTestSuite:
                         return False
                 else:
                     self.log_result("Individual Dashboard", False, 
-                                  f"Missing required fields: {missing_fields}")
+                                  f"Unexpected response structure: {data}")
                     return False
             else:
                 self.log_result("Individual Dashboard", False, 

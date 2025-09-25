@@ -1768,6 +1768,27 @@ const resources = {
         'logo_processing_failed': 'فشل معالجة الشعار. يرجى المحاولة مرة أخرى.'
       },
       
+      // Account Selection System (Arabic)
+      account_selection: {
+        'title': 'اختر نوع حسابك',
+        'subtitle': 'اختر الخطة التي تناسب احتياجات إدارة ممتلكاتك',
+        'loading': 'جاري تحميل خيارات الحساب...',
+        'individual': 'مجمع سكني فردي',
+        'enterprise': 'شركة مؤسسية',
+        'popular': 'الخيار الأكثر شعبية',
+        'per_unit_month': '/وحدة/شهر',
+        'additional_compounds': 'مجمعات إضافية',
+        'free_trial': 'تجربة مجانية',
+        'features_included': 'الميزات المتضمنة',
+        'get_started': 'ابدأ الآن',
+        'selecting': 'جاري الاختيار...',
+        'need_help': 'تحتاج مساعدة في الاختيار؟',
+        'contact_support': 'اتصل بالدعم'
+      },
+      
+      // Common (Arabic)
+      'back_to_login': 'العودة إلى تسجيل الدخول',
+      
       // Legal Documents (Arabic)
       legal: {
         'title': 'المعلومات القانونية',

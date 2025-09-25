@@ -3608,6 +3608,27 @@ const resources = {
         'logo_upload_failed': 'Échec du téléchargement du logo. Veuillez réessayer.',
         'logo_processing_failed': 'Échec du traitement du logo. Veuillez réessayer.'
       },
+      
+      // Account Selection System (French)
+      account_selection: {
+        'title': 'Choisissez Votre Type de Compte',
+        'subtitle': 'Sélectionnez le plan qui convient le mieux à vos besoins de gestion immobilière',
+        'loading': 'Chargement des options de compte...',
+        'individual': 'Complexe Individuel',
+        'enterprise': 'Entreprise',
+        'popular': 'Choix Populaire',
+        'per_unit_month': '/unité/mois',
+        'additional_compounds': 'Complexes supplémentaires',
+        'free_trial': 'Essai Gratuit',
+        'features_included': 'Fonctionnalités Incluses',
+        'get_started': 'Commencer',
+        'selecting': 'Sélection...',
+        'need_help': 'Besoin d\'aide pour choisir?',
+        'contact_support': 'Contacter le Support'
+      },
+      
+      // Common (French)
+      'back_to_login': 'Retour à la Connexion',
     }
   }
 };

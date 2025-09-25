@@ -11,7 +11,7 @@ from datetime import datetime, date, timedelta
 from typing import Dict, List, Optional
 
 # Configuration
-BASE_URL = "https://homeme-enterprise.preview.emergentagent.com/api"
+BASE_URL = "https://multi-home-admin.preview.emergentagent.com/api"
 
 class ServiceManagementTestSuite:
     def __init__(self):

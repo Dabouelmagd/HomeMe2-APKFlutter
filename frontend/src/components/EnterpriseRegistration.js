@@ -549,6 +549,62 @@ const EnterpriseRegistration = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        
+        {/* Logo Crop Modal */}
+        {showCrop && logoPreview && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                {t('enterprise.crop_logo')}
+              </h3>
+              
+              <div className="mb-4">
+                <ReactCrop
+                  crop={crop}
+                  onChange={(newCrop) => setCrop(newCrop)}
+                  onComplete={(c) => setCompletedCrop(c)}
+                  aspect={1}
+                  circularCrop
+                >
+                  <img
+                    src={logoPreview}
+                    alt="Crop preview"
+                    style={{ maxHeight: '400px', width: 'auto' }}
+                  />
+                </ReactCrop>
+              </div>
+              
+              <div className="flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowCrop(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+                >
+                  {t('enterprise.cancel')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCropComplete}
+                  disabled={logoUploading || !completedCrop}
+                  className={`px-4 py-2 text-sm font-medium rounded-md ${
+                    logoUploading || !completedCrop
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
+                >
+                  {logoUploading ? (
+                    <span className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      {t('enterprise.uploading')}
+                    </span>
+                  ) : (
+                    t('enterprise.crop_and_upload')
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Progress bar */}
         <div className="mb-8">
           <div className="flex items-center justify-center">

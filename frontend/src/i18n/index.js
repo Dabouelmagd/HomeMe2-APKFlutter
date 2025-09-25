@@ -1108,6 +1108,12 @@ const resources = {
         'features_included': 'Features Included',
         'get_started': 'Get Started',
         'selecting': 'Selecting...',
+        'need_help': 'Need help choosing?',
+        'contact_support': 'Contact Support'
+      },
+      
+      // Common
+      'back_to_login': 'Back to Login',
         'comparison_title': 'Feature Comparison',
         'feature': 'Feature',
         'compounds_limit': 'Compounds Limit',

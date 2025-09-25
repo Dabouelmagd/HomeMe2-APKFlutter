@@ -1059,6 +1059,584 @@ class SmartHomeTestSuite:
             self.log_result("Natural Language Authentication", False, f"Exception occurred: {str(e)}")
             return False
 
+    # ============ INDIVIDUAL & ENTERPRISE ACCOUNT SYSTEM TESTS ============
+    
+    def test_account_type_selection_get(self):
+        """Test GET /api/account/selection - Get account type options"""
+        print("\n=== Testing Account Type Selection - GET ===")
+        
+        if not self.admin_token:
+            self.log_result("Account Type Selection - GET", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/account/selection", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                account_types = data.get("account_types", [])
+                
+                # Verify response structure
+                if len(account_types) >= 2:
+                    individual_found = any(acc.get("type") == "individual" for acc in account_types)
+                    enterprise_found = any(acc.get("type") == "enterprise" for acc in account_types)
+                    
+                    if individual_found and enterprise_found:
+                        # Check for multilingual content
+                        has_multilingual = any(
+                            "translations" in acc for acc in account_types
+                        )
+                        
+                        self.log_result("Account Type Selection - GET", True, 
+                                      f"Retrieved {len(account_types)} account types successfully. "
+                                      f"Multilingual support: {has_multilingual}")
+                        return True
+                    else:
+                        self.log_result("Account Type Selection - GET", False, 
+                                      "Missing individual or enterprise account types")
+                        return False
+                else:
+                    self.log_result("Account Type Selection - GET", False, 
+                                  f"Expected at least 2 account types, got {len(account_types)}")
+                    return False
+            else:
+                self.log_result("Account Type Selection - GET", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Account Type Selection - GET", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_account_type_selection_post_individual(self):
+        """Test POST /api/account/select-type - Select individual account type"""
+        print("\n=== Testing Account Type Selection - POST Individual ===")
+        
+        if not self.admin_token:
+            self.log_result("Account Type Selection - POST Individual", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            selection_data = {
+                "account_type": "individual"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/account/select-type", 
+                                       json=selection_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("selected_type") == "individual" and "redirect_url" in data:
+                    self.log_result("Account Type Selection - POST Individual", True, 
+                                  f"Individual account type selected successfully. Redirect: {data.get('redirect_url')}")
+                    return True
+                else:
+                    self.log_result("Account Type Selection - POST Individual", False, 
+                                  f"Unexpected response structure: {data}")
+                    return False
+            else:
+                self.log_result("Account Type Selection - POST Individual", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Account Type Selection - POST Individual", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_account_type_selection_post_enterprise(self):
+        """Test POST /api/account/select-type - Select enterprise account type"""
+        print("\n=== Testing Account Type Selection - POST Enterprise ===")
+        
+        if not self.admin_token:
+            self.log_result("Account Type Selection - POST Enterprise", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            selection_data = {
+                "account_type": "enterprise"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/account/select-type", 
+                                       json=selection_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("selected_type") == "enterprise" and "redirect_url" in data:
+                    self.log_result("Account Type Selection - POST Enterprise", True, 
+                                  f"Enterprise account type selected successfully. Redirect: {data.get('redirect_url')}")
+                    return True
+                else:
+                    self.log_result("Account Type Selection - POST Enterprise", False, 
+                                  f"Unexpected response structure: {data}")
+                    return False
+            else:
+                self.log_result("Account Type Selection - POST Enterprise", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Account Type Selection - POST Enterprise", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_individual_compound_registration(self):
+        """Test POST /api/individual/register - Register individual compound"""
+        print("\n=== Testing Individual Compound Registration ===")
+        
+        if not self.admin_token:
+            self.log_result("Individual Compound Registration", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Create realistic test data
+            compound_data = {
+                "name": "Sunset Gardens Residential Complex",
+                "description": "A beautiful residential compound with modern amenities",
+                "address": "123 Palm Street, Dubai Marina, Dubai, UAE",
+                "total_units": 85,
+                "compound_type": "residential",
+                "amenities": ["swimming_pool", "gym", "parking", "security", "playground"],
+                "owner_email": "owner@sunsetgardens.com",
+                "owner_phone": "+971501234567",
+                "timezone": "Asia/Dubai",
+                "currency": "AED",
+                "language": "en"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/individual/register", 
+                                       json=compound_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if (data.get("message") == "Individual compound registered successfully" and 
+                    "compound_id" in data and "subscription_id" in data):
+                    
+                    # Store for later tests
+                    self.individual_compound_id = data.get("compound_id")
+                    self.individual_subscription_id = data.get("subscription_id")
+                    
+                    # Verify pricing calculation
+                    pricing = data.get("pricing", {})
+                    expected_monthly = 85 * 0.5  # 85 units * $0.50
+                    
+                    if pricing.get("monthly_amount") == expected_monthly:
+                        self.log_result("Individual Compound Registration", True, 
+                                      f"Individual compound registered successfully. "
+                                      f"ID: {self.individual_compound_id}, "
+                                      f"Monthly cost: ${pricing.get('monthly_amount')}")
+                        return True
+                    else:
+                        self.log_result("Individual Compound Registration", False, 
+                                      f"Pricing calculation error. Expected ${expected_monthly}, "
+                                      f"got ${pricing.get('monthly_amount')}")
+                        return False
+                else:
+                    self.log_result("Individual Compound Registration", False, 
+                                  f"Unexpected response structure: {data}")
+                    return False
+            else:
+                self.log_result("Individual Compound Registration", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Individual Compound Registration", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_individual_compound_validation(self):
+        """Test POST /api/individual/register - Test validation (max 1000 units)"""
+        print("\n=== Testing Individual Compound Validation ===")
+        
+        if not self.admin_token:
+            self.log_result("Individual Compound Validation", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test with too many units (over 1000 limit)
+            invalid_compound_data = {
+                "name": "Too Large Compound",
+                "address": "Test Address",
+                "total_units": 1500,  # Over 1000 limit
+                "owner_email": "test@example.com"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/individual/register", 
+                                       json=invalid_compound_data, headers=headers)
+            
+            if response.status_code == 422:  # Validation error
+                self.log_result("Individual Compound Validation", True, 
+                              "Correctly rejected compound with >1000 units")
+                return True
+            else:
+                self.log_result("Individual Compound Validation", False, 
+                              f"Expected 422 validation error, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Individual Compound Validation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_individual_dashboard(self):
+        """Test GET /api/individual/dashboard - Get individual dashboard data"""
+        print("\n=== Testing Individual Dashboard ===")
+        
+        if not self.admin_token:
+            self.log_result("Individual Dashboard", False, "No admin token available")
+            return False
+        
+        # First register a compound if we don't have one
+        if not hasattr(self, 'individual_compound_id'):
+            if not self.test_individual_compound_registration():
+                self.log_result("Individual Dashboard", False, "Could not create test compound")
+                return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/individual/dashboard", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify dashboard structure
+                required_fields = ["compound", "subscription", "statistics", "account_type"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    compound = data.get("compound", {})
+                    subscription = data.get("subscription", {})
+                    statistics = data.get("statistics", {})
+                    
+                    # Verify compound data
+                    if compound.get("account_type") == "individual":
+                        # Verify subscription data
+                        if subscription.get("plan_type") == "individual":
+                            # Verify statistics
+                            stats_fields = ["total_residents", "total_families", "occupancy_rate"]
+                            if all(field in statistics for field in stats_fields):
+                                self.log_result("Individual Dashboard", True, 
+                                              f"Dashboard retrieved successfully. "
+                                              f"Compound: {compound.get('name')}, "
+                                              f"Units: {compound.get('total_units')}, "
+                                              f"Trial: {subscription.get('is_trial_active')}")
+                                return True
+                            else:
+                                self.log_result("Individual Dashboard", False, 
+                                              f"Missing statistics fields: {stats_fields}")
+                                return False
+                        else:
+                            self.log_result("Individual Dashboard", False, 
+                                          f"Expected individual plan, got {subscription.get('plan_type')}")
+                            return False
+                    else:
+                        self.log_result("Individual Dashboard", False, 
+                                      f"Expected individual account, got {compound.get('account_type')}")
+                        return False
+                else:
+                    self.log_result("Individual Dashboard", False, 
+                                  f"Missing required fields: {missing_fields}")
+                    return False
+            else:
+                self.log_result("Individual Dashboard", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Individual Dashboard", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_individual_pricing_calculator_monthly(self):
+        """Test GET /api/individual/pricing/calculate - Monthly billing"""
+        print("\n=== Testing Individual Pricing Calculator - Monthly ===")
+        
+        if not self.admin_token:
+            self.log_result("Individual Pricing Calculator - Monthly", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test different unit counts
+            test_cases = [
+                {"units": 10, "expected_monthly": 5.0},
+                {"units": 50, "expected_monthly": 25.0},
+                {"units": 100, "expected_monthly": 50.0},
+                {"units": 500, "expected_monthly": 250.0},
+                {"units": 1000, "expected_monthly": 500.0}
+            ]
+            
+            success_count = 0
+            for test_case in test_cases:
+                units = test_case["units"]
+                expected = test_case["expected_monthly"]
+                
+                response = self.session.get(
+                    f"{BASE_URL}/individual/pricing/calculate?units={units}&billing_cycle=monthly", 
+                    headers=headers
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    pricing = data.get("pricing", {})
+                    
+                    if pricing.get("monthly_amount") == expected:
+                        success_count += 1
+                    else:
+                        self.log_result(f"Pricing Calculator - {units} units", False, 
+                                      f"Expected ${expected}, got ${pricing.get('monthly_amount')}")
+                else:
+                    self.log_result(f"Pricing Calculator - {units} units", False, 
+                                  f"Failed with status {response.status_code}")
+            
+            if success_count == len(test_cases):
+                self.log_result("Individual Pricing Calculator - Monthly", True, 
+                              f"All {len(test_cases)} pricing calculations correct")
+                return True
+            else:
+                self.log_result("Individual Pricing Calculator - Monthly", False, 
+                              f"Only {success_count}/{len(test_cases)} calculations correct")
+                return False
+                
+        except Exception as e:
+            self.log_result("Individual Pricing Calculator - Monthly", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_individual_pricing_calculator_annual(self):
+        """Test GET /api/individual/pricing/calculate - Annual billing with discount"""
+        print("\n=== Testing Individual Pricing Calculator - Annual ===")
+        
+        if not self.admin_token:
+            self.log_result("Individual Pricing Calculator - Annual", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test 100 units annual pricing
+            units = 100
+            expected_monthly = 50.0  # 100 * $0.50
+            expected_annual = 550.0  # 11 months (1 month free)
+            expected_savings = 50.0  # 1 month free
+            
+            response = self.session.get(
+                f"{BASE_URL}/individual/pricing/calculate?units={units}&billing_cycle=annual", 
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                pricing = data.get("pricing", {})
+                
+                monthly_correct = pricing.get("monthly_amount") == expected_monthly
+                annual_correct = pricing.get("annual_amount") == expected_annual
+                savings_correct = pricing.get("annual_savings") == expected_savings
+                
+                if monthly_correct and annual_correct and savings_correct:
+                    self.log_result("Individual Pricing Calculator - Annual", True, 
+                                  f"Annual pricing correct. Monthly: ${expected_monthly}, "
+                                  f"Annual: ${expected_annual}, Savings: ${expected_savings}")
+                    return True
+                else:
+                    self.log_result("Individual Pricing Calculator - Annual", False, 
+                                  f"Pricing mismatch. Got Monthly: ${pricing.get('monthly_amount')}, "
+                                  f"Annual: ${pricing.get('annual_amount')}, "
+                                  f"Savings: ${pricing.get('annual_savings')}")
+                    return False
+            else:
+                self.log_result("Individual Pricing Calculator - Annual", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Individual Pricing Calculator - Annual", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_individual_pricing_with_trial(self):
+        """Test GET /api/individual/pricing/calculate - Include trial information"""
+        print("\n=== Testing Individual Pricing Calculator - With Trial ===")
+        
+        if not self.admin_token:
+            self.log_result("Individual Pricing Calculator - With Trial", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            response = self.session.get(
+                f"{BASE_URL}/individual/pricing/calculate?units=50&billing_cycle=monthly&include_trial=true", 
+                headers=headers
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                pricing = data.get("pricing", {})
+                
+                # Verify trial information is included
+                if "trial_months" in pricing and pricing.get("trial_months") == 1:
+                    self.log_result("Individual Pricing Calculator - With Trial", True, 
+                                  f"Trial information included correctly. Trial months: {pricing.get('trial_months')}")
+                    return True
+                else:
+                    self.log_result("Individual Pricing Calculator - With Trial", False, 
+                                  f"Trial information missing or incorrect: {pricing}")
+                    return False
+            else:
+                self.log_result("Individual Pricing Calculator - With Trial", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Individual Pricing Calculator - With Trial", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_individual_upgrade_request(self):
+        """Test POST /api/individual/upgrade - Request upgrade to enterprise"""
+        print("\n=== Testing Individual Upgrade Request ===")
+        
+        if not self.admin_token:
+            self.log_result("Individual Upgrade Request", False, "No admin token available")
+            return False
+        
+        # First ensure we have an individual compound
+        if not hasattr(self, 'individual_compound_id'):
+            if not self.test_individual_compound_registration():
+                self.log_result("Individual Upgrade Request", False, "Could not create test compound")
+                return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            upgrade_data = {
+                "target_type": "enterprise",
+                "reason": "Need to manage multiple compounds and require advanced features",
+                "additional_compounds": 2,
+                "estimated_units": 300
+            }
+            
+            response = self.session.post(f"{BASE_URL}/individual/upgrade", 
+                                       json=upgrade_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify upgrade request structure
+                if ("upgrade_id" in data and "cost_analysis" in data and 
+                    data.get("message") == "Upgrade request submitted successfully"):
+                    
+                    cost_analysis = data.get("cost_analysis", {})
+                    
+                    # Verify cost analysis fields
+                    required_cost_fields = ["current_monthly_cost", "new_monthly_cost", 
+                                          "cost_difference", "percentage_change"]
+                    
+                    if all(field in cost_analysis for field in required_cost_fields):
+                        self.log_result("Individual Upgrade Request", True, 
+                                      f"Upgrade request submitted successfully. "
+                                      f"ID: {data.get('upgrade_id')}, "
+                                      f"Cost increase: ${cost_analysis.get('cost_difference'):.2f}")
+                        return True
+                    else:
+                        self.log_result("Individual Upgrade Request", False, 
+                                      f"Missing cost analysis fields: {cost_analysis}")
+                        return False
+                else:
+                    self.log_result("Individual Upgrade Request", False, 
+                                  f"Unexpected response structure: {data}")
+                    return False
+            else:
+                self.log_result("Individual Upgrade Request", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Individual Upgrade Request", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_individual_endpoints_authentication(self):
+        """Test that individual endpoints require proper authentication"""
+        print("\n=== Testing Individual Endpoints Authentication ===")
+        
+        endpoints_to_test = [
+            ("GET", "/individual/dashboard"),
+            ("POST", "/individual/register"),
+            ("GET", "/individual/pricing/calculate"),
+            ("POST", "/individual/upgrade")
+        ]
+        
+        success_count = 0
+        
+        for method, endpoint in endpoints_to_test:
+            try:
+                if method == "GET":
+                    response = self.session.get(f"{BASE_URL}{endpoint}")
+                else:
+                    response = self.session.post(f"{BASE_URL}{endpoint}", json={})
+                
+                if response.status_code in [401, 403]:
+                    success_count += 1
+                else:
+                    self.log_result(f"Auth Test - {method} {endpoint}", False, 
+                                  f"Expected 401/403, got {response.status_code}")
+            except Exception as e:
+                self.log_result(f"Auth Test - {method} {endpoint}", False, f"Exception: {str(e)}")
+        
+        if success_count == len(endpoints_to_test):
+            self.log_result("Individual Endpoints Authentication", True, 
+                          f"All {len(endpoints_to_test)} endpoints properly secured")
+            return True
+        else:
+            self.log_result("Individual Endpoints Authentication", False, 
+                          f"Only {success_count}/{len(endpoints_to_test)} endpoints properly secured")
+            return False
+    
+    def run_individual_account_system_tests(self):
+        """Run Individual & Enterprise Account System Tests"""
+        print("\n🏢 STARTING INDIVIDUAL & ENTERPRISE ACCOUNT SYSTEM TESTING")
+        print("=" * 80)
+        print("Testing new Individual Compound and Account Selection backend API endpoints")
+        print("=" * 80)
+        
+        # Authentication setup
+        print("\n🔐 AUTHENTICATION SETUP")
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_comprehensive_summary()
+        
+        # Account Type Selection Tests
+        print("\n🎯 ACCOUNT TYPE SELECTION TESTING")
+        self.test_account_type_selection_get()
+        self.test_account_type_selection_post_individual()
+        self.test_account_type_selection_post_enterprise()
+        
+        # Individual Compound Management Tests
+        print("\n🏠 INDIVIDUAL COMPOUND MANAGEMENT TESTING")
+        self.test_individual_compound_registration()
+        self.test_individual_compound_validation()
+        self.test_individual_dashboard()
+        
+        # Individual Pricing Calculator Tests
+        print("\n💰 INDIVIDUAL PRICING CALCULATOR TESTING")
+        self.test_individual_pricing_calculator_monthly()
+        self.test_individual_pricing_calculator_annual()
+        self.test_individual_pricing_with_trial()
+        
+        # Upgrade System Tests
+        print("\n⬆️ UPGRADE SYSTEM TESTING")
+        self.test_individual_upgrade_request()
+        
+        # Security Tests
+        print("\n🔒 SECURITY & AUTHENTICATION TESTING")
+        self.test_individual_endpoints_authentication()
+        
+        return self.print_comprehensive_summary()
+
     # ============ MAIN TEST RUNNER ============
     
     def run_voting_and_smart_home_tests(self):

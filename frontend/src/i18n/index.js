@@ -1746,7 +1746,20 @@ const resources = {
         'all_compounds': 'جميع المجمعات',
         'compounds_view_coming_soon': 'عرض إدارة المجمعات قريباً',
         'analytics_view_coming_soon': 'عرض التحليلات قريباً',
-        'settings_view_coming_soon': 'عرض الإعدادات قريباً'
+        'settings_view_coming_soon': 'عرض الإعدادات قريباً',
+        
+        // Logo Upload (Arabic)
+        'company_logo': 'شعار الشركة',
+        'upload_logo': 'رفع الشعار',
+        'or_drag_and_drop': 'أو اسحب وأسقط',
+        'crop_logo': 'قص الشعار',
+        'crop_and_upload': 'قص ورفع',
+        'uploading': 'جاري الرفع...',
+        'invalid_image_type': 'يرجى اختيار ملف صورة صالح',
+        'file_too_large': 'حجم الملف كبير جداً. الحد الأقصى 5 ميجابايت.',
+        'logo_uploaded_successfully': 'تم رفع الشعار بنجاح!',
+        'logo_upload_failed': 'فشل رفع الشعار. يرجى المحاولة مرة أخرى.',
+        'logo_processing_failed': 'فشل معالجة الشعار. يرجى المحاولة مرة أخرى.'
       },
       
       // Legal Documents (Arabic)

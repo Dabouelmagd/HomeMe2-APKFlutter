@@ -322,7 +322,59 @@ const resources = {
         'contact_support': 'Contact Support'
       },
       
-      // Common (English)
+      // Common Actions and Buttons
+      'view_details': 'View Details',
+      'create_request': 'Create Request',
+      'add_visitor': 'Add Visitor', 
+      'generate_qr_code': 'Generate QR Code',
+      'edit_details': 'Edit Details',
+      'delete_item': 'Delete Item',
+      'mark_complete': 'Mark Complete',
+      'mark_incomplete': 'Mark Incomplete',
+      'approve_request': 'Approve Request',
+      'reject_request': 'Reject Request',
+      'cancel_booking': 'Cancel Booking',
+      'confirm_booking': 'Confirm Booking',
+      'reschedule_visit': 'Reschedule Visit',
+      'check_in': 'Check In',
+      'check_out': 'Check Out',
+      'send_notification': 'Send Notification',
+      
+      // Status Indicators
+      'in_progress': 'In Progress',
+      'checked_in': 'Checked In',
+      'checked_out': 'Checked Out',
+      'normal_priority': 'Normal Priority',
+      'high_priority': 'High Priority',
+      'urgent_priority': 'Urgent Priority',
+      'low_priority': 'Low Priority',
+      'under_review': 'Under Review',
+      'waiting_approval': 'Waiting Approval',
+      'on_hold': 'On Hold',
+      'in_queue': 'In Queue',
+      
+      // Categories and Types
+      'general_maintenance': 'General Maintenance',
+      'business_event': 'Business Event',
+      'social_event': 'Social Event',
+      'religious_event': 'Religious Event',
+      'community_event': 'Community Event',
+      'private_event': 'Private Event',
+      'emergency_maintenance': 'Emergency Maintenance',
+      'routine_maintenance': 'Routine Maintenance',
+      'guest_visitor': 'Guest Visitor',
+      'service_provider': 'Service Provider',
+      'delivery_person': 'Delivery Person',
+      
+      // Search and Filter
+      'all_categories': 'All Categories',
+      'all_statuses': 'All Statuses',
+      'search_visitors': 'Search Visitors',
+      'date_range': 'Date Range',
+      'filter_by': 'Filter By',
+      'sort_by': 'Sort By',
+      'select_all': 'Select All',
+      'clear_all': 'Clear All',
       'back_to_login': 'Back to Login',
     }
   },

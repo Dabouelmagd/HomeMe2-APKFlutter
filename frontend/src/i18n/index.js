@@ -297,6 +297,14 @@ const resources = {
       'government_utility_gateway': 'بوابة الحكومة والمرافق',
       'community_newsletter': 'النشرة الإخبارية للمجتمع',
       
+      // Descriptions
+      'guest_management_description': 'إدارة الضيوف وطلبات الزيارة بكفاءة',
+      'maintenance_system_description': 'التعامل مع طلبات الصيانة وتتبع التقدم',
+      'smart_home_description': 'تحكم في أجهزة منزلك الذكي باللغة الطبيعية',
+      'voting_system_description': 'إنشاء والمشاركة في التصويت المجتمعي',
+      'events_announcements_description': 'ابق محدثاً مع أحداث وإعلانات المجتمع',
+      'analytics_description': 'عرض تحليلات ورؤى تفصيلية حول مجمعك',
+      
       // Dashboard
       'welcome_back_name': 'مرحباً بعودتك، {{name}}',
       'welcome_home_name': 'أهلاً بعودتك، {{name}}',

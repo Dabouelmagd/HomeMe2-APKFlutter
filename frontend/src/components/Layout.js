@@ -296,7 +296,7 @@ const Layout = () => {
     },
     {
       name: t('enterprise.dashboard'),
-      href: '/enterprise-register',
+      href: '/account-type-selection',
       icon: BuildingOffice2Icon,
       show: user?.role === 'admin' // Only show for admins
     }

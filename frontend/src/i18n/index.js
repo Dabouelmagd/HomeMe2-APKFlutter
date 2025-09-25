@@ -50,6 +50,14 @@ const resources = {
       'government_utility_gateway': 'Government & Utility Gateway',
       'community_newsletter': 'Community Newsletter',
       
+      // Descriptions
+      'guest_management_description': 'Manage guests and visitor requests efficiently',
+      'maintenance_system_description': 'Handle maintenance requests and track progress',
+      'smart_home_description': 'Control your smart home devices with natural language',
+      'voting_system_description': 'Create and participate in community voting',
+      'events_announcements_description': 'Stay updated with community events and announcements',
+      'analytics_description': 'View detailed analytics and insights about your compound',
+      
       // Dashboard
       'welcome_back_name': 'Welcome back, {{name}}',
       'welcome_home_name': 'Welcome home, {{name}}',

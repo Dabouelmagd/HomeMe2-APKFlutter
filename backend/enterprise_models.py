@@ -257,6 +257,7 @@ class CompanyAnalytics(BaseModel):
 class CompanyCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     description: Optional[str] = None
+    logo_url: Optional[str] = None
     email: EmailStr
     phone: Optional[str] = None
     website: Optional[str] = None

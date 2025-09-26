@@ -869,6 +869,8 @@ const resources = {
       'no_recent_activity': 'Aucune activité récente',
       'quick_actions': 'Actions rapides',
       'current_time': 'Heure actuelle',
+      'current_time_display': 'Heure actuelle',
+      'time_now': 'Heure actuelle',
       'active_visitors': 'Visiteurs actifs',
       'active_users': 'Utilisateurs actifs',
       'active_polls': 'Sondages actifs',

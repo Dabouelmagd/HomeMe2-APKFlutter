@@ -482,6 +482,8 @@ const resources = {
       'no_recent_activity': 'لا يوجد نشاط حديث',
       'quick_actions': 'إجراءات سريعة',
       'current_time': 'الوقت الحالي',
+      'current_time_display': 'الوقت الحالي',
+      'time_now': 'الوقت الحالي',
       'active_visitors': 'الزوار النشطون',
       'active_users': 'المستخدمون النشطون',
       'active_polls': 'الاستطلاعات النشطة',

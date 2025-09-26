@@ -832,11 +832,12 @@ const resources = {
       'events_announcements_description': 'Restez informé des événements et annonces de la communauté',
       'analytics_description': 'Voir des analyses détaillées et des informations sur votre résidence',
       
-      // Dashboard Statistics
+      // Dashboard
       'welcome_back_name': 'Bienvenue, {{name}}',
       'welcome_home_name': 'Bon retour, {{name}}',
       'dashboard_welcome_subtitle': "Voici ce qui se passe dans votre résidence aujourd'hui",
       'happening_today': "Voici ce qui se passe dans {{compound}} aujourd'hui.",
+      'whats_happening_today': "Voici ce qui se passe dans votre résidence aujourd'hui",
       'everything_manage': 'Tout ce dont vous avez besoin pour gérer votre maison',
       'total_residents': 'Total des résidents',
       'total_families': 'Total des familles',

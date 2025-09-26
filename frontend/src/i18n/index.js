@@ -445,11 +445,12 @@ const resources = {
       'events_announcements_description': 'ابق محدثاً مع أحداث وإعلانات المجتمع',
       'analytics_description': 'عرض تحليلات ورؤى تفصيلية حول مجمعك',
       
-      // Dashboard Statistics
+      // Dashboard
       'welcome_back_name': 'مرحباً بعودتك، {{name}}',
       'welcome_home_name': 'أهلاً بعودتك، {{name}}',
       'dashboard_welcome_subtitle': "إليك ما يحدث في مجمعك اليوم",
       'happening_today': "إليك ما يحدث في {{compound}} اليوم.",
+      'whats_happening_today': "إليك ما يحدث في مجمعك اليوم",
       'everything_manage': 'كل ما تحتاجه لإدارة منزلك',
       'total_residents': 'إجمالي المقيمين',
       'total_families': 'إجمالي الأسر',

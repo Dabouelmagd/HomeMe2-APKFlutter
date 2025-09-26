@@ -95,6 +95,8 @@ const resources = {
       'no_recent_activity': 'No recent activity',
       'quick_actions': 'Quick Actions',
       'current_time': 'Current Time',
+      'current_time_display': 'Current Time',
+      'time_now': 'Current Time',
       'active_visitors': 'Active Visitors',
       'active_users': 'Active Users',
       'active_polls': 'Active Polls',

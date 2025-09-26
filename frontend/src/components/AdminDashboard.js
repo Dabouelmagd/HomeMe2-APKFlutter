@@ -171,8 +171,8 @@ const AdminDashboard = () => {
         
         {/* Header Section - Redesigned */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between">
-            <div>
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="mb-4">
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
                 <TransliteratedText>
                   {t('welcome_back_name', { name: user?.full_name })}
@@ -184,8 +184,8 @@ const AdminDashboard = () => {
                 </TransliteratedText>
               </p>
             </div>
-            <div className="mt-4 md:mt-0 flex items-center space-x-4">
-              <div className="text-right">
+            <div className="flex items-center space-x-4 mt-4">
+              <div className="text-center">
                 <p className="text-sm text-gray-500">{t('current_time')}</p>
                 <p className="text-lg font-semibold text-gray-900">
                   {new Date().toLocaleTimeString()}

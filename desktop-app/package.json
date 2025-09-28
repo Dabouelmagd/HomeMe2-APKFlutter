@@ -9,7 +9,8 @@
     "build:win": "electron-builder --win",
     "build:mac": "electron-builder --mac",
     "build:linux": "electron-builder --linux",
-    "dist": "npm run build:win"
+    "dist": "node build.js",
+    "create-icons": "node create-icons.js"
   },
   "keywords": [
     "HomeMe",

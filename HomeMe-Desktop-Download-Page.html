@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحميل تطبيق HomeMe Desktop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .download-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 1rem;
+        }
+        
+        .download-btn:hover {
+            background: #3730a3;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+            text-align: right;
+        }
+        
+        .info-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        
+        .features {
+            margin-top: 2rem;
+            text-align: right;
+        }
+        
+        .feature-item {
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        .feature-item::before {
+            content: "✅";
+            margin-left: 0.5rem;
+        }
+        
+        .warning {
+            background: rgba(255, 193, 7, 0.2);
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            color: #ffc107;
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 2rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏠</div>
+        <h1>HomeMe Desktop</h1>
+        <div class="subtitle">
+            نظام إدارة المجتمعات السكنية - تطبيق سطح المكتب
+            <br>
+            Community Management Platform - Desktop Application
+        </div>
+        
+        <!-- استبدل GOOGLE_DRIVE_LINK بالرابط الفعلي -->
+        <a href="GOOGLE_DRIVE_LINK" class="download-btn" id="downloadBtn">
+            📥 تحميل التطبيق (106 MB)
+        </a>
+        
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">الإصدار</div>
+                <div>v1.0.0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">الحجم</div>
+                <div>106 MB</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">المنصة</div>
+                <div>Windows 10/11 (64-bit)</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">النوع</div>
+                <div>Portable Application</div>
+            </div>
+        </div>
+        
+        <div class="warning">
+            ⚠️ <strong>مهم:</strong> يحتاج التطبيق إلى اتصال إنترنت للعمل
+            <br>
+            <strong>Important:</strong> Internet connection required
+        </div>
+        
+        <div class="features">
+            <h3 style="margin-bottom: 1rem;">🚀 المميزات</h3>
+            <div class="feature-item">واجهة عربية كاملة مع دعم RTL</div>
+            <div class="feature-item">إدارة شاملة للمجمعات السكنية</div>
+            <div class="feature-item">نظام مالي متقدم</div>
+            <div class="feature-item">إدارة الضيوف والزيارات</div>
+            <div class="feature-item">نظام الصيانة والطلبات</div>
+            <div class="feature-item">تقارير وتحليلات متقدمة</div>
+        </div>
+        
+        <div style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.8;">
+            <p>📧 للدعم الفني: support@homeme.com</p>
+            <p>🌐 الموقع الرسمي: https://homeme.com</p>
+            <p style="margin-top: 1rem;">
+                <strong>بيانات تسجيل الدخول التجريبية:</strong><br>
+                المستخدم: admin | كلمة المرور: admin123
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // تتبع التحميلات
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            // يمكن إضافة Google Analytics هنا
+            console.log('تم بدء التحميل: HomeMe Desktop v1.0.0');
+            
+            // رسالة تأكيد
+            setTimeout(() => {
+                alert('سيبدأ التحميل قريباً. إذا لم يبدأ تلقائياً، يرجى الضغط على الرابط مرة أخرى.');
+            }, 1000);
+        });
+        
+        // معلومات إضافية عند التمرير
+        window.addEventListener('scroll', function() {
+            // يمكن إضافة تأثيرات هنا
+        });
+    </script>
+</body>
+</html>

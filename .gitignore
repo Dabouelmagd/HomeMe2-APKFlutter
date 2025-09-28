@@ -464,3 +464,5 @@ desktop-app/node_modules/electron/dist/electron
 desktop-app/dist/win-arm64-unpacked/HomeMe.exe
 desktop-app/dist/win-unpacked/HomeMe.exe
 desktop-app/dist/linux-arm64-unpacked/homeme-desktop
+desktop-app/dist/HomeMe-Portable/HomeMe.exe
+desktop-app/dist/HomeMe-Desktop-v1.0.0-Portable.zip

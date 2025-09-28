@@ -27,6 +27,7 @@
     "sharp": "^0.34.4"
   },
   "dependencies": {
+    "archiver": "^7.0.1",
     "electron-updater": "^6.1.7"
   },
   "build": {
@@ -44,11 +45,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "assets/icon.ico",

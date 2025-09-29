@@ -215,19 +215,23 @@ const FamilyManagement = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 text-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 text-center">{t('family_management')}</h1>
-            <p className="mt-1 text-sm text-gray-600 text-center">
+            <h1 className="text-2xl font-bold text-gray-900">{t('family_management')}</h1>
+            <p className="mt-1 text-sm text-gray-600">
               {subtitleText}
             </p>
           </div>
-          <button
-            onClick={() => setShowAddMember(true)}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <UserPlusIcon className="h-5 w-5 mr-2" />
-            {t('add_family_member')}
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={() => setShowAddMember(true)}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <UserPlusIcon className="h-5 w-5 mr-2" />
+              {t('add_family_member')}
+            </button>
+          </div>
+        </div>
           </button>
         </div>
 

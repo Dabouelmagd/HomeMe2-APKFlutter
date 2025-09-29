@@ -286,7 +286,7 @@ const UtilityBills = () => {
           <div className="flex items-center">
             <ExclamationTriangleIcon className="h-5 w-5 text-red-600 mr-3" />
             <div>
-              <h3 className="text-sm font-medium text-red-800">
+              <h3 className="text-sm font-medium text-red-800 text-center">
                 {t('overdue_bills_alert', { count: overdueBills.length })}
               </h3>
               <p className="text-sm text-red-700 mt-1">

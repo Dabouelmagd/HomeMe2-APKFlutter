@@ -216,7 +216,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               )}
             </div>
             <div>
-              <h3 className={`text-lg font-semibold ${
+              <h3 className={`text-lg font-semibold text-center ${
                 isAlmostExpired ? 'text-orange-900' : 'text-blue-900'
               }`}>
                 {isAlmostExpired ? t('trial_ending_soon') : t('free_trial_active')}

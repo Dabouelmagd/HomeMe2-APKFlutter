@@ -540,6 +540,16 @@ const resources = {
       'smart_home': 'المنزل الذكي',
       'government_utility_gateway': 'بوابة الحكومة والمرافق',
       'manage_government_utility_bills': 'إدارة فواتير الحكومة والمرافق في مكان واحد',
+      'utility_connections': 'اتصالات المرافق',
+      'utility_bills': 'فواتير المرافق',
+      'add_first_utility_bill': 'أضف أول فاتورة مرافق',
+      'no_utility_bills': 'لم يتم العثور على فواتير مرافق',
+      'connections': 'الاتصالات',
+      'add_bill': 'إضافة فاتورة',
+      'pending_bills': 'الفواتير المعلقة',
+      'overdue_bills': 'الفواتير المتأخرة',
+      'paid_bills': 'الفواتير المدفوعة',
+      'no_utility_connections': 'لم يتم العثور على اتصالات مرافق',
       'community_newsletter': 'النشرة الإخبارية للمجتمع',
       
       // Descriptions

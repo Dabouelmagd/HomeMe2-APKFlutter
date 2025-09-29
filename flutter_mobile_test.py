@@ -504,7 +504,7 @@ class FlutterMobileTestSuite:
     # ============ MAINTENANCE SYSTEM ENDPOINTS ============
     
     def test_get_maintenance_requests(self):
-        """Test GET /api/maintenance - Get maintenance requests for Flutter app"""
+        """Test GET /api/maintenance/requests - Get maintenance requests for Flutter app"""
         print("\n=== Testing Get Maintenance Requests (Flutter) ===")
         
         if not self.resident_token:
@@ -513,7 +513,7 @@ class FlutterMobileTestSuite:
         
         try:
             headers = self.setup_auth_headers(self.resident_token)
-            response = self.session.get(f"{BASE_URL}/maintenance", headers=headers)
+            response = self.session.get(f"{BASE_URL}/maintenance/requests", headers=headers)
             
             if response.status_code == 200:
                 data = response.json()

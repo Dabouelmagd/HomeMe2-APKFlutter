@@ -556,7 +556,7 @@ class FlutterMobileTestSuite:
             return False
     
     def test_create_maintenance_request(self):
-        """Test POST /api/maintenance - Create maintenance request for Flutter app"""
+        """Test POST /api/maintenance/requests - Create maintenance request for Flutter app"""
         print("\n=== Testing Create Maintenance Request (Flutter) ===")
         
         if not self.resident_token:
@@ -578,7 +578,7 @@ class FlutterMobileTestSuite:
                 "images": []  # Mobile app would typically include images
             }
             
-            response = self.session.post(f"{BASE_URL}/maintenance", json=maintenance_data, headers=headers)
+            response = self.session.post(f"{BASE_URL}/maintenance/requests", json=maintenance_data, headers=headers)
             
             if response.status_code == 200:
                 data = response.json()

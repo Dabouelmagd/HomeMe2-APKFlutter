@@ -1183,6 +1183,12 @@ const resources = {
       'send_first_message': 'Envoyer votre premier message',
       'residents': 'les résidents',
       'management': 'la direction',
+      
+      // Notifications
+      'manage_your_notifications': 'Gérer vos notifications',
+      'filters': 'Filtres',
+      'no_notifications': 'Aucune notification',
+      'notifications_will_appear_here': 'Les notifications apparaîtront ici',
       'community_newsletter': 'Bulletin communautaire',
       
       // Descriptions

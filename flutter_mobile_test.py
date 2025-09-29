@@ -253,7 +253,7 @@ class FlutterMobileTestSuite:
     # ============ DASHBOARD ENDPOINTS ============
     
     def test_admin_dashboard(self):
-        """Test GET /api/admin/dashboard - Admin dashboard for Flutter app"""
+        """Test GET /api/dashboard/admin - Admin dashboard for Flutter app"""
         print("\n=== Testing Admin Dashboard (Flutter) ===")
         
         if not self.admin_token:
@@ -262,7 +262,7 @@ class FlutterMobileTestSuite:
         
         try:
             headers = self.setup_auth_headers(self.admin_token)
-            response = self.session.get(f"{BASE_URL}/admin/dashboard", headers=headers)
+            response = self.session.get(f"{BASE_URL}/dashboard/admin", headers=headers)
             
             if response.status_code == 200:
                 data = response.json()

@@ -227,7 +227,7 @@ const AdminDashboard = () => {
 
         {/* Quick Actions - Redesigned with Working Buttons */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('quick_actions')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('quick_actions')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickActions.map((action) => {
               const IconComponent = action.icon;

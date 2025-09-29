@@ -770,11 +770,11 @@ class FlutterMobileTestSuite:
             return False
         
         endpoints_to_test = [
-            ("GET", "/admin/dashboard", self.admin_token),
-            ("GET", "/resident/dashboard", self.resident_token),
+            ("GET", "/dashboard/admin", self.admin_token),
+            ("GET", "/dashboard/resident", self.resident_token),
             ("GET", "/guests", self.admin_token),
             ("GET", "/visit-requests", self.resident_token),
-            ("GET", "/maintenance", self.resident_token),
+            ("GET", "/maintenance/requests", self.resident_token),
             ("GET", "/events", self.resident_token),
             ("GET", "/notifications", self.resident_token)
         ]

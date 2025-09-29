@@ -93,6 +93,12 @@ const resources = {
       'send_first_message': 'Send your first message',
       'residents': 'residents',
       'management': 'management',
+      
+      // Notifications  
+      'manage_your_notifications': 'Manage your notifications',
+      'filters': 'Filters',
+      'no_notifications': 'No notifications',
+      'notifications_will_appear_here': 'Notifications will appear here',
       'community_newsletter': 'Community Newsletter',
       
       // Descriptions

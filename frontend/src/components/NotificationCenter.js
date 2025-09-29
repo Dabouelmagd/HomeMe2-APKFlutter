@@ -162,7 +162,7 @@ const NotificationCenter = () => {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center">
+            <h1 className="text-3xl font-bold text-gray-900 text-center flex items-center justify-center">
               <BellIcon className="w-8 h-8 mr-3" />
               {t('notifications')}
               {unreadCount > 0 && (

@@ -439,6 +439,15 @@ const resources = {
       'recent_updates': 'Recent updates',
       'recent_notifications': 'Recent Notifications',
       'no_recent_notifications': 'No recent notifications',
+      
+      // Residence Management
+      'no_additional_admins': 'No Additional Admins',
+      'help_manage': 'Help Manage',
+      'residence_management': 'Residence Management',
+      'create_new_residence': 'Create New Residence',
+      'add_residence': 'Add Residence',
+      'no_residences': 'No Residences',
+      'residences_appear': 'Residences will appear here',
       'legal': {
         'title': 'Legal',
         'contact': {

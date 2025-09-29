@@ -1305,6 +1305,31 @@ const resources = {
       'online_devices': 'Appareils en Ligne',
       'active_automations': 'Automatisations Actives',
       'admin_only': 'Administrateur Seulement',
+      
+      // Additional fixes for remaining underscore issues
+      'chat': {
+        'chats': 'Discussions'
+      },
+      'gallery': {
+        'title': 'Galerie'
+      },
+      'schedule': {
+        'title': 'Calendrier'
+      },
+      'notifications': 'Notifications',
+      'settings': {
+        'settings': 'Paramètres'
+      },
+      'pricing_plans': 'Plans Tarifaires',
+      'legal': {
+        'title': 'Légal',
+        'contact': {
+          'title': 'Nous Contacter'
+        }
+      },
+      'enterprise': {
+        'dashboard': 'Tableau de Bord Entreprise'
+      },
     }
   }
 };

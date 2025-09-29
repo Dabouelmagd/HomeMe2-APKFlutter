@@ -529,6 +529,7 @@ const resources = {
       'voting_system': 'نظام التصويت',
       'smart_home': 'المنزل الذكي',
       'government_utility_gateway': 'بوابة الحكومة والمرافق',
+      'manage_government_utility_bills': 'إدارة فواتير الحكومة والمرافق في مكان واحد',
       'community_newsletter': 'النشرة الإخبارية للمجتمع',
       
       // Descriptions

@@ -289,6 +289,18 @@ backend:
           comment: "❌ ENHANCED ENTERPRISE FEATURES TESTING FAILED - CRITICAL DASHBOARD AND COMPOUND MANAGEMENT ISSUES. COMPREHENSIVE TEST RESULTS: ✅ PRICING CALCULATOR WORKING: Enterprise pricing calculator (GET /api/companies/pricing/calculate) working correctly with volume discounts and first-year free calculations, proper parameter validation, comprehensive pricing logic functional. ❌ CRITICAL DASHBOARD FAILURES: Company dashboard (GET /api/companies/dashboard) returning 500 Internal Server Error, root cause: 'unsupported operand type(s) for +: int and NoneType' when calculating total_units from compounds, compounds with null total_units values causing arithmetic errors in line 9957: sum(c.get('total_units', 0) for c in compounds). ❌ COMPOUND MANAGEMENT FAILURES: List compounds endpoint (GET /api/companies/compounds) returning 500 errors, similar null value comparison issues: 'NoneType' comparison errors in compound filtering logic. ❌ MULTI-STEP REGISTRATION FLOW BROKEN: Multi-step registration flow cannot be completed due to logo upload and company registration integration issues, dashboard access fails after company creation. ROOT CAUSE ANALYSIS: 1) Dashboard calculation logic not handling null/None values in compound data properly, 2) Compound filtering logic has null comparison issues, 3) Data model inconsistencies between compound creation and retrieval. RECOMMENDATION: Fix null value handling in dashboard statistics calculations, add proper null checks in compound filtering logic, ensure consistent data models across enterprise features. These are critical data processing bugs that prevent enterprise features from functioning correctly."
 
 frontend:
+  - task: "26 New Translation Keys Addition - Underscore Text Fix"
+    implemented: true
+    working: "NA"
+    file: "i18n/index.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Added 26 new translation keys to fix underscore text issues across multiple pages. Translation keys added for: Services & Bookings (all_bookings, all_requests, my_requests, manage_requests), Date & Time Filters (all_dates, this_week, next_week, last_year, custom_range), Guest Management (visit_requests, visit_history), Events & Announcements (new_announcement, new_event, engagement_rate, search_events_announcements, all_priorities), Analytics (vs_previous_period, maintenance_requests, revenue_collected), Voting System (create_poll, search_polls, no_polls_found, no_polls_found_description), Smart Home (smart_home_integration, add_device, create_automation, online_devices, active_automations), General (admin_only). All keys added for English, Arabic, and French languages."
+
   - task: "Comprehensive Translation System Fix"
     implemented: true
     working: true

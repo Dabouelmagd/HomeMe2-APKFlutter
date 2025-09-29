@@ -1327,6 +1327,9 @@ const resources = {
         'settings': 'Paramètres'
       },
       'pricing_plans': 'Plans Tarifaires',
+      'recent_updates': 'Mises à jour récentes',
+      'recent_notifications': 'Notifications récentes',
+      'no_recent_notifications': 'Aucune notification récente',
       'legal': {
         'title': 'Légal',
         'contact': {

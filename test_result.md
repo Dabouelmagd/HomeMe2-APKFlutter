@@ -49,7 +49,7 @@
 ##
 test_plan:
   current_focus:
-    - "Text-Center CSS Class Application to All Major Headings"
+    - "Family Management Translation Keys Implementation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

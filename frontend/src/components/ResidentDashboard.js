@@ -231,7 +231,7 @@ const ResidentDashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Notifications</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('recent_notifications')}</h3>
               <BellIcon className="h-5 w-5 text-gray-400" />
             </div>
           </div>

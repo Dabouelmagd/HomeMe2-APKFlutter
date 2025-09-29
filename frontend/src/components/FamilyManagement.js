@@ -212,9 +212,9 @@ const FamilyManagement = () => {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 text-center">Family Management</h1>
+            <h1 className="text-2xl font-bold text-gray-900 text-center">{t('family_management')}</h1>
             <p className="mt-1 text-sm text-gray-600">
-              Manage family members for Unit {user.unit_number} with QR gate access
+              {t('manage_family_members_unit_qr', { unit: user.unit_number })}
             </p>
           </div>
           <button

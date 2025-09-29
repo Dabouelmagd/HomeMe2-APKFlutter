@@ -49,6 +49,16 @@ const resources = {
       'smart_home': 'Smart Home',
       'government_utility_gateway': 'Government & Utility Gateway',
       'manage_government_utility_bills': 'Manage your government and utility bills in one place',
+      'utility_connections': 'Utility Connections',
+      'utility_bills': 'Utility Bills',
+      'add_first_utility_bill': 'Add your first utility bill',
+      'no_utility_bills': 'No utility bills found',
+      'connections': 'Connections',
+      'add_bill': 'Add Bill',
+      'pending_bills': 'Pending Bills',
+      'overdue_bills': 'Overdue Bills',
+      'paid_bills': 'Paid Bills',
+      'no_utility_connections': 'No utility connections found',
       'community_newsletter': 'Community Newsletter',
       
       // Descriptions

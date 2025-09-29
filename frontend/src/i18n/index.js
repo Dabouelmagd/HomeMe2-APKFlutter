@@ -1217,6 +1217,20 @@ const resources = {
       'filters': 'Filtres',
       'no_notifications': 'Aucune notification',
       'notifications_will_appear_here': 'Les notifications apparaîtront ici',
+      
+      // Settings
+      'manage_account_settings_preferences': 'Gérer les paramètres et préférences de votre compte',
+      'settings': {
+        'notifications': 'Notifications',
+        'profile': 'Profil',
+        'privacy': 'Confidentialité', 
+        'language': 'Langue'
+      },
+      'notificationCenter': {
+        'pushNotifications': 'Notifications Push',
+        'notSubscribed': 'Non Abonné',
+        'enable': 'Activer'
+      },
       'community_newsletter': 'Bulletin communautaire',
       
       // Descriptions

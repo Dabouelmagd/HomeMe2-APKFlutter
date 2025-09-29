@@ -881,7 +881,7 @@ const resources = {
       'settings': {
         'settings': 'الإعدادات'
       },
-      'pricing_plans': 'خطط الأسعار',
+      'pricing_plans': '💎 خطط الأسعار',
       'recent_updates': 'التحديثات الحديثة',
       'recent_notifications': 'الإشعارات الحديثة',
       'no_recent_notifications': 'لا توجد إشعارات حديثة',

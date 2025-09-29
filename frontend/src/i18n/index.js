@@ -863,6 +863,31 @@ const resources = {
       'online_devices': 'الأجهزة المتصلة',
       'active_automations': 'الأتمتة النشطة',
       'admin_only': 'للمديرين فقط',
+      
+      // Additional fixes for remaining underscore issues
+      'chat': {
+        'chats': 'المحادثات'
+      },
+      'gallery': {
+        'title': 'المعرض'
+      },
+      'schedule': {
+        'title': 'الجدول الزمني'
+      },
+      'notifications': 'الإشعارات',
+      'settings': {
+        'settings': 'الإعدادات'
+      },
+      'pricing_plans': 'خطط الأسعار',
+      'legal': {
+        'title': 'القانونية',
+        'contact': {
+          'title': 'اتصل بنا'
+        }
+      },
+      'enterprise': {
+        'dashboard': 'لوحة تحكم المؤسسة'
+      },
     }
   },
   fr: {

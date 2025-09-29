@@ -435,7 +435,7 @@ const resources = {
       'settings': {
         'settings': 'Settings'
       },
-      'pricing_plans': 'Pricing Plans',
+      'pricing_plans': '💎 Pricing Plans',
       'recent_updates': 'Recent updates',
       'recent_notifications': 'Recent Notifications',
       'no_recent_notifications': 'No recent notifications',

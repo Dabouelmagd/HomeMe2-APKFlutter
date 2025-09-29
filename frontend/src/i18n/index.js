@@ -918,6 +918,21 @@ const resources = {
       'add_residence': 'إضافة إقامة',
       'no_residences': 'لا توجد إقامات',
       'residences_appear': 'ستظهر الإقامات هنا',
+      
+      // Analytics & Statistics
+      'collection_rate': 'معدل التحصيل',
+      'maintenance_requests_trend': 'اتجاه طلبات الصيانة',
+      'last_30_days': 'آخر 30 يوماً',
+      'period_summary': 'ملخص الفترة',
+      'key_achievements': 'الإنجازات الرئيسية',
+      'increase_in_resident_registrations': 'زيادة في تسجيل المقيمين',
+      'payment_collection_rate_achieved': 'تم تحقيق معدل تحصيل الدفعات',
+      'user_engagement_maintained': 'تم الحفاظ على مشاركة المستخدمين',
+      'areas_for_improvement': 'مجالات للتحسين',
+      'maintenance_response_time_increased': 'زاد وقت الاستجابة للصيانة',
+      'pending_high_priority_requests': 'طلبات عالية الأولوية معلقة',
+      'revenue_trend': 'اتجاه الإيرادات',
+      'user_activity_trend': 'اتجاه نشاط المستخدمين',
       'legal': {
         'title': 'القانونية',
         'contact': {

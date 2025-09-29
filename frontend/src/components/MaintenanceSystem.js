@@ -191,7 +191,7 @@ const MaintenanceSystem = () => {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t('maintenance_system')}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 text-center">{t('maintenance_system')}</h1>
             <p className="text-gray-600 mt-2">{t('maintenance_system_description')}</p>
           </div>
           <button

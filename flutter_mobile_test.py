@@ -408,23 +408,22 @@ class FlutterMobileTestSuite:
             return False
         
         try:
-            headers = self.setup_auth_headers(self.resident_token)
+            headers = {"Authorization": f"Bearer {self.resident_token}"}
             
-            # Create realistic visit request data for mobile app
+            # Create realistic visit request data for mobile app using Form data
             visit_data = {
-                "guest_name": "Ahmed Al-Rashid",
-                "guest_phone": "+971501234567",
-                "guest_email": "ahmed.rashid@example.com",
+                "visitor_name": "Ahmed Al-Rashid",
+                "visitor_phone": "+971501234567",
+                "visitor_email": "ahmed.rashid@example.com",
                 "visit_purpose": "Family Visit",
-                "visit_date": (datetime.now() + timedelta(days=1)).isoformat(),
-                "visit_time": "15:30",
-                "duration_hours": 3,
-                "vehicle_plate": "A12345",
-                "notes": "Family gathering for weekend visit",
-                "visitor_count": 4
+                "visit_date": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
+                "unit_number": self.resident_user.get("unit_number", "A101"),
+                "host_name": self.resident_user.get("full_name", "Test Resident"),
+                "host_phone": "+971501234567",
+                "notes": "Family gathering for weekend visit"
             }
             
-            response = self.session.post(f"{BASE_URL}/visit-requests", json=visit_data, headers=headers)
+            response = self.session.post(f"{BASE_URL}/visit-requests", data=visit_data, headers=headers)
             
             if response.status_code == 200:
                 data = response.json()

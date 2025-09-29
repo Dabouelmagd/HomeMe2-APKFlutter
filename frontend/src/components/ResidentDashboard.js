@@ -359,7 +359,7 @@ const ResidentDashboard = () => {
                 <BellIcon className="h-5 w-5 text-yellow-600" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">Notifications</p>
+                <p className="font-medium text-gray-900">{t('notifications')}</p>
                 <p className="text-sm text-gray-600">View all updates</p>
               </div>
             </div>

@@ -882,6 +882,9 @@ const resources = {
         'settings': 'الإعدادات'
       },
       'pricing_plans': 'خطط الأسعار',
+      'recent_updates': 'التحديثات الحديثة',
+      'recent_notifications': 'الإشعارات الحديثة',
+      'no_recent_notifications': 'لا توجد إشعارات حديثة',
       'legal': {
         'title': 'القانونية',
         'contact': {

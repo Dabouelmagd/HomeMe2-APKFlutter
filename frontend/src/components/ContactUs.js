@@ -45,7 +45,7 @@ const ContactUs = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl text-center">
             {t('legal.contact.title')}
           </h1>
           <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">

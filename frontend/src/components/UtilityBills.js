@@ -232,7 +232,7 @@ const UtilityBills = () => {
         <h1 className="text-3xl font-bold text-gray-900 text-center">
           {t('government_utility_gateway')}
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 mt-2 text-center">
           {t('manage_government_utility_bills')}
         </p>
       </div>

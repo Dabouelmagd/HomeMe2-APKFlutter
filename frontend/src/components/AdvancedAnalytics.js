@@ -598,7 +598,7 @@ const AdvancedAnalytics = () => {
               {(analytics.summary?.improvements || []).map((improvement, index) => (
                 <li key={index} className="flex items-center">
                   <ArrowTrendingDownIcon className="w-4 h-4 text-orange-500 mr-2" />
-                  {improvement}
+                  {translateBackendData(improvement)}
                 </li>
               ))}
             </ul>

@@ -339,7 +339,7 @@ const FamilyManagement = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-screen overflow-y-auto">
               <h2 className="text-lg font-semibold text-center mb-6">
-                {editingMember ? 'Edit Family Member' : 'Add Family Member'}
+                {editingMember ? t('edit_family_member') : t('add_family_member')}
               </h2>
               
               <form onSubmit={editingMember ? handleUpdateMember : handleAddMember} className="space-y-4">

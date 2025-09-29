@@ -429,11 +429,11 @@ class FlutterMobileTestSuite:
                 data = response.json()
                 
                 # Verify mobile-friendly response
-                if "visit_request_id" in data and "message" in data:
-                    self.test_visit_request_id = data.get("visit_request_id")
+                if "request_id" in data and "message" in data:
+                    self.test_visit_request_id = data.get("request_id")
                     self.log_result("Create Visit Request (Flutter)", True, 
                                   f"Visit request created successfully - ID: {self.test_visit_request_id}, "
-                                  f"Guest: {visit_data['guest_name']}, Date: {visit_data['visit_date'][:10]}")
+                                  f"Guest: {visit_data['visitor_name']}, Date: {visit_data['visit_date']}")
                     return True
                 else:
                     self.log_result("Create Visit Request (Flutter)", False, 

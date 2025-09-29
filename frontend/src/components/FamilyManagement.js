@@ -214,7 +214,7 @@ const FamilyManagement = () => {
           <div>
             <h1 className="text-2xl font-bold text-gray-900 text-center">{t('family_management')}</h1>
             <p className="mt-1 text-sm text-gray-600">
-              {t('manage_family_members_unit_qr', { unit: user.unit_number })}
+              {t('manage_family_members_unit_qr', { unit: user?.unit_number || 'A-101' })}
             </p>
           </div>
           <button

@@ -439,7 +439,7 @@ const Pricing = () => {
         <div className="mt-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
           <div className="max-w-4xl mx-auto text-center">
             <UserGroupIcon className="h-16 w-16 mx-auto mb-4 text-blue-200" />
-            <h2 className="text-3xl font-bold mb-4">Bring Your Community Together</h2>
+            <h2 className="text-3xl font-bold mb-4 text-center">Bring Your Community Together</h2>
             <p className="text-xl text-blue-100 mb-6">
               Any paid user can invite up to 20 free users who get full access to your compound's features
             </p>

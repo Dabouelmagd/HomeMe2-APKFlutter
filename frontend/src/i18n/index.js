@@ -470,6 +470,9 @@ const resources = {
       '76% user engagement maintained': '76% user engagement maintained',
       'Maintenance response time increased by 5%': 'Maintenance response time increased by 5%',
       '3 pending high-priority requests': '3 pending high-priority requests',
+      
+      // Additional Analytics Terms
+      'resident_growth_trend': 'Resident Growth Trend',
       'legal': {
         'title': 'Legal',
         'contact': {

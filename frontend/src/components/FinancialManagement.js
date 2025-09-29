@@ -101,7 +101,7 @@ const FinancialManagement = () => {
     <div className="p-6">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 text-center">{t('financial_management')}</h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 mt-2 text-center">
           {t('view_manage_payments_invoices')}
         </p>
       </div>

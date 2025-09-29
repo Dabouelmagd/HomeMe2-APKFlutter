@@ -74,11 +74,11 @@ const ResidentDashboard = () => {
       description: 'This month'
     },
     {
-      name: 'Notifications',
+      name: t('notifications'),
       value: dashboardData?.recent_notifications?.length || 0,
       icon: BellIcon,
       color: 'bg-green-500',
-      description: 'Recent updates'
+      description: t('recent_updates')
     }
   ];
 

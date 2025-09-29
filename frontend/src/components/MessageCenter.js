@@ -112,9 +112,11 @@ const MessageCenter = () => {
     <div className="p-6">
       <div className="mb-8 text-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('message_center')}</h1>
-          <p className="text-gray-600 mt-2">
-            {t('communicate_with', { role: user?.role === 'admin' ? t('residents') : t('management') })}
+          <h1 className="text-3xl font-bold text-gray-900 text-center">{t('message_center')}</h1>
+          <p className="text-gray-600 mt-2 text-center">
+            {user?.role === 'admin' 
+              ? `${t('communicate_with').replace('{role}', t('residents'))}` 
+              : `${t('communicate_with').replace('{role}', t('management'))}`}
           </p>
         </div>
         <div className="mt-4 flex justify-center">

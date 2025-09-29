@@ -155,7 +155,7 @@ const FinancialManagement = () => {
           <div className="flex items-center">
             <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600 mr-3" />
             <div>
-              <h3 className="text-sm font-medium text-yellow-800">
+              <h3 className="text-sm font-medium text-yellow-800 text-center">
                 {pendingInvoices.length === 1 ? 
                   t('pending_payments_alert', { count: pendingInvoices.length }) :
                   t('pending_payments_alert_plural', { count: pendingInvoices.length })

@@ -1031,6 +1031,16 @@ const resources = {
       'smart_home': 'Maison intelligente',
       'government_utility_gateway': 'Passerelle gouvernementale et services',
       'manage_government_utility_bills': 'Gérez vos factures gouvernementales et de services publics en un seul endroit',
+      'utility_connections': 'Connexions aux Services Publics',
+      'utility_bills': 'Factures de Services Publics',
+      'add_first_utility_bill': 'Ajoutez votre première facture de services publics',
+      'no_utility_bills': 'Aucune facture de services publics trouvée',
+      'connections': 'Connexions',
+      'add_bill': 'Ajouter une Facture',
+      'pending_bills': 'Factures en Attente',
+      'overdue_bills': 'Factures en Retard',
+      'paid_bills': 'Factures Payées',
+      'no_utility_connections': 'Aucune connexion aux services publics trouvée',
       'community_newsletter': 'Bulletin communautaire',
       
       // Descriptions

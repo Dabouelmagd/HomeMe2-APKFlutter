@@ -562,7 +562,7 @@ const AdvancedAnalytics = () => {
         <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">{t('period_summary')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">{t('key_achievements')}</h4>
+            <h4 className="font-medium text-gray-900 text-center mb-2">{t('key_achievements')}</h4>
             <ul className="space-y-1 text-sm text-gray-600">
               {(analytics.summary?.achievements || []).map((achievement, index) => (
                 <li key={index} className="flex items-center">

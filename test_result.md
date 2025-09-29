@@ -224,15 +224,18 @@ backend:
     priority: "high"
   - task: "Advanced Analytics Automatic Backend Data Translation"
     implemented: true
-    working: "NA"
+    working: false
     file: "AdvancedAnalytics.js, i18n/index.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implemented automatic backend data translation system for Advanced Analytics page. Added translateBackendData() function that automatically translates backend data from English to Arabic/French. Added 5 full sentence translation keys for specific patterns: 'increase in resident registrations', 'payment collection rate achieved', 'user engagement maintained', 'Maintenance response time increased', 'pending high-priority requests'. Applied translation to achievements, improvements, and recommendations arrays in Period Summary section. Backend returns specific data patterns that should now be automatically translated to proper Arabic/French equivalents."
+        - working: false
+          agent: "testing"
+          comment: "🎯 ADVANCED ANALYTICS AUTOMATIC BACKEND DATA TRANSLATION TESTING COMPLETED - PARTIAL SUCCESS WITH CRITICAL ISSUES IDENTIFIED. COMPREHENSIVE TESTING RESULTS: ✅ BACKEND DATA RETRIEVAL WORKING: Period Summary section found with Key Achievements, Areas for Improvement, and Recommendations sections. Backend returning expected data patterns with percentages (12.5%, 94.5%, 76%, 5%) and specific text patterns. ✅ ENGLISH PATTERNS PARTIALLY FOUND: Found 1/5 complete patterns ('76% user engagement maintained'), all 5/5 partial patterns (percentages) detected. Backend data structure working correctly. ❌ CRITICAL TRANSLATION FUNCTION ISSUES: Translation function causing text duplication - '12.5% increase in increase in resident registrations', '76% user engagement maintained maintained', 'Maintenance Maintenance response time increased increased by 5%', '3 pending pending high-priority requests'. ❌ ARABIC/FRENCH TRANSLATIONS NOT WORKING: 0/5 Arabic patterns found, 0/5 French patterns found. Backend data remains in English in all languages. Translation keys exist in i18n but translateBackendData() function not properly applying them. ❌ LANGUAGE SWITCHING ISSUES: Arabic RTL layout working but backend data not translated. French language switching working but backend data not translated. ROOT CAUSE: translateBackendData() function has logic issues causing text duplication and not properly matching/replacing backend data patterns. RECOMMENDATION: Fix translateBackendData() function logic to prevent duplication and ensure proper pattern matching for Arabic/French translations."
     needs_retesting: false
     status_history:
         - working: "NA"

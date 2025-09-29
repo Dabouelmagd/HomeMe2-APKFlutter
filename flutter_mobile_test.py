@@ -415,7 +415,7 @@ class FlutterMobileTestSuite:
                 "visitor_name": "Ahmed Al-Rashid",
                 "visitor_phone": "+971501234567",
                 "visitor_email": "ahmed.rashid@example.com",
-                "visit_purpose": "Family Visit",
+                "visit_purpose": "family_visit",  # Use valid purpose from the error message
                 "visit_date": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
                 "unit_number": self.resident_user.get("unit_number", "A101"),
                 "host_name": self.resident_user.get("full_name", "Test Resident"),

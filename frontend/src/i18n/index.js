@@ -950,6 +950,9 @@ const resources = {
       '76% user engagement maintained': 'تم الحفاظ على مشاركة المستخدمين بنسبة 76%',
       'Maintenance response time increased by 5%': 'زاد وقت الاستجابة للصيانة بنسبة 5%',
       '3 pending high-priority requests': '3 طلبات عالية الأولوية معلقة',
+      
+      // Additional Analytics Terms  
+      'resident_growth_trend': 'اتجاه نمو المقيمين',
       'legal': {
         'title': 'القانونية',
         'contact': {

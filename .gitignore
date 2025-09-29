@@ -480,3 +480,11 @@ HomeMe-Desktop-Complete-Package.tar.gz
 HomeMe-Desktop-v1.0.0-Portable.zip
 HomeMe-Desktop-GitHub/HomeMe-Desktop-v1.0.0-Portable.zip
 HomeMe-Desktop-GitHub-Package.tar.gz
+-e 
+# Environment files
+*.env
+*.env.*
+-e 
+# Environment files
+*.env
+*.env.*

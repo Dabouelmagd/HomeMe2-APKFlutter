@@ -1348,6 +1348,15 @@ const resources = {
       'recent_updates': 'Mises à jour récentes',
       'recent_notifications': 'Notifications récentes',
       'no_recent_notifications': 'Aucune notification récente',
+      
+      // Residence Management
+      'no_additional_admins': 'Aucun Administrateur Supplémentaire',
+      'help_manage': 'Aide à la Gestion',
+      'residence_management': 'Gestion des Résidences',
+      'create_new_residence': 'Créer une Nouvelle Résidence',
+      'add_residence': 'Ajouter une Résidence',
+      'no_residences': 'Aucune Résidence',
+      'residences_appear': 'Les résidences apparaîtront ici',
       'legal': {
         'title': 'Légal',
         'contact': {

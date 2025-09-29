@@ -229,7 +229,7 @@ const UtilityBills = () => {
   return (
     <div className="p-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-gray-900 text-center">
           {t('government_utility_gateway')}
         </h1>
         <p className="text-gray-600 mt-2">

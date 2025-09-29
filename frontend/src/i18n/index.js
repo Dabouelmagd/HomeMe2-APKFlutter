@@ -894,6 +894,15 @@ const resources = {
       'recent_updates': 'التحديثات الحديثة',
       'recent_notifications': 'الإشعارات الحديثة',
       'no_recent_notifications': 'لا توجد إشعارات حديثة',
+      
+      // Residence Management
+      'no_additional_admins': 'لا توجد مديرين إضافيين',
+      'help_manage': 'المساعدة في الإدارة',
+      'residence_management': 'إدارة الإقامة',
+      'create_new_residence': 'إنشاء إقامة جديدة',
+      'add_residence': 'إضافة إقامة',
+      'no_residences': 'لا توجد إقامات',
+      'residences_appear': 'ستظهر الإقامات هنا',
       'legal': {
         'title': 'القانونية',
         'contact': {

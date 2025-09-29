@@ -49,10 +49,15 @@
 ##
 test_plan:
   current_focus:
-    - "Enterprise Registration Page Testing"
-    - "Enterprise Dashboard Access Testing"
-    - "Transliteration Feature Testing"
-    - "Enterprise Translation Keys Testing"
+    - "Underscore Text Verification After 26 New Translation Keys"
+    - "Services Management Page Translation Testing"
+    - "Maintenance System Page Translation Testing"
+    - "Guest Management Page Translation Testing"
+    - "Events & Announcements Page Translation Testing"
+    - "Advanced Analytics Page Translation Testing"
+    - "Voting System Page Translation Testing"
+    - "Smart Home Page Translation Testing"
+    - "Document Management Page Translation Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

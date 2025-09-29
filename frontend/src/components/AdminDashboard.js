@@ -173,7 +173,7 @@ const AdminDashboard = () => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
           <div className="flex flex-col items-center justify-center text-center">
             <div className="mb-4">
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2 text-center">
                 <TransliteratedText>
                   {t('welcome_back_name', { name: user?.full_name })}
                 </TransliteratedText> 👋

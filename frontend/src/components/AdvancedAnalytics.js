@@ -28,6 +28,49 @@ const AdvancedAnalytics = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Auto-translate backend data function
+  const translateBackendData = (data) => {
+    if (!data) return data;
+    
+    // Translation mapping for common phrases
+    const translationMap = {
+      'increase in resident registrations': t('increase_in_resident_registrations'),
+      'payment collection rate achieved': t('payment_collection_rate_achieved'),
+      'user engagement maintained': t('user_engagement_maintained'), 
+      'Maintenance response time increased': t('maintenance_response_time_increased'),
+      'pending high-priority requests': t('pending_high_priority_requests'),
+      'resident registrations': t('increase_in_resident_registrations'),
+      'collection rate': t('collection_rate'),
+      'user engagement': t('user_engagement_maintained'),
+      'response time': t('maintenance_response_time_increased'),
+      'high-priority requests': t('pending_high_priority_requests')
+    };
+    
+    // If data is a string, try to translate it
+    if (typeof data === 'string') {
+      // Try exact match first
+      if (t(data) !== data) {
+        return t(data);
+      }
+      
+      // Try partial matches
+      let translatedData = data;
+      Object.keys(translationMap).forEach(key => {
+        if (data.toLowerCase().includes(key.toLowerCase())) {
+          translatedData = translatedData.replace(new RegExp(key, 'gi'), translationMap[key]);
+        }
+      });
+      return translatedData;
+    }
+    
+    // If data is an array, translate each item
+    if (Array.isArray(data)) {
+      return data.map(item => translateBackendData(item));
+    }
+    
+    return data;
+  };
   const [analytics, setAnalytics] = useState({});
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('last_30_days');

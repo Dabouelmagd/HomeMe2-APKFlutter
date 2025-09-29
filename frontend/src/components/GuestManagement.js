@@ -273,7 +273,7 @@ const GuestManagement = () => {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t('guest_management')}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 text-center">{t('guest_management')}</h1>
             <p className="text-gray-600 mt-2">{t('guest_management_description')}</p>
           </div>
           <button

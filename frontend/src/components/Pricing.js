@@ -317,7 +317,7 @@ const Pricing = () => {
                     <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${plan.gradient} flex items-center justify-center`}>
                       <IconComponent className="h-8 w-8 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900">{plan.name}</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 text-center">{plan.name}</h3>
                     <p className="text-gray-600 mt-1">{plan.subtitle}</p>
                   </div>
                   
@@ -465,7 +465,7 @@ const Pricing = () => {
 
         {/* FAQ Section */}
         <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Frequently Asked Questions</h2>
           <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">Can I upgrade or downgrade anytime?</h3>

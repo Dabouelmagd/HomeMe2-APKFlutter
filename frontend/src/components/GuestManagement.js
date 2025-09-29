@@ -446,7 +446,7 @@ const GuestManagement = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{guest.visitor_name}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 text-center">{guest.visitor_name}</h3>
                           {getStatusBadge(guest.status)}
                         </div>
                         
@@ -529,7 +529,7 @@ const GuestManagement = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{request.visitor_name}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 text-center">{request.visitor_name}</h3>
                           {getStatusBadge(request.status)}
                         </div>
                         
@@ -586,7 +586,7 @@ const GuestManagement = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">{t('add_visitor_request')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 text-center">{t('add_visitor_request')}</h2>
             </div>
             
             <form onSubmit={handleCreateGuest} className="p-6 space-y-6">
@@ -815,7 +815,7 @@ const GuestManagement = () => {
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">{t('visitor_details')}</h2>
+                <h2 className="text-xl font-semibold text-gray-900 text-center">{t('visitor_details')}</h2>
                 <button
                   onClick={() => setShowDetailsModal(false)}
                   className="text-gray-400 hover:text-gray-600"

@@ -155,7 +155,7 @@ const AccountTypeSelection = () => {
                     )}
                   </div>
                   
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
                     {getLocalizedContent(accountType, 'name')}
                   </h2>
                   
@@ -242,7 +242,7 @@ const AccountTypeSelection = () => {
         {/* Comparison Table */}
         <div className="mt-16 bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="px-8 py-6 bg-gray-50 border-b">
-            <h3 className="text-2xl font-bold text-gray-900">
+            <h3 className="text-2xl font-bold text-gray-900 text-center">
               {t('account_selection.comparison_title')}
             </h3>
           </div>
@@ -312,7 +312,7 @@ const AccountTypeSelection = () => {
         {/* Support Section */}
         <div className="mt-16 text-center">
           <div className="bg-white rounded-xl shadow-lg p-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">
               {t('account_selection.need_help')}
             </h3>
             <p className="text-gray-600 mb-6">

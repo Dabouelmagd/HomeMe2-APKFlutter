@@ -149,7 +149,7 @@ const AdvancedAnalytics = () => {
 
   const ChartContainer = ({ title, children, className = "" }) => (
     <div className={`bg-white rounded-xl shadow-sm border border-gray-200 p-6 ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+      <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">{title}</h3>
       <div className="h-64">
         {children}
       </div>
@@ -347,7 +347,7 @@ const AdvancedAnalytics = () => {
 
             {/* Recent Activity */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('recent_activity')}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">{t('recent_activity')}</h3>
               <div className="space-y-4">
                 {(analytics.recent_activity || []).map((activity, index) => (
                   <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
@@ -559,7 +559,7 @@ const AdvancedAnalytics = () => {
 
       {/* Summary Report */}
       <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('period_summary')}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">{t('period_summary')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div>
             <h4 className="font-medium text-gray-900 mb-2">{t('key_achievements')}</h4>

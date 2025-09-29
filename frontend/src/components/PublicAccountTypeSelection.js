@@ -167,7 +167,7 @@ const PublicAccountTypeSelection = () => {
               <div className="p-8">
                 {/* Header */}
                 <div className={`mb-6 ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
                     {getLocalizedText(accountType.title)}
                   </h2>
                   <p className="text-gray-600 mb-4">
@@ -180,7 +180,7 @@ const PublicAccountTypeSelection = () => {
 
                 {/* Features */}
                 <div className={`mb-8 ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">
                     {t('account_selection.features_included')}
                   </h3>
                   <ul className="space-y-3">

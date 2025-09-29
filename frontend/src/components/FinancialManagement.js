@@ -142,7 +142,7 @@ const FinancialManagement = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">{t('total_due')}</p>
-              <p className="text-2xl font-bold text-gray-900">${totalPending.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-gray-900 text-center">${totalPending.toFixed(2)}</p>
             </div>
             <CurrencyDollarIcon className="h-8 w-8 text-blue-500" />
           </div>
@@ -173,7 +173,7 @@ const FinancialManagement = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">{t('all_invoices')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 text-center">{t('all_invoices')}</h3>
             <DocumentTextIcon className="h-5 w-5 text-gray-400" />
           </div>
         </div>

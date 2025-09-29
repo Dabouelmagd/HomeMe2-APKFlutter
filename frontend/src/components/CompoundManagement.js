@@ -1148,11 +1148,11 @@ const CompoundManagement = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t('compound_id')}</p>
-                    <p className="text-lg font-semibold text-gray-900">{compound?.id}</p>
+                    <p className="text-lg font-semibold text-gray-900 text-center">{compound?.id}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-500">{t('created')}</p>
-                    <p className="text-lg font-semibold text-gray-900">
+                    <p className="text-lg font-semibold text-gray-900 text-center">
                       {compound?.created_at ? formatDate(compound.created_at) : 'N/A'}
                     </p>
                   </div>
@@ -1165,7 +1165,7 @@ const CompoundManagement = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">{t('admin_management')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 text-center">{t('admin_management')}</h3>
                 <p className="text-gray-600">{t('manage_admins')}</p>
               </div>
               <button 
@@ -1230,7 +1230,7 @@ const CompoundManagement = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">{t('residence_management')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 text-center">{t('residence_management')}</h3>
                 <p className="text-gray-600">{t('create_new_residence')}</p>
               </div>
               <button 
@@ -1257,7 +1257,7 @@ const CompoundManagement = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Residence List</h3>
+                <h3 className="text-lg font-semibold text-gray-900 text-center">Residence List</h3>
                 <p className="text-gray-600">View all residential units and their occupancy</p>
               </div>
               <div className="text-right">
@@ -1326,7 +1326,7 @@ const CompoundManagement = () => {
                           {/* Unit Info */}
                           <div>
                             <div className="flex items-center space-x-2">
-                              <h3 className="text-lg font-semibold text-gray-900">
+                              <h3 className="text-lg font-semibold text-gray-900 text-center">
                                 Unit {residence.unit_number}
                               </h3>
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -1502,7 +1502,7 @@ const CompoundManagement = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Registration Links</h3>
+                <h3 className="text-lg font-semibold text-gray-900 text-center">Registration Links</h3>
                 <p className="text-gray-600">Create and manage registration links for new residents</p>
               </div>
               <button
@@ -1628,7 +1628,7 @@ const CompoundManagement = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Manage Users</h3>
+                <h3 className="text-lg font-semibold text-gray-900 text-center">Manage Users</h3>
                 <p className="text-gray-600">View and manage all users in your compound</p>
               </div>
               <div className="text-sm text-gray-600">
@@ -1759,7 +1759,7 @@ const CompoundManagement = () => {
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Add New Admin</h3>
+              <h3 className="text-lg font-semibold text-gray-900 text-center">Add New Admin</h3>
               <p className="text-gray-600">Create a new administrator account for your compound</p>
             </div>
 
@@ -1916,7 +1916,7 @@ const CompoundManagement = () => {
         <div className="space-y-6">
           {/* Basic Information */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-6">Basic Information</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -1983,7 +1983,7 @@ const CompoundManagement = () => {
 
           {/* Logo Management */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Compound Logo</h3>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-6">Compound Logo</h3>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Current Logo Display */}

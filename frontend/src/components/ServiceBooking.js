@@ -685,7 +685,7 @@ const ServiceBooking = () => {
                     <div className="p-6 bg-gray-50 border-b border-gray-200">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900">{booking.title}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 text-center">{booking.title}</h3>
                           <p className="text-sm text-gray-600 mt-1">{booking.provider_name}</p>
                         </div>
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
@@ -812,7 +812,7 @@ const ServiceBooking = () => {
 
         {activeTab === 'history' && (
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Booking History</h3>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">Booking History</h3>
             <div className="space-y-4">
               {bookings.filter(booking => booking.status === 'completed' || booking.status === 'cancelled').map((booking) => (
                 <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">

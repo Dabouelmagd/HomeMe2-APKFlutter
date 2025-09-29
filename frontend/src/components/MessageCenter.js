@@ -139,7 +139,7 @@ const MessageCenter = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 text-center">
                       {message.subject}
                     </h3>
                     <div className="flex items-center space-x-2">
@@ -206,7 +206,7 @@ const MessageCenter = () => {
           <div className="bg-white rounded-xl shadow-lg max-w-lg w-full max-h-90vh overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">{t('new_message')}</h3>
+                <h3 className="text-lg font-semibold text-gray-900 text-center">{t('new_message')}</h3>
                 <button
                   onClick={() => setShowNewMessage(false)}
                   className="text-gray-400 hover:text-gray-600"

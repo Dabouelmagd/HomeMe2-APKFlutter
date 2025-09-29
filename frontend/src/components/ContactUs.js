@@ -93,7 +93,7 @@ const ContactUs = () => {
 
         {/* Additional Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <h2 className="text-xl font-semibold text-gray-900 text-center mb-4">
             Get in Touch
           </h2>
           <div className="prose prose-gray max-w-none">

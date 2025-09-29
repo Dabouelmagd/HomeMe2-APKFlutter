@@ -138,7 +138,7 @@ const MobileOptimized = ({ children }) => {
           alt="HomeMe"
           className="w-8 h-8 mr-2"
         />
-        <h1 className="text-lg font-semibold text-gray-900">HomeMe</h1>
+        <h1 className="text-lg font-semibold text-gray-900 text-center">HomeMe</h1>
       </div>
       
       <div className="flex items-center space-x-2">

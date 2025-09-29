@@ -102,7 +102,7 @@ const ChatSidebar = ({ selectedChat, onChatSelect, onNewChat }) => {
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">{t('chat.chats')}</h2>
+          <h2 className="text-lg font-semibold text-gray-900 text-center">{t('chat.chats')}</h2>
           <button
             onClick={onNewChat}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

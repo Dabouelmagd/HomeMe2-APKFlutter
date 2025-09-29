@@ -138,7 +138,7 @@ const IndividualRegistration = () => {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
           {t('individual.compound_information')}
         </h2>
         <p className="text-gray-600">
@@ -261,7 +261,7 @@ const IndividualRegistration = () => {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
           {t('individual.contact_preferences')}
         </h2>
         <p className="text-gray-600">
@@ -369,7 +369,7 @@ const IndividualRegistration = () => {
   const renderStep3 = () => (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">
           {t('individual.review_and_submit')}
         </h2>
         <p className="text-gray-600">

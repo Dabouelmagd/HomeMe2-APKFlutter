@@ -187,7 +187,7 @@ const AdminDashboard = () => {
             <div className="flex items-center space-x-4 mt-4">
               <div className="text-center">
                 <p className="text-sm text-gray-500">{t('current_time')}</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-lg font-semibold text-gray-900 text-center">
                   {new Date().toLocaleTimeString()}
                 </p>
               </div>
@@ -227,7 +227,7 @@ const AdminDashboard = () => {
 
         {/* Quick Actions - Redesigned with Working Buttons */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('quick_actions')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-6 text-center">{t('quick_actions')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {quickActions.map((action) => {
               const IconComponent = action.icon;
@@ -248,7 +248,7 @@ const AdminDashboard = () => {
 
         {/* Recent Activity - Redesigned */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('recent_activity')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-6 text-center">{t('recent_activity')}</h2>
           <div className="space-y-4">
             {dashboardData?.recent_activities?.map((activity, index) => (
               <div key={index} className="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">

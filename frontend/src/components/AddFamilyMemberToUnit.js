@@ -195,7 +195,7 @@ const AddFamilyMemberToUnit = () => {
         <div className="flex items-center space-x-3 mb-4">
           <UserPlusIcon className="h-8 w-8 text-blue-600" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Add Family Member to Unit</h1>
+            <h1 className="text-2xl font-bold text-gray-900 text-center">Add Family Member to Unit</h1>
             <p className="text-gray-600">
               {user.role === 'admin' ? 'Add family members to any unit in your compound' : 'Add family members to any unit in your compound'}
             </p>

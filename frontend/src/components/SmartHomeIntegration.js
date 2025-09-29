@@ -466,7 +466,7 @@ const SmartHomeIntegration = () => {
                               <DeviceIcon className={`w-6 h-6 ${getDeviceColor(device.type)}`} />
                             </div>
                             <div>
-                              <h3 className="text-lg font-semibold text-gray-900">{device.name}</h3>
+                              <h3 className="text-lg font-semibold text-gray-900 text-center">{device.name}</h3>
                               <p className="text-sm text-gray-500">{device.location}</p>
                             </div>
                           </div>
@@ -565,7 +565,7 @@ const SmartHomeIntegration = () => {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <div className="flex items-center space-x-3 mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900">{automation.name}</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 text-center">{automation.name}</h3>
                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                               automation.is_active 
                                 ? 'bg-green-100 text-green-800' 
@@ -620,7 +620,7 @@ const SmartHomeIntegration = () => {
                   <ChatBubbleLeftRightIcon className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{t('natural_language_control')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 text-center">{t('natural_language_control')}</h3>
                   <p className="text-sm text-gray-500">{t('natural_control_description')}</p>
                 </div>
               </div>
@@ -684,7 +684,7 @@ const SmartHomeIntegration = () => {
             {naturalCommandHistory.length > 0 && (
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">{t('command_history')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 text-center">{t('command_history')}</h3>
                   <button
                     onClick={clearCommandHistory}
                     className="text-sm text-gray-500 hover:text-red-600 transition-colors"
@@ -785,7 +785,7 @@ const SmartHomeIntegration = () => {
                           <PlayIcon className="w-6 h-6 text-purple-600" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900">{scene.name}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 text-center">{scene.name}</h3>
                           <p className="text-sm text-gray-500">{scene.description}</p>
                         </div>
                       </div>
@@ -827,19 +827,19 @@ const SmartHomeIntegration = () => {
         {activeTab === 'energy' && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('energy_consumption')}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">{t('energy_consumption')}</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">{t('today')}</span>
                   <div className="flex items-center">
-                    <span className="text-2xl font-bold text-gray-900">24.5</span>
+                    <span className="text-2xl font-bold text-gray-900 text-center">24.5</span>
                     <span className="text-sm text-gray-500 ml-1">kWh</span>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">{t('this_month')}</span>
                   <div className="flex items-center">
-                    <span className="text-2xl font-bold text-gray-900">682</span>
+                    <span className="text-2xl font-bold text-gray-900 text-center">682</span>
                     <span className="text-sm text-gray-500 ml-1">kWh</span>
                   </div>
                 </div>
@@ -853,7 +853,7 @@ const SmartHomeIntegration = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('top_energy_consumers')}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">{t('top_energy_consumers')}</h3>
               <div className="space-y-3">
                 {devices.filter(d => d.energy_usage).slice(0, 5).map((device, index) => (
                   <div key={device.id} className="flex items-center justify-between">
@@ -875,7 +875,7 @@ const SmartHomeIntegration = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">{t('add_smart_device')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 text-center">{t('add_smart_device')}</h2>
             </div>
             
             <form onSubmit={handleAddDevice} className="p-6 space-y-6">
@@ -1018,7 +1018,7 @@ const SmartHomeIntegration = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">{t('create_automation')}</h2>
+              <h2 className="text-xl font-semibold text-gray-900 text-center">{t('create_automation')}</h2>
             </div>
             
             <form onSubmit={handleCreateAutomation} className="p-6 space-y-6">

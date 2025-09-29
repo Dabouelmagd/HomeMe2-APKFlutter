@@ -263,7 +263,7 @@ const UtilityBills = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">{t('total_pending')}</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(totalPending)}</p>
+              <p className="text-2xl font-bold text-gray-900 text-center">{formatCurrency(totalPending)}</p>
             </div>
             <CurrencyDollarIcon className="h-8 w-8 text-blue-500" />
           </div>
@@ -273,7 +273,7 @@ const UtilityBills = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">{t('connections')}</p>
-              <p className="text-2xl font-bold text-gray-900">{connections.length}</p>
+              <p className="text-2xl font-bold text-gray-900 text-center">{connections.length}</p>
             </div>
             <DocumentTextIcon className="h-8 w-8 text-green-500" />
           </div>
@@ -517,7 +517,7 @@ const UtilityBills = () => {
           <div className="bg-white rounded-xl shadow-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-gray-900 text-center">
                   {t('add_utility_connection')}
                 </h3>
                 <button

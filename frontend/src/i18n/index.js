@@ -99,6 +99,20 @@ const resources = {
       'filters': 'Filters',
       'no_notifications': 'No notifications',
       'notifications_will_appear_here': 'Notifications will appear here',
+      
+      // Settings
+      'manage_account_settings_preferences': 'Manage your account settings and preferences',
+      'settings': {
+        'notifications': 'Notifications',
+        'profile': 'Profile', 
+        'privacy': 'Privacy',
+        'language': 'Language'
+      },
+      'notificationCenter': {
+        'pushNotifications': 'Push Notifications',
+        'notSubscribed': 'Not Subscribed',
+        'enable': 'Enable'
+      },
       'community_newsletter': 'Community Newsletter',
       
       // Descriptions

@@ -450,7 +450,7 @@ const SmartHomeIntegration = () => {
             {devices.length === 0 ? (
               <div className="text-center py-12">
                 <HomeModernIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">{t('no_devices')}</h3>
+                <h3 className="mt-2 text-sm font-medium text-gray-900 text-center">{t('no_devices')}</h3>
                 <p className="mt-1 text-sm text-gray-500">{t('no_devices_description')}</p>
               </div>
             ) : (

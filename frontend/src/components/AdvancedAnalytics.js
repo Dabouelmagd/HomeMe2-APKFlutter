@@ -610,7 +610,7 @@ const AdvancedAnalytics = () => {
               {(analytics.summary?.recommendations || []).map((recommendation, index) => (
                 <li key={index} className="flex items-center">
                   <ChartBarIcon className="w-4 h-4 text-blue-500 mr-2" />
-                  {recommendation}
+                  {translateBackendData(recommendation)}
                 </li>
               ))}
             </ul>

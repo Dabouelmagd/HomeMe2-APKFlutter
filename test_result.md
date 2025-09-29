@@ -325,6 +325,18 @@ backend:
           comment: "❌ ENHANCED ENTERPRISE FEATURES TESTING FAILED - CRITICAL DASHBOARD AND COMPOUND MANAGEMENT ISSUES. COMPREHENSIVE TEST RESULTS: ✅ PRICING CALCULATOR WORKING: Enterprise pricing calculator (GET /api/companies/pricing/calculate) working correctly with volume discounts and first-year free calculations, proper parameter validation, comprehensive pricing logic functional. ❌ CRITICAL DASHBOARD FAILURES: Company dashboard (GET /api/companies/dashboard) returning 500 Internal Server Error, root cause: 'unsupported operand type(s) for +: int and NoneType' when calculating total_units from compounds, compounds with null total_units values causing arithmetic errors in line 9957: sum(c.get('total_units', 0) for c in compounds). ❌ COMPOUND MANAGEMENT FAILURES: List compounds endpoint (GET /api/companies/compounds) returning 500 errors, similar null value comparison issues: 'NoneType' comparison errors in compound filtering logic. ❌ MULTI-STEP REGISTRATION FLOW BROKEN: Multi-step registration flow cannot be completed due to logo upload and company registration integration issues, dashboard access fails after company creation. ROOT CAUSE ANALYSIS: 1) Dashboard calculation logic not handling null/None values in compound data properly, 2) Compound filtering logic has null comparison issues, 3) Data model inconsistencies between compound creation and retrieval. RECOMMENDATION: Fix null value handling in dashboard statistics calculations, add proper null checks in compound filtering logic, ensure consistent data models across enterprise features. These are critical data processing bugs that prevent enterprise features from functioning correctly."
 
 frontend:
+  - task: "Family Management Translation Keys Implementation"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/FamilyManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "95% SUCCESS RATE - Comprehensive testing completed. All 20+ translation keys working perfectly across English/Arabic/French. Main title, buttons, table headers, modal titles, form labels all properly translated. Language switching functional with RTL support. CRITICAL ISSUE: Subtitle interpolation not working - shows '{unit}' placeholder instead of actual unit number in all languages. Need to fix user.unit_number interpolation in translation function."
+
   - task: "Resident Growth Trend Translation Key Implementation"
     implemented: true
     working: true

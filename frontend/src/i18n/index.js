@@ -1133,6 +1133,16 @@ const resources = {
       'age': 'Âge',
       'id_number': 'Numéro d\'Identité',
       'emergency_contact': 'Contact d\'Urgence',
+      
+      // Message Center
+      'message_center': 'Centre de Messages',
+      'communicate_with': 'Communiquer avec {role}',
+      'new_message': 'Nouveau Message',
+      'no_messages_yet': 'Aucun message pour le moment',
+      'start_conversation': 'Commencer la conversation',
+      'send_first_message': 'Envoyer votre premier message',
+      'residents': 'les résidents',
+      'management': 'la direction',
       'community_newsletter': 'Bulletin communautaire',
       
       // Descriptions

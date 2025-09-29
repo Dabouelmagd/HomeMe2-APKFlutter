@@ -586,7 +586,7 @@ const AdvancedAnalytics = () => {
           </div>
           
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">{t('recommendations')}</h4>
+            <h4 className="font-medium text-gray-900 text-center mb-2">{t('recommendations')}</h4>
             <ul className="space-y-1 text-sm text-gray-600">
               {(analytics.summary?.recommendations || []).map((recommendation, index) => (
                 <li key={index} className="flex items-center">

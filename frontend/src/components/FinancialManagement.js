@@ -282,7 +282,7 @@ const FinancialManagement = () => {
             </p>
           </div>
           <div>
-            <h4 className="font-medium text-blue-800 mb-2">{t('payment_history')}</h4>
+            <h4 className="font-medium text-blue-800 text-center mb-2">{t('payment_history')}</h4>
             <p className="text-sm text-blue-700">
               {t('payment_history_description')}
             </p>

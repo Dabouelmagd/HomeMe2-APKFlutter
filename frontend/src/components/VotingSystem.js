@@ -268,7 +268,7 @@ const VotingSystem = () => {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t('voting_system')}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 text-center">{t('voting_system')}</h1>
             <p className="text-gray-600 mt-2">{t('voting_system_description')}</p>
           </div>
           {user?.role === 'admin' && (

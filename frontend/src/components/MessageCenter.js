@@ -113,7 +113,7 @@ const MessageCenter = () => {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t('message_center')}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 text-center">{t('message_center')}</h1>
             <p className="text-gray-600 mt-2">
               {t('communicate_with', { role: user?.role === 'admin' ? t('residents') : t('management') })}
             </p>

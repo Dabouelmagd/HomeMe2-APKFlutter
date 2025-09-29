@@ -246,7 +246,7 @@ const DocumentManagement = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-gray-900 text-center">
                 {t('documents.title', 'Document Management')}
               </h1>
               <p className="mt-2 text-gray-600">

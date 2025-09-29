@@ -49,7 +49,7 @@
 ##
 test_plan:
   current_focus:
-    - "Translation System Production Ready"
+    - "New Translation Keys Verification Complete"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

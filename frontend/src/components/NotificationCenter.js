@@ -171,7 +171,7 @@ const NotificationCenter = () => {
                 </span>
               )}
             </h1>
-            <p className="text-gray-600 mt-2">{t('manage_your_notifications')}</p>
+            <p className="text-gray-600 mt-2 text-center">{t('manage_your_notifications')}</p>
           </div>
           
           <div className="mt-4 sm:mt-0 flex space-x-3">

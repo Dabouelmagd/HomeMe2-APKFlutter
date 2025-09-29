@@ -217,7 +217,7 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</h3>
+                  <h3 className="text-3xl font-bold text-center">{stat.value}</h3>
                   <p className="text-sm text-gray-600">{stat.name}</p>
                 </div>
               </div>

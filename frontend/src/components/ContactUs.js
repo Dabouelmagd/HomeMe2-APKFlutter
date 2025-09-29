@@ -65,7 +65,7 @@ const ContactUs = () => {
                   <method.icon className="h-8 w-8 text-blue-600" />
                 </div>
                 <div className="ml-4 flex-1">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-lg font-medium text-gray-900 text-center">
                     {method.label}
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">
@@ -136,7 +136,7 @@ const ContactUs = () => {
 
         {/* FAQ Notice */}
         <div className="mt-8 bg-gray-100 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-gray-900 text-center mb-2">
             Before You Contact Us
           </h3>
           <p className="text-gray-600">

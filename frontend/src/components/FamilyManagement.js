@@ -222,7 +222,7 @@ const FamilyManagement = () => {
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <UserPlusIcon className="h-5 w-5 mr-2" />
-            Add Family Member
+            {t('add_family_member')}
           </button>
         </div>
 

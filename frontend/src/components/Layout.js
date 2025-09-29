@@ -271,7 +271,7 @@ const Layout = () => {
       show: true
     },
     {
-      name: '💎 Pricing Plans',
+      name: t('pricing_plans'),
       href: '/pricing',
       icon: CurrencyDollarIcon,
       show: true

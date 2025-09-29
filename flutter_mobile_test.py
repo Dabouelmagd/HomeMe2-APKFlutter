@@ -563,9 +563,9 @@ class FlutterMobileTestSuite:
             return False
         
         try:
-            headers = self.setup_auth_headers(self.resident_token)
+            headers = {"Authorization": f"Bearer {self.resident_token}"}
             
-            # Create realistic maintenance request data for mobile app
+            # Create realistic maintenance request data for mobile app using Form data
             maintenance_data = {
                 "title": "Kitchen Faucet Leak",
                 "description": "The kitchen faucet is leaking water continuously and needs immediate repair. Water is dripping from the base of the faucet.",
@@ -573,11 +573,10 @@ class FlutterMobileTestSuite:
                 "priority": "high",
                 "location": "Kitchen",
                 "contact_method": "phone",
-                "preferred_time": (datetime.now() + timedelta(days=1)).isoformat(),
-                "images": []  # Mobile app would typically include images
+                "preferred_time": (datetime.now() + timedelta(days=1)).isoformat()
             }
             
-            response = self.session.post(f"{BASE_URL}/maintenance/requests", json=maintenance_data, headers=headers)
+            response = self.session.post(f"{BASE_URL}/maintenance/requests", data=maintenance_data, headers=headers)
             
             if response.status_code == 200:
                 data = response.json()

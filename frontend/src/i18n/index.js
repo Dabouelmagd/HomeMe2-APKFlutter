@@ -638,6 +638,12 @@ const resources = {
       'send_first_message': 'أرسل رسالتك الأولى',
       'residents': 'المقيمين',
       'management': 'الإدارة',
+      
+      // Notifications
+      'manage_your_notifications': 'إدارة إشعاراتك',
+      'filters': 'المرشحات',
+      'no_notifications': 'لا توجد إشعارات',
+      'notifications_will_appear_here': 'ستظهر الإشعارات هنا',
       'community_newsletter': 'النشرة الإخبارية للمجتمع',
       
       // Descriptions

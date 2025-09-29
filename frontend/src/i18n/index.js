@@ -448,6 +448,21 @@ const resources = {
       'add_residence': 'Add Residence',
       'no_residences': 'No Residences',
       'residences_appear': 'Residences will appear here',
+      
+      // Analytics & Statistics
+      'collection_rate': 'Collection Rate',
+      'maintenance_requests_trend': 'Maintenance Requests Trend',
+      'last_30_days': 'Last 30 Days',
+      'period_summary': 'Period Summary',
+      'key_achievements': 'Key Achievements',
+      'increase_in_resident_registrations': 'increase in resident registrations',
+      'payment_collection_rate_achieved': 'payment collection rate achieved',
+      'user_engagement_maintained': 'user engagement maintained',
+      'areas_for_improvement': 'Areas for Improvement',
+      'maintenance_response_time_increased': 'Maintenance response time increased',
+      'pending_high_priority_requests': 'pending high-priority requests',
+      'revenue_trend': 'Revenue Trend',
+      'user_activity_trend': 'User Activity Trend',
       'legal': {
         'title': 'Legal',
         'contact': {

@@ -231,8 +231,8 @@ const FamilyManagement = () => {
           {familyMembers.length === 0 ? (
             <div className="text-center py-12">
               <UsersIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500 text-lg">No family members added</p>
-              <p className="text-gray-400 text-sm">Add family members to manage unit access and information</p>
+              <p className="text-gray-500 text-lg">{t('no_family_members_added')}</p>
+              <p className="text-gray-400 text-sm">{t('add_family_members_description')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">

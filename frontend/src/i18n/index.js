@@ -463,6 +463,13 @@ const resources = {
       'pending_high_priority_requests': 'pending high-priority requests',
       'revenue_trend': 'Revenue Trend',
       'user_activity_trend': 'User Activity Trend',
+      
+      // Backend Data Translation Keys
+      '12.5% increase in resident registrations': '12.5% increase in resident registrations',
+      '94.5% payment collection rate achieved': '94.5% payment collection rate achieved', 
+      '76% user engagement maintained': '76% user engagement maintained',
+      'Maintenance response time increased by 5%': 'Maintenance response time increased by 5%',
+      '3 pending high-priority requests': '3 pending high-priority requests',
       'legal': {
         'title': 'Legal',
         'contact': {

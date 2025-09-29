@@ -25,12 +25,12 @@ const API = `${BACKEND_URL}/api`;
 
 const FamilyManagement = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const unitNumber = user?.unit_number || 'A-101';
   const subtitleText = t('manage_family_members_unit_qr').includes('{unit}') 
     ? t('manage_family_members_unit_qr').replace('{unit}', unitNumber)
     : `${t('manage_family_members_for_unit')} ${unitNumber} ${t('with_qr_gate_access')}`;
   
-  const { t } = useTranslation();
   const [familyMembers, setFamilyMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddMember, setShowAddMember] = useState(false);

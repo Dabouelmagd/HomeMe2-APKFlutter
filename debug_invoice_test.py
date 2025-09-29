@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = "https://multi-home-admin.preview.emergentagent.com/api"
+BASE_URL = "https://property-hub-110.preview.emergentagent.com/api"
 
 def debug_invoice_system():
     """Debug the invoice system step by step"""

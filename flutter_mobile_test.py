@@ -718,13 +718,13 @@ class FlutterMobileTestSuite:
         print("\n=== Testing Authentication Requirements (Flutter) ===")
         
         endpoints_to_test = [
-            ("GET", "/admin/dashboard"),
-            ("GET", "/resident/dashboard"),
+            ("GET", "/dashboard/admin"),
+            ("GET", "/dashboard/resident"),
             ("GET", "/guests"),
             ("POST", "/visit-requests"),
             ("GET", "/visit-requests"),
-            ("GET", "/maintenance"),
-            ("POST", "/maintenance"),
+            ("GET", "/maintenance/requests"),
+            ("POST", "/maintenance/requests"),
             ("GET", "/events"),
             ("GET", "/notifications")
         ]

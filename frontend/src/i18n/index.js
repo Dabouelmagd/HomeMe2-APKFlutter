@@ -658,6 +658,20 @@ const resources = {
       'filters': 'المرشحات',
       'no_notifications': 'لا توجد إشعارات',
       'notifications_will_appear_here': 'ستظهر الإشعارات هنا',
+      
+      // Settings
+      'manage_account_settings_preferences': 'إدارة إعدادات حسابك وتفضيلاتك',
+      'settings': {
+        'notifications': 'الإشعارات',
+        'profile': 'الملف الشخصي',
+        'privacy': 'الخصوصية',
+        'language': 'اللغة'
+      },
+      'notificationCenter': {
+        'pushNotifications': 'الإشعارات المباشرة',
+        'notSubscribed': 'غير مشترك',
+        'enable': 'تفعيل'
+      },
       'community_newsletter': 'النشرة الإخبارية للمجتمع',
       
       // Descriptions

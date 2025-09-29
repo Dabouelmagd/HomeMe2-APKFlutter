@@ -248,7 +248,7 @@ const AdminDashboard = () => {
 
         {/* Recent Activity - Redesigned */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('recent_activity')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('recent_activity')}</h2>
           <div className="space-y-4">
             {dashboardData?.recent_activities?.map((activity, index) => (
               <div key={index} className="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">

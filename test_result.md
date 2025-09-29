@@ -49,7 +49,7 @@
 ##
 test_plan:
   current_focus:
-    - "Final Navigation Translation Verification Complete"
+    - "Advanced Analytics Automatic Backend Data Translation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

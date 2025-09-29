@@ -206,7 +206,7 @@ const AdvancedAnalytics = () => {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t('advanced_analytics')}</h1>
+            <h1 className="text-3xl font-bold text-gray-900 text-center">{t('advanced_analytics')}</h1>
             <p className="text-gray-600 mt-2">{t('analytics_description')}</p>
           </div>
           <div className="mt-4 sm:mt-0 flex items-center space-x-3">

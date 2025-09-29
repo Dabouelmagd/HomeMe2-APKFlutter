@@ -940,6 +940,13 @@ const resources = {
       'pending_high_priority_requests': 'طلبات عالية الأولوية معلقة',
       'revenue_trend': 'اتجاه الإيرادات',
       'user_activity_trend': 'اتجاه نشاط المستخدمين',
+      
+      // Backend Data Translation Keys
+      '12.5% increase in resident registrations': 'زيادة 12.5% في تسجيل المقيمين',
+      '94.5% payment collection rate achieved': 'تم تحقيق معدل تحصيل دفعات 94.5%', 
+      '76% user engagement maintained': 'تم الحفاظ على مشاركة المستخدمين بنسبة 76%',
+      'Maintenance response time increased by 5%': 'زاد وقت الاستجابة للصيانة بنسبة 5%',
+      '3 pending high-priority requests': '3 طلبات عالية الأولوية معلقة',
       'legal': {
         'title': 'القانونية',
         'contact': {

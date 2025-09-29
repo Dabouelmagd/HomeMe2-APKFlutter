@@ -1010,7 +1010,21 @@ const resources = {
         'chats': 'المحادثات'
       },
       'gallery': {
-        'title': 'المعرض'
+        'title': 'المعرض',
+        'description': 'عرض وإدارة جميع الملفات المشتركة في المحادثات',
+        'allFiles': 'جميع الملفات',
+        'images': 'الصور',
+        'videos': 'الفيديوهات',
+        'voice': 'الصوت',
+        'audio': 'الصوتيات',
+        'documents': 'المستندات',
+        'newestFirst': 'الأحدث أولاً',
+        'largestFirst': 'الأكبر أولاً',
+        'nameAZ': 'الاسم (أ-ي)',
+        'noFilesFound': 'لم يتم العثور على ملفات',
+        'filesSharedInChats': 'الملفات المشتركة في المحادثات ستظهر هنا',
+        'from': 'من',
+        'download': 'تحميل'
       },
       'schedule': {
         'title': 'الجدول الزمني'

@@ -260,7 +260,7 @@ const ResidentDashboard = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">No recent notifications</p>
+              <p className="text-gray-500 text-center py-4">{t('no_recent_notifications')}</p>
             )}
           </div>
         </div>

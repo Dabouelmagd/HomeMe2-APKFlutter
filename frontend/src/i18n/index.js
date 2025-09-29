@@ -420,6 +420,31 @@ const resources = {
       'online_devices': 'Online Devices',
       'active_automations': 'Active Automations',
       'admin_only': 'Admin Only',
+      
+      // Additional fixes for remaining underscore issues
+      'chat': {
+        'chats': 'Chats'
+      },
+      'gallery': {
+        'title': 'Gallery'
+      },
+      'schedule': {
+        'title': 'Schedule'
+      },
+      'notifications': 'Notifications',
+      'settings': {
+        'settings': 'Settings'
+      },
+      'pricing_plans': 'Pricing Plans',
+      'legal': {
+        'title': 'Legal',
+        'contact': {
+          'title': 'Contact Us'
+        }
+      },
+      'enterprise': {
+        'dashboard': 'Enterprise Dashboard'
+      },
     }
   },
   ar: {

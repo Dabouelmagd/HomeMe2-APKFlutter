@@ -1387,6 +1387,21 @@ const resources = {
       'add_residence': 'Ajouter une Résidence',
       'no_residences': 'Aucune Résidence',
       'residences_appear': 'Les résidences apparaîtront ici',
+      
+      // Analytics & Statistics
+      'collection_rate': 'Taux de Recouvrement',
+      'maintenance_requests_trend': 'Tendance des Demandes de Maintenance',
+      'last_30_days': 'Les 30 Derniers Jours',
+      'period_summary': 'Résumé de la Période',
+      'key_achievements': 'Réalisations Clés',
+      'increase_in_resident_registrations': 'augmentation des inscriptions de résidents',
+      'payment_collection_rate_achieved': 'taux de recouvrement des paiements atteint',
+      'user_engagement_maintained': 'engagement des utilisateurs maintenu',
+      'areas_for_improvement': 'Domaines d\'Amélioration',
+      'maintenance_response_time_increased': 'Le temps de réponse de maintenance a augmenté',
+      'pending_high_priority_requests': 'demandes haute priorité en attente',
+      'revenue_trend': 'Tendance des Revenus',
+      'user_activity_trend': 'Tendance d\'Activité des Utilisateurs',
       'legal': {
         'title': 'Légal',
         'contact': {

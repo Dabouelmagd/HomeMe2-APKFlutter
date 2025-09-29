@@ -512,3 +512,4 @@ HomeMe-Desktop-GitHub-Package.tar.gz
 # Environment files
 *.env
 *.env.*
+frontend/node_modules/.cache/default-development/16.pack

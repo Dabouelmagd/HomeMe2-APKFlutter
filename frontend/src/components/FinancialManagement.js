@@ -276,7 +276,7 @@ const FinancialManagement = () => {
         <h3 className="text-lg font-semibold text-center text-blue-900 mb-4">{t('payment_information')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <h4 className="font-medium text-blue-800 mb-2">{t('mock_payment_system')}</h4>
+            <h4 className="font-medium text-blue-800 text-center mb-2">{t('mock_payment_system')}</h4>
             <p className="text-sm text-blue-700">
               {t('mock_payment_description')}
             </p>

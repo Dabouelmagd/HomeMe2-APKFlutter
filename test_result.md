@@ -49,7 +49,7 @@
 ##
 test_plan:
   current_focus:
-    - "Advanced Analytics Automatic Backend Data Translation"
+    - "Text-Center CSS Class Application to All Major Headings"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

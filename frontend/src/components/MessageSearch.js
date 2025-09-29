@@ -293,7 +293,7 @@ const MessageSearch = ({ isOpen, onClose, onSelectMessage }) => {
       <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 text-center flex items-center">
+          <h2 className="text-lg font-semibold text-center text-gray-900 text-center flex items-center">
             <MagnifyingGlassIcon className="h-5 w-5 mr-2" />
             {t('search.searchMessages')}
           </h2>
@@ -597,7 +597,7 @@ const MessageSearch = ({ isOpen, onClose, onSelectMessage }) => {
         {showSaveSearch && (
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white rounded-lg p-6 w-96">
-              <h3 className="text-lg font-medium mb-4">{t('search.saveSearch')}</h3>
+              <h3 className="text-lg font-medium text-center mb-4">{t('search.saveSearch')}</h3>
               <input
                 type="text"
                 value={saveSearchName}

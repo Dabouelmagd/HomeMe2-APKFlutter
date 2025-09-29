@@ -120,7 +120,7 @@ const NewChatModal = ({ isOpen, onClose, onChatCreated }) => {
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900 text-center">{t('chat.newChat')}</h2>
+          <h2 className="text-lg font-semibold text-center text-gray-900 text-center">{t('chat.newChat')}</h2>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600"

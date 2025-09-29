@@ -338,7 +338,7 @@ const FamilyManagement = () => {
         {showAddMember && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-screen overflow-y-auto">
-              <h2 className="text-lg font-semibold mb-6">
+              <h2 className="text-lg font-semibold text-center mb-6">
                 {editingMember ? 'Edit Family Member' : 'Add Family Member'}
               </h2>
               
@@ -484,7 +484,7 @@ const FamilyManagement = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
               <div className="text-center">
-                <h2 className="text-lg font-semibold mb-4">Gate Access QR Code</h2>
+                <h2 className="text-lg font-semibold text-center mb-4">Gate Access QR Code</h2>
                 <p className="text-sm text-gray-600 mb-4">
                   QR Code for {qrCodeData.member_name}
                 </p>

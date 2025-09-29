@@ -231,7 +231,7 @@ const IndividualRegistration = () => {
       {/* Pricing Preview */}
       {pricingInfo && (
         <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-          <h4 className="font-semibold text-green-800 mb-2">
+          <h4 className="font-semibold text-center text-green-800 mb-2">
             {t('individual.pricing_preview')}
           </h4>
           <div className="grid grid-cols-2 gap-4 text-sm">
@@ -378,7 +378,7 @@ const IndividualRegistration = () => {
       </div>
 
       <div className="bg-gray-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4">{t('individual.compound_summary')}</h3>
+        <h3 className="text-lg font-semibold text-center mb-4">{t('individual.compound_summary')}</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
@@ -406,21 +406,21 @@ const IndividualRegistration = () => {
 
       {pricingInfo && (
         <div className="bg-green-50 border border-green-200 p-6 rounded-lg">
-          <h4 className="font-semibold text-green-800 mb-3">
+          <h4 className="font-semibold text-center text-green-800 mb-3">
             {t('individual.pricing_details')}
           </h4>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span>{t('individual.monthly_subscription')}:</span>
-              <span className="font-semibold">${pricingInfo.monthly_amount.toFixed(2)}</span>
+              <span className="font-semibold text-center">${pricingInfo.monthly_amount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span>{t('individual.annual_subscription')}:</span>
-              <span className="font-semibold">${pricingInfo.annual_amount.toFixed(2)}</span>
+              <span className="font-semibold text-center">${pricingInfo.annual_amount.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-green-700">
               <span>{t('individual.annual_savings')}:</span>
-              <span className="font-semibold">-${pricingInfo.annual_savings.toFixed(2)}</span>
+              <span className="font-semibold text-center">-${pricingInfo.annual_savings.toFixed(2)}</span>
             </div>
             <div className="border-t pt-2 mt-2">
               <div className="flex justify-between font-bold text-green-800">
@@ -433,7 +433,7 @@ const IndividualRegistration = () => {
       )}
 
       <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-        <h4 className="font-semibold text-blue-800 mb-2">
+        <h4 className="font-semibold text-center text-blue-800 mb-2">
           {t('individual.whats_included')}
         </h4>
         <ul className="text-sm text-blue-700 space-y-1">

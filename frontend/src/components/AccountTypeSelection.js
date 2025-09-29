@@ -192,7 +192,7 @@ const AccountTypeSelection = () => {
 
                 {/* Features */}
                 <div className="space-y-4 mb-8">
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold text-center text-gray-900">
                     {t('account_selection.features_included')}
                   </h3>
                   

@@ -93,7 +93,7 @@ const ProfileSettings = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 text-center mb-6">Personal Information</h3>
+        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">Personal Information</h3>
         
         <form onSubmit={handleProfileUpdate} className="space-y-6">
           <div className="flex items-center space-x-6">
@@ -117,7 +117,7 @@ const ProfileSettings = () => {
               />
             </div>
             <div>
-              <h4 className="text-lg font-medium text-gray-900">{user?.full_name}</h4>
+              <h4 className="text-lg font-medium text-center text-gray-900">{user?.full_name}</h4>
               <p className="text-gray-600">@{user?.username}</p>
               <p className="text-sm text-gray-500">Click the camera icon to change your picture</p>
             </div>
@@ -171,7 +171,7 @@ const ProfileSettings = () => {
 
       {/* Password Change Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 text-center mb-6">Change Password</h3>
+        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">Change Password</h3>
         
         <form onSubmit={handlePasswordUpdate} className="space-y-4 max-w-md">
           <div>
@@ -233,7 +233,7 @@ const PrivacySettings = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 text-center mb-6">Privacy & Visibility</h3>
+        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">Privacy & Visibility</h3>
         
         <div className="space-y-6">
           <div>
@@ -357,7 +357,7 @@ const LanguageSettings = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 text-center mb-6">Language Preferences</h3>
+        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">Language Preferences</h3>
         
         <div className="space-y-4">
           {languages.map((lang) => (

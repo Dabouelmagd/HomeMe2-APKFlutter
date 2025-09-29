@@ -631,7 +631,7 @@ const ServicesManagement = () => {
                         </div>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{service.name}</h3>
+                        <h3 className="font-semibold text-center text-gray-900">{service.name}</h3>
                         <p className="text-sm text-gray-600 capitalize">
                           {service.specialty || service.category}
                         </p>
@@ -720,7 +720,7 @@ const ServicesManagement = () => {
           ) : (
             <div className="text-center py-12">
               <WrenchScrewdriverIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 text-center mb-2">{t('no_services')}</h3>
+              <h3 className="text-lg font-medium text-center text-gray-900 text-center mb-2">{t('no_services')}</h3>
               <p className="text-gray-600">
                 {user?.role === 'admin'
                   ? t('add_first_service')
@@ -736,7 +736,7 @@ const ServicesManagement = () => {
       {activeTab === 'bookings' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 text-center">
+            <h3 className="text-lg font-semibold text-center text-gray-900 text-center">
               {user?.role === 'admin' ? t('all_bookings') : t('my_bookings')}
             </h3>
           </div>
@@ -797,7 +797,7 @@ const ServicesManagement = () => {
           <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-90vh overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 text-center">
+                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">
                   {editingService ? t('edit_service') : t('add_service')}
                 </h3>
                 <button
@@ -949,24 +949,24 @@ const ServicesManagement = () => {
       {activeTab === 'service-booking' && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 text-center mb-4">Service Booking & Payments</h2>
+            <h2 className="text-xl font-semibold text-center text-gray-900 text-center mb-4">Service Booking & Payments</h2>
             <p className="text-gray-600 mb-6">Book services with multiple payment options and priority levels</p>
             
             {/* Service Providers Grid */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">Available Service Providers</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">Available Service Providers</h3>
               {serviceProviders.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {serviceProviders.map((provider) => (
                     <div key={provider.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                       <div className="flex items-center space-x-4 mb-4">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                          <span className="text-lg font-medium text-white">
+                          <span className="text-lg font-medium text-center text-white">
                             {provider.full_name.charAt(0)}
                           </span>
                         </div>
                         <div>
-                          <h4 className="text-lg font-medium text-gray-900 text-center">{provider.full_name}</h4>
+                          <h4 className="text-lg font-medium text-center text-gray-900 text-center">{provider.full_name}</h4>
                           <div className="flex items-center space-x-2">
                             <div className="flex items-center">
                               {[1, 2, 3, 4, 5].map((star) => (
@@ -1029,7 +1029,7 @@ const ServicesManagement = () => {
 
             {/* Payment Methods Info */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">Supported Payment Methods</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">Supported Payment Methods</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                 {paymentMethods.map((method) => (
                   <div key={method.value} className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">
@@ -1042,7 +1042,7 @@ const ServicesManagement = () => {
 
             {/* Priority Levels Info */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">Service Priority Levels</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">Service Priority Levels</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {priorityOptions.map((option) => (
                   <div key={option.value} className={`p-4 rounded-lg border-2 ${option.color} border-opacity-20`}>
@@ -1064,7 +1064,7 @@ const ServicesManagement = () => {
           <div className="bg-white rounded-xl shadow-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 text-center">
+                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">
                   {t('book_service')}: {selectedService?.name}
                 </h3>
                 <button

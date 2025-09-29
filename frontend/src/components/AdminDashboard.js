@@ -187,7 +187,7 @@ const AdminDashboard = () => {
             <div className="flex items-center space-x-4 mt-4">
               <div className="text-center">
                 <p className="text-sm text-gray-500">{t('current_time')}</p>
-                <p className="text-lg font-semibold text-gray-900 text-center">
+                <p className="text-lg font-semibold text-center text-gray-900 text-center">
                   {new Date().toLocaleTimeString()}
                 </p>
               </div>
@@ -238,7 +238,7 @@ const AdminDashboard = () => {
                   className={`p-6 rounded-xl border border-gray-200 hover:shadow-md transition-all text-left ${action.color} group`}
                 >
                   <IconComponent className="h-8 w-8 mb-4 group-hover:scale-110 transition-transform" />
-                  <h3 className="font-semibold text-gray-900 mb-2">{action.name}</h3>
+                  <h3 className="font-semibold text-center text-gray-900 mb-2">{action.name}</h3>
                   <p className="text-sm text-gray-600">{action.description}</p>
                 </button>
               );

@@ -193,7 +193,7 @@ const PushNotifications = () => {
     <div className="space-y-6">
       {/* Push Subscription Status */}
       <div className="bg-white shadow rounded-lg p-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+        <h3 className="text-lg font-medium text-center text-gray-900 mb-4">
           {t('notificationCenter.pushNotifications')}
         </h3>
         
@@ -240,7 +240,7 @@ const PushNotifications = () => {
       {/* Notification Preferences */}
       {isSubscribed && (
         <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <h3 className="text-lg font-medium text-center text-gray-900 mb-4">
             {t('notificationCenter.preferences')}
           </h3>
           

@@ -65,7 +65,7 @@ const ContactUs = () => {
                   <method.icon className="h-8 w-8 text-blue-600" />
                 </div>
                 <div className="ml-4 flex-1">
-                  <h3 className="text-lg font-medium text-gray-900 text-center">
+                  <h3 className="text-lg font-medium text-center text-gray-900 text-center">
                     {method.label}
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">
@@ -93,7 +93,7 @@ const ContactUs = () => {
 
         {/* Additional Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 text-center mb-4">
+          <h2 className="text-xl font-semibold text-center text-gray-900 text-center mb-4">
             Get in Touch
           </h2>
           <div className="prose prose-gray max-w-none">
@@ -102,7 +102,7 @@ const ContactUs = () => {
               need technical support, or want to provide feedback, we'd love to hear from you.
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="text-lg font-medium text-blue-900 mb-2">
+              <h3 className="text-lg font-medium text-center text-blue-900 mb-2">
                 Primary Contact
               </h3>
               <div className="space-y-2">
@@ -136,7 +136,7 @@ const ContactUs = () => {
 
         {/* FAQ Notice */}
         <div className="mt-8 bg-gray-100 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 text-center mb-2">
+          <h3 className="text-lg font-medium text-center text-gray-900 text-center mb-2">
             Before You Contact Us
           </h3>
           <p className="text-gray-600">

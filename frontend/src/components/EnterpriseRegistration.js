@@ -505,7 +505,7 @@ const EnterpriseRegistration = () => {
       </div>
 
       <div className="bg-gray-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold mb-4">{t('enterprise.company_summary')}</h3>
+        <h3 className="text-lg font-semibold text-center mb-4">{t('enterprise.company_summary')}</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
@@ -533,7 +533,7 @@ const EnterpriseRegistration = () => {
       </div>
 
       <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-        <h4 className="font-semibold text-blue-800 mb-2">
+        <h4 className="font-semibold text-center text-blue-800 mb-2">
           {t('enterprise.pricing_information')}
         </h4>
         <ul className="text-sm text-blue-700 space-y-1">
@@ -554,7 +554,7 @@ const EnterpriseRegistration = () => {
         {showCrop && logoPreview && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg max-w-2xl w-full mx-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-center text-gray-900 mb-4">
                 {t('enterprise.crop_logo')}
               </h3>
               

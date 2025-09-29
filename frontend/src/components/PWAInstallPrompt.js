@@ -108,7 +108,7 @@ const PWAInstallPrompt = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <DevicePhoneMobileIcon className="w-6 h-6 text-white" />
-              <h3 className="text-lg font-semibold text-white">{t('install_homeme_app')}</h3>
+              <h3 className="text-lg font-semibold text-center text-white">{t('install_homeme_app')}</h3>
             </div>
             <button
               onClick={handleDismiss}

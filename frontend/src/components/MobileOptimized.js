@@ -138,7 +138,7 @@ const MobileOptimized = ({ children }) => {
           alt="HomeMe"
           className="w-8 h-8 mr-2"
         />
-        <h1 className="text-lg font-semibold text-gray-900 text-center">HomeMe</h1>
+        <h1 className="text-lg font-semibold text-center text-gray-900 text-center">HomeMe</h1>
       </div>
       
       <div className="flex items-center space-x-2">
@@ -214,7 +214,7 @@ const MobileOptimized = ({ children }) => {
             >
               {/* Mobile menu content would go here */}
               <div className="p-4">
-                <h2 className="text-lg font-semibold mb-4">{t('menu')}</h2>
+                <h2 className="text-lg font-semibold text-center mb-4">{t('menu')}</h2>
                 {/* Navigation items */}
               </div>
             </div>

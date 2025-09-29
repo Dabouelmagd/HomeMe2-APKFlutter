@@ -180,7 +180,7 @@ const PublicAccountTypeSelection = () => {
 
                 {/* Features */}
                 <div className={`mb-8 ${isRtl ? 'text-right' : 'text-left'}`}>
-                  <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">
+                  <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">
                     {t('account_selection.features_included')}
                   </h3>
                   <ul className="space-y-3">

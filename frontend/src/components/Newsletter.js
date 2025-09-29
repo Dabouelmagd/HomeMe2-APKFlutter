@@ -280,7 +280,7 @@ const Newsletter = () => {
                       </div>
 
                       {/* Title */}
-                      <h3 className="text-lg font-semibold text-gray-900 text-center mb-2 line-clamp-2">
+                      <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-2 line-clamp-2">
                         {newsletter.title}
                       </h3>
 

@@ -446,17 +446,17 @@ const Pricing = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
               <div className="bg-white/10 rounded-lg p-4">
                 <GiftIcon className="h-8 w-8 mx-auto mb-2 text-blue-200" />
-                <h3 className="font-semibold mb-2">Free Invitations</h3>
+                <h3 className="font-semibold text-center mb-2">Free Invitations</h3>
                 <p className="text-sm text-blue-100">Invite up to 20 residents for free</p>
               </div>
               <div className="bg-white/10 rounded-lg p-4">
                 <CheckIcon className="h-8 w-8 mx-auto mb-2 text-blue-200" />
-                <h3 className="font-semibold mb-2">Full Access</h3>
+                <h3 className="font-semibold text-center mb-2">Full Access</h3>
                 <p className="text-sm text-blue-100">Free users get all features of your plan</p>
               </div>
               <div className="bg-white/10 rounded-lg p-4">
                 <UserGroupIcon className="h-8 w-8 mx-auto mb-2 text-blue-200" />
-                <h3 className="font-semibold mb-2">No Limits</h3>
+                <h3 className="font-semibold text-center mb-2">No Limits</h3>
                 <p className="text-sm text-blue-100">Build your community without barriers</p>
               </div>
             </div>
@@ -468,19 +468,19 @@ const Pricing = () => {
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Frequently Asked Questions</h2>
           <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
             <div>
-              <h3 className="font-semibold text-gray-900 text-center mb-2">Can I upgrade or downgrade anytime?</h3>
+              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">Can I upgrade or downgrade anytime?</h3>
               <p className="text-gray-600">Yes, you can change your plan at any time. Changes take effect immediately.</p>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-center mb-2">Is there a setup fee?</h3>
+              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">Is there a setup fee?</h3>
               <p className="text-gray-600">No setup fees. Pay only for what you use, when you use it.</p>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-center mb-2">How do free invitations work?</h3>
+              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">How do free invitations work?</h3>
               <p className="text-gray-600">Paid users can invite up to 20 residents who get full access to all features.</p>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-center mb-2">What payment methods do you accept?</h3>
+              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">What payment methods do you accept?</h3>
               <p className="text-gray-600">We accept all major credit cards, PayPal, and bank transfers.</p>
             </div>
           </div>

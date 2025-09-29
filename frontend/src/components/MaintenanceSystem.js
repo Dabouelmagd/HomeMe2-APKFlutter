@@ -308,7 +308,7 @@ const MaintenanceSystem = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900 text-center">{request.title}</h3>
+                      <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{request.title}</h3>
                       {getStatusBadge(request.status)}
                       {getPriorityBadge(request.priority)}
                     </div>
@@ -396,7 +396,7 @@ const MaintenanceSystem = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 text-center">{t('create_maintenance_request')}</h2>
+              <h2 className="text-xl font-semibold text-center text-gray-900 text-center">{t('create_maintenance_request')}</h2>
             </div>
             
             <form onSubmit={handleCreateRequest} className="p-6 space-y-6">

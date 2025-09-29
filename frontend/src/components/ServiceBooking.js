@@ -604,7 +604,7 @@ const ServiceBooking = () => {
                       <div className="flex items-center text-sm text-gray-600">
                         <CurrencyDollarIcon className="h-4 w-4 mr-3 text-green-500" />
                         <span className="font-medium">Rate:</span>
-                        <span className="ml-2 text-green-600 font-semibold">${provider.hourly_rate}/hour</span>
+                        <span className="ml-2 text-green-600 font-semibold text-center">${provider.hourly_rate}/hour</span>
                       </div>
                     )}
                     
@@ -667,7 +667,7 @@ const ServiceBooking = () => {
             {bookings.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-xl shadow-sm">
                 <CalendarIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No bookings yet</h3>
+                <h3 className="text-lg font-medium text-center text-gray-900 mb-2">No bookings yet</h3>
                 <p className="text-gray-600 mb-6">Start by booking your first service!</p>
                 <button
                   onClick={() => setShowBookingForm(true)}
@@ -685,7 +685,7 @@ const ServiceBooking = () => {
                     <div className="p-6 bg-gray-50 border-b border-gray-200">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900 text-center">{booking.title}</h3>
+                          <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{booking.title}</h3>
                           <p className="text-sm text-gray-600 mt-1">{booking.provider_name}</p>
                         </div>
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
@@ -812,7 +812,7 @@ const ServiceBooking = () => {
 
         {activeTab === 'history' && (
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 text-center mb-4">Booking History</h3>
+            <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">Booking History</h3>
             <div className="space-y-4">
               {bookings.filter(booking => booking.status === 'completed' || booking.status === 'cancelled').map((booking) => (
                 <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
@@ -952,7 +952,7 @@ const ServiceBooking = () => {
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h3 className="text-lg leading-6 font-medium text-gray-900">Book Service</h3>
+                        <h3 className="text-lg leading-6 font-medium text-gray-900 text-center">Book Service</h3>
                         {selectedProvider && (
                           <p className="text-sm text-gray-600 mt-1">with {selectedProvider.full_name}</p>
                         )}
@@ -1269,7 +1269,7 @@ const ServiceBooking = () => {
                 <form onSubmit={handlePayment}>
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg font-medium text-gray-900">Process Payment</h3>
+                      <h3 className="text-lg font-medium text-center text-gray-900">Process Payment</h3>
                       <button type="button" onClick={() => setShowPaymentModal(false)} className="text-gray-400 hover:text-gray-600">
                         <XCircleIcon className="h-6 w-6" />
                       </button>
@@ -1277,7 +1277,7 @@ const ServiceBooking = () => {
 
                     {/* Booking Summary */}
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 mb-6 border border-blue-200">
-                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                      <h4 className="font-semibold text-center text-gray-900 mb-3 flex items-center">
                         <CheckCircleIcon className="h-5 w-5 text-green-500 mr-2" />
                         Booking Summary
                       </h4>
@@ -1298,7 +1298,7 @@ const ServiceBooking = () => {
                             <span className="font-medium">{new Date(selectedBooking.scheduled_date).toLocaleDateString()}</span>
                           </div>
                           <div className="flex justify-between border-t pt-2">
-                            <span className="font-semibold text-gray-900">Total Amount:</span>
+                            <span className="font-semibold text-center text-gray-900">Total Amount:</span>
                             <span className="font-bold text-green-600 text-lg">${paymentForm.amount}</span>
                           </div>
                         </div>
@@ -1441,7 +1441,7 @@ const ServiceBooking = () => {
               <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <form onSubmit={handleReview}>
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Leave a Review</h3>
+                    <h3 className="text-lg font-medium text-center text-gray-900 mb-4">Leave a Review</h3>
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Overall Rating</label>

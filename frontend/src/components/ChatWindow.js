@@ -455,7 +455,7 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
               )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 text-center">{getChatName()}</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{getChatName()}</h3>
               <p className="text-sm text-gray-500">
                 {chat.chat_type === 'direct' 
                   ? t('chat.directChatDescription')

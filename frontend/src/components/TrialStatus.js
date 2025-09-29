@@ -79,7 +79,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               <TrophyIcon className="h-6 w-6 text-green-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-green-900">{t('premium_account')}</h3>
+              <h3 className="text-lg font-semibold text-center text-green-900">{t('premium_account')}</h3>
               <p className="text-sm text-green-700">{t('unlimited_access_features')}</p>
             </div>
           </div>
@@ -256,7 +256,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
         <div className="bg-white border border-gray-200 rounded-xl p-6">
           <div className="flex items-center space-x-3 mb-6">
             <ChartBarIcon className="h-5 w-5 text-gray-600" />
-            <h4 className="text-lg font-medium text-gray-900">{t('usage_limits')}</h4>
+            <h4 className="text-lg font-medium text-center text-gray-900">{t('usage_limits')}</h4>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -312,7 +312,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
 
       {/* Upgrade Benefits */}
       <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-6">
-        <h4 className="text-lg font-medium text-gray-900 mb-4">
+        <h4 className="text-lg font-medium text-center text-gray-900 mb-4">
           {t('upgrade_unlimited_access')}
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -139,7 +139,7 @@ const ResidentDashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 text-center">Family Members</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">Family Members</h3>
               <UsersIcon className="h-5 w-5 text-gray-400" />
             </div>
           </div>
@@ -187,7 +187,7 @@ const ResidentDashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 text-center">Pending Payments</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">Pending Payments</h3>
               <CurrencyDollarIcon className="h-5 w-5 text-gray-400" />
             </div>
           </div>
@@ -231,7 +231,7 @@ const ResidentDashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 text-center">{t('recent_notifications')}</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('recent_notifications')}</h3>
               <BellIcon className="h-5 w-5 text-gray-400" />
             </div>
           </div>
@@ -269,7 +269,7 @@ const ResidentDashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 text-center">My Messages</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">My Messages</h3>
               <ChatBubbleLeftEllipsisIcon className="h-5 w-5 text-gray-400" />
             </div>
           </div>
@@ -315,7 +315,7 @@ const ResidentDashboard = () => {
 
       {/* Quick Actions */}
       <div className="mt-8">
-        <h3 className="text-lg font-semibold text-gray-900 text-center mb-4 text-center">Quick Actions</h3>
+        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4 text-center">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow text-left">
             <div className="flex items-center space-x-3">

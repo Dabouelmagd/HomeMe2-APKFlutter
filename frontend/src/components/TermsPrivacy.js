@@ -105,9 +105,9 @@ const TermsPrivacy = () => {
           >
             <div className="flex items-center space-x-3">
               <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-sm font-semibold text-blue-600">{index + 1}</span>
+                <span className="text-sm font-semibold text-center text-blue-600">{index + 1}</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 text-center">{section.title}</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{section.title}</h3>
             </div>
             {expandedSections[section.id] ? (
               <ChevronUpIcon className="w-5 h-5 text-gray-400" />
@@ -194,7 +194,7 @@ const TermsPrivacy = () => {
                 <ShieldCheckIcon className="w-6 h-6 text-blue-600 mt-1" />
               )}
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 text-center mb-2">
+                <h2 className="text-xl font-semibold text-center text-gray-900 text-center mb-2">
                   {activeTab === 'terms' ? t('legal.terms.title') : t('legal.privacy.title')}
                 </h2>
                 <p className="text-gray-700">
@@ -213,7 +213,7 @@ const TermsPrivacy = () => {
 
           {/* Contact Information */}
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mt-8">
-            <h3 className="text-lg font-semibold text-gray-900 text-center mb-3">
+            <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-3">
               {t('legal.contact.title')}
             </h3>
             <p className="text-gray-700 mb-4">

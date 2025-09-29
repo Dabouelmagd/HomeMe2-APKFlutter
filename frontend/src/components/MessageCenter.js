@@ -139,7 +139,7 @@ const MessageCenter = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900 text-center">
+                    <h3 className="text-lg font-semibold text-center text-gray-900 text-center">
                       {message.subject}
                     </h3>
                     <div className="flex items-center space-x-2">
@@ -186,7 +186,7 @@ const MessageCenter = () => {
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <ChatBubbleLeftEllipsisIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_messages_yet')}</h3>
+            <h3 className="text-lg font-medium text-center text-gray-900 mb-2">{t('no_messages_yet')}</h3>
             <p className="text-gray-600 mb-4">
               {t('start_conversation', { role: user?.role === 'admin' ? t('residents') : t('management') })}
             </p>
@@ -206,7 +206,7 @@ const MessageCenter = () => {
           <div className="bg-white rounded-xl shadow-lg max-w-lg w-full max-h-90vh overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 text-center">{t('new_message')}</h3>
+                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('new_message')}</h3>
                 <button
                   onClick={() => setShowNewMessage(false)}
                   className="text-gray-400 hover:text-gray-600"

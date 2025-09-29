@@ -350,7 +350,7 @@ const UtilityBills = () => {
                         </div>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900 capitalize">
+                        <h3 className="font-semibold text-center text-gray-900 capitalize">
                           {utilityTypes[bill.utility_type]?.name || bill.utility_type}
                         </h3>
                         <p className="text-sm text-gray-600">{bill.provider_name}</p>
@@ -433,7 +433,7 @@ const UtilityBills = () => {
           ) : (
             <div className="text-center py-12">
               <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_utility_bills')}</h3>
+              <h3 className="text-lg font-medium text-center text-gray-900 mb-2">{t('no_utility_bills')}</h3>
               <p className="text-gray-600">
                 {user?.role === 'admin'
                   ? t('add_first_utility_bill')
@@ -469,7 +469,7 @@ const UtilityBills = () => {
                       </div>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 capitalize">
+                      <h3 className="font-semibold text-center text-gray-900 capitalize">
                         {utilityTypes[connection.utility_type]?.name || connection.utility_type}
                       </h3>
                       <p className="text-sm text-gray-600">{connection.provider_name}</p>
@@ -504,7 +504,7 @@ const UtilityBills = () => {
           ) : (
             <div className="text-center py-12">
               <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_utility_connections')}</h3>
+              <h3 className="text-lg font-medium text-center text-gray-900 mb-2">{t('no_utility_connections')}</h3>
               <p className="text-gray-600">{t('add_first_connection')}</p>
             </div>
           )}
@@ -517,7 +517,7 @@ const UtilityBills = () => {
           <div className="bg-white rounded-xl shadow-lg max-w-lg w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 text-center">
+                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">
                   {t('add_utility_connection')}
                 </h3>
                 <button

@@ -285,7 +285,7 @@ const AddFamilyMemberToUnit = () => {
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h3 className="text-lg leading-6 font-medium text-gray-900" id="add-member-modal-title">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 text-center" id="add-member-modal-title">
                         Add Family Member
                       </h3>
                       <p className="text-sm text-gray-600 mt-1">

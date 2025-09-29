@@ -173,7 +173,7 @@ const FinancialManagement = () => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900 text-center">{t('all_invoices')}</h3>
+            <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('all_invoices')}</h3>
             <DocumentTextIcon className="h-5 w-5 text-gray-400" />
           </div>
         </div>
@@ -263,7 +263,7 @@ const FinancialManagement = () => {
         ) : (
           <div className="text-center py-12">
             <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_invoices_found')}</h3>
+            <h3 className="text-lg font-medium text-center text-gray-900 mb-2">{t('no_invoices_found')}</h3>
             <p className="text-gray-600">
               {t('no_invoices_description')}
             </p>
@@ -273,7 +273,7 @@ const FinancialManagement = () => {
 
       {/* Payment Methods Info */}
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">{t('payment_information')}</h3>
+        <h3 className="text-lg font-semibold text-center text-blue-900 mb-4">{t('payment_information')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <h4 className="font-medium text-blue-800 mb-2">{t('mock_payment_system')}</h4>

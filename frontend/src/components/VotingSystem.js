@@ -444,7 +444,7 @@ const VotingSystem = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-xl font-semibold text-gray-900 text-center">{poll.title}</h3>
+                      <h3 className="text-xl font-semibold text-center text-gray-900 text-center">{poll.title}</h3>
                       {getCategoryBadge(poll.category)}
                       {getStatusBadge(poll.status)}
                     </div>
@@ -580,7 +580,7 @@ const VotingSystem = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 text-center">{t('create_new_poll')}</h2>
+              <h2 className="text-xl font-semibold text-center text-gray-900 text-center">{t('create_new_poll')}</h2>
             </div>
             
             <form onSubmit={handleCreatePoll} className="p-6 space-y-6">
@@ -768,7 +768,7 @@ const VotingSystem = () => {
           <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 text-center">{selectedPoll.title}</h2>
+                <h2 className="text-xl font-semibold text-center text-gray-900 text-center">{selectedPoll.title}</h2>
                 <button
                   onClick={() => setShowDetailsModal(false)}
                   className="text-gray-400 hover:text-gray-600"
@@ -805,7 +805,7 @@ const VotingSystem = () => {
 
                 {/* Voting Options and Results */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  <h3 className="text-lg font-medium text-center text-gray-900 mb-4">
                     {selectedPoll.status === 'ended' ? t('results') : t('voting_options')}
                   </h3>
                   <div className="space-y-3">

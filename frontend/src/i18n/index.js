@@ -83,6 +83,16 @@ const resources = {
       'age': 'Age',
       'id_number': 'ID Number',
       'emergency_contact': 'Emergency Contact',
+      
+      // Message Center
+      'message_center': 'Message Center',
+      'communicate_with': 'Communicate with {role}',
+      'new_message': 'New Message',
+      'no_messages_yet': 'No messages yet',
+      'start_conversation': 'Start conversation',
+      'send_first_message': 'Send your first message',
+      'residents': 'residents',
+      'management': 'management',
       'community_newsletter': 'Community Newsletter',
       
       // Descriptions

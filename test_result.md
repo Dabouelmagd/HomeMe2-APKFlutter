@@ -176,7 +176,7 @@ agent_communication:
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "CRITICAL SYNTAX ERROR FIX: Resolve SyntaxError in /app/frontend/src/i18n/index.js preventing frontend compilation and loading. Error: 'Missing initializer in const declaration. (2444:3)' caused by UTF-8 encoding corruption of Arabic text. Secondary: Complete implementation of public account type selection feature for user registration flow as requested in Arabic (كمل - continue)."
+user_problem_statement: "TEXT-CENTER CSS CLASS APPLICATION: Apply text-center CSS class to all major headings across all components in the HomeMe application to ensure all page headings are centered. Test comprehensive heading centering implementation across 22+ components including AdminDashboard, AdvancedAnalytics, CompoundManagement, GuestManagement, MaintenanceSystem, EventsAnnouncements, NotificationCenter, Settings, SmartHomeIntegration, VotingSystem, DocumentManagement, ServiceBooking, ServicesManagement, FinancialManagement, MessageCenter, Newsletter, ContactUs, Pricing, EnterpriseRegistration, EnterpriseDashboard, and verify multi-language support with RTL layout for Arabic."
 
 backend:
   - task: "HomeMe Flutter Mobile App Backend API Testing"

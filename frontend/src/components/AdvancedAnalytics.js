@@ -586,7 +586,7 @@ const AdvancedAnalytics = () => {
               {(analytics.summary?.achievements || []).map((achievement, index) => (
                 <li key={index} className="flex items-center">
                   <ArrowTrendingUpIcon className="w-4 h-4 text-green-500 mr-2" />
-                  {achievement}
+                  {translateBackendData(achievement)}
                 </li>
               ))}
             </ul>

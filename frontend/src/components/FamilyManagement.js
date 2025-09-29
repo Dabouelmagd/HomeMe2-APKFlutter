@@ -345,7 +345,7 @@ const FamilyManagement = () => {
               <form onSubmit={editingMember ? handleUpdateMember : handleAddMember} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('full_name')}</label>
                     <input
                       type="text"
                       value={memberForm.full_name}

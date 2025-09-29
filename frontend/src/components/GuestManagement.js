@@ -586,7 +586,7 @@ const GuestManagement = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-center text-gray-900 text-center">{t('add_visitor_request')}</h2>
+              <h2 className="text-xl font-semibold text-center text-center text-gray-900 text-center">{t('add_visitor_request')}</h2>
             </div>
             
             <form onSubmit={handleCreateGuest} className="p-6 space-y-6">
@@ -815,7 +815,7 @@ const GuestManagement = () => {
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-center text-gray-900 text-center">{t('visitor_details')}</h2>
+                <h2 className="text-xl font-semibold text-center text-center text-gray-900 text-center">{t('visitor_details')}</h2>
                 <button
                   onClick={() => setShowDetailsModal(false)}
                   className="text-gray-400 hover:text-gray-600"
@@ -828,7 +828,7 @@ const GuestManagement = () => {
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-medium text-center text-gray-900 mb-4">{t('visitor_information')}</h3>
+                  <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-4">{t('visitor_information')}</h3>
                   <dl className="space-y-3">
                     <div>
                       <dt className="text-sm font-medium text-gray-600">{t('name')}</dt>
@@ -854,7 +854,7 @@ const GuestManagement = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-lg font-medium text-center text-gray-900 mb-4">{t('visit_details')}</h3>
+                  <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-4">{t('visit_details')}</h3>
                   <dl className="space-y-3">
                     <div>
                       <dt className="text-sm font-medium text-gray-600">{t('status')}</dt>
@@ -890,7 +890,7 @@ const GuestManagement = () => {
 
               {selectedGuest.special_instructions && (
                 <div className="mt-6">
-                  <h3 className="text-lg font-medium text-center text-gray-900 mb-2">{t('special_instructions')}</h3>
+                  <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">{t('special_instructions')}</h3>
                   <p className="text-sm text-gray-700">{selectedGuest.special_instructions}</p>
                 </div>
               )}

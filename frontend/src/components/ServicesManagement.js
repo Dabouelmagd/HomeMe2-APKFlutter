@@ -720,7 +720,7 @@ const ServicesManagement = () => {
           ) : (
             <div className="text-center py-12">
               <WrenchScrewdriverIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-center text-gray-900 text-center mb-2">{t('no_services')}</h3>
+              <h3 className="text-lg font-medium text-center text-center text-gray-900 text-center mb-2">{t('no_services')}</h3>
               <p className="text-gray-600">
                 {user?.role === 'admin'
                   ? t('add_first_service')
@@ -949,7 +949,7 @@ const ServicesManagement = () => {
       {activeTab === 'service-booking' && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-center text-gray-900 text-center mb-4">Service Booking & Payments</h2>
+            <h2 className="text-xl font-semibold text-center text-center text-gray-900 text-center mb-4">Service Booking & Payments</h2>
             <p className="text-gray-600 mb-6">Book services with multiple payment options and priority levels</p>
             
             {/* Service Providers Grid */}
@@ -961,12 +961,12 @@ const ServicesManagement = () => {
                     <div key={provider.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                       <div className="flex items-center space-x-4 mb-4">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                          <span className="text-lg font-medium text-center text-white">
+                          <span className="text-lg font-medium text-center text-center text-white">
                             {provider.full_name.charAt(0)}
                           </span>
                         </div>
                         <div>
-                          <h4 className="text-lg font-medium text-center text-gray-900 text-center">{provider.full_name}</h4>
+                          <h4 className="text-lg font-medium text-center text-center text-gray-900 text-center">{provider.full_name}</h4>
                           <div className="flex items-center space-x-2">
                             <div className="flex items-center">
                               {[1, 2, 3, 4, 5].map((star) => (

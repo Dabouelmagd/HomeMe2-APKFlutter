@@ -667,7 +667,7 @@ const ServiceBooking = () => {
             {bookings.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-xl shadow-sm">
                 <CalendarIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-center text-gray-900 mb-2">No bookings yet</h3>
+                <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">No bookings yet</h3>
                 <p className="text-gray-600 mb-6">Start by booking your first service!</p>
                 <button
                   onClick={() => setShowBookingForm(true)}
@@ -1269,7 +1269,7 @@ const ServiceBooking = () => {
                 <form onSubmit={handlePayment}>
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg font-medium text-center text-gray-900">Process Payment</h3>
+                      <h3 className="text-lg font-medium text-center text-center text-gray-900">Process Payment</h3>
                       <button type="button" onClick={() => setShowPaymentModal(false)} className="text-gray-400 hover:text-gray-600">
                         <XCircleIcon className="h-6 w-6" />
                       </button>
@@ -1441,7 +1441,7 @@ const ServiceBooking = () => {
               <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <form onSubmit={handleReview}>
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                    <h3 className="text-lg font-medium text-center text-gray-900 mb-4">Leave a Review</h3>
+                    <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-4">Leave a Review</h3>
                     <div className="space-y-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Overall Rating</label>

@@ -194,7 +194,7 @@ const TermsPrivacy = () => {
                 <ShieldCheckIcon className="w-6 h-6 text-blue-600 mt-1" />
               )}
               <div>
-                <h2 className="text-xl font-semibold text-center text-gray-900 text-center mb-2">
+                <h2 className="text-xl font-semibold text-center text-center text-gray-900 text-center mb-2">
                   {activeTab === 'terms' ? t('legal.terms.title') : t('legal.privacy.title')}
                 </h2>
                 <p className="text-gray-700">

@@ -433,7 +433,7 @@ const UtilityBills = () => {
           ) : (
             <div className="text-center py-12">
               <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-center text-gray-900 mb-2">{t('no_utility_bills')}</h3>
+              <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">{t('no_utility_bills')}</h3>
               <p className="text-gray-600">
                 {user?.role === 'admin'
                   ? t('add_first_utility_bill')
@@ -504,7 +504,7 @@ const UtilityBills = () => {
           ) : (
             <div className="text-center py-12">
               <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-center text-gray-900 mb-2">{t('no_utility_connections')}</h3>
+              <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">{t('no_utility_connections')}</h3>
               <p className="text-gray-600">{t('add_first_connection')}</p>
             </div>
           )}

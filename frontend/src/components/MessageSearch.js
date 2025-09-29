@@ -597,7 +597,7 @@ const MessageSearch = ({ isOpen, onClose, onSelectMessage }) => {
         {showSaveSearch && (
           <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white rounded-lg p-6 w-96">
-              <h3 className="text-lg font-medium text-center mb-4">{t('search.saveSearch')}</h3>
+              <h3 className="text-lg font-medium text-center text-center mb-4">{t('search.saveSearch')}</h3>
               <input
                 type="text"
                 value={saveSearchName}

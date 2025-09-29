@@ -425,7 +425,7 @@ const DocumentManagement = () => {
             <div className="fixed inset-0 bg-black opacity-50" onClick={() => setShowUploadModal(false)}></div>
             <div className="relative bg-white rounded-lg max-w-md w-full p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-center">
+                <h3 className="text-lg font-medium text-center text-center">
                   {t('documents.upload_document', 'Upload Document')}
                 </h3>
                 <button
@@ -545,7 +545,7 @@ const DocumentManagement = () => {
             <div className="fixed inset-0 bg-black opacity-50" onClick={() => setShowCreateFolderModal(false)}></div>
             <div className="relative bg-white rounded-lg max-w-md w-full p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-center">
+                <h3 className="text-lg font-medium text-center text-center">
                   {t('documents.create_folder', 'Create Folder')}
                 </h3>
                 <button
@@ -637,7 +637,7 @@ const DocumentManagement = () => {
             <div className="fixed inset-0 bg-black opacity-50" onClick={() => setShowDocumentModal(false)}></div>
             <div className="relative bg-white rounded-lg max-w-2xl w-full p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-center">{selectedDocument.title}</h3>
+                <h3 className="text-lg font-medium text-center text-center">{selectedDocument.title}</h3>
                 <button
                   onClick={() => setShowDocumentModal(false)}
                   className="text-gray-400 hover:text-gray-600"

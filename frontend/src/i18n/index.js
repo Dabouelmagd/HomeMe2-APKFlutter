@@ -48,6 +48,7 @@ const resources = {
       'voting_system': 'Voting System',
       'smart_home': 'Smart Home',
       'government_utility_gateway': 'Government & Utility Gateway',
+      'manage_government_utility_bills': 'Manage your government and utility bills in one place',
       'community_newsletter': 'Community Newsletter',
       
       // Descriptions

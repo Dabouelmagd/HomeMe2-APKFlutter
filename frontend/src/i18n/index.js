@@ -608,6 +608,16 @@ const resources = {
       'age': 'العمر',
       'id_number': 'رقم الهوية',
       'emergency_contact': 'جهة الاتصال الطارئة',
+      
+      // Message Center
+      'message_center': 'مركز الرسائل',
+      'communicate_with': 'التواصل مع {role}',
+      'new_message': 'رسالة جديدة',
+      'no_messages_yet': 'لا توجد رسائل بعد',
+      'start_conversation': 'بدء المحادثة',
+      'send_first_message': 'أرسل رسالتك الأولى',
+      'residents': 'المقيمين',
+      'management': 'الإدارة',
       'community_newsletter': 'النشرة الإخبارية للمجتمع',
       
       // Descriptions

@@ -1010,6 +1010,7 @@ const resources = {
       'voting_system': 'Système de vote',
       'smart_home': 'Maison intelligente',
       'government_utility_gateway': 'Passerelle gouvernementale et services',
+      'manage_government_utility_bills': 'Gérez vos factures gouvernementales et de services publics en un seul endroit',
       'community_newsletter': 'Bulletin communautaire',
       
       // Descriptions

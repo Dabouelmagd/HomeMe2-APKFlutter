@@ -471,7 +471,21 @@ const resources = {
         'chats': 'Chats'
       },
       'gallery': {
-        'title': 'Gallery'
+        'title': 'Gallery',
+        'description': 'View and manage all files shared in chats',
+        'allFiles': 'All Files',
+        'images': 'Images',
+        'videos': 'Videos',
+        'voice': 'Voice',
+        'audio': 'Audio',
+        'documents': 'Documents',
+        'newestFirst': 'Newest First',
+        'largestFirst': 'Largest First',
+        'nameAZ': 'Name (A-Z)',
+        'noFilesFound': 'No files found',
+        'filesSharedInChats': 'Files shared in chats will appear here',
+        'from': 'From',
+        'download': 'Download'
       },
       'schedule': {
         'title': 'Schedule'

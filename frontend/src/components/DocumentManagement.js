@@ -355,7 +355,7 @@ const DocumentManagement = () => {
                     <div className="flex items-center">
                       <CategoryIcon className="h-8 w-8 text-blue-600 mr-3" />
                       <div>
-                        <h3 className="font-medium text-gray-900 line-clamp-2">{doc.title}</h3>
+                        <h3 className="font-medium text-gray-900 text-center line-clamp-2">{doc.title}</h3>
                         <p className="text-sm text-gray-500 capitalize">{doc.category}</p>
                       </div>
                     </div>

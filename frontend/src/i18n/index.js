@@ -1294,6 +1294,18 @@ const resources = {
       'recent_notifications': 'الإشعارات الحديثة',
       'no_recent_notifications': 'لا توجد إشعارات حديثة',
       
+      // Compound Management
+      'compound_management': 'إدارة المجمع',
+      'overview': 'نظرة عامة',
+      'residence_list': 'قائمة الإقامات',
+      'registration_links': 'روابط التسجيل',
+      'manage_users': 'إدارة المستخدمين',
+      'add_admin_tab': 'إضافة مدير',
+      'settings': 'الإعدادات',
+      'compound_id': 'معرف المجمع',
+      'created': 'تم الإنشاء',
+      'click_to_upload_logo': 'اضغط لتحميل الشعار',
+      
       // Residence Management
       'no_additional_admins': 'لا توجد مديرين إضافيين',
       'help_manage': 'المساعدة في الإدارة',

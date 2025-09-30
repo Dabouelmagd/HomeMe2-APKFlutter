@@ -412,25 +412,25 @@ const Settings = () => {
   const tabs = [
     {
       id: 'notifications',
-      name: t('settings.notifications'),
+      name: t('settings_notifications'),
       icon: BellIcon,
       component: PushNotifications
     },
     {
       id: 'profile',
-      name: t('settings.profile'),
+      name: t('settings_profile'),
       icon: UserIcon,
       component: ProfileSettings
     },
     {
       id: 'privacy',
-      name: t('settings.privacy'),
+      name: t('settings_privacy'),
       icon: ShieldCheckIcon,
       component: PrivacySettings
     },
     {
       id: 'language',
-      name: t('settings.language'),
+      name: t('settings_language'),
       icon: LanguageIcon,
       component: LanguageSettings
     }

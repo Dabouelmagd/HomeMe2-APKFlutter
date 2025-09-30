@@ -1985,6 +1985,8 @@ const resources = {
       // Test Update Messages
       'frontend_update_successful': 'Mise à jour de l\'interface réussie',
       'frontend_updates_working': 'Les mises à jour de l\'interface fonctionnent',
+      'updated_compound_management': 'Gestion des complexes mise à jour',
+      'new_features_added': 'Nouvelles fonctionnalités ajoutées',
       
       // Compound Management
       'compound_management': 'Gestion du Complexe',

@@ -167,7 +167,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Welcome back, ${user?.fullName ?? 'Admin'}! 👋',
+                            '${AppLocalizations.of(context)?.welcomeBack ?? 'Welcome back'}, ${user?.fullName ?? 'Admin'}! 👋',
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -175,7 +175,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            "Here's what's happening in your compound today",
+                            AppLocalizations.of(context)?.translate('happening_compound_today') ?? "Here's what's happening in your compound today",
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: Colors.white.withOpacity(0.9),
                             ),

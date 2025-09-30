@@ -200,11 +200,18 @@ const Pricing = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
+          {/* HomeMe Logo */}
+          <div className="flex justify-center mb-6">
+            <div className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              HomeMe
+            </div>
+          </div>
+          
           <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center">
-            Choose Your HomeMe Plan
+            Choose Your Account Type
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Start with our free Community plan or upgrade for more residents, services, and advanced features
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto text-center">
+            Select the plan that best fits your property management needs
           </p>
           
           {/* Billing Toggle */}

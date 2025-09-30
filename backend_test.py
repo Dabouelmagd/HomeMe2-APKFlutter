@@ -3896,12 +3896,13 @@ class HomeMeFlutterTestSuite:
         total_tests = 0
         
         # Test common endpoints Flutter app might need
+        compound_id = self.compound_id if self.compound_id else "test-compound-id"
         flutter_endpoints = [
             ("GET", "/notifications", "Notifications endpoint"),
             ("GET", "/maintenance/requests", "Maintenance requests endpoint"),
-            ("GET", "/services", "Services endpoint"),
+            ("GET", f"/compounds/{compound_id}/services", "Services endpoint"),
             ("GET", "/compounds", "Compounds endpoint"),
-            ("GET", "/users/profile", "User profile endpoint")
+            ("GET", "/users/me", "User profile endpoint")  # Try /users/me instead of /users/profile
         ]
         
         for method, endpoint, description in flutter_endpoints:

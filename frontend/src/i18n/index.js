@@ -1441,6 +1441,7 @@ const resources = {
       'admin_only': 'Administrateur uniquement',
       
       // Legal Page
+      'legal_title': 'Légal',
       'legal_subtitle': 'Conditions d\'utilisation et politique de confidentialité',
       'legal_termsOfUse': 'Conditions d\'utilisation',
       'legal_privacyPolicy': 'Politique de confidentialité',

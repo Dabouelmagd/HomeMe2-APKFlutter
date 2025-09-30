@@ -331,11 +331,17 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          // Show add guest/visit request dialog
-          _showAddGuestDialog();
+          showDialog(
+            context: context,
+            builder: (context) => AddGuestDialog(
+              onGuestAdded: (guest) {
+                _loadData(); // Refresh the data
+              },
+            ),
+          );
         },
         icon: const Icon(Icons.add),
-        label: const Text('Add Guest'),
+        label: Text(AppLocalizations.of(context)?.translate('add_guest') ?? 'Add Guest'),
       ),
     );
   }

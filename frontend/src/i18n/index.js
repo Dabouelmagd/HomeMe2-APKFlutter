@@ -101,6 +101,7 @@ const resources = {
       'notifications_will_appear_here': 'Notifications will appear here',
       
       // Settings
+      'settings_title': 'Settings',
       'manage_account_settings_preferences': 'Manage your account settings and preferences',
       'settings': {
         'notifications': 'Notifications',

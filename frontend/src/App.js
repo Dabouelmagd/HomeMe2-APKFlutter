@@ -365,6 +365,10 @@ function App() {
                   <TermsPrivacy />
                 } />
                 
+                <Route path="legal" element={
+                  <TermsPrivacy />
+                } />
+                
                 <Route path="contact" element={
                   <ContactUs />
                 } />

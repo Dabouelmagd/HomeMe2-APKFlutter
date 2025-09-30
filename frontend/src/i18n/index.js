@@ -1513,6 +1513,7 @@ const resources = {
       'legal_terms_governingLaw_title': '6. Droit applicable',
       
       // Contact Us & Legal Acceptance
+      'legal_contact_title': 'Nous contacter',
       'legal_contact_description': 'Vous avez des questions sur nos conditions ou notre politique de confidentialité? Contactez-nous.',
       'legal_contact_email': 'info@datalifeai.com',
       'legal_contact_address': 'DataLife AI LLC, Business Bay, Dubaï, EAU',

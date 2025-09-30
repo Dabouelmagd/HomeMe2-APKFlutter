@@ -1,0 +1,81 @@
+{
+  "@@locale": "en",
+  
+  "appTitle": "HomeMe",
+  "welcomeBack": "Welcome back",
+  "signInToAccount": "Sign in to your HomeMe account",
+  "email": "Email",
+  "password": "Password",
+  "signIn": "Sign In",
+  "dontHaveAccount": "Don't have an account?",
+  "registerHere": "Register here",
+  "demoAccounts": "Demo Accounts",
+  
+  "adminDashboard": "Admin Dashboard",
+  "myDashboard": "My Dashboard",
+  "profile": "Profile",
+  "settings": "Settings",
+  "logout": "Logout",
+  
+  "welcomeBackAdmin": "Welcome back, {name}! 👋",
+  "@welcomeBackAdmin": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "welcomeHomeResident": "Welcome home, {name}! 🏠",
+  "@welcomeHomeResident": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "happeningInCompoundToday": "Here's what's happening in your compound today",
+  "unit": "Unit {unitNumber}",
+  "@unit": {
+    "placeholders": {
+      "unitNumber": {
+        "type": "String"
+      }
+    }
+  },
+  
+  "overview": "Overview",
+  "quickOverview": "Quick Overview",
+  "quickActions": "Quick Actions",
+  "recentActivity": "Recent Activity",
+  
+  "totalResidents": "Total Residents",
+  "totalFamilies": "Total Families",
+  "activeVisitors": "Active Visitors",
+  "openMessages": "Open Messages",
+  "familyMembers": "Family Members",
+  "pendingVisits": "Pending Visits",
+  "maintenance": "Maintenance",
+  "monthlyFees": "Monthly Fees",
+  
+  "guestManagement": "Guest Management",
+  "maintenanceRequest": "Maintenance Request",
+  "communityEvents": "Community Events",
+  "inviteGuests": "Invite Guests",
+  
+  "pleaseEnterEmail": "Please enter your email",
+  "pleaseEnterValidEmail": "Please enter a valid email",
+  "pleaseEnterPassword": "Please enter your password",
+  "passwordMinLength": "Password must be at least 6 characters",
+  
+  "loading": "Loading...",
+  "refresh": "Refresh",
+  "error": "Error",
+  "tryAgain": "Try Again",
+  
+  "guests": "Guests",
+  "maintenanceRequests": "Maintenance Requests",
+  "events": "Events",
+  "notifications": "Notifications"
+}

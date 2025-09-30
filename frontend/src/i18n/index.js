@@ -622,6 +622,8 @@ const resources = {
       // Test Update Messages
       'frontend_update_successful': 'Frontend Update Successful',
       'frontend_updates_working': 'Frontend Updates Working',
+      'updated_compound_management': 'Updated Compound Management',
+      'new_features_added': 'New Features Added',
       
       // Compound Management
       'compound_management': 'Compound Management',

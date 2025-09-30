@@ -210,25 +210,25 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                 mainAxisSpacing: 16,
                 children: [
                   StatsCard(
-                    title: 'Total Residents',
+                    title: AppLocalizations.of(context)?.totalResidents ?? 'Total Residents',
                     value: '${_dashboardData?['total_residents'] ?? 0}',
                     icon: Icons.people,
                     color: Colors.blue,
                   ),
                   StatsCard(
-                    title: 'Total Families',
+                    title: AppLocalizations.of(context)?.totalFamilies ?? 'Total Families',
                     value: '${_dashboardData?['total_families'] ?? 0}',
                     icon: Icons.family_restroom,
                     color: Colors.green,
                   ),
                   StatsCard(
-                    title: 'Active Visitors',
+                    title: AppLocalizations.of(context)?.activeVisitors ?? 'Active Visitors',
                     value: '${_dashboardData?['active_visitors'] ?? 0}',
                     icon: Icons.how_to_reg,
                     color: Colors.orange,
                   ),
                   StatsCard(
-                    title: 'Open Messages',
+                    title: AppLocalizations.of(context)?.openMessages ?? 'Open Messages',
                     value: '${_dashboardData?['open_messages'] ?? 0}',
                     icon: Icons.message,
                     color: Colors.purple,

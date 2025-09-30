@@ -129,7 +129,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               PopupMenuItem(
                 child: ListTile(
                   leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text('Logout', style: TextStyle(color: Colors.red)),
+                  title: Text(AppLocalizations.of(context)?.translate('sign_out') ?? 'Logout', style: const TextStyle(color: Colors.red)),
                   onTap: () {
                     Navigator.pop(context);
                     ref.read(authProvider.notifier).logout();

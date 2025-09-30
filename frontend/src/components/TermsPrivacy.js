@@ -237,7 +237,7 @@ const TermsPrivacy = () => {
               <ShieldCheckIcon className="w-5 h-5 text-yellow-600 mt-0.5" />
               <div>
                 <h4 className="text-sm font-medium text-yellow-800 mb-1">
-                  {t('legal.acceptance.title')}
+                  {t('legal_acceptance_title')}
                 </h4>
                 <p className="text-sm text-yellow-700">
                   {t('legal.acceptance.content')}

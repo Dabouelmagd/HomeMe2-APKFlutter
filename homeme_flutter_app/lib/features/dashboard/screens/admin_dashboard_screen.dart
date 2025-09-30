@@ -7,6 +7,8 @@ import '../../auth/providers/auth_provider.dart';
 import '../widgets/dashboard_card.dart';
 import '../widgets/stats_card.dart';
 import '../widgets/recent_activity_widget.dart';
+import '../../../core/l10n/app_localizations.dart';
+import '../../../core/widgets/language_switcher.dart';
 
 class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});

@@ -92,7 +92,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Dashboard'),
+        title: Text(AppLocalizations.of(context)?.translate('admin_dashboard') ?? 'Admin Dashboard'),
         actions: [
           PopupMenuButton(
             icon: CircleAvatar(

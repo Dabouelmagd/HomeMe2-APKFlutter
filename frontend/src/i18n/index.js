@@ -227,6 +227,18 @@ const resources = {
       'cancelled_bookings': 'Cancelled Bookings',
       'upcoming_events': 'Upcoming Events',
       'past_events': 'Past Events',
+      'all_items': 'All Items',
+      'cultural_event': 'Cultural Event',
+      'educational_event': 'Educational Event',
+      'health_event': 'Health Event',
+      'sports_event': 'Sports Event',
+      'this_month': 'This Month',
+      
+      // Smart Home
+      'energy_monitoring': 'Energy Monitoring',
+      'energy_saved': 'Energy Saved',
+      'no_devices': 'No Devices',
+      'no_devices_description': 'No smart devices connected yet',
       'monthly_revenue': 'Monthly Revenue',
       'weekly_revenue': 'Weekly Revenue',
       'daily_revenue': 'Daily Revenue',

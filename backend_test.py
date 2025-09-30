@@ -208,7 +208,7 @@ class HomeMeFlutterTestSuite:
             return False
 
     def test_resident_dashboard_endpoint(self):
-        """Test GET /api/resident/dashboard - Resident dashboard data retrieval"""
+        """Test GET /api/dashboard/resident - Resident dashboard data retrieval"""
         print("\n=== Testing Resident Dashboard Endpoint ===")
         
         # First try with admin token (some systems allow admin to access resident endpoints)
@@ -218,7 +218,7 @@ class HomeMeFlutterTestSuite:
         
         try:
             headers = self.setup_auth_headers(self.admin_token)
-            response = self.session.get(f"{BASE_URL}/resident/dashboard", headers=headers)
+            response = self.session.get(f"{BASE_URL}/dashboard/resident", headers=headers)
             
             if response.status_code == 200:
                 data = response.json()

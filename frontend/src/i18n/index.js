@@ -1538,6 +1538,15 @@ const resources = {
       'legal_contact_addressValue': 'DataLife AI Le Caire, Égypte',
       'legal_acceptance_title': 'Acceptation des conditions',
       'legal_acceptance_content': 'En accédant à nos services et en les utilisant, vous reconnaissez avoir lu, compris et accepté d\'être lié par ces termes et conditions.',
+      
+      // Privacy Policy Sections
+      'legal_privacy_infoCollection_title': '1. Collecte d\'informations',
+      'legal_privacy_infoUse_title': '2. Utilisation des informations',
+      'legal_privacy_infoProtection_title': '3. Protection des informations',
+      'legal_privacy_infoSharing_title': '4. Partage d\'informations',
+      'legal_privacy_userRights_title': '5. Droits des utilisateurs',
+      'legal_privacy_policyChanges_title': '6. Modifications de la politique',
+      'legal_privacy_applicableLaws_title': '7. Lois applicables',
       'monthly_revenue': 'Revenus mensuels',
       'weekly_revenue': 'Revenus hebdomadaires',
       'daily_revenue': 'Revenus quotidiens',

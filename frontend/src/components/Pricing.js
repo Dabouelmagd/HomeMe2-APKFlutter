@@ -200,11 +200,23 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <Layout>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
-        <div className="text-center mb-12">
+          {/* Back Button */}
+          <div className="mb-6">
+            <button
+              onClick={() => navigate('/')}
+              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              <ArrowLeftIcon className="h-5 w-5 mr-2 rtl:rotate-180" />
+              <span>{t('back_to_menu')}</span>
+            </button>
+          </div>
+
+          {/* Header */}
+          <div className="text-center mb-12">
           {/* HomeMe Logo */}
           <div className="flex justify-center mb-6">
             <img 

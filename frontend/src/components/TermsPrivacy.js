@@ -60,38 +60,38 @@ const TermsPrivacy = () => {
   const privacyContent = [
     {
       id: 'info_collection',
-      title: t('legal.privacy.infoCollection.title'),
-      content: t('legal.privacy.infoCollection.content')
+      title: t('legal_privacy_infoCollection_title'),
+      content: 'We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.'
     },
     {
       id: 'info_use',
-      title: t('legal.privacy.infoUse.title'),
-      content: t('legal.privacy.infoUse.content')
+      title: t('legal_privacy_infoUse_title'),
+      content: 'We use the information we collect to provide, maintain, and improve our services, communicate with you, and ensure platform security.'
     },
     {
       id: 'info_protection',
-      title: t('legal.privacy.infoProtection.title'),
-      content: t('legal.privacy.infoProtection.content')
+      title: t('legal_privacy_infoProtection_title'),
+      content: 'We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.'
     },
     {
       id: 'info_sharing',
-      title: t('legal.privacy.infoSharing.title'),
-      content: t('legal.privacy.infoSharing.content')
+      title: t('legal_privacy_infoSharing_title'),
+      content: 'We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this privacy policy.'
     },
     {
       id: 'user_rights',
-      title: t('legal.privacy.userRights.title'),
-      content: t('legal.privacy.userRights.content')
+      title: t('legal_privacy_userRights_title'),
+      content: 'You have the right to access, update, or delete your personal information. You may also opt out of certain communications from us.'
     },
     {
       id: 'policy_changes',
-      title: t('legal.privacy.policyChanges.title'),
-      content: t('legal.privacy.policyChanges.content')
+      title: t('legal_privacy_policyChanges_title'),
+      content: 'We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page.'
     },
     {
       id: 'applicable_laws',
-      title: t('legal.privacy.applicableLaws.title'),
-      content: t('legal.privacy.applicableLaws.content')
+      title: t('legal_privacy_applicableLaws_title'),
+      content: 'This privacy policy is governed by and construed in accordance with applicable data protection laws and regulations.'
     }
   ];
 

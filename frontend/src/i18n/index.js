@@ -1517,7 +1517,7 @@ const resources = {
       'legal_contact_description': 'Vous avez des questions sur nos conditions ou notre politique de confidentialité? Contactez-nous.',
       'legal_contact_email': 'E-mail',
       'legal_contact_address': 'Adresse',
-      'legal_contact_addressValue': 'Le Caire, Égypte',
+      'legal_contact_addressValue': 'DataLife AI Le Caire, Égypte',
       'legal_acceptance_title': 'Acceptation des conditions',
       'legal_acceptance_content': 'En accédant à nos services et en les utilisant, vous reconnaissez avoir lu, compris et accepté d\'être lié par ces termes et conditions.',
       'monthly_revenue': 'Revenus mensuels',

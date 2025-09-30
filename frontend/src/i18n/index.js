@@ -1304,6 +1304,8 @@ const resources = {
       // Test Update Messages
       'frontend_update_successful': 'تم تحديث الواجهة الأمامية بنجاح',
       'frontend_updates_working': 'تحديثات الواجهة الأمامية تعمل',
+      'updated_compound_management': 'تم تحديث إدارة المجمع',
+      'new_features_added': 'تم إضافة ميزات جديدة',
       
       // Compound Management
       'compound_management': 'إدارة المجمع',

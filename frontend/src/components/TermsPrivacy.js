@@ -240,7 +240,7 @@ const TermsPrivacy = () => {
                   {t('legal_acceptance_title')}
                 </h4>
                 <p className="text-sm text-yellow-700">
-                  {t('legal.acceptance.content')}
+                  {t('legal_acceptance_content')}
                 </p>
               </div>
             </div>

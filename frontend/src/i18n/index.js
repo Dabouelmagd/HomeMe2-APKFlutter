@@ -1215,7 +1215,12 @@ const resources = {
         'noFilesFound': 'لم يتم العثور على ملفات',
         'filesSharedInChats': 'الملفات المشتركة في المحادثات ستظهر هنا',
         'from': 'من',
-        'download': 'تحميل'
+        'download': 'تحميل',
+        'file': 'ملف',
+        'size': 'حجم',
+        'sender': 'المرسل',
+        'date': 'تاريخ',
+        'actions': 'إجراءات'
       },
       'schedule': {
         'title': 'الجدول الزمني',

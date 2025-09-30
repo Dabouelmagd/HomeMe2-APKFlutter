@@ -1299,6 +1299,10 @@ const resources = {
       'recent_notifications': 'الإشعارات الحديثة',
       'no_recent_notifications': 'لا توجد إشعارات حديثة',
       
+      // Test Update Messages
+      'frontend_update_successful': 'تم تحديث الواجهة الأمامية بنجاح',
+      'frontend_updates_working': 'تحديثات الواجهة الأمامية تعمل',
+      
       // Compound Management
       'compound_management': 'إدارة المجمع',
       'overview': 'نظرة عامة',

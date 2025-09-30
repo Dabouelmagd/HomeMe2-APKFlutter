@@ -146,12 +146,18 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Guest Management'),
+        title: Text(AppLocalizations.of(context)?.guestManagement ?? 'Guest Management'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(icon: Icon(Icons.people), text: 'Current Guests'),
-            Tab(icon: Icon(Icons.schedule), text: 'Visit Requests'),
+          tabs: [
+            Tab(
+              icon: const Icon(Icons.people), 
+              text: AppLocalizations.of(context)?.translate('current_guests') ?? 'Current Guests'
+            ),
+            Tab(
+              icon: const Icon(Icons.schedule), 
+              text: AppLocalizations.of(context)?.translate('visit_requests') ?? 'Visit Requests'
+            ),
           ],
         ),
       ),

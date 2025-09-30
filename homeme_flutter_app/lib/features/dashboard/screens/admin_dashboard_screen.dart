@@ -109,7 +109,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               PopupMenuItem(
                 child: ListTile(
                   leading: const Icon(Icons.person),
-                  title: const Text('Profile'),
+                  title: Text(AppLocalizations.of(context)?.profile ?? 'Profile'),
                   onTap: () {
                     Navigator.pop(context);
                     // Navigate to profile

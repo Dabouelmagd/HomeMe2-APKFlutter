@@ -1332,6 +1332,7 @@ const resources = {
       'admin_management': 'إدارة المديرين',
       'manage_admins': 'إدارة المديرين',
       'add_admin': 'إضافة مدير',
+      'primary_admin': 'المدير الرئيسي',
       'click_to_upload_logo': 'اضغط لتحميل الشعار',
       
       // Analytics & Statistics

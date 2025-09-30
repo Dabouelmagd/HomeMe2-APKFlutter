@@ -221,7 +221,7 @@ const TermsPrivacy = () => {
             </p>
             <div className="space-y-2 text-sm text-gray-600">
               <div>
-                <span className="font-medium">{t('legal.contact.email')}: </span>
+                <span className="font-medium">{t('legal_contact_email')}: </span>
                 <span>info@datalifeai.com</span>
               </div>
               <div>

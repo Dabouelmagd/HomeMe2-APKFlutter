@@ -843,6 +843,20 @@ const resources = {
       
       // Document Management
       'admin_only': 'للإدارة فقط',
+      
+      // Legal Page
+      'legal_subtitle': 'شروط الاستخدام وسياسة الخصوصية',
+      'legal_termsOfUse': 'شروط الاستخدام',
+      'legal_privacyPolicy': 'سياسة الخصوصية',
+      'legal_terms_title': 'شروط الاستخدام',
+      'legal_terms_description': 'يرجى قراءة هذه الشروط والأحكام بعناية قبل استخدام خدمتنا.',
+      'legal_lastUpdated': 'آخر تحديث',
+      'legal_terms_acceptance_title': '1. قبول الشروط',
+      'legal_terms_personalUse_title': '2. رخصة الاستخدام الشخصي',
+      'legal_terms_content_title': '3. المحتوى والسلوك',
+      'legal_terms_liability_title': '4. حدود المسؤولية',
+      'legal_terms_modifications_title': '5. تعديل الشروط',
+      'legal_terms_governingLaw_title': '6. القانون المنظم',
       'monthly_revenue': 'الإيرادات الشهرية',
       'weekly_revenue': 'الإيرادات الأسبوعية',
       'daily_revenue': 'الإيرادات اليومية',

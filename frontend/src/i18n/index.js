@@ -797,6 +797,18 @@ const resources = {
       'cancelled_bookings': 'حجوزات ملغية',
       'upcoming_events': 'الأحداث القادمة',
       'past_events': 'الأحداث السابقة',
+      'all_items': 'جميع العناصر',
+      'cultural_event': 'حدث ثقافي',
+      'educational_event': 'حدث تعليمي',
+      'health_event': 'حدث صحي',
+      'sports_event': 'حدث رياضي',
+      'this_month': 'هذا الشهر',
+      
+      // Smart Home
+      'energy_monitoring': 'مراقبة الطاقة',
+      'energy_saved': 'الطاقة الموفرة',
+      'no_devices': 'لا توجد أجهزة',
+      'no_devices_description': 'لا توجد أجهزة ذكية متصلة بعد',
       'monthly_revenue': 'الإيرادات الشهرية',
       'weekly_revenue': 'الإيرادات الأسبوعية',
       'daily_revenue': 'الإيرادات اليومية',

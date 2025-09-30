@@ -619,6 +619,18 @@ const resources = {
       'recent_notifications': 'Recent Notifications',
       'no_recent_notifications': 'No recent notifications',
       
+      // Compound Management
+      'compound_management': 'Compound Management',
+      'overview': 'Overview',
+      'residence_list': 'Residence List',
+      'registration_links': 'Registration Links',
+      'manage_users': 'Manage Users',
+      'add_admin_tab': 'Add Admin',
+      'settings': 'Settings',
+      'compound_id': 'Compound ID',
+      'created': 'Created',
+      'click_to_upload_logo': 'Click to upload logo',
+      
       // Residence Management
       'no_additional_admins': 'No Additional Admins',
       'help_manage': 'Help Manage',

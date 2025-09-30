@@ -310,7 +310,7 @@ class HomeMeFlutterTestSuite:
         # Test JSON response format
         try:
             total_tests += 1
-            response = self.session.get(f"{BASE_URL}/admin/dashboard", headers=headers)
+            response = self.session.get(f"{BASE_URL}/dashboard/admin", headers=headers)
             
             if response.status_code == 200:
                 try:

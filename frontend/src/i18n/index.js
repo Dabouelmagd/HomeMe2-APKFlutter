@@ -1840,7 +1840,26 @@ const resources = {
         'chats': 'Discussions'
       },
       'gallery': {
-        'title': 'Galerie'
+        'title': 'Galerie',
+        'description': 'Voir et gérer tous les fichiers partagés dans les discussions',
+        'allFiles': 'Tous les Fichiers',
+        'images': 'Images',
+        'videos': 'Vidéos',
+        'voice': 'Voix',
+        'audio': 'Audio',
+        'documents': 'Documents',
+        'newestFirst': 'Le Plus Récent d\'Abord',
+        'largestFirst': 'Le Plus Grand d\'Abord',
+        'nameAZ': 'Nom (A-Z)',
+        'noFilesFound': 'Aucun fichier trouvé',
+        'filesSharedInChats': 'Les fichiers partagés dans les discussions apparaîtront ici',
+        'from': 'De',
+        'download': 'Télécharger',
+        'file': 'Fichier',
+        'size': 'Taille',
+        'sender': 'Expéditeur',
+        'date': 'Date',
+        'actions': 'Actions'
       },
       'schedule': {
         'title': 'Calendrier',

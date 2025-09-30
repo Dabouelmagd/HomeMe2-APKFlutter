@@ -214,7 +214,7 @@ const TermsPrivacy = () => {
           {/* Contact Information */}
           <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mt-8">
             <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-3">
-              {t('legal.contact.title')}
+              {t('legal_contact_title')}
             </h3>
             <p className="text-gray-700 mb-4">
               {t('legal.contact.description')}

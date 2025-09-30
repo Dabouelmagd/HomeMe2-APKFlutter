@@ -115,6 +115,9 @@ class AppLocalizations {
       'please_enter_valid_email': 'Veuillez entrer un email valide',
       'please_enter_password': 'Veuillez entrer votre mot de passe',
       'password_min_length': 'Le mot de passe doit contenir au moins 6 caractères',
+      'happening_compound_today': 'Voici ce qui se passe dans votre complexe aujourd\'hui',
+      'overview': 'Aperçu',
+      'admin_dashboard': 'Tableau de Bord Admin',
     },
   };
 

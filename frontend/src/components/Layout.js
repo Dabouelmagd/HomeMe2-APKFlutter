@@ -283,7 +283,7 @@ const Layout = () => {
       show: true
     },
     {
-      name: t('legal.contact.title'),
+      name: t('legal_contact_title'),
       href: '/contact',
       icon: EnvelopeIcon,
       show: true

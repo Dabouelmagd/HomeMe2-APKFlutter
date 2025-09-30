@@ -181,8 +181,8 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
                               ),
                               SizedBox(height: 16),
                               Text(
-                                'No guests currently',
-                                style: TextStyle(
+                                AppLocalizations.of(context)?.translate('no_guests_currently') ?? 'No guests currently',
+                                style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
                                 ),

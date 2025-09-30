@@ -230,9 +230,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                                     ),
                                   )
-                                : const Text(
-                                    'Sign In',
-                                    style: TextStyle(
+                                : Text(
+                                    AppLocalizations.of(context)?.signIn ?? 'Sign In',
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                     ),

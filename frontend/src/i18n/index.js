@@ -1952,6 +1952,10 @@ const resources = {
       'add_residence': 'Ajouter une Résidence',
       'no_residences': 'Aucune Résidence',
       'residences_appear': 'Les résidences apparaîtront ici',
+      'admin_management': 'Gestion des Administrateurs',
+      'manage_admins': 'Gérer les Administrateurs',
+      'add_admin': 'Ajouter un Administrateur',
+      'click_to_upload_logo': 'Cliquez pour télécharger le logo',
       
       // Analytics & Statistics
       'collection_rate': 'Taux de Recouvrement',

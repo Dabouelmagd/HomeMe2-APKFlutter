@@ -575,7 +575,12 @@ const resources = {
         'noFilesFound': 'No files found',
         'filesSharedInChats': 'Files shared in chats will appear here',
         'from': 'From',
-        'download': 'Download'
+        'download': 'Download',
+        'file': 'File',
+        'size': 'Size',
+        'sender': 'Sender',
+        'date': 'Date',
+        'actions': 'Actions'
       },
       'schedule': {
         'title': 'Schedule',

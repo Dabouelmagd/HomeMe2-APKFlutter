@@ -40,6 +40,11 @@ class AppLocalizations {
       'no_recent_activity': 'No recent activity',
       'current_time': 'Current Time',
       'home': 'Home',
+      'sign_in_to_account': 'Sign in to your HomeMe account',
+      'please_enter_email': 'Please enter your email',
+      'please_enter_valid_email': 'Please enter a valid email',
+      'please_enter_password': 'Please enter your password',
+      'password_min_length': 'Password must be at least 6 characters',
     },
     'ar': {
       'welcome_back': 'مرحباً بعودتك',

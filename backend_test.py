@@ -278,8 +278,8 @@ class HomeMeFlutterTestSuite:
         # Test expected endpoints exist
         expected_endpoints = [
             ("POST", "/auth/login", "Authentication endpoint"),
-            ("GET", "/admin/dashboard", "Admin dashboard endpoint"),
-            ("GET", "/resident/dashboard", "Resident dashboard endpoint")
+            ("GET", "/dashboard/admin", "Admin dashboard endpoint"),
+            ("GET", "/dashboard/resident", "Resident dashboard endpoint")
         ]
         
         headers = self.setup_auth_headers(self.admin_token)

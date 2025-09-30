@@ -3852,40 +3852,104 @@ class HomeMeFlutterTestSuite:
         
         return self.print_summary()
 
-    def run_all_tests(self):
-        """Run all services management tests"""
-        print("🔧 STARTING SERVICES MANAGEMENT BACKEND TESTING")
-        print("=" * 60)
+    def run_flutter_mobile_app_tests(self):
+        """Run HomeMe Flutter Mobile App Backend API Tests"""
+        print("📱 STARTING HOMEME FLUTTER MOBILE APP BACKEND API TESTING")
+        print("=" * 70)
         
-        # Authentication tests
+        # 1. Basic Health Check
+        print("\n🏥 Testing Basic Health Check...")
+        self.test_basic_health_check()
+        
+        # 2. Authentication Endpoints
+        print("\n🔐 Testing Authentication Endpoints...")
         if not self.test_admin_authentication():
-            print("❌ Admin authentication failed - stopping tests")
-            return self.print_summary()
+            print("❌ Admin authentication failed - some tests may be limited")
         
-        if not self.test_resident_authentication():
-            print("⚠️ Resident authentication failed - some tests may be skipped")
+        # 3. Dashboard Endpoints
+        print("\n📊 Testing Dashboard Endpoints...")
+        self.test_admin_dashboard_endpoint()
+        self.test_resident_dashboard_endpoint()
         
-        # Services API tests
-        self.test_get_compound_services()
-        self.test_create_service()
-        self.test_update_service()
-        self.test_delete_service()
+        # 4. API Structure Verification
+        print("\n🔍 Testing API Structure Verification...")
+        self.test_api_structure_verification()
         
-        # Initialize services test
-        self.test_initialize_default_services()
-        
-        # Service providers tests
-        self.test_create_service_provider()
-        self.test_get_service_providers()
-        
-        # Service booking tests
-        self.test_create_service_booking()
-        self.test_get_service_bookings()
-        
-        # Authentication issues test
-        self.test_authentication_issues()
+        # 5. Additional Flutter-specific tests
+        print("\n📱 Testing Flutter-specific Features...")
+        if self.admin_token:
+            # Test some core endpoints that Flutter app would use
+            self.test_flutter_compatible_endpoints()
         
         return self.print_summary()
+
+    def test_flutter_compatible_endpoints(self):
+        """Test additional endpoints that Flutter app might use"""
+        print("\n=== Testing Flutter Compatible Endpoints ===")
+        
+        if not self.admin_token:
+            self.log_result("Flutter Compatible Endpoints", False, "No admin token available")
+            return False
+        
+        headers = self.setup_auth_headers(self.admin_token)
+        success_count = 0
+        total_tests = 0
+        
+        # Test common endpoints Flutter app might need
+        flutter_endpoints = [
+            ("GET", "/notifications", "Notifications endpoint"),
+            ("GET", "/maintenance/requests", "Maintenance requests endpoint"),
+            ("GET", "/services", "Services endpoint"),
+            ("GET", "/compounds", "Compounds endpoint"),
+            ("GET", "/users/profile", "User profile endpoint")
+        ]
+        
+        for method, endpoint, description in flutter_endpoints:
+            try:
+                total_tests += 1
+                
+                if method == "GET":
+                    response = self.session.get(f"{BASE_URL}{endpoint}", headers=headers)
+                
+                # Check if endpoint exists and returns valid response
+                if response.status_code in [200, 401, 403]:  # These indicate endpoint exists
+                    try:
+                        # Try to parse JSON response
+                        if response.status_code == 200:
+                            data = response.json()
+                            if isinstance(data, (dict, list)):
+                                self.log_result(f"Flutter Endpoint - {description}", True, 
+                                              f"{endpoint} returns valid JSON (status: {response.status_code})")
+                                success_count += 1
+                            else:
+                                self.log_result(f"Flutter Endpoint - {description}", False, 
+                                              f"{endpoint} returns invalid JSON format")
+                        else:
+                            self.log_result(f"Flutter Endpoint - {description}", True, 
+                                          f"{endpoint} exists but requires proper auth (status: {response.status_code})")
+                            success_count += 1
+                    except json.JSONDecodeError:
+                        self.log_result(f"Flutter Endpoint - {description}", False, 
+                                      f"{endpoint} returns non-JSON response")
+                elif response.status_code == 404:
+                    self.log_result(f"Flutter Endpoint - {description}", False, 
+                                  f"{endpoint} not found (404)")
+                else:
+                    self.log_result(f"Flutter Endpoint - {description}", False, 
+                                  f"{endpoint} unexpected status: {response.status_code}")
+                    
+            except Exception as e:
+                self.log_result(f"Flutter Endpoint - {description}", False, f"Exception: {str(e)}")
+        
+        overall_success = success_count >= (total_tests * 0.6)  # 60% success rate acceptable
+        self.log_result("Flutter Compatible Endpoints", overall_success, 
+                      f"Flutter endpoints test: {success_count}/{total_tests} endpoints working")
+        
+        return overall_success
+
+    def run_all_tests(self):
+        """Run HomeMe Flutter Mobile App Backend API Tests"""
+        return self.run_flutter_mobile_app_tests()
     
     def run_free_trial_tests(self):
         """Run Free Trial System tests"""

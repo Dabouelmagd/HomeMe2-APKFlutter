@@ -6293,12 +6293,14 @@ class HomeMeFlutterTestSuite:
 if __name__ == "__main__":
     import sys
     
-    test_suite = SmartHomeTestSuite()
+    test_suite = HomeMeFlutterTestSuite()
     
     if len(sys.argv) > 1:
         test_type = sys.argv[1].lower()
         
-        if test_type == "maintenance":
+        if test_type == "flutter":
+            success_rate = test_suite.run_flutter_mobile_app_tests()
+        elif test_type == "maintenance":
             success_rate = test_suite.run_phase1_tests()
         elif test_type == "voting":
             success_rate = test_suite.run_voting_and_smart_home_tests()
@@ -6308,7 +6310,7 @@ if __name__ == "__main__":
             success_rate = test_suite.run_authentication_investigation()
         else:
             print(f"Unknown test type: {test_type}")
-            print("Available types: maintenance, voting, individual_account_system, auth_investigation")
+            print("Available types: flutter, maintenance, voting, individual_account_system, auth_investigation")
             sys.exit(1)
     else:
         # Run voting tests by default

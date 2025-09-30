@@ -136,7 +136,7 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Maintenance'),
+        title: Text(AppLocalizations.of(context)?.maintenance ?? 'Maintenance'),
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),

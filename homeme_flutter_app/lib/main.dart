@@ -35,6 +35,8 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
     final authState = ref.watch(authProvider);
+    final currentLocale = ref.watch(languageProvider);
+    final languageNotifier = ref.read(languageProvider.notifier);
 
     return MaterialApp.router(
       title: 'HomeMe',
@@ -54,7 +56,16 @@ class MyApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      locale: const Locale('en'),
+      locale: currentLocale,
+      builder: (context, child) {
+        // Handle RTL layout for Arabic
+        return Directionality(
+          textDirection: languageNotifier.isRTL(currentLocale.languageCode)
+              ? TextDirection.rtl
+              : TextDirection.ltr,
+          child: child!,
+        );
+      },
     );
   }
 }

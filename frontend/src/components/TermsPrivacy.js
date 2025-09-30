@@ -225,8 +225,8 @@ const TermsPrivacy = () => {
                 <span>info@datalifeai.com</span>
               </div>
               <div>
-                <span className="font-medium">{t('legal.contact.address')}: </span>
-                <span>{t('legal.contact.addressValue')}</span>
+                <span className="font-medium">{t('legal_contact_address')}: </span>
+                <span>{t('legal_contact_addressValue')}</span>
               </div>
             </div>
           </div>

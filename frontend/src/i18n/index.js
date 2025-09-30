@@ -260,6 +260,9 @@ const resources = {
       'this_month': 'This Month',
       'in_progress': 'In Progress',
       
+      // Navigation
+      'back_to_menu': 'Back to Menu',
+      
       // Document Management
       'admin_only': 'Admin Only',
       

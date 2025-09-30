@@ -103,12 +103,10 @@ const resources = {
       // Settings
       'settings_title': 'Settings',
       'manage_account_settings_preferences': 'Manage your account settings and preferences',
-      'settings': {
-        'notifications': 'Notifications',
-        'profile': 'Profile', 
-        'privacy': 'Privacy',
-        'language': 'Language'
-      },
+      'settings_notifications': 'Notifications',
+      'settings_profile': 'Profile', 
+      'settings_privacy': 'Privacy',
+      'settings_language': 'Language',
       'notificationCenter': {
         'pushNotifications': 'Push Notifications',
         'notSubscribed': 'Not Subscribed',

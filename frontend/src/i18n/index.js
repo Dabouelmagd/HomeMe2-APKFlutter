@@ -249,6 +249,20 @@ const resources = {
       
       // Document Management
       'admin_only': 'Admin Only',
+      
+      // Legal Page
+      'legal_subtitle': 'Terms of Use and Privacy Policy',
+      'legal_termsOfUse': 'Terms of Use',
+      'legal_privacyPolicy': 'Privacy Policy',
+      'legal_terms_title': 'Terms of Use',
+      'legal_terms_description': 'Please read these terms and conditions carefully before using our service.',
+      'legal_lastUpdated': 'Last updated',
+      'legal_terms_acceptance_title': '1. Acceptance of Terms',
+      'legal_terms_personalUse_title': '2. Personal Use License',
+      'legal_terms_content_title': '3. Content and Conduct',
+      'legal_terms_liability_title': '4. Limitation of Liability',
+      'legal_terms_modifications_title': '5. Modifications to Terms',
+      'legal_terms_governingLaw_title': '6. Governing Law',
       'monthly_revenue': 'Monthly Revenue',
       'weekly_revenue': 'Weekly Revenue',
       'daily_revenue': 'Daily Revenue',

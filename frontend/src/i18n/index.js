@@ -283,7 +283,7 @@ const resources = {
       'legal_contact_description': 'Have questions about our terms or privacy policy? Get in touch with us.',
       'legal_contact_email': 'E-mail',
       'legal_contact_address': 'Address',
-      'legal_contact_addressValue': 'Cairo, Egypt',
+      'legal_contact_addressValue': 'DataLife AI Cairo, Egypt',
       'legal_acceptance_title': 'Acceptance of Terms',
       'legal_acceptance_content': 'By accessing and using our services, you acknowledge that you have read, understood, and agree to be bound by these terms and conditions.',
       'monthly_revenue': 'Monthly Revenue',

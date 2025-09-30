@@ -72,6 +72,11 @@ class AppLocalizations {
       'no_recent_activity': 'لا يوجد نشاط حديث',
       'current_time': 'الوقت الحالي',
       'home': 'المنزل',
+      'sign_in_to_account': 'تسجيل الدخول إلى حساب هوم مي الخاص بك',
+      'please_enter_email': 'يرجى إدخال بريدك الإلكتروني',
+      'please_enter_valid_email': 'يرجى إدخال بريد إلكتروني صحيح',
+      'please_enter_password': 'يرجى إدخال كلمة المرور',
+      'password_min_length': 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
     },
     'fr': {
       'welcome_back': 'Bon retour',

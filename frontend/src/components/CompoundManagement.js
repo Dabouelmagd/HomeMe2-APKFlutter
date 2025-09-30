@@ -2053,7 +2053,7 @@ const CompoundManagement = () => {
                       }`}
                     >
                       <PhotoIcon className="h-4 w-4" />
-                      <span>Upload Logo</span>
+                      <span>{t('upload_logo')}</span>
                     </button>
                     
                     {logoFile && (

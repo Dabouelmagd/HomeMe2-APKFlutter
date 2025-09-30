@@ -1968,6 +1968,18 @@ const resources = {
       'recent_notifications': 'Notifications récentes',
       'no_recent_notifications': 'Aucune notification récente',
       
+      // Compound Management
+      'compound_management': 'Gestion du Complexe',
+      'overview': 'Aperçu',
+      'residence_list': 'Liste des Résidences',
+      'registration_links': 'Liens d\'Inscription',
+      'manage_users': 'Gérer les Utilisateurs',
+      'add_admin_tab': 'Ajouter un Administrateur',
+      'settings': 'Paramètres',
+      'compound_id': 'ID du Complexe',
+      'created': 'Créé',
+      'click_to_upload_logo': 'Cliquez pour télécharger le logo',
+      
       // Residence Management
       'no_additional_admins': 'Aucun Administrateur Supplémentaire',
       'help_manage': 'Aide à la Gestion',

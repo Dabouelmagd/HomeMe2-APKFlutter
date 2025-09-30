@@ -578,7 +578,13 @@ const resources = {
         'download': 'Download'
       },
       'schedule': {
-        'title': 'Schedule'
+        'title': 'Schedule',
+        'description': 'Manage and schedule messages for your community',
+        'scheduleMessage': 'Schedule Message',
+        'editMessage': 'Edit Message',
+        'message': 'Message',
+        'enterMessage': 'Enter your message here...',
+        'confirmDelete': 'Are you sure you want to delete this scheduled message?'
       },
       'notifications': 'Notifications',
       'settings': {

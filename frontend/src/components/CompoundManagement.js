@@ -1027,7 +1027,7 @@ const CompoundManagement = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Overview
+            {t('overview')}
           </button>
           <button
             onClick={() => setActiveTab('residences')}
@@ -1037,7 +1037,7 @@ const CompoundManagement = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Residence List ({residences.length})
+            {t('residence_list')} ({residences.length})
           </button>
           {user?.role === 'admin' && (
             <button
@@ -1048,7 +1048,7 @@ const CompoundManagement = () => {
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Registration Links ({registrationLinks.length})
+              {t('registration_links')} ({registrationLinks.length})
             </button>
           )}
           {user?.role === 'admin' && (
@@ -1061,7 +1061,7 @@ const CompoundManagement = () => {
               }`}
             >
               <UsersIcon className="h-4 w-4 text-current" style={{minWidth: '16px', minHeight: '16px'}} />
-              <span>👥 Manage Users</span>
+              <span>👥 {t('manage_users')}</span>
             </button>
           )}
           {user?.role === 'admin' && (
@@ -1074,7 +1074,7 @@ const CompoundManagement = () => {
               }`}
             >
               <UserPlusIcon className="h-4 w-4 text-current" style={{minWidth: '16px', minHeight: '16px'}} />
-              <span>👤+ Add Admin</span>
+              <span>👤+ {t('add_admin_tab')}</span>
             </button>
           )}
           <button
@@ -1085,7 +1085,7 @@ const CompoundManagement = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            Settings
+            {t('settings')}
           </button>
         </nav>
       </div>

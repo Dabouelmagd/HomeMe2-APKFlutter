@@ -334,8 +334,8 @@ const MessageScheduling = () => {
           {scheduledMessages.length === 0 ? (
             <div className="text-center py-12">
               <ClockIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500 text-lg">No scheduled messages</p>
-              <p className="text-gray-400 text-sm">Schedule your first message to get started</p>
+              <p className="text-gray-500 text-lg">{t('schedule.noScheduledMessages')}</p>
+              <p className="text-gray-400 text-sm">{t('schedule.scheduleFirstMessage')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">

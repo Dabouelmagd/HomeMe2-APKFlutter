@@ -1399,6 +1399,16 @@ const resources = {
       'energy_saved': 'Énergie économisée',
       'no_devices': 'Aucun appareil',
       'no_devices_description': 'Aucun appareil intelligent connecté pour le moment',
+      
+      // Guest Management
+      'business_meeting': 'Réunion d\'affaires',
+      'family_visit': 'Visite familiale',
+      
+      // Advanced Analytics
+      'user_engagement': 'Engagement utilisateur',
+      
+      // Document Management
+      'admin_only': 'Administrateur uniquement',
       'monthly_revenue': 'Revenus mensuels',
       'weekly_revenue': 'Revenus hebdomadaires',
       'daily_revenue': 'Revenus quotidiens',

@@ -474,7 +474,7 @@ const ServicesManagement = () => {
         <h1 className="text-3xl font-bold text-gray-900 text-center">
           {t('services_management')}
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-gray-600 mt-2 text-center">
           {user?.role === 'admin' 
             ? 'Manage compound services and bookings'
             : 'View available services and manage your bookings'

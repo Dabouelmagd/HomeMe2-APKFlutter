@@ -889,6 +889,9 @@ const resources = {
       'this_month': 'هذا الشهر',
       'in_progress': 'قيد التنفيذ',
       
+      // Navigation
+      'back_to_menu': 'العودة إلى المنيو',
+      
       // Document Management
       'admin_only': 'للإدارة فقط',
       

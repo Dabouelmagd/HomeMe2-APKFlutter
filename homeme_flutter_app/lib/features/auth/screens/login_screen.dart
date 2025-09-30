@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/language_provider.dart';
+import '../../../core/widgets/language_switcher.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});

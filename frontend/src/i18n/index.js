@@ -912,6 +912,15 @@ const resources = {
       'legal_contact_addressValue': 'DataLife AI القاهرة، مصر',
       'legal_acceptance_title': 'قبول الشروط',
       'legal_acceptance_content': 'بالوصول إلى خدماتنا واستخدامها، فإنك تقر بأنك قد قرأت وفهمت ووافقت على الالتزام بهذه الشروط والأحكام.',
+      
+      // Privacy Policy Sections
+      'legal_privacy_infoCollection_title': '1. جمع المعلومات',
+      'legal_privacy_infoUse_title': '2. استخدام المعلومات',
+      'legal_privacy_infoProtection_title': '3. حماية المعلومات',
+      'legal_privacy_infoSharing_title': '4. مشاركة المعلومات',
+      'legal_privacy_userRights_title': '5. حقوق المستخدم',
+      'legal_privacy_policyChanges_title': '6. تغييرات السياسة',
+      'legal_privacy_applicableLaws_title': '7. القوانين المعمول بها',
       'monthly_revenue': 'الإيرادات الشهرية',
       'weekly_revenue': 'الإيرادات الأسبوعية',
       'daily_revenue': 'الإيرادات اليومية',

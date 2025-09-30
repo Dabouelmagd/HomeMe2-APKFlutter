@@ -1306,6 +1306,7 @@ const resources = {
       'compound_id': 'معرف المجمع',
       'created': 'تم الإنشاء',
       'click_to_upload_logo': 'اضغط لتحميل الشعار',
+      'upload_logo': 'تحميل الشعار',
       
       // Residence Management
       'no_additional_admins': 'لا توجد مديرين إضافيين',

@@ -627,6 +627,10 @@ const resources = {
       'add_residence': 'Add Residence',
       'no_residences': 'No Residences',
       'residences_appear': 'Residences will appear here',
+      'admin_management': 'Admin Management',
+      'manage_admins': 'Manage Admins',
+      'add_admin': 'Add Admin',
+      'click_to_upload_logo': 'Click to upload logo',
       
       // Analytics & Statistics
       'collection_rate': 'Collection Rate',

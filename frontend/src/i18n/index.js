@@ -893,6 +893,14 @@ const resources = {
       'legal_terms_liability_title': '4. حدود المسؤولية',
       'legal_terms_modifications_title': '5. تعديل الشروط',
       'legal_terms_governingLaw_title': '6. القانون المنظم',
+      
+      // Contact Us & Legal Acceptance
+      'legal_contact_description': 'هل لديك أسئلة حول شروطنا أو سياسة الخصوصية؟ تواصل معنا.',
+      'legal_contact_email': 'info@datalifeai.com',
+      'legal_contact_address': 'شركة DataLife AI المحدودة، الخليج التجاري، دبي، الإمارات العربية المتحدة',
+      'legal_contact_addressValue': 'الخليج التجاري، دبي، الإمارات العربية المتحدة',
+      'legal_acceptance_title': 'قبول الشروط',
+      'legal_acceptance_content': 'بالوصول إلى خدماتنا واستخدامها، فإنك تقر بأنك قد قرأت وفهمت ووافقت على الالتزام بهذه الشروط والأحكام.',
       'monthly_revenue': 'الإيرادات الشهرية',
       'weekly_revenue': 'الإيرادات الأسبوعية',
       'daily_revenue': 'الإيرادات اليومية',

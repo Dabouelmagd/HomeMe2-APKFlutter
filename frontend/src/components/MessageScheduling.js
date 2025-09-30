@@ -295,17 +295,17 @@ const MessageScheduling = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Repeat
+                    {t('schedule.repeat')}
                   </label>
                   <select
                     value={formData.repeat_type}
                     onChange={(e) => setFormData({...formData, repeat_type: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="none">No Repeat</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
+                    <option value="none">{t('schedule.noRepeat')}</option>
+                    <option value="daily">{t('schedule.daily')}</option>
+                    <option value="weekly">{t('schedule.weekly')}</option>
+                    <option value="monthly">{t('schedule.monthly')}</option>
                   </select>
                 </div>
 

@@ -259,6 +259,7 @@ function App() {
               <Routes>
               <Route path="/login" element={<Login />} />
         <Route path="/terms-privacy" element={<TermsPrivacy />} />
+        <Route path="/legal" element={<TermsPrivacy />} />
               <Route path="/register" element={<Register />} />
               <Route path="/debug-login" element={<DebugLogin />} />
               <Route path="/account-type-selection" element={<PublicAccountTypeSelection />} />

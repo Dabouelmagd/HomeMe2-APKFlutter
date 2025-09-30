@@ -168,7 +168,7 @@ const TermsPrivacy = () => {
             }`}
           >
             <DocumentTextIcon className="w-5 h-5 mr-2" />
-            {t('legal.termsOfUse')}
+            {t('legal_termsOfUse')}
           </button>
           <button
             onClick={() => setActiveTab('privacy')}

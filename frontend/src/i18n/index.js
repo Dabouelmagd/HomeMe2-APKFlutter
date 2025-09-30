@@ -661,6 +661,7 @@ const resources = {
       'notifications_will_appear_here': 'ستظهر الإشعارات هنا',
       
       // Settings
+      'settings_title': 'الإعدادات',
       'manage_account_settings_preferences': 'إدارة إعدادات حسابك وتفضيلاتك',
       'settings': {
         'notifications': 'الإشعارات',

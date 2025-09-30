@@ -28,8 +28,8 @@ const ContactUs = () => {
     },
     {
       icon: MapPinIcon,
-      label: t('legal.contact.address'),
-      value: t('legal.contact.addressValue'),
+      label: t('legal_contact_address'),
+      value: t('legal_contact_addressValue'),
       description: 'Our office location'
     },
     {

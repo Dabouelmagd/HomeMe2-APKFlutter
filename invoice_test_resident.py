@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = "https://community-ui-fixes.preview.emergentagent.com/api"
+BASE_URL = "https://translate-home.preview.emergentagent.com/api"
 
 def test_invoice_with_resident():
     """Test invoice system with resident user"""

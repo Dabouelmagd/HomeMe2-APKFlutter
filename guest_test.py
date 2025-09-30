@@ -20,7 +20,7 @@ from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional
 
 # Configuration
-BASE_URL = "https://community-ui-fixes.preview.emergentagent.com/api"
+BASE_URL = "https://translate-home.preview.emergentagent.com/api"
 
 class GuestManagementTestSuite:
     def __init__(self):

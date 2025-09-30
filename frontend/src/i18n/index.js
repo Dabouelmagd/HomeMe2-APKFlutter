@@ -1509,6 +1509,14 @@ const resources = {
       'legal_terms_liability_title': '4. Limitation de responsabilité',
       'legal_terms_modifications_title': '5. Modifications des conditions',
       'legal_terms_governingLaw_title': '6. Droit applicable',
+      
+      // Contact Us & Legal Acceptance
+      'legal_contact_description': 'Vous avez des questions sur nos conditions ou notre politique de confidentialité? Contactez-nous.',
+      'legal_contact_email': 'info@datalifeai.com',
+      'legal_contact_address': 'DataLife AI LLC, Business Bay, Dubaï, EAU',
+      'legal_contact_addressValue': 'Business Bay, Dubaï, EAU',
+      'legal_acceptance_title': 'Acceptation des conditions',
+      'legal_acceptance_content': 'En accédant à nos services et en les utilisant, vous reconnaissez avoir lu, compris et accepté d\'être lié par ces termes et conditions.',
       'monthly_revenue': 'Revenus mensuels',
       'weekly_revenue': 'Revenus hebdomadaires',
       'daily_revenue': 'Revenus quotidiens',

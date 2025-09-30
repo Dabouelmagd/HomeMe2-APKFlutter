@@ -21,6 +21,7 @@ import {
 const Pricing = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [showDiscountCode, setShowDiscountCode] = useState(false);
   const [discountCode, setDiscountCode] = useState('');

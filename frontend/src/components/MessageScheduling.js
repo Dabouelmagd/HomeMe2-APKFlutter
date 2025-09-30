@@ -369,7 +369,7 @@ const MessageScheduling = () => {
                           </p>
                           {message.repeat_type !== 'none' && (
                             <p className="text-xs text-gray-500">
-                              Repeats {message.repeat_type}
+                              {t('schedule.repeats')} {message.repeat_type}
                             </p>
                           )}
                         </div>

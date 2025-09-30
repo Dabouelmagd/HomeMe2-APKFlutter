@@ -1219,12 +1219,10 @@ const resources = {
       // Settings
       'settings_title': 'Paramètres',
       'manage_account_settings_preferences': 'Gérer les paramètres et préférences de votre compte',
-      'settings': {
-        'notifications': 'Notifications',
-        'profile': 'Profil',
-        'privacy': 'Confidentialité', 
-        'language': 'Langue'
-      },
+      'settings_notifications': 'Notifications',
+      'settings_profile': 'Profil',
+      'settings_privacy': 'Confidentialité', 
+      'settings_language': 'Langue',
       'notificationCenter': {
         'pushNotifications': 'Notifications Push',
         'notSubscribed': 'Non Abonné',

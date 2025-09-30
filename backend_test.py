@@ -24,7 +24,7 @@ from PIL import Image
 BASE_URL = "https://translate-home.preview.emergentagent.com/api"
 WS_URL = "wss://translate-home.preview.emergentagent.com/ws/notifications"
 
-class SmartHomeTestSuite:
+class HomeMeFlutterTestSuite:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None

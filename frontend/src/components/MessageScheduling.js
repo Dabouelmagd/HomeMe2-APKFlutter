@@ -281,7 +281,7 @@ const MessageScheduling = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Scheduled For
+                    {t('schedule.scheduledFor')}
                   </label>
                   <input
                     type="datetime-local"

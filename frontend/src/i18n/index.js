@@ -619,6 +619,10 @@ const resources = {
       'recent_notifications': 'Recent Notifications',
       'no_recent_notifications': 'No recent notifications',
       
+      // Test Update Messages
+      'frontend_update_successful': 'Frontend Update Successful',
+      'frontend_updates_working': 'Frontend Updates Working',
+      
       // Compound Management
       'compound_management': 'Compound Management',
       'overview': 'Overview',

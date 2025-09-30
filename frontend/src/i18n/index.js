@@ -630,6 +630,7 @@ const resources = {
       'compound_id': 'Compound ID',
       'created': 'Created',
       'click_to_upload_logo': 'Click to upload logo',
+      'upload_logo': 'Upload Logo',
       
       // Residence Management
       'no_additional_admins': 'No Additional Admins',

@@ -104,6 +104,11 @@ class AppLocalizations {
       'no_recent_activity': 'Aucune activité récente',
       'current_time': 'Heure actuelle',
       'home': 'Accueil',
+      'sign_in_to_account': 'Connectez-vous à votre compte HomeMe',
+      'please_enter_email': 'Veuillez entrer votre email',
+      'please_enter_valid_email': 'Veuillez entrer un email valide',
+      'please_enter_password': 'Veuillez entrer votre mot de passe',
+      'password_min_length': 'Le mot de passe doit contenir au moins 6 caractères',
     },
   };
 

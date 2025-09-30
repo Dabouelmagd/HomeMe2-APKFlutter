@@ -27,33 +27,33 @@ const TermsPrivacy = () => {
   const termsContent = [
     {
       id: 'acceptance',
-      title: t('legal.terms.acceptance.title'),
-      content: t('legal.terms.acceptance.content')
+      title: t('legal_terms_acceptance_title'),
+      content: 'By accessing and using HomeMe services, you accept and agree to be bound by the terms and provisions of this agreement.'
     },
     {
       id: 'personal_use',
-      title: t('legal.terms.personalUse.title'),
-      content: t('legal.terms.personalUse.content')
+      title: t('legal_terms_personalUse_title'),
+      content: 'You may use our service for personal, non-commercial purposes only. You agree not to use the service for any unlawful activities.'
     },
     {
       id: 'content',
-      title: t('legal.terms.content.title'),
-      content: t('legal.terms.content.content')
+      title: t('legal_terms_content_title'),
+      content: 'You are responsible for all content you post. You agree not to post content that is offensive, illegal, or violates others\' rights.'
     },
     {
       id: 'liability',
-      title: t('legal.terms.liability.title'),
-      content: t('legal.terms.liability.content')
+      title: t('legal_terms_liability_title'),
+      content: 'HomeMe shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service.'
     },
     {
       id: 'modifications',
-      title: t('legal.terms.modifications.title'),
-      content: t('legal.terms.modifications.content')
+      title: t('legal_terms_modifications_title'),
+      content: 'We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting on our website.'
     },
     {
       id: 'governing_law',
-      title: t('legal.terms.governingLaw.title'),
-      content: t('legal.terms.governingLaw.content')
+      title: t('legal_terms_governingLaw_title'),
+      content: 'These terms shall be governed by and construed in accordance with the laws of the jurisdiction in which HomeMe operates.'
     }
   ];
 

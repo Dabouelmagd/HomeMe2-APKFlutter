@@ -649,6 +649,7 @@ const resources = {
       'admin_management': 'Admin Management',
       'manage_admins': 'Manage Admins',
       'add_admin': 'Add Admin',
+      'primary_admin': 'Primary Admin',
       'click_to_upload_logo': 'Click to upload logo',
       
       // Analytics & Statistics

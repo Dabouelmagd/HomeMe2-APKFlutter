@@ -49,7 +49,7 @@ const ContactUs = () => {
             {t('legal_contact_title')}
           </h1>
           <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-            {t('legal.contact.description')}
+            {t('legal_contact_description')}
           </p>
         </div>
 

@@ -14,7 +14,7 @@ const ContactUs = () => {
   const contactMethods = [
     {
       icon: EnvelopeIcon,
-      label: t('legal.contact.email'),
+      label: t('legal_contact_email'),
       value: 'info@datalifeai.com',
       href: 'mailto:info@datalifeai.com',
       description: 'Send us an email for general inquiries and support'

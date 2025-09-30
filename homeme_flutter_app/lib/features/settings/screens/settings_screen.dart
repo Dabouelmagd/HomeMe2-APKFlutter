@@ -252,4 +252,52 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+
+  Widget _buildLanguageTile(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.watch(languageProvider);
+    final languageNotifier = ref.read(languageProvider.notifier);
+    
+    return ListTile(
+      leading: const Icon(Icons.language),
+      title: Text(
+        AppLocalizations.of(context)?.translate('language') ?? 'Language',
+        style: const TextStyle(fontWeight: FontWeight.w500),
+      ),
+      subtitle: Text(languageNotifier.getLanguageName(currentLocale.languageCode)),
+      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+      onTap: () {
+        _showLanguageDialog(context, ref);
+      },
+    );
+  }
+
+  void _showLanguageDialog(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.watch(languageProvider);
+    final languageNotifier = ref.read(languageProvider.notifier);
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)?.translate('select_language') ?? 'Select Language'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: languageNotifier.supportedLocales.map((locale) {
+            final isSelected = currentLocale == locale;
+            return ListTile(
+              leading: Text(
+                languageNotifier.getLanguageFlag(locale.languageCode),
+                style: const TextStyle(fontSize: 24),
+              ),
+              title: Text(languageNotifier.getLanguageName(locale.languageCode)),
+              trailing: isSelected ? Icon(Icons.check, color: Theme.of(context).primaryColor) : null,
+              onTap: () {
+                languageNotifier.changeLanguage(locale);
+                Navigator.pop(context);
+              },
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
 }

@@ -239,6 +239,16 @@ const resources = {
       'energy_saved': 'Energy Saved',
       'no_devices': 'No Devices',
       'no_devices_description': 'No smart devices connected yet',
+      
+      // Guest Management
+      'business_meeting': 'Business Meeting',
+      'family_visit': 'Family Visit',
+      
+      // Advanced Analytics
+      'user_engagement': 'User Engagement',
+      
+      // Document Management
+      'admin_only': 'Admin Only',
       'monthly_revenue': 'Monthly Revenue',
       'weekly_revenue': 'Weekly Revenue',
       'daily_revenue': 'Daily Revenue',

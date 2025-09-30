@@ -246,6 +246,19 @@ const resources = {
       
       // Advanced Analytics
       'user_engagement': 'User Engagement',
+      'last_7_days': 'Last 7 Days',
+      'last_30_days': 'Last 30 Days',
+      'last_90_days': 'Last 90 Days',
+      'last_6_months': 'Last 6 Months',
+      'last_year': 'Last Year',
+      
+      // Status and Time Filters
+      'checked_in': 'Checked In',
+      'checked_out': 'Checked Out',
+      'this_week': 'This Week',
+      'next_week': 'Next Week',
+      'this_month': 'This Month',
+      'in_progress': 'In Progress',
       
       // Document Management
       'admin_only': 'Admin Only',

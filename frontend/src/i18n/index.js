@@ -279,6 +279,7 @@ const resources = {
       'legal_terms_governingLaw_title': '6. Governing Law',
       
       // Contact Us & Legal Acceptance
+      'legal_contact_title': 'Contact Us',
       'legal_contact_description': 'Have questions about our terms or privacy policy? Get in touch with us.',
       'legal_contact_email': 'info@datalifeai.com',
       'legal_contact_address': 'DataLife AI LLC, Business Bay, Dubai, UAE',

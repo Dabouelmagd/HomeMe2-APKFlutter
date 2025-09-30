@@ -1833,7 +1833,13 @@ const resources = {
         'title': 'Galerie'
       },
       'schedule': {
-        'title': 'Calendrier'
+        'title': 'Calendrier',
+        'description': 'Gérer et programmer les messages pour votre communauté',
+        'scheduleMessage': 'Programmer un Message',
+        'editMessage': 'Modifier le Message',
+        'message': 'Message',
+        'enterMessage': 'Entrez votre message ici...',
+        'confirmDelete': 'Êtes-vous sûr de vouloir supprimer ce message programmé ?'
       },
       'notifications': 'Notifications',
       'settings': {

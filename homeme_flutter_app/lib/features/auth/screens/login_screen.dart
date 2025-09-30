@@ -135,7 +135,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.next,
                             decoration: InputDecoration(
-                              labelText: 'Email',
+                              labelText: AppLocalizations.of(context)?.email ?? 'Email',
                               prefixIcon: const Icon(Icons.email_outlined),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -143,10 +143,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
+                                return AppLocalizations.of(context)?.translate('please_enter_email') ?? 'Please enter your email';
                               }
                               if (!value.contains('@')) {
-                                return 'Please enter a valid email';
+                                return AppLocalizations.of(context)?.translate('please_enter_valid_email') ?? 'Please enter a valid email';
                               }
                               return null;
                             },

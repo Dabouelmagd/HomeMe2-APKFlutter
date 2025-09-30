@@ -2014,6 +2014,7 @@ const resources = {
       'admin_management': 'Gestion des Administrateurs',
       'manage_admins': 'Gérer les Administrateurs',
       'add_admin': 'Ajouter un Administrateur',
+      'primary_admin': 'Administrateur Principal',
       'click_to_upload_logo': 'Cliquez pour télécharger le logo',
       
       // Analytics & Statistics

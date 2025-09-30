@@ -854,6 +854,19 @@ const resources = {
       
       // Advanced Analytics
       'user_engagement': 'مشاركة المستخدم',
+      'last_7_days': 'آخر 7 أيام',
+      'last_30_days': 'آخر 30 يوماً',
+      'last_90_days': 'آخر 90 يوماً',
+      'last_6_months': 'آخر 6 أشهر',
+      'last_year': 'العام الماضي',
+      
+      // Status and Time Filters
+      'checked_in': 'تم تسجيل الدخول',
+      'checked_out': 'تم تسجيل الخروج',
+      'this_week': 'هذا الأسبوع',
+      'next_week': 'الأسبوع القادم',
+      'this_month': 'هذا الشهر',
+      'in_progress': 'قيد التنفيذ',
       
       // Document Management
       'admin_only': 'للإدارة فقط',

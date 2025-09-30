@@ -1213,7 +1213,13 @@ const resources = {
         'download': 'تحميل'
       },
       'schedule': {
-        'title': 'الجدول الزمني'
+        'title': 'الجدول الزمني',
+        'description': 'إدارة وجدولة الرسائل لمجتمعك',
+        'scheduleMessage': 'جدولة رسالة',
+        'editMessage': 'تعديل رسالة',
+        'message': 'رسالة',
+        'enterMessage': 'أدخل رسالتك هنا...',
+        'confirmDelete': 'هل أنت متأكد من أنك تريد حذف هذه الرسالة المجدولة؟'
       },
       'notifications': 'الإشعارات',
       'settings': {

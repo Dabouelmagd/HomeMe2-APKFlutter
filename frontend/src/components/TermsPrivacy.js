@@ -194,15 +194,15 @@ const TermsPrivacy = () => {
                 <ShieldCheckIcon className="w-6 h-6 text-blue-600 mt-1" />
               )}
               <div>
-                <h2 className="text-xl font-semibold text-center text-center text-gray-900 text-center mb-2">
-                  {activeTab === 'terms' ? t('legal.terms.title') : t('legal.privacy.title')}
+                <h2 className="text-xl font-semibold text-center text-gray-900 mb-2">
+                  {activeTab === 'terms' ? t('legal_terms_title') : 'Privacy Policy'}
                 </h2>
-                <p className="text-gray-700">
-                  {activeTab === 'terms' ? t('legal.terms.description') : t('legal.privacy.description')}
+                <p className="text-gray-700 text-center">
+                  {activeTab === 'terms' ? t('legal_terms_description') : 'Learn how we collect, use, and protect your personal information.'}
                 </p>
-                <div className="mt-3 text-sm text-gray-600">
-                  <span className="font-medium">{t('legal.lastUpdated')}: </span>
-                  <span>{new Date().toLocaleDateString()}</span>
+                <div className="mt-3 text-sm text-gray-600 text-center">
+                  <span className="font-medium">{t('legal_lastUpdated')}: </span>
+                  <span>9/30/2025</span>
                 </div>
               </div>
             </div>

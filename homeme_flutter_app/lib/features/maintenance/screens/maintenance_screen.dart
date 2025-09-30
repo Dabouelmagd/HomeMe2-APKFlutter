@@ -303,7 +303,7 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
           _showCreateRequestDialog();
         },
         icon: const Icon(Icons.add),
-        label: const Text('New Request'),
+        label: Text(AppLocalizations.of(context)?.translate('new_request') ?? 'New Request'),
       ),
     );
   }

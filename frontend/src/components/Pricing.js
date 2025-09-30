@@ -202,7 +202,7 @@ const Pricing = () => {
         <div className="text-center mb-12">
           {/* HomeMe Logo */}
           <div className="flex justify-center mb-6">
-            <div className="text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
               HomeMe
             </div>
           </div>

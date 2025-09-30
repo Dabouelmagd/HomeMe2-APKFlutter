@@ -162,8 +162,8 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                           ),
                           SizedBox(height: 16),
                           Text(
-                            'No maintenance requests',
-                            style: TextStyle(
+                            AppLocalizations.of(context)?.translate('no_maintenance_requests') ?? 'No maintenance requests',
+                            style: const TextStyle(
                               fontSize: 18,
                               color: Colors.grey,
                             ),

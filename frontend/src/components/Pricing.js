@@ -201,16 +201,6 @@ const Pricing = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => navigate('/')}
-            className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 rtl:space-x-reverse"
-          >
-            <ArrowLeftIcon className="h-5 w-5 rtl:rotate-180" />
-            <span>{t('back_to_menu')}</span>
-          </button>
-        </div>
 
         {/* Header */}
         <div className="text-center mb-12">

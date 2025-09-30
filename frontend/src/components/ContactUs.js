@@ -46,7 +46,7 @@ const ContactUs = () => {
         {/* Header */}
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl text-center">
-            {t('legal.contact.title')}
+            {t('legal_contact_title')}
           </h1>
           <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
             {t('legal.contact.description')}

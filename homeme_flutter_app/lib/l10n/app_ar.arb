@@ -1,0 +1,59 @@
+{
+  "@@locale": "ar",
+  
+  "appTitle": "هوم مي",
+  "welcomeBack": "مرحباً بعودتك",
+  "signInToAccount": "تسجيل الدخول إلى حساب هوم مي الخاص بك",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "signIn": "تسجيل الدخول",
+  "dontHaveAccount": "ليس لديك حساب؟",
+  "registerHere": "سجل هنا",
+  "demoAccounts": "حسابات تجريبية",
+  
+  "adminDashboard": "لوحة تحكم المدير",
+  "myDashboard": "لوحة التحكم الخاصة بي",
+  "profile": "الملف الشخصي",
+  "settings": "الإعدادات",
+  "logout": "تسجيل الخروج",
+  
+  "welcomeBackAdmin": "مرحباً بعودتك، {name}! 👋",
+  "welcomeHomeResident": "مرحباً بك في المنزل، {name}! 🏠",
+  
+  "happeningInCompoundToday": "إليك ما يحدث في مجمعك اليوم",
+  "unit": "الوحدة {unitNumber}",
+  
+  "overview": "نظرة عامة",
+  "quickOverview": "نظرة سريعة",
+  "quickActions": "إجراءات سريعة",
+  "recentActivity": "النشاط الحديث",
+  
+  "totalResidents": "إجمالي المقيمين",
+  "totalFamilies": "إجمالي الأسر",
+  "activeVisitors": "الزوار النشطون",
+  "openMessages": "الرسائل المفتوحة",
+  "familyMembers": "أفراد الأسرة",
+  "pendingVisits": "الزيارات المعلقة",
+  "maintenance": "الصيانة",
+  "monthlyFees": "الرسوم الشهرية",
+  
+  "guestManagement": "إدارة الضيوف",
+  "maintenanceRequest": "طلب صيانة",
+  "communityEvents": "فعاليات المجتمع",
+  "inviteGuests": "دعوة ضيوف",
+  
+  "pleaseEnterEmail": "يرجى إدخال بريدك الإلكتروني",
+  "pleaseEnterValidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+  "pleaseEnterPassword": "يرجى إدخال كلمة المرور",
+  "passwordMinLength": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+  
+  "loading": "جاري التحميل...",
+  "refresh": "تحديث",
+  "error": "خطأ",
+  "tryAgain": "حاول مرة أخرى",
+  
+  "guests": "الضيوف",
+  "maintenanceRequests": "طلبات الصيانة",
+  "events": "الفعاليات",
+  "notifications": "الإشعارات"
+}

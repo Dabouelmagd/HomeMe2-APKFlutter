@@ -6313,8 +6313,8 @@ if __name__ == "__main__":
             print("Available types: flutter, maintenance, voting, individual_account_system, auth_investigation")
             sys.exit(1)
     else:
-        # Run voting tests by default
-        success_rate = test_suite.run_voting_and_smart_home_tests()
+        # Run Flutter mobile app tests by default
+        success_rate = test_suite.run_flutter_mobile_app_tests()
     
     # Exit with appropriate code
     if success_rate >= 80:

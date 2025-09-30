@@ -145,10 +145,10 @@ const TermsPrivacy = () => {
               </button>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 text-center">
-                  {t('legal.title')}
+                  {t('legal_title')}
                 </h1>
-                <p className="text-gray-600 mt-1">
-                  {t('legal.subtitle')}
+                <p className="text-gray-600 mt-1 text-center">
+                  {t('legal_subtitle')}
                 </p>
               </div>
             </div>

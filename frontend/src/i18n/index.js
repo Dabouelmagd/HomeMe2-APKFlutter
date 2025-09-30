@@ -819,6 +819,16 @@ const resources = {
       'energy_saved': 'الطاقة الموفرة',
       'no_devices': 'لا توجد أجهزة',
       'no_devices_description': 'لا توجد أجهزة ذكية متصلة بعد',
+      
+      // Guest Management
+      'business_meeting': 'اجتماع عمل',
+      'family_visit': 'زيارة عائلية',
+      
+      // Advanced Analytics
+      'user_engagement': 'مشاركة المستخدم',
+      
+      // Document Management
+      'admin_only': 'للإدارة فقط',
       'monthly_revenue': 'الإيرادات الشهرية',
       'weekly_revenue': 'الإيرادات الأسبوعية',
       'daily_revenue': 'الإيرادات اليومية',

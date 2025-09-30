@@ -1290,6 +1290,10 @@ const resources = {
       'add_residence': 'إضافة إقامة',
       'no_residences': 'لا توجد إقامات',
       'residences_appear': 'ستظهر الإقامات هنا',
+      'admin_management': 'إدارة المديرين',
+      'manage_admins': 'إدارة المديرين',
+      'add_admin': 'إضافة مدير',
+      'click_to_upload_logo': 'اضغط لتحميل الشعار',
       
       // Analytics & Statistics
       'collection_rate': 'معدل التحصيل',

@@ -119,7 +119,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               PopupMenuItem(
                 child: ListTile(
                   leading: const Icon(Icons.settings),
-                  title: const Text('Settings'),
+                  title: Text(AppLocalizations.of(context)?.settings ?? 'Settings'),
                   onTap: () {
                     Navigator.pop(context);
                     context.push('/settings');

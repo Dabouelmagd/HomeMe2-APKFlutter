@@ -239,11 +239,11 @@ const FileGallery = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">File</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Size</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sender</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('gallery.file')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('gallery.size')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('gallery.sender')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('gallery.date')}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{t('gallery.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">

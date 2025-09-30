@@ -245,16 +245,16 @@ const MessageScheduling = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Recipient Type
+                    {t('schedule.recipientType')}
                   </label>
                   <select
                     value={formData.recipient_type}
                     onChange={(e) => setFormData({...formData, recipient_type: e.target.value, recipient_id: ''})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="direct">Direct Message</option>
-                    <option value="group">Group Message</option>
-                    <option value="compound">Compound-wide Message</option>
+                    <option value="direct">{t('schedule.directMessage')}</option>
+                    <option value="group">{t('schedule.groupMessage')}</option>
+                    <option value="compound">{t('schedule.compoundMessage')}</option>
                   </select>
                 </div>
 

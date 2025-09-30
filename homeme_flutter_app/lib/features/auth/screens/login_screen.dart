@@ -65,7 +65,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
         child: SafeArea(
-          child: Center(
+          child: Stack(
+            children: [
+              // Language switcher at top right
+              Positioned(
+                top: 16,
+                right: 16,
+                child: const LanguageSwitcher(),
+              ),
+              Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(

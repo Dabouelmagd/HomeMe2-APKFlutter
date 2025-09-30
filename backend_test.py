@@ -157,6 +157,183 @@ class HomeMeFlutterTestSuite:
         
         return False
     
+    def test_admin_dashboard_endpoint(self):
+        """Test GET /api/admin/dashboard - Admin dashboard data retrieval"""
+        print("\n=== Testing Admin Dashboard Endpoint ===")
+        
+        if not self.admin_token:
+            self.log_result("Admin Dashboard", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/admin/dashboard", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify response structure for Flutter compatibility
+                expected_sections = ["statistics", "recent_activity", "quick_actions"]
+                found_sections = []
+                
+                # Check for various possible response structures
+                if "stats" in data or "statistics" in data:
+                    found_sections.append("statistics")
+                if "recent_activity" in data or "activities" in data or "activity" in data:
+                    found_sections.append("recent_activity")
+                if "quick_actions" in data or "actions" in data:
+                    found_sections.append("quick_actions")
+                
+                # Also check for dashboard-specific fields
+                dashboard_fields = ["total_residents", "total_families", "total_services", "total_messages"]
+                found_dashboard_fields = [field for field in dashboard_fields if field in data]
+                
+                if found_sections or found_dashboard_fields:
+                    self.log_result("Admin Dashboard", True, 
+                                  f"Admin dashboard data retrieved successfully. "
+                                  f"Sections found: {found_sections}, "
+                                  f"Dashboard fields: {found_dashboard_fields}")
+                    return True
+                else:
+                    self.log_result("Admin Dashboard", False, 
+                                  f"Response structure not suitable for Flutter app: {list(data.keys())}")
+                    return False
+            else:
+                self.log_result("Admin Dashboard", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Admin Dashboard", False, f"Exception occurred: {str(e)}")
+            return False
+
+    def test_resident_dashboard_endpoint(self):
+        """Test GET /api/resident/dashboard - Resident dashboard data retrieval"""
+        print("\n=== Testing Resident Dashboard Endpoint ===")
+        
+        # First try with admin token (some systems allow admin to access resident endpoints)
+        if not self.admin_token:
+            self.log_result("Resident Dashboard", False, "No admin token available for testing")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/resident/dashboard", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify response structure for Flutter compatibility
+                expected_sections = ["notifications", "services", "maintenance_requests", "announcements"]
+                found_sections = []
+                
+                # Check for various possible response structures
+                if "notifications" in data:
+                    found_sections.append("notifications")
+                if "services" in data or "available_services" in data:
+                    found_sections.append("services")
+                if "maintenance_requests" in data or "requests" in data:
+                    found_sections.append("maintenance_requests")
+                if "announcements" in data or "news" in data:
+                    found_sections.append("announcements")
+                
+                # Also check for resident-specific fields
+                resident_fields = ["unit_number", "family_members", "recent_notifications"]
+                found_resident_fields = [field for field in resident_fields if field in data]
+                
+                if found_sections or found_resident_fields:
+                    self.log_result("Resident Dashboard", True, 
+                                  f"Resident dashboard data retrieved successfully. "
+                                  f"Sections found: {found_sections}, "
+                                  f"Resident fields: {found_resident_fields}")
+                    return True
+                else:
+                    self.log_result("Resident Dashboard", False, 
+                                  f"Response structure not suitable for Flutter app: {list(data.keys())}")
+                    return False
+            elif response.status_code == 403:
+                self.log_result("Resident Dashboard", True, 
+                              "Correctly rejected admin access to resident dashboard (proper access control)")
+                return True
+            else:
+                self.log_result("Resident Dashboard", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Resident Dashboard", False, f"Exception occurred: {str(e)}")
+            return False
+
+    def test_api_structure_verification(self):
+        """Test API structure matches Flutter app expectations"""
+        print("\n=== Testing API Structure Verification ===")
+        
+        if not self.admin_token:
+            self.log_result("API Structure Verification", False, "No admin token available")
+            return False
+        
+        success_count = 0
+        total_tests = 0
+        
+        # Test expected endpoints exist
+        expected_endpoints = [
+            ("POST", "/auth/login", "Authentication endpoint"),
+            ("GET", "/admin/dashboard", "Admin dashboard endpoint"),
+            ("GET", "/resident/dashboard", "Resident dashboard endpoint")
+        ]
+        
+        headers = self.setup_auth_headers(self.admin_token)
+        
+        for method, endpoint, description in expected_endpoints:
+            try:
+                total_tests += 1
+                
+                if method == "GET":
+                    response = self.session.get(f"{BASE_URL}{endpoint}", headers=headers)
+                elif method == "POST":
+                    # For POST endpoints, we'll just check if they exist (might get 400 for missing data)
+                    response = self.session.post(f"{BASE_URL}{endpoint}", json={}, headers=headers)
+                
+                # Consider 200, 400, 422 as "endpoint exists"
+                # 404 means endpoint doesn't exist
+                if response.status_code != 404:
+                    self.log_result(f"API Endpoint - {description}", True, 
+                                  f"{method} {endpoint} exists (status: {response.status_code})")
+                    success_count += 1
+                else:
+                    self.log_result(f"API Endpoint - {description}", False, 
+                                  f"{method} {endpoint} not found (404)")
+                    
+            except Exception as e:
+                self.log_result(f"API Endpoint - {description}", False, f"Exception: {str(e)}")
+        
+        # Test JSON response format
+        try:
+            total_tests += 1
+            response = self.session.get(f"{BASE_URL}/admin/dashboard", headers=headers)
+            
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                    if isinstance(data, dict):
+                        self.log_result("JSON Response Format", True, "API returns valid JSON objects")
+                        success_count += 1
+                    else:
+                        self.log_result("JSON Response Format", False, f"API returns non-object JSON: {type(data)}")
+                except json.JSONDecodeError:
+                    self.log_result("JSON Response Format", False, "API returns invalid JSON")
+            else:
+                self.log_result("JSON Response Format", False, f"Cannot test JSON format (status: {response.status_code})")
+                
+        except Exception as e:
+            self.log_result("JSON Response Format", False, f"Exception: {str(e)}")
+        
+        overall_success = success_count == total_tests
+        self.log_result("API Structure Verification", overall_success, 
+                      f"API structure verification: {success_count}/{total_tests} tests passed")
+        
+        return overall_success
+
     def test_resident_authentication(self):
         """Test resident authentication for maintenance requests"""
         print("\n=== Testing Resident Authentication ===")

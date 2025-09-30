@@ -113,13 +113,7 @@ class SettingsScreen extends ConsumerWidget {
             context,
             'Preferences',
             [
-              _buildTile(
-                context,
-                Icons.language,
-                'Language',
-                'العربية, English, Français',
-                () {},
-              ),
+              _buildLanguageTile(context, ref),
               _buildTile(
                 context,
                 Icons.dark_mode_outlined,

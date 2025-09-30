@@ -1221,6 +1221,7 @@ const resources = {
       'notifications_will_appear_here': 'Les notifications apparaîtront ici',
       
       // Settings
+      'settings_title': 'Paramètres',
       'manage_account_settings_preferences': 'Gérer les paramètres et préférences de votre compte',
       'settings': {
         'notifications': 'Notifications',

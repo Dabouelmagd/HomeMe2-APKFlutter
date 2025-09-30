@@ -1,0 +1,59 @@
+{
+  "@@locale": "fr",
+  
+  "appTitle": "HomeMe",
+  "welcomeBack": "Bon retour",
+  "signInToAccount": "Connectez-vous à votre compte HomeMe",
+  "email": "Email",
+  "password": "Mot de passe",
+  "signIn": "Se connecter",
+  "dontHaveAccount": "Vous n'avez pas de compte?",
+  "registerHere": "Inscrivez-vous ici",
+  "demoAccounts": "Comptes de démonstration",
+  
+  "adminDashboard": "Tableau de Bord Admin",
+  "myDashboard": "Mon Tableau de Bord",
+  "profile": "Profil",
+  "settings": "Paramètres",
+  "logout": "Se déconnecter",
+  
+  "welcomeBackAdmin": "Bon retour, {name}! 👋",
+  "welcomeHomeResident": "Bienvenue à la maison, {name}! 🏠",
+  
+  "happeningInCompoundToday": "Voici ce qui se passe dans votre complexe aujourd'hui",
+  "unit": "Unité {unitNumber}",
+  
+  "overview": "Aperçu",
+  "quickOverview": "Aperçu Rapide",
+  "quickActions": "Actions Rapides",
+  "recentActivity": "Activité Récente",
+  
+  "totalResidents": "Total des Résidents",
+  "totalFamilies": "Total des Familles",
+  "activeVisitors": "Visiteurs Actifs",
+  "openMessages": "Messages Ouverts",
+  "familyMembers": "Membres de la Famille",
+  "pendingVisits": "Visites en Attente",
+  "maintenance": "Maintenance",
+  "monthlyFees": "Frais Mensuels",
+  
+  "guestManagement": "Gestion des Invités",
+  "maintenanceRequest": "Demande de Maintenance",
+  "communityEvents": "Événements Communautaires",
+  "inviteGuests": "Inviter des Invités",
+  
+  "pleaseEnterEmail": "Veuillez entrer votre email",
+  "pleaseEnterValidEmail": "Veuillez entrer un email valide",
+  "pleaseEnterPassword": "Veuillez entrer votre mot de passe",
+  "passwordMinLength": "Le mot de passe doit contenir au moins 6 caractères",
+  
+  "loading": "Chargement...",
+  "refresh": "Actualiser",
+  "error": "Erreur",
+  "tryAgain": "Réessayer",
+  
+  "guests": "Invités",
+  "maintenanceRequests": "Demandes de Maintenance",
+  "events": "Événements",
+  "notifications": "Notifications"
+}

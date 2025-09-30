@@ -205,10 +205,10 @@ const Pricing = () => {
         <div className="mb-6">
           <button
             onClick={() => navigate('/')}
-            className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200"
+            className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors duration-200 rtl:space-x-reverse"
           >
-            <ArrowLeftIcon className="h-5 w-5" />
-            <span>العودة إلى المنيو</span>
+            <ArrowLeftIcon className="h-5 w-5 rtl:rotate-180" />
+            <span>{t('back_to_menu')}</span>
           </button>
         </div>
 

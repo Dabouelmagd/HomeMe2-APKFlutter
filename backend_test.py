@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-HomeMe Backend API Testing Suite
-Tests core backend functionality after Contact Us feature addition:
-1. Authentication System
-2. Core API Endpoints
-3. Basic CRUD Operations
-4. Contact/Messaging Functionality
-5. System Health and Stability
+HomeMe Flutter Mobile App Backend API Testing Suite
+Tests backend functionality specifically for Flutter mobile app integration:
+1. Basic Health Check
+2. Authentication Endpoints (admin credentials)
+3. Dashboard Endpoints (admin and resident)
+4. API Structure Verification for Flutter compatibility
 """
 
 import asyncio
@@ -21,9 +20,9 @@ from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional
 from PIL import Image
 
-# Configuration
+# Configuration - Using the production URL as specified in the review request
 BASE_URL = "https://translate-home.preview.emergentagent.com/api"
-WS_URL = "wss://resident-portal-11.preview.emergentagent.com/ws/notifications"
+WS_URL = "wss://translate-home.preview.emergentagent.com/ws/notifications"
 
 class SmartHomeTestSuite:
     def __init__(self):

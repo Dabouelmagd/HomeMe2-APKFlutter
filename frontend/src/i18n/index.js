@@ -896,6 +896,7 @@ const resources = {
       'legal_terms_governingLaw_title': '6. القانون المنظم',
       
       // Contact Us & Legal Acceptance
+      'legal_contact_title': 'اتصل بنا',
       'legal_contact_description': 'هل لديك أسئلة حول شروطنا أو سياسة الخصوصية؟ تواصل معنا.',
       'legal_contact_email': 'info@datalifeai.com',
       'legal_contact_address': 'شركة DataLife AI المحدودة، الخليج التجاري، دبي، الإمارات العربية المتحدة',

@@ -45,6 +45,9 @@ class AppLocalizations {
       'please_enter_valid_email': 'Please enter a valid email',
       'please_enter_password': 'Please enter your password',
       'password_min_length': 'Password must be at least 6 characters',
+      'happening_compound_today': "Here's what's happening in your compound today",
+      'overview': 'Overview',
+      'admin_dashboard': 'Admin Dashboard',
     },
     'ar': {
       'welcome_back': 'مرحباً بعودتك',

@@ -95,7 +95,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   
                   // Title
                   Text(
-                    'Welcome Back',
+                    AppLocalizations.of(context)?.welcomeBack ?? 'Welcome Back',
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -103,7 +103,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Sign in to your HomeMe account',
+                    AppLocalizations.of(context)?.translate('sign_in_to_account') ?? 'Sign in to your HomeMe account',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.white.withOpacity(0.9),
                     ),

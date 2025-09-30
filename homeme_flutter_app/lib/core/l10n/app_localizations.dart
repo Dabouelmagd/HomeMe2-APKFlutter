@@ -80,6 +80,9 @@ class AppLocalizations {
       'please_enter_valid_email': 'يرجى إدخال بريد إلكتروني صحيح',
       'please_enter_password': 'يرجى إدخال كلمة المرور',
       'password_min_length': 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+      'happening_compound_today': 'إليك ما يحدث في مجمعك اليوم',
+      'overview': 'نظرة عامة',
+      'admin_dashboard': 'لوحة تحكم المدير',
     },
     'fr': {
       'welcome_back': 'Bon retour',

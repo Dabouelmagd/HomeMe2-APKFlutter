@@ -661,12 +661,10 @@ const resources = {
       // Settings
       'settings_title': 'الإعدادات',
       'manage_account_settings_preferences': 'إدارة إعدادات حسابك وتفضيلاتك',
-      'settings': {
-        'notifications': 'الإشعارات',
-        'profile': 'الملف الشخصي',
-        'privacy': 'الخصوصية',
-        'language': 'اللغة'
-      },
+      'settings_notifications': 'الإشعارات',
+      'settings_profile': 'الملف الشخصي',
+      'settings_privacy': 'الخصوصية',
+      'settings_language': 'اللغة',
       'notificationCenter': {
         'pushNotifications': 'الإشعارات المباشرة',
         'notSubscribed': 'غير مشترك',

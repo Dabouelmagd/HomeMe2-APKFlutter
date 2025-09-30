@@ -195,7 +195,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
 
               // Statistics Cards
               Text(
-                'Overview',
+                AppLocalizations.of(context)?.translate('overview') ?? 'Overview',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

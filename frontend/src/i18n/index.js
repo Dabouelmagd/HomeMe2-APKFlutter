@@ -1518,6 +1518,9 @@ const resources = {
       'this_month': 'Ce mois-ci',
       'in_progress': 'En cours',
       
+      // Navigation
+      'back_to_menu': 'Retour au menu',
+      
       // Document Management
       'admin_only': 'Administrateur uniquement',
       

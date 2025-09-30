@@ -846,6 +846,7 @@ const resources = {
       'admin_only': 'للإدارة فقط',
       
       // Legal Page
+      'legal_title': 'القانونية',
       'legal_subtitle': 'شروط الاستخدام وسياسة الخصوصية',
       'legal_termsOfUse': 'شروط الاستخدام',
       'legal_privacyPolicy': 'سياسة الخصوصية',

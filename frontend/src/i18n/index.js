@@ -900,7 +900,7 @@ const resources = {
       'legal_contact_description': 'هل لديك أسئلة حول شروطنا أو سياسة الخصوصية؟ تواصل معنا.',
       'legal_contact_email': 'البريد الإلكتروني',
       'legal_contact_address': 'العنوان',
-      'legal_contact_addressValue': 'القاهرة، مصر',
+      'legal_contact_addressValue': 'DataLife AI القاهرة، مصر',
       'legal_acceptance_title': 'قبول الشروط',
       'legal_acceptance_content': 'بالوصول إلى خدماتنا واستخدامها، فإنك تقر بأنك قد قرأت وفهمت ووافقت على الالتزام بهذه الشروط والأحكام.',
       'monthly_revenue': 'الإيرادات الشهرية',

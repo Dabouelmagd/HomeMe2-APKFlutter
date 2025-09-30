@@ -1978,6 +1978,10 @@ const resources = {
       'recent_notifications': 'Notifications récentes',
       'no_recent_notifications': 'Aucune notification récente',
       
+      // Test Update Messages
+      'frontend_update_successful': 'Mise à jour de l\'interface réussie',
+      'frontend_updates_working': 'Les mises à jour de l\'interface fonctionnent',
+      
       // Compound Management
       'compound_management': 'Gestion du Complexe',
       'overview': 'Aperçu',

@@ -22,7 +22,7 @@ from typing import Dict, List, Optional
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://property-hub-110.preview.emergentagent.com/api"
+BASE_URL = "https://global-homeme.preview.emergentagent.com/api"
 
 class FlutterMobileTestSuite:
     def __init__(self):

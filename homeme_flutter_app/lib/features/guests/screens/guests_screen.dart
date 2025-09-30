@@ -263,8 +263,8 @@ class _GuestsScreenState extends ConsumerState<GuestsScreen>
                               ),
                               SizedBox(height: 16),
                               Text(
-                                'No visit requests',
-                                style: TextStyle(
+                                AppLocalizations.of(context)?.translate('no_visit_requests') ?? 'No visit requests',
+                                style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
                                 ),

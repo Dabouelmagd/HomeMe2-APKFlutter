@@ -10,6 +10,7 @@ import 'features/auth/providers/auth_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/services/api_service.dart';
 import 'core/l10n/app_localizations.dart';
+import 'core/providers/language_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -286,6 +286,15 @@ const resources = {
       'legal_contact_addressValue': 'DataLife AI Cairo, Egypt',
       'legal_acceptance_title': 'Acceptance of Terms',
       'legal_acceptance_content': 'By accessing and using our services, you acknowledge that you have read, understood, and agree to be bound by these terms and conditions.',
+      
+      // Privacy Policy Sections
+      'legal_privacy_infoCollection_title': '1. Information Collection',
+      'legal_privacy_infoUse_title': '2. Information Use',
+      'legal_privacy_infoProtection_title': '3. Information Protection',
+      'legal_privacy_infoSharing_title': '4. Information Sharing',
+      'legal_privacy_userRights_title': '5. User Rights',
+      'legal_privacy_policyChanges_title': '6. Policy Changes',
+      'legal_privacy_applicableLaws_title': '7. Applicable Laws',
       'monthly_revenue': 'Monthly Revenue',
       'weekly_revenue': 'Weekly Revenue',
       'daily_revenue': 'Daily Revenue',

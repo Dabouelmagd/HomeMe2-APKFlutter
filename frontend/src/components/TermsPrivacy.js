@@ -202,7 +202,7 @@ const TermsPrivacy = () => {
                 </p>
                 <div className="mt-3 text-sm text-gray-600 text-center">
                   <span className="font-medium">{t('legal_lastUpdated')}: </span>
-                  <span>9/30/2025</span>
+                  <span>30/9/2025</span>
                 </div>
               </div>
             </div>

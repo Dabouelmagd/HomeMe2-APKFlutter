@@ -898,8 +898,8 @@ const resources = {
       // Contact Us & Legal Acceptance
       'legal_contact_title': 'اتصل بنا',
       'legal_contact_description': 'هل لديك أسئلة حول شروطنا أو سياسة الخصوصية؟ تواصل معنا.',
-      'legal_contact_email': 'info@datalifeai.com',
-      'legal_contact_address': 'DataLife AI القاهرة، مصر',
+      'legal_contact_email': 'البريد الإلكتروني',
+      'legal_contact_address': 'العنوان',
       'legal_contact_addressValue': 'القاهرة، مصر',
       'legal_acceptance_title': 'قبول الشروط',
       'legal_acceptance_content': 'بالوصول إلى خدماتنا واستخدامها، فإنك تقر بأنك قد قرأت وفهمت ووافقت على الالتزام بهذه الشروط والأحكام.',

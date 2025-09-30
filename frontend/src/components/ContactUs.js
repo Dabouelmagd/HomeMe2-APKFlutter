@@ -48,7 +48,7 @@ const ContactUs = () => {
           <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl text-center">
             {t('legal_contact_title')}
           </h1>
-          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto text-center">
             {t('legal_contact_description')}
           </p>
         </div>

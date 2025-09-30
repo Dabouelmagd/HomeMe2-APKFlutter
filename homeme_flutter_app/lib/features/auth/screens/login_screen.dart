@@ -160,7 +160,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             textInputAction: TextInputAction.done,
                             onFieldSubmitted: (_) => _handleLogin(),
                             decoration: InputDecoration(
-                              labelText: 'Password',
+                              labelText: AppLocalizations.of(context)?.password ?? 'Password',
                               prefixIcon: const Icon(Icons.lock_outlined),
                               suffixIcon: IconButton(
                                 icon: Icon(
@@ -178,10 +178,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
+                                return AppLocalizations.of(context)?.translate('please_enter_password') ?? 'Please enter your password';
                               }
                               if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
+                                return AppLocalizations.of(context)?.translate('password_min_length') ?? 'Password must be at least 6 characters';
                               }
                               return null;
                             },

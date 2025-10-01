@@ -1,6 +1,6 @@
 class AppConfig {
   // Backend URL - This should match REACT_APP_BACKEND_URL from the React frontend
-  static const String baseUrl = 'https://homeme-portal-2.preview.emergentagent.com';
+  static const String baseUrl = 'https://homeme-i18n.preview.emergentagent.com';
   
   // API endpoints
   static const String apiPrefix = '/api';

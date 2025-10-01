@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://homeme-portal-2.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-i18n.preview.emergentagent.com/api"
 
 # Complete Arabic service data to replace English content
 ARABIC_SERVICES_DATA = {

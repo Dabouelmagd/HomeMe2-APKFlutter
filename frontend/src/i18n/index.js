@@ -1089,6 +1089,75 @@ const resources = {
       'max_limit_reached': 'تم الوصول للحد الأقصى',
       'limit_reached': 'تم الوصول للحد الأقصى',
       
+      // Pricing Page
+      'back_to_menu': 'العودة إلى المنيو',
+      'choose_account_type': 'اختر نوع حسابك',
+      'select_plan_fits_needs': 'اختر الخطة التي تناسب احتياجات إدارة الممتلكات',
+      'monthly': 'شهرياً',
+      'yearly': 'سنوياً',
+      'save_17_percent': 'وفر 17%',
+      'have_discount_code': 'هل لديك كود خصم؟',
+      
+      // Plan Names
+      'community_plan': 'المجتمع',
+      'essential_plan': 'الأساسي',
+      'professional_plan': 'المهني',
+      'enterprise_plan': 'المؤسسي',
+      
+      // Plan Descriptions
+      'perfect_small_communities': 'مثالي للمجتمعات الصغيرة',
+      'great_growing_communities': 'رائع للمجتمعات النامية',
+      'multiple_communities': 'لمتعدد المجتمعات',
+      'large_organizations': 'للمؤسسات الكبيرة',
+      'most_popular': 'الأكثر شعبية',
+      
+      // Plan Features
+      'residents': 'مقيمين',
+      'services_maximum': 'خدمات كحد أقصى',
+      'unlimited_services': 'خدمات غير محدودة',
+      'basic_chat_messaging': 'دردشة ومراسلة أساسية',
+      'advanced_chat_messaging': 'دردشة ومراسلة متقدمة',
+      'family_management_photos': 'إدارة العائلة مع الصور',
+      'file_storage': 'مساحة تخزين الملفات',
+      'unlimited_storage': 'تخزين غير محدود',
+      'community_support': 'دعم المجتمع',
+      'priority_support': 'دعم عالي الأولوية',
+      'dedicated_support': 'دعم مخصص',
+      'custom_branding': 'علامة تجارية مخصصة',
+      'advanced_analytics': 'تحليلات متقدمة',
+      'api_access': 'وصول API',
+      'multi_compound_management': 'إدارة متعددة المجمعات',
+      'multiple_compounds': 'مجمعات متعددة',
+      'custom_development': 'تطوير مخصص',
+      
+      // Plan Actions
+      'start_free': 'ابدأ مجاناً',
+      'no_credit_card_required': 'لا حاجة لبطاقة ائتمان',
+      'choose_essential': 'اختر الأساسي',
+      'choose_professional': 'اختر المهني',
+      'choose_enterprise': 'اختر المؤسسي',
+      
+      // Community Section
+      'bring_community_together': 'اجمع مجتمعك معاً',
+      'paid_user_invite_20_free': 'أي مستخدم مدفوع يمكنه دعوة 20 مستخدم مجاني للحصول على وصول كامل لميزات المجمع',
+      'free_invitations': 'دعوات مجانية',
+      'invite_up_20_residents': 'ادع حتى 20 مقيم مجاناً',
+      'full_access': 'وصول كامل',
+      'free_users_get_features': 'المستخدمون المجانيون يحصلون على جميع ميزات خطتك',
+      'no_limits': 'لا حدود',
+      'build_community_barriers': 'ابن مجتمعك بلا حواجز',
+      
+      // FAQ Section
+      'frequently_asked_questions': 'الأسئلة الشائعة',
+      'can_upgrade_downgrade': 'هل يمكنني الترقية أو التراجع في أي وقت؟',
+      'yes_change_plan_anytime': 'نعم، يمكنك تغيير خطتك في أي وقت. التغييرات تسري فوراً.',
+      'is_setup_fee': 'هل هناك رسوم إعداد؟',
+      'no_setup_fees': 'لا توجد رسوم إعداد. ادفع فقط لما تستخدمه، عندما تستخدمه.',
+      'how_free_invitations_work': 'كيف تعمل الدعوات المجانية؟',
+      'paid_users_invite_20': 'المستخدمون المدفوعون يمكنهم دعوة 20 مقيم للحصول على وصول كامل لجميع الميزات.',
+      'what_payment_methods': 'ما طرق الدفع المقبولة؟',
+      'accept_credit_cards_paypal': 'نقبل جميع بطاقات الائتمان الرئيسية وPayPal والتحويلات البنكية.',
+      
       'maintenance_system': 'نظام الصيانة',
       'guest_management': 'إدارة الضيوف',
       'events_announcements': 'الأحداث والإعلانات',

@@ -187,6 +187,12 @@ const Layout = ({ children }) => {
       show: true
     },
     {
+      name: t('Payment Center'),
+      href: '/payments',
+      icon: CreditCardIcon,
+      show: true
+    },
+    {
       name: t('advanced_analytics'),
       href: '/analytics',
       icon: ChartBarIcon,

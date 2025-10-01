@@ -355,7 +355,7 @@ const Pricing = () => {
                       </span>
                       {plan.id !== 'community' && (
                         <span className="text-gray-600 ml-1">
-                          /{billingPeriod === 'monthly' ? 'mo' : 'yr'}
+                          {billingPeriod === 'monthly' ? t('per_month') : t('per_year')}
                         </span>
                       )}
                     </div>

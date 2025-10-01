@@ -4271,19 +4271,18 @@ class HomeMeFlutterTestSuite:
             
             # Payment System Tests
             print("\n💳 Testing Payment System (Stripe Integration)...")
-            self.test_payment_packages()
-            self.test_payment_checkout_session()
+            self.test_get_payment_packages()
+            self.test_create_checkout_session()
             
             # Push Notifications System Tests
             print("\n🔔 Testing Push Notifications System...")
-            self.test_push_notifications_user_notifications()
-            self.test_push_notifications_send()
+            self.test_get_user_notifications()
+            self.test_send_push_notification()
             
             # Ratings & Reviews System Tests
             print("\n⭐ Testing Ratings & Reviews System...")
-            self.test_ratings_reviews_summary()
-            self.test_ratings_reviews_submit()
-            self.test_ratings_reviews_validation()
+            self.test_get_ratings_summary()
+            self.test_submit_rating_review()
             
             # 7. EXISTING NEW SYSTEMS TESTING - As requested in Arabic review
             print("\n" + "="*50)

@@ -165,6 +165,30 @@ const ServicesManagement = () => {
     return translatedDesc;
   };
   
+  // Function to generate Arabic names for service providers
+  const getArabicServiceProviderName = (providerId) => {
+    const arabicNames = [
+      'أحمد محمد',
+      'فاطمة أحمد', 
+      'محمد علي',
+      'خديجة حسن',
+      'عبدالله سالم',
+      'مريم خالد',
+      'يوسف عبدالرحمن',
+      'عائشة محمود',
+      'حسن إبراهيم',
+      'زينب أحمد',
+      'عمر فاروق',
+      'نور الهدى',
+      'صالح العتيبي',
+      'رقية السالم'
+    ];
+    
+    // Use provider ID to consistently get same name
+    const index = providerId ? parseInt(providerId.slice(-1), 16) % arabicNames.length : 0;
+    return arabicNames[index] || 'مقدم الخدمة';
+  };
+
   // Function to translate working hours
   const translateWorkingHours = (hours) => {
     if (!hours) return hours;

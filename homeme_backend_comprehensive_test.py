@@ -849,7 +849,7 @@ class HomeMeBackendTestSuite:
                 self.log_result("وصول الأدمن", True, f"الأدمن يمكنه الوصول للنقاط المناسبة ({admin_success}/{len(admin_endpoints)})")
                 
                 # Test that admin cannot access resident-only endpoints inappropriately
-                resident_response = self.session.get(f"{BASE_URL}/resident/dashboard", headers=headers)
+                resident_response = self.session.get(f"{BASE_URL}/dashboard/resident", headers=headers)
                 if resident_response.status_code == 403:
                     self.log_result("فصل الأدوار", True, "الأدمن لا يمكنه الوصول لنقاط المقيمين (تحكم صحيح)")
                 elif resident_response.status_code in [200, 500]:

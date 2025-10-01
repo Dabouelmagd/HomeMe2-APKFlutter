@@ -175,6 +175,12 @@ const ServicesManagement = () => {
     translatedHours = translatedHours.replace(/AM/gi, 'ص');
     translatedHours = translatedHours.replace(/PM/gi, 'م');
     
+    // Also handle time format in "Last updated" displays
+    if (translatedHours.includes('PM') || translatedHours.includes('AM')) {
+      translatedHours = translatedHours.replace(/(\d+:\d+:\d+)\s*PM/gi, '$1 م');
+      translatedHours = translatedHours.replace(/(\d+:\d+:\d+)\s*AM/gi, '$1 ص');
+    }
+    
     // Replace common time patterns
     translatedHours = translatedHours.replace(/Emergency Service/gi, t('emergency_word'));
     translatedHours = translatedHours.replace(/Service/gi, 'خدمة');

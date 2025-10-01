@@ -447,7 +447,7 @@ const Pricing = () => {
                         : 'bg-gray-900 hover:bg-gray-800 text-white'
                     }`}
                   >
-                    {plan.id === 'community' ? 'Start Free' : `Choose ${plan.name}`}
+                    {plan.id === 'community' ? t('start_free') : t('choose_plan', { plan: plan.name })}
                   </button>
                   
                   {plan.id === 'community' && (

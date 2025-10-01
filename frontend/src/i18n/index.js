@@ -1976,9 +1976,7 @@ const resources = {
         'repeats': 'Répète'
       },
       'notifications': 'Notifications',
-      'settings': {
-        'settings': 'Paramètres'
-      },
+      'settings_nav': 'Paramètres',
       'payment_center': 'Centre de Paiement',
       'mobile_app': 'Application Mobile',
       'pricing_plans': '💎 Plans Tarifaires',

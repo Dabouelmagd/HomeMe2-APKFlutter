@@ -70,6 +70,7 @@ const resources = {
       'available_service_providers': 'Available Service Providers',
       'no_service_providers_available': 'No service providers available',
       'service_providers_appear': 'Service providers will appear here when added',
+      'book_services_multiple_payment': 'Book services with multiple payment options and priority levels',
       'maintenance_system': 'Maintenance System',
       'guest_management': 'Guest Management',
       'events_announcements': 'Events & Announcements',

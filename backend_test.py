@@ -1321,6 +1321,162 @@ class HomeMeFlutterTestSuite:
             self.log_result("Natural Language Authentication", False, f"Exception occurred: {str(e)}")
             return False
 
+    # ============ ARABIC INTERFACE ENGLISH TEXT INVESTIGATION TESTS ============
+    
+    def test_services_management_data(self):
+        """Test GET /api/services-management/services - Check for English text in Arabic interface"""
+        print("\n=== Testing Services Management Data for English Text ===")
+        
+        if not self.admin_token:
+            self.log_result("Services Management Data", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/services-management/services", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                services = data.get("services", [])
+                
+                # Check for English text patterns in service data
+                english_patterns_found = []
+                security_guard_service = None
+                
+                for service in services:
+                    service_name = service.get("name", "")
+                    working_hours = service.get("working_hours", "")
+                    description = service.get("description", "")
+                    
+                    # Check if this is the Security Guard service
+                    if "Security Guard" in service_name or "security" in service_name.lower():
+                        security_guard_service = service
+                    
+                    # Check for English patterns in working_hours
+                    english_patterns = [
+                        "Service Available 24/7",
+                        "Available 24/7", 
+                        "24/7 Available",
+                        "Available",
+                        "Service Available",
+                        "24/7",
+                        "AM", "PM",
+                        "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday",
+                        "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+                    ]
+                    
+                    for pattern in english_patterns:
+                        if pattern in working_hours:
+                            english_patterns_found.append({
+                                "service_name": service_name,
+                                "field": "working_hours",
+                                "pattern": pattern,
+                                "full_text": working_hours
+                            })
+                        if pattern in description:
+                            english_patterns_found.append({
+                                "service_name": service_name,
+                                "field": "description", 
+                                "pattern": pattern,
+                                "full_text": description
+                            })
+                
+                # Log findings
+                if english_patterns_found:
+                    self.log_result("Services Management Data", False, 
+                                  f"Found {len(english_patterns_found)} English text patterns in services data",
+                                  f"English patterns: {english_patterns_found}")
+                    
+                    # Specifically check Security Guard service
+                    if security_guard_service:
+                        self.log_result("Security Guard Service Analysis", True,
+                                      f"Security Guard service found - Name: {security_guard_service.get('name')}, "
+                                      f"Working Hours: {security_guard_service.get('working_hours')}, "
+                                      f"Description: {security_guard_service.get('description', 'N/A')}")
+                    
+                    return False
+                else:
+                    self.log_result("Services Management Data", True, 
+                                  f"No English text patterns found in {len(services)} services. All text appears to be properly localized.")
+                    return True
+                    
+            else:
+                self.log_result("Services Management Data", False, 
+                              f"Failed to retrieve services data with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Services Management Data", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_database_sample_data_check(self):
+        """Check if there are English sample/test data in the database"""
+        print("\n=== Testing Database for English Sample Data ===")
+        
+        if not self.admin_token:
+            self.log_result("Database Sample Data Check", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Check various endpoints for English sample data
+            endpoints_to_check = [
+                ("/services-management/services", "services"),
+                ("/maintenance/requests", "requests"),
+                ("/notifications", "notifications"),
+                ("/polls", "polls")
+            ]
+            
+            english_data_found = []
+            
+            for endpoint, data_key in endpoints_to_check:
+                try:
+                    response = self.session.get(f"{BASE_URL}{endpoint}", headers=headers)
+                    if response.status_code == 200:
+                        data = response.json()
+                        items = data.get(data_key, [])
+                        
+                        for item in items:
+                            # Check all string fields for English patterns
+                            for field, value in item.items():
+                                if isinstance(value, str):
+                                    # Common English test data patterns
+                                    test_patterns = [
+                                        "test", "Test", "TEST",
+                                        "sample", "Sample", "SAMPLE", 
+                                        "demo", "Demo", "DEMO",
+                                        "example", "Example",
+                                        "Available", "Service Available",
+                                        "24/7", "AM", "PM"
+                                    ]
+                                    
+                                    for pattern in test_patterns:
+                                        if pattern in value:
+                                            english_data_found.append({
+                                                "endpoint": endpoint,
+                                                "item_id": item.get("id", "unknown"),
+                                                "field": field,
+                                                "pattern": pattern,
+                                                "full_text": value
+                                            })
+                except:
+                    continue
+            
+            if english_data_found:
+                self.log_result("Database Sample Data Check", False,
+                              f"Found {len(english_data_found)} English sample/test data entries",
+                              f"English data found: {english_data_found}")
+                return False
+            else:
+                self.log_result("Database Sample Data Check", True,
+                              "No English sample/test data found in database")
+                return True
+                
+        except Exception as e:
+            self.log_result("Database Sample Data Check", False, f"Exception occurred: {str(e)}")
+            return False
+
     # ============ INDIVIDUAL & ENTERPRISE ACCOUNT SYSTEM TESTS ============
     
     def test_account_type_selection_get(self):

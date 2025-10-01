@@ -362,7 +362,7 @@ const Pricing = () => {
                     
                     {appliedDiscount && currentPrice !== originalPrice && plan.id !== 'community' && (
                       <div className="text-sm text-gray-500 line-through mt-1">
-                        Was ${originalPrice}/{billingPeriod === 'monthly' ? 'mo' : 'yr'}
+                        {t('was_price', { price: `$${originalPrice}${billingPeriod === 'monthly' ? t('per_month') : t('per_year')}` })}
                       </div>
                     )}
                     

@@ -834,6 +834,7 @@ const resources = {
       'available_service_providers': 'مقدمو الخدمات المتاحون',
       'no_service_providers_available': 'لا يوجد مقدمو خدمات متاحون',
       'service_providers_appear': 'سيظهر مقدمو الخدمات هنا عند إضافتهم',
+      'book_services_multiple_payment': 'احجز الخدمات مع خيارات دفع متعددة ومستويات أولوية',
       'maintenance_system': 'نظام الصيانة',
       'guest_management': 'إدارة الضيوف',
       'events_announcements': 'الأحداث والإعلانات',

@@ -1219,7 +1219,7 @@ const ServicesManagement = () => {
 
             {/* Priority Levels Info */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">Service Priority Levels</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">{t('service_priority_levels')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {priorityOptions.map((option) => (
                   <div key={option.value} className={`p-4 rounded-lg border-2 ${option.color} border-opacity-20`}>

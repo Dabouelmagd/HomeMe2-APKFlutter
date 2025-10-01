@@ -514,7 +514,7 @@ const ServicesManagement = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            💳 Service Booking & Payments ({serviceProviders.length})
+            💳 {t('service_booking_payments')} ({serviceProviders.length})
           </button>
         </nav>
       </div>

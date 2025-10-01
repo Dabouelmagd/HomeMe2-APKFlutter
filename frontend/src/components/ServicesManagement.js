@@ -574,7 +574,7 @@ const ServicesManagement = () => {
                     title="Add custom service"
                   >
                     <PlusIcon className="h-5 w-5" />
-                    <span>Add Service</span>
+                    <span>{t('add_service')}</span>
                   </button>
                   
                   {/* View/Filter Toggle */}

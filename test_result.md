@@ -1605,6 +1605,7 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Arabic Services Database Translation - Complete Localization"
     - "Phase 3 Backend Systems Testing Complete"
   stuck_tasks: []
   test_all: false

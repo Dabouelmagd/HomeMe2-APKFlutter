@@ -837,7 +837,7 @@ class HomeMeBackendTestSuite:
             headers = self.setup_auth_headers(self.admin_token)
             
             # Test admin access to admin endpoints
-            admin_endpoints = ["/admin/dashboard", "/notifications"]
+            admin_endpoints = ["/dashboard/admin", "/notifications"]
             admin_success = 0
             
             for endpoint in admin_endpoints:

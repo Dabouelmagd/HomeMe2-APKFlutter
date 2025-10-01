@@ -491,23 +491,23 @@ const Pricing = () => {
 
         {/* FAQ Section */}
         <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">{t('frequently_asked_questions')}</h2>
           <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
             <div>
-              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">Can I upgrade or downgrade anytime?</h3>
-              <p className="text-gray-600">Yes, you can change your plan at any time. Changes take effect immediately.</p>
+              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">{t('can_upgrade_downgrade_anytime')}</h3>
+              <p className="text-gray-600">{t('upgrade_downgrade_answer')}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">Is there a setup fee?</h3>
-              <p className="text-gray-600">No setup fees. Pay only for what you use, when you use it.</p>
+              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">{t('is_there_setup_fee')}</h3>
+              <p className="text-gray-600">{t('setup_fee_answer')}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">How do free invitations work?</h3>
-              <p className="text-gray-600">Paid users can invite up to 20 residents who get full access to all features.</p>
+              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">{t('how_free_invitations_work')}</h3>
+              <p className="text-gray-600">{t('free_invitations_answer')}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">What payment methods do you accept?</h3>
-              <p className="text-gray-600">We accept all major credit cards, PayPal, and bank transfers.</p>
+              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">{t('what_payment_methods_accept')}</h3>
+              <p className="text-gray-600">{t('payment_methods_answer')}</p>
             </div>
           </div>
         </div>

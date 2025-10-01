@@ -91,6 +91,30 @@ const resources = {
       'event_planning': 'Event Planning',
       'catering_services': 'Catering Services',
       
+      // Edit Service Dialog
+      'edit_service': 'Edit Service',
+      'service_name': 'Service Name',
+      'category': 'Category',
+      'specialty': 'Specialty',
+      'select_specialty': 'Select Specialty',
+      'description': 'Description',
+      'phone_number': 'Phone Number',
+      'email_address': 'Email Address',
+      'working_hours': 'Working Hours',
+      'cancel': 'Cancel',
+      'update_service': 'Update Service',
+      'add_service': 'Add Service',
+      'save_service': 'Save Service',
+      
+      // Categories
+      'maintenance': 'Maintenance',
+      'cleaning': 'Cleaning',
+      'security': 'Security',
+      'landscaping': 'Landscaping',
+      'personal': 'Personal',
+      'delivery': 'Delivery',
+      'events': 'Events',
+      
       // Service Descriptions & Specialties
       'emergency_plumbing_pipe_repairs': 'Emergency plumbing, pipe repairs, water heater maintenance',
       'electrical_repairs_installations': 'Electrical repairs, installations, emergency services', 

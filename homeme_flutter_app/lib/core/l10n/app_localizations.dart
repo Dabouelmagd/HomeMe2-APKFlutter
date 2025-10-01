@@ -219,6 +219,9 @@ class AppLocalizations {
       'collection_rate': 'Collection Rate',
       'monthly_revenue': 'Monthly Revenue',
       'expense_breakdown': 'Expense Breakdown',
+      'add_family_member': 'Add Family Member',
+      'test_admin': 'Test Admin',
+      'stay_updated_community': 'Stay updated with community news and announcements',
     },
     'ar': {
       'welcome_back': 'مرحباً بعودتك',

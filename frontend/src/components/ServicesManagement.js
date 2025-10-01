@@ -56,29 +56,37 @@ const ServicesManagement = () => {
     return nameMap[serviceName] ? t(nameMap[serviceName]) : serviceName;
   };
   
-  // Function to translate service specialties/descriptions
+  // Function to translate service specialties/descriptions with complete Arabic translations
   const translateSpecialty = (specialty) => {
+    // Complete Arabic translations for specialties
     const specialtyMap = {
-      'Emergency plumbing, pipe repairs, water heater maintenance': 'emergency_plumbing_pipe_repairs',
-      'Electrical repairs, installations, emergency services': 'electrical_repairs_installations',
-      'Air conditioning, heating, ventilation systems': 'air_conditioning_heating',
-      'Minor repairs, installations, home improvements': 'minor_repairs_installations',
-      'Regular cleaning, deep cleaning, move-in/out cleaning': 'regular_cleaning_deep_cleaning',
-      'Deep carpet cleaning, stain removal, upholstery cleaning': 'deep_carpet_cleaning',
-      'Interior and exterior window cleaning': 'interior_exterior_window_cleaning',
-      '24/7 security, patrol services, event security': '24_7_security_patrol',
-      'Keycard systems, door locks, security cameras': 'keycard_systems_door_locks',
-      'Garden maintenance, lawn care, plant installation': 'garden_maintenance_lawn_care',
-      'Pool cleaning, chemical balancing, equipment repair': 'pool_cleaning_chemical_balancing',
-      'Dog walking, pet sitting, grooming': 'dog_walking_pet_sitting',
-      'Fitness training, wellness coaching, group classes': 'fitness_training_wellness',
-      'Local delivery, grocery delivery, courier services': 'local_delivery_grocery_delivery',
-      'Local moving, furniture moving, packing services': 'local_moving_furniture_moving',
-      'Party planning, corporate events, wedding coordination': 'party_planning_corporate_events',
-      'Event catering, meal prep, special dietary needs': 'event_catering_meal_prep'
+      'Emergency plumbing, pipe repairs, water heater maintenance': 'سباكة الطوارئ، إصلاح الأنابيب، صيانة سخانات المياه',
+      'Electrical repairs, installations, emergency services': 'الإصلاحات الكهربائية، التركيبات، خدمات الطوارئ',
+      'Air conditioning, heating, ventilation systems': 'تكييف الهواء، التدفئة، أنظمة التهوية',
+      'Minor repairs, installations, home improvements': 'إصلاحات طفيفة، تركيبات، تحسينات المنزل',
+      'Regular cleaning, deep cleaning, move-in/out cleaning': 'تنظيف منتظم، تنظيف عميق، تنظيف الانتقال',
+      'Deep carpet cleaning, stain removal, upholstery cleaning': 'تنظيف السجاد العميق، إزالة البقع، تنظيف المفروشات',
+      'Interior and exterior window cleaning': 'تنظيف النوافذ الداخلية والخارجية',
+      '24/7 security, patrol services, event security': 'أمن على مدار الساعة، خدمات الدورية، أمن الفعاليات',
+      'Keycard systems, door locks, security cameras': 'أنظمة البطاقات المفتاحية، أقفال الأبواب، كاميرات الأمان',
+      'Garden maintenance, lawn care, plant installation': 'صيانة الحدائق، رعاية المروج، زراعة النباتات',
+      'Pool cleaning, chemical balancing, equipment repair': 'تنظيف المسابح، توازن المواد الكيميائية، إصلاح المعدات',
+      'Dog walking, pet sitting, grooming': 'تمشية الكلاب، رعاية الحيوانات الأليفة، التنظيف',
+      'Fitness training, wellness coaching, group classes': 'التدريب البدني، التوجيه الصحي، الفصول الجماعية',
+      'Local delivery, grocery delivery, courier services': 'التوصيل المحلي، توصيل البقالة، خدمات البريد السريع',
+      'Local moving, furniture moving, packing services': 'النقل المحلي، نقل الأثاث، خدمات التعبئة',
+      'Party planning, corporate events, wedding coordination': 'تخطيط الحفلات، الفعاليات المؤسسية، تنسيق الأعراس',
+      'Event catering, meal prep, special dietary needs': 'تموين الفعاليات، إعداد الوجبات، الاحتياجات الغذائية الخاصة'
     };
     
-    return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty;
+    // If exact match found, return Arabic translation
+    if (specialtyMap[specialty]) {
+      return specialtyMap[specialty];
+    }
+    
+    // If not exact match, try to return direct translation key if available
+    const translationKey = Object.keys(specialtyMap).find(key => specialtyMap[key] && key === specialty);
+    return translationKey ? t(translationKey) : specialty;
   };
   
   // Function to clean descriptions from common English words

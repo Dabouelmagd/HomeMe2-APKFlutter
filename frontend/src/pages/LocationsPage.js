@@ -162,8 +162,8 @@ const LocationsPage = () => {
           <circle cx="12" cy="9" r="2.5" fill="white"/>
         </svg>
       `)}`,
-      scaledSize: new window.google?.maps.Size(24, 24),
-      anchor: new window.google?.maps.Point(12, 24)
+      scaledSize: window.google && new window.google.maps.Size(24, 24),
+      anchor: window.google && new window.google.maps.Point(12, 24)
     };
   };
 

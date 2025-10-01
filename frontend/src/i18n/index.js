@@ -1873,6 +1873,36 @@ const resources = {
       'phone': 'Téléphone',
       'email': 'E-mail',
       
+      // Service Booking & Payments
+      'book_service': 'Réserver le Service',
+      'reviews': 'Avis',
+      'review': 'Avis',
+      'jobs_completed': 'Travaux Terminés',
+      'job_completed': 'Travail Terminé',
+      'hour': 'Heure',
+      'per_hour': 'Par Heure',
+      
+      // Payment Methods
+      'supported_payment_methods': 'Méthodes de Paiement Supportées',
+      'cash_on_service': 'Espèces à la Livraison',
+      'credit_debit_card': 'Carte de Crédit/Débit',
+      'bank_transfer': 'Virement Bancaire',
+      'instapay': 'InstaPay',
+      'mobile_payment': 'Paiement Mobile',
+      'digital_wallet': 'Portefeuille Numérique',
+      'qr_code_payment': 'Paiement par Code QR',
+      
+      // Service Priority Levels
+      'service_priority_levels': 'Niveaux de Priorité du Service',
+      'emergency': 'Urgence',
+      'urgent': 'Urgent',
+      'standard': 'Standard',
+      'scheduled': 'Programmé',
+      'immediate_response_1_hour': 'Réponse immédiate dans 1 heure',
+      'same_day_service': 'Service le jour même',
+      'next_scheduled_slot': 'Prochain créneau programmé',
+      'future_date_time': 'Date/heure future',
+      
       // Categories
       'maintenance': 'Maintenance',
       'cleaning': 'Nettoyage',

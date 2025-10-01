@@ -4263,26 +4263,47 @@ class HomeMeFlutterTestSuite:
             # Test some core endpoints that Flutter app would use
             self.test_flutter_compatible_endpoints()
         
-        # 6. NEW SYSTEMS TESTING - As requested in Arabic review
+        # 6. PHASE 3 BACKEND SYSTEMS TESTING - As requested in review
         if self.admin_token:
             print("\n" + "="*50)
-            print("🆕 TESTING NEW HOMEME SYSTEMS")
+            print("🚀 TESTING PHASE 3 BACKEND SYSTEMS")
+            print("="*50)
+            
+            # Payment System Tests
+            print("\n💳 Testing Payment System (Stripe Integration)...")
+            self.test_payment_packages()
+            self.test_payment_checkout_session()
+            
+            # Push Notifications System Tests
+            print("\n🔔 Testing Push Notifications System...")
+            self.test_push_notifications_user_notifications()
+            self.test_push_notifications_send()
+            
+            # Ratings & Reviews System Tests
+            print("\n⭐ Testing Ratings & Reviews System...")
+            self.test_ratings_reviews_summary()
+            self.test_ratings_reviews_submit()
+            self.test_ratings_reviews_validation()
+            
+            # 7. EXISTING NEW SYSTEMS TESTING - As requested in Arabic review
+            print("\n" + "="*50)
+            print("🆕 TESTING OTHER NEW HOMEME SYSTEMS")
             print("="*50)
             
             # Payment System (Stripe Integration) Tests
-            print("\n💳 Testing Payment System (Stripe Integration)...")
+            print("\n💳 Testing Payment System (Additional Tests)...")
             self.test_get_payment_packages()
             self.test_create_checkout_session()
             self.test_get_payment_transactions()
             
             # Push Notifications System Tests
-            print("\n🔔 Testing Push Notifications System...")
+            print("\n🔔 Testing Push Notifications System (Additional Tests)...")
             self.test_send_push_notification()
             self.test_get_user_notifications()
             self.test_mark_notification_read_push()
             
             # Ratings and Reviews System Tests
-            print("\n⭐ Testing Ratings and Reviews System...")
+            print("\n⭐ Testing Ratings and Reviews System (Additional Tests)...")
             self.test_submit_rating_review()
             self.test_get_ratings_summary()
             self.test_get_category_ratings()

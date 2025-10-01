@@ -118,14 +118,25 @@ class ArabicServicesTestSuite:
             if response.status_code == 200:
                 services = response.json()
                 
+                # Debug: Print the actual response structure
+                print(f"DEBUG: Response type: {type(services)}")
+                print(f"DEBUG: Response content: {services}")
+                
                 if isinstance(services, list) and len(services) > 0:
                     self.log_result("Services Data Retrieval", True, 
                                   f"Successfully retrieved {len(services)} services")
                     return services
-                else:
-                    self.log_result("Services Data Retrieval", False, 
-                                  f"No services found or invalid response format")
-                    return None
+                elif isinstance(services, dict) and 'services' in services:
+                    # Handle case where services are wrapped in an object
+                    actual_services = services['services']
+                    if isinstance(actual_services, list) and len(actual_services) > 0:
+                        self.log_result("Services Data Retrieval", True, 
+                                      f"Successfully retrieved {len(actual_services)} services")
+                        return actual_services
+                
+                self.log_result("Services Data Retrieval", False, 
+                              f"No services found or invalid response format. Response: {services}")
+                return None
             else:
                 self.log_result("Services Data Retrieval", False, 
                               f"Failed with status {response.status_code}", response.text)

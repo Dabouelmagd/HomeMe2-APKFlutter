@@ -611,9 +611,7 @@ const resources = {
         'repeats': 'Repeats'
       },
       'notifications': 'Notifications',
-      'settings': {
-        'settings': 'Settings'
-      },
+      'settings_nav': 'Settings',
       'payment_center': 'Payment Center',
       'mobile_app': 'Mobile App',
       'pricing_plans': '💎 Pricing Plans',

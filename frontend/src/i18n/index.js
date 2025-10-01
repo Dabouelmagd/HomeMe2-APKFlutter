@@ -1801,6 +1801,13 @@ const resources = {
       'update_service': 'Mettre à jour le Service',
       'add_service': 'Ajouter un Service',
       'save_service': 'Enregistrer le Service',
+      'create_service': 'Créer un Service',
+      'enter_service_name': 'Entrez le nom du service',
+      'enter_description': 'Entrez la description',
+      'enter_phone': 'Entrez le numéro de téléphone',
+      'enter_email': 'Entrez l\'adresse e-mail',
+      'phone': 'Téléphone',
+      'email': 'E-mail',
       
       // Categories
       'maintenance': 'Maintenance',

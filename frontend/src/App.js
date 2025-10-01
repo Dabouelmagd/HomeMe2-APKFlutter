@@ -383,6 +383,26 @@ function App() {
                   <Newsletter />
                 } />
                 
+                <Route path="mobile-app" element={
+                  <MobileAppPage />
+                } />
+                
+                <Route path="payments" element={
+                  <PaymentPage />
+                } />
+                
+                <Route path="payment/success" element={
+                  <PaymentSuccessPage />
+                } />
+                
+                <Route path="payment/cancel" element={
+                  <PaymentCancelPage />
+                } />
+                
+                <Route path="locations" element={
+                  <LocationsPage />
+                } />
+                
                 {/* Enterprise Routes */}
                 <Route path="account-type-selection" element={
                   <AccountTypeSelection />

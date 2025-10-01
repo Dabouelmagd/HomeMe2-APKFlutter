@@ -452,7 +452,7 @@ const Pricing = () => {
                   
                   {plan.id === 'community' && (
                     <p className="text-center text-sm text-gray-500 mt-2">
-                      No credit card required
+                      {t('no_credit_card_required')}
                     </p>
                   )}
                 </div>

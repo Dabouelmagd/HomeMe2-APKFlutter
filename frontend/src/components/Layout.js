@@ -236,7 +236,7 @@ const Layout = ({ children }) => {
       show: true
     },
     {
-      name: 'Add Family Member',
+      name: t('add_family_member'),
       href: '/add-family-member',
       icon: UserPlusIcon,
       show: true

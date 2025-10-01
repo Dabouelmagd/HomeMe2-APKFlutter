@@ -1019,7 +1019,7 @@ const ServicesManagement = () => {
                     value={serviceForm.working_hours}
                     onChange={(e) => setServiceForm({...serviceForm, working_hours: e.target.value})}
                     className="form-input"
-                    placeholder="9:00 AM - 6:00 PM"
+                    placeholder="9:00 ص - 6:00 م"
                   />
                 </div>
 

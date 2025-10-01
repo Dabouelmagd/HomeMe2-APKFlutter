@@ -222,6 +222,7 @@ class AppLocalizations {
       'add_family_member': 'Add Family Member',
       'test_admin': 'Test Admin',
       'stay_updated_community': 'Stay updated with community news and announcements',
+      'settings_settings': 'Settings',
     },
     'ar': {
       'welcome_back': 'مرحباً بعودتك',

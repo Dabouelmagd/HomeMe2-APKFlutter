@@ -1299,6 +1299,8 @@ const resources = {
       'settings': {
         'settings': 'الإعدادات'
       },
+      'payment_center': 'مركز المدفوعات',
+      'mobile_app': 'التطبيق الجوال',
       'pricing_plans': '💎 خطط الأسعار',
       'recent_updates': 'التحديثات الحديثة',
       'recent_notifications': 'الإشعارات الحديثة',

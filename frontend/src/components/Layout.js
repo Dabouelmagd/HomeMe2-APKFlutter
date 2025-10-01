@@ -188,13 +188,13 @@ const Layout = ({ children }) => {
       show: true
     },
     {
-      name: t('Payment Center'),
+      name: t('payment_center'),
       href: '/payments',
       icon: CreditCardIcon,
       show: true
     },
     {
-      name: t('Mobile App'),
+      name: t('mobile_app'),
       href: '/mobile-app',
       icon: PhoneIcon,
       show: true

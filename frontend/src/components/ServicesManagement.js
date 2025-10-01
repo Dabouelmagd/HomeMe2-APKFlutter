@@ -734,7 +734,7 @@ const ServicesManagement = () => {
                     )}
                   </div>
 
-                  <p className="text-gray-600 mb-4 text-sm">{service.description}</p>
+                  <p className="text-gray-600 mb-4 text-sm">{translateDescription(service.description)}</p>
 
                   <div className="space-y-2 mb-4">
                     {service.phone && (

@@ -21,7 +21,7 @@ const LocationsPage = () => {
         id: 'compound-main',
         lat: 25.2048,
         lng: 55.2708,
-        title: t('Main Compound'),
+        title: t('main_compound'),
         type: 'compound',
         infoContent: `
           <div class="p-3">

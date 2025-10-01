@@ -61,8 +61,8 @@ const Pricing = () => {
     },
     {
       id: 'essential',
-      name: 'Essential',
-      subtitle: 'Great for growing communities',
+      name: t('essential_plan'),
+      subtitle: t('great_growing_communities'),
       price: { monthly: 12, yearly: 120 },
       originalPrice: { monthly: 12, yearly: 144 },
       icon: SparklesIcon,

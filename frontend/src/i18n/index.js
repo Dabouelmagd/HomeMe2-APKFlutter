@@ -2242,6 +2242,7 @@ const resources = {
       'total_units': 'Total des unités',
       'total_compounds': 'Total des complexes',
       'total_requests': 'Total des demandes',
+      'storage_mb': 'Stockage (MB)',
       'total_devices': 'Total des appareils',
       'total_votes': 'Total des votes',
       'total_announcements': 'Total des annonces',

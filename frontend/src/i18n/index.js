@@ -927,6 +927,20 @@ const resources = {
       'party_planning_corporate_events': 'تخطيط الحفلات، الفعاليات المؤسسية، تنسيق الأعراس',
       'event_catering_meal_prep': 'تموين الفعاليات، إعداد الوجبات، الاحتياجات الغذائية الخاصة',
       
+      // Common description words
+      'professional_word': 'مهني',
+      'licensed_word': 'مرخص',
+      'complete_word': 'شامل',
+      'skilled_word': 'ماهر',
+      'trusted_word': 'موثوق',
+      'certified_word': 'معتمد',
+      'reliable_word': 'موثوق',
+      'emergency_word': 'طوارئ',
+      'advanced_word': 'متطور',
+      'flexible_word': 'مرن',
+      'crystal_clear': 'واضح جداً',
+      'eco_friendly': 'صديق للبيئة',
+      
       'maintenance_system': 'نظام الصيانة',
       'guest_management': 'إدارة الضيوف',
       'events_announcements': 'الأحداث والإعلانات',

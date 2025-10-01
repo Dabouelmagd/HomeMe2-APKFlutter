@@ -565,6 +565,7 @@ const resources = {
       'view_plans': 'View Plans',
       'usage_limits': 'Usage & Limits',
       'trial_ending_soon': 'Trial Ending Soon',
+      'upgrade_soon_avoid_interruption': 'Upgrade soon to avoid interruption',
       'trial_expired': 'Trial Expired',
       'premium_account': 'Premium Account',
       'unlimited_storage': 'Unlimited storage and services',

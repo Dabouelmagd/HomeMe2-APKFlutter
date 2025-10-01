@@ -963,6 +963,36 @@ const resources = {
       'phone': 'الهاتف',
       'email': 'البريد الإلكتروني',
       
+      // Service Booking & Payments
+      'book_service': 'حجز الخدمة',
+      'reviews': 'التقييمات',
+      'review': 'تقييم',
+      'jobs_completed': 'وظائف مكتملة',
+      'job_completed': 'وظيفة مكتملة',
+      'hour': 'ساعة',
+      'per_hour': 'في الساعة',
+      
+      // Payment Methods
+      'supported_payment_methods': 'طرق الدفع المدعومة',
+      'cash_on_service': 'نقداً عند الخدمة',
+      'credit_debit_card': 'بطاقة ائتمان/خصم',
+      'bank_transfer': 'تحويل بنكي',
+      'instapay': 'إنستاباي',
+      'mobile_payment': 'دفع جوال',
+      'digital_wallet': 'محفظة رقمية',
+      'qr_code_payment': 'دفع برمز QR',
+      
+      // Service Priority Levels
+      'service_priority_levels': 'مستويات أولوية الخدمة',
+      'emergency': 'طوارئ',
+      'urgent': 'عاجل',
+      'standard': 'قياسي',
+      'scheduled': 'مجدول',
+      'immediate_response_1_hour': 'استجابة فورية خلال ساعة واحدة',
+      'same_day_service': 'خدمة في نفس اليوم',
+      'next_scheduled_slot': 'الفترة المجدولة التالية',
+      'future_date_time': 'تاريخ ووقت مستقبلي',
+      
       // Categories
       'maintenance': 'الصيانة',
       'cleaning': 'التنظيف',

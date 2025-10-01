@@ -562,7 +562,7 @@ const ServicesManagement = () => {
                         title="Reset all services"
                       >
                         <TrashIcon className="h-5 w-5" />
-                        <span>Reset</span>
+                        <span>{t('reset')}</span>
                       </button>
                     </>
                   )}

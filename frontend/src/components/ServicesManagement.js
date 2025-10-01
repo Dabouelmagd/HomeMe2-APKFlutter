@@ -949,8 +949,8 @@ const ServicesManagement = () => {
       {activeTab === 'service-booking' && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-center text-center text-gray-900 text-center mb-4">Service Booking & Payments</h2>
-            <p className="text-gray-600 mb-6">Book services with multiple payment options and priority levels</p>
+            <h2 className="text-xl font-semibold text-center text-center text-gray-900 text-center mb-4">{t('service_booking_payments')}</h2>
+            <p className="text-gray-600 mb-6">{t('book_services_multiple_payment')}</p>
             
             {/* Service Providers Grid */}
             <div className="mb-8">

@@ -1070,6 +1070,14 @@ const resources = {
       'crystal_clear': 'واضح جداً',
       'eco_friendly': 'صديق للبيئة',
       
+      // Trial/Upgrade Messages
+      'trial_version_ending_soon': 'النسخة التجريبية تنتهي قريباً',
+      'days_remaining': 'أيام متبقية',
+      'remaining': 'متبقية',
+      'upgrade_soon_avoid_interruption': 'قم بالترقية قريباً لتجنب الانقطاع',
+      'upgrade_now': 'ترقية الآن',
+      'days_left': 'أيام متبقية',
+      
       'maintenance_system': 'نظام الصيانة',
       'guest_management': 'إدارة الضيوف',
       'events_announcements': 'الأحداث والإعلانات',

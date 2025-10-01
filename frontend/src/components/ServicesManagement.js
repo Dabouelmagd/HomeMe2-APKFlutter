@@ -612,7 +612,7 @@ const ServicesManagement = () => {
                 <div className="flex items-center space-x-2 ml-auto">
                   <ClockIcon className="h-4 w-4 text-gray-400" />
                   <span className="text-sm text-gray-500">
-                    Last updated: {new Date().toLocaleTimeString()}
+                    {t('last_updated')}: {new Date().toLocaleTimeString()}
                   </span>
                 </div>
               </div>

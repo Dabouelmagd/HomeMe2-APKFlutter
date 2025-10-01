@@ -113,8 +113,8 @@ const Pricing = () => {
     },
     {
       id: 'enterprise',
-      name: 'Enterprise',
-      subtitle: 'For large organizations',
+      name: t('enterprise_plan'),
+      subtitle: t('large_organizations'),
       price: { monthly: 70, yearly: 700 },
       originalPrice: { monthly: 70, yearly: 840 },
       icon: BuildingOfficeIcon,

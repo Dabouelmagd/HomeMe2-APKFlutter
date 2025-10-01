@@ -368,7 +368,7 @@ const Pricing = () => {
                     
                     {billingPeriod === 'yearly' && plan.id !== 'community' && (
                       <div className="text-sm text-green-600 mt-1">
-                        Save ${plan.originalPrice.yearly - plan.price.yearly} annually
+                        {t('save_amount_annually', { amount: plan.originalPrice.yearly - plan.price.yearly })}
                       </div>
                     )}
                   </div>

@@ -403,21 +403,21 @@ const Pricing = () => {
                     {plan.features.branding && (
                       <div className="flex items-center">
                         <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">Custom branding</span>
+                        <span className="text-gray-700">{plan.features.branding}</span>
                       </div>
                     )}
                     
                     {plan.features.analytics && (
                       <div className="flex items-center">
                         <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">Advanced analytics</span>
+                        <span className="text-gray-700">{plan.features.analytics}</span>
                       </div>
                     )}
                     
                     {plan.features.api && (
                       <div className="flex items-center">
                         <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">API access</span>
+                        <span className="text-gray-700">{plan.features.api}</span>
                       </div>
                     )}
                     
@@ -431,7 +431,7 @@ const Pricing = () => {
                     {plan.features.customDev && (
                       <div className="flex items-center">
                         <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">Custom development</span>
+                        <span className="text-gray-700">{plan.features.customDev}</span>
                       </div>
                     )}
                   </div>

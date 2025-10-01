@@ -121,19 +121,19 @@ const Pricing = () => {
       gradient: 'from-emerald-500 to-teal-600',
       popular: false,
       features: {
-        residents: 'Unlimited residents',
-        services: 'Unlimited services',
-        chat: 'Advanced chat & messaging',
-        family: 'Family management with photos',
-        storage: 'Unlimited storage',
-        mobile: 'Mobile app access',
-        support: 'Dedicated support',
-        branding: 'Custom branding',
-        analytics: 'Advanced analytics',
-        api: 'Full API access',
-        multiCompound: 'Multiple compounds',
-        whiteLabel: 'White-label options',
-        customDev: 'Custom development'
+        residents: t('unlimited_residents'),
+        services: t('unlimited_services'),
+        chat: t('advanced_chat_messaging'),
+        family: t('family_management_photos'),
+        storage: t('unlimited_storage'),
+        mobile: t('mobile_app_access'),
+        support: t('dedicated_support'),
+        branding: t('custom_branding'),
+        analytics: t('advanced_analytics'),
+        api: t('full_api_access'),
+        multiCompound: t('multiple_compounds'),
+        whiteLabel: t('white_label_options'),
+        customDev: t('custom_development')
       },
       limitations: []
     }

@@ -3874,6 +3874,366 @@ class HomeMeFlutterTestSuite:
         
         return self.print_summary()
 
+    # ============ PAYMENT SYSTEM TESTS (STRIPE INTEGRATION) ============
+    
+    def test_get_payment_packages(self):
+        """Test GET /api/payments/v1/packages - Get payment packages"""
+        print("\n=== Testing Get Payment Packages ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Payment Packages", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/payments/v1/packages", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                packages = data.get("packages", [])
+                self.log_result("Get Payment Packages", True, f"Retrieved {len(packages)} payment packages successfully")
+                
+                # Verify package structure
+                if packages:
+                    package = packages[0]
+                    required_fields = ["id", "name", "price", "currency"]
+                    missing_fields = [field for field in required_fields if field not in package]
+                    if missing_fields:
+                        self.log_result("Payment Package Structure", False, f"Missing fields: {missing_fields}")
+                    else:
+                        self.log_result("Payment Package Structure", True, "Package structure is valid")
+                
+                return True
+            else:
+                self.log_result("Get Payment Packages", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Payment Packages", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_create_checkout_session(self):
+        """Test POST /api/payments/v1/checkout/session - Create checkout session"""
+        print("\n=== Testing Create Checkout Session ===")
+        
+        if not self.admin_token:
+            self.log_result("Create Checkout Session", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Create checkout session data
+            checkout_data = {
+                "package_id": "basic_package",
+                "success_url": "https://translate-home.preview.emergentagent.com/payment/success",
+                "cancel_url": "https://translate-home.preview.emergentagent.com/payment/cancel",
+                "customer_email": "admin@homeme.com"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/payments/v1/checkout/session", json=checkout_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                session_id = data.get("session_id")
+                checkout_url = data.get("checkout_url")
+                
+                if session_id and checkout_url:
+                    self.log_result("Create Checkout Session", True, f"Checkout session created successfully - Session ID: {session_id}")
+                    return True
+                else:
+                    self.log_result("Create Checkout Session", False, f"Missing session data: {data}")
+                    return False
+            else:
+                self.log_result("Create Checkout Session", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Checkout Session", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_payment_transactions(self):
+        """Test GET /api/payments/v1/transactions - Get payment transactions"""
+        print("\n=== Testing Get Payment Transactions ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Payment Transactions", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/payments/v1/transactions", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                transactions = data.get("transactions", [])
+                total = data.get("total", 0)
+                
+                self.log_result("Get Payment Transactions", True, f"Retrieved {len(transactions)} transactions (Total: {total})")
+                
+                # Test pagination
+                paginated_response = self.session.get(f"{BASE_URL}/payments/v1/transactions?limit=5&offset=0", headers=headers)
+                if paginated_response.status_code == 200:
+                    paginated_data = paginated_response.json()
+                    paginated_transactions = paginated_data.get("transactions", [])
+                    self.log_result("Payment Transactions Pagination", True, f"Pagination works - Retrieved {len(paginated_transactions)} transactions with limit=5")
+                
+                return True
+            else:
+                self.log_result("Get Payment Transactions", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Payment Transactions", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    # ============ PUSH NOTIFICATIONS SYSTEM TESTS ============
+    
+    def test_send_push_notification(self):
+        """Test POST /api/push-notifications/send - Send push notification"""
+        print("\n=== Testing Send Push Notification ===")
+        
+        if not self.admin_token:
+            self.log_result("Send Push Notification", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Create notification data
+            notification_data = {
+                "title": "Test Notification",
+                "message": "This is a test push notification from the HomeMe system",
+                "recipient_ids": [self.admin_user["id"]] if self.admin_user else [],
+                "type": "general",
+                "priority": "normal",
+                "data": {
+                    "action": "test",
+                    "url": "/dashboard"
+                }
+            }
+            
+            response = self.session.post(f"{BASE_URL}/push-notifications/send", json=notification_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                notification_id = data.get("notification_id")
+                sent_count = data.get("sent_count", 0)
+                
+                if notification_id:
+                    self.test_notification_id = notification_id
+                    self.log_result("Send Push Notification", True, f"Push notification sent successfully - ID: {notification_id}, Sent to: {sent_count} users")
+                    return True
+                else:
+                    self.log_result("Send Push Notification", False, f"No notification ID returned: {data}")
+                    return False
+            else:
+                self.log_result("Send Push Notification", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Send Push Notification", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_user_notifications(self):
+        """Test GET /api/push-notifications/user-notifications - Get user notifications"""
+        print("\n=== Testing Get User Notifications ===")
+        
+        if not self.admin_token:
+            self.log_result("Get User Notifications", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/push-notifications/user-notifications", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                notifications = data.get("notifications", [])
+                unread_count = data.get("unread_count", 0)
+                total_count = data.get("total_count", 0)
+                
+                self.log_result("Get User Notifications", True, f"Retrieved {len(notifications)} notifications - Unread: {unread_count}, Total: {total_count}")
+                
+                # Test filtering by read status
+                unread_response = self.session.get(f"{BASE_URL}/push-notifications/user-notifications?read_status=unread", headers=headers)
+                if unread_response.status_code == 200:
+                    unread_data = unread_response.json()
+                    unread_notifications = unread_data.get("notifications", [])
+                    self.log_result("User Notifications Filtering", True, f"Read status filtering works - {len(unread_notifications)} unread notifications")
+                
+                return True
+            else:
+                self.log_result("Get User Notifications", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get User Notifications", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_mark_notification_read_push(self):
+        """Test POST /api/push-notifications/mark-read/{id} - Mark push notification as read"""
+        print("\n=== Testing Mark Push Notification Read ===")
+        
+        if not self.admin_token:
+            self.log_result("Mark Push Notification Read", False, "No admin token available")
+            return False
+        
+        # First send a notification if we don't have one
+        if not self.test_notification_id:
+            if not self.test_send_push_notification():
+                self.log_result("Mark Push Notification Read", False, "Could not create test notification")
+                return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.post(f"{BASE_URL}/push-notifications/mark-read/{self.test_notification_id}", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                message = data.get("message", "")
+                
+                if "marked as read" in message.lower():
+                    self.log_result("Mark Push Notification Read", True, f"Notification {self.test_notification_id} marked as read successfully")
+                    return True
+                else:
+                    self.log_result("Mark Push Notification Read", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Mark Push Notification Read", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Mark Push Notification Read", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    # ============ RATINGS AND REVIEWS SYSTEM TESTS ============
+    
+    def test_submit_rating_review(self):
+        """Test POST /api/ratings-reviews/submit - Submit rating and review"""
+        print("\n=== Testing Submit Rating Review ===")
+        
+        if not self.admin_token:
+            self.log_result("Submit Rating Review", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Create rating/review data
+            review_data = {
+                "category": "maintenance",
+                "service_id": "test_service_001",
+                "rating": 4,
+                "review_text": "Excellent maintenance service. The technician was professional and fixed the issue quickly.",
+                "service_quality": 5,
+                "response_time": 4,
+                "professionalism": 5,
+                "value_for_money": 4,
+                "would_recommend": True,
+                "tags": ["professional", "quick", "reliable"]
+            }
+            
+            response = self.session.post(f"{BASE_URL}/ratings-reviews/submit", json=review_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                review_id = data.get("review_id")
+                message = data.get("message", "")
+                
+                if review_id and "submitted successfully" in message.lower():
+                    self.log_result("Submit Rating Review", True, f"Rating/review submitted successfully - ID: {review_id}")
+                    return True
+                else:
+                    self.log_result("Submit Rating Review", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_result("Submit Rating Review", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Submit Rating Review", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_ratings_summary(self):
+        """Test GET /api/ratings-reviews/summary - Get ratings summary"""
+        print("\n=== Testing Get Ratings Summary ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Ratings Summary", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/ratings-reviews/summary", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                summary = data.get("summary", {})
+                
+                # Verify summary structure
+                expected_fields = ["average_rating", "total_reviews", "rating_distribution"]
+                found_fields = [field for field in expected_fields if field in summary]
+                
+                if len(found_fields) >= 2:  # At least 2 out of 3 fields should be present
+                    avg_rating = summary.get("average_rating", 0)
+                    total_reviews = summary.get("total_reviews", 0)
+                    self.log_result("Get Ratings Summary", True, f"Ratings summary retrieved - Average: {avg_rating}, Total Reviews: {total_reviews}")
+                    return True
+                else:
+                    self.log_result("Get Ratings Summary", False, f"Invalid summary structure: {summary}")
+                    return False
+            else:
+                self.log_result("Get Ratings Summary", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Ratings Summary", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_get_category_ratings(self):
+        """Test GET /api/ratings-reviews/category/maintenance - Get ratings for specific category"""
+        print("\n=== Testing Get Category Ratings ===")
+        
+        if not self.admin_token:
+            self.log_result("Get Category Ratings", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/ratings-reviews/category/maintenance", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                reviews = data.get("reviews", [])
+                category_stats = data.get("category_stats", {})
+                
+                self.log_result("Get Category Ratings", True, f"Retrieved {len(reviews)} maintenance reviews")
+                
+                # Verify category stats structure
+                if category_stats:
+                    avg_rating = category_stats.get("average_rating", 0)
+                    total_reviews = category_stats.get("total_reviews", 0)
+                    self.log_result("Category Stats Structure", True, f"Category stats valid - Average: {avg_rating}, Total: {total_reviews}")
+                
+                # Test other categories
+                categories = ["security", "cleaning", "general"]
+                for category in categories:
+                    cat_response = self.session.get(f"{BASE_URL}/ratings-reviews/category/{category}", headers=headers)
+                    if cat_response.status_code == 200:
+                        cat_data = cat_response.json()
+                        cat_reviews = cat_data.get("reviews", [])
+                        self.log_result(f"Category Ratings - {category.title()}", True, f"Retrieved {len(cat_reviews)} {category} reviews")
+                
+                return True
+            else:
+                self.log_result("Get Category Ratings", False, f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Category Ratings", False, f"Exception occurred: {str(e)}")
+            return False
+
     def run_flutter_mobile_app_tests(self):
         """Run HomeMe Flutter Mobile App Backend API Tests"""
         print("📱 STARTING HOMEME FLUTTER MOBILE APP BACKEND API TESTING")
@@ -3902,6 +4262,30 @@ class HomeMeFlutterTestSuite:
         if self.admin_token:
             # Test some core endpoints that Flutter app would use
             self.test_flutter_compatible_endpoints()
+        
+        # 6. NEW SYSTEMS TESTING - As requested in Arabic review
+        if self.admin_token:
+            print("\n" + "="*50)
+            print("🆕 TESTING NEW HOMEME SYSTEMS")
+            print("="*50)
+            
+            # Payment System (Stripe Integration) Tests
+            print("\n💳 Testing Payment System (Stripe Integration)...")
+            self.test_get_payment_packages()
+            self.test_create_checkout_session()
+            self.test_get_payment_transactions()
+            
+            # Push Notifications System Tests
+            print("\n🔔 Testing Push Notifications System...")
+            self.test_send_push_notification()
+            self.test_get_user_notifications()
+            self.test_mark_notification_read_push()
+            
+            # Ratings and Reviews System Tests
+            print("\n⭐ Testing Ratings and Reviews System...")
+            self.test_submit_rating_review()
+            self.test_get_ratings_summary()
+            self.test_get_category_ratings()
         
         return self.print_summary()
 

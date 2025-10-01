@@ -280,7 +280,7 @@ const Pricing = () => {
                   type="text"
                   value={discountCode}
                   onChange={(e) => setDiscountCode(e.target.value)}
-                  placeholder="Enter discount code"
+                  placeholder={t('enter_discount_code')}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 <button

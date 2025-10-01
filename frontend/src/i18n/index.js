@@ -121,6 +121,8 @@ const resources = {
       'personal': 'Personal',
       'delivery': 'Delivery',
       'events': 'Events',
+      'medical': 'Medical',
+      'other': 'Other',
       
       // Service Descriptions & Specialties
       'emergency_plumbing_pipe_repairs': 'Emergency plumbing, pipe repairs, water heater maintenance',

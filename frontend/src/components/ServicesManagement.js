@@ -553,7 +553,7 @@ const ServicesManagement = () => {
                         title="Refresh services list"
                       >
                         <ArrowPathIcon className="h-5 w-5" />
-                        <span>Refresh</span>
+                        <span>{t('refresh')}</span>
                       </button>
                       
                       <button

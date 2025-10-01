@@ -780,7 +780,12 @@ const ServicesManagement = () => {
               
               {/* Stats Bar */}
               <div className="mt-6 pt-6 border-t border-gray-100">
-                {/* Service Status Stats */}
+                {/* Bookings Header - Centered */}
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('bookings')}</h3>
+                </div>
+                
+                {/* Service Status Stats - Centered */}
                 <div className="flex items-center justify-center space-x-8 mb-4">
                   <div className="flex items-center space-x-2">
                     <div className="h-2 w-2 bg-green-500 rounded-full"></div>

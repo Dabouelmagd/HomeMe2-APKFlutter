@@ -642,6 +642,7 @@ class AppLocalizations {
       'add_family_member': 'Ajouter un Membre de la Famille',
       'test_admin': 'Admin de Test',
       'stay_updated_community': 'Restez informé des actualités et annonces de la communauté',
+      'settings_settings': 'Paramètres',
     },
   };
 

@@ -637,6 +637,9 @@ class AppLocalizations {
       'collection_rate': 'Taux de Collecte',
       'monthly_revenue': 'Revenus Mensuels',
       'expense_breakdown': 'Répartition des Dépenses',
+      'add_family_member': 'Ajouter un Membre de la Famille',
+      'test_admin': 'Admin de Test',
+      'stay_updated_community': 'Restez informé des actualités et annonces de la communauté',
     },
   };
 

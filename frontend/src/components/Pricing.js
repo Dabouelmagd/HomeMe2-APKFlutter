@@ -332,7 +332,7 @@ const Pricing = () => {
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <div className="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium">
-                      Most Popular
+                      {t('most_popular')}
                     </div>
                   </div>
                 )}

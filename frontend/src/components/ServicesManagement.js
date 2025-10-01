@@ -173,7 +173,7 @@ const ServicesManagement = () => {
   });
 
   const priorityOptions = [
-    { value: 'emergency', label: 'Emergency', color: 'bg-red-100 text-red-800', description: 'Immediate response within 1 hour' },
+    { value: 'emergency', label: t('emergency_word'), color: 'bg-red-100 text-red-800', description: 'Immediate response within 1 hour' },
     { value: 'urgent', label: 'Urgent', color: 'bg-orange-100 text-orange-800', description: 'Same day service' },
     { value: 'standard', label: 'Standard', color: 'bg-blue-100 text-blue-800', description: 'Next scheduled slot' },
     { value: 'scheduled', label: 'Scheduled', color: 'bg-green-100 text-green-800', description: 'Future date/time' }

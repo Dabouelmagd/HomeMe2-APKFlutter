@@ -1983,6 +1983,8 @@ const resources = {
       'settings': {
         'settings': 'Paramètres'
       },
+      'payment_center': 'Centre de Paiement',
+      'mobile_app': 'Application Mobile',
       'pricing_plans': '💎 Plans Tarifaires',
       'recent_updates': 'Mises à jour récentes',
       'recent_notifications': 'Notifications récentes',

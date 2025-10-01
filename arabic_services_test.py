@@ -230,10 +230,15 @@ class ArabicServicesTestSuite:
         found_services = {category: [] for category in target_categories.keys()}
         
         for service in services:
-            service_name = service.get('name', '').lower()
-            service_category = service.get('category', '').lower()
-            service_specialty = service.get('specialty', '').lower()
-            service_description = service.get('description', '').lower()
+            service_name = service.get('name', '') or ''
+            service_category = service.get('category', '') or ''
+            service_specialty = service.get('specialty', '') or ''
+            service_description = service.get('description', '') or ''
+            
+            service_name = service_name.lower()
+            service_category = service_category.lower()
+            service_specialty = service_specialty.lower()
+            service_description = service_description.lower()
             
             # Check all text fields for category keywords
             all_text = f"{service_name} {service_category} {service_specialty} {service_description}"

@@ -600,7 +600,7 @@ const ServicesManagement = () => {
                 <div className="flex items-center space-x-2">
                   <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
                   <span className="text-sm text-gray-600">
-                    {services.filter(s => s.availability === 'busy').length} Busy
+                    {services.filter(s => s.availability === 'busy').length} {t('busy')}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2">

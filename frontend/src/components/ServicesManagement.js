@@ -712,7 +712,12 @@ const ServicesManagement = () => {
                       ? 'bg-yellow-100 text-yellow-800'
                       : 'bg-red-100 text-red-800'
                   }`}>
-                    {t(service.status)}
+                    {service.status === 'available' 
+                      ? t('available')
+                      : service.status === 'busy'
+                      ? t('busy')
+                      : t('unavailable')
+                    }
                   </div>
                 </div>
               ))}

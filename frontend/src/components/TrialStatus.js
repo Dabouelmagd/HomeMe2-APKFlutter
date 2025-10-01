@@ -275,6 +275,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
                        key === 'services' ? t('services') : 
                        key === 'messages' ? t('messages') : 
                        key === 'storage' ? t('storage_mb') : 
+                       key === 'storage_mb' ? t('storage_mb') :
                        key.replace('_', ' ')}
                     </span>
                     <span className={`text-sm font-medium ${

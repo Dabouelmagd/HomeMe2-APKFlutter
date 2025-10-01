@@ -4404,6 +4404,12 @@ class HomeMeFlutterTestSuite:
         if not self.test_admin_authentication():
             print("❌ Admin authentication failed - some tests may be limited")
         
+        # 2.5. Arabic Interface English Text Investigation (Priority Test)
+        if self.admin_token:
+            print("\n🔍 Testing Arabic Interface for English Text (Priority Investigation)...")
+            self.test_services_management_data()
+            self.test_database_sample_data_check()
+        
         # 3. Dashboard Endpoints
         print("\n📊 Testing Dashboard Endpoints...")
         self.test_admin_dashboard_endpoint()

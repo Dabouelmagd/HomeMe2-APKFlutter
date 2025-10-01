@@ -227,10 +227,10 @@ const Pricing = () => {
           </div>
           
           <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center">
-            Choose Your Account Type
+            {t('choose_your_account_type')}
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto text-center">
-            Select the plan that best fits your property management needs
+            {t('select_plan_best_fits')}
           </p>
           
           {/* Billing Toggle */}

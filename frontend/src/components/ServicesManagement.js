@@ -954,7 +954,7 @@ const ServicesManagement = () => {
             
             {/* Service Providers Grid */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">Available Service Providers</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">{t('available_service_providers')}</h3>
               {serviceProviders.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {serviceProviders.map((provider) => (

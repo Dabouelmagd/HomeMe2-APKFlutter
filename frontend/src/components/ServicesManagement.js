@@ -526,7 +526,7 @@ const ServicesManagement = () => {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 text-center">Services Management</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 text-center">{t('services_management')}</h3>
                   <p className="text-gray-600 mt-1">
                     Manage and organize all compound services • {services.length} services available
                   </p>

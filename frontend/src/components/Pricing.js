@@ -270,7 +270,7 @@ const Pricing = () => {
             className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-medium"
           >
             <GiftIcon className="h-5 w-5" />
-            <span>Have a discount code?</span>
+            <span>{t('have_discount_code')}</span>
           </button>
           
           {showDiscountCode && (

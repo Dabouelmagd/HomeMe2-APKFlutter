@@ -1078,6 +1078,17 @@ const resources = {
       'upgrade_now': 'ترقية الآن',
       'days_left': 'أيام متبقية',
       
+      // Dashboard Statistics
+      'families': 'العائلات',
+      'messages': 'الرسائل',
+      'storage_mb': 'مساحة التخزين (ميجابايت)',
+      'storage': 'التخزين',
+      'mb': 'ميجابايت',
+      'user': 'مستخدم',
+      'users': 'مستخدمين',
+      'max_limit_reached': 'تم الوصول للحد الأقصى',
+      'limit_reached': 'تم الوصول للحد الأقصى',
+      
       'maintenance_system': 'نظام الصيانة',
       'guest_management': 'إدارة الضيوف',
       'events_announcements': 'الأحداث والإعلانات',

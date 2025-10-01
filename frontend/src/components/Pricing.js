@@ -87,8 +87,8 @@ const Pricing = () => {
     },
     {
       id: 'professional',
-      name: 'Professional',
-      subtitle: 'For multiple communities',
+      name: t('professional_plan'),
+      subtitle: t('multiple_communities'),
       price: { monthly: 40, yearly: 400 },
       originalPrice: { monthly: 40, yearly: 480 },
       icon: TrophyIcon,

@@ -1172,7 +1172,7 @@ const ServicesManagement = () => {
                         {provider.hourly_rate && (
                           <div className="flex items-center text-sm text-gray-600">
                             <CurrencyDollarIcon className="h-4 w-4 mr-2" />
-                            ${provider.hourly_rate}/hour
+                            ${provider.hourly_rate}/{t('hour')}
                           </div>
                         )}
                         <div className="flex items-center text-sm text-gray-600">

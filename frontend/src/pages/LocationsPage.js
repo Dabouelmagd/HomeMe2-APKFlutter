@@ -25,8 +25,8 @@ const LocationsPage = () => {
         type: 'compound',
         infoContent: `
           <div class="p-3">
-            <h3 class="font-semibold text-lg mb-2">${t('HomeMe Community')}</h3>
-            <p class="text-sm text-gray-600 mb-2">${t('Main residential compound with 150 units')}</p>
+            <h3 class="font-semibold text-lg mb-2">${t('homeme_community')}</h3>
+            <p class="text-sm text-gray-600 mb-2">${t('main_residential_compound')}</p>
             <div class="space-y-1 text-xs">
               <div class="flex items-center">
                 <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>

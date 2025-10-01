@@ -216,10 +216,10 @@ const LocationsPage = () => {
       <div className="max-w-7xl mx-auto p-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t('Locations & Map')}
+            {t('locations_map')}
           </h1>
           <p className="text-gray-600">
-            {t('Explore compound facilities and nearby services')}
+            {t('explore_compound_facilities')}
           </p>
         </div>
 

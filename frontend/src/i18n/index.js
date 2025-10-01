@@ -1821,6 +1821,8 @@ const resources = {
       'personal': 'Personnel',
       'delivery': 'Livraison',
       'events': 'Événements',
+      'medical': 'Médical',
+      'other': 'Autre',
       
       'maintenance_system': 'Système de maintenance',
       'guest_management': 'Gestion des invités',

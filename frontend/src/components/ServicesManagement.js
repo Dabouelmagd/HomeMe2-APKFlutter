@@ -109,6 +109,24 @@ const ServicesManagement = () => {
     
     return translatedDesc;
   };
+  
+  // Function to translate working hours
+  const translateWorkingHours = (hours) => {
+    if (!hours) return hours;
+    
+    let translatedHours = hours;
+    
+    // Replace AM/PM with Arabic equivalents
+    translatedHours = translatedHours.replace(/AM/gi, 'ص');
+    translatedHours = translatedHours.replace(/PM/gi, 'م');
+    
+    // Replace common time patterns
+    translatedHours = translatedHours.replace(/Emergency Service/gi, t('emergency_word'));
+    translatedHours = translatedHours.replace(/Service/gi, 'خدمة');
+    translatedHours = translatedHours.replace(/Available/gi, t('available'));
+    
+    return translatedHours;
+  };
   const [services, setServices] = useState([]);
   const [serviceProviders, setServiceProviders] = useState([]);
   const [bookings, setBookings] = useState([]);

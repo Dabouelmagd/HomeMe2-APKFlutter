@@ -278,7 +278,7 @@ const Layout = ({ children }) => {
       show: true
     },
     {
-      name: t('settings.settings'),
+      name: t('settings_nav'),
       href: '/settings',
       icon: CogIcon,
       show: true

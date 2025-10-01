@@ -2540,6 +2540,7 @@ const resources = {
       'view_plans': 'Voir les plans',
       'usage_limits': 'Utilisation et limites',
       'trial_ending_soon': 'L\'essai se termine bientôt',
+      'upgrade_soon_avoid_interruption': 'Mettez à niveau bientôt pour éviter l\'interruption',
       'trial_expired': 'Essai expiré',
       'premium_account': 'Compte premium',
       'unlimited_storage': 'Stockage et services illimités',

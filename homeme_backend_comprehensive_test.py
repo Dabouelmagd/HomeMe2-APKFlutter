@@ -715,9 +715,7 @@ class HomeMeBackendTestSuite:
             
             notification_data = {
                 "title": "إشعار اختبار",
-                "message": "هذا إشعار تجريبي لاختبار النظام",
-                "type": "general",
-                "priority": "normal"
+                "content": "هذا إشعار تجريبي لاختبار النظام"
             }
             
             response = self.session.post(f"{BASE_URL}/notifications", json=notification_data, headers=headers)

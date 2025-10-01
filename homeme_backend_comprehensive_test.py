@@ -789,8 +789,8 @@ class HomeMeBackendTestSuite:
         print("\n=== اختبار أمان الطرق المحمية ===")
         
         protected_endpoints = [
-            "/admin/dashboard",
-            "/resident/dashboard", 
+            "/dashboard/admin",
+            "/dashboard/resident", 
             "/notifications",
             "/guests",
             "/maintenance/requests",

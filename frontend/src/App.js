@@ -399,9 +399,9 @@ function App() {
                   <PaymentCancelPage />
                 } />
                 
-                {/* <Route path="locations" element={
+                <Route path="locations" element={
                   <LocationsPage />
-                } /> */}
+                } />
                 
                 {/* Enterprise Routes */}
                 <Route path="account-type-selection" element={

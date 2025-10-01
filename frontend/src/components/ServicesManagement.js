@@ -1021,8 +1021,8 @@ const ServicesManagement = () => {
               ) : (
                 <div className="text-center py-8">
                   <CurrencyDollarIcon className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p className="text-gray-500">No service providers available</p>
-                  <p className="text-gray-400 text-sm">Service providers will appear here when added</p>
+                  <p className="text-gray-500">{t('no_service_providers_available')}</p>
+                  <p className="text-gray-400 text-sm">{t('service_providers_appear')}</p>
                 </div>
               )}
             </div>

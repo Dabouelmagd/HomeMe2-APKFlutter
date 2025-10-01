@@ -21,7 +21,7 @@ from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional
 
 # Configuration
-BASE_URL = "https://translate-home.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-portal-2.preview.emergentagent.com/api"
 
 class EnterpriseAPITestSuite:
     def __init__(self):

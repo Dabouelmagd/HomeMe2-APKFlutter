@@ -181,7 +181,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               <ClockIcon className="h-5 w-5" />
             )}
             <span className="text-sm font-medium">
-              {daysRemaining} {daysRemaining === 1 ? t('days_left') : t('days_left_plural')} {t('remaining')}
+              {daysRemaining} {daysRemaining === 1 ? t('days_left') : t('days_left_plural')}
             </span>
           </div>
           <button
@@ -224,7 +224,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               <p className={`text-sm ${
                 isAlmostExpired ? 'text-orange-700' : 'text-blue-700'
               }`}>
-                {daysRemaining} {daysRemaining === 1 ? t('days_left') : t('days_left_plural')} {t('remaining')}
+                {daysRemaining} {daysRemaining === 1 ? t('days_left') : t('days_left_plural')}
                 {isAlmostExpired && ' - ' + t('upgrade_soon_avoid_interruption')}
               </p>
             </div>

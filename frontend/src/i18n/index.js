@@ -110,6 +110,20 @@ const resources = {
       'party_planning_corporate_events': 'Party planning, corporate events, wedding coordination',
       'event_catering_meal_prep': 'Event catering, meal prep, special dietary needs',
       
+      // Common description words
+      'professional_word': 'Professional',
+      'licensed_word': 'Licensed', 
+      'complete_word': 'Complete',
+      'skilled_word': 'Skilled',
+      'trusted_word': 'Trusted',
+      'certified_word': 'Certified',
+      'reliable_word': 'Reliable',
+      'emergency_word': 'Emergency',
+      'advanced_word': 'Advanced',
+      'flexible_word': 'Flexible',
+      'crystal_clear': 'Crystal clear',
+      'eco_friendly': 'Eco-friendly',
+      
       'maintenance_system': 'Maintenance System',
       'guest_management': 'Guest Management',
       'events_announcements': 'Events & Announcements',

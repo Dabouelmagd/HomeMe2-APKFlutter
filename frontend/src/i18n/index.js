@@ -614,6 +614,8 @@ const resources = {
       'settings': {
         'settings': 'Settings'
       },
+      'payment_center': 'Payment Center',
+      'mobile_app': 'Mobile App',
       'pricing_plans': '💎 Pricing Plans',
       'recent_updates': 'Recent updates',
       'recent_notifications': 'Recent Notifications',

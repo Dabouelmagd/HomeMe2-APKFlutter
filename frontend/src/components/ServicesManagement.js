@@ -477,7 +477,7 @@ const ServicesManagement = () => {
         <p className="text-gray-600 mt-2 text-center">
           {user?.role === 'admin' 
             ? t('manage_compound_services_bookings')
-            : 'View available services and manage your bookings'
+            : t('view_available_services')
           }
         </p>
       </div>

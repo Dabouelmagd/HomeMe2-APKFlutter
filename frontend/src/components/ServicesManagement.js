@@ -543,7 +543,7 @@ const ServicesManagement = () => {
                         title="Load all default services"
                       >
                         <SparklesIcon className="h-5 w-5" />
-                        <span>Load Services</span>
+                        <span>{t('load_services')}</span>
                       </button>
                       
                       {/* Secondary Actions */}

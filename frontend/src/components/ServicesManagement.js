@@ -748,27 +748,32 @@ const ServicesManagement = () => {
               </div>
               
               {/* Stats Bar */}
-              <div className="flex items-center space-x-6 mt-4 pt-4 border-t border-gray-100">
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">
-                    {services.filter(s => s.availability === 'available').length} {t('available')}
-                  </span>
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                {/* Service Status Stats */}
+                <div className="flex items-center justify-center space-x-8 mb-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600">
+                      {services.filter(s => s.availability === 'available').length} {t('available')}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600">
+                      {services.filter(s => s.availability === 'busy').length} {t('busy')}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="h-2 w-2 bg-red-500 rounded-full"></div>
+                    <span className="text-sm text-gray-600">
+                      {services.filter(s => s.availability === 'unavailable').length} {t('unavailable')}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">
-                    {services.filter(s => s.availability === 'busy').length} {t('busy')}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                  <span className="text-sm text-gray-600">
-                    {services.filter(s => s.availability === 'unavailable').length} {t('unavailable')}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2 ml-auto">
-                  <ClockIcon className="h-4 w-4 text-gray-400" />
+                
+                {/* Last Updated - Centered */}
+                <div className="flex items-center justify-center py-3 bg-gray-50 rounded-lg">
+                  <ClockIcon className="h-4 w-4 text-gray-400 ml-2" />
                   <span className="text-sm text-gray-500">
                     {t('last_updated')}: {new Date().toLocaleTimeString().replace(/AM/gi, 'ص').replace(/PM/gi, 'م')}
                   </span>

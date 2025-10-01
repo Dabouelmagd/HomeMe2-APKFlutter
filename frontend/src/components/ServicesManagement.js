@@ -241,13 +241,13 @@ const ServicesManagement = () => {
   ];
 
   const paymentMethods = [
-    { value: 'cash', label: 'Cash on Service', icon: '💵' },
-    { value: 'card', label: 'Credit/Debit Card', icon: '💳' },
-    { value: 'bank_transfer', label: 'Bank Transfer', icon: '🏦' },
-    { value: 'instapay', label: 'InstaPay', icon: '⚡' },
-    { value: 'mobile_pay', label: 'Mobile Payment', icon: '📱' },
-    { value: 'digital_wallet', label: 'Digital Wallet', icon: '👛' },
-    { value: 'qr_code', label: 'QR Code Payment', icon: '📊' }
+    { value: 'cash', label: t('cash_on_service'), icon: '💵' },
+    { value: 'card', label: t('credit_debit_card'), icon: '💳' },
+    { value: 'bank_transfer', label: t('bank_transfer'), icon: '🏦' },
+    { value: 'instapay', label: t('instapay'), icon: '⚡' },
+    { value: 'mobile_pay', label: t('mobile_payment'), icon: '📱' },
+    { value: 'digital_wallet', label: t('digital_wallet'), icon: '👛' },
+    { value: 'qr_code', label: t('qr_code_payment'), icon: '📊' }
   ];
 
   useEffect(() => {

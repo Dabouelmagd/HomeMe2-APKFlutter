@@ -228,9 +228,9 @@ const LocationsPage = () => {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8 px-6" aria-label="Tabs">
               {[
-                { id: 'compound', label: t('Compound Facilities'), count: locations.length },
-                { id: 'services', label: t('Nearby Services'), count: nearbyServices.length },
-                { id: 'all', label: t('All Locations'), count: locations.length + nearbyServices.length }
+                { id: 'compound', label: t('compound_facilities'), count: locations.length },
+                { id: 'services', label: t('nearby_services'), count: nearbyServices.length },
+                { id: 'all', label: t('all_locations'), count: locations.length + nearbyServices.length }
               ].map((tab) => (
                 <button
                   key={tab.id}

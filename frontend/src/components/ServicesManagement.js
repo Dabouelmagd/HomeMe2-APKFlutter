@@ -771,12 +771,14 @@ const ServicesManagement = () => {
                   </div>
                 </div>
                 
-                {/* Last Updated - Centered */}
-                <div className="flex items-center justify-center py-3 bg-gray-50 rounded-lg">
-                  <ClockIcon className="h-4 w-4 text-gray-400 ml-2" />
-                  <span className="text-sm text-gray-500">
-                    {t('last_updated')}: {new Date().toLocaleTimeString().replace(/AM/gi, 'ص').replace(/PM/gi, 'م')}
-                  </span>
+                {/* Last Updated - Perfectly Centered */}
+                <div className="text-center py-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-center">
+                    <ClockIcon className="h-4 w-4 text-gray-400 ml-2" />
+                    <span className="text-sm text-gray-500 font-medium">
+                      {t('last_updated')}: {new Date().toLocaleTimeString().replace(/AM/gi, 'ص').replace(/PM/gi, 'م')}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

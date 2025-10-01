@@ -946,6 +946,13 @@ const resources = {
       'update_service': 'تحديث الخدمة',
       'add_service': 'إضافة خدمة',
       'save_service': 'حفظ الخدمة',
+      'create_service': 'إنشاء خدمة',
+      'enter_service_name': 'أدخل اسم الخدمة',
+      'enter_description': 'أدخل الوصف',
+      'enter_phone': 'أدخل رقم الهاتف',
+      'enter_email': 'أدخل البريد الإلكتروني',
+      'phone': 'الهاتف',
+      'email': 'البريد الإلكتروني',
       
       // Categories
       'maintenance': 'الصيانة',

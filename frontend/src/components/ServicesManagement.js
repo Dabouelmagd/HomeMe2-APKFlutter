@@ -1177,7 +1177,7 @@ const ServicesManagement = () => {
                         )}
                         <div className="flex items-center text-sm text-gray-600">
                           <CheckCircleIcon className="h-4 w-4 mr-2" />
-                          {provider.total_jobs_completed} jobs completed
+                          {provider.total_jobs_completed} {t('jobs_completed')}
                         </div>
                       </div>
 

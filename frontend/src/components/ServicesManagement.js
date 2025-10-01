@@ -606,7 +606,7 @@ const ServicesManagement = () => {
                 <div className="flex items-center space-x-2">
                   <div className="h-2 w-2 bg-red-500 rounded-full"></div>
                   <span className="text-sm text-gray-600">
-                    {services.filter(s => s.availability === 'unavailable').length} Unavailable
+                    {services.filter(s => s.availability === 'unavailable').length} {t('unavailable')}
                   </span>
                 </div>
                 <div className="flex items-center space-x-2 ml-auto">

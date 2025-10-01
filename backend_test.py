@@ -1333,7 +1333,9 @@ class HomeMeFlutterTestSuite:
         
         try:
             headers = self.setup_auth_headers(self.admin_token)
-            response = self.session.get(f"{BASE_URL}/services-management/services", headers=headers)
+            # Use the correct endpoint - get compound services
+            compound_id = self.admin_user.get("compound_id") if self.admin_user else "02af53ed-d18d-46df-b73d-e101b6fa7381"
+            response = self.session.get(f"{BASE_URL}/compounds/{compound_id}/services", headers=headers)
             
             if response.status_code == 200:
                 data = response.json()

@@ -10898,8 +10898,12 @@ async def upload_company_logo(
         logging.error(f"Error uploading logo: {e}")
         raise HTTPException(status_code=500, detail="Failed to upload logo")
 
+# Import payment router
+from payments import router as payments_router
+
 # Include the API router after all endpoints are defined
 app.include_router(api_router)
+app.include_router(payments_router)
 
 @app.on_event("startup")
 async def startup_db_client():

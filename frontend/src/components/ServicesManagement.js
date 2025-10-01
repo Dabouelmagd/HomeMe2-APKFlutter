@@ -55,6 +55,31 @@ const ServicesManagement = () => {
     
     return nameMap[serviceName] ? t(nameMap[serviceName]) : serviceName;
   };
+  
+  // Function to translate service specialties/descriptions
+  const translateSpecialty = (specialty) => {
+    const specialtyMap = {
+      'Emergency plumbing, pipe repairs, water heater maintenance': 'emergency_plumbing_pipe_repairs',
+      'Electrical repairs, installations, emergency services': 'electrical_repairs_installations',
+      'Air conditioning, heating, ventilation systems': 'air_conditioning_heating',
+      'Minor repairs, installations, home improvements': 'minor_repairs_installations',
+      'Regular cleaning, deep cleaning, move-in/out cleaning': 'regular_cleaning_deep_cleaning',
+      'Deep carpet cleaning, stain removal, upholstery cleaning': 'deep_carpet_cleaning',
+      'Interior and exterior window cleaning': 'interior_exterior_window_cleaning',
+      '24/7 security, patrol services, event security': '24_7_security_patrol',
+      'Keycard systems, door locks, security cameras': 'keycard_systems_door_locks',
+      'Garden maintenance, lawn care, plant installation': 'garden_maintenance_lawn_care',
+      'Pool cleaning, chemical balancing, equipment repair': 'pool_cleaning_chemical_balancing',
+      'Dog walking, pet sitting, grooming': 'dog_walking_pet_sitting',
+      'Fitness training, wellness coaching, group classes': 'fitness_training_wellness',
+      'Local delivery, grocery delivery, courier services': 'local_delivery_grocery_delivery',
+      'Local moving, furniture moving, packing services': 'local_moving_furniture_moving',
+      'Party planning, corporate events, wedding coordination': 'party_planning_corporate_events',
+      'Event catering, meal prep, special dietary needs': 'event_catering_meal_prep'
+    };
+    
+    return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty;
+  };
   const [services, setServices] = useState([]);
   const [serviceProviders, setServiceProviders] = useState([]);
   const [bookings, setBookings] = useState([]);

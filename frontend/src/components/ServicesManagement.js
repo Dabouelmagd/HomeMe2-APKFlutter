@@ -640,41 +640,48 @@ const ServicesManagement = () => {
         </p>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="mb-6">
-        <nav className="flex space-x-8" aria-label="Tabs">
-          <button
-            onClick={() => setActiveTab('services')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'services'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            {t('services')} ({services.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('bookings')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'bookings'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            {user?.role === 'admin' ? t('all_bookings') : t('my_bookings')} ({bookings.length})
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('service-booking')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'service-booking'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            💳 {t('service_booking_payments')} ({serviceProviders.length})
-          </button>
-        </nav>
+      {/* Tab Navigation - Centered with Better Spacing */}
+      <div className="mb-8">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2">
+          <nav className="flex justify-center items-center space-x-6" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab('services')}
+              className={`py-3 px-6 rounded-md font-medium text-sm transition-all duration-200 ${
+                activeTab === 'services'
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              {t('services')} ({services.length})
+            </button>
+            
+            <div className="h-6 w-px bg-gray-200"></div>
+            
+            <button
+              onClick={() => setActiveTab('bookings')}
+              className={`py-3 px-6 rounded-md font-medium text-sm transition-all duration-200 ${
+                activeTab === 'bookings'
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              {user?.role === 'admin' ? t('all_bookings') : t('my_bookings')} ({bookings.length})
+            </button>
+            
+            <div className="h-6 w-px bg-gray-200"></div>
+            
+            <button
+              onClick={() => setActiveTab('service-booking')}
+              className={`py-3 px-6 rounded-md font-medium text-sm transition-all duration-200 ${
+                activeTab === 'service-booking'
+                  ? 'bg-blue-500 text-white shadow-sm'
+                  : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              💳 {t('service_booking_payments')} ({serviceProviders.length})
+            </button>
+          </nav>
+        </div>
       </div>
 
       {/* Services Tab */}

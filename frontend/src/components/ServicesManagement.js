@@ -354,7 +354,7 @@ const ServicesManagement = () => {
         description: 'Professional house cleaning services',
         phone: '+1-555-CLEAN-01',
         email: 'cleaning@compound-services.com',
-        working_hours: '7:00 AM - 6:00 PM',
+        working_hours: '7:00 ص - 6:00 م',
         base_price: 80.00,
         availability: 'available'
       },

@@ -193,6 +193,12 @@ const Layout = ({ children }) => {
       show: true
     },
     {
+      name: t('Mobile App'),
+      href: '/mobile-app',
+      icon: PhoneIcon,
+      show: true
+    },
+    {
       name: t('advanced_analytics'),
       href: '/analytics',
       icon: ChartBarIcon,

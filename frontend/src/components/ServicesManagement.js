@@ -528,7 +528,7 @@ const ServicesManagement = () => {
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold text-gray-900 text-center">{t('services_management')}</h3>
                   <p className="text-gray-600 mt-1">
-                    Manage and organize all compound services • {services.length} services available
+                    {t('manage_organize_compound_services')} • {services.length} {t('services_available')}
                   </p>
                 </div>
                 

@@ -30,6 +30,31 @@ const API = `${BACKEND_URL}/api`;
 const ServicesManagement = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  
+  // Function to translate service names
+  const translateServiceName = (serviceName) => {
+    const nameMap = {
+      'Plumbing Services': 'plumbing_services',
+      'Electrical Services': 'electrical_services',
+      'HVAC Services': 'hvac_services',
+      'General Handyman': 'general_handyman',
+      'House Cleaning': 'house_cleaning',
+      'Carpet Cleaning': 'carpet_cleaning',
+      'Window Cleaning': 'window_cleaning',
+      'Security Guard': 'security_guard',
+      'Access Control Setup': 'access_control_setup',
+      'Landscaping & Gardening': 'landscaping_gardening',
+      'Pool Maintenance': 'pool_maintenance',
+      'Pet Care Services': 'pet_care_services',
+      'Personal Trainer': 'personal_trainer',
+      'Package Delivery': 'package_delivery',
+      'Moving Services': 'moving_services',
+      'Event Planning': 'event_planning',
+      'Catering Services': 'catering_services'
+    };
+    
+    return nameMap[serviceName] ? t(nameMap[serviceName]) : serviceName;
+  };
   const [services, setServices] = useState([]);
   const [serviceProviders, setServiceProviders] = useState([]);
   const [bookings, setBookings] = useState([]);

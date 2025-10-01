@@ -105,6 +105,13 @@ const resources = {
       'update_service': 'Update Service',
       'add_service': 'Add Service',
       'save_service': 'Save Service',
+      'create_service': 'Create Service',
+      'enter_service_name': 'Enter service name',
+      'enter_description': 'Enter description',
+      'enter_phone': 'Enter phone number',
+      'enter_email': 'Enter email address',
+      'phone': 'Phone',
+      'email': 'Email',
       
       // Categories
       'maintenance': 'Maintenance',

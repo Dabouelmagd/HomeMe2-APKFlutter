@@ -32,7 +32,7 @@ import MobileAppPage from './pages/MobileAppPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
-// import LocationsPage from './pages/LocationsPage';
+import LocationsPage from './pages/LocationsPage';
 import { TransliterationProvider } from './components/TransliterationToggle';
 import MaintenanceSystem from './components/MaintenanceSystem';
 import EnterpriseRegistration from './components/EnterpriseRegistration';

@@ -342,7 +342,7 @@ const ServicesManagement = () => {
         description: 'Professional plumbing services including emergency repairs',
         phone: '+1-555-PLUMB-01',
         email: 'plumbing@compound-services.com',
-        working_hours: '24/7 Emergency Service',
+        working_hours: 'خدمة طوارئ 24/7',
         base_price: 75.00,
         availability: 'available'
       },

@@ -969,6 +969,8 @@ const resources = {
       'personal': 'شخصي',
       'delivery': 'التوصيل',
       'events': 'الفعاليات',
+      'medical': 'طبي',
+      'other': 'أخرى',
       
       // Service Descriptions & Specialties
       'emergency_plumbing_pipe_repairs': 'سباكة الطوارئ، إصلاح الأنابيب، صيانة سخانات المياه',

@@ -89,30 +89,77 @@ const ServicesManagement = () => {
     return translationKey ? t(translationKey) : specialty;
   };
   
-  // Function to clean descriptions from common English words
+  // Function to provide complete Arabic translations for service descriptions
   const translateDescription = (description) => {
     if (!description) return description;
     
-    let translatedDesc = description;
+    // Complete Arabic descriptions for all services
+    const fullDescriptions = {
+      'Professional plumbing services including emergency repairs, pipe installations, and water heater maintenance': 
+        'خدمات سباكة مهنية تشمل إصلاحات الطوارئ وتركيب الأنابيب وصيانة سخانات المياه',
+      'Licensed electricians for all electrical needs including installations, repairs, and emergency services':
+        'كهربائيون مرخصون لجميع الاحتياجات الكهربائية تشمل التركيبات والإصلاحات وخدمات الطوارئ',
+      'Complete HVAC services including AC repair, heating system maintenance, and air quality solutions':
+        'خدمات تكييف وتهوية شاملة تشمل إصلاح المكيفات وصيانة أنظمة التدفئة وحلول جودة الهواء',
+      'Skilled handyman for general repairs, furniture assembly, and minor home improvements':
+        'فني ماهر للإصلاحات العامة وتجميع الأثاث والتحسينات المنزلية الطفيفة',
+      'Professional house cleaning services with flexible scheduling and eco-friendly options':
+        'خدمات تنظيف منازل مهنية مع جدولة مرنة وخيارات صديقة للبيئة',
+      'Professional carpet and upholstery cleaning using advanced equipment and safe cleaning solutions':
+        'تنظيف مهني للسجاد والمفروشات باستخدام معدات متطورة ومحاليل تنظيف آمنة',
+      'Professional window cleaning for crystal clear views, interior and exterior service available':
+        'تنظيف مهني للنوافذ للحصول على رؤية واضحة جداً، متوفر للداخل والخارج',
+      'Professional security services including patrol, monitoring, and special event security':
+        'خدمات أمنية مهنية تشمل الدورية والمراقبة وأمن الفعاليات الخاصة',
+      'Installation and maintenance of access control systems, smart locks, and surveillance equipment':
+        'تركيب وصيانة أنظمة التحكم بالدخول والأقفال الذكية ومعدات المراقبة',
+      'Complete landscaping services including garden design, lawn maintenance, and seasonal plant care':
+        'خدمات تنسيق حدائق شاملة تشمل تصميم الحدائق وصيانة المروج ورعاية النباتات الموسمية',
+      'Professional pool maintenance including cleaning, chemical treatment, and equipment servicing':
+        'صيانة مسابح مهنية تشمل التنظيف والمعالجة الكيميائية وخدمة المعدات',
+      'Trusted pet care services including walking, sitting, feeding, and basic grooming':
+        'خدمات رعاية حيوانات أليفة موثوقة تشمل المشي والجلوس والإطعام والتنظيف الأساسي',
+      'Certified personal trainers for individual sessions, group fitness, and wellness programs':
+        'مدربون شخصيون معتمدون للجلسات الفردية واللياقة الجماعية وبرامج العافية',
+      'Reliable delivery services for packages, groceries, and courier needs within the compound':
+        'خدمات توصيل موثوقة للطرود والبقالة واحتياجات البريد السريع داخل المجمع',
+      'Professional moving services for relocating within or outside the compound, including packing':
+        'خدمات نقل مهنية للانتقال داخل أو خارج المجمع، تشمل التعبئة',
+      'Full-service event planning for parties, corporate events, and special occasions':
+        'تخطيط شامل للفعاليات للحفلات والفعاليات المؤسسية والمناسبات الخاصة',
+      'Professional catering for events of all sizes with customizable menus and dietary accommodations':
+        'تموين مهني للفعاليات من جميع الأحجام مع قوائم قابلة للتخصيص وتلبية الاحتياجات الغذائية'
+    };
     
-    // Replace common English words with Arabic equivalents
+    // If exact match found, return complete Arabic description
+    if (fullDescriptions[description]) {
+      return fullDescriptions[description];
+    }
+    
+    // If no exact match, try partial replacement as fallback
+    let translatedDesc = description;
     const wordReplacements = {
-      'Professional': t('professional_word'),
-      'Licensed': t('licensed_word'),
-      'Complete': t('complete_word'), 
-      'Skilled': t('skilled_word'),
-      'Trusted': t('trusted_word'),
-      'Certified': t('certified_word'),
-      'Reliable': t('reliable_word'),
-      'Emergency': t('emergency_word'),
-      'Advanced': t('advanced_word'),
-      'Flexible': t('flexible_word'),
-      'Crystal clear': t('crystal_clear'),
-      'Eco-friendly': t('eco_friendly')
+      'Professional': 'مهني',
+      'Licensed': 'مرخص',
+      'Complete': 'شامل',
+      'Skilled': 'ماهر',
+      'Trusted': 'موثوق',
+      'Certified': 'معتمد',
+      'Reliable': 'موثوق',
+      'Emergency': 'طوارئ',
+      'Advanced': 'متطور',
+      'Flexible': 'مرن',
+      'Crystal clear': 'واضح جداً',
+      'Eco-friendly': 'صديق للبيئة',
+      'services': 'خدمات',
+      'including': 'تشمل',
+      'and': 'و',
+      'for': 'لـ',
+      'with': 'مع'
     };
     
     Object.entries(wordReplacements).forEach(([english, arabic]) => {
-      translatedDesc = translatedDesc.replace(new RegExp(english, 'gi'), arabic);
+      translatedDesc = translatedDesc.replace(new RegExp(`\\b${english}\\b`, 'gi'), arabic);
     });
     
     return translatedDesc;

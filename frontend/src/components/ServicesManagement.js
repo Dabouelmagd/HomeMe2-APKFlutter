@@ -1206,7 +1206,7 @@ const ServicesManagement = () => {
 
             {/* Payment Methods Info */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">Supported Payment Methods</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4">{t('supported_payment_methods')}</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                 {paymentMethods.map((method) => (
                   <div key={method.value} className="flex flex-col items-center p-4 bg-gray-50 rounded-lg">

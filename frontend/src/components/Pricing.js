@@ -31,8 +31,8 @@ const Pricing = () => {
   const plans = [
     {
       id: 'community',
-      name: 'Community',
-      subtitle: 'Perfect for small communities',
+      name: t('community_plan'),
+      subtitle: t('perfect_small_communities'),
       price: { monthly: 0, yearly: 0 },
       originalPrice: null,
       icon: UserGroupIcon,

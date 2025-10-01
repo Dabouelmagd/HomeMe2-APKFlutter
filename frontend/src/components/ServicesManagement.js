@@ -234,10 +234,10 @@ const ServicesManagement = () => {
   });
 
   const priorityOptions = [
-    { value: 'emergency', label: t('emergency_word'), color: 'bg-red-100 text-red-800', description: 'Immediate response within 1 hour' },
-    { value: 'urgent', label: 'Urgent', color: 'bg-orange-100 text-orange-800', description: 'Same day service' },
-    { value: 'standard', label: 'Standard', color: 'bg-blue-100 text-blue-800', description: 'Next scheduled slot' },
-    { value: 'scheduled', label: 'Scheduled', color: 'bg-green-100 text-green-800', description: 'Future date/time' }
+    { value: 'emergency', label: t('emergency'), color: 'bg-red-100 text-red-800', description: t('immediate_response_1_hour') },
+    { value: 'urgent', label: t('urgent'), color: 'bg-orange-100 text-orange-800', description: t('same_day_service') },
+    { value: 'standard', label: t('standard'), color: 'bg-blue-100 text-blue-800', description: t('next_scheduled_slot') },
+    { value: 'scheduled', label: t('scheduled'), color: 'bg-green-100 text-green-800', description: t('future_date_time') }
   ];
 
   const paymentMethods = [

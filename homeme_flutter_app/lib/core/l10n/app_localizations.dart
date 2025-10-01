@@ -428,6 +428,9 @@ class AppLocalizations {
       'collection_rate': 'معدل التحصيل',
       'monthly_revenue': 'الإيرادات الشهرية',
       'expense_breakdown': 'تفصيل المصروفات',
+      'add_family_member': 'إضافة فرد من العائلة',
+      'test_admin': 'مسؤول الاختبار',
+      'stay_updated_community': 'ابق محدثاً بأخبار وإعلانات المجتمع',
     },
     'fr': {
       'welcome_back': 'Bon retour',

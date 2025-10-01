@@ -460,7 +460,7 @@ const ServicesManagement = () => {
       description: '',
       phone: '',
       email: '',
-      working_hours: '9:00 AM - 6:00 PM'
+      working_hours: '9:00 ص - 6:00 م'
     });
     setEditingService(null);
   };

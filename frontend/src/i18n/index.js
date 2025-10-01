@@ -1598,6 +1598,7 @@ const resources = {
       'available_service_providers': 'Prestataires de Services Disponibles',
       'no_service_providers_available': 'Aucun prestataire de services disponible',
       'service_providers_appear': 'Les prestataires de services apparaîtront ici une fois ajoutés',
+      'book_services_multiple_payment': 'Réservez des services avec plusieurs options de paiement et niveaux de priorité',
       'maintenance_system': 'Système de maintenance',
       'guest_management': 'Gestion des invités',
       'events_announcements': 'Événements et annonces',

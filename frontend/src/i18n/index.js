@@ -908,6 +908,30 @@ const resources = {
       'event_planning': 'تخطيط الفعاليات',
       'catering_services': 'خدمات التموين',
       
+      // Edit Service Dialog
+      'edit_service': 'تحرير الخدمة',
+      'service_name': 'اسم الخدمة',
+      'category': 'الفئة',
+      'specialty': 'التخصص',
+      'select_specialty': 'اختر التخصص',
+      'description': 'الوصف',
+      'phone_number': 'رقم الهاتف',
+      'email_address': 'البريد الإلكتروني',
+      'working_hours': 'ساعات العمل',
+      'cancel': 'إلغاء',
+      'update_service': 'تحديث الخدمة',
+      'add_service': 'إضافة خدمة',
+      'save_service': 'حفظ الخدمة',
+      
+      // Categories
+      'maintenance': 'الصيانة',
+      'cleaning': 'التنظيف',
+      'security': 'الأمن',
+      'landscaping': 'تنسيق الحدائق',
+      'personal': 'شخصي',
+      'delivery': 'التوصيل',
+      'events': 'الفعاليات',
+      
       // Service Descriptions & Specialties
       'emergency_plumbing_pipe_repairs': 'سباكة الطوارئ، إصلاح الأنابيب، صيانة سخانات المياه',
       'electrical_repairs_installations': 'الإصلاحات الكهربائية، التركيبات، خدمات الطوارئ',

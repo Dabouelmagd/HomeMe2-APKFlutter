@@ -1190,7 +1190,7 @@ const ServicesManagement = () => {
                         className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
                       >
                         <CreditCardIcon className="h-4 w-4" />
-                        <span>Book Service</span>
+                        <span>{t('book_service')}</span>
                       </button>
                     </div>
                   ))}

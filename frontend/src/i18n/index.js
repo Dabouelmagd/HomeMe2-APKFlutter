@@ -1294,9 +1294,7 @@ const resources = {
         'repeats': 'يتكرر'
       },
       'notifications': 'الإشعارات',
-      'settings': {
-        'settings': 'الإعدادات'
-      },
+      'settings_nav': 'الإعدادات',
       'payment_center': 'مركز المدفوعات',
       'mobile_app': 'التطبيق الجوال',
       'pricing_plans': '💎 خطط الأسعار',

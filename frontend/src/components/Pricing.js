@@ -244,7 +244,7 @@ const Pricing = () => {
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Monthly
+                {t('monthly')}
               </button>
               <button
                 onClick={() => setBillingPeriod('yearly')}
@@ -254,9 +254,9 @@ const Pricing = () => {
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                Yearly
+                {t('yearly')}
                 <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                  Save 17%
+                  {t('save_17_percent')}
                 </span>
               </button>
             </div>

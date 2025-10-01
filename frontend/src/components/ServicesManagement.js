@@ -785,23 +785,25 @@ const ServicesManagement = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('bookings')}</h3>
                 </div>
                 
-                {/* Service Status Stats - Centered */}
-                <div className="flex items-center justify-center space-x-8 mb-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">
+                {/* Service Status Stats - Centered with Better Spacing */}
+                <div className="flex items-center justify-center gap-12 mb-4">
+                  <div className="flex items-center gap-3 px-4 py-2 bg-green-50 rounded-lg border border-green-200">
+                    <div className="h-3 w-3 bg-green-500 rounded-full shadow-sm"></div>
+                    <span className="text-sm font-medium text-green-700">
                       {services.filter(s => s.availability === 'available').length} {t('available')}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">
+                  
+                  <div className="flex items-center gap-3 px-4 py-2 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <div className="h-3 w-3 bg-yellow-500 rounded-full shadow-sm"></div>
+                    <span className="text-sm font-medium text-yellow-700">
                       {services.filter(s => s.availability === 'busy').length} {t('busy')}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="h-2 w-2 bg-red-500 rounded-full"></div>
-                    <span className="text-sm text-gray-600">
+                  
+                  <div className="flex items-center gap-3 px-4 py-2 bg-red-50 rounded-lg border border-red-200">
+                    <div className="h-3 w-3 bg-red-500 rounded-full shadow-sm"></div>
+                    <span className="text-sm font-medium text-red-700">
                       {services.filter(s => s.availability === 'unavailable').length} {t('unavailable')}
                     </span>
                   </div>

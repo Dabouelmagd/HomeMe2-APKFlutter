@@ -1749,6 +1749,30 @@ const resources = {
       'event_planning': 'Planification d\'Événements',
       'catering_services': 'Services de Restauration',
       
+      // Edit Service Dialog
+      'edit_service': 'Modifier le Service',
+      'service_name': 'Nom du Service',
+      'category': 'Catégorie',
+      'specialty': 'Spécialité',
+      'select_specialty': 'Sélectionner la Spécialité',
+      'description': 'Description',
+      'phone_number': 'Numéro de Téléphone',
+      'email_address': 'Adresse E-mail',
+      'working_hours': 'Heures de Travail',
+      'cancel': 'Annuler',
+      'update_service': 'Mettre à jour le Service',
+      'add_service': 'Ajouter un Service',
+      'save_service': 'Enregistrer le Service',
+      
+      // Categories
+      'maintenance': 'Maintenance',
+      'cleaning': 'Nettoyage',
+      'security': 'Sécurité',
+      'landscaping': 'Aménagement Paysager',
+      'personal': 'Personnel',
+      'delivery': 'Livraison',
+      'events': 'Événements',
+      
       'maintenance_system': 'Système de maintenance',
       'guest_management': 'Gestion des invités',
       'events_announcements': 'Événements et annonces',

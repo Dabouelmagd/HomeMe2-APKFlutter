@@ -10901,11 +10901,13 @@ async def upload_company_logo(
 # Import payment router
 from payments import router as payments_router
 from notifications_push import router as push_notifications_router
+from ratings_reviews import router as ratings_router
 
 # Include the API router after all endpoints are defined
 app.include_router(api_router)
 app.include_router(payments_router)
 app.include_router(push_notifications_router)
+app.include_router(ratings_router)
 
 @app.on_event("startup")
 async def startup_db_client():

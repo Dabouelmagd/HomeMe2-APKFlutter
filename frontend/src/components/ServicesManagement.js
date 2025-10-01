@@ -584,7 +584,7 @@ const ServicesManagement = () => {
                     title="Switch view"
                   >
                     {activeTab === 'services' ? <UserIcon className="h-5 w-5" /> : <WrenchScrewdriverIcon className="h-5 w-5" />}
-                    <span>{activeTab === 'services' ? 'Bookings' : 'Services'}</span>
+                    <span>{activeTab === 'services' ? t('bookings') : t('services')}</span>
                   </button>
                 </div>
               </div>

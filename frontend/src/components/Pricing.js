@@ -472,18 +472,18 @@ const Pricing = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
               <div className="bg-white/10 rounded-lg p-4">
                 <GiftIcon className="h-8 w-8 mx-auto mb-2 text-blue-200" />
-                <h3 className="font-semibold text-center mb-2">Free Invitations</h3>
-                <p className="text-sm text-blue-100">Invite up to 20 residents for free</p>
+                <h3 className="font-semibold text-center mb-2">{t('free_invitations')}</h3>
+                <p className="text-sm text-blue-100">{t('invite_up_to_20_residents')}</p>
               </div>
               <div className="bg-white/10 rounded-lg p-4">
                 <CheckIcon className="h-8 w-8 mx-auto mb-2 text-blue-200" />
-                <h3 className="font-semibold text-center mb-2">Full Access</h3>
-                <p className="text-sm text-blue-100">Free users get all features of your plan</p>
+                <h3 className="font-semibold text-center mb-2">{t('full_access')}</h3>
+                <p className="text-sm text-blue-100">{t('free_users_get_all_features')}</p>
               </div>
               <div className="bg-white/10 rounded-lg p-4">
                 <UserGroupIcon className="h-8 w-8 mx-auto mb-2 text-blue-200" />
-                <h3 className="font-semibold text-center mb-2">No Limits</h3>
-                <p className="text-sm text-blue-100">Build your community without barriers</p>
+                <h3 className="font-semibold text-center mb-2">{t('no_limits')}</h3>
+                <p className="text-sm text-blue-100">{t('build_community_no_barriers')}</p>
               </div>
             </div>
           </div>

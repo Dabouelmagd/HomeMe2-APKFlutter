@@ -269,7 +269,7 @@ const ServicesManagement = () => {
         description: 'Professional security services',
         phone: '+1-555-SECURE-01',
         email: 'security@compound-services.com',
-        working_hours: '24/7 Service Available',
+        working_hours: '24/7 Service',
         base_price: 25.00,
         availability: 'available'
       }

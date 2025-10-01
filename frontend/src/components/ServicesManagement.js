@@ -1158,7 +1158,7 @@ const ServicesManagement = () => {
                               ))}
                             </div>
                             <span className="text-sm text-gray-500">
-                              ({provider.total_reviews} reviews)
+                              ({provider.total_reviews} {t('reviews')})
                             </span>
                           </div>
                         </div>

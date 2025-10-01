@@ -80,6 +80,35 @@ const ServicesManagement = () => {
     
     return specialtyMap[specialty] ? t(specialtyMap[specialty]) : specialty;
   };
+  
+  // Function to clean descriptions from common English words
+  const translateDescription = (description) => {
+    if (!description) return description;
+    
+    let translatedDesc = description;
+    
+    // Replace common English words with Arabic equivalents
+    const wordReplacements = {
+      'Professional': t('professional_word'),
+      'Licensed': t('licensed_word'),
+      'Complete': t('complete_word'), 
+      'Skilled': t('skilled_word'),
+      'Trusted': t('trusted_word'),
+      'Certified': t('certified_word'),
+      'Reliable': t('reliable_word'),
+      'Emergency': t('emergency_word'),
+      'Advanced': t('advanced_word'),
+      'Flexible': t('flexible_word'),
+      'Crystal clear': t('crystal_clear'),
+      'Eco-friendly': t('eco_friendly')
+    };
+    
+    Object.entries(wordReplacements).forEach(([english, arabic]) => {
+      translatedDesc = translatedDesc.replace(new RegExp(english, 'gi'), arabic);
+    });
+    
+    return translatedDesc;
+  };
   const [services, setServices] = useState([]);
   const [serviceProviders, setServiceProviders] = useState([]);
   const [bookings, setBookings] = useState([]);

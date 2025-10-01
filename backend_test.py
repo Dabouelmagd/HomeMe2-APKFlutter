@@ -1423,8 +1423,9 @@ class HomeMeFlutterTestSuite:
             headers = self.setup_auth_headers(self.admin_token)
             
             # Check various endpoints for English sample data
+            compound_id = self.admin_user.get("compound_id") if self.admin_user else "02af53ed-d18d-46df-b73d-e101b6fa7381"
             endpoints_to_check = [
-                ("/services-management/services", "services"),
+                (f"/compounds/{compound_id}/services", "services"),
                 ("/maintenance/requests", "requests"),
                 ("/notifications", "notifications"),
                 ("/polls", "polls")

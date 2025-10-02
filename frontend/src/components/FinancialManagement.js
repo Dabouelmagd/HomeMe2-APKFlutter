@@ -394,7 +394,7 @@ const FinancialManagement = () => {
                     </p>
                     <div className="mt-4 flex items-center space-x-2 rtl:space-x-reverse">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm text-blue-700 font-medium">للاختبار والتطوير</span>
+                      <span className="text-sm text-blue-700 font-medium">{t('testing_development')}</span>
                     </div>
                   </div>
                 </div>

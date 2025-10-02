@@ -207,25 +207,57 @@ const TermsPrivacy = () => {
         </div>
 
         {/* Content */}
-        <div className="space-y-6">
-          {/* Introduction Card */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-100">
-            <div className="flex items-start space-x-3">
-              {activeTab === 'terms' ? (
-                <DocumentTextIcon className="w-6 h-6 text-blue-600 mt-1" />
-              ) : (
-                <ShieldCheckIcon className="w-6 h-6 text-blue-600 mt-1" />
-              )}
-              <div>
-                <h2 className="text-xl font-semibold text-center text-gray-900 mb-2">
-                  {activeTab === 'terms' ? t('legal_terms_title') : 'Privacy Policy'}
-                </h2>
-                <p className="text-gray-700 text-center">
-                  {activeTab === 'terms' ? t('legal_terms_description') : 'Learn how we collect, use, and protect your personal information.'}
+        <div className="space-y-8">
+          {/* Enhanced Introduction Card */}
+          <div className={`relative overflow-hidden rounded-2xl p-8 border shadow-xl ${
+            activeTab === 'terms' 
+              ? 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-blue-200' 
+              : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 border-emerald-200'
+          }`}>
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-5">
+              <div className="absolute inset-0 bg-gradient-to-r from-current to-transparent"></div>
+            </div>
+            
+            <div className="relative flex items-start space-x-6">
+              <div className={`p-4 rounded-2xl ${
+                activeTab === 'terms' 
+                  ? 'bg-gradient-to-br from-blue-500 to-indigo-600' 
+                  : 'bg-gradient-to-br from-emerald-500 to-teal-600'
+              } shadow-lg`}>
+                {activeTab === 'terms' ? (
+                  <ClipboardDocumentCheckIcon className="w-8 h-8 text-white" />
+                ) : (
+                  <UserShieldIcon className="w-8 h-8 text-white" />
+                )}
+              </div>
+              
+              <div className="flex-1">
+                <div className="flex items-center space-x-3 mb-3">
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {activeTab === 'terms' ? t('legal_terms_title') : t('legal_privacy_title') || 'Privacy Policy'}
+                  </h2>
+                  <CheckCircleIcon className={`w-6 h-6 ${
+                    activeTab === 'terms' ? 'text-blue-600' : 'text-emerald-600'
+                  }`} />
+                </div>
+                
+                <p className="text-gray-700 text-lg leading-relaxed mb-4">
+                  {activeTab === 'terms' 
+                    ? t('legal_terms_description') 
+                    : t('legal_privacy_description') || 'Learn how we collect, use, and protect your personal information.'
+                  }
                 </p>
-                <div className="mt-3 text-sm text-gray-600 text-center">
-                  <span className="font-medium">{t('legal_lastUpdated')}: </span>
-                  <span>30/9/2025</span>
+                
+                <div className="flex items-center space-x-4">
+                  <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${
+                    activeTab === 'terms' 
+                      ? 'bg-blue-100 text-blue-700' 
+                      : 'bg-emerald-100 text-emerald-700'
+                  }`}>
+                    <ClockIcon className="w-4 h-4" />
+                    <span className="text-sm font-medium">{t('legal_lastUpdated')}: 30/9/2025</span>
+                  </div>
                 </div>
               </div>
             </div>

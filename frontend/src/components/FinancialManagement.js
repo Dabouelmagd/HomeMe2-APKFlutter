@@ -371,7 +371,7 @@ const FinancialManagement = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">{t('payment_information')}</h3>
-                <p className="text-sm text-gray-600">معلومات النظام والخدمات المتاحة</p>
+                <p className="text-sm text-gray-600">{t('payment_info_subtitle')}</p>
               </div>
             </div>
           </div>

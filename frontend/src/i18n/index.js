@@ -3040,7 +3040,21 @@ const resources = {
       'notificationCenter': {
         'pushNotifications': 'Notifications Push',
         'notSubscribed': 'Non Abonné',
-        'enable': 'Activer'
+        'subscribed': 'Abonné',
+        'enable': 'Activer',
+        'disable': 'Désactiver',
+        'testNotification': 'Tester la Notification',
+        'preferences': 'Préférences de Notification',
+        'messageNotifications': 'Notifications de Messages',
+        'messageNotificationsDesc': 'Recevoir des notifications pour les nouveaux messages et conversations',
+        'directChats': 'Messages de Chat Direct',
+        'directChatsDesc': 'Être notifié quand quelqu\'un vous envoie un message direct',
+        'groupChats': 'Messages de Chat de Groupe',
+        'groupChatsDesc': 'Recevoir des notifications pour les messages dans les conversations de groupe',
+        'compoundAnnouncements': 'Annonces du Complexe',
+        'compoundAnnouncementsDesc': 'Restez informé des nouvelles et mises à jour importantes du complexe',
+        'quietHours': 'Heures Silencieuses',
+        'quietHoursDesc': 'Définir des périodes où vous ne voulez pas recevoir de notifications'
       },
       'community_newsletter': 'Bulletin communautaire',
       

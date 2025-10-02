@@ -479,7 +479,7 @@ const AddFamilyMemberToUnit = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Emergency Contact Phone
+                          {t('emergency_contact_phone')}
                         </label>
                         <input
                           type="tel"

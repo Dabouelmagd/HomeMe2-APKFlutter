@@ -1536,9 +1536,25 @@ const resources = {
       
       // Notifications
       'manage_your_notifications': 'إدارة إشعاراتك',
+      'notification_filters': 'مرشحات الإشعارات',
+      'search_notifications': 'البحث في الإشعارات...',
+      'loading_notifications': 'جاري تحميل الإشعارات...',
+      'no_notifications_yet': 'لا توجد إشعارات بعد',
+      'no_matching_notifications': 'لا توجد إشعارات مطابقة',
+      'try_adjusting_filters': 'جرب تعديل المرشحات',
+      'notifications_will_appear_here': 'ستظهر الإشعارات هنا عند وصولها',
+      'notification_types_include': 'تشمل أنواع الإشعارات:',
+      'notifications_found': 'إشعار موجود',
+      'priority_high': 'أولوية عالية',
+      'priority_medium': 'أولوية متوسطة',
+      'priority_low': 'أولوية منخفضة',
+      'filter_all': 'الكل',
+      'filter_unread': 'غير مقروء',
+      'filter_read': 'مقروء',
+      'mark_read': 'تحديد كمقروء',
+      'delete_notification': 'حذف الإشعار',
       'filters': 'المرشحات',
       'no_notifications': 'لا توجد إشعارات',
-      'notifications_will_appear_here': 'ستظهر الإشعارات هنا',
       
       // Settings
       'settings_title': 'الإعدادات',

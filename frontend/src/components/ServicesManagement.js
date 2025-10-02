@@ -973,7 +973,7 @@ const ServicesManagement = () => {
                         <div className="flex items-center text-sm text-gray-500 space-x-4">
                           <div className="flex items-center">
                             <CalendarIcon className="h-4 w-4 mr-1" />
-                            {new Date(booking.preferred_date).toLocaleDateString()}
+                            {formatDate(booking.preferred_date)}
                           </div>
                           <div className="flex items-center">
                             <ClockIcon className="h-4 w-4 mr-1" />

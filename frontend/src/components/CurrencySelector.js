@@ -32,7 +32,7 @@ const CurrencySelector = ({ selectedCurrency, onCurrencyChange }) => {
           />
           
           {/* Dropdown */}
-          <div className="absolute top-full mt-2 left-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-[250px]">
+          <div className="absolute top-full mt-2 left-0 rtl:left-auto rtl:right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-[250px]">
             <div className="p-2 border-b border-gray-100">
               <h3 className="text-sm font-medium text-gray-700">{t('select_currency')}</h3>
             </div>
@@ -42,12 +42,12 @@ const CurrencySelector = ({ selectedCurrency, onCurrencyChange }) => {
                 <button
                   key={code}
                   onClick={() => handleCurrencySelect(code)}
-                  className={`w-full text-left px-4 py-3 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none transition-colors ${
+                  className={`w-full text-left rtl:text-right px-4 py-3 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none transition-colors ${
                     selectedCurrency === code ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center space-x-3 rtl:space-x-reverse">
                       <span className="font-medium text-lg">{currency.symbol}</span>
                       <div>
                         <div className="font-medium">{getCurrencyName(code)}</div>

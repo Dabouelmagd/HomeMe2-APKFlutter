@@ -230,12 +230,34 @@ const FinancialManagement = () => {
         </div>
       )}
 
-      {/* Invoices Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
+      {/* Enhanced Invoices Table */}
+      <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+        <div className="px-8 py-6 bg-gradient-to-r from-gray-50 to-blue-50 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('all_invoices')}</h3>
-            <DocumentTextIcon className="h-5 w-5 text-gray-400" />
+            <div className="flex items-center space-x-3">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <DocumentTextIcon className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{t('all_invoices')}</h2>
+                <p className="text-sm text-gray-600">{invoices.length} {t('total_invoices')}</p>
+              </div>
+            </div>
+            
+            {/* Filter Buttons */}
+            <div className="flex space-x-2">
+              <button className="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg text-sm font-medium hover:bg-yellow-200 transition-colors">
+                {t('pending')} ({pendingInvoices.length})
+              </button>
+              <button className="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm font-medium hover:bg-green-200 transition-colors">
+                {t('paid')} ({paidInvoices.length})
+              </button>
+              {overdueInvoices.length > 0 && (
+                <button className="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200 transition-colors">
+                  {t('overdue')} ({overdueInvoices.length})
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

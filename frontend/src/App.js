@@ -311,6 +311,7 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <TransliterationProvider>
+              <LanguageInitializer />
               <PageTitleUpdater />
               <Routes>
               <Route path="/login" element={<Login />} />

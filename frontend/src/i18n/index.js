@@ -2988,6 +2988,24 @@ const resources = {
       
       // Push Notifications
       'push_notifications_not_supported': 'Les notifications push ne sont pas supportées dans ce navigateur.',
+      
+      // System and PWA
+      'privacy_level_high': 'Élevé',
+      'install_homeme_app': 'Installer HomeMe',
+      'install_app_benefits_description': 'Obtenez l\'expérience complète de l\'application avec le support hors ligne et les notifications push.',
+      'works_offline': 'Fonctionne hors ligne',
+      'instant_notifications': 'Notifications instantanées',
+      'faster_loading': 'Chargement plus rapide',
+      'native_app_experience': 'Expérience d\'application native',
+      'install_now': 'Installer',
+      'later': 'Plus tard',
+      'app_installed_successfully': 'Application installée avec succès!',
+      'installing_app': 'Installation de l\'application...',
+      'installation_cancelled': 'Installation annulée',
+      'installation_failed': 'Échec de l\'installation',
+      'ios_install_instructions': 'Pour les utilisateurs iOS',
+      'tap_share_button': 'Appuyez sur le bouton de partage',
+      'add_to_home_screen': 'Ajouter à l\'écran d\'accueil',
       'notificationCenter': {
         'pushNotifications': 'Notifications Push',
         'notSubscribed': 'Non Abonné',

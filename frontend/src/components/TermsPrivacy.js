@@ -246,7 +246,7 @@ const TermsPrivacy = () => {
             </div>
             
             {/* Decorative Elements */}
-            <div className="hidden lg:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center space-x-6">
               <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
                 <ShieldCheckIcon className="w-8 h-8 text-white" />
               </div>

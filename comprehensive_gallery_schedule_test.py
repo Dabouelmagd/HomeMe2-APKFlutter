@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://homeme-arabic-ui.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-i18n-1.preview.emergentagent.com/api"
 
 class ComprehensiveTestSuite:
     def __init__(self):

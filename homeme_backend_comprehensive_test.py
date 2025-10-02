@@ -4,7 +4,7 @@ HomeMe Backend Comprehensive API Testing Suite
 اختبار شامل للباك-إند الخاص بتطبيق HomeMe
 
 This test suite covers all the requirements mentioned in the Arabic review request:
-1. Basic connectivity test to https://homeme-arabic-ui.preview.emergentagent.com/api/
+1. Basic connectivity test to https://homeme-i18n-1.preview.emergentagent.com/api/
 2. Authentication endpoints testing (POST /api/auth/login with admin/admin123)
 3. JWT token validation and expiry testing
 4. Data endpoints testing (admin dashboard, resident dashboard, notifications, guests, maintenance, events)
@@ -21,7 +21,7 @@ from typing import Dict, List, Optional
 from PIL import Image
 
 # Configuration - Using the production URL as specified in the Arabic review request
-BASE_URL = "https://homeme-arabic-ui.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-i18n-1.preview.emergentagent.com/api"
 
 class HomeMeBackendTestSuite:
     def __init__(self):

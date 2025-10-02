@@ -2280,6 +2280,7 @@ const resources = {
       'completed_payments': 'Paiements terminés',
       'past_due_date': 'Date d\'échéance dépassée',
       'outstanding_amount': 'Montant en souffrance',
+      'total_invoices': 'factures au total',
       'update_service': 'Mettre à jour le Service',
       'add_service': 'Ajouter un Service',
       'save_service': 'Enregistrer le Service',

@@ -445,6 +445,24 @@ const resources = {
       
       // Push Notifications
       'push_notifications_not_supported': 'Push notifications are not supported in this browser.',
+      
+      // System and PWA
+      'privacy_level_high': 'High',
+      'install_homeme_app': 'Install HomeMe',
+      'install_app_benefits_description': 'Get the full app experience with offline support and push notifications.',
+      'works_offline': 'Works offline',
+      'instant_notifications': 'Instant notifications',
+      'faster_loading': 'Faster loading',
+      'native_app_experience': 'Native app experience',
+      'install_now': 'Install',
+      'later': 'Later',
+      'app_installed_successfully': 'App installed successfully!',
+      'installing_app': 'Installing app...',
+      'installation_cancelled': 'Installation cancelled',
+      'installation_failed': 'Installation failed',
+      'ios_install_instructions': 'For iOS users',
+      'tap_share_button': 'Tap the share button',
+      'add_to_home_screen': 'Add to Home Screen',
       'notificationCenter': {
         'pushNotifications': 'Push Notifications',
         'notSubscribed': 'Not Subscribed',

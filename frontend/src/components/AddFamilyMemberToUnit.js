@@ -373,6 +373,7 @@ const AddFamilyMemberToUnit = () => {
                           onChange={(e) => setMemberForm(prev => ({ ...prev, relationship: e.target.value }))}
                           className="form-input w-full"
                         >
+                          <option value="">{t('select_relationship')}</option>
                           {relationshipOptions.map(option => (
                             <option key={option.value} value={option.value}>
                               {option.label}

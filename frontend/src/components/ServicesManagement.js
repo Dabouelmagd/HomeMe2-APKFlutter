@@ -246,12 +246,20 @@ const ServicesManagement = () => {
     };
     
     if (currentLang === 'en') {
-      return {
+      const result = {
         name: service.name_en || englishFallbacks[service.name] || service.name,
         description: service.description_en || `Professional ${englishFallbacks[service.name] || service.name} services`,
         specialty: service.specialty_en || service.specialty,
         working_hours: service.working_hours_en || service.working_hours?.replace('ص', 'AM').replace('م', 'PM') || service.working_hours
       };
+      
+      console.log('English translation result:', {
+        original: service.name,
+        translated: result.name,
+        fallback: englishFallbacks[service.name]
+      });
+      
+      return result;
     } else if (currentLang === 'ar') {
       return {
         name: service.name_ar || service.name,

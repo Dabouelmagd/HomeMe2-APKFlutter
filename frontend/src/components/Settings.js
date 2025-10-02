@@ -165,7 +165,7 @@ const ProfileSettings = () => {
           </div>
 
           <div className="flex justify-end">
-            <button type="submit" className="btn btn-primary">Save Changes</button>
+            <button type="submit" className="btn btn-primary">{t('save_changes')}</button>
           </div>
         </form>
       </div>

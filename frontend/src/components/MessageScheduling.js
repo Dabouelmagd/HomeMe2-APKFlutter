@@ -456,18 +456,30 @@ const MessageScheduling = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 text-center py-16">
-            <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-              <ClockIcon className="h-12 w-12 text-gray-400" />
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden max-w-2xl mx-auto">
+            {/* Empty State Header */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-8 text-center">
+              <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                <ClockIcon className="h-12 w-12 text-green-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('schedule.noScheduledMessages')}</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                {t('schedule.scheduleFirstMessage')}
+              </p>
             </div>
-            <h3 className="text-2xl font-bold text-gray-700 mb-4">{t('schedule.noScheduledMessages')}</h3>
-            <p className="text-gray-500 text-lg mb-8 max-w-md mx-auto">{t('schedule.scheduleFirstMessage')}</p>
-            <button
-              onClick={() => setShowCreateForm(true)}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-            >
-              {t('schedule.scheduleMessage')}
-            </button>
+            
+            {/* Empty State Action */}
+            <div className="p-8 text-center">
+              <button
+                onClick={() => setShowCreateForm(true)}
+                className="group bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-3 rtl:space-x-reverse mx-auto"
+              >
+                <div className="bg-white/20 p-2 rounded-xl group-hover:bg-white/30 transition-colors">
+                  <PlusIcon className="h-5 w-5" />
+                </div>
+                <span>{t('schedule.scheduleFirstMessage')}</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

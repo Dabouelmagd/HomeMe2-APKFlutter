@@ -33,7 +33,8 @@ const ServicesManagement = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   
-  // Language state management handled above
+  // Track current language for re-rendering - defined early for translateServiceData
+  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
   
   // Function to translate service names
   const translateServiceName = (serviceName) => {

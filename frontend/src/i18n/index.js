@@ -1893,6 +1893,20 @@ const resources = {
       'what_payment_methods_accept': 'ما طرق الدفع التي تقبلونها؟',
       'payment_methods_answer': 'نحن نقبل جميع بطاقات الائتمان الرئيسية، PayPal، والتحويلات البنكية.',
       
+      // Add Family Member Page
+      'add_family_member_to_unit': 'إضافة فرد عائلة للوحدة',
+      'add_family_members_any_unit': 'أضف أفراد العائلة لأي وحدة في المجمع بسهولة',
+      'search_name_unit_email': 'البحث بالاسم أو رقم الوحدة أو الإيميل...',
+      'available_residents': 'السكان المتاحين',
+      'select_unit_add_member': 'اختر وحدة لإضافة فرد عائلة جديد',
+      'no_matching_residents': 'لم يتم العثور على سكان مطابقين',
+      'no_residents_registered': 'لم يتم العثور على سكان',
+      'try_adjusting_search': 'جرب تعديل مصطلح البحث للعثور على السكان',
+      'no_residents_yet': 'لا يوجد سكان مسجلون في المجمع بعد',
+      'add_member': 'إضافة عضو',
+      'add_family_member': 'إضافة فرد عائلة',
+      'adding_to_unit': 'إضافة للوحدة',
+      
       // Locations & Map
       'locations_map': 'المواقع والخريطة',
       'explore_compound_facilities': 'استكشف مرافق المجمع والخدمات القريبة',

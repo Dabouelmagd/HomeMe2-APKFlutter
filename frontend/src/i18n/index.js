@@ -1109,6 +1109,7 @@ const resources = {
       'email_address': 'البريد الإلكتروني',
       'working_hours': 'ساعات العمل',
       'cancel': 'إلغاء',
+      'click_to_upload_image': 'اضغط لرفع صورة',
       'update_service': 'تحديث الخدمة',
       'add_service': 'إضافة خدمة',
       'save_service': 'حفظ الخدمة',

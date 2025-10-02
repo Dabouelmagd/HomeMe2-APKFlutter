@@ -53,9 +53,39 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 ##
+user_problem_statement: "Test the improved service translation system to verify all translation issues are resolved: PRIORITY 1 - COMPREHENSIVE TRANSLATION VERIFICATION: Navigate to Services Management page (/services) after admin login, verify in English interface that service names are in English (Plumbing Services, Electrical Services, etc.), specialties are in English (NOT Arabic), descriptions are proper English, working hours are properly converted. PRIORITY 2 - SPECIFIC TRANSLATION FIXES: Check for specific fixes like 'سباكة الطوارئ، إصلاح الأنابيب' should become 'Emergency plumbing, pipe repairs', 'الإصلاحات الكهربائية، التركيبات' should become 'Electrical repairs, installations', 'خدPMة طوارئ 24/7' should become '24/7 emergency service', '8:00 AM - 6:00 PM، طوارئ 24/7' should become '8:00 AM - 6:00 PM, 24/7 emergencies'. PRIORITY 3 - DESCRIPTION QUALITY: Verify descriptions are meaningful, not repetitive. PRIORITY 4 - WORKING HOURS CONVERSION: Verify Arabic to English time conversion (ص → AM correctly, م → PM correctly, no mixed language like 'خدPMة', proper English phrases for emergency services)."
+
+frontend:
+  - task: "Service Translation System Testing"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/components/ServicesManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "❌ CRITICAL SERVICE TRANSLATION FAILURE IDENTIFIED - Services displaying Arabic content in English interface. API testing revealed services stored in Arabic format: 'خدمات السباكة' (should be 'Plumbing Services'), 'سباكة الطوارئ، إصلاح الأنابيب، صيانة سخانات المياه' (should be 'Emergency plumbing, pipe repairs, water heater maintenance'), 'خدمة طوارئ 24/7' (should be '24/7 emergency service'). The translateServiceData function in ServicesManagement.js exists with comprehensive English translations but is not being applied correctly. Root cause: Translation system not converting Arabic service data to English when interface language is English. All 4 priority requirements FAILED: ❌ Service names showing Arabic instead of English, ❌ Specialties showing Arabic instead of English, ❌ Working hours showing Arabic format instead of English AM/PM, ❌ Mixed language issues present. URGENT FIX NEEDED: translateServiceData function needs debugging to ensure proper English translations are applied when currentLang is 'en'."
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.1"
+  test_sequence: 1
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Service Translation System Testing"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
 agent_communication:
      - agent: "main"
        message: "🚧 COMPREHENSIVE PRICING PAGE TRANSLATION IN PROGRESS: Successfully added 50+ new translation keys to /app/frontend/src/i18n/index.js for full pricing page localization across English, Arabic, and French. Updated Pricing.js component to use translation functions for all hardcoded strings including: plan names (Community→community_plan, Essential→essential_plan), billing toggles (Monthly→monthly, Yearly→yearly), plan features (residents, services, storage options), FAQ section, and community section. All major pricing elements now fully translatable with proper RTL support for Arabic. Next: Need to verify dashboard statistics translation keys and fix any remaining no_bookings display issue."
+     - agent: "testing"
+       message: "❌ CRITICAL SERVICE TRANSLATION SYSTEM FAILURE IDENTIFIED - COMPREHENSIVE TESTING COMPLETED! DETAILED FINDINGS: ✅ BACKEND API VERIFICATION: Successfully tested GET /api/compounds/{compound_id}/services endpoint with admin authentication, API returning 17 services with proper response structure, backend service working correctly. ❌ CRITICAL TRANSLATION ISSUES DISCOVERED: Services displaying Arabic content in English interface - API returned: 'خدمات السباكة' (should be 'Plumbing Services'), 'الخدمات الكهربائية' (should be 'Electrical Services'), 'سباكة الطوارئ، إصلاح الأنابيب، صيانة سخانات المياه' (should be 'Emergency plumbing, pipe repairs, water heater maintenance'), 'خدمة طوارئ 24/7' (should be '24/7 emergency service'), '8:00 ص - 6:00 م، طوارئ 24/7' (should be '8:00 AM - 6:00 PM, 24/7 emergencies'). ❌ ALL 4 PRIORITY REQUIREMENTS FAILED: PRIORITY 1 - Service names showing Arabic instead of English ❌, PRIORITY 2 - Specific translation fixes not applied ❌, PRIORITY 3 - Descriptions in Arabic instead of English ❌, PRIORITY 4 - Working hours showing Arabic time format (ص/م) instead of AM/PM ❌. ✅ TRANSLATION FUNCTION EXISTS: Found comprehensive translateServiceData function in ServicesManagement.js with complete English translations for all services, but function not being applied correctly. ❌ ROOT CAUSE: Translation system not converting Arabic service data to English when interface language is English. The forceEnglish logic and currentLang detection may not be working properly. URGENT RECOMMENDATION: Debug translateServiceData function to ensure proper English translations are applied when currentLang === 'en'. Fix language detection and English fallback system. All requested translation improvements are NOT working - services still displaying Arabic content in English interface."
      - agent: "testing"
        message: "🎉 PRICING PAGE TRANSLATION TESTING COMPLETED SUCCESSFULLY - 90% SUCCESS RATE! COMPREHENSIVE TESTING RESULTS: ✅ PRIORITY 1 - LANGUAGE SWITCHING EXCELLENT: Language switcher found in sidebar and fully functional, Arabic language switching working perfectly with proper RTL layout (document.dir = 'rtl'), Arabic header 'اختر نوع حسابك' displaying correctly, Arabic subtitle working, Arabic billing toggles (شهرياً، سنوياً، وفر 17%) all functional, All 4 Arabic plan names working perfectly (المجتمع، الأساسية، المحترف، المؤسسة), French language switching partially working (switcher found but some timeout issues). ✅ PRIORITY 2 - STORAGE_MB PARTIALLY FIXED: Found 'Storage Mb' on dashboard instead of raw 'storage_mb' key, but still needs proper formatting to 'Storage (MB)' as requested. ✅ PRIORITY 3 - TRANSLATION VERIFICATION EXCELLENT: Zero raw translation keys found on pricing page - all translations working properly, Pricing page fully functional with proper English translations, All major pricing elements (header, subtitle, billing toggles, plan names, features) properly translated, FAQ and Community sections accessible. ✅ RESPONSIVE DESIGN: RTL layout working excellently for Arabic with proper right-to-left text direction, All UI elements properly positioned in Arabic interface, Language switcher accessible in sidebar navigation. ❌ MINOR ISSUES: French language switching has some timeout issues but core functionality works, Storage display shows 'Storage Mb' instead of 'Storage (MB)' format. RECOMMENDATION: Pricing page translation system is 90% successful and production-ready. Main agent should fix the Storage display formatting from 'Storage Mb' to 'Storage (MB)' and address French language switching timeout issue."
      - agent: "testing"

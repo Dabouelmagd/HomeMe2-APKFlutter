@@ -183,7 +183,7 @@ const PushNotifications = () => {
     return (
       <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
         <p className="text-yellow-800">
-          Push notifications are not supported in this browser.
+          {t('push_notifications_not_supported')}
         </p>
       </div>
     );

@@ -350,99 +350,126 @@ const MessageScheduling = () => {
           </div>
         )}
 
-        {/* Scheduled Messages List */}
-        <div className="bg-white rounded-lg shadow">
-          {scheduledMessages.length === 0 ? (
-            <div className="text-center py-12">
-              <ClockIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500 text-lg">{t('schedule.noScheduledMessages')}</p>
-              <p className="text-gray-400 text-sm">{t('schedule.scheduleFirstMessage')}</p>
+        {/* Enhanced Scheduled Messages Section */}
+        {scheduledMessages.length > 0 ? (
+          <div className="space-y-6">
+            {/* Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              {[
+                { label: t('schedule.totalScheduled'), count: scheduledMessages.length, color: 'blue', icon: CalendarIcon },
+                { label: t('schedule.pending'), count: scheduledMessages.filter(m => m.status === 'pending').length, color: 'yellow', icon: ClockIcon },
+                { label: t('schedule.sent'), count: scheduledMessages.filter(m => m.status === 'sent').length, color: 'green', icon: CheckCircleIcon },
+                { label: t('schedule.failed'), count: scheduledMessages.filter(m => m.status === 'failed').length, color: 'red', icon: XCircleIcon }
+              ].map((stat, index) => (
+                <div key={index} className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 text-center hover:shadow-xl transition-shadow duration-200">
+                  <div className={`bg-gradient-to-br from-${stat.color}-100 to-${stat.color}-200 rounded-2xl p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center`}>
+                    <stat.icon className={`h-8 w-8 text-${stat.color}-600`} />
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900 mb-2">{stat.count}</div>
+                  <div className="text-sm font-medium text-gray-600">{stat.label}</div>
+                </div>
+              ))}
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {t('schedule.message')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {t('schedule.recipient')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {t('schedule.scheduledFor')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {t('schedule.status')}
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                      {t('schedule.actions')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {scheduledMessages.map((message) => (
-                    <tr key={message.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="max-w-xs">
-                          <p className="text-sm text-gray-900 truncate">
-                            {message.message_content}
-                          </p>
-                          {message.repeat_type !== 'none' && (
-                            <p className="text-xs text-gray-500">
-                              {t('schedule.repeats')} {message.repeat_type}
-                            </p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
+
+            {/* Messages Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {scheduledMessages.map((message) => (
+                <div key={message.id} className="group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300">
+                  {/* Message Header */}
+                  <div className="bg-gradient-to-r from-gray-50 to-white p-6 border-b border-gray-100">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                        <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-2 rounded-xl">
                           {getRecipientIcon(message.recipient_type)}
-                          <span className="ml-2 text-sm text-gray-900">
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">
                             {getRecipientDisplay(message)}
-                          </span>
+                          </h3>
+                          <p className="text-sm text-gray-500 capitalize">
+                            {t(`schedule.${message.recipient_type}Message`)}
+                          </p>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        {formatDateTime(message.scheduled_for)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          {getStatusIcon(message.status)}
-                          <span className="ml-2 text-sm text-gray-900 capitalize">
-                            {message.status}
-                          </span>
+                      </div>
+                      
+                      {/* Status Badge */}
+                      <div className={`flex items-center space-x-2 rtl:space-x-reverse px-3 py-1 rounded-full text-xs font-bold ${
+                        message.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        message.status === 'sent' ? 'bg-green-100 text-green-800' :
+                        message.status === 'failed' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {getStatusIcon(message.status)}
+                        <span className="capitalize">{t(`schedule.${message.status}`)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Message Content */}
+                  <div className="p-6">
+                    <div className="mb-4">
+                      <p className="text-gray-800 leading-relaxed line-clamp-3">
+                        {message.message_content}
+                      </p>
+                    </div>
+
+                    {/* Message Details */}
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <CalendarIcon className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0 text-green-500" />
+                        <span>{t('schedule.scheduledFor')}: {formatDateTime(message.scheduled_for)}</span>
+                      </div>
+                      
+                      {message.repeat_type !== 'none' && (
+                        <div className="flex items-center text-sm text-gray-600">
+                          <ClockIcon className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0 text-blue-500" />
+                          <span>{t('schedule.repeat')}: {t(`schedule.${message.repeat_type}`)}</span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center space-x-2">
-                          {message.status === 'pending' && (
-                            <>
-                              <button
-                                onClick={() => handleEdit(message)}
-                                className="text-blue-600 hover:text-blue-900"
-                                title="Edit"
-                              >
-                                <PencilIcon className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDelete(message.id)}
-                                className="text-red-600 hover:text-red-900"
-                                title="Delete"
-                              >
-                                <TrashIcon className="h-4 w-4" />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      )}
+
+                      <div className="text-xs text-gray-400 font-mono">
+                        ID: {message.id.slice(0, 8)}...
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex space-x-3 rtl:space-x-reverse">
+                      <button
+                        onClick={() => handleEdit(message)}
+                        className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 px-4 rounded-xl font-medium transition-colors flex items-center justify-center space-x-2 rtl:space-x-reverse"
+                      >
+                        <PencilIcon className="h-4 w-4" />
+                        <span>{t('schedule.edit')}</span>
+                      </button>
+                      
+                      <button
+                        onClick={() => handleDelete(message.id)}
+                        className="flex-1 bg-red-50 hover:bg-red-100 text-red-700 py-2 px-4 rounded-xl font-medium transition-colors flex items-center justify-center space-x-2 rtl:space-x-reverse"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                        <span>{t('schedule.delete')}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 text-center py-16">
+            <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+              <ClockIcon className="h-12 w-12 text-gray-400" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-700 mb-4">{t('schedule.noScheduledMessages')}</h3>
+            <p className="text-gray-500 text-lg mb-8 max-w-md mx-auto">{t('schedule.scheduleFirstMessage')}</p>
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+            >
+              {t('schedule.scheduleMessage')}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -253,9 +253,29 @@ const ServicesManagement = () => {
         working_hours: service.working_hours_ar || service.working_hours
       };
     } else if (currentLang === 'fr') {
+      const frenchFallbacks = {
+        'خدمات السباكة': 'Services de Plomberie',
+        'الخدمات الكهربائية': 'Services Électriques',
+        'خدمات التكييف والتهوية': 'Services CVC',
+        'الفني العام': 'Homme à Tout Faire',
+        'تنظيف المنازل': 'Nettoyage de Maison',
+        'تنظيف السجاد': 'Nettoyage de Tapis',
+        'تنظيف النوافذ': 'Nettoyage de Vitres',
+        'حارس الأمن': 'Agent de Sécurité',
+        'إعداد نظام التحكم بالدخول': 'Configuration Contrôle d\'Accès',
+        'تنسيق الحدائق والبستنة': 'Aménagement Paysager',
+        'صيانة المسابح': 'Entretien de Piscine',
+        'خدمات رعاية الحيوانات الأليفة': 'Services de Soins aux Animaux',
+        'مدرب شخصي': 'Entraîneur Personnel',
+        'توصيل الطرود': 'Livraison de Colis',
+        'خدمات النقل': 'Services de Déménagement',
+        'تخطيط الفعاليات': 'Planification d\'Événements',
+        'خدمات التموين': 'Services de Restauration'
+      };
+      
       return {
-        name: service.name_fr || service.name,
-        description: service.description_fr || service.description,
+        name: service.name_fr || frenchFallbacks[service.name] || service.name,
+        description: service.description_fr || `Services professionnels ${frenchFallbacks[service.name] || service.name}`,
         specialty: service.specialty_fr || service.specialty,
         working_hours: service.working_hours_fr || service.working_hours
       };

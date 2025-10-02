@@ -238,36 +238,44 @@ const AddFamilyMemberToUnit = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredResidents.map((resident) => (
-              <div key={resident.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start space-x-3">
+              <div key={resident.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200">
+                <div className="flex flex-col space-y-4">
+                  <div className="flex items-start space-x-4">
                     {resident.profile_picture_url ? (
                       <img
                         src={`${BACKEND_URL}${resident.profile_picture_url}`}
                         alt={resident.full_name}
-                        className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                        className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 shadow-sm"
                       />
                     ) : (
-                      <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
-                        <UsersIcon className="h-6 w-6 text-gray-600" />
+                      <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center shadow-sm">
+                        <UsersIcon className="h-8 w-8 text-blue-600" />
                       </div>
                     )}
-                    <div>
-                      <h3 className="font-medium text-gray-900">{resident.full_name}</h3>
-                      <div className="flex items-center space-x-1 text-sm text-gray-500">
-                        <HomeIcon className="h-4 w-4" />
-                        <span>Unit {resident.unit_number}</span>
-                      </div>
-                      <p className="text-sm text-gray-500">{resident.email}</p>
-                      {resident.phone && (
-                        <div className="text-sm text-gray-500 flex items-center space-x-1">
-                          <PhoneIcon className="h-4 w-4" />
-                          <span>{resident.phone}</span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 text-lg truncate">{resident.full_name}</h3>
+                      <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
+                        <div className="bg-blue-100 p-1 rounded">
+                          <HomeIcon className="h-4 w-4 text-blue-600" />
                         </div>
-                      )}
+                        <span className="font-medium">Unit {resident.unit_number}</span>
+                      </div>
                     </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <EnvelopeIcon className="h-4 w-4 text-gray-400" />
+                      <span className="truncate">{resident.email}</span>
+                    </div>
+                    {resident.phone && (
+                      <div className="flex items-center space-x-2 text-sm text-gray-600">
+                        <PhoneIcon className="h-4 w-4 text-gray-400" />
+                        <span>{resident.phone}</span>
+                      </div>
+                    )}
                   </div>
                   <button
                     onClick={() => handleAddMember(resident)}

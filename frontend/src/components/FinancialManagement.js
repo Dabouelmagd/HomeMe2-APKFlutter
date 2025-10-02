@@ -300,8 +300,8 @@ const FinancialManagement = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        ${invoice.amount.toFixed(2)}
+                      <div className="text-sm font-bold text-gray-900">
+                        {formatCurrency(convertCurrency(invoice.amount, 'USD', selectedCurrency), selectedCurrency)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

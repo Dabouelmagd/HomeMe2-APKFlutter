@@ -854,6 +854,7 @@ const resources = {
       'residents': 'residents',
       'found': 'found',
       'search_placeholder': 'Search users, residences, services...',
+      'unit': 'Unit',
       
       // Locations & Map
       'locations_map': 'Locations & Map',

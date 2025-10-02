@@ -1482,6 +1482,9 @@ const resources = {
       'chat.createFirstChat': 'إنشاء المحادثة الأولى',
       'chat.noMessages': 'لا توجد رسائل بعد',
       'chat.chats': 'المحادثات',
+      'chat.welcomeToChats': 'مرحباً بك في المحادثات',
+      'chat.chatFeatures': 'أرسل الرسائل، شارك الملفات، وابق على تواصل',
+      'chat.participants': 'مشاركون',
       'common.loading': 'جاري التحميل...',
       'chat.searchChats': 'البحث في المحادثات',
       

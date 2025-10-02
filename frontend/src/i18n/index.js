@@ -503,9 +503,9 @@ const resources = {
       // Financial Management
       'view_manage_payments_invoices': 'View and manage payments and invoices',
       'total_due': 'Total Due',
-      'pending_payments_alert': 'You have {count} pending payment',
-      'pending_payments_alert_plural': 'You have {count} pending payments',
-      'total_amount_due': 'Total amount due: ${amount}',
+      'pending_payments_alert': 'You have {{count}} pending payment',
+      'pending_payments_alert_plural': 'You have {{count}} pending payments',
+      'total_amount_due': 'Total amount due: ${{amount}}',
       'all_invoices': 'All Invoices',
       'due_date': 'Due Date',
       'pay_now': 'Pay Now',

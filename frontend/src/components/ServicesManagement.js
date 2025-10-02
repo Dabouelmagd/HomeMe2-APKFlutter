@@ -215,19 +215,12 @@ const ServicesManagement = () => {
     return translatedHours;
   };
   // Dynamic translation for service names and descriptions based on current language
-  const translateServiceData = (service) => {
-    // Get current language from useTranslation hook context
+  const translateServiceData = useCallback((service) => {
+    // Get current language from useTranslation hook context 
     const currentLang = i18n.language || i18n.resolvedLanguage || 'en';
     
-    console.log('translateServiceData called:', { 
-      serviceName: service.name, 
-      currentLang,
-      i18nLang: i18n.language,
-      resolvedLang: i18n.resolvedLanguage,
-      hasNameEn: !!service.name_en,
-      serviceKeys: Object.keys(service),
-      fullService: service
-    });
+    // Always force English for testing
+    const forceEnglish = true;
     
     // Create default English fallbacks based on service names
     const englishFallbacks = {

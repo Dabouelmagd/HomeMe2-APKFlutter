@@ -296,6 +296,9 @@ const resources = {
       'chat.noUsersAvailable': 'No users available',
       'chat.compoundChatInfo': 'This will create a compound-wide chat where all residents can participate',
       'chat.createChat': 'Create Chat',
+      'chat.noChatsYet': 'No chats yet',
+      'chat.startFirstChat': 'Start your first conversation',
+      'chat.selectChatToStart': 'Select a chat to start messaging',
       
       // Common
       'common.cancel': 'Cancel',

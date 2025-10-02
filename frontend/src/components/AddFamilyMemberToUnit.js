@@ -494,7 +494,7 @@ const AddFamilyMemberToUnit = () => {
                     {/* Profile Picture */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Profile Picture
+                        {t('profile_picture')}
                       </label>
                       <input
                         type="file"

@@ -371,11 +371,15 @@ const LanguageSettings = () => {
 
   const handleLanguageChange = async (langCode) => {
     try {
+      console.log('🔄 Starting language change to:', langCode);
+      
       // Set in localStorage first to ensure persistence
       localStorage.setItem('i18nextLng', langCode);
+      console.log('✅ Set localStorage to:', langCode);
       
       // Change language in i18n
       await i18n.changeLanguage(langCode);
+      console.log('✅ i18n language changed to:', i18n.language);
       
       // Apply layout changes immediately
       if (langCode === 'ar') {
@@ -383,21 +387,26 @@ const LanguageSettings = () => {
         document.documentElement.setAttribute('dir', 'rtl');
         document.body.classList.add('rtl');
         document.body.style.direction = 'rtl';
+        console.log('✅ Applied RTL layout');
       } else {
         document.dir = 'ltr';
         document.documentElement.setAttribute('dir', 'ltr');
         document.body.classList.remove('rtl');
         document.body.style.direction = 'ltr';
+        console.log('✅ Applied LTR layout');
       }
       
       // Update state
       setSelectedLanguage(langCode);
+      console.log('✅ Updated selected language state');
       
       // Show success message
       toast.success(t('language_updated_successfully'));
+      console.log('✅ Showed success toast');
       
       // Small delay to ensure all changes are applied
       setTimeout(() => {
+        console.log('🔄 Reloading page...');
         window.location.reload();
       }, 800);
       

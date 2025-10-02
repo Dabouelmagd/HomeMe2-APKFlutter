@@ -266,10 +266,10 @@ const PrivacySettings = () => {
             <label className="block text-sm font-medium text-gray-700 mb-3">{t('contact_information_visibility')}</label>
             <div className="space-y-2">
               {[
-                { value: 'compound', label: 'Compound members can see' },
-                { value: 'family', label: 'Family members only' },
-                { value: 'admins', label: 'Admins only' },
-                { value: 'private', label: 'Keep private' }
+                { value: 'compound', label: t('compound_members_can_see') },
+                { value: 'family', label: t('family_members_only') },
+                { value: 'admins', label: t('admins_only') },
+                { value: 'private', label: t('keep_private') }
               ].map(option => (
                 <label key={option.value} className="flex items-center">
                   <input

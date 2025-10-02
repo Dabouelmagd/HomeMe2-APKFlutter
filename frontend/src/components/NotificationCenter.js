@@ -157,103 +157,124 @@ const NotificationCenter = () => {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 text-center flex items-center justify-center">
-              <BellIcon className="w-8 h-8 mr-3" />
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      {/* Enhanced Header Section */}
+      <div className="bg-white shadow-lg">
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-4 rounded-2xl shadow-xl relative">
+                <BellIcon className="h-12 w-12 text-white" />
+                {unreadCount > 0 && (
+                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </div>
+                )}
+              </div>
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
               {t('notifications')}
-              {unreadCount > 0 && (
-                <span className="ml-2 bg-red-500 text-white text-sm font-medium px-2.5 py-0.5 rounded-full">
-                  {unreadCount}
-                </span>
-              )}
             </h1>
-            <p className="text-gray-600 mt-2 text-center">{t('manage_your_notifications')}</p>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              {t('manage_your_notifications')}
+            </p>
           </div>
           
-          <div className="mt-4 sm:mt-0 flex space-x-3">
+          {/* Enhanced Action Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className={`group px-6 py-3 rounded-2xl font-semibold transition-all duration-200 flex items-center justify-center space-x-3 rtl:space-x-reverse ${
+                showFilters 
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl' 
+                  : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50'
+              }`}
             >
-              <FunnelIcon className="w-4 h-4 mr-2" />
-              {t('filters')}
+              <FunnelIcon className="h-5 w-5" />
+              <span>{t('filters')}</span>
             </button>
             
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
                 disabled={loading}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="group bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-2xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-3 rtl:space-x-reverse disabled:opacity-50"
               >
-                <CheckIcon className="w-4 h-4 mr-2" />
-                {t('mark_all_read')}
+                <CheckIcon className="h-5 w-5" />
+                <span>{t('mark_all_read')} ({unreadCount})</span>
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      {showFilters && (
-        <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('search')}
-              </label>
-              <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        {/* Enhanced Filters Section */}
+        {showFilters && (
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
+            <h3 className="text-lg font-bold text-gray-900 mb-6">{t('notification_filters')}</h3>
+            
+            {/* Search Bar */}
+            <div className="mb-6">
+              <div className="relative max-w-md">
+                <MagnifyingGlassIcon className="absolute left-4 rtl:right-4 rtl:left-auto top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <input
                   type="text"
+                  placeholder={t('search_notifications')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder={t('search_notifications')}
+                  className="w-full pl-12 rtl:pr-12 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all duration-200"
                 />
               </div>
             </div>
 
-            {/* Status Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('status')}
-              </label>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="all">{t('all')}</option>
-                <option value="unread">{t('unread')}</option>
-                <option value="read">{t('read')}</option>
-              </select>
+            {/* Filter Tabs */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {notificationTypes.map((type, index) => {
+                const colors = [
+                  'from-blue-500 to-cyan-500',
+                  'from-orange-500 to-red-500',
+                  'from-green-500 to-emerald-500',
+                  'from-purple-500 to-pink-500',
+                  'from-indigo-500 to-purple-500'
+                ];
+                return (
+                  <button
+                    key={type.value}
+                    onClick={() => setTypeFilter(type.value)}
+                    className={`p-4 rounded-2xl text-center transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
+                      typeFilter === type.value
+                        ? `bg-gradient-to-br ${colors[index % colors.length]} text-white shadow-xl`
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-2 border-gray-200'
+                    }`}
+                  >
+                    <type.icon className="h-6 w-6 mx-auto mb-2" />
+                    <div className="text-sm font-medium">{type.label}</div>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Type Filter */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('type')}
-              </label>
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                {notificationTypes.map(type => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
+            {/* Status Filter */}
+            <div className="mt-6">
+              <div className="flex flex-wrap gap-2">
+                {['all', 'unread', 'read'].map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => setFilter(status)}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      filter === status
+                        ? 'bg-indigo-600 text-white shadow-lg'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {t(`filter_${status}`)}
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Bulk Actions */}
       {selectedNotifications.length > 0 && (

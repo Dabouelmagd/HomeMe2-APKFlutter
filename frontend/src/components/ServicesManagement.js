@@ -384,6 +384,12 @@ const ServicesManagement = () => {
       };
     }
     
+    console.log('Using default (no translation):', {
+      serviceName: service.name,
+      currentLang,
+      forceEnglish
+    });
+    
     return {
       name: service.name,
       description: service.description,

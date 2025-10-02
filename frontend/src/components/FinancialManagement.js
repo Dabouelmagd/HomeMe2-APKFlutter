@@ -415,7 +415,7 @@ const FinancialManagement = () => {
                     </p>
                     <div className="mt-4 flex items-center space-x-2 rtl:space-x-reverse">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm text-green-700 font-medium">متاح للجميع</span>
+                      <span className="text-sm text-green-700 font-medium">{t('available_for_all')}</span>
                     </div>
                   </div>
                 </div>

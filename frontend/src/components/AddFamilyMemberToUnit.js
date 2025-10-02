@@ -33,7 +33,7 @@ const AddFamilyMemberToUnit = () => {
 
   const [memberForm, setMemberForm] = useState({
     full_name: '',
-    relationship: 'son',
+    relationship: '',
     age: '',
     birthday: '',
     phone: '',

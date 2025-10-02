@@ -124,7 +124,21 @@ async def add_english_translations():
     print("Connecting to MongoDB...")
     client = AsyncIOMotorClient(MONGO_URL)
     db = client.homeme
-    services_collection = db.compound_services
+    
+    # Check available collections
+    collections = await db.list_collection_names()
+    print(f"Available collections: {collections}")
+    
+    # Try different possible collection names
+    for collection_name in ['services', 'compound_services', 'compound_service']:
+        services_collection = db[collection_name]
+        services = await services_collection.find().to_list(length=None)
+        if services:
+            print(f"Found {len(services)} services in collection '{collection_name}'")
+            break
+    else:
+        print("No services found in any collection")
+        return
     
     try:
         # Get all services

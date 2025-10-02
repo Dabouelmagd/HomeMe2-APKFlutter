@@ -277,7 +277,7 @@ const AddFamilyMemberToUnit = () => {
                         <div className="bg-blue-100 p-1 rounded">
                           <HomeIcon className="h-4 w-4 text-blue-600" />
                         </div>
-                        <span className="font-medium">Unit {resident.unit_number}</span>
+                        <span className="font-medium">{t('unit')} {resident.unit_number}</span>
                       </div>
                     </div>
                   </div>

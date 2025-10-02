@@ -2825,6 +2825,20 @@ const resources = {
       'what_payment_methods_accept': 'Quelles méthodes de paiement acceptez-vous?',
       'payment_methods_answer': 'Nous acceptons toutes les principales cartes de crédit, PayPal, et les virements bancaires.',
       
+      // Add Family Member Page
+      'add_family_member_to_unit': 'Ajouter un Membre de Famille à l\'Unité',
+      'add_family_members_any_unit': 'Ajoutez facilement des membres de famille à n\'importe quelle unité de votre complexe',
+      'search_name_unit_email': 'Rechercher par nom, numéro d\'unité ou email...',
+      'available_residents': 'Résidents Disponibles',
+      'select_unit_add_member': 'Sélectionnez une unité pour ajouter un nouveau membre de famille',
+      'no_matching_residents': 'Aucun résident correspondant trouvé',
+      'no_residents_registered': 'Aucun résident trouvé',
+      'try_adjusting_search': 'Essayez d\'ajuster votre terme de recherche pour trouver des résidents',
+      'no_residents_yet': 'Il n\'y a pas encore de résidents enregistrés dans votre complexe',
+      'add_member': 'Ajouter Membre',
+      'add_family_member': 'Ajouter Membre de Famille',
+      'adding_to_unit': 'Ajout à l\'Unité',
+      
       // Locations & Map
       'locations_map': 'Emplacements et Carte',
       'explore_compound_facilities': 'Explorer les installations du complexe et les services à proximité',

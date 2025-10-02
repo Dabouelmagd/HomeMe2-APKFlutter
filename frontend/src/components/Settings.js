@@ -81,7 +81,7 @@ const ProfileSettings = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('please_select_image_file'));
         return;
       }
       setProfilePicture(file);

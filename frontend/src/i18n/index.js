@@ -851,6 +851,9 @@ const resources = {
       'add_member': 'Add Member',
       'add_family_member': 'Add Family Member',
       'adding_to_unit': 'Adding to Unit',
+      'resident': 'resident',
+      'residents': 'residents',
+      'found': 'found',
       
       // Locations & Map
       'locations_map': 'Locations & Map',

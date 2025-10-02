@@ -304,6 +304,9 @@ const resources = {
       'chat.createFirstChat': 'Create First Chat',
       'chat.noMessages': 'No messages yet',
       'chat.chats': 'Chats',
+      'chat.welcomeToChats': 'Welcome to Chats',
+      'chat.chatFeatures': 'Send messages, share files, and stay connected',
+      'chat.participants': 'participants',
       'common.loading': 'Loading...',
       'chat.searchChats': 'Search Chats',
       

@@ -214,7 +214,7 @@ const AddFamilyMemberToUnit = () => {
             </div>
             <input
               type="text"
-              placeholder="Search by name, unit number, or email..."
+              placeholder={t('search_name_unit_email')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm text-gray-900 placeholder-gray-500"

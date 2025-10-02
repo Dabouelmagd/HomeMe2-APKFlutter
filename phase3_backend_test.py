@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Dict, List
 
 # Configuration - Using the production URL as specified
-BASE_URL = "https://homeme-i18n-1.preview.emergentagent.com/api"
+BASE_URL = "https://arabic-homeme.preview.emergentagent.com/api"
 
 class Phase3BackendTestSuite:
     def __init__(self):
@@ -124,7 +124,7 @@ class Phase3BackendTestSuite:
             # Test creating checkout session for monthly fee
             checkout_data = {
                 "package_id": "monthly_fee",
-                "origin_url": "https://homeme-i18n-1.preview.emergentagent.com",
+                "origin_url": "https://arabic-homeme.preview.emergentagent.com",
                 "metadata": {
                     "unit_number": "A101",
                     "payment_type": "monthly_maintenance"

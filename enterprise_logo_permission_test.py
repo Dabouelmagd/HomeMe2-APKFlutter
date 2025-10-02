@@ -24,7 +24,7 @@ from PIL import Image
 from pathlib import Path
 
 # Configuration
-BASE_URL = "https://homeme-i18n-1.preview.emergentagent.com/api"
+BASE_URL = "https://arabic-homeme.preview.emergentagent.com/api"
 
 class EnterpriseLogoPermissionTestSuite:
     def __init__(self):

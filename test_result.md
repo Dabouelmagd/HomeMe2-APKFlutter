@@ -76,7 +76,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Arabic Translation Verification for Financial Management Page"
+    - "Financial Management Template String Interpolation Fix Verification"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

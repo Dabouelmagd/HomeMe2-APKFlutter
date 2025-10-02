@@ -2199,6 +2199,7 @@ const resources = {
       'email_address': 'Adresse E-mail',
       'working_hours': 'Heures de Travail',
       'cancel': 'Annuler',
+      'click_to_upload_image': 'Cliquer pour télécharger une image',
       'update_service': 'Mettre à jour le Service',
       'add_service': 'Ajouter un Service',
       'save_service': 'Enregistrer le Service',

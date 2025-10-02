@@ -211,7 +211,7 @@ const FinancialManagement = () => {
                             {invoice.description}
                           </div>
                           <div className="text-sm text-gray-500">
-                            Unit {invoice.unit_number}
+                            {t('unit')} {invoice.unit_number}
                           </div>
                         </div>
                       </div>

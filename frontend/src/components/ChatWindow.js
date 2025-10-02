@@ -408,10 +408,16 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
 
   if (!chat) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <InformationCircleIcon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-          <p className="text-gray-500">{t('chat.selectChatToStart')}</p>
+      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="text-center p-12">
+          <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-3xl p-12 mb-6 max-w-md">
+            <ChatBubbleLeftRightIcon className="h-20 w-20 mx-auto mb-6 text-gray-400" />
+            <h3 className="text-xl font-bold text-gray-700 mb-2">{t('chat.welcomeToChats')}</h3>
+            <p className="text-gray-500 leading-relaxed">{t('chat.selectChatToStart')}</p>
+          </div>
+          <div className="text-sm text-gray-400">
+            {t('chat.chatFeatures')}
+          </div>
         </div>
       </div>
     );
@@ -419,8 +425,11 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-500 font-medium">{t('common.loading')}</p>
+        </div>
       </div>
     );
   }

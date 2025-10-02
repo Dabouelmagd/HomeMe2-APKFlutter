@@ -674,6 +674,23 @@ const resources = {
       'legal_privacy_description': 'Learn how we collect, use, and protect your personal information to ensure your privacy and data security.',
       'legal_clickToExpand': 'Click to expand',
       'legal_clickToCollapse': 'Click to collapse',
+      
+      // Terms Content
+      'legal_terms_acceptance_content': 'By accessing and using HomeMe services, you accept and agree to be bound by the terms and provisions of this agreement.',
+      'legal_terms_personalUse_content': 'You may use our service for personal, non-commercial purposes only. You agree not to use the service for any unlawful activities.',
+      'legal_terms_content_content': 'You are responsible for all content you post. You agree not to post content that is offensive, illegal, or violates others\' rights.',
+      'legal_terms_liability_content': 'HomeMe shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service.',
+      'legal_terms_modifications_content': 'We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting on our website.',
+      'legal_terms_governingLaw_content': 'These terms shall be governed by and construed in accordance with the laws of the jurisdiction in which HomeMe operates.',
+      
+      // Privacy Content
+      'legal_privacy_infoCollection_content': 'We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.',
+      'legal_privacy_infoUse_content': 'We use the information we collect to provide, maintain, and improve our services, communicate with you, and ensure platform security.',
+      'legal_privacy_infoProtection_content': 'We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.',
+      'legal_privacy_infoSharing_content': 'We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this privacy policy.',
+      'legal_privacy_userRights_content': 'You have the right to access, update, or delete your personal information. You may also opt out of certain communications from us.',
+      'legal_privacy_policyChanges_content': 'We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page.',
+      'legal_privacy_applicableLaws_content': 'This privacy policy is governed by and construed in accordance with applicable data protection laws and regulations.',
       'monthly_revenue': 'Monthly Revenue',
       'weekly_revenue': 'Weekly Revenue',
       'daily_revenue': 'Daily Revenue',

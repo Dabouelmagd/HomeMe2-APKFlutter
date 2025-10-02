@@ -231,10 +231,18 @@ const AddFamilyMemberToUnit = () => {
       {/* Residents List */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
         {filteredResidents.length === 0 ? (
-          <div className="text-center py-8">
-            <UsersIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">
-              {searchTerm ? 'No residents found matching your search' : 'No residents found'}
+          <div className="text-center py-16">
+            <div className="bg-gray-100 p-4 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+              <UsersIcon className="h-12 w-12 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {searchTerm ? 'No matching residents found' : 'No residents found'}
+            </h3>
+            <p className="text-gray-500 max-w-sm mx-auto">
+              {searchTerm ? 
+                `Try adjusting your search term "${searchTerm}" to find residents` : 
+                'There are no residents registered in your compound yet'
+              }
             </p>
           </div>
         ) : (

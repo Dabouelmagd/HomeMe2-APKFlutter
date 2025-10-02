@@ -156,8 +156,6 @@ const ChatSidebar = ({ selectedChat, onChatSelect, onNewChat }) => {
               </button>
             )}
           </div>
-            )}
-          </div>
         ) : (
           <div className="space-y-2">
             {filteredChats.map((chat) => (

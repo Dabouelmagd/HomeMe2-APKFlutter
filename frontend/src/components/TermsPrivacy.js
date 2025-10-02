@@ -43,6 +43,51 @@ const TermsPrivacy = () => {
     window.history.back();
   };
 
+  // دالة لإرجاع الأيقونة المناسبة لكل قسم
+  const getSectionIcon = (sectionId, index) => {
+    const iconProps = { className: "w-6 h-6 text-white" };
+    
+    // أيقونات شروط الاستخدام
+    if (activeTab === 'terms') {
+      switch (sectionId) {
+        case 'acceptance':
+          return <HandRaisedIcon {...iconProps} />;
+        case 'personal_use':
+          return <HomeIcon {...iconProps} />;
+        case 'content':
+          return <PencilSquareIcon {...iconProps} />;
+        case 'liability':
+          return <ScaleIcon {...iconProps} />;
+        case 'modifications':
+          return <CogIcon {...iconProps} />;
+        case 'governing_law':
+          return <BookOpenIcon {...iconProps} />;
+        default:
+          return <DocumentTextIcon {...iconProps} />;
+      }
+    }
+    
+    // أيقونات سياسة الخصوصية
+    switch (sectionId) {
+      case 'info_collection':
+        return <DocumentArrowUpIcon {...iconProps} />;
+      case 'info_use':
+        return <EyeIcon {...iconProps} />;
+      case 'info_protection':
+        return <LockClosedIcon {...iconProps} />;
+      case 'info_sharing':
+        return <UserGroupIcon {...iconProps} />;
+      case 'user_rights':
+        return <UserCircleIcon {...iconProps} />;
+      case 'policy_changes':
+        return <BellIcon {...iconProps} />;
+      case 'applicable_laws':
+        return <ScaleIcon {...iconProps} />;
+      default:
+        return <ShieldCheckIcon {...iconProps} />;
+    }
+  };
+
   const termsContent = [
     {
       id: 'acceptance',

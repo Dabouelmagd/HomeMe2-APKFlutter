@@ -401,44 +401,98 @@ const TermsPrivacy = () => {
 
         {/* Content */}
         <div className="space-y-8">
-          {/* Clean Introduction Card */}
-          <div className={`rounded-2xl p-6 shadow-lg border mb-8 ${
-            activeTab === 'terms' 
-              ? 'bg-blue-50 border-blue-200' 
-              : 'bg-emerald-50 border-emerald-200'
-          }`}>
-            <div className="flex items-start space-x-4">
-              <div className={`p-3 rounded-xl ${
+          {/* Ultra Modern Introduction Card */}
+          <div className="relative mb-16">
+            {/* Background Glow Effects */}
+            <div className={`absolute inset-0 rounded-[3rem] blur-3xl opacity-30 ${
+              activeTab === 'terms' 
+                ? 'bg-gradient-to-br from-cyan-400/40 to-blue-500/40' 
+                : 'bg-gradient-to-br from-emerald-400/40 to-teal-500/40'
+            }`}></div>
+            
+            <div className="relative bg-black/20 backdrop-blur-3xl rounded-[3rem] p-12 border border-white/10 shadow-2xl overflow-hidden">
+              {/* Animated Background Pattern */}
+              <div className={`absolute inset-0 opacity-5 ${
                 activeTab === 'terms' 
-                  ? 'bg-blue-600' 
-                  : 'bg-emerald-600'
-              }`}>
-                {activeTab === 'terms' ? (
-                  <ClipboardDocumentCheckIcon className="w-6 h-6 text-white" />
-                ) : (
-                  <UserCircleIcon className="w-6 h-6 text-white" />
-                )}
-              </div>
+                  ? 'bg-gradient-to-br from-cyan-500 to-blue-600' 
+                  : 'bg-gradient-to-br from-emerald-500 to-teal-600'
+              } animate-pulse`}></div>
               
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  {activeTab === 'terms' ? t('legal_terms_title') : t('legal_privacy_title') || 'Privacy Policy'}
-                </h2>
+              {/* Floating Geometric Elements */}
+              <div className={`absolute top-8 right-8 w-32 h-32 rounded-full blur-2xl opacity-20 ${
+                activeTab === 'terms' ? 'bg-cyan-400' : 'bg-emerald-400'
+              } animate-float`}></div>
+              <div className={`absolute bottom-8 left-8 w-24 h-24 rounded-full blur-2xl opacity-15 ${
+                activeTab === 'terms' ? 'bg-blue-400' : 'bg-teal-400'
+              } animate-float-delay-1`}></div>
+              
+              <div className="relative flex items-start space-x-10">
+                {/* Ultra Modern Icon */}
+                <div className="relative group">
+                  <div className={`absolute inset-0 rounded-[2rem] blur-2xl ${
+                    activeTab === 'terms' 
+                      ? 'bg-gradient-to-br from-cyan-400/60 to-blue-500/60' 
+                      : 'bg-gradient-to-br from-emerald-400/60 to-teal-500/60'
+                  } group-hover:blur-3xl transition-all duration-700`}></div>
+                  
+                  <div className={`relative p-8 rounded-[2rem] backdrop-blur-2xl border border-white/20 transition-all duration-700 group-hover:scale-110 ${
+                    activeTab === 'terms' 
+                      ? 'bg-gradient-to-br from-cyan-500/20 to-blue-600/20' 
+                      : 'bg-gradient-to-br from-emerald-500/20 to-teal-600/20'
+                  }`}>
+                    {activeTab === 'terms' ? (
+                      <ClipboardDocumentCheckIcon className="w-16 h-16 text-white group-hover:scale-110 transition-all duration-500" />
+                    ) : (
+                      <UserCircleIcon className="w-16 h-16 text-white group-hover:scale-110 transition-all duration-500" />
+                    )}
+                  </div>
+                </div>
                 
-                <p className="text-gray-700 text-lg leading-relaxed mb-4">
-                  {activeTab === 'terms' 
-                    ? t('legal_terms_description') 
-                    : t('legal_privacy_description') || 'Learn how we collect, use, and protect your personal information.'
-                  }
-                </p>
-                
-                <div className={`inline-flex items-center space-x-2 px-3 py-1 rounded-lg text-sm font-medium ${
-                  activeTab === 'terms' 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'bg-emerald-100 text-emerald-700'
-                }`}>
-                  <ClockIcon className="w-4 h-4" />
-                  <span>{t('legal_lastUpdated')}: 30/9/2025</span>
+                {/* Content */}
+                <div className="flex-1 space-y-8">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-4">
+                      <h2 className="text-4xl font-black text-white tracking-tight">
+                        {activeTab === 'terms' ? t('legal_terms_title') : t('legal_privacy_title') || 'Privacy Policy'}
+                      </h2>
+                      <div className={`p-3 rounded-2xl ${
+                        activeTab === 'terms' ? 'bg-cyan-500/20' : 'bg-emerald-500/20'
+                      } animate-bounce`}>
+                        <CheckCircleIcon className={`w-8 h-8 ${
+                          activeTab === 'terms' ? 'text-cyan-300' : 'text-emerald-300'
+                        }`} />
+                      </div>
+                    </div>
+                    
+                    <div className={`w-32 h-1.5 rounded-full ${
+                      activeTab === 'terms' 
+                        ? 'bg-gradient-to-r from-cyan-400 to-blue-500' 
+                        : 'bg-gradient-to-r from-emerald-400 to-teal-500'
+                    } shadow-lg ${
+                      activeTab === 'terms' ? 'shadow-cyan-400/30' : 'shadow-emerald-400/30'
+                    }`}></div>
+                  </div>
+                  
+                  <p className="text-white/90 text-2xl leading-relaxed font-light tracking-wide">
+                    {activeTab === 'terms' 
+                      ? t('legal_terms_description') 
+                      : t('legal_privacy_description') || 'Learn how we collect, use, and protect your personal information.'
+                    }
+                  </p>
+                  
+                  {/* Modern Status Badge */}
+                  <div className="flex items-center space-x-6">
+                    <div className={`flex items-center space-x-4 px-8 py-4 rounded-[2rem] backdrop-blur-xl border transition-all duration-500 hover:scale-105 ${
+                      activeTab === 'terms' 
+                        ? 'bg-cyan-500/10 border-cyan-400/20 shadow-lg shadow-cyan-400/10' 
+                        : 'bg-emerald-500/10 border-emerald-400/20 shadow-lg shadow-emerald-400/10'
+                    }`}>
+                      <ClockIcon className={`w-6 h-6 ${
+                        activeTab === 'terms' ? 'text-cyan-300' : 'text-emerald-300'
+                      }`} />
+                      <span className="text-white text-lg font-bold tracking-wide">{t('legal_lastUpdated')}: 30/9/2025</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

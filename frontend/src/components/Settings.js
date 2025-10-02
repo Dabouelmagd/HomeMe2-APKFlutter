@@ -60,7 +60,7 @@ const ProfileSettings = () => {
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
     if (profileData.new_password !== profileData.confirm_password) {
-      toast.error('New passwords do not match');
+      toast.error(t('passwords_do_not_match'));
       return;
     }
 

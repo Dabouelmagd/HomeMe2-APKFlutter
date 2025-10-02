@@ -223,20 +223,30 @@ const TermsPrivacy = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-x-hidden">
-      {/* Animated Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      {/* Ultra Modern Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-10 -right-10 w-72 h-72 bg-gradient-to-br from-blue-400/10 to-indigo-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 -left-20 w-96 h-96 bg-gradient-to-tr from-purple-400/8 to-blue-500/8 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-0 right-1/3 w-80 h-80 bg-gradient-to-tl from-indigo-400/8 to-purple-500/8 rounded-full blur-3xl animate-pulse delay-500"></div>
+        {/* Floating Orbs */}
+        <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-gradient-to-tr from-purple-400/15 to-pink-500/15 rounded-full blur-3xl animate-float-delay-1"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-gradient-to-tl from-indigo-400/10 to-cyan-500/10 rounded-full blur-3xl animate-float-delay-2"></div>
+        
+        {/* Geometric Patterns */}
+        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-3xl rotate-12 animate-spin-slow"></div>
+        <div className="absolute bottom-20 left-1/3 w-24 h-24 bg-gradient-to-tr from-cyan-500/10 to-transparent border border-cyan-300/20 rounded-2xl -rotate-45 animate-pulse"></div>
+        
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent bg-[length:100px_100px] bg-[linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)]"></div>
       </div>
       
-      {/* Modern Header with Enhanced Gradient */}
+      {/* Ultra Modern Header */}
       <div className="relative">
-        {/* Enhanced Background Gradient with Animation */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 animate-gradient-x"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/30"></div>
-        <div className="absolute inset-0 bg-black/5"></div>
+        {/* Glassmorphism Background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-violet-600/80 via-purple-600/80 to-indigo-600/80 backdrop-blur-3xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20"></div>
+        
+        {/* Header Glow Effect */}
+        <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/20 via-transparent to-transparent animate-pulse"></div>
         
         {/* Enhanced Header Content */}
         <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">

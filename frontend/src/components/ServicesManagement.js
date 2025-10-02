@@ -382,7 +382,7 @@ const ServicesManagement = () => {
       specialty: service.specialty,
       working_hours: service.working_hours
     };
-  }, [i18n.language, i18n.resolvedLanguage]);
+  }, [currentLanguage, i18n.language, i18n.resolvedLanguage]);
   const [services, setServices] = useState([]);
   const [serviceProviders, setServiceProviders] = useState([]);
   const [bookings, setBookings] = useState([]);

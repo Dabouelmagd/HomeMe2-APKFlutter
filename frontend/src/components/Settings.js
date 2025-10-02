@@ -239,7 +239,7 @@ const PrivacySettings = () => {
         
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Profile Visibility</label>
+            <label className="block text-sm font-medium text-gray-700 mb-3">{t('profile_visibility')}</label>
             <div className="space-y-2">
               {[
                 { value: 'public', label: 'Public - Visible to everyone' },

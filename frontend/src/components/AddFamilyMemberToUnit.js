@@ -192,14 +192,16 @@ const AddFamilyMemberToUnit = () => {
   return (
     <div className="p-6">
       <div className="mb-6">
-        <div className="mb-6 text-center">
-          <div className="flex justify-center mb-4">
-            <UserPlusIcon className="h-8 w-8 text-blue-600" />
+        <div className="mb-8 text-center">
+          <div className="flex justify-center mb-6">
+            <div className="bg-blue-100 p-4 rounded-full">
+              <UserPlusIcon className="h-12 w-12 text-blue-600" />
+            </div>
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Add Family Member to Unit</h1>
-            <p className="text-gray-600 mt-1">
-              {user.role === 'admin' ? 'Add family members to any unit in your compound' : 'Add family members to any unit in your compound'}
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Add Family Member to Unit</h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              {user.role === 'admin' ? 'Add family members to any unit in your compound with ease' : 'Add family members to any unit in your compound with ease'}
             </p>
           </div>
         </div>

@@ -232,59 +232,105 @@ const MessageCenter = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-            <ChatBubbleLeftEllipsisIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2 text-center">{t('no_messages_yet')}</h3>
-            <p className="text-gray-600 mb-4">
-              {t('start_conversation')} {user?.role === 'admin' 
-                ? `${t('communicate_with').replace('{role}', t('residents'))}` 
-                : `${t('communicate_with').replace('{role}', t('management'))}`}
-            </p>
-            <button
-              onClick={() => setShowNewMessage(true)}
-              className="btn btn-primary"
-            >
-              {t('send_first_message')}
-            </button>
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden max-w-2xl mx-auto">
+            {/* Empty State Header */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 text-center">
+              <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                <ChatBubbleLeftEllipsisIcon className="h-12 w-12 text-blue-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('no_messages_yet')}</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                {t('start_conversation')} {user?.role === 'admin' 
+                  ? `${t('communicate_with').replace('{role}', t('residents'))}` 
+                  : `${t('communicate_with').replace('{role}', t('management'))}`}
+              </p>
+            </div>
+            
+            {/* Empty State Action */}
+            <div className="p-8 text-center">
+              <button
+                onClick={() => setShowNewMessage(true)}
+                className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-3 rtl:space-x-reverse mx-auto"
+              >
+                <div className="bg-white/20 p-2 rounded-xl group-hover:bg-white/30 transition-colors">
+                  <PlusIcon className="h-5 w-5" />
+                </div>
+                <span>{t('send_first_message')}</span>
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      {/* New Message Modal */}
+      {/* Enhanced New Message Modal */}
       {showNewMessage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-lg w-full max-h-90vh overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('new_message')}</h3>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                  <div className="bg-white/20 p-3 rounded-2xl">
+                    <PaperAirplaneIcon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-2xl font-bold">{t('new_message')}</h3>
+                </div>
                 <button
                   onClick={() => setShowNewMessage(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="p-2 hover:bg-white/20 rounded-xl transition-colors"
                 >
-                  ×
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
+            </div>
 
-              <form onSubmit={handleSendMessage} className="space-y-4">
+            {/* Modal Body */}
+            <div className="p-8 overflow-y-auto max-h-[calc(90vh-120px)]">
+              <form onSubmit={handleSendMessage} className="space-y-6">
+                {/* Message Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-bold text-gray-900 mb-3">
                     {t('message_type')}
                   </label>
-                  <select
-                    name="message_type"
-                    value={messageForm.message_type}
-                    onChange={handleInputChange}
-                    className="form-input"
-                    required
-                  >
-                    <option value="general">{t('general_message')}</option>
-                    <option value="maintenance_request">{t('maintenance_request')}</option>
-                    <option value="complaint">{t('complaint')}</option>
-                  </select>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      { value: 'general', icon: ChatBubbleBottomCenterTextIcon, color: 'blue' },
+                      { value: 'maintenance_request', icon: WrenchScrewdriverIcon, color: 'orange' },
+                      { value: 'complaint', icon: ExclamationTriangleIcon, color: 'red' }
+                    ].map((type) => (
+                      <label key={type.value} className="cursor-pointer">
+                        <input
+                          type="radio"
+                          name="message_type"
+                          value={type.value}
+                          checked={messageForm.message_type === type.value}
+                          onChange={handleInputChange}
+                          className="sr-only"
+                        />
+                        <div className={`p-4 rounded-2xl border-2 transition-all duration-200 ${
+                          messageForm.message_type === type.value
+                            ? `border-${type.color}-500 bg-${type.color}-50 shadow-lg`
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}>
+                          <type.icon className={`h-8 w-8 mx-auto mb-2 ${
+                            messageForm.message_type === type.value ? `text-${type.color}-600` : 'text-gray-400'
+                          }`} />
+                          <p className={`text-sm font-medium text-center ${
+                            messageForm.message_type === type.value ? `text-${type.color}-900` : 'text-gray-700'
+                          }`}>
+                            {t(type.value)}
+                          </p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
                 </div>
 
+                {/* Subject */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-bold text-gray-900 mb-3">
                     {t('subject')}
                   </label>
                   <input
@@ -292,40 +338,42 @@ const MessageCenter = () => {
                     name="subject"
                     value={messageForm.subject}
                     onChange={handleInputChange}
-                    className="form-input"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200"
                     required
                     placeholder={t('enter_message_subject')}
                   />
                 </div>
 
+                {/* Message Content */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-bold text-gray-900 mb-3">
                     {t('message')}
                   </label>
                   <textarea
                     name="content"
                     value={messageForm.content}
                     onChange={handleInputChange}
-                    rows={5}
-                    className="form-input"
+                    rows={6}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 resize-none"
                     required
                     placeholder={t('enter_message_here')}
                   />
                 </div>
 
-                <div className="flex space-x-4 pt-4">
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 pt-6">
                   <button
                     type="button"
                     onClick={() => setShowNewMessage(false)}
-                    className="btn btn-secondary flex-1"
+                    className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-2xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
                   >
                     {t('cancel')}
                   </button>
                   <button
                     type="submit"
-                    className="btn btn-primary flex-1 flex items-center justify-center space-x-2"
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-3 rtl:space-x-reverse"
                   >
-                    <PaperAirplaneIcon className="h-4 w-4" />
+                    <PaperAirplaneIcon className="h-5 w-5" />
                     <span>{t('send_message')}</span>
                   </button>
                 </div>

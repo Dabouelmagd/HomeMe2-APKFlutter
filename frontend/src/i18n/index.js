@@ -2526,6 +2526,12 @@ const resources = {
       'chat.noChatsYet': 'Aucun chat pour le moment',
       'chat.startFirstChat': 'Commencez votre première conversation',
       'chat.selectChatToStart': 'Sélectionnez un chat pour commencer à envoyer des messages',
+      'chat.noChatsFound': 'Aucun chat trouvé',
+      'chat.tryDifferentSearch': 'Essayez un terme de recherche différent',
+      'chat.createFirstChat': 'Créer le Premier Chat',
+      'chat.noMessages': 'Aucun message pour le moment',
+      'chat.chats': 'Chats',
+      'common.loading': 'Chargement...',
       
       // Common
       'common.cancel': 'Annuler',

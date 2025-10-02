@@ -910,7 +910,7 @@ const ServicesManagement = () => {
                     )}
                     <div className="flex items-center text-sm text-gray-600">
                       <ClockIcon className="h-4 w-4 mr-2" />
-                      {translateWorkingHours(service.working_hours)}
+                      {translateServiceData(service).working_hours}
                     </div>
                   </div>
 

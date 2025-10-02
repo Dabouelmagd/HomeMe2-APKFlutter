@@ -162,25 +162,25 @@ const TermsPrivacy = () => {
   const renderContent = (content) => (
     <div className="space-y-4">
       {content.map((section, index) => (
-        <div key={section.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+        <div key={section.id} className="bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-white/10 hover:bg-gray-700/30 transition-all duration-300">
           <button
             onClick={() => toggleSection(section.id)}
-            className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 rounded-2xl transition-all duration-200"
+            className="w-full px-6 py-5 flex items-center justify-between text-left rounded-2xl transition-all duration-200"
           >
             <div className="flex items-center space-x-4">
               <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-md transition-all duration-200 ${
                 activeTab === 'terms' 
-                  ? 'bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700' 
-                  : 'bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700'
+                  ? 'bg-gradient-to-br from-blue-500 to-blue-600' 
+                  : 'bg-gradient-to-br from-emerald-500 to-emerald-600'
               }`}>
                 {getSectionIcon(section.id, index)}
               </div>
               
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                <h3 className="text-lg font-bold text-white mb-1">
                   {section.title}
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-white/60">
                   {expandedSections[section.id] 
                     ? (t('legal_clickToCollapse') || 'انقر للطي') 
                     : (t('legal_clickToExpand') || 'انقر للتوسيع')
@@ -191,8 +191,8 @@ const TermsPrivacy = () => {
             
             <div className={`p-2 rounded-lg transition-all duration-200 ${
               expandedSections[section.id] 
-                ? (activeTab === 'terms' ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600')
-                : 'bg-gray-100 text-gray-400'
+                ? (activeTab === 'terms' ? 'bg-blue-600/20 text-blue-300' : 'bg-emerald-600/20 text-emerald-300')
+                : 'bg-white/10 text-white/40'
             }`}>
               {expandedSections[section.id] ? (
                 <ChevronUpIcon className="w-5 h-5" />
@@ -205,12 +205,12 @@ const TermsPrivacy = () => {
           {expandedSections[section.id] && (
             <div className="px-6 pb-6">
               <div className="ml-16">
-                <div className={`p-5 rounded-xl ${
+                <div className={`p-5 rounded-xl border-l-4 ${
                   activeTab === 'terms' 
-                    ? 'bg-blue-50 border-l-4 border-blue-400' 
-                    : 'bg-emerald-50 border-l-4 border-emerald-400'
+                    ? 'bg-blue-900/30 border-blue-400' 
+                    : 'bg-emerald-900/30 border-emerald-400'
                 }`}>
-                  <p className="text-gray-700 leading-relaxed text-base">
+                  <p className="text-white/90 leading-relaxed text-base">
                     {section.content}
                   </p>
                 </div>

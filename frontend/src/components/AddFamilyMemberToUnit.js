@@ -246,7 +246,16 @@ const AddFamilyMemberToUnit = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
+            <div className="mb-6 pb-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">
+                Available Residents ({filteredResidents.length})
+              </h2>
+              <p className="text-gray-600 mt-1">
+                Select a unit to add a new family member
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredResidents.map((resident) => (
               <div key={resident.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200">
                 <div className="flex flex-col space-y-4">

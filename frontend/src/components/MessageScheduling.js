@@ -195,30 +195,51 @@ const MessageScheduling = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-200 border-t-green-600 mx-auto mb-6"></div>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('common.loading')}</h3>
+          <p className="text-gray-500">{t('schedule.loadingMessages')}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 text-center">{t('schedule.title')}</h1>
-            <p className="mt-1 text-sm text-gray-600">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+      {/* Enhanced Header Section */}
+      <div className="bg-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <div className="bg-gradient-to-br from-green-600 to-emerald-600 p-4 rounded-2xl shadow-xl">
+                <CalendarIcon className="h-12 w-12 text-white" />
+              </div>
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
+              {t('schedule.title')}
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               {t('schedule.description')}
             </p>
           </div>
-          <button
-            onClick={() => setShowCreateForm(true)}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <PlusIcon className="h-5 w-5 mr-2" />
-            {t('schedule.scheduleMessage')}
-          </button>
+          
+          {/* Enhanced Action Button */}
+          <div className="flex justify-center">
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="group bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-3 rtl:space-x-reverse"
+            >
+              <div className="bg-white/20 p-2 rounded-xl group-hover:bg-white/30 transition-colors">
+                <PlusIcon className="h-6 w-6" />
+              </div>
+              <span className="text-lg">{t('schedule.scheduleMessage')}</span>
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
 
         {/* Create/Edit Form Modal */}
         {showCreateForm && (

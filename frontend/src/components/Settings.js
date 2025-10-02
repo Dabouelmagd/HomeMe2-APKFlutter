@@ -414,69 +414,175 @@ const Settings = () => {
       id: 'notifications',
       name: t('settings_notifications'),
       icon: BellIcon,
-      component: PushNotifications
+      component: PushNotifications,
+      color: 'from-blue-600 to-indigo-600',
+      bgColor: 'from-blue-50 to-indigo-50'
     },
     {
       id: 'profile',
       name: t('settings_profile'),
       icon: UserIcon,
-      component: ProfileSettings
+      component: ProfileSettings,
+      color: 'from-emerald-600 to-teal-600',
+      bgColor: 'from-emerald-50 to-teal-50'
     },
     {
       id: 'privacy',
       name: t('settings_privacy'),
       icon: ShieldCheckIcon,
-      component: PrivacySettings
+      component: PrivacySettings,
+      color: 'from-purple-600 to-pink-600',
+      bgColor: 'from-purple-50 to-pink-50'
     },
     {
       id: 'language',
       name: t('settings_language'),
       icon: LanguageIcon,
-      component: LanguageSettings
+      component: LanguageSettings,
+      color: 'from-orange-600 to-red-600',
+      bgColor: 'from-orange-50 to-red-50'
     }
   ];
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || (() => null);
+  const activeTabData = tabs.find(tab => tab.id === activeTab);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 text-center">{t('settings_title')}</h1>
-          <p className="text-gray-600 mt-2 text-center">{t('manage_account_settings_preferences')}</p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Enhanced Header Section */}
+      <div className="bg-white shadow-xl">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <div className="bg-gradient-to-br from-slate-600 to-slate-800 p-4 rounded-2xl shadow-xl relative">
+                <CogIcon className="h-12 w-12 text-white" />
+                <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-indigo-500 w-6 h-6 rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent mb-4">
+              {t('settings_title')}
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              {t('manage_account_settings_preferences')}
+            </p>
+          </div>
+          
+          {/* Enhanced Navigation Tabs */}
+          <div className="flex flex-wrap justify-center gap-4">
+            {tabs.map((tab) => {
+              const IconComponent = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`group relative px-6 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center space-x-3 rtl:space-x-reverse shadow-lg hover:shadow-xl ${
+                    isActive
+                      ? `bg-gradient-to-r ${tab.color} text-white shadow-2xl`
+                      : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-100 hover:border-gray-200'
+                  }`}
+                >
+                  <div className={`p-2 rounded-xl ${isActive ? 'bg-white/20' : `bg-gradient-to-br ${tab.bgColor}`}`}>
+                    <IconComponent className={`h-5 w-5 ${isActive ? 'text-white' : 'text-gray-600'}`} />
+                  </div>
+                  <span className="font-medium">{tab.name}</span>
+                  {isActive && (
+                    <div className="absolute -top-1 -right-1 bg-white text-gray-700 w-6 h-6 rounded-full flex items-center justify-center shadow-lg">
+                      <CheckIcon className="w-3 h-3" />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
+      </div>
 
-        <div className="lg:grid lg:grid-cols-12 lg:gap-x-5">
-          <aside className="py-6 px-2 sm:px-6 lg:py-0 lg:px-0 lg:col-span-3">
-            <nav className="space-y-1">
-              {tabs.map((tab) => {
-                const IconComponent = tab.icon;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`group rounded-md px-3 py-2 flex items-center text-sm font-medium w-full text-left ${
-                      activeTab === tab.id
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-900 hover:text-gray-900 hover:bg-gray-50'
-                    }`}
-                  >
-                    <IconComponent
-                      className={`flex-shrink-0 -ml-1 mr-3 h-6 w-6 ${
-                        activeTab === tab.id
-                          ? 'text-blue-500'
-                          : 'text-gray-400 group-hover:text-gray-500'
-                      }`}
-                    />
-                    <span className="truncate">{tab.name}</span>
-                  </button>
-                );
-              })}
-            </nav>
-          </aside>
-
-          <div className="space-y-6 sm:px-6 lg:px-0 lg:col-span-9">
+      {/* Enhanced Content Area */}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className={`bg-gradient-to-br ${activeTabData?.bgColor || 'from-gray-50 to-white'} rounded-3xl shadow-2xl border border-white/50 overflow-hidden`}>
+          {/* Tab Content Header */}
+          <div className={`bg-gradient-to-r ${activeTabData?.color || 'from-gray-600 to-gray-800'} px-8 py-6`}>
+            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+              <div className="bg-white/20 p-3 rounded-2xl">
+                <activeTabData.icon className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">
+                  {activeTabData?.name}
+                </h2>
+                <p className="text-white/80 mt-1">
+                  {activeTab === 'notifications' && t('notification_settings_description')}
+                  {activeTab === 'profile' && t('profile_settings_description')}
+                  {activeTab === 'privacy' && t('privacy_settings_description')}
+                  {activeTab === 'language' && t('language_settings_description')}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Tab Content Body */}
+          <div className="p-8">
             <ActiveComponent />
+          </div>
+        </div>
+        
+        {/* Enhanced Quick Actions Card */}
+        <div className="mt-8 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+            <h3 className="text-lg font-bold text-white flex items-center">
+              <CogIcon className="h-5 w-5 mr-2 rtl:ml-2 rtl:mr-0" />
+              {t('quick_settings_actions')}
+            </h3>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { 
+                  key: 'reset_preferences', 
+                  icon: '🔄', 
+                  label: t('reset_preferences'),
+                  desc: t('reset_all_settings_default')
+                },
+                { 
+                  key: 'export_data', 
+                  icon: '📤', 
+                  label: t('export_data'),
+                  desc: t('download_account_data')
+                },
+                { 
+                  key: 'account_security', 
+                  icon: '🔒', 
+                  label: t('security_checkup'),
+                  desc: t('review_security_settings')
+                },
+                { 
+                  key: 'help_support', 
+                  icon: '❓', 
+                  label: t('help_support'),
+                  desc: t('get_help_contact_support')
+                }
+              ].map((action) => (
+                <button
+                  key={action.key}
+                  className="group p-4 rounded-xl border-2 border-gray-100 hover:border-indigo-200 hover:bg-indigo-50 transition-all duration-200 text-left"
+                >
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse mb-2">
+                    <span className="text-2xl group-hover:scale-110 transition-transform">
+                      {action.icon}
+                    </span>
+                    <span className="font-semibold text-gray-900 group-hover:text-indigo-700">
+                      {action.label}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 group-hover:text-indigo-600">
+                    {action.desc}
+                  </p>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>

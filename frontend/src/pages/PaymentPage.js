@@ -314,7 +314,7 @@ const PaymentPage = () => {
                             {transaction.description}
                           </h4>
                           <p className="text-sm text-gray-500">
-                            {formatDate(transaction.created_at)}
+                            {formatDateUtil(transaction.created_at)}
                           </p>
                         </div>
                         <div className="text-right">

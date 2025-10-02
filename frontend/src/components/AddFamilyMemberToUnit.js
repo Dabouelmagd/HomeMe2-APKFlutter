@@ -528,7 +528,7 @@ const AddFamilyMemberToUnit = () => {
                     ) : (
                       <>
                         <CheckCircleIcon className="h-5 w-5" />
-                        <span>Add Family Member</span>
+                        <span>{t('add_family_member')}</span>
                       </>
                     )}
                   </button>

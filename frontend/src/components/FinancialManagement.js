@@ -225,7 +225,9 @@ const FinancialManagement = () => {
                 }
               </h3>
               <p className="text-sm text-yellow-700 mt-1">
-                {t('total_amount_due', { amount: totalPending.toFixed(2) })}
+                {t('total_amount_due', { 
+                  amount: formatCurrency(convertCurrency(totalPending, 'USD', selectedCurrency), selectedCurrency)
+                })}
               </p>
             </div>
           </div>

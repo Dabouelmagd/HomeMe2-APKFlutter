@@ -47,19 +47,19 @@ const AddFamilyMemberToUnit = () => {
   });
 
   const relationshipOptions = [
-    { value: 'spouse', label: 'Spouse' },
-    { value: 'son', label: 'Son' },
-    { value: 'daughter', label: 'Daughter' },
-    { value: 'father', label: 'Father' },
-    { value: 'mother', label: 'Mother' },
-    { value: 'brother', label: 'Brother' },
-    { value: 'sister', label: 'Sister' },
-    { value: 'grandfather', label: 'Grandfather' },
-    { value: 'grandmother', label: 'Grandmother' },
-    { value: 'uncle', label: 'Uncle' },
-    { value: 'aunt', label: 'Aunt' },
-    { value: 'cousin', label: 'Cousin' },
-    { value: 'other', label: 'Other' }
+    { value: 'spouse', label: t('spouse') },
+    { value: 'son', label: t('son') },
+    { value: 'daughter', label: t('daughter') },
+    { value: 'father', label: t('father') },
+    { value: 'mother', label: t('mother') },
+    { value: 'brother', label: t('brother') },
+    { value: 'sister', label: t('sister') },
+    { value: 'grandfather', label: t('grandfather') },
+    { value: 'grandmother', label: t('grandmother') },
+    { value: 'uncle', label: t('uncle') },
+    { value: 'aunt', label: t('aunt') },
+    { value: 'cousin', label: t('cousin') },
+    { value: 'other', label: t('other') }
   ];
 
   useEffect(() => {

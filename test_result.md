@@ -56,7 +56,7 @@ test_plan:
 user_problem_statement: "Test the Arabic translation implementation for Add Family Member to Unit page: PRIORITY 1 - ARABIC TRANSLATION VERIFICATION: Navigate to Add Family Member page (/add-family-member) after admin login, Switch to Arabic language via sidebar settings, Verify all text elements are translated to Arabic: Page title should be 'إضافة فرد عائلة للوحدة' (not 'Add Family Member to Unit'), Subtitle should be 'أضف أفراد العائلة لأي وحدة في المجمع بسهولة', Search placeholder should be 'البحث بالاسم أو رقم الوحدة أو الإيميل...', Section header should be 'السكان المتاحين' (Available Residents), Button text should be 'إضافة عضو' (Add Member). PRIORITY 2 - RTL LAYOUT VERIFICATION: Verify Arabic text displays right-to-left correctly, Check that page layout adapts properly for Arabic interface, Verify search bar and buttons align correctly in RTL mode. PRIORITY 3 - MODAL TRANSLATION TEST: Click 'Add Member' button to open modal in Arabic interface, Verify modal title shows 'إضافة فرد عائلة' (Add Family Member), Verify modal subtitle shows 'إضافة للوحدة' followed by unit details. PRIORITY 4 - LANGUAGE SWITCHING TEST: Test switching from English to Arabic - verify all content updates, Test switching from Arabic back to English - verify content reverts, Verify no mixed-language content appears during switching."
 
 frontend:
-  - task: "Arabic Translation Implementation for Add Family Member Page"
+  - task: "No File Chosen Translation Fix in Add Family Member Form"
     implemented: true
     working: true
     file: "/app/frontend/src/components/AddFamilyMemberToUnit.js"

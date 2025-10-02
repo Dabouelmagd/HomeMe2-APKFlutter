@@ -3,17 +3,17 @@ import i18n from '../i18n';
 // Date format configurations for different locales
 export const DATE_FORMATS = {
   en: {
-    short: 'MM/dd/yyyy',     // US format
-    long: 'MMMM d, yyyy',
-    locale: 'en-US'
+    short: 'dd/mm/yyyy',     // Universal dd/mm/yyyy format
+    long: 'd MMMM yyyy',
+    locale: 'en-GB'          // Changed to GB for dd/mm format
   },
   ar: {
-    short: 'dd/MM/yyyy',     // European/Arabic format
+    short: 'dd/mm/yyyy',     // Universal dd/mm/yyyy format
     long: 'd MMMM yyyy',
     locale: 'ar-EG'
   },
   fr: {
-    short: 'dd/MM/yyyy',     // European/French format
+    short: 'dd/mm/yyyy',     // Universal dd/mm/yyyy format
     long: 'd MMMM yyyy',
     locale: 'fr-FR'
   }

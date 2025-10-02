@@ -22,6 +22,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const ProfileSettings = () => {
+  const { t } = useTranslation();
   const { user, updateUser } = useAuth();
   const [profileData, setProfileData] = useState({
     full_name: user?.full_name || '',

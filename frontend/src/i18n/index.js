@@ -279,6 +279,25 @@ const resources = {
       'residents': 'residents',
       'management': 'management',
       
+      // Chat System
+      'chat': {
+        'newChat': 'New Chat',
+        'directChat': 'Direct Chat',
+        'directChatDescription': 'Start a private conversation with another user',
+        'groupChat': 'Group Chat',
+        'groupChatDescription': 'Create a group conversation with multiple users',
+        'compoundChat': 'Compound Chat',
+        'compoundChatDescription': 'Chat with all residents in your compound',
+        'searchUsers': 'Search Users',
+        'noUsersAvailable': 'No users available',
+        'createChat': 'Create Chat'
+      },
+      
+      // Common
+      'common': {
+        'cancel': 'Cancel'
+      },
+      
       // Notifications  
       'manage_your_notifications': 'Manage your notifications',
       'filters': 'Filters',

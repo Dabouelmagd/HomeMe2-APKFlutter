@@ -416,7 +416,8 @@ const Settings = () => {
       icon: BellIcon,
       component: PushNotifications,
       color: 'from-blue-600 to-indigo-600',
-      bgColor: 'from-blue-50 to-indigo-50'
+      bgColor: 'from-blue-50 to-indigo-50',
+      accent: 'bg-blue-500'
     },
     {
       id: 'profile',
@@ -424,7 +425,8 @@ const Settings = () => {
       icon: UserIcon,
       component: ProfileSettings,
       color: 'from-emerald-600 to-teal-600',
-      bgColor: 'from-emerald-50 to-teal-50'
+      bgColor: 'from-emerald-50 to-teal-50',
+      accent: 'bg-emerald-500'
     },
     {
       id: 'privacy',
@@ -432,7 +434,8 @@ const Settings = () => {
       icon: ShieldCheckIcon,
       component: PrivacySettings,
       color: 'from-purple-600 to-pink-600',
-      bgColor: 'from-purple-50 to-pink-50'
+      bgColor: 'from-purple-50 to-pink-50',
+      accent: 'bg-purple-500'
     },
     {
       id: 'language',
@@ -440,7 +443,8 @@ const Settings = () => {
       icon: LanguageIcon,
       component: LanguageSettings,
       color: 'from-orange-600 to-red-600',
-      bgColor: 'from-orange-50 to-red-50'
+      bgColor: 'from-orange-50 to-red-50',
+      accent: 'bg-orange-500'
     }
   ];
 
@@ -448,20 +452,20 @@ const Settings = () => {
   const activeTabData = tabs.find(tab => tab.id === activeTab);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Enhanced Header Section */}
-      <div className="bg-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      {/* Enhanced Header Section - Similar to NotificationCenter */}
+      <div className="bg-white shadow-2xl">
+        <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <div className="bg-gradient-to-br from-slate-600 to-slate-800 p-4 rounded-2xl shadow-xl relative">
+              <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-4 rounded-2xl shadow-xl relative">
                 <CogIcon className="h-12 w-12 text-white" />
-                <div className="absolute -top-1 -right-1 bg-gradient-to-r from-blue-500 to-indigo-500 w-6 h-6 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center animate-pulse">
+                  4
                 </div>
               </div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
               {t('settings_title')}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -469,119 +473,144 @@ const Settings = () => {
             </p>
           </div>
           
-          {/* Enhanced Navigation Tabs */}
-          <div className="flex flex-wrap justify-center gap-4">
-            {tabs.map((tab) => {
+          {/* Enhanced Action Buttons - Similar to NotificationCenter */}
+          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+            <button className="group px-6 py-3 rounded-2xl font-semibold transition-all duration-200 flex items-center justify-center space-x-3 rtl:space-x-reverse bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl hover:shadow-2xl transform hover:scale-105">
+              <CheckIcon className="h-5 w-5" />
+              <span>{t('save_all_changes')}</span>
+            </button>
+            
+            <button className="group px-6 py-3 rounded-2xl font-semibold transition-all duration-200 flex items-center justify-center space-x-3 rtl:space-x-reverse bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50">
+              <TrashIcon className="h-5 w-5" />
+              <span>{t('reset_to_defaults')}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        {/* Enhanced Filters Section - Similar to NotificationCenter */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
+          <h3 className="text-lg font-bold text-gray-900 mb-6">{t('settings_categories')}</h3>
+          
+          {/* Category Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {tabs.map((tab, index) => {
               const IconComponent = tab.icon;
               const isActive = activeTab === tab.id;
+              const colors = [
+                'from-blue-500 to-cyan-500',
+                'from-emerald-500 to-teal-500', 
+                'from-purple-500 to-pink-500',
+                'from-orange-500 to-red-500'
+              ];
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative px-6 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center space-x-3 rtl:space-x-reverse shadow-lg hover:shadow-xl ${
+                  className={`p-6 rounded-2xl text-center transition-all duration-300 transform hover:scale-105 hover:shadow-lg relative overflow-hidden ${
                     isActive
-                      ? `bg-gradient-to-r ${tab.color} text-white shadow-2xl`
-                      : 'bg-white text-gray-700 hover:bg-gray-50 border-2 border-gray-100 hover:border-gray-200'
+                      ? `bg-gradient-to-br ${colors[index % colors.length]} text-white shadow-2xl`
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-2 border-gray-200'
                   }`}
                 >
-                  <div className={`p-2 rounded-xl ${isActive ? 'bg-white/20' : `bg-gradient-to-br ${tab.bgColor}`}`}>
-                    <IconComponent className={`h-5 w-5 ${isActive ? 'text-white' : 'text-gray-600'}`} />
+                  {/* Background Pattern */}
+                  <div className={`absolute inset-0 opacity-10 ${isActive ? 'bg-white' : 'bg-gray-300'}`}>
+                    <div className="absolute -top-4 -right-4 w-24 h-24 rounded-full bg-current"></div>
+                    <div className="absolute -bottom-4 -left-4 w-16 h-16 rounded-full bg-current"></div>
                   </div>
-                  <span className="font-medium">{tab.name}</span>
-                  {isActive && (
-                    <div className="absolute -top-1 -right-1 bg-white text-gray-700 w-6 h-6 rounded-full flex items-center justify-center shadow-lg">
-                      <CheckIcon className="w-3 h-3" />
+                  
+                  <div className="relative z-10">
+                    <div className={`mx-auto mb-4 w-16 h-16 rounded-2xl flex items-center justify-center ${
+                      isActive ? 'bg-white/20' : `bg-gradient-to-br ${tab.bgColor}`
+                    }`}>
+                      <IconComponent className={`h-8 w-8 ${isActive ? 'text-white' : 'text-gray-600'}`} />
                     </div>
-                  )}
+                    <div className="text-sm font-bold mb-2">{tab.name}</div>
+                    <div className={`text-xs ${isActive ? 'text-white/80' : 'text-gray-500'}`}>
+                      {tab.id === 'notifications' && t('manage_notifications_desc')}
+                      {tab.id === 'profile' && t('update_profile_desc')}
+                      {tab.id === 'privacy' && t('control_privacy_desc')}
+                      {tab.id === 'language' && t('choose_language_desc')}
+                    </div>
+                    
+                    {isActive && (
+                      <div className="absolute -top-2 -right-2 bg-white text-gray-700 w-8 h-8 rounded-full flex items-center justify-center shadow-lg">
+                        <CheckIcon className="w-4 h-4" />
+                      </div>
+                    )}
+                  </div>
                 </button>
               );
             })}
           </div>
         </div>
-      </div>
 
-      {/* Enhanced Content Area */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className={`bg-gradient-to-br ${activeTabData?.bgColor || 'from-gray-50 to-white'} rounded-3xl shadow-2xl border border-white/50 overflow-hidden`}>
-          {/* Tab Content Header */}
-          <div className={`bg-gradient-to-r ${activeTabData?.color || 'from-gray-600 to-gray-800'} px-8 py-6`}>
-            <div className="flex items-center space-x-4 rtl:space-x-reverse">
-              <div className="bg-white/20 p-3 rounded-2xl">
-                <activeTabData.icon className="h-8 w-8 text-white" />
+        {/* Enhanced Content Area - Similar to NotificationCenter */}
+        <div className="space-y-8">
+          {/* Statistics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            {[
+              { label: t('active_sessions'), value: '3', icon: '🔐', color: 'bg-gradient-to-r from-blue-500 to-cyan-500' },
+              { label: t('notifications_enabled'), value: '12', icon: '🔔', color: 'bg-gradient-to-r from-emerald-500 to-teal-500' },
+              { label: t('privacy_level'), value: 'High', icon: '🛡️', color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
+              { label: t('languages_available'), value: '3', icon: '🌍', color: 'bg-gradient-to-r from-orange-500 to-red-500' }
+            ].map((stat, index) => (
+              <div key={index} className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+                <div className={`${stat.color} rounded-xl p-3 w-fit mb-4`}>
+                  <span className="text-2xl">{stat.icon}</span>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
+                  <p className="text-sm text-gray-600">{stat.label}</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  {activeTabData?.name}
-                </h2>
-                <p className="text-white/80 mt-1">
-                  {activeTab === 'notifications' && t('notification_settings_description')}
-                  {activeTab === 'profile' && t('profile_settings_description')}
-                  {activeTab === 'privacy' && t('privacy_settings_description')}
-                  {activeTab === 'language' && t('language_settings_description')}
-                </p>
+            ))}
+          </div>
+
+          {/* Main Content - Similar to NotificationCenter Empty State */}
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+            {/* Content Header with gradient */}
+            <div className={`bg-gradient-to-r ${activeTabData?.color || 'from-indigo-600 to-purple-600'} p-8 text-center`}>
+              <div className={`bg-gradient-to-br ${activeTabData?.bgColor || 'from-indigo-100 to-purple-100'} rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center`}>
+                <activeTabData.icon className={`h-12 w-12 ${activeTabData?.accent ? `text-${activeTabData.accent.split('-')[1]}-600` : 'text-indigo-600'}`} />
               </div>
+              <h2 className="text-2xl font-bold text-white mb-3">
+                {activeTabData?.name}
+              </h2>
+              <p className="text-white/90 text-lg leading-relaxed max-w-2xl mx-auto">
+                {activeTab === 'notifications' && t('notification_settings_description')}
+                {activeTab === 'profile' && t('profile_settings_description')}
+                {activeTab === 'privacy' && t('privacy_settings_description')}
+                {activeTab === 'language' && t('language_settings_description')}
+              </p>
+            </div>
+            
+            {/* Content Body */}
+            <div className="p-8">
+              <ActiveComponent />
             </div>
           </div>
-          
-          {/* Tab Content Body */}
-          <div className="p-8">
-            <ActiveComponent />
-          </div>
-        </div>
-        
-        {/* Enhanced Quick Actions Card */}
-        <div className="mt-8 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
-            <h3 className="text-lg font-bold text-white flex items-center">
-              <CogIcon className="h-5 w-5 mr-2 rtl:ml-2 rtl:mr-0" />
-              {t('quick_settings_actions')}
-            </h3>
-          </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { 
-                  key: 'reset_preferences', 
-                  icon: '🔄', 
-                  label: t('reset_preferences'),
-                  desc: t('reset_all_settings_default')
-                },
-                { 
-                  key: 'export_data', 
-                  icon: '📤', 
-                  label: t('export_data'),
-                  desc: t('download_account_data')
-                },
-                { 
-                  key: 'account_security', 
-                  icon: '🔒', 
-                  label: t('security_checkup'),
-                  desc: t('review_security_settings')
-                },
-                { 
-                  key: 'help_support', 
-                  icon: '❓', 
-                  label: t('help_support'),
-                  desc: t('get_help_contact_support')
-                }
-              ].map((action) => (
-                <button
-                  key={action.key}
-                  className="group p-4 rounded-xl border-2 border-gray-100 hover:border-indigo-200 hover:bg-indigo-50 transition-all duration-200 text-left"
-                >
-                  <div className="flex items-center space-x-3 rtl:space-x-reverse mb-2">
-                    <span className="text-2xl group-hover:scale-110 transition-transform">
-                      {action.icon}
-                    </span>
-                    <span className="font-semibold text-gray-900 group-hover:text-indigo-700">
-                      {action.label}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 group-hover:text-indigo-600">
-                    {action.desc}
-                  </p>
-                </button>
-              ))}
+
+          {/* Enhanced Features Grid - Similar to NotificationCenter bottom */}
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+            <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">{t('settings_features')}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center p-6 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
+                <div className="text-4xl mb-4">🔒</div>
+                <h4 className="font-bold text-gray-900 mb-2">{t('advanced_security')}</h4>
+                <p className="text-sm text-gray-600">{t('advanced_security_desc')}</p>
+              </div>
+              <div className="text-center p-6 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100">
+                <div className="text-4xl mb-4">⚡</div>
+                <h4 className="font-bold text-gray-900 mb-2">{t('instant_sync')}</h4>
+                <p className="text-sm text-gray-600">{t('instant_sync_desc')}</p>
+              </div>
+              <div className="text-center p-6 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-100">
+                <div className="text-4xl mb-4">🌍</div>
+                <h4 className="font-bold text-gray-900 mb-2">{t('multilingual')}</h4>
+                <p className="text-sm text-gray-600">{t('multilingual_desc')}</p>
+              </div>
             </div>
           </div>
         </div>

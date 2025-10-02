@@ -332,15 +332,7 @@ const ServicesManagement = () => {
         working_hours: service.working_hours_en || workingHours
       };
       
-      console.log('English translation result:', {
-        original: service.name,
-        translated: result.name,
-        originalSpecialty: service.specialty,
-        translatedSpecialty: result.specialty,
-        hasTranslation: !!translation,
-        translationName: translation?.name,
-        translationSpecialty: translation?.specialty
-      });
+      // English translation applied successfully
       
       return result;
     } else if (currentLang === 'ar') {

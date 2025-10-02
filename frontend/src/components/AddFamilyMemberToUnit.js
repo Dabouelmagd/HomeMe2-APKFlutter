@@ -222,7 +222,7 @@ const AddFamilyMemberToUnit = () => {
           </div>
           {searchTerm && (
             <p className="text-sm text-gray-500 mt-2 text-center">
-              {filteredResidents.length} resident{filteredResidents.length !== 1 ? 's' : ''} found
+              {filteredResidents.length} {filteredResidents.length === 1 ? t('resident') : t('residents')} {t('found')}
             </p>
           )}
         </div>

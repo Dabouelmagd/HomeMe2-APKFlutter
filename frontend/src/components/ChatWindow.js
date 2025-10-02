@@ -412,6 +412,20 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
     return chat?.participants?.length || 0;
   };
 
+  const getChatTypeLabel = () => {
+    if (!chat) return '';
+    
+    if (chat.chat_type === 'direct') {
+      return t('chat.directChat');
+    } else if (chat.chat_type === 'group') {
+      return t('chat.groupChat');
+    } else if (chat.chat_type === 'compound_wide') {
+      return t('chat.compoundChat');
+    }
+    
+    return t('chat.groupChat');
+  };
+
   if (!chat) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50">

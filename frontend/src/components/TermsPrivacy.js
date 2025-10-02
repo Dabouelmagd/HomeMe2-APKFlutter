@@ -13,7 +13,8 @@ import {
   LockClosedIcon,
   EyeIcon,
   UserShieldIcon,
-  ClipboardDocumentCheckIcon
+  ClipboardDocumentCheckIcon,
+  ClockIcon
 } from '@heroicons/react/24/outline';
 
 const TermsPrivacy = () => {

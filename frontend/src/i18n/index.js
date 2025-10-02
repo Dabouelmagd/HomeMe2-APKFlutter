@@ -319,9 +319,25 @@ const resources = {
       
       // Notifications  
       'manage_your_notifications': 'Manage your notifications',
+      'notification_filters': 'Notification Filters',
+      'search_notifications': 'Search notifications...',
+      'loading_notifications': 'Loading notifications...',
+      'no_notifications_yet': 'No Notifications Yet',
+      'no_matching_notifications': 'No Matching Notifications',
+      'try_adjusting_filters': 'Try adjusting your filters',
+      'notifications_will_appear_here': 'Notifications will appear here when they arrive',
+      'notification_types_include': 'Notification types include:',
+      'notifications_found': 'notifications found',
+      'priority_high': 'High Priority',
+      'priority_medium': 'Medium Priority',
+      'priority_low': 'Low Priority',
+      'filter_all': 'All',
+      'filter_unread': 'Unread',
+      'filter_read': 'Read',
+      'mark_read': 'Mark Read',
+      'delete_notification': 'Delete Notification',
       'filters': 'Filters',
       'no_notifications': 'No notifications',
-      'notifications_will_appear_here': 'Notifications will appear here',
       
       // Settings
       'settings_title': 'Settings',

@@ -179,29 +179,29 @@ const TermsPrivacy = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 mb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Enhanced Tab Navigation */}
+        <div className="flex space-x-1 bg-white/70 backdrop-blur-sm rounded-2xl p-2 mb-10 shadow-lg border border-white/20">
           <button
             onClick={() => setActiveTab('terms')}
-            className={`flex-1 flex items-center justify-center px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 flex items-center justify-center px-6 py-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
               activeTab === 'terms'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 transform scale-[1.02]'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
             }`}
           >
-            <DocumentTextIcon className="w-5 h-5 mr-2" />
+            <DocumentTextIcon className="w-5 h-5 mr-3" />
             {t('legal_termsOfUse')}
           </button>
           <button
             onClick={() => setActiveTab('privacy')}
-            className={`flex-1 flex items-center justify-center px-4 py-3 rounded-md text-sm font-medium transition-colors ${
+            className={`flex-1 flex items-center justify-center px-6 py-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
               activeTab === 'privacy'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/25 transform scale-[1.02]'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
             }`}
           >
-            <ShieldCheckIcon className="w-5 h-5 mr-2" />
+            <ShieldCheckIcon className="w-5 h-5 mr-3" />
             {t('legal_privacyPolicy')}
           </button>
         </div>

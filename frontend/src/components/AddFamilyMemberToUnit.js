@@ -496,12 +496,27 @@ const AddFamilyMemberToUnit = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         {t('profile_picture')}
                       </label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleProfilePictureChange}
-                        className="form-input w-full"
-                      />
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleProfilePictureChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          id="profile-picture-upload"
+                        />
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-400 transition-colors">
+                          <div className="text-gray-600">
+                            {memberForm.profile_picture_file ? (
+                              <span className="text-blue-600 font-medium">{memberForm.profile_picture_file.name}</span>
+                            ) : (
+                              <span>{t('no_file_chosen')}</span>
+                            )}
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            {t('click_to_upload_image')}
+                          </div>
+                        </div>
+                      </div>
                       {memberForm.profile_picture_preview && (
                         <div className="mt-2">
                           <img

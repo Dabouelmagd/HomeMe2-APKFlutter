@@ -91,53 +91,70 @@ const ChatSidebar = ({ selectedChat, onChatSelect, onNewChat }) => {
 
   if (loading) {
     return (
-      <div className="w-80 bg-white border-r border-gray-200 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="w-80 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-500 text-sm">{t('common.loading')}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-center text-gray-900 text-center">{t('chat.chats')}</h2>
+    <div className="w-80 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200 flex flex-col h-full">
+      {/* Enhanced Header */}
+      <div className="p-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            <div className="bg-white/20 p-2 rounded-lg">
+              <ChatBubbleLeftEllipsisSolidIcon className="h-6 w-6" />
+            </div>
+            <h2 className="text-xl font-bold">{t('chat.chats')}</h2>
+          </div>
           <button
             onClick={onNewChat}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all duration-200 hover:scale-105"
             title={t('chat.newChat')}
           >
             <PlusIcon className="h-5 w-5" />
           </button>
         </div>
         
-        {/* Search */}
+        {/* Enhanced Search */}
         <div className="relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-4 rtl:right-4 rtl:left-auto top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/70" />
           <input
             type="text"
             placeholder={t('chat.searchChats')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-12 rtl:pr-12 rtl:pl-4 pr-4 py-3 bg-white/20 border border-white/30 rounded-xl text-white placeholder-white/70 focus:bg-white/30 focus:border-white/50 focus:outline-none transition-all duration-200"
           />
         </div>
       </div>
 
-      {/* Chat List */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Chat List with Enhanced Design */}
+      <div className="flex-1 overflow-y-auto p-2">
         {filteredChats.length === 0 ? (
-          <div className="p-4 text-center text-gray-500">
-            <ChatBubbleLeftEllipsisIcon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
-            <p>{searchTerm ? t('chat.noChatsFound') : t('chat.noChatsYet')}</p>
+          <div className="p-8 text-center">
+            <div className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl p-8 mb-4">
+              <ChatBubbleLeftEllipsisIcon className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-600 text-lg font-medium mb-2">
+                {searchTerm ? t('chat.noChatsFound') : t('chat.noChatsYet')}
+              </p>
+              <p className="text-gray-500 text-sm">
+                {searchTerm ? t('chat.tryDifferentSearch') : t('chat.startFirstChat')}
+              </p>
+            </div>
             {!searchTerm && (
               <button
                 onClick={onNewChat}
-                className="mt-2 text-blue-600 hover:text-blue-700 font-medium"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-medium hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
               >
-                {t('chat.startFirstChat')}
+                {t('chat.createFirstChat')}
               </button>
+            )}
+          </div>
             )}
           </div>
         ) : (

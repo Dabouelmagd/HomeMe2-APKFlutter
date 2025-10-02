@@ -53,14 +53,14 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 ##
-user_problem_statement: "Test the improved service translation system to verify all translation issues are resolved: PRIORITY 1 - COMPREHENSIVE TRANSLATION VERIFICATION: Navigate to Services Management page (/services) after admin login, verify in English interface that service names are in English (Plumbing Services, Electrical Services, etc.), specialties are in English (NOT Arabic), descriptions are proper English, working hours are properly converted. PRIORITY 2 - SPECIFIC TRANSLATION FIXES: Check for specific fixes like 'سباكة الطوارئ، إصلاح الأنابيب' should become 'Emergency plumbing, pipe repairs', 'الإصلاحات الكهربائية، التركيبات' should become 'Electrical repairs, installations', 'خدPMة طوارئ 24/7' should become '24/7 emergency service', '8:00 AM - 6:00 PM، طوارئ 24/7' should become '8:00 AM - 6:00 PM, 24/7 emergencies'. PRIORITY 3 - DESCRIPTION QUALITY: Verify descriptions are meaningful, not repetitive. PRIORITY 4 - WORKING HOURS CONVERSION: Verify Arabic to English time conversion (ص → AM correctly, م → PM correctly, no mixed language like 'خدPMة', proper English phrases for emergency services)."
+user_problem_statement: "Test the redesigned 'Add Family Member to Unit' page UI improvements and functionality: PRIORITY 1 - UI DESIGN VERIFICATION: Navigate to Add Family Member page (/add-family-member) after admin login, verify the enhanced design elements: Main icon should be larger (h-12 w-12) with blue background circle, Page title should be larger (text-3xl) and better positioned, Search bar should be centered with rounded design (rounded-xl), Cards should have improved layout with larger profile pictures, 'Add Member' buttons should be full-width with enhanced styling. PRIORITY 2 - RESPONSIVE DESIGN TEST: Test the grid layout responsiveness: Mobile: 1 column (grid-cols-1), Tablet: 2 columns (md:grid-cols-2), Desktop: 3 columns (lg:grid-cols-3), Verify cards have proper spacing (gap-6) and padding. PRIORITY 3 - INTERACTIVE ELEMENTS TEST: Test 'Add Member' button functionality: Click should open modal with enhanced header design, Modal should have improved styling with blue icon background, Buttons should have proper hover effects and transitions, Test search functionality with the redesigned search bar. PRIORITY 4 - VISUAL IMPROVEMENTS VERIFICATION: Background should be light gray (bg-gray-50), Cards should be white with rounded corners (rounded-xl), Profile pictures should be larger (h-16 w-16) with gradient fallback, Icons should have proper colors and sizing, Typography should be improved with better font weights."
 
 frontend:
-  - task: "Service Translation System Testing"
+  - task: "Add Family Member UI Redesign Testing"
     implemented: true
-    working: false
-    file: "/app/frontend/src/components/ServicesManagement.js"
-    stuck_count: 2
+    working: true
+    file: "/app/frontend/src/components/AddFamilyMemberToUnit.js"
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:

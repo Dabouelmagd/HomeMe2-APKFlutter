@@ -283,7 +283,7 @@ const FamilyManagement = () => {
                         {member.birthday ? (
                           <div className="flex items-center">
                             <CalendarIcon className="h-4 w-4 mr-1 text-gray-400" />
-                            {new Date(member.birthday).toLocaleDateString()}
+                            {formatDate(member.birthday)}
                           </div>
                         ) : (
                           <span className="text-gray-400">-</span>

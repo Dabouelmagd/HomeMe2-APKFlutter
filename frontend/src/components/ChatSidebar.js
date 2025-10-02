@@ -4,7 +4,6 @@ import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import {
   ChatBubbleLeftEllipsisIcon,
-  ChatBubbleLeftEllipsisSolidIcon,
   UsersIcon,
   PlusIcon,
   EllipsisVerticalIcon,

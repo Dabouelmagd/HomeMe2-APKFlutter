@@ -340,18 +340,27 @@ const LanguageSettings = () => {
   const { t, i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
 
+  // Apply RTL layout when language changes
   useEffect(() => {
-    // Apply RTL on component mount based on current language
-    const currentLang = i18n.language;
-    if (currentLang === 'ar') {
-      document.dir = 'rtl';
-      document.documentElement.setAttribute('dir', 'rtl');
-      document.body.classList.add('rtl');
-    } else {
-      document.dir = 'ltr';
-      document.documentElement.setAttribute('dir', 'ltr');
-      document.body.classList.remove('rtl');
-    }
+    const applyLanguageLayout = (lang) => {
+      if (lang === 'ar') {
+        document.dir = 'rtl';
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.body.classList.add('rtl');
+        document.body.style.direction = 'rtl';
+      } else {
+        document.dir = 'ltr';
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.body.classList.remove('rtl');
+        document.body.style.direction = 'ltr';
+      }
+    };
+
+    // Apply layout for current language
+    applyLanguageLayout(i18n.language);
+    
+    // Update selected language state
+    setSelectedLanguage(i18n.language);
   }, [i18n.language]);
 
   const languages = [
@@ -362,31 +371,35 @@ const LanguageSettings = () => {
 
   const handleLanguageChange = async (langCode) => {
     try {
-      // Explicitly set in localStorage first
+      // Set in localStorage first to ensure persistence
       localStorage.setItem('i18nextLng', langCode);
       
       // Change language in i18n
       await i18n.changeLanguage(langCode);
-      setSelectedLanguage(langCode);
       
-      // Apply RTL for Arabic immediately
+      // Apply layout changes immediately
       if (langCode === 'ar') {
         document.dir = 'rtl';
         document.documentElement.setAttribute('dir', 'rtl');
         document.body.classList.add('rtl');
+        document.body.style.direction = 'rtl';
       } else {
         document.dir = 'ltr';
         document.documentElement.setAttribute('dir', 'ltr');
         document.body.classList.remove('rtl');
+        document.body.style.direction = 'ltr';
       }
+      
+      // Update state
+      setSelectedLanguage(langCode);
       
       // Show success message
       toast.success(t('language_updated_successfully'));
       
-      // Force re-render by refreshing the page after ensuring persistence
+      // Small delay to ensure all changes are applied
       setTimeout(() => {
         window.location.reload();
-      }, 1000);
+      }, 800);
       
     } catch (error) {
       console.error('Language change error:', error);

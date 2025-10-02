@@ -523,33 +523,6 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
             </button>
           </div>
         </div>
-              ) : (
-                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center">
-                  <UserGroupIcon className="h-5 w-5 text-white" />
-                </div>
-              )}
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{getChatName()}</h3>
-              <p className="text-sm text-gray-500">
-                {chat.chat_type === 'direct' 
-                  ? t('chat.directChatDescription')
-                  : `${getParticipantCount()} ${t('chat.participants')}`
-                }
-              </p>
-            </div>
-          </div>
-          <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-            <EllipsisVerticalIcon className="h-5 w-5" />
-          </button>
-          <button 
-            onClick={() => setShowMessageSearch(true)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title={t('search.searchInChat')}
-          >
-            <MagnifyingGlassIcon className="h-5 w-5" />
-          </button>
-        </div>
       </div>
 
       {/* Messages */}

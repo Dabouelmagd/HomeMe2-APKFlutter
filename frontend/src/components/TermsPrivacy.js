@@ -160,87 +160,63 @@ const TermsPrivacy = () => {
   ];
 
   const renderContent = (content) => (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {content.map((section, index) => (
-        <div key={section.id} className="group relative">
-          {/* Glow effect on hover */}
-          <div className={`absolute inset-0 rounded-3xl blur-lg opacity-0 group-hover:opacity-20 transition-opacity duration-500 ${
-            activeTab === 'terms' 
-              ? 'bg-gradient-to-r from-blue-400 to-indigo-500' 
-              : 'bg-gradient-to-r from-emerald-400 to-teal-500'
-          }`}></div>
+        <div key={section.id} className="bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+          <button
+            onClick={() => toggleSection(section.id)}
+            className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 rounded-2xl transition-all duration-200"
+          >
+            <div className="flex items-center space-x-4">
+              <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-md transition-all duration-200 ${
+                activeTab === 'terms' 
+                  ? 'bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700' 
+                  : 'bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700'
+              }`}>
+                {getSectionIcon(section.id, index)}
+              </div>
+              
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                  {section.title}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {expandedSections[section.id] 
+                    ? (t('legal_clickToCollapse') || 'انقر للطي') 
+                    : (t('legal_clickToExpand') || 'انقر للتوسيع')
+                  }
+                </p>
+              </div>
+            </div>
+            
+            <div className={`p-2 rounded-lg transition-all duration-200 ${
+              expandedSections[section.id] 
+                ? (activeTab === 'terms' ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600')
+                : 'bg-gray-100 text-gray-400'
+            }`}>
+              {expandedSections[section.id] ? (
+                <ChevronUpIcon className="w-5 h-5" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5" />
+              )}
+            </div>
+          </button>
           
-          <div className="relative bg-white/90 backdrop-blur-md rounded-3xl border border-white/30 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden">
-            <button
-              onClick={() => toggleSection(section.id)}
-              className="w-full px-10 py-8 flex items-center justify-between text-left hover:bg-white/60 rounded-3xl transition-all duration-500 group-hover:scale-[1.02]"
-            >
-              <div className="flex items-center space-x-8">
-                <div className={`relative flex-shrink-0 w-16 h-16 rounded-3xl flex items-center justify-center transition-all duration-500 shadow-2xl ${
+          {expandedSections[section.id] && (
+            <div className="px-6 pb-6">
+              <div className="ml-16">
+                <div className={`p-5 rounded-xl ${
                   activeTab === 'terms' 
-                    ? 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 group-hover:from-blue-700 group-hover:via-indigo-700 group-hover:to-purple-700' 
-                    : 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 group-hover:from-emerald-700 group-hover:via-teal-700 group-hover:to-cyan-700'
-                } hover:scale-110 hover:rotate-3`}>
-                  {/* Icon background glow */}
-                  <div className="absolute inset-0 bg-white/20 rounded-3xl blur-md"></div>
-                  <div className="relative z-10">
-                    {getSectionIcon(section.id, index)}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <h3 className="text-2xl font-black text-gray-900 group-hover:text-gray-800 transition-colors tracking-tight">
-                    {section.title}
-                  </h3>
-                  <p className={`text-base font-medium transition-colors ${
-                    expandedSections[section.id] 
-                      ? (activeTab === 'terms' ? 'text-blue-600' : 'text-emerald-600')
-                      : 'text-gray-500 group-hover:text-gray-600'
-                  }`}>
-                    {expandedSections[section.id] ? t('legal_clickToCollapse') || '▲ Click to collapse' : t('legal_clickToExpand') || '▼ Click to expand'}
+                    ? 'bg-blue-50 border-l-4 border-blue-400' 
+                    : 'bg-emerald-50 border-l-4 border-emerald-400'
+                }`}>
+                  <p className="text-gray-700 leading-relaxed text-base">
+                    {section.content}
                   </p>
                 </div>
               </div>
-              
-              <div className={`relative p-4 rounded-2xl transition-all duration-500 hover:scale-110 ${
-                expandedSections[section.id] 
-                  ? (activeTab === 'terms' 
-                      ? 'bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 shadow-lg' 
-                      : 'bg-gradient-to-br from-emerald-100 to-teal-100 text-emerald-700 shadow-lg')
-                  : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200 group-hover:text-gray-600'
-              }`}>
-                {expandedSections[section.id] ? (
-                  <ChevronUpIcon className="w-6 h-6 transform transition-transform duration-300 rotate-180" />
-                ) : (
-                  <ChevronDownIcon className="w-6 h-6 transform transition-transform duration-300 group-hover:translate-y-1" />
-                )}
-              </div>
-            </button>
-            
-            {expandedSections[section.id] && (
-              <div className="px-10 pb-10 animate-fadeIn">
-                <div className="pl-20">
-                  <div className={`relative p-8 rounded-2xl shadow-inner transition-all duration-300 ${
-                    activeTab === 'terms' 
-                      ? 'bg-gradient-to-br from-blue-50/80 to-indigo-50/80 border-l-4 border-blue-500' 
-                      : 'bg-gradient-to-br from-emerald-50/80 to-teal-50/80 border-l-4 border-emerald-500'
-                  }`}>
-                    {/* Content decorative elements */}
-                    <div className={`absolute top-4 right-4 w-12 h-12 rounded-full opacity-10 ${
-                      activeTab === 'terms' ? 'bg-blue-400' : 'bg-emerald-400'
-                    }`}></div>
-                    <div className={`absolute bottom-4 right-8 w-8 h-8 rounded-full opacity-5 ${
-                      activeTab === 'terms' ? 'bg-indigo-400' : 'bg-teal-400'
-                    }`}></div>
-                    
-                    <p className="text-gray-800 leading-relaxed text-xl font-medium whitespace-pre-line relative z-10">
-                      {section.content}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       ))}
     </div>

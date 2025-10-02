@@ -328,7 +328,7 @@ const PrivacySettings = () => {
           </div>
 
           <div className="flex justify-end">
-            <button onClick={handlePrivacyUpdate} className="btn btn-primary">Save Privacy Settings</button>
+            <button onClick={handlePrivacyUpdate} className="btn btn-primary">{t('save_privacy_settings')}</button>
           </div>
         </div>
       </div>

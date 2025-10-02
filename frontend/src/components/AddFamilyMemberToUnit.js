@@ -206,18 +206,25 @@ const AddFamilyMemberToUnit = () => {
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+        {/* Enhanced Search Bar */}
+        <div className="max-w-md mx-auto">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search by name, unit number, or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm text-gray-900 placeholder-gray-500"
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Search by name, unit number, or email..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="form-input w-full pl-10"
-          />
+          {searchTerm && (
+            <p className="text-sm text-gray-500 mt-2 text-center">
+              {filteredResidents.length} resident{filteredResidents.length !== 1 ? 's' : ''} found
+            </p>
+          )}
         </div>
       </div>
 

@@ -438,14 +438,14 @@ const AddFamilyMemberToUnit = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          ID Number
+                          {t('id_number')}
                         </label>
                         <input
                           type="text"
                           value={memberForm.id_number}
                           onChange={(e) => setMemberForm(prev => ({ ...prev, id_number: e.target.value }))}
                           className="form-input w-full"
-                          placeholder="Enter ID number"
+                          placeholder={t('enter_id_number')}
                         />
                       </div>
 

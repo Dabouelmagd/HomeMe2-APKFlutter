@@ -1970,6 +1970,16 @@ const resources = {
       'profile_picture': 'صورة الملف الشخصي',
       'no_file_chosen': 'لم يتم اختيار ملف',
       'cancel': 'إلغاء',
+      'select_relationship': 'اختر القرابة',
+      'father': 'الأب',
+      'mother': 'الأم',
+      'brother': 'الأخ',
+      'sister': 'الأخت',
+      'grandfather': 'الجد',
+      'grandmother': 'الجدة',
+      'uncle': 'العم',
+      'aunt': 'العمة',
+      'cousin': 'ابن العم',
       
       // Locations & Map
       'locations_map': 'المواقع والخريطة',

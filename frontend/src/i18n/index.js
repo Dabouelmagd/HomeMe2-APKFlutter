@@ -2503,14 +2503,21 @@ const resources = {
         'groupChatDescription': 'Créer une conversation de groupe avec plusieurs utilisateurs',
         'compoundChat': 'Chat du Complexe',
         'compoundChatDescription': 'Chatter avec tous les résidents de votre complexe',
+        'groupName': 'Nom du Groupe',
+        'enterGroupName': 'Entrez le nom du groupe',
+        'groupDescription': 'Description du Groupe',
+        'enterGroupDescription': 'Entrez la description du groupe (optionnel)',
         'searchUsers': 'Rechercher des Utilisateurs',
+        'noUsersFound': 'Aucun utilisateur trouvé',
         'noUsersAvailable': 'Aucun utilisateur disponible',
+        'compoundChatInfo': 'Ceci créera un chat à l\'échelle du complexe où tous les résidents peuvent participer',
         'createChat': 'Créer un Chat'
       },
       
       // Common
       'common': {
-        'cancel': 'Annuler'
+        'cancel': 'Annuler',
+        'creating': 'Création en cours...'
       },
       
       // Notifications

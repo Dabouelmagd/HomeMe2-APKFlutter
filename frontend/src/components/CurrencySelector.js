@@ -16,7 +16,7 @@ const CurrencySelector = ({ selectedCurrency, onCurrencyChange }) => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+        className="flex items-center space-x-2 rtl:space-x-reverse px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
       >
         <span className="font-medium">{CURRENCIES[selectedCurrency]?.symbol}</span>
         <span className="text-sm text-gray-600">{selectedCurrency}</span>

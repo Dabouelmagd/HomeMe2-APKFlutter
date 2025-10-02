@@ -105,32 +105,55 @@ const TermsPrivacy = () => {
   ];
 
   const renderContent = (content) => (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {content.map((section, index) => (
-        <div key={section.id} className="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div key={section.id} className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300">
           <button
             onClick={() => toggleSection(section.id)}
-            className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 rounded-lg transition-colors"
+            className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-white/50 rounded-2xl transition-all duration-300 group"
           >
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-sm font-semibold text-center text-blue-600">{index + 1}</span>
+            <div className="flex items-center space-x-4">
+              <div className={`flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                activeTab === 'terms' 
+                  ? 'bg-gradient-to-br from-blue-500 to-indigo-600 group-hover:from-blue-600 group-hover:to-indigo-700' 
+                  : 'bg-gradient-to-br from-emerald-500 to-teal-600 group-hover:from-emerald-600 group-hover:to-teal-700'
+              } shadow-lg`}>
+                <span className="text-lg font-bold text-white">{index + 1}</span>
               </div>
-              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{section.title}</h3>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-gray-800 transition-colors">
+                  {section.title}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  {expandedSections[section.id] ? t('legal_clickToCollapse') || 'Click to collapse' : t('legal_clickToExpand') || 'Click to expand'}
+                </p>
+              </div>
             </div>
-            {expandedSections[section.id] ? (
-              <ChevronUpIcon className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronDownIcon className="w-5 h-5 text-gray-400" />
-            )}
+            <div className={`p-2 rounded-xl transition-all duration-300 ${
+              expandedSections[section.id] 
+                ? (activeTab === 'terms' ? 'bg-blue-100 text-blue-600' : 'bg-emerald-100 text-emerald-600')
+                : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'
+            }`}>
+              {expandedSections[section.id] ? (
+                <ChevronUpIcon className="w-5 h-5" />
+              ) : (
+                <ChevronDownIcon className="w-5 h-5" />
+              )}
+            </div>
           </button>
           
           {expandedSections[section.id] && (
-            <div className="px-6 pb-4">
-              <div className="pl-11">
-                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {section.content}
-                </p>
+            <div className="px-8 pb-8">
+              <div className="pl-16">
+                <div className={`p-6 rounded-xl border-l-4 ${
+                  activeTab === 'terms' 
+                    ? 'bg-blue-50/50 border-blue-400' 
+                    : 'bg-emerald-50/50 border-emerald-400'
+                }`}>
+                  <p className="text-gray-700 leading-relaxed text-lg whitespace-pre-line">
+                    {section.content}
+                  </p>
+                </div>
               </div>
             </div>
           )}

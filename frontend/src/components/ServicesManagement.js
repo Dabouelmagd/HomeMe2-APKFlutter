@@ -222,25 +222,93 @@ const ServicesManagement = () => {
     // Always force English for testing
     const forceEnglish = currentLang.startsWith('en') || currentLang === 'en-US@posix';
     
-    // Create default English fallbacks based on service names
-    const englishFallbacks = {
-      'خدمات السباكة': 'Plumbing Services',
-      'الخدمات الكهربائية': 'Electrical Services',
-      'خدمات التكييف والتهوية': 'HVAC Services',
-      'الفني العام': 'General Handyman',
-      'تنظيف المنازل': 'House Cleaning',
-      'تنظيف السجاد': 'Carpet Cleaning',
-      'تنظيف النوافذ': 'Window Cleaning',
-      'حارس الأمن': 'Security Guard',
-      'إعداد نظام التحكم بالدخول': 'Access Control Setup',
-      'تنسيق الحدائق والبستنة': 'Landscaping & Gardening',
-      'صيانة المسابح': 'Pool Maintenance',
-      'خدمات رعاية الحيوانات الأليفة': 'Pet Care Services',
-      'مدرب شخصي': 'Personal Trainer',
-      'توصيل الطرود': 'Package Delivery',
-      'خدمات النقل': 'Moving Services',
-      'تخطيط الفعاليات': 'Event Planning',
-      'خدمات التموين': 'Catering Services'
+    // Create comprehensive English translations
+    const serviceTranslations = {
+      'خدمات السباكة': {
+        name: 'Plumbing Services',
+        specialty: 'Emergency plumbing, pipe repairs, water heater maintenance',
+        description: 'Professional plumbing services including emergency repairs, pipe installation, and water heater maintenance'
+      },
+      'الخدمات الكهربائية': {
+        name: 'Electrical Services',
+        specialty: 'Electrical repairs, installations, emergency services',
+        description: 'Licensed electricians for all electrical needs including installations, repairs, and emergency services'
+      },
+      'خدمات التكييف والتهوية': {
+        name: 'HVAC Services',
+        specialty: 'Air conditioning, heating, ventilation systems',
+        description: 'Comprehensive HVAC services including air conditioning repair, heating maintenance, and air quality solutions'
+      },
+      'الفني العام': {
+        name: 'General Handyman',
+        specialty: 'Minor repairs, installations, home improvements',
+        description: 'Skilled handyman for general repairs, furniture assembly, and minor home improvements'
+      },
+      'تنظيف المنازل': {
+        name: 'House Cleaning',
+        specialty: 'Regular cleaning, deep cleaning, move-out cleaning',
+        description: 'Professional house cleaning services with flexible scheduling and eco-friendly options'
+      },
+      'تنظيف السجاد': {
+        name: 'Carpet Cleaning',
+        specialty: 'Deep carpet cleaning, stain removal, upholstery cleaning',
+        description: 'Professional carpet and upholstery cleaning using advanced equipment and safe cleaning solutions'
+      },
+      'تنظيف النوافذ': {
+        name: 'Window Cleaning',
+        specialty: 'Interior and exterior window cleaning',
+        description: 'Professional window cleaning for crystal clear views, available for interior and exterior'
+      },
+      'حارس الأمن': {
+        name: 'Security Guard',
+        specialty: '24/7 security, patrol services, event security',
+        description: 'Professional security services including patrol, monitoring, and special event security'
+      },
+      'إعداد نظام التحكم بالدخول': {
+        name: 'Access Control Setup',
+        specialty: 'Key card systems, door locks, security cameras',
+        description: 'Installation and maintenance of access control systems, smart locks, and surveillance equipment'
+      },
+      'تنسيق الحدائق والبستنة': {
+        name: 'Landscaping & Gardening',
+        specialty: 'Garden maintenance, lawn care, plant installation',
+        description: 'Complete landscaping services including garden design, lawn maintenance, and seasonal plant care'
+      },
+      'صيانة المسابح': {
+        name: 'Pool Maintenance',
+        specialty: 'Pool cleaning, chemical balancing, equipment repair',
+        description: 'Professional pool maintenance including cleaning, chemical treatment, and equipment servicing'
+      },
+      'خدمات رعاية الحيوانات الأليفة': {
+        name: 'Pet Care Services',
+        specialty: 'Dog walking, pet sitting, grooming',
+        description: 'Trusted pet care services including walking, sitting, feeding, and basic grooming'
+      },
+      'مدرب شخصي': {
+        name: 'Personal Trainer',
+        specialty: 'Physical training, health coaching, group classes',
+        description: 'Certified personal trainers for individual sessions, group fitness, and wellness programs'
+      },
+      'توصيل الطرود': {
+        name: 'Package Delivery',
+        specialty: 'Local delivery, grocery delivery, courier services',
+        description: 'Reliable delivery services for packages, groceries, and courier needs within the compound'
+      },
+      'خدمات النقل': {
+        name: 'Moving Services',
+        specialty: 'Local moving, furniture moving, packing services',
+        description: 'Professional moving services for relocating within or outside the compound, including packing'
+      },
+      'تخطيط الفعاليات': {
+        name: 'Event Planning',
+        specialty: 'Party planning, corporate events, wedding coordination',
+        description: 'Comprehensive event planning for parties, corporate events, and special occasions'
+      },
+      'خدمات التموين': {
+        name: 'Catering Services',
+        specialty: 'Event catering, meal prep, special dietary needs',
+        description: 'Professional catering for events of all sizes with customizable menus and dietary accommodations'
+      }
     };
     
     if (forceEnglish || currentLang === 'en' || currentLang.startsWith('en')) {

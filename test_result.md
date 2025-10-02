@@ -76,7 +76,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Service Translation System Testing"
+    - "Add Family Member UI Redesign Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

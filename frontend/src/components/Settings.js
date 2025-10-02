@@ -205,7 +205,7 @@ const ProfileSettings = () => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary">Update Password</button>
+          <button type="submit" className="btn btn-primary">{t('update_password')}</button>
         </form>
       </div>
     </div>

@@ -12,7 +12,7 @@ import {
   MapPinIcon,
   LockClosedIcon,
   EyeIcon,
-  UserShieldIcon,
+  UserCircleIcon,
   ClipboardDocumentCheckIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';

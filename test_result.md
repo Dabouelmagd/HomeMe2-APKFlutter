@@ -245,7 +245,7 @@ metadata:
 
 test_plan:
   current_focus: 
-    - "Privacy Settings Translation Keys Implementation"
+    - "Language Settings and Push Notifications Translation Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

@@ -224,7 +224,9 @@ const ServicesManagement = () => {
       currentLang,
       i18nLang: i18n.language,
       resolvedLang: i18n.resolvedLanguage,
-      hasNameEn: !!service.name_en 
+      hasNameEn: !!service.name_en,
+      serviceKeys: Object.keys(service),
+      fullService: service
     });
     
     // Create default English fallbacks based on service names

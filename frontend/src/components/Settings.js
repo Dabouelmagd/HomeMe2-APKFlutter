@@ -151,7 +151,7 @@ const ProfileSettings = () => {
                 className="form-input w-full bg-gray-50"
                 disabled
               />
-              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+              <p className="text-xs text-gray-500 mt-1">{t('email_cannot_be_changed')}</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>

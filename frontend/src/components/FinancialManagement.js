@@ -126,7 +126,7 @@ const FinancialManagement = () => {
             </div>
             
             {/* Currency Selector */}
-            <div className="flex items-center justify-end rtl:justify-start rtl:order-1 lg:justify-center">
+            <div className="flex items-center justify-end rtl:justify-start rtl:order-1 lg:justify-end rtl:lg:justify-start">
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-600 mb-2">{t('currency_display')}</p>
                 <CurrencySelector 

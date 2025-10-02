@@ -362,10 +362,14 @@ const LanguageSettings = () => {
 
   const handleLanguageChange = async (langCode) => {
     try {
+      // Explicitly set in localStorage first
+      localStorage.setItem('i18nextLng', langCode);
+      
+      // Change language in i18n
       await i18n.changeLanguage(langCode);
       setSelectedLanguage(langCode);
       
-      // Apply RTL for Arabic
+      // Apply RTL for Arabic immediately
       if (langCode === 'ar') {
         document.dir = 'rtl';
         document.documentElement.setAttribute('dir', 'rtl');
@@ -376,12 +380,16 @@ const LanguageSettings = () => {
         document.body.classList.remove('rtl');
       }
       
-      // Force re-render by refreshing the page to apply all changes
+      // Show success message
+      toast.success(t('language_updated_successfully'));
+      
+      // Force re-render by refreshing the page after ensuring persistence
       setTimeout(() => {
         window.location.reload();
-      }, 500);
+      }, 1000);
       
     } catch (error) {
+      console.error('Language change error:', error);
       toast.error(t('failed_to_update_language'));
     }
   };

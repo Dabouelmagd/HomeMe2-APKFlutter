@@ -584,7 +584,7 @@ const Settings = () => {
             {[
               { label: t('active_sessions'), value: '3', icon: '🔐', color: 'bg-gradient-to-r from-blue-500 to-cyan-500' },
               { label: t('notifications_enabled'), value: '12', icon: '🔔', color: 'bg-gradient-to-r from-emerald-500 to-teal-500' },
-              { label: t('privacy_level'), value: 'High', icon: '🛡️', color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
+              { label: t('privacy_level'), value: t('privacy_level_high'), icon: '🛡️', color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
               { label: t('languages_available'), value: '3', icon: '🌍', color: 'bg-gradient-to-r from-orange-500 to-red-500' }
             ].map((stat, index) => (
               <div key={index} className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">

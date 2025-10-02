@@ -333,41 +333,59 @@ const TermsPrivacy = () => {
 
         {/* Content */}
         <div className="space-y-8">
-          {/* Enhanced Introduction Card */}
-          <div className={`relative overflow-hidden rounded-2xl p-8 border shadow-xl ${
+          {/* Premium Introduction Card */}
+          <div className={`relative overflow-hidden rounded-3xl p-10 shadow-2xl transition-all duration-700 ${
             activeTab === 'terms' 
-              ? 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border-blue-200' 
-              : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 border-emerald-200'
+              ? 'bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 border border-blue-200/50' 
+              : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 border border-emerald-200/50'
           }`}>
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute inset-0 bg-gradient-to-r from-current to-transparent"></div>
+            {/* Animated Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className={`absolute inset-0 bg-gradient-to-r ${
+                activeTab === 'terms' 
+                  ? 'from-blue-500 to-purple-600' 
+                  : 'from-emerald-500 to-teal-600'
+              } animate-pulse`}></div>
             </div>
             
-            <div className="relative flex items-start space-x-6">
-              <div className={`p-4 rounded-2xl ${
+            {/* Floating elements */}
+            <div className={`absolute top-4 right-4 w-20 h-20 rounded-full blur-2xl opacity-20 ${
+              activeTab === 'terms' ? 'bg-blue-400' : 'bg-emerald-400'
+            } animate-pulse delay-300`}></div>
+            <div className={`absolute bottom-4 left-4 w-16 h-16 rounded-full blur-2xl opacity-15 ${
+              activeTab === 'terms' ? 'bg-purple-400' : 'bg-teal-400'
+            } animate-pulse delay-700`}></div>
+            
+            <div className="relative flex items-start space-x-8">
+              <div className={`relative p-6 rounded-3xl shadow-2xl transition-all duration-500 ${
                 activeTab === 'terms' 
-                  ? 'bg-gradient-to-br from-blue-500 to-indigo-600' 
-                  : 'bg-gradient-to-br from-emerald-500 to-teal-600'
-              } shadow-lg`}>
+                  ? 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600' 
+                  : 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600'
+              } hover:scale-110 group`}>
+                {/* Icon glow effect */}
+                <div className="absolute inset-0 bg-white/20 rounded-3xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 {activeTab === 'terms' ? (
-                  <ClipboardDocumentCheckIcon className="w-8 h-8 text-white" />
+                  <ClipboardDocumentCheckIcon className="w-12 h-12 text-white relative z-10" />
                 ) : (
-                  <UserCircleIcon className="w-8 h-8 text-white" />
+                  <UserCircleIcon className="w-12 h-12 text-white relative z-10" />
                 )}
               </div>
               
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-3">
-                  <h2 className="text-2xl font-bold text-gray-900">
+              <div className="flex-1 space-y-6">
+                <div className="flex items-center space-x-4 mb-4">
+                  <h2 className="text-3xl font-black text-gray-900 tracking-tight">
                     {activeTab === 'terms' ? t('legal_terms_title') : t('legal_privacy_title') || 'Privacy Policy'}
                   </h2>
-                  <CheckCircleIcon className={`w-6 h-6 ${
-                    activeTab === 'terms' ? 'text-blue-600' : 'text-emerald-600'
-                  }`} />
+                  <div className={`p-2 rounded-full ${
+                    activeTab === 'terms' ? 'bg-blue-100' : 'bg-emerald-100'
+                  } animate-bounce`}>
+                    <CheckCircleIcon className={`w-6 h-6 ${
+                      activeTab === 'terms' ? 'text-blue-600' : 'text-emerald-600'
+                    }`} />
+                  </div>
                 </div>
                 
-                <p className="text-gray-700 text-lg leading-relaxed mb-4">
+                <p className="text-gray-700 text-xl leading-relaxed font-medium">
                   {activeTab === 'terms' 
                     ? t('legal_terms_description') 
                     : t('legal_privacy_description') || 'Learn how we collect, use, and protect your personal information.'
@@ -375,13 +393,13 @@ const TermsPrivacy = () => {
                 </p>
                 
                 <div className="flex items-center space-x-6">
-                  <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${
+                  <div className={`flex items-center space-x-3 px-6 py-3 rounded-2xl shadow-lg transition-all duration-300 hover:scale-105 ${
                     activeTab === 'terms' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'bg-emerald-100 text-emerald-700'
+                      ? 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800' 
+                      : 'bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-800'
                   }`}>
-                    <ClockIcon className="w-4 h-4" />
-                    <span className="text-sm font-medium">{t('legal_lastUpdated')}: 30/9/2025</span>
+                    <ClockIcon className="w-5 h-5" />
+                    <span className="text-lg font-bold">{t('legal_lastUpdated')}: 30/9/2025</span>
                   </div>
                 </div>
               </div>

@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://homeme-i18n.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-arabic-ui.preview.emergentagent.com/api"
 
 class ArabicLocalizationFix:
     def __init__(self):

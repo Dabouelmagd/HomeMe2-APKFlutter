@@ -1,79 +1,68 @@
 <analysis>
-The trajectory documents a comprehensive development cycle for the HomeMe application, transitioning from web UI refinement to extensive mobile app development using Flutter. The initial phase focused on verifying and completing internationalization (i18n) tasks on the React frontend, specifically on the  page, confirming that translations for English and Arabic (including RTL layout) were correctly implemented.
+The trajectory chronicles an extensive series of updates to the HomeMe application, driven by an Arabic-speaking user focused on achieving full localization and UI polish. The work began with basic internationalization (i18n) fixes, such as translating static sidebar menus and pages by adding keys to .
 
-The core of the work then shifted to the Flutter application. The engineer systematically built out the mobile app's foundation, starting with i18n support for English, Arabic, and French. This involved creating localization files (), setting up state management with Riverpod for language switching, and refactoring existing screens like Login and Dashboard to be fully translated.
+The focus then shifted to complex, iterative feature development and refinement. A major effort was dedicated to the  page, where the engineer implemented a dynamic, client-side translation system () to handle data fetched from the database, which was originally in English. This involved significant debugging to ensure the translation function correctly responded to language changes.
 
-Driven by user requests to develop more, the engineer then implemented a wide array of features in the Flutter app, including screens for Guest Management, Maintenance, and Events. Subsequently, advanced features like a notification system, direct chat, QR codes for guests, and an analytics dashboard were scaffolded.
+Following this, the user requested a global change to the date format, leading to the creation of a centralized  module to enforce the  format across the application.
 
-The final phase saw a return to the full-stack context. The engineer integrated a Stripe payment system into the backend and frontend, added scaffolding for other features like push notifications and ratings, and linked the web app to a new mobile download page. This phase concluded with a series of debugging steps to fix UI errors and routing issues introduced by the new features, with the final task being the translation of the new menu items in the web app's sidebar.
+Subsequent user requests involved complete UI redesigns and localization of the  and  pages. These tasks required extensive modifications using Tailwind CSS, adding dozens of new translation keys, and implementing new features like a multi-currency selector and conversion utility ().
+
+The trajectory concludes with the engineer having just deployed the redesigned  page. The user has approved the new design and currency feature but has identified a final bug: a template string for a payment alert is not correctly interpolating dynamic values. The engineer's immediate task is to resolve this final localization issue on the newly updated page.
 </analysis>
 
 <product_requirements>
-The HomeMe application is a comprehensive community management platform for residential compounds, targeting a multilingual user base (English, Arabic, French).
+The HomeMe application is a comprehensive management platform for multilingual residential compounds, primarily targeting English, Arabic, and French users. The user's core objective is to achieve a fully localized and polished user experience for the Arabic-speaking audience. This requires that all user-facing text—both static UI elements and dynamic data retrieved from the database—be accurately translated and displayed. The application's layout must also fully support Right-to-Left (RTL) orientation and be aesthetically pleasing and intuitive.
 
-**Core Requirements:**
-1.  **Full Internationalization (i18n):** All user-facing text on both the web and mobile platforms must be fully translated, with proper Right-to-Left (RTL) support for Arabic.
-2.  **Feature Parity:** The Flutter mobile app should mirror and expand upon the features available on the React web application.
-3.  **Web Platform Features:** The web dashboard must support compound management, user management, guest tracking, maintenance requests, and event announcements.
-4.  **Mobile Platform Features:** The Flutter app must include user authentication, dashboards, guest management, maintenance requests, events, notifications, direct chat, QR code generation for guests, and an analytics overview.
-5.  **Advanced Functionality:** The platform requires a payment processing system (integrated with Stripe), a push notification system, and a rating/review mechanism.
-
-**Implementation Summary:**
-The web application's i18n has been largely completed. The Flutter application has been significantly developed from a basic structure to a feature-rich MVP, including full i18n, authentication, and screens for most core features. Scaffolding for advanced features and Stripe integration on the web platform has been created.
+So far, the project has involved extensive internationalization of the React frontend. Key pages like Services Management, Add Family Member, and Financial Management have undergone multiple iterations of UI redesigns and full translation. New features, such as a multi-currency display system, have been added based on user requests. The current state is a nearly complete localization effort, with only minor bugs remaining on the most recently updated pages. The backend is a stable FastAPI application with pre-existing modules for payments and notifications.
 </product_requirements>
 
 <key_technical_concepts>
-- **Frontend (Web):** React.js, Tailwind CSS,  for translation, React Router for navigation.
-- **Frontend (Mobile):** Flutter, Riverpod for state management, GoRouter for navigation,  files for internationalization.
-- **Backend:** FastAPI, MongoDB.
-- **Architecture:** Monorepo structure containing separate , , and  directories.
-- **Third-Party Integrations:** Stripe for payment processing.
+- **Frontend:** React.js, Tailwind CSS for styling.
+- **Internationalization (i18n):**  library for static text translation.
+- **Dynamic Content Translation:** Custom client-side JavaScript functions () to translate database content in real-time based on the selected language.
+- **Code Organization:** Centralized utility modules for handling cross-cutting concerns like date formatting () and currency conversion ().
+- **Backend:** FastAPI with Python, connected to a MongoDB database.
 </key_technical_concepts>
 
 <code_architecture>
-The application is a monorepo containing a React frontend, a FastAPI backend, and a Flutter mobile app.
-
-**Directory Structure:**
+The application uses a monorepo structure with separate frontend and backend projects.
 
 
 - ****
-  - **Importance:** The single source of truth for all web application translations.
-  - **Changes:** This file was repeatedly updated to add keys for various components. The last action in the trajectory was an attempt to add translations for Payment Center and Mobile App.
+  - **Importance:** This file is the central repository for all static UI text translations across the application for English, Arabic, and French.
+  - **Changes:** It has been extensively and repeatedly modified throughout the trajectory to add keys for every new page, component, and feature that was localized, including forms, buttons, table headers, and status labels.
 
 - ****
-  - **Importance:** Defines the main navigation sidebar for the web application.
-  - **Changes:** It was modified to add new navigation links for Payment Center and Mobile App. A bug fix was also implemented to add a missing  import.
+  - **Importance:** Manages the display of compound services. It was the first component where dynamic, data-driven translation was implemented.
+  - **Changes:** A complex  function was created and debugged within this component. This function uses a client-side dictionary to translate service details (name, description, specialty) from their Arabic database versions into English or French based on the current i18n language setting.
 
 - ****
-  - **Importance:** The root component that defines the web application's routing.
-  - **Changes:** It was updated to include routes for the new , , and other pages to make them accessible.
+  - **Importance:** This component provides the UI for adding residents to a housing unit.
+  - **Changes:** The component underwent a complete visual overhaul using Tailwind CSS to improve layout, iconography, and spacing. All hardcoded text in the main page and the modal form (labels, placeholders, buttons) was replaced with  function calls and linked to keys in . A custom file input was created to solve a browser-default translation issue.
 
 - ****
-  - **Importance:** The main FastAPI application file that includes all API routers.
-  - **Changes:** This file was modified to include new routers for payments, push notifications, and ratings/reviews.
+  - **Importance:** Displays invoices and payment information. It was the subject of the most recent major update.
+  - **Changes:** This component was completely redesigned for a more modern look and feel. A new  component was integrated, and all monetary values were updated to use a new  helper for conversion and display. All static text was internationalized.
 
-- ** (, , )**
-  - **Importance:** These files contain all the translation strings for the Flutter mobile application.
-  - **Changes:** These files were created and heavily populated with over 250 translation keys for all the features developed, including auth, dashboard, guests, maintenance, chat, QR codes, and analytics.
-
-- ****
-  - **Importance:** This directory contains the UI and logic for all features of the Flutter app.
-  - **Changes:** It saw massive expansion. Existing screens were refactored for i18n, and new directories, screens, models, and widgets were created to scaffold advanced features like Notifications, Chat, QR Code generation, and Analytics.
+- ** & **
+  - **Importance:** These new utility files were created to centralize application-wide logic.
+  - **Changes:**  was created to enforce a global  date format.  was created to handle multi-currency selection, conversion rates, and formatting.
 </code_architecture>
 
 <pending_tasks>
-- **Translate Web Sidebar:** The newly added sidebar menu items Payment Center and Mobile App are not translated into Arabic or French.
-- **Fix Locations Page:** The  file contains a JavaScript error and its route is currently commented out in .
-- **Implement Backend Scaffolding:** The backend modules for payments (), push notifications (), and ratings () are just scaffolds and require full implementation.
-- **Build/Test Flutter App:** The Flutter development was done without a build environment. The entire mobile app needs to be compiled and tested on a device/emulator.
+- Fix the template string for the pending payments alert on the Financial Management page. The text لديك {count} دفعات معلقة and إجمالي المبلغ المستحق: {amount} ر.س are displaying with the raw  and  placeholders instead of the actual dynamic values.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the user reported that several new menu items in the web application's sidebar—specifically settings.settings, Payment Center, Add Family Member, and Mobile App—were not translated when the language was switched to Arabic.
+Immediately before this summary request, the AI engineer had just completed a major overhaul of the **** component based on explicit user feedback. This work involved three main parts:
 
-The previous engineer correctly identified this as a missing translations issue. The final actions were focused on debugging this problem by inspecting the central translation file, , to add the necessary key-value pairs for Arabic and other languages. The trajectory ended just as the engineer was about to search for and add these missing translations to fix the untranslated sidebar links. This is a crucial final touch to ensure the UI is consistent across all supported languages after adding significant new features.
+1.  **Fixing Translations:** Ensuring all static text on the page was correctly translated into Arabic.
+2.  **UI Redesign:** A complete visual redesign of the page using Tailwind CSS to create a more modern and user-friendly interface with improved statistics cards and a cleaner invoice table.
+3.  **Multi-Currency Feature:** A new feature was implemented allowing users to switch between different currencies (USD, EGP, EUR, GBP). This involved creating a new utility file, ****, to handle currency conversion and formatting, and a new component, ****. All monetary values on the page were updated to use this new system.
+
+The work concluded with the user reviewing the updated page. While they were happy with the redesign and new currency feature, they pointed out a final bug: the alert message for pending payments was not correctly displaying the dynamic count of pending invoices, showing the raw template string instead. The current task is to fix this specific interpolation issue.
 </current_work>
 
 <optional_next_step>
-Add the missing translation keys for 'Payment Center' and 'Mobile App' to  and update  to use them.
+Fix the template string interpolation for the pending payments alert on the  page so that it correctly displays the dynamic count and amount values.
 </optional_next_step>

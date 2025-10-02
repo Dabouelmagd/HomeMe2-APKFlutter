@@ -212,7 +212,7 @@ metadata:
 
 test_plan:
   current_focus: 
-    - "Enhanced Schedule Design Testing in Arabic Interface"
+    - "NotificationCenter Translation Keys Implementation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

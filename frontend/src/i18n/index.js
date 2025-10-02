@@ -838,6 +838,20 @@ const resources = {
       'what_payment_methods_accept': 'What payment methods do you accept?',
       'payment_methods_answer': 'We accept all major credit cards, PayPal, and bank transfers.',
       
+      // Add Family Member Page
+      'add_family_member_to_unit': 'Add Family Member to Unit',
+      'add_family_members_any_unit': 'Add family members to any unit in your compound with ease',
+      'search_name_unit_email': 'Search by name, unit number, or email...',
+      'available_residents': 'Available Residents',
+      'select_unit_add_member': 'Select a unit to add a new family member',
+      'no_matching_residents': 'No matching residents found',
+      'no_residents_registered': 'No residents found',
+      'try_adjusting_search': 'Try adjusting your search term to find residents',
+      'no_residents_yet': 'There are no residents registered in your compound yet',
+      'add_member': 'Add Member',
+      'add_family_member': 'Add Family Member',
+      'adding_to_unit': 'Adding to Unit',
+      
       // Locations & Map
       'locations_map': 'Locations & Map',
       'explore_compound_facilities': 'Explore compound facilities and nearby services',

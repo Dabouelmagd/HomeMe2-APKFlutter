@@ -1913,6 +1913,7 @@ const resources = {
       'residents': 'مقيمين',
       'found': 'موجود',
       'search_placeholder': 'البحث في المستخدمين والمساكن والخدمات...',
+      'unit': 'وحدة',
       
       // Locations & Map
       'locations_map': 'المواقع والخريطة',

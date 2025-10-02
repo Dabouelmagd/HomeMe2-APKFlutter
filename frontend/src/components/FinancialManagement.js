@@ -441,8 +441,8 @@ const FinancialManagement = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </div>
-                  <h5 className="font-semibold text-gray-900 mb-2">سرعة فائقة</h5>
-                  <p className="text-sm text-gray-600">معالجة فورية للمدفوعات</p>
+                  <h5 className="font-semibold text-gray-900 mb-2">{t('super_speed')}</h5>
+                  <p className="text-sm text-gray-600">{t('super_speed_desc')}</p>
                 </div>
 
                 <div className="text-center">

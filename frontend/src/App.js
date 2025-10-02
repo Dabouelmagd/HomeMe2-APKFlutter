@@ -253,7 +253,19 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   return children;
 };
 
-// Main App Component
+// Page Title Component
+const PageTitleUpdater = () => {
+  const { t, i18n } = useTranslation();
+  
+  useEffect(() => {
+    // Update page title when language changes
+    document.title = t('app_title');
+  }, [t, i18n.language]);
+  
+  return null;
+};
+
+// Main App Component  
 function App() {
   return (
     <div className="App">
@@ -261,6 +273,7 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <TransliterationProvider>
+              <PageTitleUpdater />
               <Routes>
               <Route path="/login" element={<Login />} />
         <Route path="/terms-privacy" element={<TermsPrivacy />} />

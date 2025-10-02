@@ -3289,6 +3289,23 @@ const resources = {
       'legal_privacy_description': 'Découvrez comment nous collectons, utilisons et protégeons vos informations personnelles pour garantir votre confidentialité et la sécurité de vos données.',
       'legal_clickToExpand': 'Cliquer pour développer',
       'legal_clickToCollapse': 'Cliquer pour réduire',
+      
+      // Terms Content - Contenu des conditions
+      'legal_terms_acceptance_content': 'En accédant aux services HomeMe et en les utilisant, vous acceptez et convenez d\'être lié par les termes et dispositions de cet accord.',
+      'legal_terms_personalUse_content': 'Vous pouvez utiliser notre service à des fins personnelles et non commerciales uniquement. Vous acceptez de ne pas utiliser le service pour des activités illégales.',
+      'legal_terms_content_content': 'Vous êtes responsable de tout le contenu que vous publiez. Vous acceptez de ne pas publier de contenu offensant, illégal ou qui viole les droits d\'autrui.',
+      'legal_terms_liability_content': 'HomeMe ne sera pas responsable des dommages indirects, accessoires, spéciaux, consécutifs ou punitifs résultant de votre utilisation du service.',
+      'legal_terms_modifications_content': 'Nous nous réservons le droit de modifier ces conditions à tout moment. Les changements prendront effet immédiatement après publication sur notre site web.',
+      'legal_terms_governingLaw_content': 'Ces conditions sont régies et interprétées conformément aux lois de la juridiction dans laquelle HomeMe opère.',
+      
+      // Privacy Content - Contenu de la politique de confidentialité
+      'legal_privacy_infoCollection_content': 'Nous collectons les informations que vous nous fournissez directement, par exemple lorsque vous créez un compte, utilisez nos services ou nous contactez pour obtenir de l\'aide.',
+      'legal_privacy_infoUse_content': 'Nous utilisons les informations que nous collectons pour fournir, maintenir et améliorer nos services, communiquer avec vous et assurer la sécurité de la plateforme.',
+      'legal_privacy_infoProtection_content': 'Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos informations personnelles contre l\'accès non autorisé, la modification, la divulgation ou la destruction.',
+      'legal_privacy_infoSharing_content': 'Nous ne vendons, n\'échangeons ni ne transférons vos informations personnelles à des tiers sans votre consentement, sauf comme décrit dans cette politique de confidentialité.',
+      'legal_privacy_userRights_content': 'Vous avez le droit d\'accéder à vos informations personnelles, de les mettre à jour ou de les supprimer. Vous pouvez également vous désinscrire de certaines communications de notre part.',
+      'legal_privacy_policyChanges_content': 'Nous pouvons mettre à jour cette politique de confidentialité de temps à autre. Nous vous informerons de tout changement en publiant la nouvelle politique sur cette page.',
+      'legal_privacy_applicableLaws_content': 'Cette politique de confidentialité est régie et interprétée conformément aux lois et réglementations applicables en matière de protection des données.',
       'monthly_revenue': 'Revenus mensuels',
       'weekly_revenue': 'Revenus hebdomadaires',
       'daily_revenue': 'Revenus quotidiens',

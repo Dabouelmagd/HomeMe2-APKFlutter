@@ -305,19 +305,24 @@ const AddFamilyMemberToUnit = () => {
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full max-h-screen overflow-y-auto">
               <form onSubmit={handleSubmit}>
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="text-lg leading-6 font-medium text-gray-900 text-center" id="add-member-modal-title">
-                        Add Family Member
-                      </h3>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Adding to Unit {selectedUnit.unit_number} - {selectedUnit.full_name}
-                      </p>
+                  <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-200">
+                    <div className="flex items-center space-x-3">
+                      <div className="bg-blue-100 p-2 rounded-lg">
+                        <UserPlusIcon className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl leading-6 font-semibold text-gray-900" id="add-member-modal-title">
+                          Add Family Member
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Adding to Unit {selectedUnit.unit_number} - {selectedUnit.full_name}
+                        </p>
+                      </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => setShowAddMemberModal(false)}
-                      className="text-gray-400 hover:text-gray-600"
+                      className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
                     >
                       <XCircleIcon className="h-6 w-6" />
                     </button>

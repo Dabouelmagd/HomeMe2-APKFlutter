@@ -233,33 +233,50 @@ const TermsPrivacy = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/30"></div>
         <div className="absolute inset-0 bg-black/5"></div>
         
-        {/* Header Content */}
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-8">
-            <div className="flex items-center space-x-6">
+        {/* Enhanced Header Content */}
+        <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex items-center justify-between py-12">
+            <div className="flex items-center space-x-8">
               <button
                 onClick={handleBack}
-                className="p-3 text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
+                className="group p-4 text-white/80 hover:text-white hover:bg-white/15 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-white/10"
               >
-                <ArrowLeftIcon className="w-6 h-6" />
+                <ArrowLeftIcon className="w-6 h-6 group-hover:-translate-x-1 transition-transform duration-300" />
               </button>
-              <div>
-                <h1 className="text-3xl font-bold text-white mb-2">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                  <div className="w-1 h-1 bg-white/70 rounded-full animate-pulse delay-200"></div>
+                  <div className="w-1 h-1 bg-white/50 rounded-full animate-pulse delay-400"></div>
+                </div>
+                <h1 className="text-4xl font-black text-white mb-3 tracking-tight">
                   {t('legal_title')}
                 </h1>
-                <p className="text-blue-100 text-lg">
+                <p className="text-blue-100 text-xl font-medium max-w-md leading-relaxed">
                   {t('legal_subtitle')}
                 </p>
               </div>
             </div>
             
-            {/* Decorative Elements */}
+            {/* Enhanced Decorative Elements */}
             <div className="hidden lg:flex items-center space-x-6">
-              <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-                <ShieldCheckIcon className="w-8 h-8 text-white" />
+              <div className="relative">
+                <div className="absolute inset-0 bg-white/20 rounded-3xl blur-lg"></div>
+                <div className="relative p-5 bg-white/10 rounded-3xl backdrop-blur-sm hover:bg-white/15 transition-all duration-300 hover:scale-105 group cursor-pointer">
+                  <ShieldCheckIcon className="w-10 h-10 text-white group-hover:scale-110 transition-transform duration-300" />
+                </div>
               </div>
-              <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
-                <DocumentTextIcon className="w-8 h-8 text-white" />
+              <div className="relative">
+                <div className="absolute inset-0 bg-white/20 rounded-3xl blur-lg"></div>
+                <div className="relative p-5 bg-white/10 rounded-3xl backdrop-blur-sm hover:bg-white/15 transition-all duration-300 hover:scale-105 group cursor-pointer">
+                  <DocumentTextIcon className="w-10 h-10 text-white group-hover:scale-110 transition-transform duration-300" />
+                </div>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-0 bg-white/20 rounded-3xl blur-lg"></div>
+                <div className="relative p-5 bg-white/10 rounded-3xl backdrop-blur-sm hover:bg-white/15 transition-all duration-300 hover:scale-105 group cursor-pointer">
+                  <ScaleIcon className="w-10 h-10 text-white group-hover:scale-110 transition-transform duration-300" />
+                </div>
               </div>
             </div>
           </div>

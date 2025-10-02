@@ -137,45 +137,75 @@ const FinancialManagement = () => {
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      {/* Enhanced Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Pending Card */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">{t('pending')}</p>
-              <p className="text-2xl font-bold text-yellow-600">{pendingInvoices.length}</p>
+              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">{t('pending')}</p>
+              <p className="text-3xl font-bold text-yellow-600 mt-2">{pendingInvoices.length}</p>
+              <div className="flex items-center mt-2">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full mr-2"></div>
+                <p className="text-xs text-gray-500">{t('awaiting_payment')}</p>
+              </div>
             </div>
-            <ClockIcon className="h-8 w-8 text-yellow-500" />
+            <div className="bg-yellow-100 p-4 rounded-2xl">
+              <ClockIcon className="h-8 w-8 text-yellow-600" />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        {/* Paid Card */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">{t('paid')}</p>
-              <p className="text-2xl font-bold text-green-600">{paidInvoices.length}</p>
+              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">{t('paid')}</p>
+              <p className="text-3xl font-bold text-green-600 mt-2">{paidInvoices.length}</p>
+              <div className="flex items-center mt-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                <p className="text-xs text-gray-500">{t('completed_payments')}</p>
+              </div>
             </div>
-            <CheckCircleIcon className="h-8 w-8 text-green-500" />
+            <div className="bg-green-100 p-4 rounded-2xl">
+              <CheckCircleIcon className="h-8 w-8 text-green-600" />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        {/* Overdue Card */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">{t('overdue')}</p>
-              <p className="text-2xl font-bold text-red-600">{overdueInvoices.length}</p>
+              <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">{t('overdue')}</p>
+              <p className="text-3xl font-bold text-red-600 mt-2">{overdueInvoices.length}</p>
+              <div className="flex items-center mt-2">
+                <div className="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
+                <p className="text-xs text-gray-500">{t('past_due_date')}</p>
+              </div>
             </div>
-            <ExclamationTriangleIcon className="h-8 w-8 text-red-500" />
+            <div className="bg-red-100 p-4 rounded-2xl">
+              <ExclamationTriangleIcon className="h-8 w-8 text-red-600" />
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        {/* Total Due Card */}
+        <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl shadow-lg p-6 text-white hover:shadow-xl transition-shadow duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">{t('total_due')}</p>
-              <p className="text-2xl font-bold text-gray-900 text-center">${totalPending.toFixed(2)}</p>
+              <p className="text-sm font-semibold text-blue-100 uppercase tracking-wide">{t('total_due')}</p>
+              <p className="text-3xl font-bold mt-2">
+                {formatCurrency(convertCurrency(totalPending, 'USD', selectedCurrency), selectedCurrency)}
+              </p>
+              <div className="flex items-center mt-2">
+                <div className="w-2 h-2 bg-blue-300 rounded-full mr-2"></div>
+                <p className="text-xs text-blue-100">{t('outstanding_amount')}</p>
+              </div>
             </div>
-            <CurrencyDollarIcon className="h-8 w-8 text-blue-500" />
+            <div className="bg-white/20 p-4 rounded-2xl">
+              <CurrencyDollarIcon className="h-8 w-8 text-white" />
+            </div>
           </div>
         </div>
       </div>

@@ -425,7 +425,10 @@ const LanguageSettings = () => {
           {languages.map((lang) => (
             <div
               key={lang.code}
-              onClick={() => handleLanguageChange(lang.code)}
+              onClick={() => {
+                console.log('🎯 Language option clicked:', lang.code);
+                handleLanguageChange(lang.code);
+              }}
               className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
                 selectedLanguage === lang.code
                   ? 'border-blue-500 bg-blue-50'

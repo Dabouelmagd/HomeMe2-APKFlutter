@@ -280,30 +280,26 @@ const resources = {
       'management': 'management',
       
       // Chat System
-      'chat': {
-        'newChat': 'New Chat',
-        'directChat': 'Direct Chat',
-        'directChatDescription': 'Start a private conversation with another user',
-        'groupChat': 'Group Chat',
-        'groupChatDescription': 'Create a group conversation with multiple users',
-        'compoundChat': 'Compound Chat',
-        'compoundChatDescription': 'Chat with all residents in your compound',
-        'groupName': 'Group Name',
-        'enterGroupName': 'Enter group name',
-        'groupDescription': 'Group Description',
-        'enterGroupDescription': 'Enter group description (optional)',
-        'searchUsers': 'Search Users',
-        'noUsersFound': 'No users found',
-        'noUsersAvailable': 'No users available',
-        'compoundChatInfo': 'This will create a compound-wide chat where all residents can participate',
-        'createChat': 'Create Chat'
-      },
+      'chat.newChat': 'New Chat',
+      'chat.directChat': 'Direct Chat',
+      'chat.directChatDescription': 'Start a private conversation with another user',
+      'chat.groupChat': 'Group Chat',
+      'chat.groupChatDescription': 'Create a group conversation with multiple users',
+      'chat.compoundChat': 'Compound Chat',
+      'chat.compoundChatDescription': 'Chat with all residents in your compound',
+      'chat.groupName': 'Group Name',
+      'chat.enterGroupName': 'Enter group name',
+      'chat.groupDescription': 'Group Description',
+      'chat.enterGroupDescription': 'Enter group description (optional)',
+      'chat.searchUsers': 'Search Users',
+      'chat.noUsersFound': 'No users found',
+      'chat.noUsersAvailable': 'No users available',
+      'chat.compoundChatInfo': 'This will create a compound-wide chat where all residents can participate',
+      'chat.createChat': 'Create Chat',
       
       // Common
-      'common': {
-        'cancel': 'Cancel',
-        'creating': 'Creating...'
-      },
+      'common.cancel': 'Cancel',
+      'common.creating': 'Creating...',
       
       // Notifications  
       'manage_your_notifications': 'Manage your notifications',

@@ -242,10 +242,10 @@ const PrivacySettings = () => {
             <label className="block text-sm font-medium text-gray-700 mb-3">{t('profile_visibility')}</label>
             <div className="space-y-2">
               {[
-                { value: 'public', label: 'Public - Visible to everyone' },
-                { value: 'compound', label: 'Compound Only - Visible to compound members' },
-                { value: 'family', label: 'Family Only - Visible to family members' },
-                { value: 'private', label: 'Private - Only visible to you' }
+                { value: 'public', label: t('public_visible_to_everyone') },
+                { value: 'compound', label: t('compound_only_visible_to_compound_members') },
+                { value: 'family', label: t('family_only_visible_to_family_members') },
+                { value: 'private', label: t('private_only_visible_to_you') }
               ].map(option => (
                 <label key={option.value} className="flex items-center">
                   <input

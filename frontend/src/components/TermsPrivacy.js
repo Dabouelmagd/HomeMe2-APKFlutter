@@ -290,35 +290,61 @@ const TermsPrivacy = () => {
           {/* Content Sections */}
           {activeTab === 'terms' ? renderContent(termsContent) : renderContent(privacyContent)}
 
-          {/* Contact Information */}
-          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mt-8">
-            <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-3">
-              {t('legal_contact_title')}
-            </h3>
-            <p className="text-gray-700 mb-4">
+          {/* Enhanced Contact Information */}
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200 shadow-lg p-8 mt-10">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
+                <EnvelopeIcon className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">
+                {t('legal_contact_title')}
+              </h3>
+            </div>
+            
+            <p className="text-gray-700 text-lg mb-6 leading-relaxed">
               {t('legal_contact_description')}
             </p>
-            <div className="space-y-2 text-sm text-gray-600">
-              <div>
-                <span className="font-medium">{t('legal_contact_email')}: </span>
-                <span>info@datalifeai.com</span>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <EnvelopeIcon className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{t('legal_contact_email')}</p>
+                  <p className="text-lg font-semibold text-gray-900">info@datalifeai.com</p>
+                </div>
               </div>
-              <div>
-                <span className="font-medium">{t('legal_contact_address')}: </span>
-                <span>{t('legal_contact_addressValue')}</span>
+              
+              <div className="flex items-center space-x-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
+                <div className="p-2 bg-emerald-100 rounded-lg">
+                  <MapPinIcon className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">{t('legal_contact_address')}</p>
+                  <p className="text-lg font-semibold text-gray-900">{t('legal_contact_addressValue')}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Acceptance Notice */}
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <div className="flex items-start space-x-3">
-              <ShieldCheckIcon className="w-5 h-5 text-yellow-600 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-medium text-yellow-800 mb-1">
-                  {t('legal_acceptance_title')}
+          {/* Enhanced Acceptance Notice */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 shadow-lg">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500"></div>
+            </div>
+            
+            <div className="relative flex items-start space-x-4">
+              <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg">
+                <ExclamationTriangleIcon className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-amber-900 mb-3 flex items-center space-x-2">
+                  <span>{t('legal_acceptance_title')}</span>
+                  <CheckCircleIcon className="w-5 h-5 text-amber-600" />
                 </h4>
-                <p className="text-sm text-yellow-700">
+                <p className="text-amber-800 text-lg leading-relaxed">
                   {t('legal_acceptance_content')}
                 </p>
               </div>

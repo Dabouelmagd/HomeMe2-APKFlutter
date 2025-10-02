@@ -300,7 +300,7 @@ metadata:
 
 test_plan:
   current_focus: 
-    - "Complete Translation and RTL Layout System Testing"
+    - "Redesigned Terms & Privacy Page Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

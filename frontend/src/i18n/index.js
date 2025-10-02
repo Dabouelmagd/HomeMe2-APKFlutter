@@ -129,6 +129,7 @@ const resources = {
       'completed_payments': 'Completed Payments',
       'past_due_date': 'Past Due Date',
       'outstanding_amount': 'Outstanding Amount',
+      'total_invoices': 'total invoices',
       'update_service': 'Update Service',
       'add_service': 'Add Service',
       'save_service': 'Save Service',

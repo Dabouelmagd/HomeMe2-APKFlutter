@@ -222,12 +222,7 @@ const ServicesManagement = () => {
     // Always force English for testing
     const forceEnglish = currentLang.startsWith('en') || currentLang === 'en-US@posix';
     
-    console.log('translateServiceData DEBUG:', {
-      serviceName: service.name,
-      currentLang,
-      forceEnglish,
-      willTranslate: forceEnglish || currentLang === 'en' || currentLang.startsWith('en')
-    });
+    // Translation debug removed
     
     // Create comprehensive English translations
     const serviceTranslations = {

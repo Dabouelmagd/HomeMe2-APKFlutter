@@ -2849,6 +2849,7 @@ const resources = {
       'resident': 'résident',
       'residents': 'résidents',
       'found': 'trouvé',
+      'search_placeholder': 'Rechercher utilisateurs, résidences, services...',
       
       // Locations & Map
       'locations_map': 'Emplacements et Carte',

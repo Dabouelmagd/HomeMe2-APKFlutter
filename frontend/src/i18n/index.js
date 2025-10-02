@@ -2633,9 +2633,9 @@ const resources = {
       // Financial Management
       'view_manage_payments_invoices': 'Voir et gérer les paiements et factures',
       'total_due': 'Total dû',
-      'pending_payments_alert': 'Vous avez {count} paiement en attente',
-      'pending_payments_alert_plural': 'Vous avez {count} paiements en attente',
-      'total_amount_due': 'Montant total dû: {amount}€',
+      'pending_payments_alert': 'Vous avez {{count}} paiement en attente',
+      'pending_payments_alert_plural': 'Vous avez {{count}} paiements en attente',
+      'total_amount_due': 'Montant total dû: {{amount}}€',
       'all_invoices': 'Toutes les factures',
       'due_date': 'Date d\'échéance',
       'pay_now': 'Payer maintenant',

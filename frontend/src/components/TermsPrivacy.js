@@ -139,25 +139,40 @@ const TermsPrivacy = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center space-x-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Modern Header with Gradient */}
+      <div className="relative">
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20"></div>
+        
+        {/* Header Content */}
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-8">
+            <div className="flex items-center space-x-6">
               <button
                 onClick={handleBack}
-                className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-3 text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200"
               >
-                <ArrowLeftIcon className="w-5 h-5" />
+                <ArrowLeftIcon className="w-6 h-6" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 text-center">
+                <h1 className="text-3xl font-bold text-white mb-2">
                   {t('legal_title')}
                 </h1>
-                <p className="text-gray-600 mt-1 text-center">
+                <p className="text-blue-100 text-lg">
                   {t('legal_subtitle')}
                 </p>
+              </div>
+            </div>
+            
+            {/* Decorative Elements */}
+            <div className="hidden lg:flex items-center space-x-4">
+              <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+                <ShieldCheckIcon className="w-8 h-8 text-white" />
+              </div>
+              <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+                <DocumentTextIcon className="w-8 h-8 text-white" />
               </div>
             </div>
           </div>

@@ -74,23 +74,15 @@ export const parseDate = (dateString) => {
     return new Date(dateString);
   }
   
-  // Handle dd/MM/yyyy or MM/dd/yyyy formats
+  // Handle dd/mm/yyyy format for all languages
   if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString)) {
     const parts = dateString.split('/');
     
-    if (currentLang === 'en') {
-      // US format: MM/dd/yyyy
-      const month = parseInt(parts[0], 10) - 1; // Month is 0-indexed
-      const day = parseInt(parts[1], 10);
-      const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    } else {
-      // European format: dd/MM/yyyy
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
-      const year = parseInt(parts[2], 10);
-      return new Date(year, month, day);
-    }
+    // All languages now use dd/mm/yyyy format
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+    const year = parseInt(parts[2], 10);
+    return new Date(year, month, day);
   }
   
   // Try parsing with native Date constructor as fallback

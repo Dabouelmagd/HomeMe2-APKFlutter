@@ -102,6 +102,7 @@ const resources = {
       'email_address': 'Email Address',
       'working_hours': 'Working Hours',
       'cancel': 'Cancel',
+      'click_to_upload_image': 'Click to upload image',
       'update_service': 'Update Service',
       'add_service': 'Add Service',
       'save_service': 'Save Service',

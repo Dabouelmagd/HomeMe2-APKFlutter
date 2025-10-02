@@ -446,17 +446,63 @@ const ChatWindow = ({ chat, onChatUpdate }) => {
 
   return (
     <div className="flex-1 flex flex-col bg-white">
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-white">
+      {/* Enhanced Header */}
+      <div className="px-6 py-4 bg-gradient-to-r from-white to-gray-50 border-b border-gray-200 shadow-sm">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="flex-shrink-0">
+          <div className="flex items-center space-x-4 rtl:space-x-reverse">
+            {/* Enhanced Avatar */}
+            <div className="relative">
               {chat.chat_type === 'direct' ? (
-                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                  <span className="text-sm font-medium text-white">
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                  <span className="text-lg font-bold text-white">
                     {getChatName().charAt(0).toUpperCase()}
                   </span>
                 </div>
+              ) : (
+                <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center shadow-lg">
+                  <UsersIcon className="h-6 w-6 text-white" />
+                </div>
+              )}
+              {/* Online indicator */}
+              <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white"></div>
+            </div>
+            
+            {/* Chat Info */}
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">{getChatName()}</h2>
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <span className="inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium bg-blue-100 text-blue-800">
+                  {getChatTypeLabel()}
+                </span>
+                {chat.chat_type === 'group' && (
+                  <span className="text-sm text-gray-500">
+                    {getParticipantCount()} {t('chat.participants')}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-2 rtl:space-x-reverse">
+            {/* Search Toggle */}
+            <button
+              onClick={() => setShowSearch(!showSearch)}
+              className={`p-3 rounded-xl transition-all duration-200 hover:scale-105 ${
+                showSearch 
+                  ? 'bg-blue-500 text-white shadow-lg' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <MagnifyingGlassIcon className="h-5 w-5" />
+            </button>
+            
+            {/* More Options */}
+            <button className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-200 hover:scale-105 text-gray-600">
+              <EllipsisVerticalIcon className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
               ) : (
                 <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center">
                   <UserGroupIcon className="h-5 w-5 text-white" />

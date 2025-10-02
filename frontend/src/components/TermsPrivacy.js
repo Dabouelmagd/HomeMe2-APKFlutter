@@ -5,7 +5,15 @@ import {
   ShieldCheckIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  EnvelopeIcon,
+  MapPinIcon,
+  LockClosedIcon,
+  EyeIcon,
+  UserShieldIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline';
 
 const TermsPrivacy = () => {

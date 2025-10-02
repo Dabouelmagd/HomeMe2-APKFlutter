@@ -217,12 +217,33 @@ const ServicesManagement = () => {
   const translateServiceData = (service) => {
     const currentLang = i18n.language || 'en';
     
+    // Create default English fallbacks based on service names
+    const englishFallbacks = {
+      'خدمات السباكة': 'Plumbing Services',
+      'الخدمات الكهربائية': 'Electrical Services',
+      'خدمات التكييف والتهوية': 'HVAC Services',
+      'الفني العام': 'General Handyman',
+      'تنظيف المنازل': 'House Cleaning',
+      'تنظيف السجاد': 'Carpet Cleaning',
+      'تنظيف النوافذ': 'Window Cleaning',
+      'حارس الأمن': 'Security Guard',
+      'إعداد نظام التحكم بالدخول': 'Access Control Setup',
+      'تنسيق الحدائق والبستنة': 'Landscaping & Gardening',
+      'صيانة المسابح': 'Pool Maintenance',
+      'خدمات رعاية الحيوانات الأليفة': 'Pet Care Services',
+      'مدرب شخصي': 'Personal Trainer',
+      'توصيل الطرود': 'Package Delivery',
+      'خدمات النقل': 'Moving Services',
+      'تخطيط الفعاليات': 'Event Planning',
+      'خدمات التموين': 'Catering Services'
+    };
+    
     if (currentLang === 'en') {
       return {
-        name: service.name_en || service.name,
-        description: service.description_en || service.description,
+        name: service.name_en || englishFallbacks[service.name] || service.name,
+        description: service.description_en || `Professional ${englishFallbacks[service.name] || service.name} services`,
         specialty: service.specialty_en || service.specialty,
-        working_hours: service.working_hours_en || service.working_hours
+        working_hours: service.working_hours_en || service.working_hours?.replace('ص', 'AM').replace('م', 'PM') || service.working_hours
       };
     } else if (currentLang === 'ar') {
       return {

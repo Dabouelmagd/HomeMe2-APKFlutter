@@ -340,6 +340,20 @@ const LanguageSettings = () => {
   const { t, i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
 
+  useEffect(() => {
+    // Apply RTL on component mount based on current language
+    const currentLang = i18n.language;
+    if (currentLang === 'ar') {
+      document.dir = 'rtl';
+      document.documentElement.setAttribute('dir', 'rtl');
+      document.body.classList.add('rtl');
+    } else {
+      document.dir = 'ltr';
+      document.documentElement.setAttribute('dir', 'ltr');
+      document.body.classList.remove('rtl');
+    }
+  }, [i18n.language]);
+
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸' },
     { code: 'ar', name: 'العربية', flag: '🇸🇦' },

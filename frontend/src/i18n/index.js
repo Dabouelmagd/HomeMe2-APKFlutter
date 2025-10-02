@@ -299,6 +299,12 @@ const resources = {
       'chat.noChatsYet': 'No chats yet',
       'chat.startFirstChat': 'Start your first conversation',
       'chat.selectChatToStart': 'Select a chat to start messaging',
+      'chat.noChatsFound': 'No chats found',
+      'chat.tryDifferentSearch': 'Try a different search term',
+      'chat.createFirstChat': 'Create First Chat',
+      'chat.noMessages': 'No messages yet',
+      'chat.chats': 'Chats',
+      'common.loading': 'Loading...',
       'chat.searchChats': 'Search Chats',
       
       // Common

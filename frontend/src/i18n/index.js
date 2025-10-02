@@ -1637,6 +1637,8 @@ const resources = {
       
       // Financial Management
       'view_manage_payments_invoices': 'عرض وإدارة المدفوعات والفواتير',
+      'admin_view_manage_payments_invoices': 'عرض وإدارة جميع مدفوعات وفواتير المجمع',
+      'resident_view_manage_payments_invoices': 'عرض وإدارة مدفوعات وفواتير وحدتك',
       'total_due': 'إجمالي المستحق',
       'pending_payments_alert': 'لديك {{count}} دفعة معلقة',
       'pending_payments_alert_plural': 'لديك {{count}} دفعات معلقة',

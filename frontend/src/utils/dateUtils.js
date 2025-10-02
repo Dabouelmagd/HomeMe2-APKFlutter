@@ -36,16 +36,12 @@ export const formatDate = (date, format = 'short') => {
   
   try {
     if (format === 'short') {
-      // Return dd/MM/yyyy format for all languages except US English
+      // Return dd/mm/yyyy format for ALL languages
       const day = String(dateObj.getDate()).padStart(2, '0');
       const month = String(dateObj.getMonth() + 1).padStart(2, '0');
       const year = dateObj.getFullYear();
       
-      if (currentLang === 'en') {
-        return `${month}/${day}/${year}`; // MM/dd/yyyy for US English
-      } else {
-        return `${day}/${month}/${year}`; // dd/MM/yyyy for others
-      }
+      return `${day}/${month}/${year}`; // dd/mm/yyyy for all languages
     } else {
       // Use browser's Intl.DateTimeFormat for long format
       return dateObj.toLocaleDateString(config.locale, {

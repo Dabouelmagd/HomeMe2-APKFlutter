@@ -347,7 +347,7 @@ const TermsPrivacy = () => {
 
           {/* Enhanced Contact Information */}
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200 shadow-lg p-8 mt-10">
-            <div className="flex items-center space-x-4 mb-6">
+            <div className="flex items-center space-x-6 mb-6">
               <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
                 <EnvelopeIcon className="w-6 h-6 text-white" />
               </div>

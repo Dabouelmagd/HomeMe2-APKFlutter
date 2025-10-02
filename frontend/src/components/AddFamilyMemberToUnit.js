@@ -539,7 +539,7 @@ const AddFamilyMemberToUnit = () => {
                     className="mt-3 w-full inline-flex justify-center items-center space-x-2 rounded-lg border border-gray-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:w-auto transition-colors"
                   >
                     <XCircleIcon className="h-5 w-5" />
-                    <span>Cancel</span>
+                    <span>{t('cancel')}</span>
                   </button>
                 </div>
               </form>

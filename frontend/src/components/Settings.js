@@ -263,7 +263,7 @@ const PrivacySettings = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Contact Information Visibility</label>
+            <label className="block text-sm font-medium text-gray-700 mb-3">{t('contact_information_visibility')}</label>
             <div className="space-y-2">
               {[
                 { value: 'compound', label: 'Compound members can see' },

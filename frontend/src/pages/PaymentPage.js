@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
+import { formatDate as formatDateUtil } from '../utils/dateUtils';
 
 const PaymentPage = () => {
   const { t } = useTranslation();

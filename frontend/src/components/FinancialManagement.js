@@ -451,8 +451,8 @@ const FinancialManagement = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <h5 className="font-semibold text-gray-900 mb-2">موثوق</h5>
-                  <p className="text-sm text-gray-600">نظام مُختبر وموثوق</p>
+                  <h5 className="font-semibold text-gray-900 mb-2">{t('reliable')}</h5>
+                  <p className="text-sm text-gray-600">{t('reliable_desc')}</p>
                 </div>
               </div>
             </div>

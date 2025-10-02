@@ -302,8 +302,8 @@ const PrivacySettings = () => {
 
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium text-gray-700">Data Sharing</label>
-                <p className="text-xs text-gray-500">Share anonymous usage data to improve HomeMe</p>
+                <label className="text-sm font-medium text-gray-700">{t('data_sharing')}</label>
+                <p className="text-xs text-gray-500">{t('share_anonymous_usage_data')}</p>
               </div>
               <input
                 type="checkbox"

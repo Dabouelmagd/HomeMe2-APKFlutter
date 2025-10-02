@@ -245,38 +245,6 @@ const ChatSidebar = ({ selectedChat, onChatSelect, onNewChat }) => {
               </div>
             ))}
           </div>
-                        <UsersIcon className="h-5 w-5 text-white" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Chat Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-gray-900 truncate">
-                        {getChatName(chat)}
-                      </p>
-                      <div className="flex items-center space-x-2">
-                        {chat.last_message?.created_at && (
-                          <span className="text-xs text-gray-500">
-                            {formatTime(chat.last_message.created_at)}
-                          </span>
-                        )}
-                        {chat.unread_count > 0 && (
-                          <span className="inline-flex items-center justify-center h-5 w-5 text-xs font-medium text-white bg-red-500 rounded-full">
-                            {chat.unread_count > 99 ? '99+' : chat.unread_count}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 truncate mt-1">
-                      {getChatDescription(chat)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         )}
       </div>
     </div>

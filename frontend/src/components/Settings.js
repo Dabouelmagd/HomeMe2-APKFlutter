@@ -376,9 +376,9 @@ const LanguageSettings = () => {
               <div className="flex-1">
                 <h4 className="font-medium text-gray-900">{lang.name}</h4>
                 <p className="text-sm text-gray-500">
-                  {lang.code === 'en' && 'English - Default language'}
-                  {lang.code === 'ar' && 'العربية - Right to left support'}
-                  {lang.code === 'fr' && 'Français - Langue française'}
+                  {lang.code === 'en' && t('english_default_language')}
+                  {lang.code === 'ar' && t('arabic_rtl_support')}
+                  {lang.code === 'fr' && t('french_language')}
                 </p>
               </div>
               {selectedLanguage === lang.code && (

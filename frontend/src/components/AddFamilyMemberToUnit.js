@@ -365,7 +365,7 @@ const AddFamilyMemberToUnit = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Relationship *
+                          {t('relationship_required')}
                         </label>
                         <select
                           required

@@ -223,30 +223,16 @@ const TermsPrivacy = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      {/* Ultra Modern Animated Background */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+      {/* Modern Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {/* Floating Orbs */}
-        <div className="absolute -top-20 -right-20 w-96 h-96 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-gradient-to-tr from-purple-400/15 to-pink-500/15 rounded-full blur-3xl animate-float-delay-1"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-gradient-to-tl from-indigo-400/10 to-cyan-500/10 rounded-full blur-3xl animate-float-delay-2"></div>
-        
-        {/* Geometric Patterns */}
-        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-3xl rotate-12 animate-spin-slow"></div>
-        <div className="absolute bottom-20 left-1/3 w-24 h-24 bg-gradient-to-tr from-cyan-500/10 to-transparent border border-cyan-300/20 rounded-2xl -rotate-45 animate-pulse"></div>
-        
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent bg-[length:100px_100px] bg-[linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)]"></div>
+        <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
       </div>
       
-      {/* Ultra Modern Header */}
-      <div className="relative">
-        {/* Glassmorphism Background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-violet-600/80 via-purple-600/80 to-indigo-600/80 backdrop-blur-3xl"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/20"></div>
-        
-        {/* Header Glow Effect */}
-        <div className="absolute inset-0 bg-gradient-to-b from-cyan-400/20 via-transparent to-transparent animate-pulse"></div>
+      {/* Modern Header */}
+      <div className="relative bg-gradient-to-r from-blue-600 to-purple-700">
+        <div className="absolute inset-0 bg-black/20"></div>
         
         {/* Ultra Modern Header Content */}
         <div className="relative max-w-8xl mx-auto px-8 sm:px-12 lg:px-20">

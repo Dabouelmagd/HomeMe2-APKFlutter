@@ -330,10 +330,10 @@ const AddFamilyMemberToUnit = () => {
                       </div>
                       <div>
                         <h3 className="text-xl leading-6 font-semibold text-gray-900" id="add-member-modal-title">
-                          Add Family Member
+                          {t('add_family_member')}
                         </h3>
                         <p className="text-sm text-gray-600 mt-1">
-                          Adding to Unit {selectedUnit.unit_number} - {selectedUnit.full_name}
+                          {t('adding_to_unit')} {selectedUnit.unit_number} - {selectedUnit.full_name}
                         </p>
                       </div>
                     </div>

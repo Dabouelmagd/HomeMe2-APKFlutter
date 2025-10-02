@@ -216,11 +216,14 @@ const ServicesManagement = () => {
   };
   // Dynamic translation for service names and descriptions based on current language
   const translateServiceData = (service) => {
-    const currentLang = i18n.language || 'en';
+    // Get current language from useTranslation hook context
+    const currentLang = i18n.language || i18n.resolvedLanguage || 'en';
     
     console.log('translateServiceData called:', { 
       serviceName: service.name, 
-      currentLang, 
+      currentLang,
+      i18nLang: i18n.language,
+      resolvedLang: i18n.resolvedLanguage,
       hasNameEn: !!service.name_en 
     });
     

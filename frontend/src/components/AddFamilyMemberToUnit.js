@@ -466,14 +466,14 @@ const AddFamilyMemberToUnit = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Emergency Contact Name
+                          {t('emergency_contact_name')}
                         </label>
                         <input
                           type="text"
                           value={memberForm.emergency_contact_name}
                           onChange={(e) => setMemberForm(prev => ({ ...prev, emergency_contact_name: e.target.value }))}
                           className="form-input w-full"
-                          placeholder="Emergency contact name"
+                          placeholder={t('emergency_contact_name')}
                         />
                       </div>
 

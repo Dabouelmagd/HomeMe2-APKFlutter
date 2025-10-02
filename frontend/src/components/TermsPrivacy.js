@@ -125,37 +125,37 @@ const TermsPrivacy = () => {
     {
       id: 'info_collection',
       title: t('legal_privacy_infoCollection_title'),
-      content: 'We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.'
+      content: t('legal_privacy_infoCollection_content')
     },
     {
       id: 'info_use',
       title: t('legal_privacy_infoUse_title'),
-      content: 'We use the information we collect to provide, maintain, and improve our services, communicate with you, and ensure platform security.'
+      content: t('legal_privacy_infoUse_content')
     },
     {
       id: 'info_protection',
       title: t('legal_privacy_infoProtection_title'),
-      content: 'We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.'
+      content: t('legal_privacy_infoProtection_content')
     },
     {
       id: 'info_sharing',
       title: t('legal_privacy_infoSharing_title'),
-      content: 'We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as described in this privacy policy.'
+      content: t('legal_privacy_infoSharing_content')
     },
     {
       id: 'user_rights',
       title: t('legal_privacy_userRights_title'),
-      content: 'You have the right to access, update, or delete your personal information. You may also opt out of certain communications from us.'
+      content: t('legal_privacy_userRights_content')
     },
     {
       id: 'policy_changes',
       title: t('legal_privacy_policyChanges_title'),
-      content: 'We may update this privacy policy from time to time. We will notify you of any changes by posting the new policy on this page.'
+      content: t('legal_privacy_policyChanges_content')
     },
     {
       id: 'applicable_laws',
       title: t('legal_privacy_applicableLaws_title'),
-      content: 'This privacy policy is governed by and construed in accordance with applicable data protection laws and regulations.'
+      content: t('legal_privacy_applicableLaws_content')
     }
   ];
 

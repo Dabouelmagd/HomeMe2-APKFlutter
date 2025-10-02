@@ -288,14 +288,21 @@ const resources = {
         'groupChatDescription': 'Create a group conversation with multiple users',
         'compoundChat': 'Compound Chat',
         'compoundChatDescription': 'Chat with all residents in your compound',
+        'groupName': 'Group Name',
+        'enterGroupName': 'Enter group name',
+        'groupDescription': 'Group Description',
+        'enterGroupDescription': 'Enter group description (optional)',
         'searchUsers': 'Search Users',
+        'noUsersFound': 'No users found',
         'noUsersAvailable': 'No users available',
+        'compoundChatInfo': 'This will create a compound-wide chat where all residents can participate',
         'createChat': 'Create Chat'
       },
       
       // Common
       'common': {
-        'cancel': 'Cancel'
+        'cancel': 'Cancel',
+        'creating': 'Creating...'
       },
       
       // Notifications  

@@ -220,7 +220,7 @@ const ServicesManagement = () => {
     const currentLang = i18n.language || i18n.resolvedLanguage || 'en';
     
     // Always force English for testing
-    const forceEnglish = true;
+    const forceEnglish = currentLang.startsWith('en') || currentLang === 'en-US@posix';
     
     // Create default English fallbacks based on service names
     const englishFallbacks = {

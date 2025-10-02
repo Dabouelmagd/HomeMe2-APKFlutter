@@ -337,7 +337,7 @@ const PrivacySettings = () => {
 };
 
 const LanguageSettings = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language);
 
   const languages = [

@@ -1816,7 +1816,21 @@ const resources = {
       'notificationCenter': {
         'pushNotifications': 'الإشعارات المباشرة',
         'notSubscribed': 'غير مشترك',
-        'enable': 'تفعيل'
+        'subscribed': 'مشترك',
+        'enable': 'تفعيل',
+        'disable': 'إلغاء التفعيل',
+        'testNotification': 'اختبار الإشعار',
+        'preferences': 'تفضيلات الإشعارات',
+        'messageNotifications': 'إشعارات الرسائل',
+        'messageNotificationsDesc': 'تلقي إشعارات للرسائل الجديدة والمحادثات',
+        'directChats': 'رسائل المحادثة المباشرة',
+        'directChatsDesc': 'احصل على إشعار عندما يرسل لك أحد رسالة مباشرة',
+        'groupChats': 'رسائل المحادثة الجماعية',
+        'groupChatsDesc': 'تلقي إشعارات للرسائل في المحادثات الجماعية',
+        'compoundAnnouncements': 'إعلانات المجمع',
+        'compoundAnnouncementsDesc': 'ابق مطلعاً على أخبار وتحديثات المجمع المهمة',
+        'quietHours': 'ساعات الهدوء',
+        'quietHoursDesc': 'حدد فترات زمنية لا تريد فيها تلقي إشعارات'
       },
       'community_newsletter': 'النشرة الإخبارية للمجتمع',
       

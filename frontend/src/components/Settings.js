@@ -394,10 +394,9 @@ const LanguageSettings = () => {
               <LanguageIcon className="h-5 w-5 text-blue-400" />
             </div>
             <div className="ml-3">
-              <h4 className="text-sm font-medium text-blue-800">Language Support</h4>
+              <h4 className="text-sm font-medium text-blue-800">{t('language_support')}</h4>
               <p className="text-sm text-blue-700 mt-1">
-                HomeMe supports multiple languages with full RTL (Right-to-Left) support for Arabic.
-                Language changes apply immediately to the entire interface.
+                {t('language_support_description')}
               </p>
             </div>
           </div>

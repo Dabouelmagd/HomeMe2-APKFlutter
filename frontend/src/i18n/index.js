@@ -2537,6 +2537,9 @@ const resources = {
       'chat.createFirstChat': 'Créer le Premier Chat',
       'chat.noMessages': 'Aucun message pour le moment',
       'chat.chats': 'Chats',
+      'chat.welcomeToChats': 'Bienvenue dans les Chats',
+      'chat.chatFeatures': 'Envoyez des messages, partagez des fichiers et restez connecté',
+      'chat.participants': 'participants',
       'common.loading': 'Chargement...',
       
       // Common

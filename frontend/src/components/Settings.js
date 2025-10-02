@@ -176,7 +176,7 @@ const ProfileSettings = () => {
         
         <form onSubmit={handlePasswordUpdate} className="space-y-4 max-w-md">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('current_password')}</label>
             <input
               type="password"
               value={profileData.current_password}

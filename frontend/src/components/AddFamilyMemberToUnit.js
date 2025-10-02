@@ -302,7 +302,7 @@ const AddFamilyMemberToUnit = () => {
                     <div className="bg-white/20 p-1 rounded-full">
                       <PlusIcon className="h-5 w-5" />
                     </div>
-                    <span>Add Member</span>
+                    <span>{t('add_member')}</span>
                   </button>
                 </div>
               </div>

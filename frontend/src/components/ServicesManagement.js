@@ -213,6 +213,40 @@ const ServicesManagement = () => {
     
     return translatedHours;
   };
+  // Dynamic translation for service names and descriptions based on current language
+  const translateServiceData = (service) => {
+    const currentLang = i18n.language || 'en';
+    
+    if (currentLang === 'en') {
+      return {
+        name: service.name_en || service.name,
+        description: service.description_en || service.description,
+        specialty: service.specialty_en || service.specialty,
+        working_hours: service.working_hours_en || service.working_hours
+      };
+    } else if (currentLang === 'ar') {
+      return {
+        name: service.name_ar || service.name,
+        description: service.description_ar || service.description,
+        specialty: service.specialty_ar || service.specialty,
+        working_hours: service.working_hours_ar || service.working_hours
+      };
+    } else if (currentLang === 'fr') {
+      return {
+        name: service.name_fr || service.name,
+        description: service.description_fr || service.description,
+        specialty: service.specialty_fr || service.specialty,
+        working_hours: service.working_hours_fr || service.working_hours
+      };
+    }
+    
+    return {
+      name: service.name,
+      description: service.description,
+      specialty: service.specialty,
+      working_hours: service.working_hours
+    };
+  };
   const [services, setServices] = useState([]);
   const [serviceProviders, setServiceProviders] = useState([]);
   const [bookings, setBookings] = useState([]);

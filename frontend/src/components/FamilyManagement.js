@@ -199,9 +199,9 @@ const FamilyManagement = () => {
     return option ? option.label : relationship;
   };
 
-  const formatDate = (dateString) => {
+  const formatDateForFamily = (dateString) => {
     if (!dateString) return 'Not specified';
-    return new Date(dateString).toLocaleDateString();
+    return formatDate(dateString);
   };
 
   if (loading) {

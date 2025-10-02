@@ -191,7 +191,7 @@ const AddFamilyMemberToUnit = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="mb-6">
+      <div className="mb-8 bg-white rounded-2xl shadow-sm p-8">
         <div className="mb-8 text-center">
           <div className="flex justify-center mb-6">
             <div className="bg-blue-100 p-4 rounded-full">

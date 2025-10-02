@@ -19,14 +19,10 @@ import {
   ChatBubbleLeftRightIcon,
   UsersIcon,
   MagnifyingGlassIcon,
-  VideoCameraIcon,
-  SpeakerWaveIcon,
-  DocumentIcon,
   PlayIcon,
   PauseIcon,
   ArrowDownTrayIcon,
-  MicrophoneIcon,
-  MagnifyingGlassIcon
+  MicrophoneIcon
 } from '@heroicons/react/24/outline';
 import { CheckIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 

@@ -878,6 +878,16 @@ const resources = {
       'profile_picture': 'Profile Picture',
       'no_file_chosen': 'No file chosen',
       'cancel': 'Cancel',
+      'select_relationship': 'Select relationship',
+      'father': 'Father',
+      'mother': 'Mother',
+      'brother': 'Brother',
+      'sister': 'Sister',
+      'grandfather': 'Grandfather',
+      'grandmother': 'Grandmother',
+      'uncle': 'Uncle',
+      'aunt': 'Aunt',
+      'cousin': 'Cousin',
       
       // Locations & Map
       'locations_map': 'Locations & Map',

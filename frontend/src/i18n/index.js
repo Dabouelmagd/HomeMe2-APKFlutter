@@ -3008,6 +3008,7 @@ const resources = {
       'ios_install_instructions': 'Pour les utilisateurs iOS',
       'tap_share_button': 'Appuyez sur le bouton de partage',
       'add_to_home_screen': 'Ajouter à l\'écran d\'accueil',
+      'app_title': 'HomeMe - Gestion de Complexe',
       'notificationCenter': {
         'pushNotifications': 'Notifications Push',
         'notSubscribed': 'Non Abonné',

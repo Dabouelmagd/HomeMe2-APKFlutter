@@ -283,31 +283,52 @@ const TermsPrivacy = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Enhanced Tab Navigation */}
-        <div className="flex space-x-1 bg-white/70 backdrop-blur-sm rounded-2xl p-2 mb-10 shadow-lg border border-white/20">
-          <button
-            onClick={() => setActiveTab('terms')}
-            className={`flex-1 flex items-center justify-center px-6 py-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              activeTab === 'terms'
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/25 transform scale-[1.02]'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
-            }`}
-          >
-            <DocumentTextIcon className="w-5 h-5 mr-3" />
-            {t('legal_termsOfUse')}
-          </button>
-          <button
-            onClick={() => setActiveTab('privacy')}
-            className={`flex-1 flex items-center justify-center px-6 py-4 rounded-xl text-sm font-semibold transition-all duration-300 ${
-              activeTab === 'privacy'
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-500/25 transform scale-[1.02]'
-                : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
-            }`}
-          >
-            <ShieldCheckIcon className="w-5 h-5 mr-3" />
-            {t('legal_privacyPolicy')}
-          </button>
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-12">
+        {/* Premium Tab Navigation */}
+        <div className="relative mb-16">
+          {/* Background glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-emerald-500/10 rounded-3xl blur-xl"></div>
+          <div className="relative flex space-x-2 bg-white/80 backdrop-blur-md rounded-3xl p-3 shadow-2xl border border-white/30">
+            <button
+              onClick={() => setActiveTab('terms')}
+              className={`group flex-1 flex items-center justify-center px-8 py-6 rounded-2xl text-lg font-bold transition-all duration-500 relative overflow-hidden ${
+                activeTab === 'terms'
+                  ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-2xl shadow-blue-500/30 transform scale-[1.03]'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/70 hover:scale-[1.01]'
+              }`}
+            >
+              {activeTab === 'terms' && (
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-600/20 animate-pulse"></div>
+              )}
+              <DocumentTextIcon className={`w-6 h-6 mr-4 transition-all duration-300 ${
+                activeTab === 'terms' ? 'scale-110' : 'group-hover:scale-105'
+              }`} />
+              <span className="relative z-10">{t('legal_termsOfUse')}</span>
+              {activeTab === 'terms' && (
+                <div className="absolute -right-1 -top-1 w-3 h-3 bg-white/30 rounded-full animate-ping"></div>
+              )}
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('privacy')}
+              className={`group flex-1 flex items-center justify-center px-8 py-6 rounded-2xl text-lg font-bold transition-all duration-500 relative overflow-hidden ${
+                activeTab === 'privacy'
+                  ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 text-white shadow-2xl shadow-emerald-500/30 transform scale-[1.03]'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-white/70 hover:scale-[1.01]'
+              }`}
+            >
+              {activeTab === 'privacy' && (
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-cyan-600/20 animate-pulse"></div>
+              )}
+              <ShieldCheckIcon className={`w-6 h-6 mr-4 transition-all duration-300 ${
+                activeTab === 'privacy' ? 'scale-110' : 'group-hover:scale-105'
+              }`} />
+              <span className="relative z-10">{t('legal_privacyPolicy')}</span>
+              {activeTab === 'privacy' && (
+                <div className="absolute -right-1 -top-1 w-3 h-3 bg-white/30 rounded-full animate-ping"></div>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Content */}

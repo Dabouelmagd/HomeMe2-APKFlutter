@@ -249,10 +249,10 @@ const AddFamilyMemberToUnit = () => {
           <div>
             <div className="mb-6 pb-4 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900">
-                Available Residents ({filteredResidents.length})
+                {t('available_residents')} ({filteredResidents.length})
               </h2>
               <p className="text-gray-600 mt-1">
-                Select a unit to add a new family member
+                {t('select_unit_add_member')}
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

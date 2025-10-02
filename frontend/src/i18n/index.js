@@ -1440,6 +1440,25 @@ const resources = {
       'send_first_message': 'أرسل رسالتك الأولى',
       'residents': 'السكان',
       'management': 'الإدارة',
+      
+      // Chat System
+      'chat': {
+        'newChat': 'محادثة جديدة',
+        'directChat': 'محادثة مباشرة',
+        'directChatDescription': 'ابدأ محادثة خاصة مع مستخدم آخر',
+        'groupChat': 'محادثة جماعية',
+        'groupChatDescription': 'أنشئ محادثة جماعية مع عدة مستخدمين',
+        'compoundChat': 'محادثة المجمع',
+        'compoundChatDescription': 'تحدث مع جميع السكان في مجمعك',
+        'searchUsers': 'البحث عن المستخدمين',
+        'noUsersAvailable': 'لا يوجد مستخدمون متاحون',
+        'createChat': 'إنشاء محادثة'
+      },
+      
+      // Common
+      'common': {
+        'cancel': 'إلغاء'
+      },
       'send_first_message': 'أرسل رسالتك الأولى',
       'residents': 'المقيمين',
       'management': 'الإدارة',

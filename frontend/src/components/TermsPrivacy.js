@@ -252,7 +252,7 @@ const TermsPrivacy = () => {
                 {activeTab === 'terms' ? (
                   <ClipboardDocumentCheckIcon className="w-8 h-8 text-white" />
                 ) : (
-                  <UserShieldIcon className="w-8 h-8 text-white" />
+                  <UserCircleIcon className="w-8 h-8 text-white" />
                 )}
               </div>
               

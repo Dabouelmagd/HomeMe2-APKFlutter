@@ -374,11 +374,7 @@ const ServicesManagement = () => {
       };
     }
     
-    console.log('Using default (no translation):', {
-      serviceName: service.name,
-      currentLang,
-      forceEnglish
-    });
+    // No translation applied - using original data
     
     return {
       name: service.name,

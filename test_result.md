@@ -76,7 +76,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Unit Translation Verification for Add Family Member Page"
+    - "Arabic Translation Verification for Financial Management Page"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

@@ -105,7 +105,11 @@ const AddFamilyMemberToUnit = () => {
         return;
       }
       
-      setMemberForm(prev => ({ ...prev, profile_picture: file }));
+      setMemberForm(prev => ({ 
+        ...prev, 
+        profile_picture: file,
+        profile_picture_file: file
+      }));
       
       const reader = new FileReader();
       reader.onload = (e) => {

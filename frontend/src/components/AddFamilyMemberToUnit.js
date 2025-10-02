@@ -229,7 +229,7 @@ const AddFamilyMemberToUnit = () => {
       </div>
 
       {/* Residents List */}
-      <div className="space-y-4">
+      <div className="bg-white rounded-2xl shadow-sm p-6">
         {filteredResidents.length === 0 ? (
           <div className="text-center py-8">
             <UsersIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />

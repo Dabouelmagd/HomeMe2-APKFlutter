@@ -337,6 +337,13 @@ const ServicesManagement = () => {
         working_hours: service.working_hours_en || workingHours
       };
       
+      console.log('English translation result:', {
+        original: service.name,
+        translated: result.name,
+        hasTranslation: !!translation,
+        translationName: translation?.name
+      });
+      
       return result;
     } else if (currentLang === 'ar') {
       return {

@@ -218,6 +218,12 @@ const ServicesManagement = () => {
   const translateServiceData = (service) => {
     const currentLang = i18n.language || 'en';
     
+    console.log('translateServiceData called:', { 
+      serviceName: service.name, 
+      currentLang, 
+      hasNameEn: !!service.name_en 
+    });
+    
     // Create default English fallbacks based on service names
     const englishFallbacks = {
       'خدمات السباكة': 'Plumbing Services',

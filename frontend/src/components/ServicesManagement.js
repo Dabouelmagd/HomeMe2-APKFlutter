@@ -339,29 +339,32 @@ const ServicesManagement = () => {
         working_hours: service.working_hours_ar || service.working_hours
       };
     } else if (currentLang === 'fr') {
-      const frenchFallbacks = {
-        'خدمات السباكة': 'Services de Plomberie',
-        'الخدمات الكهربائية': 'Services Électriques',
-        'خدمات التكييف والتهوية': 'Services CVC',
-        'الفني العام': 'Homme à Tout Faire',
-        'تنظيف المنازل': 'Nettoyage de Maison',
-        'تنظيف السجاد': 'Nettoyage de Tapis',
-        'تنظيف النوافذ': 'Nettoyage de Vitres',
-        'حارس الأمن': 'Agent de Sécurité',
-        'إعداد نظام التحكم بالدخول': 'Configuration Contrôle d\'Accès',
-        'تنسيق الحدائق والبستنة': 'Aménagement Paysager',
-        'صيانة المسابح': 'Entretien de Piscine',
-        'خدمات رعاية الحيوانات الأليفة': 'Services de Soins aux Animaux',
-        'مدرب شخصي': 'Entraîneur Personnel',
-        'توصيل الطرود': 'Livraison de Colis',
-        'خدمات النقل': 'Services de Déménagement',
-        'تخطيط الفعاليات': 'Planification d\'Événements',
-        'خدمات التموين': 'Services de Restauration'
+      const translation = serviceTranslations[service.name];
+      const frenchTranslations = {
+        'خدمات السباكة': { name: 'Services de Plomberie', description: 'Services de plomberie professionnels' },
+        'الخدمات الكهربائية': { name: 'Services Électriques', description: 'Services électriques professionnels' },
+        'خدمات التكييف والتهوية': { name: 'Services CVC', description: 'Services de climatisation et ventilation' },
+        'الفني العام': { name: 'Homme à Tout Faire', description: 'Services d\'homme à tout faire' },
+        'تنظيف المنازل': { name: 'Nettoyage de Maison', description: 'Services de nettoyage de maison' },
+        'تنظيف السجاد': { name: 'Nettoyage de Tapis', description: 'Services de nettoyage de tapis' },
+        'تنظيف النوافذ': { name: 'Nettoyage de Vitres', description: 'Services de nettoyage de vitres' },
+        'حارس الأمن': { name: 'Agent de Sécurité', description: 'Services de sécurité professionnels' },
+        'إعداد نظام التحكم بالدخول': { name: 'Configuration Contrôle d\'Accès', description: 'Installation de systèmes de contrôle d\'accès' },
+        'تنسيق الحدائق والبستنة': { name: 'Aménagement Paysager', description: 'Services d\'aménagement paysager' },
+        'صيانة المسابح': { name: 'Entretien de Piscine', description: 'Services d\'entretien de piscine' },
+        'خدمات رعاية الحيوانات الأليفة': { name: 'Services de Soins aux Animaux', description: 'Services de soins pour animaux domestiques' },
+        'مدرب شخصي': { name: 'Entraîneur Personnel', description: 'Services d\'entraînement personnel' },
+        'توصيل الطرود': { name: 'Livraison de Colis', description: 'Services de livraison de colis' },
+        'خدمات النقل': { name: 'Services de Déménagement', description: 'Services de déménagement professionnels' },
+        'تخطيط الفعاليات': { name: 'Planification d\'Événements', description: 'Services de planification d\'événements' },
+        'خدمات التموين': { name: 'Services de Restauration', description: 'Services de restauration professionnels' }
       };
       
+      const frenchTranslation = frenchTranslations[service.name];
+      
       return {
-        name: service.name_fr || frenchFallbacks[service.name] || service.name,
-        description: service.description_fr || `Services professionnels ${frenchFallbacks[service.name] || service.name}`,
+        name: service.name_fr || frenchTranslation?.name || service.name,
+        description: service.description_fr || frenchTranslation?.description || service.description,
         specialty: service.specialty_fr || service.specialty,
         working_hours: service.working_hours_fr || service.working_hours
       };

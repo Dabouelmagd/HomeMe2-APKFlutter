@@ -307,6 +307,7 @@ const AddFamilyMemberToUnit = () => {
                 </div>
               </div>
             ))}
+            </div>
           </div>
         )}
       </div>

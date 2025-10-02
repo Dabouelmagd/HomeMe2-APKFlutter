@@ -1445,30 +1445,26 @@ const resources = {
       'management': 'الإدارة',
       
       // Chat System
-      'chat': {
-        'newChat': 'محادثة جديدة',
-        'directChat': 'محادثة مباشرة',
-        'directChatDescription': 'ابدأ محادثة خاصة مع مستخدم آخر',
-        'groupChat': 'محادثة جماعية',
-        'groupChatDescription': 'أنشئ محادثة جماعية مع عدة مستخدمين',
-        'compoundChat': 'محادثة المجمع',
-        'compoundChatDescription': 'تحدث مع جميع السكان في مجمعك',
-        'groupName': 'اسم المجموعة',
-        'enterGroupName': 'أدخل اسم المجموعة',
-        'groupDescription': 'وصف المجموعة',
-        'enterGroupDescription': 'أدخل وصف المجموعة (اختياري)',
-        'searchUsers': 'البحث عن المستخدمين',
-        'noUsersFound': 'لم يتم العثور على مستخدمين',
-        'noUsersAvailable': 'لا يوجد مستخدمون متاحون',
-        'compoundChatInfo': 'هذا سينشئ محادثة عامة للمجمع حيث يمكن لجميع السكان المشاركة',
-        'createChat': 'إنشاء محادثة'
-      },
+      'chat.newChat': 'محادثة جديدة',
+      'chat.directChat': 'محادثة مباشرة',
+      'chat.directChatDescription': 'ابدأ محادثة خاصة مع مستخدم آخر',
+      'chat.groupChat': 'محادثة جماعية',
+      'chat.groupChatDescription': 'أنشئ محادثة جماعية مع عدة مستخدمين',
+      'chat.compoundChat': 'محادثة المجمع',
+      'chat.compoundChatDescription': 'تحدث مع جميع السكان في مجمعك',
+      'chat.groupName': 'اسم المجموعة',
+      'chat.enterGroupName': 'أدخل اسم المجموعة',
+      'chat.groupDescription': 'وصف المجموعة',
+      'chat.enterGroupDescription': 'أدخل وصف المجموعة (اختياري)',
+      'chat.searchUsers': 'البحث عن المستخدمين',
+      'chat.noUsersFound': 'لم يتم العثور على مستخدمين',
+      'chat.noUsersAvailable': 'لا يوجد مستخدمون متاحون',
+      'chat.compoundChatInfo': 'هذا سينشئ محادثة عامة للمجمع حيث يمكن لجميع السكان المشاركة',
+      'chat.createChat': 'إنشاء محادثة',
       
       // Common
-      'common': {
-        'cancel': 'إلغاء',
-        'creating': 'جاري الإنشاء...'
-      },
+      'common.cancel': 'إلغاء',
+      'common.creating': 'جاري الإنشاء...',
       'send_first_message': 'أرسل رسالتك الأولى',
       'residents': 'المقيمين',
       'management': 'الإدارة',

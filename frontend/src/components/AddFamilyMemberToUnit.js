@@ -451,7 +451,7 @@ const AddFamilyMemberToUnit = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Move-in Date
+                          {t('move_in_date')}
                         </label>
                         <input
                           type="date"

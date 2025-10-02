@@ -1457,14 +1457,21 @@ const resources = {
         'groupChatDescription': 'أنشئ محادثة جماعية مع عدة مستخدمين',
         'compoundChat': 'محادثة المجمع',
         'compoundChatDescription': 'تحدث مع جميع السكان في مجمعك',
+        'groupName': 'اسم المجموعة',
+        'enterGroupName': 'أدخل اسم المجموعة',
+        'groupDescription': 'وصف المجموعة',
+        'enterGroupDescription': 'أدخل وصف المجموعة (اختياري)',
         'searchUsers': 'البحث عن المستخدمين',
+        'noUsersFound': 'لم يتم العثور على مستخدمين',
         'noUsersAvailable': 'لا يوجد مستخدمون متاحون',
+        'compoundChatInfo': 'هذا سينشئ محادثة عامة للمجمع حيث يمكن لجميع السكان المشاركة',
         'createChat': 'إنشاء محادثة'
       },
       
       // Common
       'common': {
-        'cancel': 'إلغاء'
+        'cancel': 'إلغاء',
+        'creating': 'جاري الإنشاء...'
       },
       'send_first_message': 'أرسل رسالتك الأولى',
       'residents': 'المقيمين',

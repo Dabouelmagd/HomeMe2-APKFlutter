@@ -360,6 +360,17 @@ const ServicesManagement = () => {
       fetchMyBookings();
     }
   }, [user]);
+  
+  // Trigger re-render when language changes
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      // Force re-render by updating a state
+      setServices(prevServices => [...prevServices]);
+    };
+    
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => i18n.off('languageChanged', handleLanguageChange);
+  }, []);
 
   const fetchServices = async () => {
     try {

@@ -358,21 +358,104 @@ const FinancialManagement = () => {
         )}
       </div>
 
-      {/* Payment Methods Info */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-center text-blue-900 mb-4">{t('payment_information')}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h4 className="font-medium text-blue-800 text-center mb-2">{t('mock_payment_system')}</h4>
-            <p className="text-sm text-blue-700">
-              {t('mock_payment_description')}
-            </p>
+      {/* Enhanced Payment Methods Info */}
+      <div className="mt-8">
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-8 py-6 border-b border-gray-200">
+            <div className="flex items-center justify-center space-x-3 rtl:space-x-reverse">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">{t('payment_information')}</h3>
+                <p className="text-sm text-gray-600">معلومات النظام والخدمات المتاحة</p>
+              </div>
+            </div>
           </div>
-          <div>
-            <h4 className="font-medium text-blue-800 text-center mb-2">{t('payment_history')}</h4>
-            <p className="text-sm text-blue-700">
-              {t('payment_history_description')}
-            </p>
+
+          {/* Content */}
+          <div className="p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Mock Payment System Card */}
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">
+                <div className="flex items-start space-x-4 rtl:space-x-reverse">
+                  <div className="bg-blue-600 p-3 rounded-lg flex-shrink-0">
+                    <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-semibold text-blue-900 mb-3">{t('mock_payment_system')}</h4>
+                    <p className="text-blue-800 leading-relaxed">
+                      {t('mock_payment_description')}
+                    </p>
+                    <div className="mt-4 flex items-center space-x-2 rtl:space-x-reverse">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-sm text-blue-700 font-medium">للاختبار والتطوير</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment History Card */}
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
+                <div className="flex items-start space-x-4 rtl:space-x-reverse">
+                  <div className="bg-green-600 p-3 rounded-lg flex-shrink-0">
+                    <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-semibold text-green-900 mb-3">{t('payment_history')}</h4>
+                    <p className="text-green-800 leading-relaxed">
+                      {t('payment_history_description')}
+                    </p>
+                    <div className="mt-4 flex items-center space-x-2 rtl:space-x-reverse">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm text-green-700 font-medium">متاح للجميع</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Features */}
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="bg-purple-100 p-3 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                    <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <h5 className="font-semibold text-gray-900 mb-2">أمان عالي</h5>
+                  <p className="text-sm text-gray-600">جميع المعاملات محمية ومشفرة</p>
+                </div>
+
+                <div className="text-center">
+                  <div className="bg-orange-100 p-3 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                    <svg className="h-6 w-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <h5 className="font-semibold text-gray-900 mb-2">سرعة فائقة</h5>
+                  <p className="text-sm text-gray-600">معالجة فورية للمدفوعات</p>
+                </div>
+
+                <div className="text-center">
+                  <div className="bg-teal-100 p-3 rounded-full w-12 h-12 mx-auto mb-3 flex items-center justify-center">
+                    <svg className="h-6 w-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h5 className="font-semibold text-gray-900 mb-2">موثوق</h5>
+                  <p className="text-sm text-gray-600">نظام مُختبر وموثوق</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

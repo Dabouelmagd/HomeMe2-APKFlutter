@@ -306,7 +306,7 @@ const FamilyManagement = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {formatDate(member.move_in_date)}
+                        {formatDateForFamily(member.move_in_date)}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center space-x-2">

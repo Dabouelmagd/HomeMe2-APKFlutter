@@ -92,32 +92,32 @@ const TermsPrivacy = () => {
     {
       id: 'acceptance',
       title: t('legal_terms_acceptance_title'),
-      content: 'By accessing and using HomeMe services, you accept and agree to be bound by the terms and provisions of this agreement.'
+      content: t('legal_terms_acceptance_content')
     },
     {
       id: 'personal_use',
       title: t('legal_terms_personalUse_title'),
-      content: 'You may use our service for personal, non-commercial purposes only. You agree not to use the service for any unlawful activities.'
+      content: t('legal_terms_personalUse_content')
     },
     {
       id: 'content',
       title: t('legal_terms_content_title'),
-      content: 'You are responsible for all content you post. You agree not to post content that is offensive, illegal, or violates others\' rights.'
+      content: t('legal_terms_content_content')
     },
     {
       id: 'liability',
       title: t('legal_terms_liability_title'),
-      content: 'HomeMe shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service.'
+      content: t('legal_terms_liability_content')
     },
     {
       id: 'modifications',
       title: t('legal_terms_modifications_title'),
-      content: 'We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting on our website.'
+      content: t('legal_terms_modifications_content')
     },
     {
       id: 'governing_law',
       title: t('legal_terms_governingLaw_title'),
-      content: 'These terms shall be governed by and construed in accordance with the laws of the jurisdiction in which HomeMe operates.'
+      content: t('legal_terms_governingLaw_content')
     }
   ];
 

@@ -105,8 +105,8 @@ const FinancialManagement = () => {
       {/* Enhanced Header Section */}
       <div className="mb-8">
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-            <div className="mb-6 lg:mb-0 rtl:order-2">
+          <div className="flex flex-col lg:flex-row lg:items-center">
+            <div className="mb-6 lg:mb-0 lg:flex-1">
               <div className="flex items-center space-x-3 rtl:space-x-reverse mb-2">
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl">
                   <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,7 +126,7 @@ const FinancialManagement = () => {
             </div>
             
             {/* Currency Selector */}
-            <div className="flex items-center justify-end rtl:justify-start rtl:order-1 lg:justify-end rtl:lg:justify-start">
+            <div className="lg:ms-auto">
               <div className="text-center">
                 <p className="text-sm font-medium text-gray-600 mb-2">{t('currency_display')}</p>
                 <CurrencySelector 

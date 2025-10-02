@@ -14,7 +14,17 @@ import {
   EyeIcon,
   UserCircleIcon,
   ClipboardDocumentCheckIcon,
-  ClockIcon
+  ClockIcon,
+  HandRaisedIcon,
+  HomeIcon,
+  PencilSquareIcon,
+  ScaleIcon,
+  CogIcon,
+  BookOpenIcon,
+  EyeSlashIcon,
+  UserGroupIcon,
+  BellIcon,
+  DocumentArrowUpIcon
 } from '@heroicons/react/24/outline';
 
 const TermsPrivacy = () => {

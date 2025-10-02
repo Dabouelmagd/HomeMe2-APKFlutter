@@ -126,8 +126,8 @@ const FinancialManagement = () => {
             </div>
             
             {/* Currency Selector */}
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
+            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+              <div className="text-right rtl:text-left">
                 <p className="text-sm font-medium text-gray-600">{t('currency_display')}</p>
                 <CurrencySelector 
                   selectedCurrency={selectedCurrency}

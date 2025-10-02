@@ -94,7 +94,7 @@ const ProfileSettings = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">Personal Information</h3>
+        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">{t('personal_information')}</h3>
         
         <form onSubmit={handleProfileUpdate} className="space-y-6">
           <div className="flex items-center space-x-6">

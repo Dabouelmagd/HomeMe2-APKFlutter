@@ -105,67 +105,120 @@ const FileGallery = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-200 border-t-purple-600 mx-auto mb-6"></div>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('common.loading')}</h3>
+          <p className="text-gray-500">{t('gallery.loadingFiles')}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 text-center">{t('gallery.title')}</h1>
-          <p className="mt-1 text-sm text-gray-600 text-center">
-            {t('gallery.description')}
-          </p>
-        </div>
-
-        {/* Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          {fileTypeCategories.map((category) => (
-            <button
-              key={category.value}
-              onClick={() => setSelectedType(category.value)}
-              className={`p-4 rounded-lg text-center transition-colors ${
-                selectedType === category.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              <div className="text-2xl font-bold">{category.count}</div>
-              <div className="text-sm">{category.label}</div>
-            </button>
-          ))}
-        </div>
-
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-3 sm:space-y-0">
-          <div className="flex items-center space-x-4">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="uploaded_at">{t('gallery.newestFirst')}</option>
-              <option value="file_size">{t('gallery.largestFirst')}</option>
-              <option value="filename">{t('gallery.nameAZ')}</option>
-            </select>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
+      {/* Enhanced Header Section */}
+      <div className="bg-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-4 rounded-2xl shadow-xl">
+                <PhotoIcon className="h-12 w-12 text-white" />
+              </div>
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
+              {t('gallery.title')}
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              {t('gallery.description')}
+            </p>
           </div>
+        </div>
+      </div>
 
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-gray-600'}`}
-            >
-              <Squares2X2Icon className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-gray-600'}`}
-            >
-              <ListBulletIcon className="h-5 w-5" />
-            </button>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Enhanced Stats Overview */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('gallery.fileTypes')}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {fileTypeCategories.map((category, index) => {
+              const gradients = [
+                'from-blue-500 to-cyan-500',
+                'from-purple-500 to-pink-500', 
+                'from-green-500 to-teal-500',
+                'from-orange-500 to-red-500',
+                'from-indigo-500 to-purple-500',
+                'from-gray-500 to-slate-500'
+              ];
+              return (
+                <button
+                  key={category.value}
+                  onClick={() => setSelectedType(category.value)}
+                  className={`group p-6 rounded-2xl text-center transition-all duration-300 transform hover:scale-105 hover:shadow-2xl ${
+                    selectedType === category.value
+                      ? `bg-gradient-to-br ${gradients[index % gradients.length]} text-white shadow-xl`
+                      : 'bg-white text-gray-700 hover:bg-gray-50 shadow-lg border border-gray-100'
+                  }`}
+                >
+                  <div className="text-3xl font-bold mb-2">{category.count}</div>
+                  <div className="text-sm font-medium">{category.label}</div>
+                  {selectedType === category.value && (
+                    <div className="mt-2 w-8 h-1 bg-white/30 rounded-full mx-auto"></div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Enhanced Controls */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+            {/* Sort Controls */}
+            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <FunnelIcon className="h-5 w-5 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">{t('gallery.sortBy')}:</span>
+              </div>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-xl focus:ring-4 focus:ring-purple-100 focus:border-purple-500 transition-all duration-200"
+              >
+                <option value="uploaded_at">{t('gallery.newestFirst')}</option>
+                <option value="file_size">{t('gallery.largestFirst')}</option>
+                <option value="filename">{t('gallery.nameAZ')}</option>
+              </select>
+            </div>
+
+            {/* View Mode Controls */}
+            <div className="flex items-center space-x-2 rtl:space-x-reverse">
+              <span className="text-sm font-medium text-gray-700">{t('gallery.view')}:</span>
+              <div className="flex bg-gray-100 rounded-xl p-1">
+                <button
+                  onClick={() => setViewMode('grid')}
+                  className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    viewMode === 'grid' 
+                      ? 'bg-white text-purple-600 shadow-md' 
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <Squares2X2Icon className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                  {t('gallery.grid')}
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    viewMode === 'list' 
+                      ? 'bg-white text-purple-600 shadow-md' 
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <ListBulletIcon className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                  {t('gallery.list')}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 

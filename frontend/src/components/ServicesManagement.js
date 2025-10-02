@@ -312,11 +312,22 @@ const ServicesManagement = () => {
     };
     
     if (forceEnglish || currentLang === 'en' || currentLang.startsWith('en')) {
+      const translation = serviceTranslations[service.name];
+      
+      // Convert working hours from Arabic to English
+      let workingHours = service.working_hours || '';
+      workingHours = workingHours
+        .replace(/ص/g, 'AM')
+        .replace(/م/g, 'PM')
+        .replace(/خدمة طوارئ/g, 'Emergency service')
+        .replace(/خدمة متاحة/g, 'Service available')
+        .replace(/طوارئ/g, 'emergencies');
+      
       const result = {
-        name: service.name_en || englishFallbacks[service.name] || service.name,
-        description: service.description_en || `Professional ${englishFallbacks[service.name] || service.name} services`,
-        specialty: service.specialty_en || service.specialty,
-        working_hours: service.working_hours_en || service.working_hours?.replace('ص', 'AM').replace('م', 'PM') || service.working_hours
+        name: service.name_en || translation?.name || service.name,
+        description: service.description_en || translation?.description || service.description,
+        specialty: service.specialty_en || translation?.specialty || service.specialty,
+        working_hours: service.working_hours_en || workingHours
       };
       
       return result;

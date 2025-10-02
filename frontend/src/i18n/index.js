@@ -2844,6 +2844,9 @@ const resources = {
       'add_member': 'Ajouter Membre',
       'add_family_member': 'Ajouter Membre de Famille',
       'adding_to_unit': 'Ajout à l\'Unité',
+      'resident': 'résident',
+      'residents': 'résidents',
+      'found': 'trouvé',
       
       // Locations & Map
       'locations_map': 'Emplacements et Carte',

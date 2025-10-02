@@ -199,9 +199,9 @@ const AddFamilyMemberToUnit = () => {
             </div>
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Add Family Member to Unit</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('add_family_member_to_unit')}</h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              {user.role === 'admin' ? 'Add family members to any unit in your compound with ease' : 'Add family members to any unit in your compound with ease'}
+              {t('add_family_members_any_unit')}
             </p>
           </div>
         </div>

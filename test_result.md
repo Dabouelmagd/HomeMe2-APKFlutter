@@ -53,7 +53,7 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 ##
-user_problem_statement: "Add the missing translation keys for the newly redesigned NotificationCenter.js component to the i18n/index.js file for English, Arabic, and French to complete the localization of the new UI. The NotificationCenter has been redesigned with modern UI elements and needs all hardcoded strings to be replaced with translatable keys to support full internationalization."
+user_problem_statement: "اختبار شامل لصفحة القانونية المُعاد تصميمها في تطبيق HomeMe - التحقق من أن إعادة تصميم صفحة شروط الاستخدام وسياسة الخصوصية يعمل بشكل مثالي مع التصميم الجديد والترجمة العربية و RTL layout"
 
 backend:
   - task: "Financial Management API Permissions System Testing"

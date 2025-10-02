@@ -226,9 +226,9 @@ const PrivacySettings = () => {
   const handlePrivacyUpdate = async () => {
     try {
       await axios.put(`${API}/users/${user.id}/privacy`, privacySettings);
-      toast.success('Privacy settings updated successfully!');
+      toast.success(t('privacy_settings_updated_successfully'));
     } catch (error) {
-      toast.error('Failed to update privacy settings');
+      toast.error(t('failed_to_update_privacy_settings'));
     }
   };
 

@@ -236,12 +236,12 @@ const AddFamilyMemberToUnit = () => {
               <UsersIcon className="h-12 w-12 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchTerm ? 'No matching residents found' : 'No residents found'}
+              {searchTerm ? t('no_matching_residents') : t('no_residents_registered')}
             </h3>
             <p className="text-gray-500 max-w-sm mx-auto">
               {searchTerm ? 
-                `Try adjusting your search term "${searchTerm}" to find residents` : 
-                'There are no residents registered in your compound yet'
+                `${t('try_adjusting_search')} "${searchTerm}"` : 
+                t('no_residents_yet')
               }
             </p>
           </div>

@@ -1474,6 +1474,12 @@ const resources = {
       'chat.noChatsYet': 'لا توجد محادثات بعد',
       'chat.startFirstChat': 'ابدأ محادثتك الأولى',
       'chat.selectChatToStart': 'اختر محادثة لبدء المراسلة',
+      'chat.noChatsFound': 'لم يتم العثور على محادثات',
+      'chat.tryDifferentSearch': 'جرب مصطلح بحث مختلف',
+      'chat.createFirstChat': 'إنشاء المحادثة الأولى',
+      'chat.noMessages': 'لا توجد رسائل بعد',
+      'chat.chats': 'المحادثات',
+      'common.loading': 'جاري التحميل...',
       'chat.searchChats': 'البحث في المحادثات',
       
       // Common

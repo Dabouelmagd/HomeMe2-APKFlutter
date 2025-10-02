@@ -218,12 +218,20 @@ const TermsPrivacy = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Modern Header with Gradient */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-x-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-10 -right-10 w-72 h-72 bg-gradient-to-br from-blue-400/10 to-indigo-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 -left-20 w-96 h-96 bg-gradient-to-tr from-purple-400/8 to-blue-500/8 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute bottom-0 right-1/3 w-80 h-80 bg-gradient-to-tl from-indigo-400/8 to-purple-500/8 rounded-full blur-3xl animate-pulse delay-500"></div>
+      </div>
+      
+      {/* Modern Header with Enhanced Gradient */}
       <div className="relative">
-        {/* Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/20"></div>
+        {/* Enhanced Background Gradient with Animation */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 animate-gradient-x"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-purple-600/30"></div>
+        <div className="absolute inset-0 bg-black/5"></div>
         
         {/* Header Content */}
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">

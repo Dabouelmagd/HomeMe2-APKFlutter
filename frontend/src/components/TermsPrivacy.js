@@ -173,7 +173,7 @@ const TermsPrivacy = () => {
                   ? 'bg-gradient-to-br from-blue-500 to-indigo-600 group-hover:from-blue-600 group-hover:to-indigo-700' 
                   : 'bg-gradient-to-br from-emerald-500 to-teal-600 group-hover:from-emerald-600 group-hover:to-teal-700'
               } shadow-lg`}>
-                <span className="text-lg font-bold text-white">{index + 1}</span>
+                {getSectionIcon(section.id, index)}
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900 group-hover:text-gray-800 transition-colors">

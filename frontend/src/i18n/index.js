@@ -2636,6 +2636,8 @@ const resources = {
       
       // Financial Management
       'view_manage_payments_invoices': 'Voir et gérer les paiements et factures',
+      'admin_view_manage_payments_invoices': 'Voir et gérer tous les paiements et factures du complexe',
+      'resident_view_manage_payments_invoices': 'Voir et gérer vos paiements et factures d\'unité',
       'total_due': 'Total dû',
       'pending_payments_alert': 'Vous avez {{count}} paiement en attente',
       'pending_payments_alert_plural': 'Vous avez {{count}} paiements en attente',

@@ -2628,9 +2628,25 @@ const resources = {
       
       // Notifications
       'manage_your_notifications': 'Gérer vos notifications',
+      'notification_filters': 'Filtres de Notifications',
+      'search_notifications': 'Rechercher des notifications...',
+      'loading_notifications': 'Chargement des notifications...',
+      'no_notifications_yet': 'Aucune Notification Pour le Moment',
+      'no_matching_notifications': 'Aucune Notification Correspondante',
+      'try_adjusting_filters': 'Essayez d\'ajuster vos filtres',
+      'notifications_will_appear_here': 'Les notifications apparaîtront ici lorsqu\'elles arriveront',
+      'notification_types_include': 'Les types de notifications incluent:',
+      'notifications_found': 'notifications trouvées',
+      'priority_high': 'Priorité Élevée',
+      'priority_medium': 'Priorité Moyenne',
+      'priority_low': 'Priorité Faible',
+      'filter_all': 'Tout',
+      'filter_unread': 'Non Lu',
+      'filter_read': 'Lu',
+      'mark_read': 'Marquer comme Lu',
+      'delete_notification': 'Supprimer la Notification',
       'filters': 'Filtres',
       'no_notifications': 'Aucune notification',
-      'notifications_will_appear_here': 'Les notifications apparaîtront ici',
       
       // Settings
       'settings_title': 'Paramètres',

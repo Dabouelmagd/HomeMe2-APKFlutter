@@ -235,7 +235,7 @@ const PrivacySettings = () => {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">Privacy & Visibility</h3>
+        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">{t('privacy_and_visibility')}</h3>
         
         <div className="space-y-6">
           <div>

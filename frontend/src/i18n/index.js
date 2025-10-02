@@ -1163,6 +1163,7 @@ const resources = {
       'completed_payments': 'المدفوعات المكتملة',
       'past_due_date': 'متجاوز تاريخ الاستحقاق',
       'outstanding_amount': 'المبلغ المستحق',
+      'total_invoices': 'إجمالي الفواتير',
       'update_service': 'تحديث الخدمة',
       'add_service': 'إضافة خدمة',
       'save_service': 'حفظ الخدمة',

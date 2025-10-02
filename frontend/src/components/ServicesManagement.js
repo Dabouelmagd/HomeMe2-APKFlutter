@@ -340,8 +340,11 @@ const ServicesManagement = () => {
       console.log('English translation result:', {
         original: service.name,
         translated: result.name,
+        originalSpecialty: service.specialty,
+        translatedSpecialty: result.specialty,
         hasTranslation: !!translation,
-        translationName: translation?.name
+        translationName: translation?.name,
+        translationSpecialty: translation?.specialty
       });
       
       return result;

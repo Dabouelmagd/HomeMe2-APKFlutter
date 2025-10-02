@@ -264,9 +264,11 @@ const AddFamilyMemberToUnit = () => {
                   </div>
                   <button
                     onClick={() => handleAddMember(resident)}
-                    className="btn btn-primary btn-sm flex items-center space-x-1"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors duration-200 font-medium shadow-sm"
                   >
-                    <PlusIcon className="h-4 w-4" />
+                    <div className="bg-white/20 p-1 rounded-full">
+                      <PlusIcon className="h-5 w-5" />
+                    </div>
                     <span>Add Member</span>
                   </button>
                 </div>

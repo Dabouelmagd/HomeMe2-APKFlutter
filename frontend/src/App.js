@@ -266,6 +266,43 @@ const PageTitleUpdater = () => {
   return null;
 };
 
+// Language and Layout Initializer
+const LanguageInitializer = () => {
+  const { i18n } = useTranslation();
+  
+  useEffect(() => {
+    // Initialize language from localStorage or default
+    const storedLanguage = localStorage.getItem('i18nextLng');
+    if (storedLanguage && ['en', 'ar', 'fr'].includes(storedLanguage)) {
+      if (i18n.language !== storedLanguage) {
+        i18n.changeLanguage(storedLanguage);
+      }
+    }
+  }, [i18n]);
+  
+  useEffect(() => {
+    // Apply RTL layout based on current language
+    const applyLanguageLayout = (lang) => {
+      if (lang === 'ar') {
+        document.dir = 'rtl';
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.body.classList.add('rtl');
+        document.body.style.direction = 'rtl';
+      } else {
+        document.dir = 'ltr';
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.body.classList.remove('rtl');
+        document.body.style.direction = 'ltr';
+      }
+    };
+
+    // Apply layout for current language
+    applyLanguageLayout(i18n.language);
+  }, [i18n.language]);
+  
+  return null;
+};
+
 // Main App Component  
 function App() {
   return (

@@ -1642,7 +1642,7 @@ const resources = {
       'total_due': 'إجمالي المستحق',
       'pending_payments_alert': 'لديك {{count}} دفعة معلقة',
       'pending_payments_alert_plural': 'لديك {{count}} دفعات معلقة',
-      'total_amount_due': 'إجمالي المبلغ المستحق: {{amount}} ر.س',
+      'total_amount_due': 'إجمالي المبلغ المستحق: {{amount}}',
       'all_invoices': 'جميع الفواتير',
       'due_date': 'تاريخ الاستحقاق',
       'pay_now': 'ادفع الآن',

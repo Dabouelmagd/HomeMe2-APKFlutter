@@ -158,26 +158,94 @@ const ChatSidebar = ({ selectedChat, onChatSelect, onNewChat }) => {
             )}
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="space-y-2">
             {filteredChats.map((chat) => (
               <div
                 key={chat.id}
                 onClick={() => onChatSelect(chat)}
-                className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
-                  selectedChat?.id === chat.id ? 'bg-blue-50 border-r-2 border-blue-500' : ''
+                className={`mx-2 p-4 cursor-pointer rounded-2xl transition-all duration-200 hover:shadow-lg transform hover:-translate-y-1 ${
+                  selectedChat?.id === chat.id 
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl' 
+                    : 'bg-white hover:bg-gray-50 shadow-sm border border-gray-100'
                 }`}
               >
-                <div className="flex items-start space-x-3">
-                  {/* Avatar */}
-                  <div className="flex-shrink-0">
+                <div className="flex items-start space-x-4 rtl:space-x-reverse">
+                  {/* Enhanced Avatar */}
+                  <div className="flex-shrink-0 relative">
                     {chat.chat_type === 'direct' ? (
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                        <span className="text-sm font-medium text-white">
+                      <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg ${
+                        selectedChat?.id === chat.id ? 'ring-4 ring-white/50' : ''
+                      }`}>
+                        <span className="text-sm font-bold text-white">
                           {getChatName(chat).charAt(0).toUpperCase()}
                         </span>
                       </div>
                     ) : (
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center">
+                      <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br from-green-500 to-blue-600 flex items-center justify-center shadow-lg ${
+                        selectedChat?.id === chat.id ? 'ring-4 ring-white/50' : ''
+                      }`}>
+                        <UsersIcon className="h-6 w-6 text-white" />
+                      </div>
+                    )}
+                    {/* Online indicator */}
+                    <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white"></div>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className={`text-sm font-semibold truncate ${
+                        selectedChat?.id === chat.id ? 'text-white' : 'text-gray-900'
+                      }`}>
+                        {getChatName(chat)}
+                      </h3>
+                      {chat.last_message_at && (
+                        <span className={`text-xs flex-shrink-0 ml-2 rtl:mr-2 rtl:ml-0 ${
+                          selectedChat?.id === chat.id ? 'text-white/80' : 'text-gray-500'
+                        }`}>
+                          {formatTime(chat.last_message_at)}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Enhanced Message Preview */}
+                    <div className="flex items-center justify-between">
+                      <p className={`text-xs truncate ${
+                        selectedChat?.id === chat.id ? 'text-white/90' : 'text-gray-600'
+                      }`}>
+                        {chat.last_message_content || t('chat.noMessages')}
+                      </p>
+                      
+                      {/* Unread indicator */}
+                      {chat.unread_count > 0 && (
+                        <div className={`flex-shrink-0 ml-2 rtl:mr-2 rtl:ml-0 h-5 w-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                          selectedChat?.id === chat.id 
+                            ? 'bg-white text-purple-600' 
+                            : 'bg-red-500 text-white'
+                        }`}>
+                          {chat.unread_count > 9 ? '9+' : chat.unread_count}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Chat type indicator */}
+                    <div className="mt-2">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium ${
+                        selectedChat?.id === chat.id 
+                          ? 'bg-white/20 text-white' 
+                          : chat.chat_type === 'group' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {chat.chat_type === 'direct' ? t('chat.directChat') : 
+                         chat.chat_type === 'group' ? t('chat.groupChat') : 
+                         t('chat.compoundChat')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
                         <UsersIcon className="h-5 w-5 text-white" />
                       </div>
                     )}

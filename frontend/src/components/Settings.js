@@ -315,8 +315,8 @@ const PrivacySettings = () => {
 
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium text-gray-700">Marketing Emails</label>
-                <p className="text-xs text-gray-500">Receive updates and feature announcements</p>
+                <label className="text-sm font-medium text-gray-700">{t('marketing_emails')}</label>
+                <p className="text-xs text-gray-500">{t('receive_updates_and_announcements')}</p>
               </div>
               <input
                 type="checkbox"

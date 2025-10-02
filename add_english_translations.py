@@ -124,7 +124,7 @@ async def add_english_translations():
     print("Connecting to MongoDB...")
     client = AsyncIOMotorClient(MONGO_URL)
     db = client.homeme
-    services_collection = db.services
+    services_collection = db.compound_services
     
     try:
         # Get all services

@@ -135,7 +135,7 @@ const ProfileSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('phone_number')}</label>
               <input
                 type="tel"
                 value={profileData.phone}

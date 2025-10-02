@@ -299,6 +299,7 @@ const resources = {
       'chat.noChatsYet': 'No chats yet',
       'chat.startFirstChat': 'Start your first conversation',
       'chat.selectChatToStart': 'Select a chat to start messaging',
+      'chat.searchChats': 'Search Chats',
       
       // Common
       'common.cancel': 'Cancel',

@@ -154,7 +154,7 @@ const ProfileSettings = () => {
               <p className="text-xs text-gray-500 mt-1">{t('email_cannot_be_changed')}</p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">{t('role')}</label>
               <input
                 type="text"
                 value={user?.role || ''}

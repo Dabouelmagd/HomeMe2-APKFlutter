@@ -222,64 +222,120 @@ const FileGallery = () => {
           </div>
         </div>
 
-        {/* File Grid/List */}
+        {/* Enhanced File Grid/List */}
         {files.length === 0 ? (
-          <div className="text-center py-12">
-            <PhotoIcon className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-            <p className="text-gray-500 text-lg">{t('gallery.noFilesFound')}</p>
-            <p className="text-gray-400 text-sm">{t('gallery.filesSharedInChats')}</p>
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden max-w-2xl mx-auto">
+            {/* Empty State Header */}
+            <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-8 text-center">
+              <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                <PhotoIcon className="h-12 w-12 text-purple-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('gallery.noFilesFound')}</h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                {t('gallery.filesSharedInChats')}
+              </p>
+            </div>
+            
+            {/* Empty State Suggestion */}
+            <div className="p-8 text-center bg-gray-50">
+              <p className="text-gray-500 mb-4">{t('gallery.startSharingFiles')}</p>
+              <div className="flex justify-center space-x-4 rtl:space-x-reverse text-sm text-gray-400">
+                <span>📸 {t('gallery.images')}</span>
+                <span>🎥 {t('gallery.videos')}</span>
+                <span>📄 {t('gallery.documents')}</span>
+                <span>🎵 {t('gallery.audio')}</span>
+              </div>
+            </div>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {files.map((file, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                className="group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300"
               >
+                {/* File Preview */}
                 {file.file_type === 'image' && (
-                  <div className="aspect-square bg-gray-100">
+                  <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                     <img
                       src={file.thumbnail_url ? `${BACKEND_URL}${file.thumbnail_url}` : `${BACKEND_URL}${file.file_url}`}
                       alt={file.original_filename}
-                      className="w-full h-full object-cover cursor-pointer"
+                      className="w-full h-full object-cover cursor-pointer group-hover:scale-110 transition-transform duration-300"
                       onClick={() => window.open(`${BACKEND_URL}${file.file_url}`, '_blank')}
                     />
+                    <div className="absolute top-3 right-3 bg-black/20 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <PhotoIcon className="h-4 w-4 text-white" />
+                    </div>
                   </div>
                 )}
 
                 {file.file_type === 'video' && (
-                  <div className="aspect-square bg-gray-900 flex items-center justify-center">
-                    <VideoCameraIcon className="h-12 w-12 text-white" />
+                  <div className="aspect-square bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center relative">
+                    <VideoCameraIcon className="h-16 w-16 text-white opacity-80" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1">
+                        <span className="text-white text-xs font-medium">{t('gallery.video')}</span>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {(file.file_type === 'audio' || file.file_type === 'voice') && (
-                  <div className="aspect-square bg-green-100 flex items-center justify-center">
-                    <SpeakerWaveIcon className="h-12 w-12 text-green-600" />
+                  <div className="aspect-square bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center relative">
+                    <SpeakerWaveIcon className="h-16 w-16 text-green-600" />
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <div className="bg-green-500/20 backdrop-blur-sm rounded-lg px-3 py-1">
+                        <span className="text-green-800 text-xs font-medium">
+                          {file.file_type === 'voice' ? t('gallery.voice') : t('gallery.audio')}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {file.file_type === 'document' && (
-                  <div className="aspect-square bg-gray-100 flex items-center justify-center">
-                    <DocumentIcon className="h-12 w-12 text-gray-600" />
+                  <div className="aspect-square bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center relative">
+                    <DocumentIcon className="h-16 w-16 text-blue-600" />
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <div className="bg-blue-500/20 backdrop-blur-sm rounded-lg px-3 py-1">
+                        <span className="text-blue-800 text-xs font-medium">{t('gallery.document')}</span>
+                      </div>
+                    </div>
                   </div>
                 )}
 
-                <div className="p-3">
-                  <h3 className="text-sm font-medium text-gray-900 truncate mb-1">
+                {/* File Information */}
+                <div className="p-4">
+                  <h3 className="text-sm font-bold text-gray-900 truncate mb-2">
                     {file.original_filename}
                   </h3>
-                  <p className="text-xs text-gray-500 mb-2">
-                    {formatFileSize(file.file_size)} • {formatDate(file.uploaded_at)}
-                  </p>
-                  <p className="text-xs text-gray-400 truncate mb-2">
-                    {t('gallery.from')}: {file.sender?.full_name}
-                  </p>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span className="flex items-center space-x-1 rtl:space-x-reverse">
+                        <span>📏</span>
+                        <span>{formatFileSize(file.file_size)}</span>
+                      </span>
+                      <span className="flex items-center space-x-1 rtl:space-x-reverse">
+                        <CalendarIcon className="h-3 w-3" />
+                        <span>{formatDate(file.uploaded_at)}</span>
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-xs text-gray-400">
+                      <span className="truncate">
+                        👤 {file.sender?.full_name || t('gallery.unknown')}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Download Button */}
                   <button
                     onClick={() => downloadFile(file)}
-                    className="w-full flex items-center justify-center space-x-1 py-1 px-2 bg-blue-50 text-blue-600 rounded text-xs hover:bg-blue-100"
+                    className="w-full flex items-center justify-center space-x-2 rtl:space-x-reverse py-2 px-3 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white rounded-xl text-xs font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                   >
-                    <ArrowDownTrayIcon className="h-3 w-3" />
+                    <ArrowDownTrayIcon className="h-4 w-4" />
                     <span>{t('gallery.download')}</span>
                   </button>
                 </div>

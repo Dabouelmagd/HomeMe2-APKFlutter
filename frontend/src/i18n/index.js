@@ -467,7 +467,21 @@ const resources = {
       'notificationCenter': {
         'pushNotifications': 'Push Notifications',
         'notSubscribed': 'Not Subscribed',
-        'enable': 'Enable'
+        'subscribed': 'Subscribed',
+        'enable': 'Enable',
+        'disable': 'Disable',
+        'testNotification': 'Test Notification',
+        'preferences': 'Notification Preferences',
+        'messageNotifications': 'Message Notifications',
+        'messageNotificationsDesc': 'Receive notifications for new messages and conversations',
+        'directChats': 'Direct Chat Messages',
+        'directChatsDesc': 'Get notified when someone sends you a direct message',
+        'groupChats': 'Group Chat Messages',
+        'groupChatsDesc': 'Receive notifications for messages in group conversations',
+        'compoundAnnouncements': 'Compound Announcements',
+        'compoundAnnouncementsDesc': 'Stay informed about important compound news and updates',
+        'quietHours': 'Quiet Hours',
+        'quietHoursDesc': 'Set time periods when you don\'t want to receive notifications'
       },
       'community_newsletter': 'Community Newsletter',
       

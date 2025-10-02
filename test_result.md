@@ -194,7 +194,7 @@ metadata:
 
 test_plan:
   current_focus: 
-    - "Enhanced Message Center Design Testing"
+    - "Enhanced Gallery Design Testing in Arabic Interface"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

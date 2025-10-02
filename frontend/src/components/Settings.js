@@ -350,9 +350,9 @@ const LanguageSettings = () => {
     try {
       await i18n.changeLanguage(langCode);
       setSelectedLanguage(langCode);
-      toast.success('Language updated successfully!');
+      toast.success(t('language_updated_successfully'));
     } catch (error) {
-      toast.error('Failed to update language');
+      toast.error(t('failed_to_update_language'));
     }
   };
 

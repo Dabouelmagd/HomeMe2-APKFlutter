@@ -33,7 +33,7 @@ const NotificationCenter = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const notificationTypes = [
-    { value: 'all', label: t('all_notifications'), icon: BellIcon },
+    { value: 'all', label: t('filter_all'), icon: BellIcon },
     { value: 'maintenance', label: t('maintenance'), icon: ExclamationTriangleIcon },
     { value: 'payment', label: t('payment'), icon: CheckCircleIcon },
     { value: 'system', label: t('system'), icon: InformationCircleIcon },

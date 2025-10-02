@@ -213,6 +213,7 @@ const ProfileSettings = () => {
 };
 
 const PrivacySettings = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [privacySettings, setPrivacySettings] = useState({
     profile_visibility: 'compound',

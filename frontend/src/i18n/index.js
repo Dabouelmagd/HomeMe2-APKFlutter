@@ -2480,6 +2480,25 @@ const resources = {
       'residents': 'les résidents',
       'management': 'la direction',
       
+      // Chat System
+      'chat': {
+        'newChat': 'Nouveau Chat',
+        'directChat': 'Chat Direct',
+        'directChatDescription': 'Démarrer une conversation privée avec un autre utilisateur',
+        'groupChat': 'Chat de Groupe',
+        'groupChatDescription': 'Créer une conversation de groupe avec plusieurs utilisateurs',
+        'compoundChat': 'Chat du Complexe',
+        'compoundChatDescription': 'Chatter avec tous les résidents de votre complexe',
+        'searchUsers': 'Rechercher des Utilisateurs',
+        'noUsersAvailable': 'Aucun utilisateur disponible',
+        'createChat': 'Créer un Chat'
+      },
+      
+      // Common
+      'common': {
+        'cancel': 'Annuler'
+      },
+      
       // Notifications
       'manage_your_notifications': 'Gérer vos notifications',
       'filters': 'Filtres',

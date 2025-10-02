@@ -234,78 +234,34 @@ const TermsPrivacy = () => {
       <div className="relative bg-gradient-to-r from-blue-600 to-purple-700">
         <div className="absolute inset-0 bg-black/20"></div>
         
-        {/* Ultra Modern Header Content */}
-        <div className="relative max-w-8xl mx-auto px-8 sm:px-12 lg:px-20">
-          <div className="flex items-center justify-between py-16">
-            <div className="flex items-center space-x-12">
+        {/* Modern Header Content */}
+        <div className="relative max-w-6xl mx-auto px-6 py-12">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-6">
               <button
                 onClick={handleBack}
-                className="group relative p-6 text-white hover:text-cyan-200 transition-all duration-500 hover:scale-110"
+                className="p-3 bg-white/10 rounded-xl text-white hover:bg-white/20 transition-all duration-300"
               >
-                {/* Button Glassmorphism */}
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 group-hover:bg-white/20 group-hover:border-cyan-300/30 transition-all duration-500"></div>
-                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl group-hover:from-cyan-300/20 transition-all duration-500"></div>
-                <ArrowLeftIcon className="relative w-7 h-7 group-hover:-translate-x-2 transition-all duration-500" />
+                <ArrowLeftIcon className="w-6 h-6" />
               </button>
               
-              <div className="space-y-6">
-                {/* Animated Indicator Dots */}
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-3 h-3 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full animate-pulse shadow-lg shadow-cyan-400/50"></div>
-                    <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full animate-pulse delay-300 shadow-lg shadow-purple-400/50"></div>
-                    <div className="w-1.5 h-1.5 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full animate-pulse delay-500 shadow-lg shadow-indigo-400/50"></div>
-                  </div>
-                  <div className="text-cyan-300/60 text-sm font-semibold tracking-wider uppercase">Legal Hub</div>
-                </div>
-                
-                {/* Main Title with Advanced Typography */}
-                <div className="space-y-4">
-                  <h1 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-purple-300 tracking-tight leading-none">
-                    {t('legal_title')}
-                  </h1>
-                  <div className="w-24 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full shadow-lg shadow-cyan-400/30"></div>
-                </div>
-                
-                <p className="text-white/80 text-2xl font-light max-w-2xl leading-relaxed tracking-wide">
+              <div>
+                <h1 className="text-5xl font-bold text-white mb-2">
+                  {t('legal_title')}
+                </h1>
+                <p className="text-white/80 text-xl">
                   {t('legal_subtitle')}
                 </p>
-                
-                {/* Status Indicators */}
-                <div className="flex items-center space-x-8 pt-4">
-                  <div className="flex items-center space-x-3 px-6 py-3 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-lg shadow-green-400/50"></div>
-                    <span className="text-green-300 text-sm font-semibold">Updated 2024</span>
-                  </div>
-                  <div className="flex items-center space-x-3 px-6 py-3 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse delay-300 shadow-lg shadow-blue-400/50"></div>
-                    <span className="text-blue-300 text-sm font-semibold">3 Languages</span>
-                  </div>
-                </div>
               </div>
             </div>
             
-            {/* Ultra Modern Decorative Elements */}
-            <div className="hidden xl:flex items-center space-x-8">
-              <div className="relative group cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-[2rem] blur-2xl group-hover:blur-3xl transition-all duration-700"></div>
-                <div className="relative p-8 bg-white/10 backdrop-blur-2xl rounded-[2rem] border border-white/20 group-hover:bg-white/15 group-hover:border-cyan-300/30 transition-all duration-700 hover:scale-105">
-                  <ShieldCheckIcon className="w-12 h-12 text-white group-hover:text-cyan-200 group-hover:scale-110 transition-all duration-500" />
-                </div>
+            {/* Decorative Icons */}
+            <div className="hidden lg:flex items-center space-x-4">
+              <div className="p-4 bg-white/10 rounded-2xl">
+                <ShieldCheckIcon className="w-8 h-8 text-white" />
               </div>
-              
-              <div className="relative group cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-500/20 rounded-[2rem] blur-2xl group-hover:blur-3xl transition-all duration-700"></div>
-                <div className="relative p-8 bg-white/10 backdrop-blur-2xl rounded-[2rem] border border-white/20 group-hover:bg-white/15 group-hover:border-purple-300/30 transition-all duration-700 hover:scale-105">
-                  <DocumentTextIcon className="w-12 h-12 text-white group-hover:text-purple-200 group-hover:scale-110 transition-all duration-500" />
-                </div>
-              </div>
-              
-              <div className="relative group cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/20 to-cyan-500/20 rounded-[2rem] blur-2xl group-hover:blur-3xl transition-all duration-700"></div>
-                <div className="relative p-8 bg-white/10 backdrop-blur-2xl rounded-[2rem] border border-white/20 group-hover:bg-white/15 group-hover:border-indigo-300/30 transition-all duration-700 hover:scale-105">
-                  <ScaleIcon className="w-12 h-12 text-white group-hover:text-indigo-200 group-hover:scale-110 transition-all duration-500" />
-                </div>
+              <div className="p-4 bg-white/10 rounded-2xl">
+                <DocumentTextIcon className="w-8 h-8 text-white" />
               </div>
             </div>
           </div>

@@ -122,7 +122,7 @@ export const getDatePlaceholder = () => {
       return 'jj/mm/aaaa';
     case 'en':
     default:
-      return 'mm/dd/yyyy';
+      return 'dd/mm/yyyy';
   }
 };
 

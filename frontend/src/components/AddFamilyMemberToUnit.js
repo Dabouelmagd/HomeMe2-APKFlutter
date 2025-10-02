@@ -351,7 +351,7 @@ const AddFamilyMemberToUnit = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Full Name *
+                          {t('full_name_required')}
                         </label>
                         <input
                           type="text"
@@ -359,7 +359,7 @@ const AddFamilyMemberToUnit = () => {
                           value={memberForm.full_name}
                           onChange={(e) => setMemberForm(prev => ({ ...prev, full_name: e.target.value }))}
                           className="form-input w-full"
-                          placeholder="Enter full name"
+                          placeholder={t('enter_full_name')}
                         />
                       </div>
 

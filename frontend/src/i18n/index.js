@@ -1798,6 +1798,7 @@ const resources = {
       'ios_install_instructions': 'لمستخدمي iOS',
       'tap_share_button': 'اضغط على زر المشاركة',
       'add_to_home_screen': 'إضافة إلى الشاشة الرئيسية',
+      'app_title': 'هوم-مي - إدارة المجمعات',
       'notificationCenter': {
         'pushNotifications': 'الإشعارات المباشرة',
         'notSubscribed': 'غير مشترك',

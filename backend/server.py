@@ -2195,11 +2195,28 @@ async def get_my_invoices(current_user: User = Depends(get_current_user)):
         invoices = await db.invoices.find({"compound_id": current_user.compound_id}).to_list(None)
         return serialize_datetime(invoices)
     
-    # Regular users see only their family invoices
-    if not current_user.family_id:
+    # Regular users see only invoices for units they own
+    # Find all families where user is head or member
+    families = await db.families.find({
+        "$or": [
+            {"head_user_id": current_user.id},
+            {"members": current_user.id}
+        ],
+        "compound_id": current_user.compound_id
+    }).to_list(None)
+    
+    if not families:
         return []
     
-    invoices = await db.invoices.find({"family_id": current_user.family_id}).to_list(None)
+    # Get family IDs for the user's units
+    family_ids = [family["id"] for family in families]
+    
+    # Get invoices for all the user's units
+    invoices = await db.invoices.find({
+        "family_id": {"$in": family_ids},
+        "compound_id": current_user.compound_id
+    }).to_list(None)
+    
     return serialize_datetime(invoices)
 
 @api_router.post("/payments")

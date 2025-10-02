@@ -397,7 +397,7 @@ const AddFamilyMemberToUnit = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Date of Birth
+                          {t('date_of_birth')}
                         </label>
                         <input
                           type="date"

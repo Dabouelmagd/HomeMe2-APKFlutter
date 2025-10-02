@@ -186,7 +186,7 @@ const ProfileSettings = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('new_password')}</label>
             <input
               type="password"
               value={profileData.new_password}

@@ -172,7 +172,7 @@ const ProfileSettings = () => {
 
       {/* Password Change Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">Change Password</h3>
+        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">{t('change_password')}</h3>
         
         <form onSubmit={handlePasswordUpdate} className="space-y-4 max-w-md">
           <div>

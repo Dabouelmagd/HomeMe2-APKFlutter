@@ -289,8 +289,8 @@ const PrivacySettings = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <label className="text-sm font-medium text-gray-700">Show Activity Status</label>
-                <p className="text-xs text-gray-500">Let others see when you're online</p>
+                <label className="text-sm font-medium text-gray-700">{t('show_activity_status')}</label>
+                <p className="text-xs text-gray-500">{t('let_others_see_when_online')}</p>
               </div>
               <input
                 type="checkbox"

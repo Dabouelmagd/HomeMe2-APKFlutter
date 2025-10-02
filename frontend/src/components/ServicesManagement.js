@@ -243,7 +243,7 @@ const ServicesManagement = () => {
       'خدمات التموين': 'Catering Services'
     };
     
-    if (currentLang === 'en') {
+    if (forceEnglish || currentLang === 'en' || currentLang.startsWith('en')) {
       const result = {
         name: service.name_en || englishFallbacks[service.name] || service.name,
         description: service.description_en || `Professional ${englishFallbacks[service.name] || service.name} services`,

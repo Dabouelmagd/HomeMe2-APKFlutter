@@ -97,13 +97,42 @@ const FinancialManagement = () => {
     );
   }
 
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
+
   return (
-    <div className="p-6">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
+      {/* Enhanced Header Section */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 text-center">{t('financial_management')}</h1>
-        <p className="text-gray-600 mt-2 text-center">
-          {t('view_manage_payments_invoices')}
-        </p>
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div className="mb-6 lg:mb-0">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl">
+                  <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">{t('financial_management')}</h1>
+                  <p className="text-gray-600 mt-1">
+                    {t('view_manage_payments_invoices')}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Currency Selector */}
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-600">{t('currency_display')}</p>
+                <CurrencySelector 
+                  selectedCurrency={selectedCurrency}
+                  onCurrencyChange={setSelectedCurrency}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Summary Cards */}

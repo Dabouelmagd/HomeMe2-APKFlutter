@@ -23,6 +23,7 @@ const FinancialManagement = () => {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState(null);
+  const [selectedCurrency, setSelectedCurrency] = useState('USD');
 
   useEffect(() => {
     fetchInvoices();
@@ -98,8 +99,6 @@ const FinancialManagement = () => {
       </div>
     );
   }
-
-  const [selectedCurrency, setSelectedCurrency] = useState('USD');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">

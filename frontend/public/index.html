@@ -30,7 +30,24 @@
     <title>HomeMe - Compound Management</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <div id="noscript-message">
+        You need to enable JavaScript to run this app.
+      </div>
+    </noscript>
+    <script>
+      // Update noscript message based on language preference
+      const lang = localStorage.getItem('i18nextLng') || 'en';
+      const messages = {
+        en: 'You need to enable JavaScript to run this app.',
+        ar: 'تحتاج إلى تمكين JavaScript لتشغيل هذا التطبيق.',
+        fr: 'Vous devez activer JavaScript pour exécuter cette application.'
+      };
+      const noscriptEl = document.getElementById('noscript-message');
+      if (noscriptEl && messages[lang]) {
+        noscriptEl.textContent = messages[lang];
+      }
+    </script>
     <div id="root"></div>
     
     <!-- PWA Install Prompt -->

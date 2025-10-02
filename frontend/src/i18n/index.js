@@ -502,6 +502,8 @@ const resources = {
       
       // Financial Management
       'view_manage_payments_invoices': 'View and manage payments and invoices',
+      'admin_view_manage_payments_invoices': 'View and manage all compound payments and invoices',
+      'resident_view_manage_payments_invoices': 'View and manage your unit payments and invoices',
       'total_due': 'Total Due',
       'pending_payments_alert': 'You have {{count}} pending payment',
       'pending_payments_alert_plural': 'You have {{count}} pending payments',

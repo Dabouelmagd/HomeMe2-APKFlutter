@@ -70,10 +70,10 @@ const ProfileSettings = () => {
         new_password: profileData.new_password
       });
 
-      toast.success('Password updated successfully!');
+      toast.success(t('password_updated_successfully'));
       setProfileData(prev => ({ ...prev, current_password: '', new_password: '', confirm_password: '' }));
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to update password');
+      toast.error(error.response?.data?.detail || t('failed_to_update_password'));
     }
   };
 

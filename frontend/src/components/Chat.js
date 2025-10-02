@@ -65,18 +65,21 @@ const Chat = () => {
   };
 
   return (
-    <div className="h-screen flex bg-gray-50">
-      <ChatSidebar
-        selectedChat={selectedChat}
-        onChatSelect={handleChatSelect}
-        onNewChat={handleNewChat}
-        key={chatUpdateTrigger}
-      />
-      
-      <ChatWindow
-        chat={selectedChat}
-        onChatUpdate={handleChatUpdate}
-      />
+    <div className="h-screen flex bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 overflow-hidden">
+      {/* Enhanced Chat Layout */}
+      <div className="flex-1 flex shadow-2xl rounded-xl m-4 overflow-hidden bg-white">
+        <ChatSidebar
+          selectedChat={selectedChat}
+          onChatSelect={handleChatSelect}
+          onNewChat={handleNewChat}
+          key={chatUpdateTrigger}
+        />
+        
+        <ChatWindow
+          chat={selectedChat}
+          onChatUpdate={handleChatUpdate}
+        />
+      </div>
       
       <NewChatModal
         isOpen={showNewChatModal}

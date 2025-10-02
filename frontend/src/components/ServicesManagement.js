@@ -458,9 +458,6 @@ const ServicesManagement = () => {
     }
   }, [user]);
   
-  // Track current language for re-rendering
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
-  
   // Trigger re-render when language changes
   useEffect(() => {
     const handleLanguageChange = (lng) => {

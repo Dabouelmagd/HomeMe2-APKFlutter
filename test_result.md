@@ -273,7 +273,8 @@ metadata:
 test_plan:
   current_focus: 
     - "Settings Page Arabic Interface Translation Testing"
-  stuck_tasks: []
+  stuck_tasks: 
+    - "Settings Page Arabic Interface Translation Testing"
   test_all: false
   test_priority: "high_first"
 

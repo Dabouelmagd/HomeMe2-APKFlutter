@@ -1151,7 +1151,7 @@ const resources = {
       'due_date': 'تاريخ الاستحقاق',
       'pay_now': 'ادفع الآن',
       'you_have_pending_payments': 'لديك {{count}} دفعة معلقة',
-      'total_amount_due': 'إجمالي المبلغ المستحق: {{amount}} ر.س',
+      'total_amount_due': 'إجمالي المبلغ المستحق: {{amount}}',
       'pending_payments_alert': 'لديك {{count}} دفعة معلقة',
       'pending_payments_alert_plural': 'لديك {{count}} دفعة معلقة',
       'processing': 'جاري المعالجة...',

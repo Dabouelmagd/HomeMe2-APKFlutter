@@ -216,8 +216,8 @@ const ServicesManagement = () => {
   };
   // Dynamic translation for service names and descriptions based on current language
   const translateServiceData = useCallback((service) => {
-    // Get current language from useTranslation hook context 
-    const currentLang = i18n.language || i18n.resolvedLanguage || 'en';
+    // Get current language from state 
+    const currentLang = currentLanguage || i18n.language || i18n.resolvedLanguage || 'en';
     
     // Always force English for testing
     const forceEnglish = currentLang.startsWith('en') || currentLang === 'en-US@posix';

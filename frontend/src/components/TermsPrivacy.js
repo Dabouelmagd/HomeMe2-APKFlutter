@@ -167,7 +167,7 @@ const TermsPrivacy = () => {
             onClick={() => toggleSection(section.id)}
             className="w-full px-8 py-6 flex items-center justify-between text-left hover:bg-white/50 rounded-2xl transition-all duration-300 group"
           >
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <div className={`flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ${
                 activeTab === 'terms' 
                   ? 'bg-gradient-to-br from-blue-500 to-indigo-600 group-hover:from-blue-600 group-hover:to-indigo-700' 
@@ -328,7 +328,7 @@ const TermsPrivacy = () => {
                   }
                 </p>
                 
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-6">
                   <div className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${
                     activeTab === 'terms' 
                       ? 'bg-blue-100 text-blue-700' 

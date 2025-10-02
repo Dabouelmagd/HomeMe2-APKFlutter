@@ -1779,6 +1779,24 @@ const resources = {
       
       // Push Notifications  
       'push_notifications_not_supported': 'الإشعارات المباشرة غير مدعومة في هذا المتصفح.',
+      
+      // System and PWA
+      'privacy_level_high': 'عالي',
+      'install_homeme_app': 'تثبيت هوم-مي',
+      'install_app_benefits_description': 'احصل على تجربة التطبيق الكاملة مع الدعم دون اتصال والإشعارات المباشرة.',
+      'works_offline': 'يعمل دون اتصال',
+      'instant_notifications': 'إشعارات فورية',
+      'faster_loading': 'تحميل أسرع',
+      'native_app_experience': 'تجربة تطبيق أصلي',
+      'install_now': 'تثبيت',
+      'later': 'لاحقاً',
+      'app_installed_successfully': 'تم تثبيت التطبيق بنجاح!',
+      'installing_app': 'جاري تثبيت التطبيق...',
+      'installation_cancelled': 'تم إلغاء التثبيت',
+      'installation_failed': 'فشل التثبيت',
+      'ios_install_instructions': 'لمستخدمي iOS',
+      'tap_share_button': 'اضغط على زر المشاركة',
+      'add_to_home_screen': 'إضافة إلى الشاشة الرئيسية',
       'notificationCenter': {
         'pushNotifications': 'الإشعارات المباشرة',
         'notSubscribed': 'غير مشترك',

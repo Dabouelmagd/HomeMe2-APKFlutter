@@ -505,3 +505,38 @@ const TermsPrivacy = () => {
 };
 
 export default TermsPrivacy;
+
+// Add custom CSS animations
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes gradient-x {
+    0%, 100% {
+      background-size: 200% 200%;
+      background-position: left center;
+    }
+    50% {
+      background-size: 200% 200%;
+      background-position: right center;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-gradient-x {
+    animation: gradient-x 8s ease infinite;
+  }
+  
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out;
+  }
+`;
+document.head.appendChild(style);

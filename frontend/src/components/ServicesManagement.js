@@ -251,11 +251,7 @@ const ServicesManagement = () => {
         working_hours: service.working_hours_en || service.working_hours?.replace('ص', 'AM').replace('م', 'PM') || service.working_hours
       };
       
-      console.log('English translation result:', {
-        original: service.name,
-        translated: result.name,
-        fallback: englishFallbacks[service.name]
-      });
+      // Translation successful
       
       return result;
     } else if (currentLang === 'ar') {

@@ -104,8 +104,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Financial Management API Permissions System Testing"
-    - "Financial Management UI Integration Testing"
+    - "RTL Currency Selector Fix Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

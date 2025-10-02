@@ -287,9 +287,8 @@ metadata:
 
 test_plan:
   current_focus: 
-    - "Settings Page Arabic Interface Translation Testing"
-  stuck_tasks: 
-    - "Settings Page Arabic Interface Translation Testing"
+    - "Complete Translation and RTL Layout System Testing"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 

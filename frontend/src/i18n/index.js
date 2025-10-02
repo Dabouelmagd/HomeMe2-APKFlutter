@@ -1468,6 +1468,7 @@ const resources = {
       'chat.noChatsYet': 'لا توجد محادثات بعد',
       'chat.startFirstChat': 'ابدأ محادثتك الأولى',
       'chat.selectChatToStart': 'اختر محادثة لبدء المراسلة',
+      'chat.searchChats': 'البحث في المحادثات',
       
       // Common
       'common.cancel': 'إلغاء',

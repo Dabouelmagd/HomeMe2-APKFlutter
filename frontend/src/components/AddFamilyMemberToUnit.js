@@ -43,7 +43,8 @@ const AddFamilyMemberToUnit = () => {
     emergency_contact_phone: '',
     move_in_date: '',
     profile_picture: null,
-    profile_picture_preview: null
+    profile_picture_preview: null,
+    profile_picture_file: null
   });
 
   const relationshipOptions = [

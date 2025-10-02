@@ -869,9 +869,9 @@ const ServicesManagement = () => {
                         </div>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-center text-gray-900">{translateServiceName(service.name)}</h3>
+                        <h3 className="font-semibold text-center text-gray-900">{translateServiceData(service).name}</h3>
                         <p className="text-sm text-gray-600">
-                          {service.specialty ? translateSpecialty(service.specialty) : service.category}
+                          {service.specialty ? translateServiceData(service).specialty : service.category}
                         </p>
                       </div>
                     </div>

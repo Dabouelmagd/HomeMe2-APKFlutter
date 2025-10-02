@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import CurrencySelector from './CurrencySelector';
+import { convertCurrency, formatCurrency } from '../utils/currencyUtils';
 import {
   CurrencyDollarIcon,
   DocumentTextIcon,

@@ -463,6 +463,7 @@ const resources = {
       'ios_install_instructions': 'For iOS users',
       'tap_share_button': 'Tap the share button',
       'add_to_home_screen': 'Add to Home Screen',
+      'app_title': 'HomeMe - Compound Management',
       'notificationCenter': {
         'pushNotifications': 'Push Notifications',
         'notSubscribed': 'Not Subscribed',

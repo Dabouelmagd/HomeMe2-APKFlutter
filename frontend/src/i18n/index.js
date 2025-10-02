@@ -1909,6 +1909,9 @@ const resources = {
       'add_member': 'إضافة عضو',
       'add_family_member': 'إضافة فرد عائلة',
       'adding_to_unit': 'إضافة للوحدة',
+      'resident': 'مقيم',
+      'residents': 'مقيمين',
+      'found': 'موجود',
       
       // Locations & Map
       'locations_map': 'المواقع والخريطة',

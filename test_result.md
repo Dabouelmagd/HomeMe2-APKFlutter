@@ -89,7 +89,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Financial Management Template String Interpolation Fix Verification"
+    - "Financial Management API Permissions System Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

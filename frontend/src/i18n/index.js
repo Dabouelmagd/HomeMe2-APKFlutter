@@ -1464,6 +1464,9 @@ const resources = {
       'chat.noUsersAvailable': 'لا يوجد مستخدمون متاحون',
       'chat.compoundChatInfo': 'هذا سينشئ محادثة عامة للمجمع حيث يمكن لجميع السكان المشاركة',
       'chat.createChat': 'إنشاء محادثة',
+      'chat.noChatsYet': 'لا توجد محادثات بعد',
+      'chat.startFirstChat': 'ابدأ محادثتك الأولى',
+      'chat.selectChatToStart': 'اختر محادثة لبدء المراسلة',
       
       // Common
       'common.cancel': 'إلغاء',

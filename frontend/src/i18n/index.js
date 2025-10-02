@@ -1748,6 +1748,19 @@ const resources = {
       'save_privacy_settings': 'حفظ إعدادات الخصوصية',
       'privacy_settings_updated_successfully': 'تم تحديث إعدادات الخصوصية بنجاح!',
       'failed_to_update_privacy_settings': 'فشل في تحديث إعدادات الخصوصية',
+      
+      // Language Settings
+      'language_preferences': 'تفضيلات اللغة',
+      'english_default_language': 'English - اللغة الافتراضية',
+      'arabic_rtl_support': 'العربية - دعم الكتابة من اليمين لليسار',
+      'french_language': 'Français - اللغة الفرنسية',
+      'language_support': 'دعم اللغات',
+      'language_support_description': 'يدعم HomeMe عدة لغات مع دعم كامل للكتابة من اليمين لليسار للغة العربية. تُطبق تغييرات اللغة فوراً على جميع أجزاء الواجهة.',
+      'language_updated_successfully': 'تم تحديث اللغة بنجاح!',
+      'failed_to_update_language': 'فشل في تحديث اللغة',
+      
+      // Push Notifications  
+      'push_notifications_not_supported': 'الإشعارات المباشرة غير مدعومة في هذا المتصفح.',
       'notificationCenter': {
         'pushNotifications': 'الإشعارات المباشرة',
         'notSubscribed': 'غير مشترك',

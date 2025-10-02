@@ -350,7 +350,23 @@ const LanguageSettings = () => {
     try {
       await i18n.changeLanguage(langCode);
       setSelectedLanguage(langCode);
-      toast.success(t('language_updated_successfully'));
+      
+      // Apply RTL for Arabic
+      if (langCode === 'ar') {
+        document.dir = 'rtl';
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.body.classList.add('rtl');
+      } else {
+        document.dir = 'ltr';
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.body.classList.remove('rtl');
+      }
+      
+      // Force re-render by refreshing the page to apply all changes
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+      
     } catch (error) {
       toast.error(t('failed_to_update_language'));
     }

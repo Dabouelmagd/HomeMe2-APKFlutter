@@ -432,6 +432,19 @@ const resources = {
       'save_privacy_settings': 'Save Privacy Settings',
       'privacy_settings_updated_successfully': 'Privacy settings updated successfully!',
       'failed_to_update_privacy_settings': 'Failed to update privacy settings',
+      
+      // Language Settings
+      'language_preferences': 'Language Preferences',
+      'english_default_language': 'English - Default language',
+      'arabic_rtl_support': 'العربية - Right to left support',
+      'french_language': 'Français - Langue française',
+      'language_support': 'Language Support',
+      'language_support_description': 'HomeMe supports multiple languages with full RTL (Right-to-Left) support for Arabic. Language changes apply immediately to the entire interface.',
+      'language_updated_successfully': 'Language updated successfully!',
+      'failed_to_update_language': 'Failed to update language',
+      
+      // Push Notifications
+      'push_notifications_not_supported': 'Push notifications are not supported in this browser.',
       'notificationCenter': {
         'pushNotifications': 'Push Notifications',
         'notSubscribed': 'Not Subscribed',

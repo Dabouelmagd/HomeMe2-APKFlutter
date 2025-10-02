@@ -120,7 +120,7 @@ const ProfileSettings = () => {
             <div>
               <h4 className="text-lg font-medium text-center text-center text-gray-900">{user?.full_name}</h4>
               <p className="text-gray-600">@{user?.username}</p>
-              <p className="text-sm text-gray-500">Click the camera icon to change your picture</p>
+              <p className="text-sm text-gray-500">{t('click_camera_to_change_picture')}</p>
             </div>
           </div>
 

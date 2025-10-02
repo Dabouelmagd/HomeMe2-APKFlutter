@@ -122,7 +122,7 @@ const AddFamilyMemberToUnit = () => {
   const resetForm = () => {
     setMemberForm({
       full_name: '',
-      relationship: 'son',
+      relationship: '',
       age: '',
       birthday: '',
       phone: '',

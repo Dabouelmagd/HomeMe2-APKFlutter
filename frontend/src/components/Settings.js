@@ -51,9 +51,9 @@ const ProfileSettings = () => {
       });
 
       updateUser({ ...user, ...response.data });
-      toast.success('Profile updated successfully!');
+      toast.success(t('profile_updated_successfully'));
     } catch (error) {
-      toast.error('Failed to update profile');
+      toast.error(t('failed_to_update_profile'));
     }
   };
 

@@ -1103,7 +1103,7 @@ const CompoundManagement = () => {
       {activeTab === 'overview' && (
         <div className="space-y-6">
           {/* Compound Info Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-gradient-to-br from-white via-blue-50 to-indigo-50 rounded-2xl shadow-lg border border-blue-100 p-6">
             <div className="flex items-start space-x-6">
               {/* Logo Section */}
               <div className="flex-shrink-0">

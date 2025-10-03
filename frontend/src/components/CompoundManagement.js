@@ -2750,7 +2750,7 @@ const CompoundManagement = () => {
                           <div>
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <EnvelopeIcon className="h-4 w-4 text-green-500" />
-                              <span>Email Address *</span>
+                              <span>عنوان البريد الإلكتروني *</span>
                             </label>
                             <input
                               type="email"

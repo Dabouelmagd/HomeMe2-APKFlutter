@@ -2728,47 +2728,51 @@ const CompoundManagement = () => {
                         <p className="text-sm text-green-700">Enter complete information for the primary resident</p>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Full Name *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={comprehensiveFamilyForm.head_full_name}
-                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_full_name: e.target.value }))}
-                            className="form-input w-full"
-                            placeholder="Enter full name"
-                          />
-                        </div>
+                      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                              <IdentificationIcon className="h-4 w-4 text-green-500" />
+                              <span>Full Name *</span>
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              value={comprehensiveFamilyForm.head_full_name}
+                              onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_full_name: e.target.value }))}
+                              className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3"
+                              placeholder="Enter full name"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Email Address *
-                          </label>
-                          <input
-                            type="email"
-                            required
-                            value={comprehensiveFamilyForm.head_email}
-                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_email: e.target.value }))}
-                            className="form-input w-full"
-                            placeholder="resident@email.com"
-                          />
-                        </div>
+                          <div>
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                              <EnvelopeIcon className="h-4 w-4 text-green-500" />
+                              <span>Email Address *</span>
+                            </label>
+                            <input
+                              type="email"
+                              required
+                              value={comprehensiveFamilyForm.head_email}
+                              onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_email: e.target.value }))}
+                              className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3"
+                              placeholder="resident@email.com"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Phone Number
-                          </label>
-                          <input
-                            type="tel"
-                            value={comprehensiveFamilyForm.head_phone}
-                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_phone: e.target.value }))}
-                            className="form-input w-full"
-                            placeholder="+1 (555) 123-4567"
-                          />
-                        </div>
+                          <div>
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                              <PhoneIcon className="h-4 w-4 text-green-500" />
+                              <span>Phone Number</span>
+                            </label>
+                            <input
+                              type="tel"
+                              value={comprehensiveFamilyForm.head_phone}
+                              onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_phone: e.target.value }))}
+                              className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3"
+                              placeholder="+1 (555) 123-4567"
+                            />
+                          </div>
 
                         <div>
                           <DateInput

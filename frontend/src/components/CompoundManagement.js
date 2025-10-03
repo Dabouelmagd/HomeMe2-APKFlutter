@@ -2634,25 +2634,37 @@ const CompoundManagement = () => {
                   </button>
                 </div>
 
-                {/* Progress Steps */}
+                {/* Enhanced Modern Progress Steps */}
                 <div className="mb-8">
                   <div className="flex items-center justify-between">
-                    {[1, 2, 3, 4].map((step) => (
+                    {[
+                      { step: 1, label: t('unit_info'), icon: BuildingOfficeIcon },
+                      { step: 2, label: t('family_head'), icon: AcademicCapIcon },
+                      { step: 3, label: t('family_members'), icon: UserGroupIcon },
+                      { step: 4, label: t('review'), icon: CheckCircleIcon }
+                    ].map(({ step, label, icon: Icon }) => (
                       <div key={step} className="flex items-center">
-                        <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
+                        <div className={`relative flex items-center justify-center w-10 h-10 rounded-full ${
                           familyCreationStep >= step 
-                            ? 'bg-blue-600 border-blue-600 text-white' 
-                            : 'border-gray-300 text-gray-500'
-                        }`}>
-                          {step}
+                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg' 
+                            : 'bg-gray-100 border-2 border-gray-300 text-gray-400'
+                        } transition-all duration-300`}>
+                          <Icon className="h-5 w-5" />
+                          {familyCreationStep > step && (
+                            <div className="absolute inset-0 bg-green-500 rounded-full flex items-center justify-center">
+                              <CheckCircleIcon className="h-5 w-5 text-white" />
+                            </div>
+                          )}
                         </div>
-                        <div className="ml-2 text-sm font-medium">
-                          {step === 1 && t('unit_info')}
-                          {step === 2 && t('family_head')}
-                          {step === 3 && t('family_members')}
-                          {step === 4 && t('review')}
+                        <div className={`ml-3 ${familyCreationStep === step ? 'text-blue-600' : 'text-gray-500'}`}>
+                          <div className="text-sm font-medium">{label}</div>
+                          <div className="text-xs text-gray-400">Step {step}</div>
                         </div>
-                        {step < 4 && <div className={`ml-4 w-12 h-0.5 ${familyCreationStep > step ? 'bg-blue-600' : 'bg-gray-300'}`}></div>}
+                        {step < 4 && (
+                          <div className={`ml-6 w-16 h-1 rounded-full ${
+                            familyCreationStep > step ? 'bg-gradient-to-r from-blue-500 to-indigo-600' : 'bg-gray-200'
+                          } transition-all duration-300`}></div>
+                        )}
                       </div>
                     ))}
                   </div>

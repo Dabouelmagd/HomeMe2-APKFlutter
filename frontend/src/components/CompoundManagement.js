@@ -1638,7 +1638,7 @@ const CompoundManagement = () => {
       {/* Manage Users Tab - Admin Only */}
       {activeTab === 'manage-users' && user?.role === 'admin' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-gradient-to-br from-white via-purple-50 to-indigo-50 rounded-2xl shadow-lg border border-purple-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-semibold text-center text-gray-900 text-center">Manage Users</h3>

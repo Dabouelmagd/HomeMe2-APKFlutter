@@ -1992,7 +1992,7 @@ const CompoundManagement = () => {
                   onClick={handleSaveCompoundSettings}
                   className="btn btn-primary"
                 >
-                  Save Changes
+                  حفظ التغييرات
                 </button>
               </div>
             </div>
@@ -3256,7 +3256,7 @@ const CompoundManagement = () => {
                       type="submit"
                       className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                     >
-                      Save Changes
+                      حفظ التغييرات
                     </button>
                     <button
                       type="button"
@@ -3422,7 +3422,7 @@ const CompoundManagement = () => {
                       type="submit"
                       className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                     >
-                      Save Changes
+                      حفظ التغييرات
                     </button>
                     <button
                       type="button"

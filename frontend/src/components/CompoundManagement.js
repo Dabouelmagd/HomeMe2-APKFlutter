@@ -2672,28 +2672,44 @@ const CompoundManagement = () => {
 
                 {/* Step Content */}
                 <div className="min-h-96">
-                  {/* Step 1: Unit Information */}
+                  {/* Enhanced Step 1: Unit Information */}
                   {familyCreationStep === 1 && (
                     <div className="space-y-6">
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h4 className="font-medium text-blue-900 mb-2">{t('step_1_unit_information')}</h4>
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 rounded-2xl p-6">
+                        <div className="flex items-center space-x-3 mb-3">
+                          <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
+                            <BuildingOfficeIcon className="h-4 w-4 text-white" />
+                          </div>
+                          <h4 className="font-semibold text-blue-900">{t('step_1_unit_information')}</h4>
+                        </div>
                         <p className="text-sm text-blue-700">{t('enter_basic_residence_details')}</p>
                       </div>
                       
-                      <div className="grid grid-cols-1 gap-6">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {t('unit_number')} *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={comprehensiveFamilyForm.unit_number}
-                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, unit_number: e.target.value }))}
-                            className="form-input w-full"
-                            placeholder={t('unit_number_example')}
-                          />
-                          <p className="text-xs text-gray-500 mt-1">{t('enter_unit_number_identifier')}</p>
+                      <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                        <div className="space-y-6">
+                          <div>
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                              <HomeIcon className="h-4 w-4 text-blue-500" />
+                              <span>{t('unit_number')} *</span>
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="text"
+                                required
+                                value={comprehensiveFamilyForm.unit_number}
+                                onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, unit_number: e.target.value }))}
+                                className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-4 pr-4 py-3 text-lg"
+                                placeholder={t('unit_number_example')}
+                              />
+                              <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <IdentificationIcon className="h-5 w-5 text-gray-400" />
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-2 flex items-center space-x-1">
+                              <SparklesIcon className="h-3 w-3" />
+                              <span>{t('enter_unit_number_identifier')}</span>
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>

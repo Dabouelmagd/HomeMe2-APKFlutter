@@ -344,84 +344,84 @@ const TermsPrivacy = () => {
           {/* Content Sections */}
           {activeTab === 'terms' ? renderContent(termsContent) : renderContent(privacyContent)}
 
-          {/* Complete Contact Information */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200 shadow-lg p-8 mt-10">
+          {/* Modern Contact Information */}
+          <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl border border-white/10 shadow-xl p-8 mt-10">
             <div className="flex items-center space-x-6 mb-6">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
-                <EnvelopeIcon className="w-6 h-6 text-white" />
+              <div className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
+                <EnvelopeIcon className="w-8 h-8 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">
+              <h3 className="text-3xl font-bold text-white">
                 {t('legal_contact_title')}
               </h3>
             </div>
             
-            <p className="text-gray-700 text-lg mb-8 leading-relaxed">
+            <p className="text-white/80 text-xl mb-8 leading-relaxed">
               {t('legal_contact_description')}
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {/* Email */}
-              <div className="flex items-center space-x-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <EnvelopeIcon className="w-5 h-5 text-blue-600" />
+              <div className="bg-gray-700/40 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:bg-gray-600/40 transition-all duration-300">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
+                    <EnvelopeIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-white">{t('legal_contact_email')}</h4>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{t('legal_contact_email')}</p>
-                  <p className="text-sm text-gray-500">{t('legal_contact_email_desc')}</p>
-                  <p className="text-lg font-semibold text-gray-900">info@datalifeai.com</p>
-                </div>
+                <p className="text-white/70 text-sm mb-2">{t('legal_contact_email_desc')}</p>
+                <p className="text-white font-semibold">info@datalifeai.com</p>
               </div>
               
               {/* Website */}
-              <div className="flex items-center space-x-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <DocumentTextIcon className="w-5 h-5 text-purple-600" />
+              <div className="bg-gray-700/40 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:bg-gray-600/40 transition-all duration-300">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="p-3 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl">
+                    <DocumentTextIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-white">{t('legal_contact_website')}</h4>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{t('legal_contact_website')}</p>
-                  <p className="text-sm text-gray-500">{t('legal_contact_website_desc')}</p>
-                  <p className="text-lg font-semibold text-gray-900">www.homemeapp.net</p>
-                </div>
+                <p className="text-white/70 text-sm mb-2">{t('legal_contact_website_desc')}</p>
+                <p className="text-white font-semibold">www.homemeapp.net</p>
               </div>
               
               {/* Address */}
-              <div className="flex items-center space-x-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="p-2 bg-emerald-100 rounded-lg">
-                  <MapPinIcon className="w-5 h-5 text-emerald-600" />
+              <div className="bg-gray-700/40 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:bg-gray-600/40 transition-all duration-300">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="p-3 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl">
+                    <MapPinIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-white">{t('legal_contact_address')}</h4>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{t('legal_contact_address')}</p>
-                  <p className="text-sm text-gray-500">{t('legal_contact_address_desc')}</p>
-                  <p className="text-lg font-semibold text-gray-900">{t('legal_contact_addressValue')}</p>
-                </div>
+                <p className="text-white/70 text-sm mb-2">{t('legal_contact_address_desc')}</p>
+                <p className="text-white font-semibold">{t('legal_contact_addressValue')}</p>
               </div>
               
               {/* Support */}
-              <div className="flex items-center space-x-3 p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <CheckCircleIcon className="w-5 h-5 text-orange-600" />
+              <div className="bg-gray-700/40 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:bg-gray-600/40 transition-all duration-300">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="p-3 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl">
+                    <CheckCircleIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <h4 className="text-lg font-bold text-white">{t('legal_contact_support')}</h4>
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{t('legal_contact_support')}</p>
-                  <p className="text-sm text-gray-500">{t('legal_contact_support_desc')}</p>
-                  <p className="text-lg font-semibold text-gray-900">{t('legal_contact_support_method')}</p>
-                </div>
+                <p className="text-white/70 text-sm mb-2">{t('legal_contact_support_desc')}</p>
+                <p className="text-white font-semibold">{t('legal_contact_support_method')}</p>
               </div>
             </div>
             
             {/* Additional Contact Information */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h4 className="text-xl font-bold text-gray-900 mb-4">{t('legal_contact_get_in_touch')}</h4>
-              <p className="text-gray-700 mb-4">{t('legal_contact_get_in_touch_desc')}</p>
+            <div className="bg-gray-700/30 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+              <h4 className="text-2xl font-bold text-white mb-4">{t('legal_contact_get_in_touch')}</h4>
+              <p className="text-white/80 text-lg mb-6">{t('legal_contact_get_in_touch_desc')}</p>
               
-              <div className="mb-4">
-                <h5 className="text-lg font-semibold text-gray-900 mb-2">{t('legal_contact_primary')}</h5>
-                <p className="text-gray-700">{t('legal_contact_primary_desc')}</p>
+              <div className="mb-6">
+                <h5 className="text-xl font-bold text-white mb-3">{t('legal_contact_primary')}</h5>
+                <p className="text-white/80">{t('legal_contact_primary_desc')}</p>
               </div>
               
-              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <h5 className="text-lg font-semibold text-blue-800 mb-2">{t('legal_contact_before_contact')}</h5>
-                <p className="text-blue-700">{t('legal_contact_before_contact_desc')}</p>
+              <div className="bg-blue-900/40 rounded-xl p-5 border border-blue-400/20">
+                <h5 className="text-xl font-bold text-blue-300 mb-3">{t('legal_contact_before_contact')}</h5>
+                <p className="text-blue-200">{t('legal_contact_before_contact_desc')}</p>
               </div>
             </div>
           </div>

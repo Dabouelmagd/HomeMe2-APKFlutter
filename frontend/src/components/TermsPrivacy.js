@@ -426,23 +426,23 @@ const TermsPrivacy = () => {
             </div>
           </div>
 
-          {/* Enhanced Acceptance Notice */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-6 shadow-lg">
+          {/* Modern Acceptance Notice */}
+          <div className="relative overflow-hidden bg-gradient-to-r from-amber-900/30 via-yellow-900/30 to-orange-900/30 border border-amber-400/20 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
             {/* Background Pattern */}
             <div className="absolute inset-0 opacity-10">
               <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500"></div>
             </div>
             
             <div className="relative flex items-start space-x-4">
-              <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg">
-                <ExclamationTriangleIcon className="w-6 h-6 text-white" />
+              <div className="p-4 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg">
+                <ExclamationTriangleIcon className="w-7 h-7 text-white" />
               </div>
               <div className="flex-1">
-                <h4 className="text-xl font-bold text-amber-900 mb-3 flex items-center space-x-2">
+                <h4 className="text-2xl font-bold text-amber-200 mb-3 flex items-center space-x-3">
                   <span>{t('legal_acceptance_title')}</span>
-                  <CheckCircleIcon className="w-5 h-5 text-amber-600" />
+                  <CheckCircleIcon className="w-6 h-6 text-amber-400" />
                 </h4>
-                <p className="text-amber-800 text-lg leading-relaxed">
+                <p className="text-amber-100 text-lg leading-relaxed">
                   {t('legal_acceptance_content')}
                 </p>
               </div>

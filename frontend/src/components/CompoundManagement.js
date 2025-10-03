@@ -1176,8 +1176,8 @@ const CompoundManagement = () => {
           <div className="bg-gradient-to-br from-white via-purple-50 to-indigo-50 rounded-2xl shadow-lg border border-purple-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('admin_management')}</h3>
-                <p className="text-gray-600">{t('manage_admins')}</p>
+                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">إدارة المديرين</h3>
+                <p className="text-gray-600">إدارة المديرين</p>
               </div>
               <button 
                 onClick={() => setShowAddAdmin(true)}

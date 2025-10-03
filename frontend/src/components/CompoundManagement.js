@@ -1246,9 +1246,9 @@ const CompoundManagement = () => {
               </div>
               <button 
                 onClick={() => setShowComprehensiveFamilyModal(true)}
-                className="btn btn-primary flex items-center space-x-2"
+                className="btn btn-primary flex items-center space-x-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
               >
-                <PlusIcon className="h-4 w-4" />
+                <BuildingOfficeIcon className="h-4 w-4" />
                 <span>{t('add_residence')}</span>
               </button>
             </div>

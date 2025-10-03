@@ -3114,26 +3114,29 @@ const CompoundManagement = () => {
                         (familyCreationStep === 1 && !comprehensiveFamilyForm.unit_number) ||
                         (familyCreationStep === 2 && (!comprehensiveFamilyForm.head_full_name || !comprehensiveFamilyForm.head_email))
                       }
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg"
                     >
-                      {t('next_step')}
+                      <span>{t('next_step')}</span>
+                      <ChevronRightIcon className="h-4 w-4" />
                     </button>
                   )}
                   
                   {familyCreationStep > 1 && (
                     <button
                       onClick={() => setFamilyCreationStep(prev => prev - 1)}
-                      className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                      className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300"
                     >
-                      {t('previous_step')}
+                      <ChevronLeftIcon className="h-4 w-4" />
+                      <span>{t('previous_step')}</span>
                     </button>
                   )}
                   
                   <button
                     onClick={() => setShowComprehensiveFamilyModal(false)}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-300"
                   >
-                    {t('cancel')}
+                    <XCircleIcon className="h-4 w-4" />
+                    <span>{t('cancel')}</span>
                   </button>
                 </div>
               </div>

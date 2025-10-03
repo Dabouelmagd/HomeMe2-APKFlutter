@@ -2774,48 +2774,57 @@ const CompoundManagement = () => {
                             />
                           </div>
 
-                        <div>
-                          <DateInput
-                            label={t('date_of_birth')}
-                            value={comprehensiveFamilyForm.head_date_of_birth}
-                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_date_of_birth: e.target.value }))}
-                            className="w-full"
-                          />
-                        </div>
+                          <div>
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                              <CalendarIcon className="h-4 w-4 text-green-500" />
+                              <span>{t('date_of_birth')}</span>
+                            </label>
+                            <DateInput
+                              value={comprehensiveFamilyForm.head_date_of_birth}
+                              onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_date_of_birth: e.target.value }))}
+                              className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            ID Number
-                          </label>
-                          <input
-                            type="text"
-                            value={comprehensiveFamilyForm.head_id_number}
-                            onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_id_number: e.target.value }))}
-                            className="form-input w-full"
-                            placeholder="Enter ID/Passport number"
-                          />
-                        </div>
+                          <div>
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                              <DocumentDuplicateIcon className="h-4 w-4 text-green-500" />
+                              <span>ID Number</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={comprehensiveFamilyForm.head_id_number}
+                              onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_id_number: e.target.value }))}
+                              className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3"
+                              placeholder="Enter ID/Passport number"
+                            />
+                          </div>
 
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Profile Picture
-                          </label>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFamilyHeadProfilePictureChange}
-                            className="form-input w-full"
-                          />
-                          {comprehensiveFamilyForm.head_profile_picture_preview && (
-                            <div className="mt-2">
-                              <img
-                                src={comprehensiveFamilyForm.head_profile_picture_preview}
-                                alt="Family head preview"
-                                className="h-20 w-20 rounded-full object-cover border-2 border-gray-200"
+                          <div className="md:col-span-2">
+                            <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
+                              <CameraIcon className="h-4 w-4 text-green-500" />
+                              <span>Profile Picture</span>
+                            </label>
+                            <div className="flex items-center space-x-4">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFamilyHeadProfilePictureChange}
+                                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
                               />
+                              {comprehensiveFamilyForm.head_profile_picture_preview && (
+                                <div className="flex-shrink-0">
+                                  <img
+                                    src={comprehensiveFamilyForm.head_profile_picture_preview}
+                                    alt="Family head preview"
+                                    className="h-16 w-16 rounded-full object-cover border-2 border-green-200 shadow-sm"
+                                  />
+                                </div>
+                              )}
                             </div>
-                          )}
+                          </div>
                         </div>
+                      </div>
                       </div>
                     </div>
                   )}

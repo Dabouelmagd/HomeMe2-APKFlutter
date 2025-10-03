@@ -1812,7 +1812,7 @@ const CompoundManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address *
+                    عنوان البريد الإلكتروني *
                   </label>
                   <input
                     type="email"
@@ -2145,7 +2145,7 @@ const CompoundManagement = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email Address *
+                          عنوان البريد الإلكتروني *
                         </label>
                         <input
                           type="email"
@@ -2369,7 +2369,7 @@ const CompoundManagement = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email Address *
+                          عنوان البريد الإلكتروني *
                         </label>
                         <input
                           type="email"
@@ -2502,7 +2502,7 @@ const CompoundManagement = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Email Address *
+                          عنوان البريد الإلكتروني *
                         </label>
                         <input
                           type="email"

@@ -1272,8 +1272,8 @@ const CompoundManagement = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">Residence List</h3>
-                <p className="text-gray-600">View all residential units and their occupancy</p>
+                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">قائمة المساكن</h3>
+                <p className="text-gray-600">عرض جميع الوحدات السكنية ومعدل الإشغال</p>
               </div>
               <div className="text-right">
                 <button

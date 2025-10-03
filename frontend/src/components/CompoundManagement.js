@@ -1210,8 +1210,8 @@ const CompoundManagement = () => {
                 compound.additional_admins.map((adminId, index) => (
                   <div key={index} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
                     <div className="flex-shrink-0">
-                      <div className="h-10 w-10 rounded-full bg-gray-400 flex items-center justify-center">
-                        <UsersIcon className="h-5 w-5 text-white" />
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center">
+                        <ShieldCheckIcon className="h-5 w-5 text-white" />
                       </div>
                     </div>
                     <div className="flex-1">

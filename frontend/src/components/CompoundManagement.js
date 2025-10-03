@@ -3117,7 +3117,7 @@ const CompoundManagement = () => {
                       }
                       className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-lg"
                     >
-                      <span>{t('next_step')}</span>
+                      <span>الخطوة التالية</span>
                       <ChevronRightIcon className="h-4 w-4" />
                     </button>
                   )}
@@ -3128,7 +3128,7 @@ const CompoundManagement = () => {
                       className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300"
                     >
                       <ChevronLeftIcon className="h-4 w-4" />
-                      <span>{t('previous_step')}</span>
+                      <span>الخطوة السابقة</span>
                     </button>
                   )}
                   
@@ -3137,7 +3137,7 @@ const CompoundManagement = () => {
                     className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-300"
                   >
                     <XCircleIcon className="h-4 w-4" />
-                    <span>{t('cancel')}</span>
+                    <span>إلغاء</span>
                   </button>
                 </div>
               </div>

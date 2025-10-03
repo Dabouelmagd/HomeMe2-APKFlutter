@@ -1115,8 +1115,8 @@ const CompoundManagement = () => {
                       className="h-24 w-24 rounded-lg object-cover border-2 border-gray-200"
                     />
                   ) : (
-                    <div className="h-24 w-24 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
-                      <PhotoIcon className="h-8 w-8 text-gray-400" />
+                    <div className="h-24 w-24 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-dashed border-blue-200 flex items-center justify-center">
+                      <BuildingLibraryIcon className="h-8 w-8 text-blue-500" />
                     </div>
                   )}
                   

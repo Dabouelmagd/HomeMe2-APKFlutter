@@ -2834,8 +2834,8 @@ const CompoundManagement = () => {
                   {familyCreationStep === 3 && (
                     <div className="space-y-6">
                       <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <h4 className="font-medium text-purple-900 mb-2">Step 3: Family Members</h4>
-                        <p className="text-sm text-purple-700">Add all family members with their complete information</p>
+                        <h4 className="font-medium text-purple-900 mb-2">الخطوة 3: أفراد الأسرة</h4>
+                        <p className="text-sm text-purple-700">أضف جميع أفراد الأسرة مع معلوماتهم الكاملة</p>
                       </div>
 
                       {/* Existing Family Members */}

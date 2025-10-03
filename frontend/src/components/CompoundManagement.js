@@ -1130,7 +1130,7 @@ const CompoundManagement = () => {
                       disabled={uploading}
                     />
                     <div className="absolute inset-0 rounded-lg bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <PhotoIcon className="h-6 w-6 text-white" />
+                      <CameraIcon className="h-6 w-6 text-white" />
                     </div>
                   </label>
                   

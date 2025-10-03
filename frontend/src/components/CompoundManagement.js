@@ -1113,7 +1113,7 @@ const CompoundManagement = () => {
                   {compound?.logo_url ? (
                     <img
                       src={compound.logo_url}
-                      alt="Compound Logo"
+                      alt="شعار المجمع"
                       className="h-24 w-24 rounded-lg object-cover border-2 border-gray-200"
                     />
                   ) : (
@@ -2013,7 +2013,7 @@ const CompoundManagement = () => {
                     <div className="space-y-4">
                       <img
                         src={logoPreview}
-                        alt="Compound Logo"
+                        alt="شعار المجمع"
                         className="mx-auto h-32 w-32 object-contain rounded-lg border border-gray-200"
                       />
                       <p className="text-sm text-gray-600">Current compound logo</p>
@@ -2267,7 +2267,7 @@ const CompoundManagement = () => {
                                   {compound.logo_url ? (
                                     <img
                                       src={compound.logo_url}
-                                      alt="Compound Logo"
+                                      alt="شعار المجمع"
                                       className="h-12 w-12 rounded-lg object-cover border border-gray-200"
                                     />
                                   ) : (

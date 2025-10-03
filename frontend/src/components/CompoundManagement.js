@@ -1254,7 +1254,9 @@ const CompoundManagement = () => {
             </div>
 
             <div className="text-center py-8">
-              <HomeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-green-100 to-emerald-200 flex items-center justify-center mx-auto mb-4">
+                <BuildingOfficeIcon className="h-6 w-6 text-green-600" />
+              </div>
               <p className="text-gray-500">{t('no_residences')}</p>
               <p className="text-sm text-gray-400">{t('residences_appear')}</p>
             </div>

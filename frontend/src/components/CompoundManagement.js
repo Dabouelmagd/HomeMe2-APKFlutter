@@ -2610,22 +2610,27 @@ const CompoundManagement = () => {
             
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full max-h-screen overflow-y-auto">
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 text-center" id="comprehensive-family-modal-title">
-                      {t('add_new_resident_family')}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {t('complete_family_setup')}
-                    </p>
+                {/* Enhanced Modern Header */}
+                <div className="flex items-center justify-between mb-8 p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-2xl -m-6 mb-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                      <UserGroupIcon className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold" id="comprehensive-family-modal-title">
+                        {t('add_new_resident_family')}
+                      </h3>
+                      <p className="text-blue-100 text-sm mt-1">
+                        {t('complete_family_setup')}
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => setShowComprehensiveFamilyModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-white/80 hover:text-white hover:bg-white/10 rounded-full p-2 transition-colors"
                   >
                     <span className="sr-only">Close</span>
-                    ×
+                    <XCircleIcon className="h-6 w-6" />
                   </button>
                 </div>
 

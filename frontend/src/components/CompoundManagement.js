@@ -2709,7 +2709,7 @@ const CompoundManagement = () => {
                             </div>
                             <p className="text-xs text-gray-500 mt-2 flex items-center space-x-1">
                               <SparklesIcon className="h-3 w-3" />
-                              <span>{t('enter_unit_number_identifier')}</span>
+                              <span>أدخل معرف رقم الوحدة الفريد</span>
                             </p>
                           </div>
                         </div>

@@ -2827,7 +2827,6 @@ const CompoundManagement = () => {
                           </div>
                         </div>
                       </div>
-                      </div>
                     </div>
                   )}
 

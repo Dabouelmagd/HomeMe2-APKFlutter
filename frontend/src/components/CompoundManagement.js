@@ -1179,9 +1179,9 @@ const CompoundManagement = () => {
               </div>
               <button 
                 onClick={() => setShowAddAdmin(true)}
-                className="btn btn-primary flex items-center space-x-2"
+                className="btn btn-primary flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
               >
-                <PlusIcon className="h-4 w-4" />
+                <ShieldCheckIcon className="h-4 w-4" />
                 <span>{t('add_admin')}</span>
               </button>
             </div>

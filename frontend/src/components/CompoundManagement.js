@@ -1756,7 +1756,9 @@ const CompoundManagement = () => {
               </div>
             ) : (
               <div className="text-center py-12">
-                <UsersIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-purple-100 to-indigo-200 flex items-center justify-center mx-auto mb-4">
+                  <UserGroupIcon className="h-6 w-6 text-purple-600" />
+                </div>
                 <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">No users found</h3>
                 <p className="text-gray-600">
                   Users will appear here once they register in your compound.

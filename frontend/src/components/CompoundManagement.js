@@ -2692,7 +2692,7 @@ const CompoundManagement = () => {
                           <div>
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <HomeIcon className="h-4 w-4 text-blue-500" />
-                              <span>{t('unit_number')} *</span>
+                              <span>رقم الوحدة *</span>
                             </label>
                             <div className="relative">
                               <input
@@ -2701,7 +2701,7 @@ const CompoundManagement = () => {
                                 value={comprehensiveFamilyForm.unit_number}
                                 onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, unit_number: e.target.value }))}
                                 className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-4 pr-4 py-3 text-lg"
-                                placeholder={t('unit_number_example')}
+                                placeholder="مثال: أ-101، فيلا-205"
                               />
                               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                                 <IdentificationIcon className="h-5 w-5 text-gray-400" />

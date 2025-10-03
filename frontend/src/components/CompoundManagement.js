@@ -1847,7 +1847,7 @@ const CompoundManagement = () => {
                     value={adminForm.phone}
                     onChange={(e) => setAdminForm(prev => ({ ...prev, phone: e.target.value }))}
                     className="form-input w-full"
-                    placeholder="+1 (555) 123-4567"
+                    placeholder="+966 123 456 789"
                   />
                 </div>
 
@@ -2166,7 +2166,7 @@ const CompoundManagement = () => {
                           value={residenceForm.phone}
                           onChange={(e) => setResidenceForm(prev => ({ ...prev, phone: e.target.value }))}
                           className="form-input w-full"
-                          placeholder="+1 (555) 123-4567"
+                          placeholder="+966 123 456 789"
                         />
                       </div>
 
@@ -2390,7 +2390,7 @@ const CompoundManagement = () => {
                           value={newResidenceForm.phone}
                           onChange={(e) => setNewResidenceForm(prev => ({ ...prev, phone: e.target.value }))}
                           className="form-input w-full"
-                          placeholder="+1 (555) 123-4567"
+                          placeholder="+966 123 456 789"
                         />
                       </div>
 
@@ -2537,7 +2537,7 @@ const CompoundManagement = () => {
                           value={adminForm.phone}
                           onChange={(e) => setAdminForm(prev => ({ ...prev, phone: e.target.value }))}
                           className="form-input w-full"
-                          placeholder="+1 (555) 123-4567"
+                          placeholder="+966 123 456 789"
                         />
                       </div>
 
@@ -2772,7 +2772,7 @@ const CompoundManagement = () => {
                               value={comprehensiveFamilyForm.head_phone}
                               onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_phone: e.target.value }))}
                               className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3"
-                              placeholder="+1 (555) 123-4567"
+                              placeholder="+966 123 456 789"
                             />
                           </div>
 
@@ -2934,7 +2934,7 @@ const CompoundManagement = () => {
                               value={newFamilyMember.phone}
                               onChange={(e) => setNewFamilyMember(prev => ({ ...prev, phone: e.target.value }))}
                               className="form-input w-full"
-                              placeholder="+1 (555) 123-4567"
+                              placeholder="+966 123 456 789"
                             />
                           </div>
 
@@ -3225,7 +3225,7 @@ const CompoundManagement = () => {
                         value={editUnitForm.phone}
                         onChange={(e) => setEditUnitForm(prev => ({ ...prev, phone: e.target.value }))}
                         className="form-input w-full"
-                        placeholder="+1 (555) 123-4567"
+                        placeholder="+966 123 456 789"
                       />
                     </div>
 
@@ -3369,7 +3369,7 @@ const CompoundManagement = () => {
                         value={editMemberForm.phone}
                         onChange={(e) => setEditMemberForm(prev => ({ ...prev, phone: e.target.value }))}
                         className="form-input w-full"
-                        placeholder="+1 (555) 123-4567"
+                        placeholder="+966 123 456 789"
                       />
                     </div>
 

@@ -2640,10 +2640,10 @@ const CompoundManagement = () => {
                 <div className="mb-8">
                   <div className="flex items-center justify-between">
                     {[
-                      { step: 1, label: t('unit_info'), icon: BuildingOfficeIcon },
-                      { step: 2, label: t('family_head'), icon: AcademicCapIcon },
-                      { step: 3, label: t('family_members'), icon: UserGroupIcon },
-                      { step: 4, label: t('review'), icon: CheckCircleIcon }
+                      { step: 1, label: 'معلومات الوحدة', icon: BuildingOfficeIcon },
+                      { step: 2, label: 'رب الأسرة', icon: AcademicCapIcon },
+                      { step: 3, label: 'أفراد الأسرة', icon: UserGroupIcon },
+                      { step: 4, label: 'مراجعة', icon: CheckCircleIcon }
                     ].map(({ step, label, icon: Icon }) => (
                       <div key={step} className="flex items-center">
                         <div className={`relative flex items-center justify-center w-10 h-10 rounded-full ${

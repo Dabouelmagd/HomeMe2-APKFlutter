@@ -1649,8 +1649,8 @@ const CompoundManagement = () => {
           <div className="bg-gradient-to-br from-white via-purple-50 to-indigo-50 rounded-2xl shadow-lg border border-purple-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">Manage Users</h3>
-                <p className="text-gray-600">View and manage all users in your compound</p>
+                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">👤 إدارة المستخدمين</h3>
+                <p className="text-gray-600">عرض وإدارة جميع المستخدمين في مجمعك</p>
               </div>
               <div className="text-sm text-gray-600">
                 Total Users: <span className="font-semibold text-center">{allUsers.length}</span>

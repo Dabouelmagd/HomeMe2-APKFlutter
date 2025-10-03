@@ -1143,7 +1143,7 @@ const CompoundManagement = () => {
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-2 text-center">
-                  {t('click_to_upload_logo')}
+                  انقر لتحميل الشعار
                 </p>
               </div>
 

@@ -2805,7 +2805,7 @@ const CompoundManagement = () => {
                           <div className="md:col-span-2">
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <CameraIcon className="h-4 w-4 text-green-500" />
-                              <span>Profile Picture</span>
+                              <span>الصورة الشخصية</span>
                             </label>
                             <div className="flex items-center space-x-4">
                               <input

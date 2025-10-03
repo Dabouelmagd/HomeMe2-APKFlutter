@@ -2682,9 +2682,9 @@ const CompoundManagement = () => {
                           <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
                             <BuildingOfficeIcon className="h-4 w-4 text-white" />
                           </div>
-                          <h4 className="font-semibold text-blue-900">{t('step_1_unit_information')}</h4>
+                          <h4 className="font-semibold text-blue-900">الخطوة 1: معلومات الوحدة</h4>
                         </div>
-                        <p className="text-sm text-blue-700">{t('enter_basic_residence_details')}</p>
+                        <p className="text-sm text-blue-700">أدخل تفاصيل السكن الأساسية</p>
                       </div>
                       
                       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">

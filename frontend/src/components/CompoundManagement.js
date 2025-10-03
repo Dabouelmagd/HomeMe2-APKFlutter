@@ -1525,7 +1525,7 @@ const CompoundManagement = () => {
                 className="btn btn-primary flex items-center space-x-2"
               >
                 <UserPlusIcon className="h-4 w-4 text-current" style={{minWidth: '16px', minHeight: '16px'}} />
-                <span>Create New Link</span>
+                <span>إنشاء رابط جديد</span>
               </button>
             </div>
 

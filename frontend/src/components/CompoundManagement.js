@@ -2765,7 +2765,7 @@ const CompoundManagement = () => {
                           <div>
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <PhoneIcon className="h-4 w-4 text-green-500" />
-                              <span>Phone Number</span>
+                              <span>رقم الهاتف</span>
                             </label>
                             <input
                               type="tel"

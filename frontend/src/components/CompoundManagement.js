@@ -1806,7 +1806,7 @@ const CompoundManagement = () => {
                     value={adminForm.full_name}
                     onChange={(e) => setAdminForm(prev => ({ ...prev, full_name: e.target.value }))}
                     className="form-input w-full"
-                    placeholder="Enter full name"
+                    placeholder="أدخل الاسم الكامل"
                   />
                 </div>
 
@@ -2496,7 +2496,7 @@ const CompoundManagement = () => {
                           value={adminForm.full_name}
                           onChange={(e) => setAdminForm(prev => ({ ...prev, full_name: e.target.value }))}
                           className="form-input w-full"
-                          placeholder="Enter full name"
+                          placeholder="أدخل الاسم الكامل"
                         />
                       </div>
 
@@ -2743,7 +2743,7 @@ const CompoundManagement = () => {
                               value={comprehensiveFamilyForm.head_full_name}
                               onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_full_name: e.target.value }))}
                               className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3"
-                              placeholder="Enter full name"
+                              placeholder="أدخل الاسم الكامل"
                             />
                           </div>
 
@@ -2887,7 +2887,7 @@ const CompoundManagement = () => {
                               value={newFamilyMember.full_name}
                               onChange={(e) => setNewFamilyMember(prev => ({ ...prev, full_name: e.target.value }))}
                               className="form-input w-full"
-                              placeholder="Enter full name"
+                              placeholder="أدخل الاسم الكامل"
                             />
                           </div>
 

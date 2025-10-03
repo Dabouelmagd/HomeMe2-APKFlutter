@@ -2725,9 +2725,9 @@ const CompoundManagement = () => {
                           <div className="h-8 w-8 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center">
                             <AcademicCapIcon className="h-4 w-4 text-white" />
                           </div>
-                          <h4 className="font-semibold text-green-900">Step 2: Family Head Details</h4>
+                          <h4 className="font-semibold text-green-900">الخطوة 2: تفاصيل رب الأسرة</h4>
                         </div>
-                        <p className="text-sm text-green-700">Enter complete information for the primary resident</p>
+                        <p className="text-sm text-green-700">أدخل المعلومات الكاملة للمقيم الأساسي</p>
                       </div>
                       
                       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">

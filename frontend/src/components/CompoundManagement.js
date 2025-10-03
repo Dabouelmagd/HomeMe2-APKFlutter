@@ -1782,8 +1782,8 @@ const CompoundManagement = () => {
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">Add New Admin</h3>
-              <p className="text-gray-600">Create a new administrator account for your compound</p>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">🛡️ إضافة مدير جديد</h3>
+              <p className="text-gray-600">إنشاء حساب مدير جديد لمجمعك</p>
             </div>
 
             <form onSubmit={handleCreateAdmin} className="space-y-6">

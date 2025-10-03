@@ -2335,7 +2335,7 @@ const CompoundManagement = () => {
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
                     <h3 className="text-lg leading-6 font-medium text-gray-900 text-center mb-4" id="new-residence-modal-title">
-                      Add New Residence
+                      إضافة إقامة جديدة
                     </h3>
                     
                     <div className="space-y-4">

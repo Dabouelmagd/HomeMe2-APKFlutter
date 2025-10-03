@@ -1227,7 +1227,9 @@ const CompoundManagement = () => {
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <UsersIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center mx-auto mb-4">
+                    <UserGroupIcon className="h-6 w-6 text-blue-500" />
+                  </div>
                   <p className="text-gray-500">{t('no_additional_admins')}</p>
                   <p className="text-sm text-gray-400">{t('help_manage')}</p>
                 </div>

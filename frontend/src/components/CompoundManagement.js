@@ -1238,7 +1238,7 @@ const CompoundManagement = () => {
           </div>
 
           {/* Residence Management */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="bg-gradient-to-br from-white via-green-50 to-emerald-50 rounded-2xl shadow-lg border border-green-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('residence_management')}</h3>

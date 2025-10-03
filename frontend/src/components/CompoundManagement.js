@@ -1798,7 +1798,7 @@ const CompoundManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name *
+                    الاسم الكامل *
                   </label>
                   <input
                     type="text"

@@ -1629,7 +1629,7 @@ const CompoundManagement = () => {
                   className="btn btn-primary inline-flex items-center space-x-2"
                 >
                   <UserPlusIcon className="h-4 w-4 text-current" style={{minWidth: '16px', minHeight: '16px'}} />
-                  <span>Create First Link</span>
+                  <span>إنشاء أول رابط</span>
                 </button>
               </div>
             )}

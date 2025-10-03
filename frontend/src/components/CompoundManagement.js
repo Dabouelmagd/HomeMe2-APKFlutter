@@ -2000,7 +2000,7 @@ const CompoundManagement = () => {
 
           {/* Logo Management */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">Compound Logo</h3>
+            <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">شعار المجمع</h3>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Current Logo Display */}

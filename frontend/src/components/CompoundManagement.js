@@ -1190,7 +1190,7 @@ const CompoundManagement = () => {
                 className="btn btn-primary flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
               >
                 <ShieldCheckIcon className="h-4 w-4" />
-                <span>{t('add_admin')}</span>
+                <span>🛡️ إضافة مدير جديد</span>
               </button>
             </div>
 

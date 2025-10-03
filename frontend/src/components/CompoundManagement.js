@@ -3025,8 +3025,8 @@ const CompoundManagement = () => {
 
                       {/* Unit Info */}
                       <div className="bg-white border border-gray-200 rounded-lg p-4">
-                        <h5 className="font-medium text-gray-900 mb-3">Unit Information</h5>
-                        <p className="text-sm text-gray-600">Unit Number: <span className="font-medium">{comprehensiveFamilyForm.unit_number}</span></p>
+                        <h5 className="font-medium text-gray-900 mb-3">معلومات الوحدة</h5>
+                        <p className="text-sm text-gray-600">رقم الوحدة: <span className="font-medium">{comprehensiveFamilyForm.unit_number}</span></p>
                       </div>
 
                       {/* Family Head Info */}

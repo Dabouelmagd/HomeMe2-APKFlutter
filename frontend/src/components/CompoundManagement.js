@@ -1933,7 +1933,7 @@ const CompoundManagement = () => {
         <div className="space-y-6">
           {/* Basic Information */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">Basic Information</h3>
+            <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">المعلومات الأساسية</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>

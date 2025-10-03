@@ -2791,14 +2791,14 @@ const CompoundManagement = () => {
                           <div>
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <DocumentDuplicateIcon className="h-4 w-4 text-green-500" />
-                              <span>ID Number</span>
+                              <span>رقم الهوية</span>
                             </label>
                             <input
                               type="text"
                               value={comprehensiveFamilyForm.head_id_number}
                               onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_id_number: e.target.value }))}
                               className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3"
-                              placeholder="Enter ID/Passport number"
+                              placeholder="أدخل رقم الهوية/جواز السفر"
                             />
                           </div>
 

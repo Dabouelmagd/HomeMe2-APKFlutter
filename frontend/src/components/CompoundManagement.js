@@ -1501,9 +1501,9 @@ const CompoundManagement = () => {
             ) : (
               <div className="text-center py-12">
                 <HomeIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">No residences found</h3>
+                <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">لا توجد مساكن</h3>
                 <p className="text-gray-600">
-                  Residences will appear here once families register in your compound.
+                  ستظهر المساكن هنا بمجرد تسجيل العائلات في مجمعك.
                 </p>
               </div>
             )}

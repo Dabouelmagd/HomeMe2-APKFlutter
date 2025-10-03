@@ -1190,8 +1190,8 @@ const CompoundManagement = () => {
               {/* Primary Admin */}
               <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-                    <UsersIcon className="h-5 w-5 text-white" />
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center justify-center">
+                    <AcademicCapIcon className="h-5 w-5 text-white" />
                   </div>
                 </div>
                 <div className="flex-1">

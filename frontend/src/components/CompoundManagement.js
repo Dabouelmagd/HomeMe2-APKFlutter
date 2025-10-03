@@ -1066,7 +1066,7 @@ const CompoundManagement = () => {
             <button
               id="manage-users-tab-v2"
               onClick={() => setActiveTab('manage-users')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-1 ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'manage-users'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -1079,7 +1079,7 @@ const CompoundManagement = () => {
             <button
               id="add-admin-tab-v2"
               onClick={() => setActiveTab('add-admin')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-1 ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'add-admin'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'

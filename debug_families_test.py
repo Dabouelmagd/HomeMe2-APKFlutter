@@ -6,7 +6,7 @@ Debug the families endpoint response format
 import requests
 import json
 
-BASE_URL = "https://arabic-homeme.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-i18n-2.preview.emergentagent.com/api"
 
 def debug_families_endpoint():
     # Login as admin

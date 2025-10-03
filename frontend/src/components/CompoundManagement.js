@@ -2016,7 +2016,7 @@ const CompoundManagement = () => {
                         alt="شعار المجمع"
                         className="mx-auto h-32 w-32 object-contain rounded-lg border border-gray-200"
                       />
-                      <p className="text-sm text-gray-600">Current compound logo</p>
+                      <p className="text-sm text-gray-600">شعار المجمع الحالي</p>
                     </div>
                   ) : (
                     <div className="space-y-4">

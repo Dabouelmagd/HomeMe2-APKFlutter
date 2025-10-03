@@ -27,7 +27,16 @@ import {
   ChevronDownIcon,
   CalendarIcon,
   IdentificationIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  // New modern icons for redesign
+  CameraIcon,
+  BuildingLibraryIcon,
+  UserGroupIcon,
+  AcademicCapIcon,
+  ShieldCheckIcon,
+  CogIcon,
+  SparklesIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;

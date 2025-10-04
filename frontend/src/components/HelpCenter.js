@@ -177,7 +177,14 @@ const HelpCenter = () => {
         </div>
         
         <div className="divide-y divide-gray-200">
-          {helpSections.map((section) => (
+          {sectionsToShow.length === 0 && searchQuery ? (
+            <div className="px-6 py-12 text-center">
+              <MagnifyingGlassIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_results_found')}</h3>
+              <p className="text-gray-600">{t('try_different_keywords')}</p>
+            </div>
+          ) : (
+            sectionsToShow.map((section) => (
             <div key={section.id}>
               <button
                 onClick={() => toggleSection(section.id)}

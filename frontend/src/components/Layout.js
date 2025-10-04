@@ -454,8 +454,18 @@ const Layout = ({ children }) => {
                           </span>
                         )}
                         {item.name === t('help_center') && (
-                          <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                          <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium animate-bounce">
                             {t('new')}
+                          </span>
+                        )}
+                        {item.name === t('message_center') && (
+                          <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium">
+                            3
+                          </span>
+                        )}
+                        {item.name === t('financial_management') && (
+                          <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-medium">
+                            $2.5K
                           </span>
                         )}
                       </Link>

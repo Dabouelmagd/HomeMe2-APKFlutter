@@ -371,33 +371,78 @@ const VideoTutorial = () => {
                   <div className="flex items-center space-x-3">
                     <button
                       onClick={togglePlay}
-                      className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-semibold transition-colors"
+                      className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg"
                     >
                       {isPlaying ? (
-                        <PauseCircleIcon className="h-5 w-5" />
+                        <PauseCircleIcon className="h-6 w-6" />
                       ) : (
-                        <PlayCircleIcon className="h-5 w-5" />
+                        <PlayCircleIcon className="h-6 w-6" />
                       )}
-                      <span className="text-sm">{isPlaying ? t('pause') : t('play')}</span>
+                      <span className="text-sm font-bold">{isPlaying ? t('pause') : t('play')}</span>
                     </button>
                     
+                    {/* Volume Control */}
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={toggleMute}
+                        className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg"
+                      >
+                        {isMuted ? (
+                          <SpeakerXMarkIcon className="h-5 w-5 text-red-400" />
+                        ) : (
+                          <SpeakerWaveIcon className="h-5 w-5 text-white" />
+                        )}
+                      </button>
+                      
+                      {!isMuted && (
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={volume}
+                            onChange={(e) => setVolume(parseInt(e.target.value))}
+                            className="w-16 h-1 bg-white bg-opacity-30 rounded-lg appearance-none slider"
+                          />
+                          <span className="text-xs w-8">{volume}%</span>
+                        </div>
+                      )}
+                    </div>
+                    
                     <div className="flex items-center space-x-2 text-xs">
-                      <span className="bg-white bg-opacity-20 px-2 py-1 rounded">
+                      <span className="bg-white bg-opacity-20 px-3 py-1 rounded-lg font-semibold">
                         {Math.round(videoProgress)}%
                       </span>
+                      <div className="flex items-center space-x-1">
+                        <div className={`w-2 h-2 rounded-full ${!isMuted ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`}></div>
+                        <span className="text-xs">{!isMuted ? 'صوت' : 'صامت'}</span>
+                      </div>
                     </div>
                   </div>
                   
                   <div className="flex items-center space-x-3 text-sm">
                     <button
+                      onClick={toggleFullscreen}
+                      className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
+                      title={isFullscreen ? 'تصغير الشاشة' : 'ملء الشاشة'}
+                    >
+                      {isFullscreen ? (
+                        <ArrowsPointingInIcon className="h-5 w-5" />
+                      ) : (
+                        <ArrowsPointingOutIcon className="h-5 w-5" />
+                      )}
+                    </button>
+                    
+                    <button
                       onClick={() => setAutoPlay(!autoPlay)}
-                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                      className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                         autoPlay ? 'bg-green-600 text-white' : 'bg-white bg-opacity-20 text-white'
                       }`}
                     >
-                      🔄 {autoPlay ? 'تشغيل تلقائي' : 'تشغيل يدوي'}
+                      🔄 {autoPlay ? 'تلقائي' : 'يدوي'}
                     </button>
-                    <span className="text-blue-200">{currentTutorial.duration}</span>
+                    
+                    <span className="text-blue-200 font-semibold">{currentTutorial.duration}</span>
                   </div>
                 </div>
               </div>

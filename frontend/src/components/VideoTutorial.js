@@ -148,43 +148,161 @@ const VideoTutorial = () => {
     }
   };
 
-  // Audio simulation function
+  // Enhanced audio system with multiple fallbacks
   const playAudioFeedback = (type = 'play') => {
     if (isMuted) return;
     
     try {
-      // Create audio context for sound effects
+      // Method 1: Try Web Audio API with user gesture
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
       
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      // Different sounds for different actions
-      switch(type) {
-        case 'play':
-          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-          oscillator.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.1);
-          break;
-        case 'pause':
-          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-          break;
-        case 'complete':
-          oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
-          break;
-        default:
-          oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
+      // Resume context if suspended (browser policy)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+          playActualSound(audioContext, type);
+        });
+      } else {
+        playActualSound(audioContext, type);
       }
       
-      gainNode.gain.setValueAtTime(volume / 300, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.3);
     } catch (error) {
-      console.log('Audio not supported');
+      console.log('Primary audio failed, trying backup method');
+      // Fallback: Use HTML5 Audio
+      try {
+        playHTMLAudio(type);
+      } catch (fallbackError) {
+        console.log('All audio methods failed');
+        // Visual feedback only
+        showVisualAudioFeedback(type);
+      }
     }
+  };
+
+  const playActualSound = (audioContext, type) => {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Enhanced sound profiles
+    switch(type) {
+      case 'play':
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(volume / 200, audioContext.currentTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+        break;
+      case 'pause':
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.2);
+        gainNode.gain.setValueAtTime(volume / 300, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        break;
+      case 'complete':
+        // Success sound (3 ascending tones)
+        [800, 1000, 1200].forEach((freq, index) => {
+          const osc = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          osc.connect(gain);
+          gain.connect(audioContext.destination);
+          
+          osc.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.1);
+          gain.gain.setValueAtTime(volume / 400, audioContext.currentTime + index * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.1 + 0.15);
+          
+          osc.start(audioContext.currentTime + index * 0.1);
+          osc.stop(audioContext.currentTime + index * 0.1 + 0.15);
+        });
+        return; // Skip the default oscillator
+      case 'progress':
+        oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(volume / 500, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+        break;
+      default:
+        oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(volume / 400, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+    }
+    
+    if (type !== 'complete') {
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.4);
+    }
+  };
+
+  const playHTMLAudio = (type) => {
+    // Create data URL for audio
+    const createBeep = (frequency, duration) => {
+      const sampleRate = 8000;
+      const samples = duration * sampleRate;
+      const buffer = new ArrayBuffer(44 + samples * 2);
+      const view = new DataView(buffer);
+      
+      // WAV header
+      const writeString = (offset, string) => {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      };
+      
+      writeString(0, 'RIFF');
+      view.setUint32(4, 36 + samples * 2, true);
+      writeString(8, 'WAVE');
+      writeString(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(36, 'data');
+      view.setUint32(40, samples * 2, true);
+      
+      // Generate sine wave
+      for (let i = 0; i < samples; i++) {
+        const sample = Math.sin(frequency * 2 * Math.PI * i / sampleRate) * 0.3 * (volume / 100);
+        view.setInt16(44 + i * 2, sample * 32767, true);
+      }
+      
+      return new Blob([buffer], { type: 'audio/wav' });
+    };
+    
+    const frequencies = {
+      play: 800,
+      pause: 600, 
+      complete: 1200,
+      progress: 1000
+    };
+    
+    const audioBlob = createBeep(frequencies[type] || 500, 0.3);
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+    audio.volume = volume / 100;
+    audio.play().catch(console.log);
+  };
+
+  const showVisualAudioFeedback = (type) => {
+    // Visual feedback when audio fails
+    const colors = {
+      play: 'bg-green-500',
+      pause: 'bg-yellow-500',
+      complete: 'bg-blue-500',
+      progress: 'bg-purple-500'
+    };
+    
+    // Create temporary visual indicator
+    const indicator = document.createElement('div');
+    indicator.className = `fixed top-4 right-4 ${colors[type] || 'bg-gray-500'} text-white px-3 py-2 rounded-lg z-50 animate-bounce`;
+    indicator.textContent = `🔊 ${type}`;
+    document.body.appendChild(indicator);
+    
+    setTimeout(() => {
+      document.body.removeChild(indicator);
+    }, 1000);
   };
 
   const togglePlay = () => {

@@ -2468,7 +2468,7 @@ const CompoundManagement = () => {
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
                     <h3 className="text-lg leading-6 font-medium text-gray-900 text-center mb-4" id="add-admin-modal-title">
-                      Create New Admin Account
+                      {t('create_new_admin_account')}
                     </h3>
                     
                     <div className="space-y-4">

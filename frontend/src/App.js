@@ -436,6 +436,10 @@ function App() {
                   <Newsletter />
                 } />
                 
+                <Route path="help" element={
+                  <HelpCenter />
+                } />
+                
                 <Route path="mobile-app" element={
                   <MobileAppPage />
                 } />

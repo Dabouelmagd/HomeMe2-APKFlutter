@@ -589,6 +589,7 @@ const VideoTutorial = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

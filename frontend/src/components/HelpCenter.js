@@ -13,6 +13,7 @@ import {
   ClockIcon,
   FireIcon
 } from '@heroicons/react/24/outline';
+import VideoTutorial from './VideoTutorial';
 
 const HelpCenter = () => {
   const { t } = useTranslation();

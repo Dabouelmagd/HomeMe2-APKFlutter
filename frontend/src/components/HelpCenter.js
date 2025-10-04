@@ -112,11 +112,35 @@ const HelpCenter = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="text-center mb-12">
-        <QuestionMarkCircleIcon className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('help_center')}</h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <div className="relative">
+          <QuestionMarkCircleIcon className="h-16 w-16 text-blue-600 mx-auto mb-4" />
+          <SparklesIcon className="h-6 w-6 text-yellow-500 absolute top-0 right-1/2 transform translate-x-8 animate-pulse" />
+        </div>
+        <h1 className="text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          {t('help_center')}
+        </h1>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
           {t('help_center_description')}
         </p>
+        
+        {/* Search Bar */}
+        <div className="max-w-md mx-auto">
+          <div className="relative">
+            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder={t('search_help_topics')}
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            />
+          </div>
+          {searchQuery && (
+            <p className="mt-2 text-sm text-gray-500">
+              {sectionsToShow.length} {t('results_found')}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Quick Actions */}

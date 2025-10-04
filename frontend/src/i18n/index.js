@@ -4050,6 +4050,10 @@ const resources = {
       'review_all_info_before_creating': 'Révisez toutes les informations avant de créer la résidence et la famille',
       'step': 'Étape',
       'previous_step': 'Étape Précédente',
+      'create_new_admin_account': 'Créer un Nouveau Compte Administrateur',
+      'admin_account_creation': 'Création de Compte Administrateur',
+      'create_admin_account_description': 'Cela créera un nouveau compte administrateur avec tous les privilèges de gestion pour votre complexe.',
+      'create_admin': 'Créer Administrateur',
       'upload_logo': 'Télécharger le Logo',
       
       // Residence Management

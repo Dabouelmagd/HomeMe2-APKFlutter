@@ -548,7 +548,7 @@ const VideoTutorial = () => {
                           <div className="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
                             <p className="font-semibold mb-2">🎬 الإجراءات الحالية:</p>
                             <div className="space-y-1">
-                              {currentTutorial.videoContent.actions.map((action, index) => (
+                              {currentTutorial?.videoContent?.actions?.map((action, index) => (
                                 <div key={index} className={`text-xs ${
                                   videoProgress > (index * 25) ? 'text-green-300' : 'text-white opacity-60'
                                 }`}>

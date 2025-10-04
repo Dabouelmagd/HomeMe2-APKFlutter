@@ -4040,6 +4040,8 @@ const resources = {
       'add_all_family_members_complete_info': 'Ajoutez tous les membres de la famille avec leurs informations complètes',
       'step_4_review_confirm': 'Étape 4: Révision et Confirmation',
       'review_all_info_before_creating': 'Révisez toutes les informations avant de créer la résidence et la famille',
+      'step': 'Étape',
+      'previous_step': 'Étape Précédente',
       'upload_logo': 'Télécharger le Logo',
       
       // Residence Management

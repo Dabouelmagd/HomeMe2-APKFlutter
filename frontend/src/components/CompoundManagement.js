@@ -2569,10 +2569,10 @@ const CompoundManagement = () => {
                           </div>
                           <div className="ml-3">
                             <h4 className="text-sm font-medium text-blue-800">
-                              Admin Account Creation
+                              {t('admin_account_creation')}
                             </h4>
                             <p className="text-sm text-blue-700 mt-1">
-                              This will create a new administrator account with full management privileges for your compound.
+                              {t('create_admin_account_description')}
                             </p>
                           </div>
                         </div>

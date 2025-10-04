@@ -1048,7 +1048,7 @@ const CompoundManagement = () => {
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
-            قائمة المساكن ({residences.length})
+            {t('residence_list')} ({residences.length})
           </button>
           {user?.role === 'admin' && (
             <button

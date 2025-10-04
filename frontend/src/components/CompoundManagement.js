@@ -1792,7 +1792,7 @@ const CompoundManagement = () => {
                     value={adminForm.username}
                     onChange={(e) => setAdminForm(prev => ({ ...prev, username: e.target.value }))}
                     className="form-input w-full"
-                    placeholder="Enter username"
+                    placeholder={t('enter_username')}
                   />
                 </div>
 
@@ -2482,7 +2482,7 @@ const CompoundManagement = () => {
                           value={adminForm.username}
                           onChange={(e) => setAdminForm(prev => ({ ...prev, username: e.target.value }))}
                           className="form-input w-full"
-                          placeholder="Enter username"
+                          placeholder={t('enter_username')}
                         />
                       </div>
 

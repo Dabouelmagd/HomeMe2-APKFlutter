@@ -50,6 +50,7 @@ import SmartHomeIntegration from './components/SmartHomeIntegration';
 import TermsPrivacy from './components/TermsPrivacy';
 import ContactUs from './components/ContactUs';
 import Newsletter from './components/Newsletter';
+import HelpCenter from './components/HelpCenter';
 import MobileOptimized from './components/MobileOptimized';
 import { Toaster } from './components/ui/sonner';
 

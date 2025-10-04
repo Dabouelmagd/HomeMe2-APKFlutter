@@ -403,7 +403,14 @@ const VideoTutorial = () => {
     }
   }, [currentStep]);
 
-  const currentTutorial = tutorialSteps[currentStep];
+  const currentTutorial = tutorialSteps[currentStep] || tutorialSteps[0] || {
+    id: 1,
+    title: 'Loading...',
+    description: 'Please wait...',
+    duration: '0 seconds',
+    tips: [],
+    videoContent: { actions: [] }
+  };
 
   return (
     <>

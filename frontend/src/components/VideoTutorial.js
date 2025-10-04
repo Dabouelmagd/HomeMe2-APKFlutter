@@ -364,6 +364,45 @@ const VideoTutorial = () => {
     playAudioFeedback('click');
   };
 
+  // Auto-play when modal opens
+  React.useEffect(() => {
+    if (showModal && autoPlay) {
+      // Initialize audio context on user interaction (modal open)
+      try {
+        const initAudio = async () => {
+          if (!audioContext) {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') {
+              await ctx.resume();
+            }
+            setAudioContext(ctx);
+          }
+        };
+        initAudio();
+      } catch (error) {
+        console.log('Audio initialization failed:', error);
+      }
+
+      // Start first video automatically after a short delay
+      const timer = setTimeout(() => {
+        startVideoPlayback(true);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showModal, autoPlay]);
+
+  // Auto-play when step changes (if auto-play is enabled)
+  React.useEffect(() => {
+    if (showModal && autoPlay && !isPlaying) {
+      const timer = setTimeout(() => {
+        startVideoPlayback(true);
+      }, 800);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentStep]);
+
   const currentTutorial = tutorialSteps[currentStep];
 
   return (

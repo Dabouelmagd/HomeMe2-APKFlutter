@@ -2728,6 +2728,12 @@ const resources = {
       'compound_logo': 'شعار المجمع',
       'add_new_admin': 'إضافة مدير جديد',
       'create_admin_account_for_compound': 'إنشاء حساب مدير جديد لمجمعك',
+      'step_2_family_head_details': 'الخطوة 2: تفاصيل رب الأسرة',
+      'enter_complete_information_primary_resident': 'أدخل المعلومات الكاملة للمقيم الأساسي',
+      'step_3_family_members': 'الخطوة 3: أفراد الأسرة',
+      'add_all_family_members_complete_info': 'أضف جميع أفراد الأسرة مع معلوماتهم الكاملة',
+      'step_4_review_confirm': 'الخطوة 4: مراجعة وتأكيد',
+      'review_all_info_before_creating': 'راجع جميع المعلومات قبل إنشاء السكن والعائلة',
       'upload_logo': 'تحميل الشعار',
       
       // Residence Management

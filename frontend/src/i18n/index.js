@@ -4015,6 +4015,9 @@ const resources = {
       'compound_id': 'ID du Complexe',
       'created': 'Créé',
       'click_to_upload_logo': 'Cliquez pour télécharger le logo',
+      'compound_logo': 'Logo du Complexe',
+      'add_new_admin': 'Ajouter un Nouvel Administrateur',
+      'create_admin_account_for_compound': 'Créer un nouveau compte administrateur pour votre complexe',
       'upload_logo': 'Télécharger le Logo',
       
       // Residence Management

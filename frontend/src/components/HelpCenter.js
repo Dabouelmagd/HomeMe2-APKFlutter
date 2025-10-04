@@ -7,7 +7,11 @@ import {
   BookOpenIcon,
   VideoCameraIcon,
   PhoneIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  MagnifyingGlassIcon,
+  SparklesIcon,
+  ClockIcon,
+  FireIcon
 } from '@heroicons/react/24/outline';
 
 const HelpCenter = () => {

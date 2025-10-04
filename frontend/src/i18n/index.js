@@ -1289,6 +1289,12 @@ const resources = {
       'compound_logo': 'Compound Logo',
       'add_new_admin': 'Add New Admin',
       'create_admin_account_for_compound': 'Create a new administrator account for your compound',
+      'step_2_family_head_details': 'Step 2: Family Head Details',
+      'enter_complete_information_primary_resident': 'Enter complete information for the primary resident',
+      'step_3_family_members': 'Step 3: Family Members',
+      'add_all_family_members_complete_info': 'Add all family members with their complete information',
+      'step_4_review_confirm': 'Step 4: Review & Confirm',
+      'review_all_info_before_creating': 'Review all information before creating the residence and family',
       'upload_logo': 'Upload Logo',
       
       // Residence Management

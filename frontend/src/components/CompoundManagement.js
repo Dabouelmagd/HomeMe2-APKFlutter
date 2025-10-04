@@ -3137,7 +3137,7 @@ const CompoundManagement = () => {
                     className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-200 transition-all duration-300"
                   >
                     <XCircleIcon className="h-4 w-4" />
-                    <span>إلغاء</span>
+                    <span>{t('cancel')}</span>
                   </button>
                 </div>
               </div>

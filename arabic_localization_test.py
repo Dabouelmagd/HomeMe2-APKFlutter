@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 # Configuration - Using the production URL
-BASE_URL = "https://compound-ui-refresh.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-help.preview.emergentagent.com/api"
 
 class ArabicLocalizationTestSuite:
     def __init__(self):

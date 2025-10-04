@@ -19,7 +19,7 @@ from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional
 
 # Configuration
-BASE_URL = "https://compound-ui-refresh.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-help.preview.emergentagent.com/api"
 
 class ContactUsBackendTestSuite:
     def __init__(self):

@@ -13,6 +13,8 @@ import {
 const HelpCenter = () => {
   const { t } = useTranslation();
   const [expandedSection, setExpandedSection] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredSections, setFilteredSections] = useState([]);
 
   const helpSections = [
     {

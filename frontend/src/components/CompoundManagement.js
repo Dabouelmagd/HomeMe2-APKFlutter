@@ -2692,7 +2692,7 @@ const CompoundManagement = () => {
                           <div>
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <HomeIcon className="h-4 w-4 text-blue-500" />
-                              <span>رقم الوحدة *</span>
+                              <span>{t('unit_number')} *</span>
                             </label>
                             <div className="relative">
                               <input

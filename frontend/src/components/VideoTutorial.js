@@ -12,6 +12,47 @@ import {
   ArrowsPointingInIcon
 } from '@heroicons/react/24/outline';
 
+// Add CSS for volume slider
+const sliderCSS = `
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  
+  .slider::-webkit-slider-track {
+    background: rgba(255, 255, 255, 0.3);
+    height: 4px;
+    border-radius: 2px;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #ffffff;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .slider::-moz-range-track {
+    background: rgba(255, 255, 255, 0.3);
+    height: 4px;
+    border-radius: 2px;
+  }
+  
+  .slider::-moz-range-thumb {
+    background: #ffffff;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+  }
+`;
+
 const VideoTutorial = () => {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);

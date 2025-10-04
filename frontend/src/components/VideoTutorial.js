@@ -206,22 +206,23 @@ const VideoTutorial = () => {
           gainNode.gain.setValueAtTime(baseVolume * 0.8, audioContext.currentTime);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
           break;
-      case 'complete':
-        // Success sound (3 ascending tones)
-        [800, 1000, 1200].forEach((freq, index) => {
-          const osc = audioContext.createOscillator();
-          const gain = audioContext.createGain();
-          osc.connect(gain);
-          gain.connect(audioContext.destination);
-          
-          osc.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.1);
-          gain.gain.setValueAtTime(volume / 400, audioContext.currentTime + index * 0.1);
-          gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.1 + 0.15);
-          
-          osc.start(audioContext.currentTime + index * 0.1);
-          osc.stop(audioContext.currentTime + index * 0.1 + 0.15);
-        });
-        return; // Skip the default oscillator
+        case 'complete':
+          // Success sound (3 ascending tones) with better volume control
+          [800, 1000, 1200].forEach((freq, index) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.12);
+            gain.gain.setValueAtTime(baseVolume * 0.7, audioContext.currentTime + index * 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.12 + 0.2);
+            
+            osc.start(audioContext.currentTime + index * 0.12);
+            osc.stop(audioContext.currentTime + index * 0.12 + 0.2);
+          });
+          setTimeout(() => resolve(), 600);
+          return; // Skip the default oscillator
       case 'progress':
         oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
         gainNode.gain.setValueAtTime(volume / 500, audioContext.currentTime);

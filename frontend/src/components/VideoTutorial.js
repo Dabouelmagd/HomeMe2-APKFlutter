@@ -288,23 +288,47 @@ const VideoTutorial = () => {
                 </div>
               )}
 
-              {/* Video Controls */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">
+              {/* Enhanced Video Controls */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black to-transparent p-4">
+                {/* Progress Bar */}
+                <div className="w-full bg-white bg-opacity-20 rounded-full h-1 mb-4">
+                  <div 
+                    className="bg-blue-500 h-1 rounded-full transition-all duration-300" 
+                    style={{width: `${videoProgress}%`}}
+                  ></div>
+                </div>
+                
                 <div className="flex items-center justify-between text-white">
-                  <button
-                    onClick={togglePlay}
-                    className="flex items-center space-x-2 bg-white bg-opacity-20 hover:bg-opacity-30 px-4 py-2 rounded-lg"
-                  >
-                    {isPlaying ? (
-                      <PauseCircleIcon className="h-6 w-6" />
-                    ) : (
-                      <PlayCircleIcon className="h-6 w-6" />
-                    )}
-                    <span>{isPlaying ? t('pause') : t('play')}</span>
-                  </button>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={togglePlay}
+                      className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-semibold transition-colors"
+                    >
+                      {isPlaying ? (
+                        <PauseCircleIcon className="h-5 w-5" />
+                      ) : (
+                        <PlayCircleIcon className="h-5 w-5" />
+                      )}
+                      <span className="text-sm">{isPlaying ? t('pause') : t('play')}</span>
+                    </button>
+                    
+                    <div className="flex items-center space-x-2 text-xs">
+                      <span className="bg-white bg-opacity-20 px-2 py-1 rounded">
+                        {Math.round(videoProgress)}%
+                      </span>
+                    </div>
+                  </div>
                   
-                  <div className="text-sm">
-                    {currentTutorial.duration}
+                  <div className="flex items-center space-x-3 text-sm">
+                    <button
+                      onClick={() => setAutoPlay(!autoPlay)}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                        autoPlay ? 'bg-green-600 text-white' : 'bg-white bg-opacity-20 text-white'
+                      }`}
+                    >
+                      🔄 {autoPlay ? 'تشغيل تلقائي' : 'تشغيل يدوي'}
+                    </button>
+                    <span className="text-blue-200">{currentTutorial.duration}</span>
                   </div>
                 </div>
               </div>

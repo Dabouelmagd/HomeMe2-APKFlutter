@@ -1776,8 +1776,8 @@ const CompoundManagement = () => {
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">🛡️ إضافة مدير جديد</h3>
-              <p className="text-gray-600">إنشاء حساب مدير جديد لمجمعك</p>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">🛡️ {t('add_new_admin')}</h3>
+              <p className="text-gray-600">{t('create_admin_account_for_compound')}</p>
             </div>
 
             <form onSubmit={handleCreateAdmin} className="space-y-6">

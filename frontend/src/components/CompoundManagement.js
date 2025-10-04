@@ -1162,7 +1162,7 @@ const CompoundManagement = () => {
                     <p className="text-lg font-semibold text-center text-gray-900 text-center">{compound?.id}</p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-500">تاريخ الإنشاء</p>
+                    <p className="text-sm font-medium text-gray-500">{t('created')}</p>
                     <p className="text-lg font-semibold text-center text-gray-900 text-center">
                       {compound?.created_at ? formatDate(compound.created_at) : 'N/A'}
                     </p>

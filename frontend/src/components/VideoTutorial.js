@@ -13,6 +13,8 @@ const VideoTutorial = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(false);
 
   const tutorialSteps = [
     {

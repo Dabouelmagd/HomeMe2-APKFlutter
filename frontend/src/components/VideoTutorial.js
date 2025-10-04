@@ -338,9 +338,9 @@ const VideoTutorial = () => {
           }
           return 100;
         }
-        return prev + 2; // Faster progress for better user experience
+        return prev + 0.5; // Slower progress - more realistic video speed
       });
-    }, 100); // Faster updates for smoother animation
+    }, 150); // Slower updates for more natural video pace
     
     return interval;
   };

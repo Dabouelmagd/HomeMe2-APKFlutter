@@ -519,11 +519,27 @@ const VideoTutorial = () => {
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-600 mb-4">{t('tutorial_benefits')}</p>
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4">
+            <p className="text-gray-700 font-semibold mb-2">🎥 تجربة فيديو محسنة</p>
+            <div className="text-sm text-gray-600 grid grid-cols-1 md:grid-cols-3 gap-2">
+              <div className="flex items-center justify-center space-x-2">
+                <span>🔊</span>
+                <span>صوت واضح وتفاعلي</span>
+              </div>
+              <div className="flex items-center justify-center space-x-2">
+                <span>🎬</span>
+                <span>فيديو بحجم كبير</span>
+              </div>
+              <div className="flex items-center justify-center space-x-2">
+                <span>⚡</span>
+                <span>سرعة قابلة للتحكم</span>
+              </div>
+            </div>
+          </div>
           <div className="flex flex-wrap justify-center gap-2">
             <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">✓ {t('step_by_step')}</span>
             <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">✓ {t('interactive')}</span>
-            <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">✓ {t('multilingual')}</span>
+            <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">✓ ملء الشاشة</span>
             <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">✓ {t('practical_tips')}</span>
           </div>
         </div>

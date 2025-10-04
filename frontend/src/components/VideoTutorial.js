@@ -20,12 +20,21 @@ const VideoTutorial = () => {
     {
       id: 1,
       title: 'تسجيل الدخول',
-      titleEn: 'Login Process',
+      titleEn: 'Login Process', 
       description: 'ابدأ بإدخال اسم المستخدم وكلمة المرور للوصول إلى النظام',
       descriptionEn: 'Start by entering your username and password to access the system',
       image: '/tutorial_images/step1_login.png',
       duration: '30 ثانية',
-      tips: ['استخدم بيانات اعتماد صحيحة', 'تأكد من اختيار اللغة المناسبة']
+      tips: ['استخدم بيانات اعتماد صحيحة', 'تأكد من اختيار اللغة المناسبة'],
+      videoContent: {
+        actions: [
+          '1️⃣ افتح صفحة تسجيل الدخول',
+          '2️⃣ أدخل اسم المستخدم: admin',
+          '3️⃣ أدخل كلمة المرور: admin123',
+          '4️⃣ اضغط على زر "تسجيل الدخول"'
+        ],
+        highlights: ['تأكد من صحة البيانات', 'انتظر حتى يتم التحقق']
+      }
     },
     {
       id: 2,

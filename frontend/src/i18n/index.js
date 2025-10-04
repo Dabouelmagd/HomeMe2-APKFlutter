@@ -1295,6 +1295,8 @@ const resources = {
       'add_all_family_members_complete_info': 'Add all family members with their complete information',
       'step_4_review_confirm': 'Step 4: Review & Confirm',
       'review_all_info_before_creating': 'Review all information before creating the residence and family',
+      'step': 'Step',
+      'previous_step': 'Previous Step',
       'upload_logo': 'Upload Logo',
       
       // Residence Management

@@ -3019,8 +3019,8 @@ const CompoundManagement = () => {
                   {familyCreationStep === 4 && (
                     <div className="space-y-6">
                       <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-                        <h4 className="font-medium text-indigo-900 mb-2">الخطوة 4: مراجعة وتأكيد</h4>
-                        <p className="text-sm text-indigo-700">راجع جميع المعلومات قبل إنشاء السكن والعائلة</p>
+                        <h4 className="font-medium text-indigo-900 mb-2">{t('step_4_review_confirm')}</h4>
+                        <p className="text-sm text-indigo-700">{t('review_all_info_before_creating')}</p>
                       </div>
 
                       {/* Unit Info */}

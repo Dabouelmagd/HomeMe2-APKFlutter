@@ -2422,10 +2422,10 @@ const CompoundManagement = () => {
                           </div>
                           <div className="ml-3">
                             <h4 className="text-sm font-medium text-green-800">
-                              Direct Residence Creation
+                              إنشاء إقامة مباشر
                             </h4>
                             <p className="text-sm text-green-700 mt-1">
-                              This will create a new residence and the resident account immediately. The resident will be able to log in with their email and a temporary password will be generated.
+                              سيتم إنشاء إقامة جديدة وحساب المقيم فوراً. سيتمكن المقيم من تسجيل الدخول بإيميله وسيتم إنتاج كلمة مرور مؤقتة.
                             </p>
                           </div>
                         </div>

@@ -344,11 +344,11 @@ const VideoTutorial = () => {
           if (autoPlay && currentStep < tutorialSteps.length - 1) {
             setTimeout(() => {
               setCurrentStep(prev => prev + 1);
-              // Automatically start next video after 1.5 seconds
+              // Automatically start next video after 2 seconds for better user experience
               setTimeout(() => {
                 startVideoPlayback(true);
-              }, 500);
-            }, 1500);
+              }, 1000);
+            }, 2000);
           }
           return 100;
         }

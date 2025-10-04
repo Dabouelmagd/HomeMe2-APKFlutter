@@ -217,7 +217,8 @@ const HelpCenter = () => {
                 </div>
               )}
             </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

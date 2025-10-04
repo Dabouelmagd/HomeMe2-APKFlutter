@@ -1297,6 +1297,10 @@ const resources = {
       'review_all_info_before_creating': 'Review all information before creating the residence and family',
       'step': 'Step',
       'previous_step': 'Previous Step',
+      'create_new_admin_account': 'Create New Admin Account',
+      'admin_account_creation': 'Admin Account Creation',
+      'create_admin_account_description': 'This will create a new administrator account with full management privileges for your compound.',
+      'create_admin': 'Create Admin',
       'upload_logo': 'Upload Logo',
       
       // Residence Management

@@ -4030,6 +4030,12 @@ const resources = {
       'compound_logo': 'Logo du Complexe',
       'add_new_admin': 'Ajouter un Nouvel Administrateur',
       'create_admin_account_for_compound': 'Créer un nouveau compte administrateur pour votre complexe',
+      'step_2_family_head_details': 'Étape 2: Détails du Chef de Famille',
+      'enter_complete_information_primary_resident': 'Entrez les informations complètes pour le résident principal',
+      'step_3_family_members': 'Étape 3: Membres de la Famille',
+      'add_all_family_members_complete_info': 'Ajoutez tous les membres de la famille avec leurs informations complètes',
+      'step_4_review_confirm': 'Étape 4: Révision et Confirmation',
+      'review_all_info_before_creating': 'Révisez toutes les informations avant de créer la résidence et la famille',
       'upload_logo': 'Télécharger le Logo',
       
       // Residence Management

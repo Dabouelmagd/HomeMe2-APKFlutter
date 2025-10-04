@@ -277,9 +277,19 @@ const VideoTutorial = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 animate-pulse">
                   <div className="absolute inset-0 flex items-center justify-center text-white">
                     <div className="text-center">
-                      <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                      <p className="text-xl font-semibold mb-2">🎬 {currentTutorial.title}</p>
-                      <p className="text-blue-200">جاري تشغيل الفيديو التعليمي...</p>
+                      <div className="w-24 h-24 border-6 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+                      <p className="text-3xl font-bold mb-4">🎬 {currentTutorial.title}</p>
+                      <p className="text-xl text-blue-200 font-semibold">جاري تشغيل الفيديو التعليمي...</p>
+                      
+                      {/* Large Visual Elements */}
+                      <div className="mt-8 grid grid-cols-2 gap-4 max-w-md mx-auto">
+                        <div className="aspect-square bg-white bg-opacity-20 rounded-2xl flex items-center justify-center animate-pulse">
+                          <span className="text-4xl">📱</span>
+                        </div>
+                        <div className="aspect-square bg-white bg-opacity-15 rounded-2xl flex items-center justify-center animate-pulse delay-150">
+                          <span className="text-4xl">💻</span>
+                        </div>
+                      </div>
                       
                       {/* Realistic progress bar */}
                       <div className="w-64 bg-white bg-opacity-20 rounded-full h-2 mx-auto mt-4">

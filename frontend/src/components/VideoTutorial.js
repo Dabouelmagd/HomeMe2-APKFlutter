@@ -170,14 +170,70 @@ const VideoTutorial = () => {
             </div>
 
             {/* Video/Image Area */}
-            <div className="aspect-video bg-gray-900 relative">
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600">
-                <div className="text-center text-white">
-                  <PlayCircleIcon className="h-20 w-20 mx-auto mb-4 opacity-80" />
-                  <p className="text-xl font-semibold mb-2">{currentTutorial.title}</p>
-                  <p className="text-purple-200">{t('video_simulation')}</p>
+            <div className="aspect-video bg-gray-900 relative overflow-hidden">
+              {isPlaying ? (
+                // Active Video Simulation
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 animate-pulse">
+                  <div className="absolute inset-0 flex items-center justify-center text-white">
+                    <div className="text-center">
+                      <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                      <p className="text-xl font-semibold mb-2">🎬 {currentTutorial.title}</p>
+                      <p className="text-blue-200">جاري تشغيل الفيديو التعليمي...</p>
+                      
+                      {/* Simulated progress bar */}
+                      <div className="w-64 bg-white bg-opacity-20 rounded-full h-2 mx-auto mt-4">
+                        <div className="bg-white h-2 rounded-full animate-pulse" style={{width: '45%'}}></div>
+                      </div>
+                      
+                      {/* Tutorial Content Preview */}
+                      <div className="mt-6 text-sm text-blue-100 max-w-md">
+                        <p className="mb-2">📝 {currentTutorial.description}</p>
+                        <div className="flex justify-center space-x-4 text-xs">
+                          <span>⏱️ {currentTutorial.duration}</span>
+                          <span>📊 خطوة {currentStep + 1} من {tutorialSteps.length}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Animated overlay effects */}
+                  <div className="absolute top-0 left-0 w-full h-full">
+                    <div className="absolute top-4 left-4 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <div className="absolute top-4 right-4 text-white text-sm">🔴 LIVE</div>
+                    <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
+                      <div className="flex space-x-2">
+                        {[1,2,3].map(i => (
+                          <div key={i} className="w-2 h-8 bg-white bg-opacity-60 animate-bounce" style={{animationDelay: `${i * 0.1}s`}}></div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                // Paused State
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600">
+                  <div className="text-center text-white">
+                    <div className="relative">
+                      <PlayCircleIcon className="h-20 w-20 mx-auto mb-4 opacity-80 hover:opacity-100 cursor-pointer transition-opacity" 
+                                     onClick={togglePlay} />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-6 h-6 bg-white rounded-full animate-ping opacity-20"></div>
+                      </div>
+                    </div>
+                    <p className="text-xl font-semibold mb-2">{currentTutorial.title}</p>
+                    <p className="text-purple-200">اضغط للتشغيل - فيديو تعليمي تفاعلي</p>
+                    
+                    {/* Preview thumbnails */}
+                    <div className="mt-6 grid grid-cols-3 gap-2 max-w-sm mx-auto">
+                      {[1,2,3].map(i => (
+                        <div key={i} className="aspect-video bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                          <span className="text-xs">📱</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Video Controls */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6">

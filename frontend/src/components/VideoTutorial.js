@@ -107,16 +107,64 @@ const VideoTutorial = () => {
     }
   };
 
+  // Audio simulation function
+  const playAudioFeedback = (type = 'play') => {
+    if (isMuted) return;
+    
+    try {
+      // Create audio context for sound effects
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Different sounds for different actions
+      switch(type) {
+        case 'play':
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 0.1);
+          break;
+        case 'pause':
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          break;
+        case 'complete':
+          oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+          break;
+        default:
+          oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
+      }
+      
+      gainNode.gain.setValueAtTime(volume / 300, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (error) {
+      console.log('Audio not supported');
+    }
+  };
+
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
+    playAudioFeedback(isPlaying ? 'pause' : 'play');
+    
     if (!isPlaying) {
-      // Start progress simulation
+      // Start progress simulation with audio cues
       setVideoProgress(0);
       const interval = setInterval(() => {
         setVideoProgress(prev => {
+          // Audio cue every 25%
+          if (prev % 25 === 0 && prev > 0) {
+            playAudioFeedback('progress');
+          }
+          
           if (prev >= 100) {
             clearInterval(interval);
             setIsPlaying(false);
+            playAudioFeedback('complete');
+            
             // Auto advance to next step when video completes
             if (autoPlay && currentStep < tutorialSteps.length - 1) {
               setTimeout(() => {
@@ -126,10 +174,20 @@ const VideoTutorial = () => {
             }
             return 100;
           }
-          return prev + 2; // Increase by 2% every 100ms
+          return prev + 1; // Slower progress for better experience
         });
-      }, 100);
+      }, 150); // Slightly slower for better audio sync
     }
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    playAudioFeedback('click');
+  };
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    playAudioFeedback('click');
   };
 
   const currentTutorial = tutorialSteps[currentStep];

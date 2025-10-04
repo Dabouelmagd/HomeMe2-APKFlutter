@@ -212,17 +212,38 @@ const VideoTutorial = () => {
                       <p className="text-xl font-semibold mb-2">🎬 {currentTutorial.title}</p>
                       <p className="text-blue-200">جاري تشغيل الفيديو التعليمي...</p>
                       
-                      {/* Simulated progress bar */}
+                      {/* Realistic progress bar */}
                       <div className="w-64 bg-white bg-opacity-20 rounded-full h-2 mx-auto mt-4">
-                        <div className="bg-white h-2 rounded-full animate-pulse" style={{width: '45%'}}></div>
+                        <div 
+                          className="bg-white h-2 rounded-full transition-all duration-300" 
+                          style={{width: `${videoProgress}%`}}
+                        ></div>
                       </div>
                       
-                      {/* Tutorial Content Preview */}
+                      {/* Live Tutorial Actions */}
                       <div className="mt-6 text-sm text-blue-100 max-w-md">
-                        <p className="mb-2">📝 {currentTutorial.description}</p>
+                        <p className="mb-3">📝 {currentTutorial.description}</p>
+                        
+                        {/* Current actions being demonstrated */}
+                        {currentTutorial.videoContent && (
+                          <div className="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
+                            <p className="font-semibold mb-2">🎬 الإجراءات الحالية:</p>
+                            <div className="space-y-1">
+                              {currentTutorial.videoContent.actions.map((action, index) => (
+                                <div key={index} className={`text-xs ${
+                                  videoProgress > (index * 25) ? 'text-green-300' : 'text-white opacity-60'
+                                }`}>
+                                  {videoProgress > (index * 25) && '✅ '}{action}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
                         <div className="flex justify-center space-x-4 text-xs">
                           <span>⏱️ {currentTutorial.duration}</span>
                           <span>📊 خطوة {currentStep + 1} من {tutorialSteps.length}</span>
+                          <span>🎯 {Math.round(videoProgress)}%</span>
                         </div>
                       </div>
                     </div>

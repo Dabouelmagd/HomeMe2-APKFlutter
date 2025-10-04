@@ -1286,6 +1286,9 @@ const resources = {
       'compound_id': 'Compound ID',
       'created': 'Created',
       'click_to_upload_logo': 'Click to upload logo',
+      'compound_logo': 'Compound Logo',
+      'add_new_admin': 'Add New Admin',
+      'create_admin_account_for_compound': 'Create a new administrator account for your compound',
       'upload_logo': 'Upload Logo',
       
       // Residence Management

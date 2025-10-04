@@ -273,7 +273,7 @@ metadata:
 
 test_plan:
   current_focus: 
-    - "HomeMe Frontend Comprehensive Testing - Icon Updates and Arabic Interface"
+    - "Enhanced Tutorial Video System Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

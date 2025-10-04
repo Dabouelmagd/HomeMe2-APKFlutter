@@ -544,7 +544,7 @@ const VideoTutorial = () => {
                         <p className="mb-3">📝 {currentTutorial.description}</p>
                         
                         {/* Current actions being demonstrated */}
-                        {currentTutorial.videoContent && (
+                        {currentTutorial?.videoContent?.actions && (
                           <div className="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
                             <p className="font-semibold mb-2">🎬 الإجراءات الحالية:</p>
                             <div className="space-y-1">

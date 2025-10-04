@@ -373,9 +373,28 @@ const VideoTutorial = () => {
     playAudioFeedback('click');
   };
 
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
+  const toggleFullscreen = async () => {
+    const newFullscreenState = !isFullscreen;
+    setIsFullscreen(newFullscreenState);
     playAudioFeedback('click');
+    
+    // Also try native fullscreen API for better experience
+    try {
+      const modalElement = document.querySelector('.video-tutorial-modal');
+      if (newFullscreenState) {
+        if (modalElement && modalElement.requestFullscreen) {
+          await modalElement.requestFullscreen();
+        } else if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } else {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen();
+        }
+      }
+    } catch (error) {
+      console.log('Native fullscreen not available, using CSS fullscreen');
+    }
   };
 
   // Auto-play when modal opens

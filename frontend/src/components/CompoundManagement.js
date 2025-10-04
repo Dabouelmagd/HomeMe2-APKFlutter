@@ -2701,7 +2701,7 @@ const CompoundManagement = () => {
                                 value={comprehensiveFamilyForm.unit_number}
                                 onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, unit_number: e.target.value }))}
                                 className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 pl-4 pr-4 py-3 text-lg"
-                                placeholder="مثال: أ-101، فيلا-205"
+                                placeholder={t('unit_number_example')}
                               />
                               <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
                                 <IdentificationIcon className="h-5 w-5 text-gray-400" />

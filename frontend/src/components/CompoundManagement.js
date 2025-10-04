@@ -2488,7 +2488,7 @@ const CompoundManagement = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Full Name *
+                          {t('full_name')} *
                         </label>
                         <input
                           type="text"

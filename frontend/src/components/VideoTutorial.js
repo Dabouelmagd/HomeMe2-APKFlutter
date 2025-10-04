@@ -306,37 +306,51 @@ const VideoTutorial = () => {
     }, 1000);
   };
 
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-    playAudioFeedback(isPlaying ? 'pause' : 'play');
-    
-    if (!isPlaying) {
-      // Start progress simulation with audio cues
+  const startVideoPlayback = (resetProgress = true) => {
+    if (resetProgress) {
       setVideoProgress(0);
-      const interval = setInterval(() => {
-        setVideoProgress(prev => {
-          // Audio cue every 25%
-          if (prev % 25 === 0 && prev > 0) {
-            playAudioFeedback('progress');
-          }
+    }
+    setIsPlaying(true);
+    playAudioFeedback('play');
+    
+    // Start progress simulation with enhanced audio cues
+    const interval = setInterval(() => {
+      setVideoProgress(prev => {
+        // Audio cue every 20% with different tones
+        if (prev > 0 && prev % 20 === 0 && prev !== 100) {
+          playAudioFeedback('progress');
+        }
+        
+        if (prev >= 100) {
+          clearInterval(interval);
+          setIsPlaying(false);
+          playAudioFeedback('complete');
           
-          if (prev >= 100) {
-            clearInterval(interval);
-            setIsPlaying(false);
-            playAudioFeedback('complete');
-            
-            // Auto advance to next step when video completes
-            if (autoPlay && currentStep < tutorialSteps.length - 1) {
+          // Auto advance to next step when video completes
+          if (autoPlay && currentStep < tutorialSteps.length - 1) {
+            setTimeout(() => {
+              setCurrentStep(prev => prev + 1);
+              // Automatically start next video after 1.5 seconds
               setTimeout(() => {
-                setCurrentStep(currentStep + 1);
-                setIsPlaying(true);
-              }, 1000);
-            }
-            return 100;
+                startVideoPlayback(true);
+              }, 500);
+            }, 1500);
           }
-          return prev + 1; // Slower progress for better experience
-        });
-      }, 150); // Slightly slower for better audio sync
+          return 100;
+        }
+        return prev + 2; // Faster progress for better user experience
+      });
+    }, 100); // Faster updates for smoother animation
+    
+    return interval;
+  };
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      setIsPlaying(false);
+      playAudioFeedback('pause');
+    } else {
+      startVideoPlayback(false); // Don't reset progress when resuming
     }
   };
 

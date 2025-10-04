@@ -401,38 +401,61 @@ const Layout = ({ children }) => {
 
         <nav className="mt-6 px-3 pb-8 overflow-y-auto">
           <div className="space-y-6">
-            {navigationSections.map((section) => {
+            {navigationSections.map((section, sectionIndex) => {
               const visibleItems = section.items.filter(item => item.show);
               if (visibleItems.length === 0) return null;
               
+              // Define section colors
+              const sectionColors = [
+                'bg-blue-50 border-blue-200 text-blue-700',
+                'bg-green-50 border-green-200 text-green-700',
+                'bg-purple-50 border-purple-200 text-purple-700',
+                'bg-orange-50 border-orange-200 text-orange-700',
+                'bg-pink-50 border-pink-200 text-pink-700',
+                'bg-indigo-50 border-indigo-200 text-indigo-700',
+                'bg-red-50 border-red-200 text-red-700',
+                'bg-emerald-50 border-emerald-200 text-emerald-700'
+              ];
+              
               return (
                 <div key={section.title}>
-                  <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                    {section.title}
-                  </h3>
+                  <div className={`px-3 py-2 rounded-lg border ${sectionColors[sectionIndex]} mb-3`}>
+                    <h3 className="text-xs font-semibold uppercase tracking-wider flex items-center">
+                      <div className="w-2 h-2 rounded-full bg-current mr-2"></div>
+                      {section.title}
+                      <span className="ml-auto text-xs font-normal bg-white bg-opacity-50 px-2 py-1 rounded-full">
+                        {visibleItems.length}
+                      </span>
+                    </h3>
+                  </div>
                   <div className="space-y-1">
                     {visibleItems.map((item) => (
                       <Link
                         key={item.name}
                         to={item.href}
                         className={`
-                          group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200
+                          group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm
                           ${isActive(item.href)
-                            ? `bg-blue-50 text-blue-700 ${isRTL ? 'border-l-2 border-blue-700' : 'border-r-2 border-blue-700'}`
-                            : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                            ? `bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm ${isRTL ? 'border-l-3 border-blue-500' : 'border-r-3 border-blue-500'}`
+                            : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 hover:text-gray-900'
                           }
                         `}
                         onClick={() => setSidebarOpen(false)}
                       >
                         <item.icon
-                          className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 ${
-                            isActive(item.href) ? 'text-blue-700' : 'text-gray-500 group-hover:text-gray-700'
+                          className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 transition-colors duration-200 ${
+                            isActive(item.href) ? 'text-blue-600' : 'text-gray-500 group-hover:text-blue-600'
                           }`}
                         />
-                        {item.name}
+                        <span className="flex-1">{item.name}</span>
                         {item.name === t('notifications_nav') && unreadCount > 0 && (
-                          <span className={`${isRTL ? 'mr-auto' : 'ml-auto'} bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center`}>
+                          <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                             {unreadCount > 99 ? '99+' : unreadCount}
+                          </span>
+                        )}
+                        {item.name === t('help_center') && (
+                          <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                            {t('new')}
                           </span>
                         )}
                       </Link>

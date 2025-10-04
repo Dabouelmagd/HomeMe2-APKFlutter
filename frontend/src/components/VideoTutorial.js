@@ -744,13 +744,22 @@ const VideoTutorial = () => {
                     </button>
                     
                     <button
-                      onClick={() => setAutoPlay(!autoPlay)}
+                      onClick={() => {
+                        setAutoPlay(!autoPlay);
+                        playAudioFeedback('click');
+                      }}
                       className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                         autoPlay ? 'bg-green-600 text-white' : 'bg-white bg-opacity-20 text-white'
                       }`}
+                      title={autoPlay ? 'إيقاف التشغيل التلقائي' : 'تفعيل التشغيل التلقائي'}
                     >
-                      🔄 {autoPlay ? 'تلقائي' : 'يدوي'}
+                      🔄 {autoPlay ? 'تلقائي مفعل' : 'يدوي'}
                     </button>
+                    
+                    <div className="flex items-center space-x-2 bg-white bg-opacity-20 px-3 py-1 rounded-lg">
+                      <span className="text-xs">⚡</span>
+                      <span className="text-xs font-medium">سرعة طبيعية</span>
+                    </div>
                     
                     <span className="text-blue-200 font-semibold">{currentTutorial.duration}</span>
                   </div>

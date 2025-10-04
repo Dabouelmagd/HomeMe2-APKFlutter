@@ -2742,6 +2742,10 @@ const resources = {
       'review_all_info_before_creating': 'راجع جميع المعلومات قبل إنشاء السكن والعائلة',
       'step': 'الخطوة',
       'previous_step': 'الخطوة السابقة',
+      'create_new_admin_account': 'إنشاء حساب مدير جديد',
+      'admin_account_creation': 'إنشاء حساب المدير',
+      'create_admin_account_description': 'سيتم إنشاء حساب مدير جديد بصلاحيات إدارة كاملة لمجمعك.',
+      'create_admin': 'إنشاء مدير',
       'upload_logo': 'تحميل الشعار',
       
       // Residence Management

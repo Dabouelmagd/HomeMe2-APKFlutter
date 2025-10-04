@@ -5,7 +5,11 @@ import {
   PauseCircleIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  XMarkIcon
+  XMarkIcon,
+  SpeakerWaveIcon,
+  SpeakerXMarkIcon,
+  ArrowsPointingOutIcon,
+  ArrowsPointingInIcon
 } from '@heroicons/react/24/outline';
 
 const VideoTutorial = () => {

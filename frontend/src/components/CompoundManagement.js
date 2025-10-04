@@ -2396,7 +2396,7 @@ const CompoundManagement = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Profile Picture
+                          {t('profile_picture')}
                         </label>
                         <input
                           type="file"
@@ -2543,7 +2543,7 @@ const CompoundManagement = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Profile Picture
+                          {t('profile_picture')}
                         </label>
                         <input
                           type="file"
@@ -2975,7 +2975,7 @@ const CompoundManagement = () => {
 
                           <div className="md:col-span-2">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Profile Picture
+                              {t('profile_picture')}
                             </label>
                             <input
                               type="file"

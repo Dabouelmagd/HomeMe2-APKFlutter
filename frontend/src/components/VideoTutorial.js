@@ -416,13 +416,30 @@ const VideoTutorial = () => {
             <h2 className="text-2xl font-bold mb-2">{t('video_tutorial')}</h2>
             <p className="text-purple-100">{t('interactive_guide_description')}</p>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2"
-          >
-            <PlayCircleIcon className="h-5 w-5" />
-            <span>{t('start_tutorial')}</span>
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => {
+                setShowModal(true);
+                // Try to enable audio immediately
+                playAudioFeedback('play');
+              }}
+              className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2"
+            >
+              <PlayCircleIcon className="h-5 w-5" />
+              <span>{t('start_tutorial')}</span>
+            </button>
+            
+            <button
+              onClick={() => {
+                setIsMuted(false);
+                playAudioFeedback('play');
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2"
+            >
+              <SpeakerWaveIcon className="h-5 w-5" />
+              <span className="text-sm">🔊 تفعيل الصوت</span>
+            </button>
+          </div>
         </div>
       </div>
 

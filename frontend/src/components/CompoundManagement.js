@@ -1834,7 +1834,7 @@ const CompoundManagement = () => {
                     value={adminForm.password}
                     onChange={(e) => setAdminForm(prev => ({ ...prev, password: e.target.value }))}
                     className="form-input w-full"
-                    placeholder="Enter password"
+                    placeholder={t('enter_password')}
                   />
                 </div>
 

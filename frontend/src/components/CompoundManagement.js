@@ -1840,7 +1840,7 @@ const CompoundManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    رقم الهاتف
+                    {t('phone_number')}
                   </label>
                   <input
                     type="tel"
@@ -2159,7 +2159,7 @@ const CompoundManagement = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          رقم الهاتف
+                          {t('phone_number')}
                         </label>
                         <input
                           type="tel"
@@ -2383,7 +2383,7 @@ const CompoundManagement = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          رقم الهاتف
+                          {t('phone_number')}
                         </label>
                         <input
                           type="tel"
@@ -2530,7 +2530,7 @@ const CompoundManagement = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          رقم الهاتف
+                          {t('phone_number')}
                         </label>
                         <input
                           type="tel"
@@ -2927,7 +2927,7 @@ const CompoundManagement = () => {
 
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              رقم الهاتف
+                              {t('phone_number')}
                             </label>
                             <input
                               type="tel"
@@ -3218,7 +3218,7 @@ const CompoundManagement = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        رقم الهاتف
+                        {t('phone_number')}
                       </label>
                       <input
                         type="tel"
@@ -3362,7 +3362,7 @@ const CompoundManagement = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        رقم الهاتف
+                        {t('phone_number')}
                       </label>
                       <input
                         type="tel"

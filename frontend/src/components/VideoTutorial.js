@@ -234,7 +234,9 @@ const VideoTutorial = () => {
   const currentTutorial = tutorialSteps[currentStep];
 
   return (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+    <>
+      <style dangerouslySetInnerHTML={{ __html: sliderCSS }} />
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6">
         <div className="flex items-center justify-between">

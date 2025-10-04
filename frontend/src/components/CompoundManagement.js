@@ -2620,10 +2620,10 @@ const CompoundManagement = () => {
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold" id="comprehensive-family-modal-title">
-                        إضافة عائلة مقيمة جديدة
+                        {t('add_new_resident_family')}
                       </h3>
                       <p className="text-blue-100 text-sm mt-1">
-                        إكمال عملية إعداد العائلة
+                        {t('complete_family_setup')}
                       </p>
                     </div>
                   </div>

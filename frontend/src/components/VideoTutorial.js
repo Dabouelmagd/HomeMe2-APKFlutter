@@ -223,21 +223,29 @@ const VideoTutorial = () => {
           });
           setTimeout(() => resolve(), 600);
           return; // Skip the default oscillator
-      case 'progress':
-        oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
-        gainNode.gain.setValueAtTime(volume / 500, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-        break;
-      default:
-        oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
-        gainNode.gain.setValueAtTime(volume / 400, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-    }
-    
-    if (type !== 'complete') {
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.4);
-    }
+        case 'progress':
+          oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
+          gainNode.gain.setValueAtTime(baseVolume * 0.5, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+          break;
+        case 'click':
+          oscillator.frequency.setValueAtTime(1500, audioContext.currentTime);
+          gainNode.gain.setValueAtTime(baseVolume * 0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+          break;
+        default:
+          oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
+          gainNode.gain.setValueAtTime(baseVolume * 0.6, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+      }
+      
+      if (type !== 'complete') {
+        oscillator.start(audioContext.currentTime);
+        const duration = type === 'progress' || type === 'click' ? 0.15 : 0.5;
+        oscillator.stop(audioContext.currentTime + duration);
+        setTimeout(() => resolve(), duration * 1000);
+      }
+    });
   };
 
   const playHTMLAudio = (type) => {

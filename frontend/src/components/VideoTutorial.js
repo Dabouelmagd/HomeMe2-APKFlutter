@@ -705,7 +705,7 @@ const VideoTutorial = () => {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3">{t('helpful_tips')}</h4>
                   <ul className="space-y-2">
-                    {currentTutorial.tips.map((tip, index) => (
+                    {currentTutorial?.tips?.map((tip, index) => (
                       <li key={index} className="flex items-start space-x-2">
                         <span className="text-blue-600 mt-1">•</span>
                         <span className="text-gray-700">{tip}</span>

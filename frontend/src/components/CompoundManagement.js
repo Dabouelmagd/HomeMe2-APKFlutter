@@ -1202,7 +1202,7 @@ const CompoundManagement = () => {
                 </div>
                 <div className="flex-shrink-0">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                    المدير الرئيسي
+                    {t('primary_admin')}
                   </span>
                 </div>
               </div>

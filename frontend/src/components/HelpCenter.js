@@ -144,6 +144,11 @@ const HelpCenter = () => {
         </div>
       </div>
 
+      {/* Video Tutorial Section */}
+      <div className="mb-12">
+        <VideoTutorial />
+      </div>
+
       {/* Quick Actions */}
       <div className="grid md:grid-cols-4 gap-6 mb-12">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">

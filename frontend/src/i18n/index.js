@@ -2736,6 +2736,8 @@ const resources = {
       'add_all_family_members_complete_info': 'أضف جميع أفراد الأسرة مع معلوماتهم الكاملة',
       'step_4_review_confirm': 'الخطوة 4: مراجعة وتأكيد',
       'review_all_info_before_creating': 'راجع جميع المعلومات قبل إنشاء السكن والعائلة',
+      'step': 'الخطوة',
+      'previous_step': 'الخطوة السابقة',
       'upload_logo': 'تحميل الشعار',
       
       // Residence Management

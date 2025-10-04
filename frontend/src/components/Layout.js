@@ -150,168 +150,215 @@ const Layout = ({ children }) => {
     navigate('/login');
   };
 
-  const navigation = [
+  // Organized navigation with sections
+  const navigationSections = [
     {
-      name: t('dashboard'),
-      href: '/dashboard',
-      icon: HomeIcon,
-      show: true
+      title: t('main_sections'),
+      items: [
+        {
+          name: t('dashboard'),
+          href: '/dashboard',
+          icon: HomeIcon,
+          show: true
+        },
+        {
+          name: t('compound_management'),
+          href: '/compound',
+          icon: BuildingOfficeIcon,
+          show: user?.role === 'admin'
+        }
+      ]
     },
     {
-      name: t('compound_management'),
-      href: '/compound',
-      icon: BuildingOfficeIcon,
-      show: true
+      title: t('services_maintenance'),
+      items: [
+        {
+          name: t('services_management'),
+          href: '/services',
+          icon: WrenchScrewdriverIcon,
+          show: true
+        },
+        {
+          name: t('maintenance_system'),
+          href: '/maintenance',
+          icon: CogIcon,
+          show: true
+        },
+        {
+          name: t('guest_management'),
+          href: '/guests',
+          icon: UsersIcon,
+          show: true
+        }
+      ]
     },
     {
-      name: t('services_management'),
-      href: '/services',
-      icon: WrenchScrewdriverIcon,
-      show: true
+      title: t('family_management_section'),
+      items: [
+        {
+          name: t('family_management'),
+          href: '/family',
+          icon: UsersIcon,
+          show: true
+        },
+        {
+          name: t('add_family_member'),
+          href: '/add-family-member',
+          icon: UserPlusIcon,
+          show: true
+        }
+      ]
     },
     {
-      name: t('maintenance_system'),
-      href: '/maintenance',
-      icon: CogIcon,
-      show: true
+      title: t('financial_services'),
+      items: [
+        {
+          name: t('financial_management'),
+          href: '/finances',
+          icon: CurrencyDollarIcon,
+          show: true
+        },
+        {
+          name: t('payment_center'),
+          href: '/payments',
+          icon: CreditCardIcon,
+          show: true
+        },
+        {
+          name: t('government_utility_gateway'),
+          href: '/utilities',
+          icon: BoltIcon,
+          show: true
+        },
+        {
+          name: t('pricing_plans'),
+          href: '/pricing',
+          icon: CurrencyDollarIcon,
+          show: true
+        }
+      ]
     },
     {
-      name: t('guest_management'),
-      href: '/guests',
-      icon: UsersIcon,
-      show: true
+      title: t('communication'),
+      items: [
+        {
+          name: t('message_center'),
+          href: '/messages',
+          icon: ChatBubbleLeftEllipsisIcon,
+          show: true
+        },
+        {
+          name: t('chat.chats'),
+          href: '/chat',
+          icon: ChatBubbleLeftEllipsisIcon,
+          show: true
+        },
+        {
+          name: t('notifications_nav'),
+          href: '/notifications',
+          icon: BellIcon,
+          show: true
+        },
+        {
+          name: t('events_announcements'),
+          href: '/events',
+          icon: SpeakerWaveIcon,
+          show: true
+        }
+      ]
     },
     {
-      name: t('events_announcements'),
-      href: '/events',
-      icon: SpeakerWaveIcon,
-      show: true
+      title: t('tools_resources'),
+      items: [
+        {
+          name: t('gallery.title'),
+          href: '/gallery',
+          icon: PhotoIcon,
+          show: true
+        },
+        {
+          name: t('document_management'),
+          href: '/documents',
+          icon: DocumentTextIcon,
+          show: true
+        },
+        {
+          name: t('voting_system'),
+          href: '/voting',
+          icon: HandRaisedIcon,
+          show: true
+        },
+        {
+          name: t('smart_home'),
+          href: '/smart-home',
+          icon: HomeModernIcon,
+          show: true
+        },
+        {
+          name: t('schedule.title'),
+          href: '/schedule',
+          icon: ClockIcon,
+          show: true
+        }
+      ]
     },
     {
-      name: t('payment_center'),
-      href: '/payments',
-      icon: CreditCardIcon,
-      show: true
+      title: t('admin_tools'),
+      items: [
+        {
+          name: t('advanced_analytics'),
+          href: '/analytics',
+          icon: ChartBarIcon,
+          show: user?.role === 'admin'
+        },
+        {
+          name: t('enterprise.dashboard'),
+          href: '/account-type-selection',
+          icon: BuildingOffice2Icon,
+          show: user?.role === 'admin'
+        }
+      ]
     },
     {
-      name: t('mobile_app'),
-      href: '/mobile-app',
-      icon: PhoneIcon,
-      show: true
-    },
-    {
-      name: t('advanced_analytics'),
-      href: '/analytics',
-      icon: ChartBarIcon,
-      show: user?.role === 'admin'
-    },
-    {
-      name: t('document_management'),
-      href: '/documents',
-      icon: DocumentTextIcon,
-      show: true
-    },
-    {
-      name: t('voting_system'),
-      href: '/voting',
-      icon: HandRaisedIcon,
-      show: true
-    },
-    {
-      name: t('smart_home'),
-      href: '/smart-home',
-      icon: HomeModernIcon,
-      show: true
-    },
-    {
-      name: t('government_utility_gateway'),
-      href: '/utilities',
-      icon: BoltIcon,
-      show: true
-    },
-    {
-      name: t('family_management'),
-      href: '/family',
-      icon: UsersIcon,
-      show: true
-    },
-    {
-      name: t('add_family_member'),
-      href: '/add-family-member',
-      icon: UserPlusIcon,
-      show: true
-    },
-    {
-      name: t('financial_management'),
-      href: '/finances',
-      icon: CurrencyDollarIcon,
-      show: true
-    },
-    {
-      name: t('message_center'),
-      href: '/messages',
-      icon: ChatBubbleLeftEllipsisIcon,
-      show: true
-    },
-    {
-      name: t('chat.chats'),
-      href: '/chat',
-      icon: ChatBubbleLeftEllipsisIcon,
-      show: true
-    },
-    {
-      name: t('gallery.title'),
-      href: '/gallery',
-      icon: PhotoIcon,
-      show: true
-    },
-    {
-      name: t('schedule.title'),
-      href: '/schedule',
-      icon: ClockIcon,
-      show: true
-    },
-    {
-      name: t('notifications_nav'),
-      href: '/notifications',
-      icon: BellIcon,
-      show: true
-    },
-    {
-      name: t('settings_nav'),
-      href: '/settings',
-      icon: CogIcon,
-      show: true
-    },
-    {
-      name: t('pricing_plans'),
-      href: '/pricing',
-      icon: CurrencyDollarIcon,
-      show: true
-    },
-    {
-      name: t('legal.title'),
-      href: '/terms-privacy',
-      icon: DocumentTextIcon,
-      show: true
-    },
-    {
-      name: t('legal_contact_title'),
-      href: '/contact',
-      icon: EnvelopeIcon,
-      show: true
-    },
-    {
-      name: t('community_newsletter'),
-      href: '/newsletter',
-      icon: NewspaperIcon,
-      show: true
-    },
-    {
-      name: t('enterprise.dashboard'),
-      href: '/account-type-selection',
-      icon: BuildingOffice2Icon,
-      show: user?.role === 'admin' // Only show for admins
+      title: t('support_info'),
+      items: [
+        {
+          name: t('help_center'),
+          href: '/help',
+          icon: QuestionMarkCircleIcon,
+          show: true
+        },
+        {
+          name: t('mobile_app'),
+          href: '/mobile-app',
+          icon: PhoneIcon,
+          show: true
+        },
+        {
+          name: t('settings_nav'),
+          href: '/settings',
+          icon: Cog6ToothIcon,
+          show: true
+        },
+        {
+          name: t('legal.title'),
+          href: '/terms-privacy',
+          icon: DocumentTextIcon,
+          show: true
+        },
+        {
+          name: t('legal_contact_title'),
+          href: '/contact',
+          icon: EnvelopeIcon,
+          show: true
+        },
+        {
+          name: t('community_newsletter'),
+          href: '/newsletter',
+          icon: NewspaperIcon,
+          show: true
+        }
+      ]
     }
   ];
 

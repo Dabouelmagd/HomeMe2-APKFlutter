@@ -181,22 +181,25 @@ const VideoTutorial = () => {
     }
   };
 
-  const playActualSound = (audioContext, type) => {
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    // Enhanced sound profiles
-    switch(type) {
-      case 'play':
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.2);
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(volume / 200, audioContext.currentTime + 0.05);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
-        break;
+  const playActualSound = async (audioContext, type) => {
+    return new Promise((resolve) => {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Enhanced sound profiles with better volume control
+      const baseVolume = Math.min(volume / 100, 0.3); // Limit max volume to 30%
+      
+      switch(type) {
+        case 'play':
+          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.3);
+          gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(baseVolume, audioContext.currentTime + 0.05);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+          break;
       case 'pause':
         oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
         oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.2);

@@ -268,8 +268,10 @@ const VideoTutorial = () => {
               </button>
             </div>
 
-            {/* Video/Image Area */}
-            <div className="aspect-video bg-gray-900 relative overflow-hidden">
+            {/* Enhanced Video Area */}
+            <div className={`bg-gray-900 relative overflow-hidden ${
+              isFullscreen ? 'h-4/5' : 'aspect-video'
+            }`}>
               {isPlaying ? (
                 // Active Video Simulation
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 animate-pulse">

@@ -1620,9 +1620,9 @@ const CompoundManagement = () => {
             ) : (
               <div className="text-center py-12">
                 <LinkIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">No registration links created</h3>
+                <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">لم يتم إنشاء روابط تسجيل</h3>
                 <p className="text-gray-600 mb-4">
-                  Create registration links to onboard new residents to your compound.
+                  إنشاء روابط تسجيل لإدخال مقيمين جدد إلى مجمعك.
                 </p>
                 <button
                   onClick={() => setShowAddResidence(true)}

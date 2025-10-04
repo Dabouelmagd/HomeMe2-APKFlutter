@@ -3128,7 +3128,7 @@ const CompoundManagement = () => {
                       className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300"
                     >
                       <ChevronLeftIcon className="h-4 w-4" />
-                      <span>الخطوة السابقة</span>
+                      <span>{t('previous_step')}</span>
                     </button>
                   )}
                   

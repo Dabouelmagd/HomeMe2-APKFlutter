@@ -59,10 +59,11 @@ const VideoTutorial = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(false);
+  const [autoPlay, setAutoPlay] = useState(true); // Auto-play enabled by default
   const [volume, setVolume] = useState(75);
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [audioContext, setAudioContext] = useState(null);
 
   const tutorialSteps = [
     {

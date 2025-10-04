@@ -88,6 +88,26 @@ const HelpCenter = () => {
     setExpandedSection(expandedSection === sectionId ? null : sectionId);
   };
 
+  // Search functionality
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    if (query.trim() === '') {
+      setFilteredSections([]);
+      return;
+    }
+
+    const filtered = helpSections.filter(section => {
+      const sectionMatch = section.title.toLowerCase().includes(query.toLowerCase());
+      const articleMatch = section.articles.some(article => 
+        article.title.toLowerCase().includes(query.toLowerCase())
+      );
+      return sectionMatch || articleMatch;
+    });
+    setFilteredSections(filtered);
+  };
+
+  const sectionsToShow = searchQuery.trim() ? filteredSections : helpSections;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}

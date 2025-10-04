@@ -2660,7 +2660,7 @@ const CompoundManagement = () => {
                         </div>
                         <div className={`ml-3 ${familyCreationStep === step ? 'text-blue-600' : 'text-gray-500'}`}>
                           <div className="text-sm font-medium">{label}</div>
-                          <div className="text-xs text-gray-400">الخطوة {step}</div>
+                          <div className="text-xs text-gray-400">{t('step')} {step}</div>
                         </div>
                         {step < 4 && (
                           <div className={`ml-6 w-16 h-1 rounded-full ${

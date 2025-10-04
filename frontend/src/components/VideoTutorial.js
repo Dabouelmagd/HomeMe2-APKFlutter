@@ -149,30 +149,32 @@ const VideoTutorial = () => {
     }
   };
 
-  // Enhanced audio system with multiple fallbacks
-  const playAudioFeedback = (type = 'play') => {
+  // Enhanced audio system with multiple fallbacks and better initialization
+  const playAudioFeedback = async (type = 'play') => {
     if (isMuted) return;
     
     try {
-      // Method 1: Try Web Audio API with user gesture
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      
-      // Resume context if suspended (browser policy)
-      if (audioContext.state === 'suspended') {
-        audioContext.resume().then(() => {
-          playActualSound(audioContext, type);
-        });
-      } else {
-        playActualSound(audioContext, type);
+      // Method 1: Try Web Audio API with better error handling
+      let ctx = audioContext;
+      if (!ctx) {
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        setAudioContext(ctx);
       }
       
+      // Resume context if suspended (browser policy)
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+      }
+      
+      await playActualSound(ctx, type);
+      
     } catch (error) {
-      console.log('Primary audio failed, trying backup method');
+      console.log('Primary audio failed, trying backup method:', error.message);
       // Fallback: Use HTML5 Audio
       try {
         playHTMLAudio(type);
       } catch (fallbackError) {
-        console.log('All audio methods failed');
+        console.log('HTML5 audio failed, showing visual feedback');
         // Visual feedback only
         showVisualAudioFeedback(type);
       }

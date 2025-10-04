@@ -316,8 +316,8 @@ const VideoTutorial = () => {
     // Start progress simulation with enhanced audio cues
     const interval = setInterval(() => {
       setVideoProgress(prev => {
-        // Audio cue every 20% with different tones
-        if (prev > 0 && prev % 20 === 0 && prev !== 100) {
+        // Audio cue every 25% with different tones (less frequent)
+        if (prev > 0 && Math.round(prev) % 25 === 0 && prev !== 100) {
           playAudioFeedback('progress');
         }
         

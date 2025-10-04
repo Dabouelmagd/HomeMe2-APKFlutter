@@ -93,6 +93,27 @@ const VideoTutorial = () => {
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
+    if (!isPlaying) {
+      // Start progress simulation
+      setVideoProgress(0);
+      const interval = setInterval(() => {
+        setVideoProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setIsPlaying(false);
+            // Auto advance to next step when video completes
+            if (autoPlay && currentStep < tutorialSteps.length - 1) {
+              setTimeout(() => {
+                setCurrentStep(currentStep + 1);
+                setIsPlaying(true);
+              }, 1000);
+            }
+            return 100;
+          }
+          return prev + 2; // Increase by 2% every 100ms
+        });
+      }, 100);
+    }
   };
 
   const currentTutorial = tutorialSteps[currentStep];

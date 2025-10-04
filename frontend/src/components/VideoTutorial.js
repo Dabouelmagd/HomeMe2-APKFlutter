@@ -200,12 +200,12 @@ const VideoTutorial = () => {
           gainNode.gain.linearRampToValueAtTime(baseVolume, audioContext.currentTime + 0.05);
           gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
           break;
-      case 'pause':
-        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-        oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.2);
-        gainNode.gain.setValueAtTime(volume / 300, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-        break;
+        case 'pause':
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.2);
+          gainNode.gain.setValueAtTime(baseVolume * 0.8, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+          break;
       case 'complete':
         // Success sound (3 ascending tones)
         [800, 1000, 1200].forEach((freq, index) => {

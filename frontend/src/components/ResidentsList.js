@@ -94,7 +94,7 @@ const ResidentsList = () => {
         uniqueResidents.push({
           ...resident,
           // Add default names for residents without names
-          name: resident.name || `مقيم ${resident.id?.substr(-4) || Math.random().toString().substr(2, 4)}`,
+          name: resident.name || `${t('resident') || 'مقيم'} ${resident.id?.substr(-4) || Math.random().toString().substr(2, 4)}`,
           // Fix relationships - ensure we have family heads (1 head per every 3-4 residents)
           relationship: resident.relationship || 
             (uniqueResidents.length % 3 === 0 ? 'head' : 

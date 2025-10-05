@@ -441,7 +441,7 @@ const VideoTutorial = () => {
 
             {/* Enhanced Video Area */}
             <div className={`bg-gray-900 relative overflow-hidden ${
-              isFullscreen ? 'h-[75vh]' : 'h-[50vh] min-h-[400px]'
+              isFullscreen ? 'h-[85vh]' : 'h-[70vh] min-h-[500px]'
             }`}>
               {isPlaying ? (
                 // Active Video Simulation

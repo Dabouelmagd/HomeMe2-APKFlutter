@@ -216,15 +216,15 @@ const VideoTutorial = () => {
           setIsPlaying(false);
           playAudioFeedback('complete');
           
-          // Auto advance to next step when infographic completes
+          // Auto advance to next step when infographic completes - faster
           if (autoPlay && currentStep < infographicSteps.length - 1) {
             setTimeout(() => {
               setCurrentStep(prev => prev + 1);
-              // Automatically start next infographic after 2 seconds
+              // Automatically start next infographic quickly
               setTimeout(() => {
                 startVideoPlayback(true);
-              }, 1000);
-            }, 2500);
+              }, 500);
+            }, 1000);
           }
           return 100;
         }

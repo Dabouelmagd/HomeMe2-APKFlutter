@@ -187,15 +187,15 @@ const VideoTutorial = () => {
           setIsPlaying(false);
           playAudioFeedback('complete');
           
-          // Auto advance to next step when video completes (slower transitions)
-          if (autoPlay && currentStep < tutorialSteps.length - 1) {
+          // Auto advance to next step when infographic completes
+          if (autoPlay && currentStep < infographicSteps.length - 1) {
             setTimeout(() => {
               setCurrentStep(prev => prev + 1);
-              // Automatically start next video after 3 seconds for better user experience
+              // Automatically start next infographic after 2 seconds
               setTimeout(() => {
                 startVideoPlayback(true);
-              }, 1500);
-            }, 3000);
+              }, 1000);
+            }, 2500);
           }
           return 100;
         }

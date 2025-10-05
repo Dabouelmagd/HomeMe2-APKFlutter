@@ -155,7 +155,7 @@ const UserManagement = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
-      toast.success('تم حذف المستخدم بنجاح!');
+      toast.success(t('user_deleted'));
       loadUsersData();
     } catch (error) {
       console.error('Failed to delete user:', error);

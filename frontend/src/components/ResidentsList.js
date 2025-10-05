@@ -533,14 +533,14 @@ const ResidentsList = () => {
                   type="submit"
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
                 >
-                  إضافة المقيم
+                  {t('add_resident_btn')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAddResident(false)}
                   className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-medium transition-colors"
                 >
-                  إلغاء
+                  {t('cancel')}
                 </button>
               </div>
             </form>

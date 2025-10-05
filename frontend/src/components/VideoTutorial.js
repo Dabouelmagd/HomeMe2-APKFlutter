@@ -65,75 +65,50 @@ const VideoTutorial = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [audioContext, setAudioContext] = useState(null);
 
-  const tutorialSteps = [
+  const infographicSteps = [
     {
       id: 1,
+      icon: '🔑',
       title: 'تسجيل الدخول',
-      titleEn: 'Login Process', 
-      description: 'ابدأ بإدخال اسم المستخدم وكلمة المرور للوصول إلى النظام',
-      descriptionEn: 'Start by entering your username and password to access the system',
-      image: '/tutorial_images/step1_login.png',
-      duration: '30 ثانية',
-      tips: ['استخدم بيانات اعتماد صحيحة', 'تأكد من اختيار اللغة المناسبة'],
-      videoContent: {
-        actions: [
-          '1️⃣ افتح صفحة تسجيل الدخول',
-          '2️⃣ أدخل اسم المستخدم: admin',
-          '3️⃣ أدخل كلمة المرور: admin123',
-          '4️⃣ اضغط على زر "تسجيل الدخول"'
-        ],
-        highlights: ['تأكد من صحة البيانات', 'انتظر حتى يتم التحقق']
+      simple: 'ادخل بياناتك',
+      visual: {
+        main: '👤',
+        arrow: '→',
+        action: '🏠'
       }
     },
     {
       id: 2,
-      title: 'لوحة التحكم الرئيسية',
-      titleEn: 'Main Dashboard',
-      description: 'تعرف على لوحة التحكم والإحصائيات المتاحة',
-      descriptionEn: 'Explore the main dashboard and available statistics',
-      image: '/tutorial_images/step2_dashboard.png',
-      duration: '45 ثانية',
-      tips: ['راجع الإحصائيات الرئيسية', 'استخدم الإجراءات السريعة']
+      icon: '📊',
+      title: 'لوحة التحكم',
+      simple: 'شاهد الإحصائيات',
+      visual: {
+        main: '📈',
+        arrow: '→',
+        action: '✅'
+      }
     },
     {
       id: 3,
-      title: 'التنقل في القائمة الجانبية',
-      titleEn: 'Sidebar Navigation',
-      description: 'تعلم كيفية استخدام القائمة الجانبية المنظمة',
-      descriptionEn: 'Learn how to use the organized sidebar navigation',
-      image: '/tutorial_images/step3_sidebar.png',
-      duration: '60 ثانية',
-      tips: ['الأقسام منظمة بالألوان', 'كل قسم يحتوي على عدد العناصر']
+      icon: '🏠',
+      title: 'إدارة المجمع',
+      simple: 'أضف المقيمين',
+      visual: {
+        main: '👥',
+        arrow: '→',
+        action: '➕'
+      }
     },
     {
       id: 4,
-      title: 'إدارة المجمع',
-      titleEn: 'Compound Management',
-      description: 'استخدم أدوات إدارة المجمع لإدارة المقيمين والوحدات',
-      descriptionEn: 'Use compound management tools to manage residents and units',
-      image: '/tutorial_images/step4_compound.png',
-      duration: '90 ثانية',
-      tips: ['إضافة مقيمين جدد', 'إدارة معلومات المجمع', 'تحميل الشعار']
-    },
-    {
-      id: 5,
-      title: 'إضافة عائلة جديدة',
-      titleEn: 'Add New Family',
-      description: 'تعلم كيفية إضافة عائلة جديدة خطوة بخطوة',
-      descriptionEn: 'Learn how to add a new family step by step',
-      image: '/tutorial_images/step5_add_family.png',
-      duration: '120 ثانية',
-      tips: ['اتبع الخطوات المرقمة', 'تأكد من صحة البيانات', 'احفظ المعلومات']
-    },
-    {
-      id: 6,
-      title: 'مركز المساعدة',
-      titleEn: 'Help Center',
-      description: 'استخدم مركز المساعدة للحصول على الدعم',
-      descriptionEn: 'Use the help center to get support when needed',
-      image: '/tutorial_images/step6_help.png',
-      duration: '45 ثانية',
-      tips: ['استخدم البحث للعثور على الإجابات', 'تصفح الأقسام المنظمة']
+      icon: '💬',
+      title: 'التواصل',
+      simple: 'أرسل رسائل',
+      visual: {
+        main: '📨',
+        arrow: '→',
+        action: '📤'
+      }
     }
   ];
 

@@ -273,6 +273,86 @@ const VideoTutorial = () => {
     }
   };
 
+  // Keyboard shortcuts for navigation
+  const handleKeyPress = React.useCallback((e) => {
+    if (!showModal) return;
+    
+    switch(e.key) {
+      case 'ArrowRight':
+      case ' ': // Spacebar
+        e.preventDefault();
+        if (isPlaying) {
+          setIsPlaying(false);
+          playAudioFeedback('pause');
+        } else {
+          startVideoPlayback(false);
+        }
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        prevStep();
+        playAudioFeedback('prev');
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        nextStep();
+        playAudioFeedback('next');
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        prevStep();
+        playAudioFeedback('prev');
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setShowModal(false);
+        break;
+      case 's':
+      case 'S':
+        e.preventDefault();
+        skipToNext();
+        break;
+      case 'r':
+      case 'R':
+        e.preventDefault();
+        restartCurrent();
+        break;
+      case 'm':
+      case 'M':
+        e.preventDefault();
+        toggleMute();
+        break;
+      case 'f':
+      case 'F':
+        e.preventDefault();
+        toggleFullscreen();
+        break;
+    }
+  }, [showModal, isPlaying, currentStep]);
+
+  // Skip to next step immediately  
+  const skipToNext = () => {
+    if (currentStep < infographicSteps.length - 1) {
+      setCurrentStep(currentStep + 1);
+      setVideoProgress(0);
+      setIsPlaying(false);
+      playAudioFeedback('skip');
+    }
+  };
+
+  // Restart current step
+  const restartCurrent = () => {
+    setVideoProgress(0);
+    setIsPlaying(false);
+    playAudioFeedback('play');
+  };
+
+  // Add keyboard event listeners
+  React.useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [handleKeyPress]);
+
   // Auto-play when modal opens
   React.useEffect(() => {
     if (showModal && autoPlay) {

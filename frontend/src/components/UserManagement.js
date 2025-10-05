@@ -99,7 +99,7 @@ const UserManagement = () => {
     e.preventDefault();
     
     try {
-      await axios.post(`${API}/admin/users`, newUser, {
+      await axios.post(`${API}/api/admin/users`, newUser, {
         headers: { 
           Authorization: `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json'

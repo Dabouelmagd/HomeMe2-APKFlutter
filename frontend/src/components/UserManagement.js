@@ -121,7 +121,7 @@ const UserManagement = () => {
       loadUsersData();
     } catch (error) {
       console.error('Failed to add user:', error);
-      toast.error(error.response?.data?.detail || 'فشل في إضافة المستخدم');
+      toast.error(error.response?.data?.detail || t('add_user_failed'));
     }
   };
 

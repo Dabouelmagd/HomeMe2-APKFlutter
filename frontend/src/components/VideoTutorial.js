@@ -623,13 +623,13 @@ const VideoTutorial = () => {
                       {step.simple}
                     </p>
                     <div className={`w-8 h-8 rounded-full mx-auto mt-3 flex items-center justify-center text-xs font-bold ${
-                      index === currentStep
+                      index === safeCurrentStep
                         ? 'bg-blue-600 text-white'
-                        : index < currentStep
+                        : index < safeCurrentStep
                         ? 'bg-green-600 text-white'
                         : 'bg-gray-400 text-white'
                     }`}>
-                      {index < currentStep ? '✓' : index + 1}
+                      {index < safeCurrentStep ? '✓' : index + 1}
                     </div>
                   </div>
                 ))}

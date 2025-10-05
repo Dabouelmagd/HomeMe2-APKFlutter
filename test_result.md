@@ -49,11 +49,11 @@
 ##
 test_plan:
   current_focus: 
-    - "Quick Actions Translation Testing"
-    - "Arabic Interface Translation Verification"
+    - "CompoundManagement Translation Testing"
+    - "Arabic Interface Tab Translation Verification"
   stuck_tasks: 
-    - "UserManagement Backend API Integration"
-    - "Quick Actions Arabic Translation System"
+    - "Language Switcher UI Visibility"
+    - "Arabic Language Switching Mechanism"
   test_all: false
   test_priority: "high_first"
 

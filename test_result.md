@@ -264,8 +264,8 @@ metadata:
 
 metadata:
   created_by: "testing_agent"
-  version: "1.6"
-  test_sequence: 6
+  version: "1.7"
+  test_sequence: 7
   run_ui: true
 
   - task: "CompoundManagement Icon Updates and Arabic Translation Testing"

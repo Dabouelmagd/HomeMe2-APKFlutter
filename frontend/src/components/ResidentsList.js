@@ -400,9 +400,9 @@ const ResidentsList = () => {
                           resident.relationship === 'child' ? 'bg-purple-100 text-purple-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
-                          {resident.relationship === 'head' ? 'رب الأسرة' :
-                           resident.relationship === 'spouse' ? 'الزوج/ة' :
-                           resident.relationship === 'child' ? 'طفل' : 'أخرى'}
+                          {resident.relationship === 'head' ? t('family_head') :
+                           resident.relationship === 'spouse' ? t('spouse') :
+                           resident.relationship === 'child' ? t('child') : t('other')}
                         </span>
                       </td>
                       

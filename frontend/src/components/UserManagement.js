@@ -59,7 +59,7 @@ const UserManagement = () => {
   const loadUsersData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/admin/users`, {
+      const response = await axios.get(`${API}/api/admin/users`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       

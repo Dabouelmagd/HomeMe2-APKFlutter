@@ -60,11 +60,12 @@ const ResidentsList = () => {
       });
       
       if (response.data && response.data.family_members) {
-        setResidents(response.data.family_members);
+        const processedResidents = processResidents(response.data.family_members);
+        setResidents(processedResidents);
       }
     } catch (error) {
       console.error('Failed to load residents:', error);
-      toast.error('فشل في تحميل قائمة السكان');
+      toast.error(t('failed_to_load_residents') || 'فشل في تحميل قائمة السكان');
     } finally {
       setLoading(false);
     }

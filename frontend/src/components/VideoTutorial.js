@@ -113,7 +113,7 @@ const VideoTutorial = () => {
   ];
 
   const nextStep = () => {
-    if (currentStep < tutorialSteps.length - 1) {
+    if (currentStep < infographicSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };

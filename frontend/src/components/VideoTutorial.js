@@ -212,15 +212,15 @@ const VideoTutorial = () => {
           setIsPlaying(false);
           playAudioFeedback('complete');
           
-          // Auto advance to next step when video completes
+          // Auto advance to next step when video completes (slower transitions)
           if (autoPlay && currentStep < tutorialSteps.length - 1) {
             setTimeout(() => {
               setCurrentStep(prev => prev + 1);
-              // Automatically start next video after 2 seconds for better user experience
+              // Automatically start next video after 3 seconds for better user experience
               setTimeout(() => {
                 startVideoPlayback(true);
-              }, 1000);
-            }, 2000);
+              }, 1500);
+            }, 3000);
           }
           return 100;
         }

@@ -491,7 +491,7 @@ const ResidentsList = () => {
                   onChange={(e) => setNewResident({...newResident, unit_id: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="">اختر الوحدة</option>
+                  <option value="">{t('select_unit')}</option>
                   {units.map(unit => (
                     <option key={unit.id} value={unit.id}>{unit.unit_number}</option>
                   ))}

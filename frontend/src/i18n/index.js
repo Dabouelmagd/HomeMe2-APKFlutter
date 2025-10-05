@@ -2928,6 +2928,8 @@ const resources = {
       'compound_management': 'إدارة المجمع',
       'overview': 'نظرة عامة',
       'residence_list': 'قائمة الإقامات',
+      'residences_list': 'قائمة المساكن', 
+      'view_all_residences_occupancy': 'عرض جميع الوحدات السكنية ومعدل الإشغال',
       'view_all_residential': 'عرض جميع الوحدات السكنية وإشغالها',
       'add_resident_family': 'إضافة مقيم + عائلة',
       'create_new_resident': 'إنشاء حساب مقيم جديد مع إعداد إدارة العائلة الكامل',

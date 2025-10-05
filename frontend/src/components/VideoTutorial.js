@@ -454,13 +454,16 @@ const VideoTutorial = () => {
                       <p className="text-xl text-green-300 font-bold">✨ تعلم خطوة بخطوة</p>
                       <p className="text-lg text-purple-200 mt-2">📚 دليل شامل ومفصل</p>
                       
-                      {/* Large Visual Elements */}
-                      <div className="mt-8 grid grid-cols-2 gap-4 max-w-md mx-auto">
-                        <div className="aspect-square bg-white bg-opacity-20 rounded-2xl flex items-center justify-center animate-pulse">
-                          <span className="text-4xl">📱</span>
+                      {/* Large Visual Elements - More Creative */}
+                      <div className="mt-8 grid grid-cols-3 gap-6 max-w-2xl mx-auto">
+                        <div className="aspect-square bg-gradient-to-br from-blue-400 to-purple-600 rounded-3xl flex items-center justify-center animate-bounce shadow-2xl">
+                          <span className="text-6xl animate-pulse">📱</span>
                         </div>
-                        <div className="aspect-square bg-white bg-opacity-15 rounded-2xl flex items-center justify-center animate-pulse delay-150">
-                          <span className="text-4xl">💻</span>
+                        <div className="aspect-square bg-gradient-to-br from-green-400 to-blue-600 rounded-3xl flex items-center justify-center animate-bounce delay-150 shadow-2xl">
+                          <span className="text-6xl animate-pulse">💻</span>
+                        </div>
+                        <div className="aspect-square bg-gradient-to-br from-purple-400 to-pink-600 rounded-3xl flex items-center justify-center animate-bounce delay-300 shadow-2xl">
+                          <span className="text-6xl animate-pulse">🏠</span>
                         </div>
                       </div>
                       

@@ -694,7 +694,7 @@ const VideoTutorial = () => {
                 disabled={safeCurrentStep === infographicSteps.length - 1}
                 className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
-                <span>{currentStep === infographicSteps.length - 1 ? 'انتهاء' : 'التالي'}</span>
+                <span>{safeCurrentStep === infographicSteps.length - 1 ? 'انتهاء' : 'التالي'}</span>
                 <ChevronRightIcon className="h-5 w-5" />
               </button>
             </div>

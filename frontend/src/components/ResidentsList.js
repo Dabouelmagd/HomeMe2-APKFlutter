@@ -446,7 +446,7 @@ const ResidentsList = () => {
             <form onSubmit={handleAddResident} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  الاسم الكامل
+                  {t('full_name')}
                 </label>
                 <input
                   type="text"

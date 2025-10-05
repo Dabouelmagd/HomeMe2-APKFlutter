@@ -422,13 +422,12 @@ const VideoTutorial = () => {
             <button
               onClick={() => {
                 setIsMuted(false);
-                // Simple visual feedback instead of annoying beeps
-                showVisualAudioFeedback('play');
+                playAudioFeedback('play'); // Test the new audio system
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center space-x-2 shadow-lg"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center space-x-2 shadow-lg animate-pulse"
             >
               <SpeakerWaveIcon className="h-6 w-6" />
-              <span className="text-base">🔕➡️🔊 صوت بصري فقط</span>
+              <span className="text-base">🔊 تفعيل الصوت الواضح</span>
             </button>
           </div>
         </div>

@@ -135,7 +135,7 @@ const AdminDashboard = () => {
     }
   ];
 
-  const quickActions = [
+  const quickActions = React.useMemo(() => [
     {
       id: 'add_resident',
       name: t('add_resident'),
@@ -164,7 +164,7 @@ const AdminDashboard = () => {
       icon: CurrencyDollarIcon,
       color: 'text-orange-600 bg-orange-50 hover:bg-orange-100'
     }
-  ];
+  ], [t]);
 
   return (
     <div className="min-h-screen bg-gray-50">

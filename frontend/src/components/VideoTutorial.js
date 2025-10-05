@@ -767,7 +767,7 @@ const VideoTutorial = () => {
               {/* Simple Usage Flow */}
               <div className="mt-8 bg-gray-50 rounded-2xl p-6">
                 <h4 className="text-xl font-bold text-center mb-6 text-gray-800">كيفية الاستخدام</h4>
-                <div className="flex items-center justify-center space-x-4">
+                <div className="flex items-center justify-center space-x-4 mb-6">
                   <div className="text-center">
                     <div className="text-3xl mb-2">🔑</div>
                     <p className="text-sm font-semibold">ادخل</p>
@@ -786,6 +786,37 @@ const VideoTutorial = () => {
                   <div className="text-center">
                     <div className="text-3xl mb-2">💬</div>
                     <p className="text-sm font-semibold">تواصل</p>
+                  </div>
+                </div>
+
+                {/* Keyboard Controls Guide */}
+                <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
+                  <h5 className="font-bold text-sm mb-3 text-blue-800">⌨️ مفاتيح التحكم السريع:</h5>
+                  <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div className="flex items-center space-x-2">
+                      <kbd className="bg-white px-2 py-1 rounded border">مسافة</kbd>
+                      <span>تشغيل/إيقاف</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <kbd className="bg-white px-2 py-1 rounded border">S</kbd>
+                      <span>تخطي الخطوة</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <kbd className="bg-white px-2 py-1 rounded border">↑↓</kbd>
+                      <span>الخطوة السابقة/التالية</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <kbd className="bg-white px-2 py-1 rounded border">R</kbd>
+                      <span>إعادة تشغيل</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <kbd className="bg-white px-2 py-1 rounded border">M</kbd>
+                      <span>كتم الصوت</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <kbd className="bg-white px-2 py-1 rounded border">F</kbd>
+                      <span>ملء الشاشة</span>
+                    </div>
                   </div>
                 </div>
               </div>

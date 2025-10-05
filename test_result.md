@@ -49,10 +49,11 @@
 ##
 test_plan:
   current_focus: 
-    - "View Payments Button Navigation Testing"
-    - "Financial Management Page Functionality Testing"
+    - "Quick Actions Translation Testing"
+    - "Arabic Interface Translation Verification"
   stuck_tasks: 
     - "UserManagement Backend API Integration"
+    - "Quick Actions Arabic Translation System"
   test_all: false
   test_priority: "high_first"
 

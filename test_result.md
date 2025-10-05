@@ -54,7 +54,7 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 ##
-user_problem_statement: "اختبار شامل لصفحة القانونية المُعاد تصميمها في تطبيق HomeMe - التحقق من أن إعادة تصميم صفحة شروط الاستخدام وسياسة الخصوصية يعمل بشكل مثالي مع التصميم الجديد والترجمة العربية و RTL layout"
+user_problem_statement: "اختبار شامل للإنفوجراف الجديد المبسط في تطبيق HomeMe بدلاً من الفيديو المعقد - التحقق من تحويل المحتوى من فيديو تعليمي إلى دليل الاستخدام المبسط مع 4 خطوات بسيطة بدلاً من 6 خطوات معقدة"
 
 backend:
   - task: "Financial Management API Permissions System Testing"

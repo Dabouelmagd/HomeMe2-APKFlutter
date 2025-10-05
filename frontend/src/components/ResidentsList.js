@@ -471,7 +471,7 @@ const ResidentsList = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  البريد الإلكتروني
+                  {t('email_address')}
                 </label>
                 <input
                   type="email"

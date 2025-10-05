@@ -174,15 +174,24 @@ const CompoundManagement = () => {
     });
   };
 
-  const fetchAllUsers = async () => {
+  // Add throttling to prevent too many requests
+  const fetchAllUsers = React.useCallback(async () => {
+    // Prevent concurrent calls
+    if (fetchAllUsers._isLoading) return;
+    fetchAllUsers._isLoading = true;
+    
     try {
       const response = await axios.get(`${API}/admin/users`);
       setAllUsers(response.data.users || []);
     } catch (error) {
       console.error('Failed to fetch users:', error);
-      toast.error('Failed to load users');
+      if (error.response?.status !== 429) {
+        toast.error('Failed to load users');
+      }
+    } finally {
+      fetchAllUsers._isLoading = false;
     }
-  };
+  }, []);
 
   const handleCreateAdmin = async (e) => {
     e.preventDefault();

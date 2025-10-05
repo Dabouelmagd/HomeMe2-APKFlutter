@@ -466,10 +466,10 @@ const VideoTutorial = () => {
                     </div>
                     
                     <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
-                      {currentTutorial.title}
+                      {currentInfo.title}
                     </h2>
                     <p className="text-xl text-blue-200 mb-6 font-semibold">اضغط للبدء - تعلم بطريقة تفاعلية ممتعة</p>
-                    <p className="text-lg text-purple-200 mb-8">{currentTutorial.description}</p>
+                    <p className="text-lg text-purple-200 mb-8">{currentInfo.simple}</p>
                     
                     {/* Enhanced preview thumbnails */}
                     <div className="grid grid-cols-6 gap-3 max-w-3xl mx-auto">

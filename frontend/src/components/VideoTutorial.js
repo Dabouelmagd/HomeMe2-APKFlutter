@@ -170,57 +170,7 @@ const VideoTutorial = () => {
 
   // Removed annoying beep sounds - using simple visual feedback instead
 
-  const playHTMLAudio = (type) => {
-    // Create data URL for audio
-    const createBeep = (frequency, duration) => {
-      const sampleRate = 8000;
-      const samples = duration * sampleRate;
-      const buffer = new ArrayBuffer(44 + samples * 2);
-      const view = new DataView(buffer);
-      
-      // WAV header
-      const writeString = (offset, string) => {
-        for (let i = 0; i < string.length; i++) {
-          view.setUint8(offset + i, string.charCodeAt(i));
-        }
-      };
-      
-      writeString(0, 'RIFF');
-      view.setUint32(4, 36 + samples * 2, true);
-      writeString(8, 'WAVE');
-      writeString(12, 'fmt ');
-      view.setUint32(16, 16, true);
-      view.setUint16(20, 1, true);
-      view.setUint16(22, 1, true);
-      view.setUint32(24, sampleRate, true);
-      view.setUint32(28, sampleRate * 2, true);
-      view.setUint16(32, 2, true);
-      view.setUint16(34, 16, true);
-      writeString(36, 'data');
-      view.setUint32(40, samples * 2, true);
-      
-      // Generate sine wave
-      for (let i = 0; i < samples; i++) {
-        const sample = Math.sin(frequency * 2 * Math.PI * i / sampleRate) * 0.3 * (volume / 100);
-        view.setInt16(44 + i * 2, sample * 32767, true);
-      }
-      
-      return new Blob([buffer], { type: 'audio/wav' });
-    };
-    
-    const frequencies = {
-      play: 800,
-      pause: 600, 
-      complete: 1200,
-      progress: 1000
-    };
-    
-    const audioBlob = createBeep(frequencies[type] || 500, 0.3);
-    const audioUrl = URL.createObjectURL(audioBlob);
-    const audio = new Audio(audioUrl);
-    audio.volume = volume / 100;
-    audio.play().catch(console.log);
-  };
+  // Removed complex beep generation - using simple feedback instead
 
   const showVisualAudioFeedback = (type) => {
     // Visual feedback when audio fails

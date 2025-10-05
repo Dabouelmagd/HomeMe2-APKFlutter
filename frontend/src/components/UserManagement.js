@@ -544,7 +544,7 @@ const UserManagement = () => {
                   type="submit"
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
                 >
-                  إضافة المستخدم
+                  {t('add_user_btn')}
                 </button>
                 <button
                   type="button"

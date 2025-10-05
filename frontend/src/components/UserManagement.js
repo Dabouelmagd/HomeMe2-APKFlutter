@@ -106,7 +106,7 @@ const UserManagement = () => {
         }
       });
 
-      toast.success('تم إضافة المستخدم بنجاح!');
+      toast.success(t('add_user_success'));
       setShowAddUser(false);
       setNewUser({
         username: '',

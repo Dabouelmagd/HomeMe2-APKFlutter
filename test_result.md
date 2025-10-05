@@ -49,7 +49,7 @@
 ##
 test_plan:
   current_focus: 
-    - "Redesigned Terms & Privacy Page Testing"
+    - "Interactive Infographic Enhancements Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

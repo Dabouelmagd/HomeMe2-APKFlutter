@@ -388,7 +388,7 @@ const UserManagement = () => {
                             <XCircleIcon className="h-5 w-5 text-red-500 ml-2" />
                           )}
                           <span className={`text-sm ${userItem.is_active ? 'text-green-800' : 'text-red-800'}`}>
-                            {userItem.is_active ? 'نشط' : 'غير نشط'}
+                            {userItem.is_active ? t('active') : t('inactive')}
                           </span>
                         </div>
                       </td>

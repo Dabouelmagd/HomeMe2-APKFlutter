@@ -135,23 +135,51 @@ const VideoTutorial = () => {
   // Removed complex beep generation - using simple feedback instead
 
   const showVisualAudioFeedback = (type) => {
-    // Visual feedback when audio fails
-    const colors = {
-      play: 'bg-green-500',
-      pause: 'bg-yellow-500',
-      complete: 'bg-blue-500',
-      progress: 'bg-purple-500'
+    // Enhanced visual feedback system with clear icons and animations
+    const feedbackData = {
+      play: { color: 'bg-green-500', icon: '▶️', text: 'تشغيل' },
+      pause: { color: 'bg-orange-500', icon: '⏸️', text: 'إيقاف' },
+      complete: { color: 'bg-blue-500', icon: '✅', text: 'مكتمل' },
+      next: { color: 'bg-purple-500', icon: '➡️', text: 'التالي' },
+      prev: { color: 'bg-indigo-500', icon: '⬅️', text: 'السابق' },
+      skip: { color: 'bg-yellow-500', icon: '⏭️', text: 'تخطي' },
+      click: { color: 'bg-gray-500', icon: '👆', text: 'نقر' }
     };
     
-    // Create temporary visual indicator
+    const data = feedbackData[type] || feedbackData.play;
+    
+    // Create enhanced visual indicator
     const indicator = document.createElement('div');
-    indicator.className = `fixed top-4 right-4 ${colors[type] || 'bg-gray-500'} text-white px-3 py-2 rounded-lg z-50 animate-bounce`;
-    indicator.textContent = `🔊 ${type}`;
+    indicator.className = `fixed top-6 left-6 ${data.color} text-white px-4 py-3 rounded-xl z-50 shadow-2xl border-2 border-white/50 transform transition-all duration-300`;
+    indicator.innerHTML = `
+      <div class="flex items-center space-x-2">
+        <span class="text-xl animate-pulse">${data.icon}</span>
+        <span class="font-bold">${data.text}</span>
+      </div>
+    `;
+    
+    // Add entrance animation
+    indicator.style.transform = 'translateY(-20px) scale(0.8)';
+    indicator.style.opacity = '0';
+    
     document.body.appendChild(indicator);
     
+    // Animate in
     setTimeout(() => {
-      document.body.removeChild(indicator);
-    }, 1000);
+      indicator.style.transform = 'translateY(0) scale(1)';
+      indicator.style.opacity = '1';
+    }, 10);
+    
+    // Animate out and remove
+    setTimeout(() => {
+      indicator.style.transform = 'translateY(-20px) scale(0.8)';
+      indicator.style.opacity = '0';
+      setTimeout(() => {
+        if (document.body.contains(indicator)) {
+          document.body.removeChild(indicator);
+        }
+      }, 300);
+    }, 1200);
   };
 
   const startVideoPlayback = (resetProgress = true) => {

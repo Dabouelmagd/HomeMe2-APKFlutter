@@ -440,7 +440,7 @@ const ResidentsList = () => {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl max-w-md w-full max-h-screen overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">إضافة مقيم جديد</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('add_new_resident_modal')}</h3>
             </div>
             
             <form onSubmit={handleAddResident} className="p-6 space-y-4">

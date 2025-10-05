@@ -2487,7 +2487,7 @@ const CompoundManagement = () => {
                           </div>
                           <div className="ml-3">
                             <h4 className="text-sm font-medium text-green-800">
-                              إنشاء إقامة مباشر
+                              {t('create_direct_residence')}
                             </h4>
                             <p className="text-sm text-green-700 mt-1">
                               سيتم إنشاء إقامة جديدة وحساب المقيم فوراً. سيتمكن المقيم من تسجيل الدخول بإيميله وسيتم إنتاج كلمة مرور مؤقتة.

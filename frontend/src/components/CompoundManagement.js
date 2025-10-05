@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import DateInput from './DateInput';
 import { formatDate, formatRelativeTime } from '../utils/dateUtils';
 import TestUpdate from './TestUpdate';
+import LanguageSwitcher from './LanguageSwitcher';
 import {
   BuildingOfficeIcon,
   PhotoIcon,

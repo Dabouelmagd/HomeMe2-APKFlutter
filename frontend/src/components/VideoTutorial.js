@@ -679,13 +679,13 @@ const VideoTutorial = () => {
                     <div
                       key={index}
                       className={`w-3 h-3 rounded-full ${
-                        index === currentStep ? 'bg-blue-600' : 'bg-gray-300'
+                        index === safeCurrentStep ? 'bg-blue-600' : 'bg-gray-300'
                       }`}
                     />
                   ))}
                 </div>
                 <p className="text-sm text-gray-600">
-                  {currentStep + 1} من {infographicSteps.length}
+                  {safeCurrentStep + 1} من {infographicSteps.length}
                 </p>
               </div>
 

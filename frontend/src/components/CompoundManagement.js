@@ -354,8 +354,13 @@ const CompoundManagement = () => {
     };
   }, [user?.compound_id, user?.role]);
 
-  const fetchCompound = async () => {
+  const fetchCompound = React.useCallback(async () => {
+    // Prevent concurrent calls
+    if (fetchCompound._isLoading) return;
+    fetchCompound._isLoading = true;
+    
     try {
+      if (!user?.compound_id) return;
       const response = await axios.get(`${API}/compounds/${user.compound_id}`);
       setCompound(response.data);
       setEditableCompound({
@@ -371,13 +376,16 @@ const CompoundManagement = () => {
         console.log('Compound not found, loading available compounds for selection');
         setCompoundNotFound(true);
         await loadAvailableCompounds();
+      } else if (error.response?.status === 429) {
+        console.log('Rate limited - compound data will retry later');
       } else {
         toast.error('Failed to load compound data');
       }
     } finally {
+      fetchCompound._isLoading = false;
       setLoading(false);
     }
-  };
+  }, [user?.compound_id]);
 
   const loadAvailableCompounds = async () => {
     try {

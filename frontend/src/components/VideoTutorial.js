@@ -479,16 +479,17 @@ const VideoTutorial = () => {
                       <div className="mt-6 text-sm text-blue-100 max-w-md">
                         <p className="mb-3">📝 {currentTutorial.description}</p>
                         
-                        {/* Current actions being demonstrated */}
+                        {/* Current actions being demonstrated - More Clear */}
                         {currentTutorial?.videoContent?.actions && (
-                          <div className="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
-                            <p className="font-semibold mb-2">🎬 الإجراءات الحالية:</p>
-                            <div className="space-y-1">
+                          <div className="bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6 border border-white/20">
+                            <p className="font-bold mb-4 text-yellow-300 text-lg">🎬 الخطوات التعليمية:</p>
+                            <div className="space-y-3">
                               {currentTutorial?.videoContent?.actions?.map((action, index) => (
-                                <div key={index} className={`text-xs ${
-                                  videoProgress > (index * 25) ? 'text-green-300' : 'text-white opacity-60'
+                                <div key={index} className={`text-base flex items-center space-x-3 p-2 rounded-lg ${
+                                  videoProgress > (index * 25) ? 'bg-green-500/30 text-green-200 border-l-4 border-green-400' : 'bg-white/10 text-white/70'
                                 }`}>
-                                  {videoProgress > (index * 25) && '✅ '}{action}
+                                  <span className="text-xl">{videoProgress > (index * 25) ? '✅' : '⏳'}</span>
+                                  <span className="flex-1">{action}</span>
                                 </div>
                               ))}
                             </div>

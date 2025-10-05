@@ -381,22 +381,28 @@ const Layout = ({ children }) => {
         lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}
       `}>
-        <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <img 
-                src="https://customer-assets.emergentagent.com/job_c6284a52-3971-4d5d-97ad-6dbfb32cfec5/artifacts/lwjnxovk_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
-                alt="HomeMe Logo"
-                className="h-24 w-auto"
-              />
-            </div>
-          </div>
+        <div className="flex items-center justify-between h-24 px-6 border-b border-gray-200">
+          {/* Close button for mobile - positioned on the left */}
           <button
             className="lg:hidden"
             onClick={() => setSidebarOpen(false)}
           >
             <XMarkIcon className="h-6 w-6 text-gray-500" />
           </button>
+          
+          {/* Logo centered */}
+          <div className="flex-1 flex justify-center">
+            <div className="flex-shrink-0">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_c6284a52-3971-4d5d-97ad-6dbfb32cfec5/artifacts/lwjnxovk_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
+                alt="HomeMe Logo"
+                className="h-32 w-auto object-contain"
+              />
+            </div>
+          </div>
+          
+          {/* Empty space for balance */}
+          <div className="w-6 lg:hidden"></div>
         </div>
 
         <nav className="mt-6 px-3 pb-8 overflow-y-auto">

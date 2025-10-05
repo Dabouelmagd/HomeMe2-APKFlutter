@@ -118,6 +118,11 @@ const ResidentsList = () => {
       );
     }
     
+    // Unit filter
+    if (selectedUnit) {
+      filtered = filtered.filter(resident => resident.unit_id === selectedUnit);
+    }
+    
     // Role filter
     if (selectedRole) {
       filtered = filtered.filter(resident => resident.relationship === selectedRole);

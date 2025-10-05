@@ -589,54 +589,68 @@ const VideoTutorial = () => {
               </div>
             </div>
 
-            {/* Tutorial Content */}
-            <div className="p-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Tips */}
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3">{t('helpful_tips')}</h4>
-                  <ul className="space-y-2">
-                    {currentTutorial?.tips?.map((tip, index) => (
-                      <li key={index} className="flex items-start space-x-2">
-                        <span className="text-blue-600 mt-1">•</span>
-                        <span className="text-gray-700">{tip}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            {/* Simple Infographic Content */}
+            <div className="p-8">
+              {/* Visual Steps Overview */}
+              <div className="grid grid-cols-4 gap-6 max-w-4xl mx-auto">
+                {infographicSteps.map((step, index) => (
+                  <div
+                    key={step.id}
+                    className={`text-center p-6 rounded-2xl cursor-pointer transition-all duration-300 ${
+                      index === currentStep
+                        ? 'bg-blue-100 border-2 border-blue-500 scale-110 shadow-lg'
+                        : index < currentStep
+                        ? 'bg-green-100 border-2 border-green-500'
+                        : 'bg-gray-100 border-2 border-gray-300'
+                    }`}
+                    onClick={() => setCurrentStep(index)}
+                  >
+                    <div className={`text-4xl mb-3 ${index === currentStep ? 'animate-bounce' : ''}`}>
+                      {step.icon}
+                    </div>
+                    <h4 className={`font-bold text-sm mb-2 ${
+                      index === currentStep ? 'text-blue-800' : 'text-gray-700'
+                    }`}>
+                      {step.title}
+                    </h4>
+                    <p className="text-xs text-gray-600">
+                      {step.simple}
+                    </p>
+                    <div className={`w-8 h-8 rounded-full mx-auto mt-3 flex items-center justify-center text-xs font-bold ${
+                      index === currentStep
+                        ? 'bg-blue-600 text-white'
+                        : index < currentStep
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-400 text-white'
+                    }`}>
+                      {index < currentStep ? '✓' : index + 1}
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-                {/* Progress */}
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3">{t('tutorial_progress')}</h4>
-                  <div className="space-y-3">
-                    {tutorialSteps.map((step, index) => (
-                      <div
-                        key={step.id}
-                        className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                          index === currentStep
-                            ? 'bg-blue-50 border-2 border-blue-200'
-                            : index < currentStep
-                            ? 'bg-green-50 border border-green-200'
-                            : 'bg-gray-50 border border-gray-200'
-                        }`}
-                        onClick={() => setCurrentStep(index)}
-                      >
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                          index === currentStep
-                            ? 'bg-blue-600 text-white'
-                            : index < currentStep
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-300 text-gray-600'
-                        }`}>
-                          {index < currentStep ? '✓' : index + 1}
-                        </div>
-                        <span className={`text-sm ${
-                          index === currentStep ? 'text-blue-900 font-semibold' : 'text-gray-700'
-                        }`}>
-                          {step.title}
-                        </span>
-                      </div>
-                    ))}
+              {/* Simple Usage Flow */}
+              <div className="mt-8 bg-gray-50 rounded-2xl p-6">
+                <h4 className="text-xl font-bold text-center mb-6 text-gray-800">كيفية الاستخدام</h4>
+                <div className="flex items-center justify-center space-x-4">
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">🔑</div>
+                    <p className="text-sm font-semibold">ادخل</p>
+                  </div>
+                  <div className="text-2xl text-gray-400">→</div>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">📊</div>
+                    <p className="text-sm font-semibold">شاهد</p>
+                  </div>
+                  <div className="text-2xl text-gray-400">→</div>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">🏠</div>
+                    <p className="text-sm font-semibold">أدر</p>
+                  </div>
+                  <div className="text-2xl text-gray-400">→</div>
+                  <div className="text-center">
+                    <div className="text-3xl mb-2">💬</div>
+                    <p className="text-sm font-semibold">تواصل</p>
                   </div>
                 </div>
               </div>

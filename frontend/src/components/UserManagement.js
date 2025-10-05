@@ -327,7 +327,7 @@ const UserManagement = () => {
                       {t('status')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      تاريخ الإنشاء
+                      {t('created_date')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       الإجراءات

@@ -141,7 +141,7 @@ const UserManagement = () => {
       loadUsersData();
     } catch (error) {
       console.error('Failed to toggle user status:', error);
-      toast.error('فشل في تغيير حالة المستخدم');
+      toast.error(t('user_status_failed'));
     }
   };
 

@@ -348,29 +348,36 @@ const VideoTutorial = () => {
           ))}
         </div>
 
-        <div className="mt-6 text-center">
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg mb-4">
-            <p className="text-gray-700 font-semibold mb-2">🎥 تجربة فيديو محسنة</p>
-            <div className="text-sm text-gray-600 grid grid-cols-1 md:grid-cols-3 gap-2">
-              <div className="flex items-center justify-center space-x-2">
-                <span>🔊</span>
-                <span>صوت واضح وتفاعلي</span>
+        <div className="mt-8 text-center">
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl mb-6">
+            <p className="text-gray-800 font-bold text-lg mb-3">📋 إنفوجراف بسيط للاستخدام</p>
+            <div className="flex justify-center items-center space-x-6">
+              <div className="text-center">
+                <div className="text-2xl mb-1">🎯</div>
+                <span className="text-sm text-gray-600">واضح ومباشر</span>
               </div>
-              <div className="flex items-center justify-center space-x-2">
-                <span>🎬</span>
-                <span>فيديو بحجم كبير</span>
+              <div className="text-center">
+                <div className="text-2xl mb-1">⚡</div>
+                <span className="text-sm text-gray-600">سريع التعلم</span>
               </div>
-              <div className="flex items-center justify-center space-x-2">
-                <span>⚡</span>
-                <span>سرعة قابلة للتحكم</span>
+              <div className="text-center">
+                <div className="text-2xl mb-1">📱</div>
+                <span className="text-sm text-gray-600">بصري تفاعلي</span>
               </div>
             </div>
           </div>
-          <div className="flex flex-wrap justify-center gap-2">
-            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">✓ {t('step_by_step')}</span>
-            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">✓ {t('interactive')}</span>
-            <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm">✓ ملء الشاشة</span>
-            <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm">✓ {t('practical_tips')}</span>
+          
+          <div className="bg-white rounded-xl p-4 border border-gray-200">
+            <p className="text-gray-700 font-semibold mb-3">مسار التعلم البسيط:</p>
+            <div className="flex justify-center items-center space-x-4 text-sm">
+              <span className="bg-blue-100 text-blue-800 px-3 py-2 rounded-full">🔑 ادخل</span>
+              <span className="text-gray-400">→</span>
+              <span className="bg-green-100 text-green-800 px-3 py-2 rounded-full">📊 شاهد</span>
+              <span className="text-gray-400">→</span>
+              <span className="bg-purple-100 text-purple-800 px-3 py-2 rounded-full">🏠 أدر</span>
+              <span className="text-gray-400">→</span>
+              <span className="bg-orange-100 text-orange-800 px-3 py-2 rounded-full">💬 تواصل</span>
+            </div>
           </div>
         </div>
       </div>

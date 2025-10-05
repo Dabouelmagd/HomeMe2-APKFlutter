@@ -496,10 +496,22 @@ const VideoTutorial = () => {
                           </div>
                         )}
                         
-                        <div className="flex justify-center space-x-4 text-xs">
-                          <span>⏱️ {currentTutorial.duration}</span>
-                          <span>📊 خطوة {currentStep + 1} من {tutorialSteps.length}</span>
-                          <span>🎯 {Math.round(videoProgress)}%</span>
+                        <div className="grid grid-cols-3 gap-4 text-center">
+                          <div className="bg-blue-500/30 rounded-xl p-3 border border-blue-400/50">
+                            <div className="text-2xl mb-1">⏱️</div>
+                            <div className="text-sm font-semibold">{currentTutorial.duration}</div>
+                            <div className="text-xs opacity-75">المدة المقدرة</div>
+                          </div>
+                          <div className="bg-purple-500/30 rounded-xl p-3 border border-purple-400/50">
+                            <div className="text-2xl mb-1">📊</div>
+                            <div className="text-sm font-semibold">{currentStep + 1} من {tutorialSteps.length}</div>
+                            <div className="text-xs opacity-75">الخطوة الحالية</div>
+                          </div>
+                          <div className="bg-green-500/30 rounded-xl p-3 border border-green-400/50">
+                            <div className="text-2xl mb-1">🎯</div>
+                            <div className="text-sm font-semibold">{Math.round(videoProgress)}%</div>
+                            <div className="text-xs opacity-75">التقدم المحرز</div>
+                          </div>
                         </div>
                       </div>
                     </div>

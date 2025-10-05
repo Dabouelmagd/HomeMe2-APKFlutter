@@ -49,7 +49,7 @@
 ##
 test_plan:
   current_focus: 
-    - "Comprehensive Residents List Improvements Testing - Arabic Interface Enhancements"
+    - "Residents List Translation Fix Testing - Arabic Interface Enhancements"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

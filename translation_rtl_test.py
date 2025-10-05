@@ -26,8 +26,8 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 # Configuration - Using the production URL as specified
-FRONTEND_URL = "https://homeme-help.preview.emergentagent.com"
-BACKEND_URL = "https://homeme-help.preview.emergentagent.com/api"
+FRONTEND_URL = "https://compound-manager.preview.emergentagent.com"
+BACKEND_URL = "https://compound-manager.preview.emergentagent.com/api"
 
 class TranslationRTLTestSuite:
     def __init__(self):

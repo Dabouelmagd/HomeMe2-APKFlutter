@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Dict, List
 
 # Configuration
-BASE_URL = "https://homeme-help.preview.emergentagent.com/api"
+BASE_URL = "https://compound-manager.preview.emergentagent.com/api"
 
 class SmartHomeTestSuite:
     def __init__(self):

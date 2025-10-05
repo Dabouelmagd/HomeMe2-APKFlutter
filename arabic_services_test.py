@@ -16,7 +16,7 @@ import re
 from typing import Dict, List, Optional
 
 # Configuration
-BASE_URL = "https://homeme-help.preview.emergentagent.com/api"
+BASE_URL = "https://compound-manager.preview.emergentagent.com/api"
 
 class ArabicServicesTestSuite:
     def __init__(self):

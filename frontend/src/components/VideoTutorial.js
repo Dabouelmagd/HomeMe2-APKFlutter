@@ -307,7 +307,7 @@ const VideoTutorial = () => {
               className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2"
             >
               <PlayCircleIcon className="h-5 w-5" />
-              <span>{t('start_tutorial')}</span>
+              <span>شاهد الدليل</span>
             </button>
             
             <button

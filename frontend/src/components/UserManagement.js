@@ -127,7 +127,7 @@ const UserManagement = () => {
 
   const handleToggleUserStatus = async (userId, currentStatus) => {
     try {
-      await axios.patch(`${API}/api/admin/users/${userId}`, 
+      await axios.put(`${API}/api/admin/users/${userId}/status`, 
         { is_active: !currentStatus },
         {
           headers: { 

@@ -656,35 +656,40 @@ const VideoTutorial = () => {
               </div>
             </div>
 
-            {/* Navigation */}
-            <div className="flex items-center justify-between p-6 border-t border-gray-200">
+            {/* Simple Navigation */}
+            <div className="flex items-center justify-between p-6 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={prevStep}
                 disabled={currentStep === 0}
-                className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center space-x-2 px-6 py-3 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
-                <ChevronLeftIcon className="h-4 w-4" />
-                <span>{t('previous')}</span>
+                <ChevronLeftIcon className="h-5 w-5" />
+                <span>السابق</span>
               </button>
 
-              <div className="flex space-x-2">
-                {tutorialSteps.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-2 h-2 rounded-full ${
-                      index === currentStep ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}
-                  />
-                ))}
+              <div className="text-center">
+                <div className="flex justify-center space-x-2 mb-2">
+                  {infographicSteps.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-3 h-3 rounded-full ${
+                        index === currentStep ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-600">
+                  {currentStep + 1} من {infographicSteps.length}
+                </p>
               </div>
 
               <button
                 onClick={nextStep}
-                disabled={currentStep === tutorialSteps.length - 1}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={currentStep === infographicSteps.length - 1}
+                className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
-                <span>{currentStep === tutorialSteps.length - 1 ? t('finish') : t('next')}</span>
-                <ChevronRightIcon className="h-4 w-4" />
+                <span>{currentStep === infographicSteps.length - 1 ? 'انتهاء' : 'التالي'}</span>
+                <ChevronRightIcon className="h-5 w-5" />
               </button>
             </div>
           </div>

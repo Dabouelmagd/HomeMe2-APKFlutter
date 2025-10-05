@@ -3183,7 +3183,7 @@ const resources = {
       'age': 'Âge',
       'actions': 'Actions',
       'no_results': 'Aucun Résultat',
-      'no_residents_found': 'Aucun résident trouvé correspondant à la recherche'
+      'no_residents_found': 'Aucun résident trouvé correspondant à la recherche',
       'financial_services': 'Services Financiers',
       'communication': 'Communication',
       'tools_resources': 'Outils et Ressources',

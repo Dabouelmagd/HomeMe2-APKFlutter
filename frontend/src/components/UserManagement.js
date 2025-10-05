@@ -405,7 +405,7 @@ const UserManagement = () => {
                           <button 
                             onClick={() => handleToggleUserStatus(userItem.id, userItem.is_active)}
                             className={`${userItem.is_active ? 'text-red-600 hover:text-red-900' : 'text-green-600 hover:text-green-900'}`}
-                            title={userItem.is_active ? 'إلغاء التفعيل' : 'تفعيل'}
+                            title={userItem.is_active ? t('deactivate') : t('activate')}
                           >
                             {userItem.is_active ? <XCircleIcon className="h-4 w-4" /> : <CheckCircleIcon className="h-4 w-4" />}
                           </button>

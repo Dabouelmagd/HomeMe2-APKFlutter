@@ -29,6 +29,7 @@ import ServiceBooking from './components/ServiceBooking';
 import Pricing from './components/Pricing';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
+import ResidentsList from './components/ResidentsList';
 import MobileAppPage from './pages/MobileAppPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';

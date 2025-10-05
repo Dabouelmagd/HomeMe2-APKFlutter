@@ -1582,8 +1582,8 @@ const CompoundManagement = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">روابط التسجيل</h3>
-                <p className="text-gray-600">إنشاء وإدارة روابط التسجيل للمقيمين الجدد</p>
+                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('registration_links')}</h3>
+                <p className="text-gray-600">{t('create_manage_registration_links')}</p>
               </div>
               <button
                 onClick={() => setShowAddResidence(true)}

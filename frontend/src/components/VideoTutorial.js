@@ -611,11 +611,11 @@ const VideoTutorial = () => {
                     }`}
                     onClick={() => setCurrentStep(index)}
                   >
-                    <div className={`text-4xl mb-3 ${index === currentStep ? 'animate-bounce' : ''}`}>
+                    <div className={`text-4xl mb-3 ${index === safeCurrentStep ? 'animate-bounce' : ''}`}>
                       {step.icon}
                     </div>
                     <h4 className={`font-bold text-sm mb-2 ${
-                      index === currentStep ? 'text-blue-800' : 'text-gray-700'
+                      index === safeCurrentStep ? 'text-blue-800' : 'text-gray-700'
                     }`}>
                       {step.title}
                     </h4>

@@ -49,11 +49,9 @@
 ##
 test_plan:
   current_focus: 
-    - "CompoundManagement Translation Testing"
+    - "CompoundManagement Language Switcher Testing After Layout Wrapper Update"
     - "Arabic Interface Tab Translation Verification"
-  stuck_tasks: 
-    - "Language Switcher UI Visibility"
-    - "Arabic Language Switching Mechanism"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 

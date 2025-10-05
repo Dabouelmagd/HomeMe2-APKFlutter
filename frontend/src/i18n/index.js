@@ -1375,6 +1375,8 @@ const resources = {
       'compound_management': 'Compound Management',
       'overview': 'Overview',
       'residence_list': 'Residence List',
+      'residences_list': 'Residences List',
+      'view_all_residences_occupancy': 'View all residential units and occupancy rate',
       'view_all_residential': 'View all residential units and their occupancy',
       'add_resident_family': 'Add Resident + Family',
       'create_new_resident': 'Create new resident account with complete family management setup',

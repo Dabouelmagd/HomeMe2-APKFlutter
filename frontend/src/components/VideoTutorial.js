@@ -603,9 +603,9 @@ const VideoTutorial = () => {
                   <div
                     key={step.id}
                     className={`text-center p-6 rounded-2xl cursor-pointer transition-all duration-300 ${
-                      index === currentStep
+                      index === safeCurrentStep
                         ? 'bg-blue-100 border-2 border-blue-500 scale-110 shadow-lg'
-                        : index < currentStep
+                        : index < safeCurrentStep
                         ? 'bg-green-100 border-2 border-green-500'
                         : 'bg-gray-100 border-2 border-gray-300'
                     }`}

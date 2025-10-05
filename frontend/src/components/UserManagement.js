@@ -535,7 +535,7 @@ const UserManagement = () => {
                   className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                 />
                 <label htmlFor="is_active" className="mr-2 block text-sm text-gray-900">
-                  حساب نشط
+                  {t('active_account')}
                 </label>
               </div>
               

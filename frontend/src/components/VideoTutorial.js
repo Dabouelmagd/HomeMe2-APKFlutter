@@ -667,38 +667,58 @@ const VideoTutorial = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center space-x-3 text-sm">
+                  <div className="flex items-center space-x-2 text-sm">
+                    {/* Skip Controls */}
+                    <button
+                      onClick={restartCurrent}
+                      className="px-2 py-1 bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors"
+                      title="إعادة تشغيل (R)"
+                    >
+                      <span className="text-xs">🔄</span>
+                    </button>
+                    
+                    <button
+                      onClick={skipToNext}
+                      disabled={currentStep === infographicSteps.length - 1}
+                      className="px-2 py-1 bg-yellow-600 hover:bg-yellow-700 rounded-lg transition-colors disabled:opacity-50"
+                      title="تخطي (S)"
+                    >
+                      <span className="text-xs">⏭️</span>
+                    </button>
+                    
+                    {/* Fullscreen */}
                     <button
                       onClick={toggleFullscreen}
                       className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
-                      title={isFullscreen ? 'تصغير الشاشة' : 'ملء الشاشة'}
+                      title={isFullscreen ? 'تصغير الشاشة (F)' : 'ملء الشاشة (F)'}
                     >
                       {isFullscreen ? (
-                        <ArrowsPointingInIcon className="h-5 w-5" />
+                        <ArrowsPointingInIcon className="h-4 w-4" />
                       ) : (
-                        <ArrowsPointingOutIcon className="h-5 w-5" />
+                        <ArrowsPointingOutIcon className="h-4 w-4" />
                       )}
                     </button>
                     
+                    {/* Auto Play Toggle */}
                     <button
                       onClick={() => {
                         setAutoPlay(!autoPlay);
                         playAudioFeedback('click');
                       }}
-                      className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                      className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
                         autoPlay ? 'bg-green-600 text-white' : 'bg-white bg-opacity-20 text-white'
                       }`}
                       title={autoPlay ? 'إيقاف التشغيل التلقائي' : 'تفعيل التشغيل التلقائي'}
                     >
-                      🔄 {autoPlay ? 'تلقائي مفعل' : 'يدوي'}
+                      {autoPlay ? '🟢' : '🔴'}
                     </button>
                     
-                    <div className="flex items-center space-x-2 bg-white bg-opacity-20 px-3 py-1 rounded-lg">
-                      <span className="text-xs">⚡</span>
-                      <span className="text-xs font-medium">سرعة طبيعية</span>
+                    {/* Speed Indicator */}
+                    <div className="bg-white bg-opacity-20 px-2 py-1 rounded-lg">
+                      <span className="text-xs font-medium">⚡ سريع</span>
                     </div>
                     
-                    <span className="text-blue-200 font-semibold">دقيقتان</span>
+                    <span className="text-blue-200 font-semibold text-xs">30 ثانية</span>
                   </div>
                 </div>
               </div>

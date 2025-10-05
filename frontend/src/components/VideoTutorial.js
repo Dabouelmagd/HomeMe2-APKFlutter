@@ -124,23 +124,52 @@ const VideoTutorial = () => {
     }
   };
 
-  // Simple audio system with pleasant sounds (no annoying beeps)
-  const playAudioFeedback = async (type = 'play') => {
+  // Enhanced audio system with clear, pleasant sounds
+  const playAudioFeedback = (type = 'play') => {
     if (isMuted) return;
     
-    // Simple pleasant notification sounds using HTML5 Audio
     try {
-      // Use simple click sounds instead of annoying beeps
-      const audioElement = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaQQJ5');
-      audioElement.volume = Math.min(volume / 100, 0.1); // Very low volume
-      audioElement.play().catch(() => {
-        // Silently fail if audio doesn't work
-        showVisualAudioFeedback(type);
-      });
+      // Create pleasant audio tones using Web Audio API
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      
+      if (audioContext.state === 'suspended') {
+        audioContext.resume().then(() => playSimpleSound(audioContext, type));
+      } else {
+        playSimpleSound(audioContext, type);
+      }
     } catch (error) {
-      // Just show visual feedback if audio fails
+      // Show visual feedback if audio fails
       showVisualAudioFeedback(type);
     }
+  };
+
+  const playSimpleSound = (ctx, type) => {
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    // Pleasant sound frequencies
+    const frequencies = {
+      play: 523,    // C5 note - pleasant start sound
+      pause: 440,   // A4 note - neutral pause sound  
+      complete: 659, // E5 note - happy completion sound
+      next: 587,    // D5 note - forward navigation
+      prev: 494,    // B4 note - backward navigation
+      skip: 698     // F5 note - skip sound
+    };
+    
+    const freq = frequencies[type] || 523;
+    const vol = Math.min(volume / 100, 0.15); // Clear but not too loud
+    
+    oscillator.frequency.setValueAtTime(freq, ctx.currentTime);
+    gainNode.gain.setValueAtTime(0, ctx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.05);
+    gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
+    
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + 0.25);
   };
 
   // Removed annoying beep sounds - using simple visual feedback instead

@@ -221,6 +221,18 @@ const ResidentsList = () => {
               <option key={unit.id} value={unit.id}>{unit.unit_number}</option>
             ))}
           </select>
+          
+          <select
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="">{t('all_relationships') || 'جميع العلاقات'}</option>
+            <option value="head">{t('family_head') || 'رب الأسرة'}</option>
+            <option value="spouse">{t('spouse') || 'الزوج/ة'}</option>
+            <option value="child">{t('child') || 'طفل'}</option>
+            <option value="other">{t('other') || 'أخرى'}</option>
+          </select>
         </div>
 
         {/* Stats Cards */}

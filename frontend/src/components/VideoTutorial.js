@@ -769,15 +769,24 @@ const VideoTutorial = () => {
                       
                       {!isMuted && (
                         <div className="flex items-center space-x-2">
+                          {/* Enhanced volume slider with audio test */}
                           <input
                             type="range"
                             min="0"
                             max="100"
                             value={volume}
-                            onChange={(e) => setVolume(parseInt(e.target.value))}
-                            className="w-16 h-1 bg-white bg-opacity-30 rounded-lg appearance-none slider"
+                            onChange={(e) => {
+                              const newVolume = parseInt(e.target.value);
+                              setVolume(newVolume);
+                              // Test audio at new volume level
+                              setTimeout(() => playAudioFeedback('click'), 100);
+                            }}
+                            className="w-20 h-2 bg-white bg-opacity-30 rounded-lg appearance-none slider"
+                            title={`مستوى الصوت: ${volume}%`}
                           />
-                          <span className="text-xs w-8">{volume}%</span>
+                          <span className="text-xs font-bold text-white bg-white/20 px-2 py-1 rounded">
+                            {volume}%
+                          </span>
                         </div>
                       )}
                     </div>

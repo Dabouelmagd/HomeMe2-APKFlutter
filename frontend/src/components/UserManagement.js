@@ -208,7 +208,7 @@ const UserManagement = () => {
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
             >
               <UserPlusIcon className="h-5 w-5" />
-              <span>إضافة مستخدم جديد</span>
+              <span>{t('add_new_user')}</span>
             </button>
           </div>
         </div>

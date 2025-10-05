@@ -1530,6 +1530,7 @@ const resources = {
       'email_address': 'البريد الإلكتروني',
       'working_hours': 'ساعات العمل',
       'cancel': 'إلغاء',
+      'all_units': 'جميع الوحدات',
       'click_to_upload_image': 'اضغط لرفع صورة',
       
       // Financial Management Page

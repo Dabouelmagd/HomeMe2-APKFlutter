@@ -49,7 +49,8 @@
 ##
 test_plan:
   current_focus: 
-    - "UserManagement Page Translation and Functionality Testing"
+    - "View Payments Button Navigation Testing"
+    - "Financial Management Page Functionality Testing"
   stuck_tasks: 
     - "UserManagement Backend API Integration"
   test_all: false

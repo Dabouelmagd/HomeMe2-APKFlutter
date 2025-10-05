@@ -283,8 +283,8 @@ const VideoTutorial = () => {
     }
   }, [currentStep]);
 
-  const currentStep = Math.min(currentStep, infographicSteps.length - 1);
-  const currentInfo = infographicSteps[currentStep] || infographicSteps[0];
+  const safeCurrentStep = Math.min(currentStep, infographicSteps.length - 1);
+  const currentInfo = infographicSteps[safeCurrentStep] || infographicSteps[0];
 
   return (
     <>

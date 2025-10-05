@@ -2490,7 +2490,7 @@ const CompoundManagement = () => {
                               {t('create_direct_residence')}
                             </h4>
                             <p className="text-sm text-green-700 mt-1">
-                              سيتم إنشاء إقامة جديدة وحساب المقيم فوراً. سيتمكن المقيم من تسجيل الدخول بإيميله وسيتم إنتاج كلمة مرور مؤقتة.
+                              {t('direct_residence_description')}
                             </p>
                           </div>
                         </div>

@@ -316,13 +316,34 @@ const CompoundManagement = () => {
   };
 
   useEffect(() => {
-    fetchCompound();
-    fetchResidences();
-    if (user?.role === 'admin') {
-      fetchRegistrationLinks();
-      fetchAllUsers();
-    }
-  }, []);
+    // Debounce and prevent multiple calls
+    let isMounted = true;
+    
+    const loadData = async () => {
+      if (!user?.compound_id || !isMounted) return;
+      
+      try {
+        await fetchCompound();
+        await fetchResidences();
+        if (user?.role === 'admin' && isMounted) {
+          await fetchRegistrationLinks();
+          await fetchAllUsers();
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+    };
+
+    // Add delay to prevent rapid requests
+    const timeoutId = setTimeout(() => {
+      loadData();
+    }, 100);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [user?.compound_id, user?.role]);
 
   const fetchCompound = async () => {
     try {

@@ -1798,7 +1798,7 @@ const resources = {
       'age': 'العمر',
       'actions': 'الإجراءات',
       'no_results': 'لا توجد نتائج',
-      'no_residents_found': 'لم يتم العثور على أي سكان يطابقون البحث'
+      'no_residents_found': 'لم يتم العثور على أي سكان يطابقون البحث',
       'financial_services': 'الخدمات المالية',
       'communication': 'التواصل والإشعارات',
       'tools_resources': 'الأدوات والموارد',

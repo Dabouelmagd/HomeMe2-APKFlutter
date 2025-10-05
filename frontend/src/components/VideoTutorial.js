@@ -149,35 +149,22 @@ const VideoTutorial = () => {
     }
   };
 
-  // Enhanced audio system with multiple fallbacks and better initialization
+  // Simple audio system with pleasant sounds (no annoying beeps)
   const playAudioFeedback = async (type = 'play') => {
     if (isMuted) return;
     
+    // Simple pleasant notification sounds using HTML5 Audio
     try {
-      // Method 1: Try Web Audio API with better error handling
-      let ctx = audioContext;
-      if (!ctx) {
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
-        setAudioContext(ctx);
-      }
-      
-      // Resume context if suspended (browser policy)
-      if (ctx.state === 'suspended') {
-        await ctx.resume();
-      }
-      
-      await playActualSound(ctx, type);
-      
-    } catch (error) {
-      console.log('Primary audio failed, trying backup method:', error.message);
-      // Fallback: Use HTML5 Audio
-      try {
-        playHTMLAudio(type);
-      } catch (fallbackError) {
-        console.log('HTML5 audio failed, showing visual feedback');
-        // Visual feedback only
+      // Use simple click sounds instead of annoying beeps
+      const audioElement = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaQQJ5');
+      audioElement.volume = Math.min(volume / 100, 0.1); // Very low volume
+      audioElement.play().catch(() => {
+        // Silently fail if audio doesn't work
         showVisualAudioFeedback(type);
-      }
+      });
+    } catch (error) {
+      // Just show visual feedback if audio fails
+      showVisualAudioFeedback(type);
     }
   };
 

@@ -152,7 +152,7 @@ const ResidentsList = () => {
         }
       });
 
-      toast.success('تم إضافة المقيم بنجاح!');
+      toast.success(t('add_resident_success'));
       setShowAddResident(false);
       setNewResident({
         name: '',

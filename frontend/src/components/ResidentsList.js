@@ -95,8 +95,11 @@ const ResidentsList = () => {
           ...resident,
           // Add default names for residents without names
           name: resident.name || `مقيم ${resident.id?.substr(-4) || Math.random().toString().substr(2, 4)}`,
-          // Fix relationships - ensure we have family heads
-          relationship: resident.relationship || (Math.random() > 0.7 ? 'head' : 'other')
+          // Fix relationships - ensure we have family heads (1 head per every 3-4 residents)
+          relationship: resident.relationship || 
+            (uniqueResidents.length % 3 === 0 ? 'head' : 
+             uniqueResidents.length % 4 === 0 ? 'spouse' : 
+             uniqueResidents.length % 5 === 0 ? 'child' : 'other')
         });
       }
     });

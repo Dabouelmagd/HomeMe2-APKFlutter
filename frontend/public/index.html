@@ -50,6 +50,39 @@
     </script>
     <div id="root"></div>
     
+    <!-- Force cache clear script for development -->
+    <script>
+      // Force clear all caches and reload for latest changes
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(registration => {
+          console.log('HomeMe: Sending cache clear command...');
+          if (registration.active) {
+            registration.active.postMessage({ type: 'CLEAR_ALL_CACHES' });
+          }
+        });
+        
+        // Listen for cache cleared message
+        navigator.serviceWorker.addEventListener('message', event => {
+          if (event.data && event.data.type === 'CACHE_CLEARED') {
+            console.log('HomeMe: Cache cleared, reloading page...');
+            window.location.reload(true);
+          }
+        });
+      }
+      
+      // Also clear browser cache programmatically
+      if ('caches' in window) {
+        caches.keys().then(names => {
+          names.forEach(name => {
+            if (name.includes('homeme')) {
+              console.log('HomeMe: Deleting cache:', name);
+              caches.delete(name);
+            }
+          });
+        });
+      }
+    </script>
+    
     <!-- PWA Install Prompt -->
     <div id="pwa-install-prompt" style="display: none;">
       <div style="position: fixed; bottom: 20px; left: 20px; right: 20px; background: #2563eb; color: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000;">

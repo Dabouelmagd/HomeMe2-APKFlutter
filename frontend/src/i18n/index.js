@@ -3116,6 +3116,8 @@ const resources = {
       'main_sections': 'Sections Principales',
       'services_maintenance': 'Services et Maintenance',
       'family_management_section': 'Gestion de Famille',
+      'residents_list': 'Liste des Résidents',
+      'user_management': 'Gestion des Utilisateurs',
       'financial_services': 'Services Financiers',
       'communication': 'Communication',
       'tools_resources': 'Outils et Ressources',

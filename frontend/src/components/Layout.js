@@ -174,6 +174,12 @@ const Layout = ({ children }) => {
           href: '/residents',
           icon: UserGroupIcon,
           show: user?.role === 'admin'
+        },
+        {
+          name: 'إدارة المستخدمين',
+          href: '/users',
+          icon: UsersIcon,
+          show: user?.role === 'admin'
         }
       ]
     },

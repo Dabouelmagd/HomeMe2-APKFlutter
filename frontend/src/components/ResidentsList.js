@@ -500,7 +500,7 @@ const ResidentsList = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  العلاقة بالأسرة
+                  {t('family_relationship')}
                 </label>
                 <select
                   value={newResident.relationship}

@@ -159,7 +159,7 @@ const UserManagement = () => {
       loadUsersData();
     } catch (error) {
       console.error('Failed to delete user:', error);
-      toast.error('فشل في حذف المستخدم');
+      toast.error(t('user_delete_failed'));
     }
   };
 

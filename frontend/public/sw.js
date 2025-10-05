@@ -144,8 +144,29 @@ async function handleApiRequest(request) {
   }
 }
 
-// Handle static assets with cache-first strategy
+// Handle static assets with network-first strategy for JS files during development
 async function handleStaticRequest(request) {
+  const url = new URL(request.url);
+  
+  // For JS files, try network first to get latest changes
+  if (url.pathname.includes('.js') || url.pathname.includes('main.')) {
+    try {
+      console.log('HomeMe PWA: Fetching latest JS from network:', url.pathname);
+      const networkResponse = await fetch(request);
+      const cache = await caches.open(STATIC_CACHE);
+      await cache.put(request, networkResponse.clone());
+      return networkResponse;
+    } catch (error) {
+      console.log('HomeMe PWA: Network failed for JS, trying cache:', url.pathname);
+      const cachedResponse = await caches.match(request);
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      throw error;
+    }
+  }
+  
+  // For other static assets, use cache-first
   const cachedResponse = await caches.match(request);
   if (cachedResponse) {
     return cachedResponse;

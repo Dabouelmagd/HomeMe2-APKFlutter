@@ -449,7 +449,7 @@ const VideoTutorial = () => {
                     </div>
                     
                     <div className="mt-4 text-lg">
-                      الخطوة {currentStep + 1} من {infographicSteps.length}
+                      الخطوة {safeCurrentStep + 1} من {infographicSteps.length}
                     </div>
                   </div>
                 </div>

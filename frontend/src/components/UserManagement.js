@@ -137,7 +137,7 @@ const UserManagement = () => {
         }
       );
 
-      toast.success(currentStatus ? 'تم إلغاء تفعيل المستخدم' : 'تم تفعيل المستخدم');
+      toast.success(currentStatus ? t('user_deactivated') : t('user_activated'));
       loadUsersData();
     } catch (error) {
       console.error('Failed to toggle user status:', error);

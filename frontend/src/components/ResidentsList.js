@@ -374,7 +374,7 @@ const ResidentsList = () => {
                         <div className="flex items-center">
                           <HomeIcon className="h-4 w-4 text-gray-400 ml-2" />
                           <span className="text-sm text-gray-900">
-                            {resident.unit_number || 'غير محدد'}
+                            {resident.unit_number || t('not_specified')}
                           </span>
                         </div>
                       </td>

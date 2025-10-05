@@ -1,7 +1,7 @@
 // HomeMe PWA Service Worker
-const CACHE_NAME = 'homeme-pwa-v1.0';
-const STATIC_CACHE = 'homeme-static-v1.0';
-const DYNAMIC_CACHE = 'homeme-dynamic-v1.0';
+const CACHE_NAME = 'homeme-pwa-v1.2';
+const STATIC_CACHE = 'homeme-static-v1.2';
+const DYNAMIC_CACHE = 'homeme-dynamic-v1.2';
 
 // Cache resources for offline functionality
 const STATIC_ASSETS = [

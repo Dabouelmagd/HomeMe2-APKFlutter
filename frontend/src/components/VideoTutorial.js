@@ -342,25 +342,15 @@ const VideoTutorial = () => {
             </button>
             
             <button
-              onClick={async () => {
-                // Force enable audio with user gesture
+              onClick={() => {
                 setIsMuted(false);
-                try {
-                  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                  if (ctx.state === 'suspended') {
-                    await ctx.resume();
-                  }
-                  setAudioContext(ctx);
-                  await playAudioFeedback('play');
-                } catch (error) {
-                  console.log('Audio initialization failed:', error);
-                  showVisualAudioFeedback('play');
-                }
+                // Simple visual feedback instead of annoying beeps
+                showVisualAudioFeedback('play');
               }}
-              className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2 animate-pulse"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center space-x-2 shadow-lg"
             >
-              <SpeakerWaveIcon className="h-5 w-5" />
-              <span className="text-sm">🔊 تفعيل الصوت الآن</span>
+              <SpeakerWaveIcon className="h-6 w-6" />
+              <span className="text-base">🔕➡️🔊 صوت بصري فقط</span>
             </button>
           </div>
         </div>

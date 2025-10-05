@@ -68,7 +68,7 @@ const UserManagement = () => {
       }
     } catch (error) {
       console.error('Failed to load users:', error);
-      toast.error('فشل في تحميل قائمة المستخدمين');
+      toast.error(t('failed_to_load_users'));
     } finally {
       setLoading(false);
     }

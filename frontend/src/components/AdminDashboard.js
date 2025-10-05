@@ -145,8 +145,8 @@ const AdminDashboard = () => {
     },
     {
       id: 'manage_users',
-      name: 'إدارة المستخدمين',
-      description: 'إضافة وإدارة حسابات المستخدمين',
+      name: t('user_management'),
+      description: t('add_manage_user_accounts'),
       icon: UserGroupIcon,
       color: 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
     },

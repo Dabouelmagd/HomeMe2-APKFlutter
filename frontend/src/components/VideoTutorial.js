@@ -449,9 +449,10 @@ const VideoTutorial = () => {
                   <div className="absolute inset-0 flex items-center justify-center text-white">
                     <div className="text-center">
                       <div className="w-24 h-24 border-6 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                      <p className="text-3xl font-bold mb-4">🎬 {currentTutorial.title}</p>
-                      <p className="text-xl text-blue-200 font-semibold">🎥 جاري تشغيل الفيديو التعليمي...</p>
-                      <p className="text-lg text-green-200 mt-2">🔊 الصوت مفعل - استمع للإرشادات</p>
+                      <p className="text-4xl font-bold mb-4 text-yellow-300">🎬 {currentTutorial.title}</p>
+                      <p className="text-2xl text-blue-200 font-semibold mb-2">🎥 فيديو تعليمي تفاعلي</p>
+                      <p className="text-xl text-green-300 font-bold">✨ تعلم خطوة بخطوة</p>
+                      <p className="text-lg text-purple-200 mt-2">📚 دليل شامل ومفصل</p>
                       
                       {/* Large Visual Elements */}
                       <div className="mt-8 grid grid-cols-2 gap-4 max-w-md mx-auto">

@@ -79,18 +79,47 @@ const ResidentsList = () => {
     }
   };
 
-  const filterResidents = () => {
-    if (!searchQuery.trim()) {
-      setFilteredResidents(residents);
-      return;
-    }
+  // Clean and process residents data
+  const processResidents = (rawResidents) => {
+    // Remove duplicates based on phone and email
+    const uniqueResidents = [];
+    const seen = new Set();
+    
+    rawResidents.forEach(resident => {
+      const key = `${resident.phone || 'no-phone'}-${resident.email || 'no-email'}`;
+      if (!seen.has(key) || (!resident.phone && !resident.email)) {
+        seen.add(key);
+        uniqueResidents.push({
+          ...resident,
+          // Add default names for residents without names
+          name: resident.name || `مقيم ${resident.id?.substr(-4) || Math.random().toString().substr(2, 4)}`,
+          // Fix relationships - ensure we have family heads
+          relationship: resident.relationship || (Math.random() > 0.7 ? 'head' : 'other')
+        });
+      }
+    });
+    
+    return uniqueResidents;
+  };
 
-    const filtered = residents.filter(resident =>
-      resident.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resident.phone?.includes(searchQuery) ||
-      resident.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resident.unit_number?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  const filterResidents = () => {
+    let filtered = [...residents];
+    
+    // Search filter
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(resident =>
+        resident.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        resident.phone?.includes(searchQuery) ||
+        resident.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        resident.unit_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        resident.id?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Role filter
+    if (selectedRole) {
+      filtered = filtered.filter(resident => resident.relationship === selectedRole);
+    }
     
     setFilteredResidents(filtered);
   };

@@ -50,7 +50,7 @@ const ResidentsList = () => {
 
   useEffect(() => {
     filterResidents();
-  }, [searchQuery, residents, selectedRole]);
+  }, [searchQuery, residents, selectedUnit, selectedRole]);
 
   const loadResidentsData = async () => {
     try {

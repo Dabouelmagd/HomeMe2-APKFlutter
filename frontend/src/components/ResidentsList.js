@@ -507,10 +507,10 @@ const ResidentsList = () => {
                   onChange={(e) => setNewResident({...newResident, relationship: e.target.value})}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="head">رب الأسرة</option>
-                  <option value="spouse">الزوج/ة</option>
-                  <option value="child">طفل</option>
-                  <option value="other">أخرى</option>
+                  <option value="head">{t('family_head')}</option>
+                  <option value="spouse">{t('spouse')}</option>
+                  <option value="child">{t('child')}</option>
+                  <option value="other">{t('other')}</option>
                 </select>
               </div>
               

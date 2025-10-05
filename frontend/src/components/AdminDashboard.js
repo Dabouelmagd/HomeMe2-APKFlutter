@@ -143,10 +143,10 @@ const AdminDashboard = () => {
       color: 'text-blue-600 bg-blue-50 hover:bg-blue-100'
     },
     {
-      id: 'manage_units',
-      name: t('manage_units'),
-      description: t('view_all_units'),
-      icon: HomeIcon,
+      id: 'manage_users',
+      name: 'إدارة المستخدمين',
+      description: 'إضافة وإدارة حسابات المستخدمين',
+      icon: UserGroupIcon,
       color: 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'
     },
     {

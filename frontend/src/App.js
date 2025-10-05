@@ -338,9 +338,7 @@ function App() {
                 
                 <Route path="compound" element={
                   <ProtectedRoute adminOnly>
-                    <Layout>
-                      <CompoundManagement />
-                    </Layout>
+                    <CompoundManagement />
                   </ProtectedRoute>
                 } />
                 

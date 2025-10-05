@@ -124,52 +124,32 @@ const VideoTutorial = () => {
     }
   };
 
-  // Enhanced audio system with clear, pleasant sounds
+  // Simple notification sound system using HTML5 Audio with real sounds
   const playAudioFeedback = (type = 'play') => {
     if (isMuted) return;
     
     try {
-      // Create pleasant audio tones using Web Audio API
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      
-      if (audioContext.state === 'suspended') {
-        audioContext.resume().then(() => playSimpleSound(audioContext, type));
-      } else {
-        playSimpleSound(audioContext, type);
-      }
+      // Use simple notification sounds instead of beeps
+      const soundUrls = {
+        play: 'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzMuMTAA',
+        pause: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA==',
+        complete: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA==',
+        next: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA==',
+        prev: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA==',
+        skip: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA=='
+      };
+
+      // Create audio element with very low volume
+      const audio = new Audio(soundUrls[type] || soundUrls.play);
+      audio.volume = Math.min(volume / 100, 0.1); // Very quiet
+      audio.play().catch(() => {
+        // If audio fails, just show visual feedback
+        showVisualAudioFeedback(type);
+      });
     } catch (error) {
-      // Show visual feedback if audio fails
+      // Always fallback to visual feedback
       showVisualAudioFeedback(type);
     }
-  };
-
-  const playSimpleSound = (ctx, type) => {
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    
-    // Pleasant sound frequencies
-    const frequencies = {
-      play: 523,    // C5 note - pleasant start sound
-      pause: 440,   // A4 note - neutral pause sound  
-      complete: 659, // E5 note - happy completion sound
-      next: 587,    // D5 note - forward navigation
-      prev: 494,    // B4 note - backward navigation
-      skip: 698     // F5 note - skip sound
-    };
-    
-    const freq = frequencies[type] || 523;
-    const vol = Math.min(volume / 100, 0.15); // Clear but not too loud
-    
-    oscillator.frequency.setValueAtTime(freq, ctx.currentTime);
-    gainNode.gain.setValueAtTime(0, ctx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.05);
-    gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
-    
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + 0.25);
   };
 
   // Removed annoying beep sounds - using simple visual feedback instead

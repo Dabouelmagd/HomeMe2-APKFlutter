@@ -334,22 +334,34 @@ const ResidentsList = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredResidents.map((resident) => (
-                    <tr key={resident.id} className="hover:bg-gray-50">
+                    <tr key={resident.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                              <span className="text-sm font-medium text-blue-600">
-                                {resident.name?.charAt(0)?.toUpperCase()}
+                          <div className="flex-shrink-0 h-12 w-12">
+                            <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                              resident.relationship === 'head' ? 'bg-blue-100 border-2 border-blue-300' :
+                              resident.relationship === 'spouse' ? 'bg-green-100' :
+                              resident.relationship === 'child' ? 'bg-purple-100' :
+                              'bg-gray-100'
+                            }`}>
+                              <span className={`text-sm font-bold ${
+                                resident.relationship === 'head' ? 'text-blue-700' :
+                                resident.relationship === 'spouse' ? 'text-green-700' :
+                                resident.relationship === 'child' ? 'text-purple-700' :
+                                'text-gray-700'
+                              }`}>
+                                {resident.name?.charAt(0)?.toUpperCase() || '؟'}
                               </span>
                             </div>
                           </div>
                           <div className="mr-4">
                             <div className="text-sm font-medium text-gray-900">
-                              {resident.name}
+                              {resident.name || `${t('resident') || 'مقيم'} ${resident.id?.substr(-4)}`}
                             </div>
-                            <div className="text-sm text-gray-500">
-                              ID: {resident.id}
+                            <div className="text-xs text-gray-500 flex items-center">
+                              <span className="bg-gray-100 px-2 py-1 rounded text-xs">
+                                ID: {resident.id?.substr(-8) || 'غير محدد'}
+                              </span>
                             </div>
                           </div>
                         </div>

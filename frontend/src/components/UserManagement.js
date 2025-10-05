@@ -262,7 +262,7 @@ const UserManagement = () => {
                 <CheckCircleIcon className="h-6 w-6 text-green-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">مستخدمين نشطين</p>
+                <p className="text-sm font-medium text-gray-500">{t('active_users')}</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {users.filter(u => u.is_active).length}
                 </p>

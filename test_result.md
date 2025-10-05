@@ -49,7 +49,7 @@
 ##
 test_plan:
   current_focus: 
-    - "HomeMe Logo Sidebar Enhancement Testing"
+    - "Rate Limiting Fix Testing for 429 Too Many Requests Error"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

@@ -102,6 +102,7 @@ const resources = {
       'email_address': 'Email Address',
       'working_hours': 'Working Hours',
       'cancel': 'Cancel',
+      'all_units': 'All Units',
       'click_to_upload_image': 'Click to upload image',
       
       // Financial Management Page

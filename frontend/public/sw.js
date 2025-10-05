@@ -368,6 +368,27 @@ self.addEventListener('message', event => {
           })
         );
         break;
+      case 'CLEAR_ALL_CACHES':
+        console.log('HomeMe PWA: Clearing all caches on demand');
+        event.waitUntil(
+          caches.keys().then(cacheNames => {
+            return Promise.all(
+              cacheNames.map(cacheName => {
+                console.log('HomeMe PWA: Deleting cache:', cacheName);
+                return caches.delete(cacheName);
+              })
+            );
+          }).then(() => {
+            console.log('HomeMe PWA: All caches cleared, reloading...');
+            // Force reload all clients
+            return self.clients.matchAll().then(clients => {
+              clients.forEach(client => {
+                client.postMessage({ type: 'CACHE_CLEARED' });
+              });
+            });
+          })
+        );
+        break;
     }
   }
 });

@@ -382,13 +382,14 @@ const VideoTutorial = () => {
           <div className={`bg-white w-full max-h-screen overflow-y-auto transition-all duration-300 video-tutorial-modal ${
             isFullscreen ? 'max-w-full h-full rounded-none' : 'max-w-full h-full'
           }`}>
-            {/* Modal Header */}
+            {/* Modal header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">
-                  {t('step')} {currentStep + 1}: {currentTutorial.title}
+                <h3 className="text-2xl font-bold text-gray-900 flex items-center space-x-3">
+                  <span className="text-3xl">{currentInfo.icon}</span>
+                  <span>{currentInfo.title}</span>
                 </h3>
-                <p className="text-gray-600">{currentTutorial.description}</p>
+                <p className="text-gray-600 mt-1">{currentInfo.simple}</p>
               </div>
               <button
                 onClick={() => setShowModal(false)}

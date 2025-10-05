@@ -488,14 +488,37 @@ const VideoTutorial = () => {
             </button>
             
             <button
-              onClick={() => {
+              onClick={async () => {
                 setIsMuted(false);
-                playAudioFeedback('play'); // Test the visual feedback system
+                // Initialize audio context with user gesture
+                try {
+                  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                  await audioCtx.resume();
+                  
+                  // Play test sound to confirm audio is working
+                  const testOsc = audioCtx.createOscillator();
+                  const testGain = audioCtx.createGain();
+                  testOsc.connect(testGain);
+                  testGain.connect(audioCtx.destination);
+                  
+                  testOsc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                  testGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                  testGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                  
+                  testOsc.start(audioCtx.currentTime);
+                  testOsc.stop(audioCtx.currentTime + 0.3);
+                  
+                  console.log('Audio test successful');
+                } catch (error) {
+                  console.log('Audio initialization failed:', error);
+                }
+                
+                playAudioFeedback('play'); // Test the audio system
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center space-x-2 shadow-lg"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center space-x-2 shadow-lg animate-pulse"
             >
               <SpeakerWaveIcon className="h-6 w-6" />
-              <span className="text-base">👁️ تفعيل التأثيرات البصرية</span>
+              <span className="text-base">🔊 تفعيل الصوت الواضح</span>
             </button>
           </div>
         </div>

@@ -170,13 +170,13 @@ const Layout = ({ children }) => {
           show: user?.role === 'admin'
         },
         {
-          name: 'قائمة السكان',
+          name: t('residents_list'),
           href: '/residents',
           icon: UserGroupIcon,
           show: user?.role === 'admin'
         },
         {
-          name: 'إدارة المستخدمين',
+          name: t('user_management'),
           href: '/users',
           icon: UsersIcon,
           show: user?.role === 'admin'

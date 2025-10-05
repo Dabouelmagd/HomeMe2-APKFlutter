@@ -419,9 +419,9 @@ const VideoTutorial = () => {
 
       {/* Tutorial Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50 p-1">
-          <div className={`bg-white rounded-xl w-full max-h-screen overflow-y-auto transition-all duration-300 video-tutorial-modal ${
-            isFullscreen ? 'max-w-full h-full rounded-none' : 'max-w-7xl h-[95vh]'
+        <div className="fixed inset-0 bg-black bg-opacity-98 flex items-center justify-center z-50 p-0">
+          <div className={`bg-white w-full max-h-screen overflow-y-auto transition-all duration-300 video-tutorial-modal ${
+            isFullscreen ? 'max-w-full h-full rounded-none' : 'max-w-full h-full'
           }`}>
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">

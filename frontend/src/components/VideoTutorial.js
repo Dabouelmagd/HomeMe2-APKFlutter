@@ -199,9 +199,9 @@ const VideoTutorial = () => {
           }
           return 100;
         }
-        return prev + 0.2; // Much slower progress - very realistic and easy to follow
+        return prev + 2; // Fast progress for quick infographic viewing
       });
-    }, 250); // Much slower updates for very natural video pace
+    }, 80); // Fast updates for snappy infographic experience
     
     return interval;
   };

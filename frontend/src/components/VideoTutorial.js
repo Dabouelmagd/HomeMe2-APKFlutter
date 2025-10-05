@@ -403,89 +403,46 @@ const VideoTutorial = () => {
               isFullscreen ? 'h-[85vh]' : 'h-[70vh] min-h-[500px]'
             }`}>
               {isPlaying ? (
-                // Active Video Simulation
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-600 animate-pulse">
-                  <div className="absolute inset-0 flex items-center justify-center text-white">
-                    <div className="text-center">
-                      <div className="w-24 h-24 border-6 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-                      <p className="text-4xl font-bold mb-4 text-yellow-300">🎬 {currentTutorial.title}</p>
-                      <p className="text-2xl text-blue-200 font-semibold mb-2">🎥 فيديو تعليمي تفاعلي</p>
-                      <p className="text-xl text-green-300 font-bold">✨ تعلم خطوة بخطوة</p>
-                      <p className="text-lg text-purple-200 mt-2">📚 دليل شامل ومفصل</p>
-                      
-                      {/* Large Visual Elements - More Creative */}
-                      <div className="mt-8 grid grid-cols-3 gap-6 max-w-2xl mx-auto">
-                        <div className="aspect-square bg-gradient-to-br from-blue-400 to-purple-600 rounded-3xl flex items-center justify-center animate-bounce shadow-2xl">
-                          <span className="text-6xl animate-pulse">📱</span>
-                        </div>
-                        <div className="aspect-square bg-gradient-to-br from-green-400 to-blue-600 rounded-3xl flex items-center justify-center animate-bounce delay-150 shadow-2xl">
-                          <span className="text-6xl animate-pulse">💻</span>
-                        </div>
-                        <div className="aspect-square bg-gradient-to-br from-purple-400 to-pink-600 rounded-3xl flex items-center justify-center animate-bounce delay-300 shadow-2xl">
-                          <span className="text-6xl animate-pulse">🏠</span>
-                        </div>
+                // Simple Infographic Animation
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-800 to-purple-800 flex items-center justify-center">
+                  <div className="text-center text-white max-w-4xl">
+                    
+                    {/* Big Visual Step */}
+                    <div className="mb-8">
+                      <div className="text-8xl mb-4 animate-bounce">
+                        {currentInfo.icon}
                       </div>
-                      
-                      {/* Realistic progress bar */}
-                      <div className="w-64 bg-white bg-opacity-20 rounded-full h-2 mx-auto mt-4">
-                        <div 
-                          className="bg-white h-2 rounded-full transition-all duration-300" 
-                          style={{width: `${videoProgress}%`}}
-                        ></div>
+                      <h2 className="text-4xl font-bold text-white mb-2">
+                        {currentInfo.title}
+                      </h2>
+                      <p className="text-xl text-blue-200">
+                        {currentInfo.simple}
+                      </p>
+                    </div>
+
+                    {/* Visual Flow */}
+                    <div className="flex items-center justify-center space-x-8 mb-8">
+                      <div className="text-6xl animate-pulse">
+                        {currentInfo.visual.main}
                       </div>
-                      
-                      {/* Live Tutorial Actions */}
-                      <div className="mt-6 text-sm text-blue-100 max-w-md">
-                        <p className="mb-3">📝 {currentTutorial.description}</p>
-                        
-                        {/* Current actions being demonstrated - More Clear */}
-                        {currentTutorial?.videoContent?.actions && (
-                          <div className="bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6 border border-white/20">
-                            <p className="font-bold mb-4 text-yellow-300 text-lg">🎬 الخطوات التعليمية:</p>
-                            <div className="space-y-3">
-                              {currentTutorial?.videoContent?.actions?.map((action, index) => (
-                                <div key={index} className={`text-base flex items-center space-x-3 p-2 rounded-lg ${
-                                  videoProgress > (index * 25) ? 'bg-green-500/30 text-green-200 border-l-4 border-green-400' : 'bg-white/10 text-white/70'
-                                }`}>
-                                  <span className="text-xl">{videoProgress > (index * 25) ? '✅' : '⏳'}</span>
-                                  <span className="flex-1">{action}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        
-                        <div className="grid grid-cols-3 gap-4 text-center">
-                          <div className="bg-blue-500/30 rounded-xl p-3 border border-blue-400/50">
-                            <div className="text-2xl mb-1">⏱️</div>
-                            <div className="text-sm font-semibold">{currentTutorial.duration}</div>
-                            <div className="text-xs opacity-75">المدة المقدرة</div>
-                          </div>
-                          <div className="bg-purple-500/30 rounded-xl p-3 border border-purple-400/50">
-                            <div className="text-2xl mb-1">📊</div>
-                            <div className="text-sm font-semibold">{currentStep + 1} من {tutorialSteps.length}</div>
-                            <div className="text-xs opacity-75">الخطوة الحالية</div>
-                          </div>
-                          <div className="bg-green-500/30 rounded-xl p-3 border border-green-400/50">
-                            <div className="text-2xl mb-1">🎯</div>
-                            <div className="text-sm font-semibold">{Math.round(videoProgress)}%</div>
-                            <div className="text-xs opacity-75">التقدم المحرز</div>
-                          </div>
-                        </div>
+                      <div className="text-4xl text-yellow-300 animate-bounce">
+                        {currentInfo.visual.arrow}
+                      </div>
+                      <div className="text-6xl animate-pulse delay-500">
+                        {currentInfo.visual.action}
                       </div>
                     </div>
-                  </div>
-                  
-                  {/* Animated overlay effects */}
-                  <div className="absolute top-0 left-0 w-full h-full">
-                    <div className="absolute top-4 left-4 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    <div className="absolute top-4 right-4 text-white text-sm">🔴 LIVE</div>
-                    <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2">
-                      <div className="flex space-x-2">
-                        {[1,2,3].map(i => (
-                          <div key={i} className="w-2 h-8 bg-white bg-opacity-60 animate-bounce" style={{animationDelay: `${i * 0.1}s`}}></div>
-                        ))}
-                      </div>
+
+                    {/* Simple Progress */}
+                    <div className="w-80 bg-white/20 rounded-full h-3 mx-auto">
+                      <div 
+                        className="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full transition-all duration-500" 
+                        style={{width: `${videoProgress}%`}}
+                      ></div>
+                    </div>
+                    
+                    <div className="mt-4 text-lg">
+                      الخطوة {currentStep + 1} من {infographicSteps.length}
                     </div>
                   </div>
                 </div>

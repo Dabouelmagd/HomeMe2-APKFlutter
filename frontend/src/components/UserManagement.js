@@ -417,7 +417,7 @@ const UserManagement = () => {
                           </button>
                           <button 
                             className="text-green-600 hover:text-green-900"
-                            title="تعديل"
+                            title={t('edit')}
                           >
                             <PencilIcon className="h-4 w-4" />
                           </button>

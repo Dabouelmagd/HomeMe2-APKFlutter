@@ -167,6 +167,12 @@ const Layout = ({ children }) => {
           href: '/compound',
           icon: BuildingOfficeIcon,
           show: user?.role === 'admin'
+        },
+        {
+          name: 'قائمة السكان',
+          href: '/residents',
+          icon: UserGroupIcon,
+          show: user?.role === 'admin'
         }
       ]
     },

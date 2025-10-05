@@ -483,7 +483,7 @@ const ResidentsList = () => {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  الوحدة السكنية
+                  {t('residential_unit')}
                 </label>
                 <select
                   required

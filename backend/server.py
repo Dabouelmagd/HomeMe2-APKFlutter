@@ -6186,9 +6186,10 @@ async def create_admin_account(
 
 @api_router.get("/admin/users")
 async def get_all_users(current_user: User = Depends(require_admin)):
-    """Get all users in the system (Admin only)"""
+    """Get all users in the compound (Admin only)"""
     try:
-        users = await db.users.find({}).to_list(None)
+        # Filter users by compound_id for multi-tenant support
+        users = await db.users.find({"compound_id": current_user.compound_id}).to_list(None)
         
         # Serialize datetime objects and remove sensitive data
         safe_users = []

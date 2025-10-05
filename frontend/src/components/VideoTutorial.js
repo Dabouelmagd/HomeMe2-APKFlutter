@@ -534,16 +534,37 @@ const VideoTutorial = () => {
                       </div>
                     </div>
 
-                    {/* Simple Progress */}
-                    <div className="w-80 bg-white/20 rounded-full h-3 mx-auto">
+                    {/* Enhanced Progress with Visual Feedback */}
+                    <div className="w-80 bg-white/20 rounded-full h-4 mx-auto mb-4 shadow-lg">
                       <div 
-                        className="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full transition-all duration-500" 
+                        className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 h-4 rounded-full transition-all duration-500 relative overflow-hidden" 
                         style={{width: `${videoProgress}%`}}
-                      ></div>
+                      >
+                        {/* Animated shine effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+                      </div>
                     </div>
                     
-                    <div className="mt-4 text-lg">
-                      الخطوة {safeCurrentStep + 1} من {infographicSteps.length}
+                    <div className="flex items-center justify-center space-x-4 mb-4">
+                      <div className="bg-white/20 px-4 py-2 rounded-xl">
+                        <span className="text-lg font-bold">الخطوة {safeCurrentStep + 1} من {infographicSteps.length}</span>
+                      </div>
+                      <div className="bg-white/20 px-4 py-2 rounded-xl animate-pulse">
+                        <span className="text-sm">{Math.round(videoProgress)}% مكتمل</span>
+                      </div>
+                    </div>
+                    
+                    {/* Visual indicators for current action */}
+                    <div className="flex justify-center space-x-2">
+                      {[1,2,3,4,5].map((i) => (
+                        <div 
+                          key={i}
+                          className={`w-2 h-8 rounded-full transition-all duration-300 ${
+                            videoProgress > (i * 20) ? 'bg-green-400 animate-bounce' : 'bg-white/30'
+                          }`}
+                          style={{animationDelay: `${i * 100}ms`}}
+                        ></div>
+                      ))}
                     </div>
                   </div>
                 </div>

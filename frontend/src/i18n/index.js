@@ -272,6 +272,8 @@ const resources = {
       'main_sections': 'Main Sections',
       'services_maintenance': 'Services & Maintenance',
       'family_management_section': 'Family Management',
+      'residents_list': 'Residents List',
+      'user_management': 'User Management',
       'financial_services': 'Financial Services',
       'communication': 'Communication',
       'tools_resources': 'Tools & Resources',

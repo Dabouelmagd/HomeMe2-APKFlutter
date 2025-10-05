@@ -532,25 +532,41 @@ const VideoTutorial = () => {
                 </div>
               ) : (
                 // Paused State
-                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600">
-                  <div className="text-center text-white">
-                    <div className="relative">
-                      <PlayCircleIcon className="h-20 w-20 mx-auto mb-4 opacity-80 hover:opacity-100 cursor-pointer transition-opacity" 
-                                     onClick={togglePlay} />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-6 h-6 bg-white rounded-full animate-ping opacity-20"></div>
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+                  <div className="text-center text-white max-w-4xl px-8">
+                    <div className="relative mb-8">
+                      <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl">
+                        <PlayCircleIcon className="h-20 w-20 text-white cursor-pointer hover:scale-110 transition-all duration-300" 
+                                       onClick={togglePlay} />
                       </div>
+                      <div className="absolute -inset-4 border-4 border-white/20 rounded-full animate-ping"></div>
                     </div>
-                    <p className="text-xl font-semibold mb-2">{currentTutorial.title}</p>
-                    <p className="text-purple-200">اضغط للتشغيل - فيديو تعليمي تفاعلي</p>
                     
-                    {/* Preview thumbnails */}
-                    <div className="mt-6 grid grid-cols-3 gap-2 max-w-sm mx-auto">
-                      {[1,2,3].map(i => (
-                        <div key={i} className="aspect-video bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                          <span className="text-xs">📱</span>
+                    <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
+                      {currentTutorial.title}
+                    </h2>
+                    <p className="text-xl text-blue-200 mb-6 font-semibold">اضغط للبدء - تعلم بطريقة تفاعلية ممتعة</p>
+                    <p className="text-lg text-purple-200 mb-8">{currentTutorial.description}</p>
+                    
+                    {/* Enhanced preview thumbnails */}
+                    <div className="grid grid-cols-6 gap-3 max-w-3xl mx-auto">
+                      {['📱', '💻', '🏠', '👥', '📊', '⚙️'].map((icon, i) => (
+                        <div key={i} className="aspect-square bg-gradient-to-br from-white/20 to-white/10 rounded-xl flex items-center justify-center border border-white/20 hover:scale-105 transition-all duration-300">
+                          <span className="text-3xl">{icon}</span>
                         </div>
                       ))}
+                    </div>
+                    
+                    <div className="mt-8 flex justify-center space-x-4">
+                      <div className="bg-white/10 px-4 py-2 rounded-full border border-white/20">
+                        <span className="text-sm">⚡ سريع وسهل</span>
+                      </div>
+                      <div className="bg-white/10 px-4 py-2 rounded-full border border-white/20">
+                        <span className="text-sm">🎯 خطوة بخطوة</span>
+                      </div>
+                      <div className="bg-white/10 px-4 py-2 rounded-full border border-white/20">
+                        <span className="text-sm">🌟 تفاعلي</span>
+                      </div>
                     </div>
                   </div>
                 </div>

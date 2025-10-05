@@ -348,6 +348,12 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
+                <Route path="users" element={
+                  <ProtectedRoute adminOnly>
+                    <UserManagement />
+                  </ProtectedRoute>
+                } />
+                
                 <Route path="services" element={
                   <ServicesManagement />
                 } />

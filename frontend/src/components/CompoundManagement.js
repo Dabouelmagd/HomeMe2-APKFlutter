@@ -1079,10 +1079,17 @@ const CompoundManagement = () => {
     <div className="p-6">
       <TestUpdate />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-red-600 text-center">🔴 {t('updated_compound_management')}</h1>
-        <p className="text-gray-600 mt-2">
-          🚀 {t('new_features_added')}
-        </p>
+        <div className="flex justify-between items-center">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-red-600 text-center">🔴 {t('updated_compound_management')}</h1>
+            <p className="text-gray-600 mt-2 text-center">
+              🚀 {t('new_features_added')}
+            </p>
+          </div>
+          <div className="ml-4">
+            <LanguageSwitcher />
+          </div>
+        </div>
       </div>
 
       {/* Tab Navigation */}

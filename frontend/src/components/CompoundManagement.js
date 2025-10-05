@@ -422,14 +422,24 @@ const CompoundManagement = () => {
     }
   };
 
-  const fetchResidences = async () => {
+  const fetchResidences = React.useCallback(async () => {
+    // Prevent concurrent calls
+    if (fetchResidences._isLoading) return;
+    fetchResidences._isLoading = true;
+    
     try {
+      if (!user?.compound_id) return;
       const response = await axios.get(`${API}/compounds/${user.compound_id}/residences`);
       setResidences(response.data.residences);
     } catch (error) {
       console.error('Failed to load residences:', error);
+      if (error.response?.status === 429) {
+        console.log('Rate limited - will retry later');
+      }
+    } finally {
+      fetchResidences._isLoading = false;
     }
-  };
+  }, [user?.compound_id]);
 
   const fetchRegistrationLinks = async () => {
     try {

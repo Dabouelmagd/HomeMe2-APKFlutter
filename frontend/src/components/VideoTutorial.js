@@ -589,7 +589,7 @@ const VideoTutorial = () => {
                       <span className="text-xs font-medium">سرعة طبيعية</span>
                     </div>
                     
-                    <span className="text-blue-200 font-semibold">{currentTutorial.duration}</span>
+                    <span className="text-blue-200 font-semibold">دقيقتان</span>
                   </div>
                 </div>
               </div>

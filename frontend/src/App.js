@@ -341,6 +341,12 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
+                <Route path="residents" element={
+                  <ProtectedRoute adminOnly>
+                    <ResidentsList />
+                  </ProtectedRoute>
+                } />
+                
                 <Route path="services" element={
                   <ServicesManagement />
                 } />

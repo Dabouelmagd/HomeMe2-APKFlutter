@@ -327,24 +327,23 @@ const VideoTutorial = () => {
 
       {/* Tutorial Preview */}
       <div className="p-6">
-        <div className="grid md:grid-cols-3 gap-4">
-          {tutorialSteps.slice(0, 3).map((step, index) => (
+        <div className="grid grid-cols-4 gap-4">
+          {infographicSteps.map((step, index) => (
             <div
               key={step.id}
-              className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+              className="border-2 border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer text-center"
               onClick={() => {
                 setCurrentStep(index);
                 setShowModal(true);
               }}
             >
-              <div className="aspect-video bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                <PlayCircleIcon className="h-12 w-12 text-blue-600" />
+              <div className="text-4xl mb-3 animate-pulse">
+                {step.icon}
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-bold text-gray-900 mb-2">
                 {step.title}
               </h3>
-              <p className="text-sm text-gray-600 mb-2">{step.description}</p>
-              <span className="text-xs text-blue-600 font-medium">{step.duration}</span>
+              <p className="text-sm text-gray-600">{step.simple}</p>
             </div>
           ))}
         </div>

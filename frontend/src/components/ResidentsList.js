@@ -29,6 +29,7 @@ const ResidentsList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddResident, setShowAddResident] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
   const [units, setUnits] = useState([]);
   
   // New resident form data

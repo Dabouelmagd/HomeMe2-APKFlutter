@@ -313,22 +313,22 @@ const ResidentsList = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      المقيم
+                      {t('resident_info')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      الوحدة السكنية
+                      {t('unit')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      معلومات التواصل
+                      {t('contact_info')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      العلاقة
+                      {t('relationship')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      العمر
+                      {t('age')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      الإجراءات
+                      {t('actions')}
                     </th>
                   </tr>
                 </thead>

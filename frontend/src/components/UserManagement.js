@@ -174,9 +174,9 @@ const UserManagement = () => {
 
   const getRoleName = (role) => {
     switch (role) {
-      case 'admin': return 'مدير';
-      case 'resident': return 'مقيم';
-      case 'staff': return 'موظف';
+      case 'admin': return t('admin');
+      case 'resident': return t('resident');
+      case 'staff': return t('staff');
       default: return role;
     }
   };

@@ -4344,6 +4344,8 @@ const resources = {
       'compound_management': 'Gestion du Complexe',
       'overview': 'Aperçu',
       'residence_list': 'Liste des Résidences',
+      'residences_list': 'Liste des Résidences',
+      'view_all_residences_occupancy': 'Voir toutes les unités résidentielles et le taux d\'occupation',
       'view_all_residential': 'Voir toutes les unités résidentielles et leur occupation',
       'add_resident_family': 'Ajouter Résident + Famille',
       'create_new_resident': 'Créer un nouveau compte résident avec configuration complète de gestion familiale',

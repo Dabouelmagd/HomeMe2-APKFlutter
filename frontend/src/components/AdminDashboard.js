@@ -82,9 +82,9 @@ const AdminDashboard = () => {
         window.location.href = '/residents';
         toast.success('الانتقال إلى قائمة السكان...');
         break;
-      case 'manage_units':
-        window.location.href = '/compound';
-        toast.success('Opening residence management...');
+      case 'manage_users':
+        window.location.href = '/users';
+        toast.success('الانتقال إلى إدارة المستخدمين...');
         break;
       case 'send_notice':
         window.location.href = '/messages';

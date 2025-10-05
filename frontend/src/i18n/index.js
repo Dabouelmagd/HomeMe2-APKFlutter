@@ -3049,6 +3049,7 @@ const resources = {
       'email_address': 'Adresse E-mail',
       'working_hours': 'Heures de Travail',
       'cancel': 'Annuler',
+      'all_units': 'Toutes les Unités',
       'click_to_upload_image': 'Cliquer pour télécharger une image',
       
       // Financial Management Page

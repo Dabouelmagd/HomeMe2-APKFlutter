@@ -151,7 +151,7 @@ const UserManagement = () => {
     }
 
     try {
-      await axios.delete(`${API}/admin/users/${userId}`, {
+      await axios.delete(`${API}/api/admin/users/${userId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 

@@ -250,7 +250,7 @@ const UserManagement = () => {
                 <UserGroupIcon className="h-6 w-6 text-blue-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">إجمالي المستخدمين</p>
+                <p className="text-sm font-medium text-gray-500">{t('total_users')}</p>
                 <p className="text-2xl font-bold text-gray-900">{users.length}</p>
               </div>
             </div>

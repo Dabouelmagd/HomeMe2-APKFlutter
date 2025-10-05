@@ -124,32 +124,10 @@ const VideoTutorial = () => {
     }
   };
 
-  // Simple notification sound system using HTML5 Audio with real sounds
+  // Visual-only feedback system - no annoying sounds!
   const playAudioFeedback = (type = 'play') => {
-    if (isMuted) return;
-    
-    try {
-      // Use simple notification sounds instead of beeps
-      const soundUrls = {
-        play: 'data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzMuMTAA',
-        pause: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA==',
-        complete: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA==',
-        next: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA==',
-        prev: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA==',
-        skip: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwaC14AAA=='
-      };
-
-      // Create audio element with very low volume
-      const audio = new Audio(soundUrls[type] || soundUrls.play);
-      audio.volume = Math.min(volume / 100, 0.1); // Very quiet
-      audio.play().catch(() => {
-        // If audio fails, just show visual feedback
-        showVisualAudioFeedback(type);
-      });
-    } catch (error) {
-      // Always fallback to visual feedback
-      showVisualAudioFeedback(type);
-    }
+    // Always use visual feedback instead of sound to avoid any beeping issues
+    showVisualAudioFeedback(type);
   };
 
   // Removed annoying beep sounds - using simple visual feedback instead

@@ -290,7 +290,7 @@ const UserManagement = () => {
                 <MagnifyingGlassIcon className="h-6 w-6 text-purple-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">نتائج البحث</p>
+                <p className="text-sm font-medium text-gray-500">{t('search_results')}</p>
                 <p className="text-2xl font-bold text-gray-900">{filteredUsers.length}</p>
               </div>
             </div>

@@ -441,14 +441,23 @@ const CompoundManagement = () => {
     }
   }, [user?.compound_id]);
 
-  const fetchRegistrationLinks = async () => {
+  const fetchRegistrationLinks = React.useCallback(async () => {
+    // Prevent concurrent calls
+    if (fetchRegistrationLinks._isLoading) return;
+    fetchRegistrationLinks._isLoading = true;
+    
     try {
       const response = await axios.get(`${API}/admin/registration-links`);
       setRegistrationLinks(response.data.registration_links || []);
     } catch (error) {
       console.error('Failed to load registration links:', error);
+      if (error.response?.status === 429) {
+        console.log('Rate limited - registration links will retry later');
+      }
+    } finally {
+      fetchRegistrationLinks._isLoading = false;
     }
-  };
+  }, []);
 
   const handleCreateRegistrationLink = async (e) => {
     e.preventDefault();

@@ -124,10 +124,92 @@ const VideoTutorial = () => {
     }
   };
 
-  // Visual-only feedback system - no annoying sounds!
+  // Real audio system with clear notification sounds
   const playAudioFeedback = (type = 'play') => {
-    // Always use visual feedback instead of sound to avoid any beeping issues
+    if (isMuted) return;
+    
+    try {
+      // Create clear notification sounds using Web Audio API
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      
+      // Resume audio context if needed
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+          createNotificationSound(audioCtx, type);
+        });
+      } else {
+        createNotificationSound(audioCtx, type);
+      }
+    } catch (error) {
+      console.log('Audio context failed, trying alternative method');
+      // Fallback to simple HTML5 audio
+      playSimpleNotification(type);
+    }
+    
+    // Also show visual feedback
     showVisualAudioFeedback(type);
+  };
+
+  const createNotificationSound = (ctx, type) => {
+    // Create pleasant notification tones (like phone notifications)
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    
+    // Clear notification frequencies (pleasant and audible)
+    const soundConfig = {
+      play: { freq: 800, duration: 0.15 },      // High pleasant beep
+      pause: { freq: 600, duration: 0.1 },     // Lower pause tone
+      complete: { freq: 1000, duration: 0.2 }, // Success tone
+      next: { freq: 750, duration: 0.1 },      // Forward navigation
+      prev: { freq: 650, duration: 0.1 },      // Backward navigation
+      skip: { freq: 900, duration: 0.12 },     // Skip tone
+      click: { freq: 700, duration: 0.08 }     // Click sound
+    };
+    
+    const config = soundConfig[type] || soundConfig.play;
+    const currentVolume = Math.min(volume / 100, 0.3); // Audible but not too loud
+    
+    // Set frequency
+    oscillator.frequency.setValueAtTime(config.freq, ctx.currentTime);
+    
+    // Envelope for smooth sound
+    gainNode.gain.setValueAtTime(0, ctx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(currentVolume, ctx.currentTime + 0.01);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + config.duration);
+    
+    // Play the sound
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + config.duration + 0.01);
+  };
+
+  const playSimpleNotification = (type) => {
+    // Fallback method using frequency generator
+    try {
+      const duration = type === 'complete' ? 200 : 100;
+      const frequency = {
+        play: 800, pause: 600, complete: 1000, 
+        next: 750, prev: 650, skip: 900, click: 700
+      }[type] || 800;
+      
+      // Create a simple sine wave
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.frequency.value = frequency;
+      gain.gain.value = Math.min(volume / 100, 0.2);
+      
+      osc.start();
+      setTimeout(() => osc.stop(), duration);
+    } catch (error) {
+      console.log('All audio methods failed, showing visual feedback only');
+    }
   };
 
   // Removed annoying beep sounds - using simple visual feedback instead

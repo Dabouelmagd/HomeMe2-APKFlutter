@@ -50,7 +50,8 @@
 test_plan:
   current_focus: 
     - "UserManagement Page Translation and Functionality Testing"
-  stuck_tasks: []
+  stuck_tasks: 
+    - "UserManagement Backend API Integration"
   test_all: false
   test_priority: "high_first"
 

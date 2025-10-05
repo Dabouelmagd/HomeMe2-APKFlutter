@@ -92,7 +92,7 @@ const AdminDashboard = () => {
         toast.success('Opening message center...');
         break;
       case 'view_payments':
-        window.location.href = '/financial';
+        window.location.href = '/finances';
         toast.success('Opening financial management...');
         break;
       default:

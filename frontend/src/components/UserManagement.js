@@ -424,7 +424,7 @@ const UserManagement = () => {
                           <button 
                             onClick={() => handleDeleteUser(userItem.id)}
                             className="text-red-600 hover:text-red-900"
-                            title="حذف"
+                            title={t('delete')}
                           >
                             <TrashIcon className="h-4 w-4" />
                           </button>

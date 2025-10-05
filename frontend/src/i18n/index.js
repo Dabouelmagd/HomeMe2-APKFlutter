@@ -1753,6 +1753,8 @@ const resources = {
       'main_sections': 'الأقسام الرئيسية',
       'services_maintenance': 'الخدمات والصيانة',
       'family_management_section': 'إدارة العائلة',
+      'residents_list': 'قائمة السكان',
+      'user_management': 'إدارة المستخدمين',
       'financial_services': 'الخدمات المالية',
       'communication': 'التواصل والإشعارات',
       'tools_resources': 'الأدوات والموارد',

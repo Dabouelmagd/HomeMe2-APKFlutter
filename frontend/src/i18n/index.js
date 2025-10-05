@@ -295,7 +295,7 @@ const resources = {
       'age': 'Age',
       'actions': 'Actions',
       'no_results': 'No Results',
-      'no_residents_found': 'No residents found matching the search'
+      'no_residents_found': 'No residents found matching the search',
       'financial_services': 'Financial Services',
       'communication': 'Communication',
       'tools_resources': 'Tools & Resources',

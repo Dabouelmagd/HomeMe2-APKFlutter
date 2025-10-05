@@ -741,14 +741,29 @@ const VideoTutorial = () => {
                     
                     {/* Volume Control */}
                     <div className="flex items-center space-x-2">
+                      {/* Enhanced mute button with volume indicator */}
                       <button
-                        onClick={toggleMute}
-                        className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg"
+                        onClick={() => {
+                          toggleMute();
+                          playAudioFeedback('click'); // Test audio when toggling
+                        }}
+                        className={`p-2 rounded-lg transition-colors flex items-center space-x-1 ${
+                          isMuted 
+                            ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse' 
+                            : 'bg-green-600 hover:bg-green-700 text-white'
+                        }`}
+                        title={isMuted ? 'إلغاء الكتم (M)' : 'كتم الصوت (M)'}
                       >
                         {isMuted ? (
-                          <SpeakerXMarkIcon className="h-5 w-5 text-red-400" />
+                          <>
+                            <SpeakerXMarkIcon className="h-4 w-4" />
+                            <span className="text-xs">🔇</span>
+                          </>
                         ) : (
-                          <SpeakerWaveIcon className="h-5 w-5 text-white" />
+                          <>
+                            <SpeakerWaveIcon className="h-4 w-4" />
+                            <span className="text-xs">🔊</span>
+                          </>
                         )}
                       </button>
                       

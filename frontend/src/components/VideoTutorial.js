@@ -294,8 +294,8 @@ const VideoTutorial = () => {
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold mb-2">{t('video_tutorial')}</h2>
-            <p className="text-purple-100">{t('interactive_guide_description')}</p>
+            <h2 className="text-2xl font-bold mb-2">دليل الاستخدام المبسط</h2>
+            <p className="text-purple-100">إنفوجراف تفاعلي يوضح كيفية استخدام التطبيق خطوة بخطوة</p>
           </div>
           <div className="flex space-x-3">
             <button

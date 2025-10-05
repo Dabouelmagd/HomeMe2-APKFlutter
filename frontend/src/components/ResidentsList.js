@@ -166,7 +166,7 @@ const ResidentsList = () => {
       loadResidentsData();
     } catch (error) {
       console.error('Failed to add resident:', error);
-      toast.error('فشل في إضافة المقيم');
+      toast.error(t('add_resident_failed'));
     }
   };
 

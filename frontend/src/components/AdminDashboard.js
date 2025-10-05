@@ -79,8 +79,8 @@ const AdminDashboard = () => {
   const handleQuickAction = (action) => {
     switch (action) {
       case 'add_resident':
-        window.location.href = '/compound';
-        toast.success('Navigating to Compound Management...');
+        window.location.href = '/residents';
+        toast.success('الانتقال إلى قائمة السكان...');
         break;
       case 'manage_units':
         window.location.href = '/compound';

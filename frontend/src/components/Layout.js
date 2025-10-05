@@ -8,6 +8,7 @@ import {
   BuildingOffice2Icon,
   UsersIcon,
   UserPlusIcon,
+  UserGroupIcon,
   SpeakerWaveIcon,
   ChartBarIcon,
   CurrencyDollarIcon,

@@ -1549,7 +1549,7 @@ const CompoundManagement = () => {
                         ) : (
                           <div className="text-center py-6">
                             <UsersIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                            <p className="text-gray-500 text-sm">لم يتم إضافة أفراد الأسرة بعد</p>
+                            <p className="text-gray-500 text-sm">{t('no_family_members_added')}</p>
                             <Link
                               to="/add-family-member"
                               className="text-blue-600 hover:text-blue-800 text-sm"

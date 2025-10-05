@@ -248,7 +248,7 @@ const ResidentsList = () => {
                 <UserGroupIcon className="h-6 w-6 text-blue-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">إجمالي السكان</p>
+                <p className="text-sm font-medium text-gray-500">{t('total_residents')}</p>
                 <p className="text-2xl font-bold text-gray-900">{residents.length}</p>
               </div>
             </div>
@@ -260,9 +260,9 @@ const ResidentsList = () => {
                 <HomeIcon className="h-6 w-6 text-green-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">وحدات مأهولة</p>
+                <p className="text-sm font-medium text-gray-500">{t('occupied_units')}</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {new Set(residents.map(r => r.unit_id)).size}
+                  {new Set(residents.filter(r => r.unit_id).map(r => r.unit_id)).size}
                 </p>
               </div>
             </div>
@@ -274,7 +274,7 @@ const ResidentsList = () => {
                 <UserGroupIcon className="h-6 w-6 text-purple-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">أرباب الأسر</p>
+                <p className="text-sm font-medium text-gray-500">{t('family_heads')}</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {residents.filter(r => r.relationship === 'head').length}
                 </p>
@@ -288,7 +288,7 @@ const ResidentsList = () => {
                 <MagnifyingGlassIcon className="h-6 w-6 text-orange-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">نتائج البحث</p>
+                <p className="text-sm font-medium text-gray-500">{t('search_results')}</p>
                 <p className="text-2xl font-bold text-gray-900">{filteredResidents.length}</p>
               </div>
             </div>

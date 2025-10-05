@@ -276,7 +276,7 @@ const UserManagement = () => {
                 <ShieldCheckIcon className="h-6 w-6 text-red-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">المديرين</p>
+                <p className="text-sm font-medium text-gray-500">{t('administrators')}</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {users.filter(u => u.role === 'admin').length}
                 </p>

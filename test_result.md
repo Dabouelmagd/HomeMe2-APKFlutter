@@ -49,7 +49,7 @@
 ##
 test_plan:
   current_focus: 
-    - "Rate Limiting Fix Testing for 429 Too Many Requests Error"
+    - "New Residents List Page Testing and Navigation from Add Resident Button"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

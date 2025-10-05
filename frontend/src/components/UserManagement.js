@@ -146,7 +146,7 @@ const UserManagement = () => {
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+    if (!window.confirm(t('confirm_delete_user'))) {
       return;
     }
 

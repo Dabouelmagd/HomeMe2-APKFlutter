@@ -6205,6 +6205,58 @@ async def get_all_users(current_user: User = Depends(require_admin)):
         logging.error(f"Error getting users: {e}")
         raise HTTPException(status_code=500, detail="Failed to get users")
 
+@api_router.post("/admin/users")
+async def create_user(user_data: UserCreate, current_user: User = Depends(require_admin)):
+    """Create a new user (Admin only)"""
+    try:
+        # Check if username or email already exists
+        existing_user = await db.users.find_one({
+            "$or": [{"username": user_data.username}, {"email": user_data.email}]
+        })
+        
+        if existing_user:
+            if existing_user["username"] == user_data.username:
+                raise HTTPException(status_code=400, detail="Username already exists")
+            else:
+                raise HTTPException(status_code=400, detail="Email already exists")
+        
+        # Ensure user is created in the same compound as the admin
+        user_data.compound_id = current_user.compound_id
+        
+        # Hash password
+        password_hash = bcrypt.hashpw(user_data.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
+        # Create user document
+        user_doc = {
+            "id": str(uuid.uuid4()),
+            "username": user_data.username,
+            "email": user_data.email,
+            "password_hash": password_hash,
+            "role": user_data.role,
+            "compound_id": current_user.compound_id,  # Enforce compound isolation
+            "family_id": None,
+            "full_name": user_data.full_name,
+            "phone": user_data.phone,
+            "unit_number": user_data.unit_number,
+            "is_family_head": False,
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc),
+            "profile_picture_url": None
+        }
+        
+        result = await db.users.insert_one(user_doc)
+        
+        if result.inserted_id:
+            return {"message": "User created successfully", "user_id": user_doc["id"]}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to create user")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating user: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create user")
+
 @api_router.put("/admin/users/{user_id}/status")
 async def update_user_status(
     user_id: str,

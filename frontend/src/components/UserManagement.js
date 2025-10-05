@@ -235,10 +235,10 @@ const UserManagement = () => {
             onChange={(e) => setSelectedRole(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">جميع الأدوار</option>
-            <option value="admin">مدير</option>
-            <option value="resident">مقيم</option>
-            <option value="staff">موظف</option>
+            <option value="">{t('all_roles')}</option>
+            <option value="admin">{t('admin')}</option>
+            <option value="resident">{t('resident')}</option>
+            <option value="staff">{t('staff')}</option>
           </select>
         </div>
 

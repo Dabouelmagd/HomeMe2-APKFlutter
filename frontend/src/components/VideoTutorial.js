@@ -168,72 +168,7 @@ const VideoTutorial = () => {
     }
   };
 
-  const playActualSound = async (audioContext, type) => {
-    return new Promise((resolve) => {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      // Enhanced sound profiles with better volume control
-      const baseVolume = Math.min(volume / 100, 0.3); // Limit max volume to 30%
-      
-      switch(type) {
-        case 'play':
-          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-          oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.3);
-          gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-          gainNode.gain.linearRampToValueAtTime(baseVolume, audioContext.currentTime + 0.05);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-          break;
-        case 'pause':
-          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-          oscillator.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.2);
-          gainNode.gain.setValueAtTime(baseVolume * 0.8, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-          break;
-        case 'complete':
-          // Success sound (3 ascending tones) with better volume control
-          [800, 1000, 1200].forEach((freq, index) => {
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-            
-            osc.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.12);
-            gain.gain.setValueAtTime(baseVolume * 0.7, audioContext.currentTime + index * 0.12);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.12 + 0.2);
-            
-            osc.start(audioContext.currentTime + index * 0.12);
-            osc.stop(audioContext.currentTime + index * 0.12 + 0.2);
-          });
-          setTimeout(() => resolve(), 600);
-          return; // Skip the default oscillator
-        case 'progress':
-          oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
-          gainNode.gain.setValueAtTime(baseVolume * 0.5, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-          break;
-        case 'click':
-          oscillator.frequency.setValueAtTime(1500, audioContext.currentTime);
-          gainNode.gain.setValueAtTime(baseVolume * 0.3, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-          break;
-        default:
-          oscillator.frequency.setValueAtTime(500, audioContext.currentTime);
-          gainNode.gain.setValueAtTime(baseVolume * 0.6, audioContext.currentTime);
-          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-      }
-      
-      if (type !== 'complete') {
-        oscillator.start(audioContext.currentTime);
-        const duration = type === 'progress' || type === 'click' ? 0.15 : 0.5;
-        oscillator.stop(audioContext.currentTime + duration);
-        setTimeout(() => resolve(), duration * 1000);
-      }
-    });
-  };
+  // Removed annoying beep sounds - using simple visual feedback instead
 
   const playHTMLAudio = (type) => {
     // Create data URL for audio

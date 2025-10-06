@@ -1559,6 +1559,7 @@ const resources = {
       'describe_issue': 'اوصف المشكلة التي تحتاج المساعدة بها',
       'additional_notes': 'ملاحظات إضافية',
       'any_additional_info': 'أي معلومات إضافية أو طلبات خاصة',
+      'preferred_date': 'التاريخ المفضل',
       'signing_in': 'جاري تسجيل الدخول...',
       'creating_account': 'جاري إنشاء الحساب...',
       'already_have_account': 'لديك حساب بالفعل؟',

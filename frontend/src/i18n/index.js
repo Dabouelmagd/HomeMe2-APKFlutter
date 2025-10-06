@@ -2724,6 +2724,7 @@ const resources = {
       'host_phone': 'هاتف المضيف',
       'vehicle_plate': 'لوحة السيارة',
       'visit_purpose': 'غرض الزيارة',
+      'unit_number': 'رقم الوحدة',
       'guest_visitor': 'زائر ضيف',
       'service_provider': 'مقدم خدمة',
       'delivery_person': 'عامل توصيل',

@@ -163,15 +163,18 @@ backend:
 frontend:
   - task: "Cache Busting Fix for Government & Utility Gateway Visibility Issue"
     implemented: true
-    working: true
+    working: false
     file: "/app/frontend/public/sw.js, /app/frontend/public/index.html, /app/frontend/src/components/UtilityBills.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
         - working: true
           agent: "testing"
           comment: "✅ Government & Utility Gateway Cache Busting Updates - WORKING (95% Success Rate) ✅ Cache-busting timestamp parameters (?_t=1759775484848) - WORKING ✅ Admin login and access to /utilities endpoint - WORKING ✅ Backend API utility bills and connections data retrieval - WORKING ✅ All 7 utility types (electricity, water, telephone, mobile, natural_gas, internet, government) - IMPLEMENTED ✅ Version indicator and updated features - WORKING. Cache busting updates are working perfectly - no fixes needed. All requested verification points have been successfully completed. The comprehensive cache busting fixes (Service Worker updates, cache control headers, timestamp parameters) are operational. Backend logs show timestamp parameters working correctly as reported. All 7 utility types are fully implemented in frontend with proper Egyptian providers. The user's issue of not seeing latest updates on Government & Utility Gateway page has been resolved. System is production-ready with excellent cache busting functionality."
+        - working: false
+          agent: "testing"
+          comment: "🚨 CRITICAL CACHE BUSTING SYSTEM FAILURE - APPLICATION UNUSABLE DUE TO INFINITE RELOAD LOOP! COMPREHENSIVE TESTING RESULTS: ❌ INFINITE RELOAD LOOP DETECTED: Browser console shows continuous cache clearing messages: 'HomeMe: Detected new version, clearing caches...', 'HomeMe: Starting comprehensive cache clear...', 'HomeMe: Cache clearing complete, scheduling reload...' repeating endlessly every few seconds ❌. ❌ APPLICATION COMPLETELY UNUSABLE: Users cannot login or access any functionality due to constant page reloads ❌. ❌ CACHE BUSTING TOO AGGRESSIVE: The cache busting mechanism is detecting 'new versions' continuously with different timestamps (v1759776762115, v1759776762872, etc.) causing infinite cache clearing cycles ❌. ❌ LOGIN IMPOSSIBLE: Even when login credentials are filled quickly, the page reloads before authentication can complete ❌. ❌ TESTING BLOCKED: Cannot test multi-country support, Stripe integration, or translation system due to application being stuck in reload loop ❌. ROOT CAUSE: The cache busting system implemented to resolve visibility issues has become too aggressive and is now preventing normal application usage. The version detection logic is triggering continuously instead of only when actual updates occur. URGENT ACTION REQUIRED: The cache busting mechanism needs immediate revision to prevent infinite reload loops while maintaining cache clearing functionality. Current implementation makes the application completely unusable for end users."
 
   - task: "Utility Connections Translation and Payment Testing"
     implemented: true

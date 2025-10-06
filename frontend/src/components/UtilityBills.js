@@ -39,8 +39,9 @@ const UtilityBills = () => {
   const [connectionForm, setConnectionForm] = useState({
     utility_type: 'electricity',
     provider_name: '',
-    account_number: '',
-    meter_number: ''
+    identifier: '', // رقم العداد أو التليفون أو الحساب
+    subscriber_name: '', // اسم المشترك
+    address: '' // العنوان
   });
 
   const [billForm, setBillForm] = useState({

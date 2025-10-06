@@ -120,14 +120,11 @@
         }
       }
       
-      // Execute on page load
+      // Execute on page load  
       document.addEventListener('DOMContentLoaded', async () => {
-        await checkForceReload();
+        await lightCacheRefresh();
         await registerServiceWorker();
       });
-      
-      // Also run immediately
-      checkForceReload().then(() => registerServiceWorker());
     </script>
     
     <!-- PWA Install Prompt -->

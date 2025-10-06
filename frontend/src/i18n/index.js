@@ -3422,6 +3422,8 @@ const resources = {
       'no_utility_connections': 'Aucune connexion aux services publics trouvée',
       'add_connection': 'Ajouter Connexion',
       'add_first_connection': 'Ajoutez votre première connexion aux services publics',
+      'overdue_bills_alert': 'Vous avez {{count}} facture(s) en retard',
+      'pay_overdue_bills_message': 'Veuillez payer vos factures en retard pour éviter une interruption de service',
       
       // Family Management
       'family_management': 'Gestion Familiale',

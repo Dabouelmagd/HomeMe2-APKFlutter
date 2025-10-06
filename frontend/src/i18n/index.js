@@ -3360,6 +3360,7 @@ const resources = {
       'any_additional_info': 'Toute information supplémentaire ou demande spéciale',
       'preferred_date': 'Date Préférée',
       'optional': 'Optionnel',
+      'special_instructions': 'Instructions Spéciales',
       'landscaping': 'Aménagement Paysager',
       'personal': 'Personnel',
       'delivery': 'Livraison',

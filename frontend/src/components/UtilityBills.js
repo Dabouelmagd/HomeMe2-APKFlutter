@@ -382,6 +382,13 @@ const UtilityBills = () => {
 
   return (
     <div className="p-6">
+      {/* Version indicator for cache debugging */}
+      <div className="mb-4 text-center">
+        <small className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+          ✅ {t('updated_version')} - {new Date().toLocaleTimeString()} | 7 {t('utility_types')} | {t('egyptian_providers')}
+        </small>
+      </div>
+      
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 text-center">
           {t('government_utility_gateway')}

@@ -3432,6 +3432,10 @@ const resources = {
       'add_first_connection': 'Ajoutez votre première connexion aux services publics',
       'overdue_bills_alert': 'Vous avez {{count}} facture(s) en retard',
       'pay_overdue_bills_message': 'Veuillez payer vos factures en retard pour éviter une interruption de service',
+      'utility_type': 'Type de Service Public',
+      'provider_name': 'Nom du Fournisseur',
+      'account_number': 'Numéro de Compte',
+      'meter_number': 'Numéro de Compteur',
       
       // Family Management
       'family_management': 'Gestion Familiale',

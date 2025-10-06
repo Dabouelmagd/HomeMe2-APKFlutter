@@ -117,7 +117,7 @@ const GuestManagement = () => {
 
       const response = await axios.post(`${API}/visit-requests`, formData);
 
-      toast.success('Visit request created successfully!');
+      toast.success(t('visit_request_created_successfully'));
       setShowAddModal(false);
       setGuestForm({
         visitor_name: '',

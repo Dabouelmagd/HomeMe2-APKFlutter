@@ -267,7 +267,7 @@ const PaymentPage = () => {
                     {t('processing')}
                   </div>
                 ) : (
-                  t('Proceed to Payment')
+                  t('proceed_to_payment')
                 )}
               </button>
 

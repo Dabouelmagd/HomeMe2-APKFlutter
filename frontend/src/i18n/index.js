@@ -1561,6 +1561,7 @@ const resources = {
       'additional_notes': 'ملاحظات إضافية',
       'any_additional_info': 'أي معلومات إضافية أو طلبات خاصة',
       'preferred_date': 'التاريخ المفضل',
+      'optional': 'اختياري',
       'signing_in': 'جاري تسجيل الدخول...',
       'creating_account': 'جاري إنشاء الحساب...',
       'already_have_account': 'لديك حساب بالفعل؟',

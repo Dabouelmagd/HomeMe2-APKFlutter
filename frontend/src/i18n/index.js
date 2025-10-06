@@ -3465,6 +3465,11 @@ const resources = {
       'water': 'Eau',
       'gas': 'Gaz',
       'internet': 'Internet',
+      'landline_telephone': 'Téléphone Fixe',
+      'mobile_phone': 'Téléphone Mobile',
+      'natural_gas': 'Gaz Naturel',
+      'government_services': 'Services Gouvernementaux',
+      'reference_number': 'Numéro de Référence',
       
       // Family Management
       'family_management': 'Gestion Familiale',

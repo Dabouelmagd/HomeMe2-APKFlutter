@@ -1072,7 +1072,7 @@ const ServiceBooking = () => {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Time</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">{t('preferred_time')}</label>
                           <input 
                             type="time" 
                             value={bookingForm.scheduled_time} 

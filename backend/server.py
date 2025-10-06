@@ -10971,10 +10971,248 @@ async def upload_company_logo(
         logging.error(f"Error uploading logo: {e}")
         raise HTTPException(status_code=500, detail="Failed to upload logo")
 
+# Payment Transaction Models for Stripe Integration
+class PaymentTransaction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    amount: float
+    currency: str = "EGP"
+    utility_bill_id: Optional[str] = None  # For utility bill payments
+    session_id: str  # Stripe session ID
+    payment_id: Optional[str] = None
+    user_id: Optional[str] = None
+    metadata: Dict[str, Any] = {}
+    payment_status: str = "pending"  # pending, paid, failed, cancelled
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class PaymentSessionCreate(BaseModel):
+    utility_bill_id: str
+    amount: float
+    currency: str = "EGP"
+
+class PaymentStatusResponse(BaseModel):
+    payment_id: str
+    status: str
+    payment_status: str
+    amount: float
+    currency: str
+    metadata: Dict[str, Any]
+
+# Stripe Payment Endpoints
+@api_router.post("/payments/create-session")
+async def create_payment_session(
+    request: PaymentSessionCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create Stripe checkout session for utility bill payment"""
+    try:
+        # Get Stripe API key from environment
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(status_code=500, detail="Stripe API key not configured")
+        
+        # Validate utility bill exists and belongs to user
+        bill = await db.utility_bills.find_one({"id": request.utility_bill_id})
+        if not bill:
+            raise HTTPException(status_code=404, detail="Utility bill not found")
+        
+        # For admins, allow payment of any bill in their compound
+        # For residents, only allow payment of their own bills
+        if current_user.role != UserRole.ADMIN:
+            if bill.get("family_id") != current_user.family_id:
+                raise HTTPException(status_code=403, detail="Cannot pay this bill")
+        elif bill.get("compound_id") != current_user.compound_id:
+            raise HTTPException(status_code=403, detail="Bill not in your compound")
+        
+        # Get frontend origin from request headers (for success/cancel URLs)
+        frontend_origin = "http://localhost:3000"  # Default fallback
+        
+        # Initialize Stripe checkout
+        webhook_url = f"{frontend_origin}/api/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+        
+        # Create success and cancel URLs
+        success_url = f"{frontend_origin}/utilities?payment=success&session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{frontend_origin}/utilities?payment=cancelled"
+        
+        # Create checkout session
+        checkout_request = CheckoutSessionRequest(
+            amount=float(request.amount),
+            currency=request.currency.lower(),
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "utility_bill_id": request.utility_bill_id,
+                "user_id": current_user.id,
+                "payment_type": "utility_bill"
+            }
+        )
+        
+        session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+        
+        # Create payment transaction record
+        payment_transaction = PaymentTransaction(
+            amount=request.amount,
+            currency=request.currency,
+            utility_bill_id=request.utility_bill_id,
+            session_id=session.session_id,
+            user_id=current_user.id,
+            metadata={
+                "utility_bill_id": request.utility_bill_id,
+                "bill_type": bill.get("utility_type", "unknown"),
+                "provider": bill.get("provider_name", "unknown")
+            },
+            payment_status="pending"
+        )
+        
+        await db.payment_transactions.insert_one(payment_transaction.dict())
+        
+        return {
+            "checkout_url": session.url,
+            "session_id": session.session_id,
+            "payment_id": payment_transaction.id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating payment session: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create payment session")
+
+@api_router.get("/payments/status/{session_id}")
+async def get_payment_status(
+    session_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get payment status from Stripe"""
+    try:
+        # Get Stripe API key
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(status_code=500, detail="Stripe API key not configured")
+        
+        # Find payment transaction
+        transaction = await db.payment_transactions.find_one({"session_id": session_id})
+        if not transaction:
+            raise HTTPException(status_code=404, detail="Payment transaction not found")
+        
+        # Verify user has access to this payment
+        if transaction["user_id"] != current_user.id and current_user.role != UserRole.ADMIN:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Initialize Stripe checkout
+        webhook_url = f"http://localhost:3000/api/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+        
+        # Get checkout status from Stripe
+        checkout_status: CheckoutStatusResponse = await stripe_checkout.get_checkout_status(session_id)
+        
+        # Update local transaction if payment was successful and not already updated
+        if checkout_status.payment_status == "paid" and transaction["payment_status"] != "paid":
+            await db.payment_transactions.update_one(
+                {"session_id": session_id},
+                {"$set": {
+                    "payment_status": "paid",
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            
+            # Update utility bill status to paid
+            if transaction.get("utility_bill_id"):
+                await db.utility_bills.update_one(
+                    {"id": transaction["utility_bill_id"]},
+                    {"$set": {
+                        "status": PaymentStatus.PAID,
+                        "payment_date": datetime.utcnow(),
+                        "payment_method": "stripe"
+                    }}
+                )
+        
+        return PaymentStatusResponse(
+            payment_id=transaction["id"],
+            status=checkout_status.status,
+            payment_status=checkout_status.payment_status,
+            amount=checkout_status.amount_total / 100.0,  # Convert from cents
+            currency=checkout_status.currency.upper(),
+            metadata=checkout_status.metadata
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting payment status: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get payment status")
+
+@api_router.post("/webhook/stripe")
+async def stripe_webhook(request):
+    """Handle Stripe webhook events"""
+    try:
+        # Get Stripe API key
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(status_code=500, detail="Stripe API key not configured")
+        
+        # Get webhook body and signature
+        body = await request.body()
+        signature = request.headers.get("stripe-signature")
+        
+        # Initialize Stripe checkout
+        webhook_url = f"http://localhost:3000/api/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+        
+        # Handle webhook
+        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        
+        # Process the webhook event
+        if webhook_response.event_type == "checkout.session.completed":
+            session_id = webhook_response.session_id
+            
+            # Find and update payment transaction
+            transaction = await db.payment_transactions.find_one({"session_id": session_id})
+            if transaction and transaction["payment_status"] != "paid":
+                # Update transaction
+                await db.payment_transactions.update_one(
+                    {"session_id": session_id},
+                    {"$set": {
+                        "payment_status": "paid",
+                        "updated_at": datetime.utcnow()
+                    }}
+                )
+                
+                # Update utility bill
+                if transaction.get("utility_bill_id"):
+                    await db.utility_bills.update_one(
+                        {"id": transaction["utility_bill_id"]},
+                        {"$set": {
+                            "status": PaymentStatus.PAID,
+                            "payment_date": datetime.utcnow(),
+                            "payment_method": "stripe"
+                        }}
+                    )
+                
+                logging.info(f"Payment completed for session {session_id}")
+        
+        return {"status": "success"}
+        
+    except Exception as e:
+        logging.error(f"Error handling Stripe webhook: {e}")
+        raise HTTPException(status_code=400, detail="Webhook error")
+
 # Import payment router
-from payments import router as payments_router
-from notifications_push import router as push_notifications_router
-from ratings_reviews import router as ratings_router
+try:
+    from payments import router as payments_router
+except ImportError:
+    payments_router = None
+
+try:
+    from notifications_push import router as push_notifications_router
+except ImportError:
+    push_notifications_router = None
+
+try:
+    from ratings_reviews import router as ratings_router
+except ImportError:
+    ratings_router = None
 
 # Include the API router after all endpoints are defined
 app.include_router(api_router)

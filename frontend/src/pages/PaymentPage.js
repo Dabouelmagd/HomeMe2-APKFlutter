@@ -272,7 +272,7 @@ const PaymentPage = () => {
               </button>
 
               <p className="text-sm text-gray-500 text-center">
-                {t('Secure payments powered by Stripe')}
+                {t('secure_payments_stripe')}
               </p>
             </div>
           </div>

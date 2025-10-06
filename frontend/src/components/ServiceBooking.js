@@ -269,6 +269,20 @@ const ServiceBooking = () => {
     }
   };
 
+  // Function to translate booking status
+  const translateStatus = (status) => {
+    const statusTranslations = {
+      'pending': t('pending'),
+      'confirmed': t('confirmed'),
+      'in_progress': t('in_progress'),
+      'completed': t('completed'),
+      'cancelled': t('cancelled'),
+      'paid': t('paid')
+    };
+    
+    return statusTranslations[status?.toLowerCase()] || status;
+  };
+
   const handleBookService = async (e) => {
     e.preventDefault();
     try {

@@ -45,6 +45,9 @@ from websocket_manager import manager
 # Import emergent integrations for LLM
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 
+# Import Stripe integration from emergentintegrations
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')

@@ -780,7 +780,7 @@ const ServicesManagement = () => {
       });
       fetchMyBookings();
     } catch (error) {
-      toast.error('Failed to book service');
+      toast.error(t('failed_to_book_service'));
     }
   };
 

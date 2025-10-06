@@ -208,7 +208,7 @@ const PaymentPage = () => {
             {t('payment_center')}
           </h1>
           <p className="text-gray-600">
-            {t('Manage your payments and view transaction history')}
+            {t('manage_payments_description')}
           </p>
         </div>
 

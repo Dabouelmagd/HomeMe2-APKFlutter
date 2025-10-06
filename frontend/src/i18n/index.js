@@ -1894,6 +1894,8 @@ const resources = {
       'no_utility_connections': 'لم يتم العثور على اتصالات مرافق',
       'add_connection': 'إضافة اتصال',
       'add_first_connection': 'أضف أول اتصال مرافق',
+      'overdue_bills_alert': 'لديك {{count}} فاتورة متأخرة',
+      'pay_overdue_bills_message': 'يرجى دفع الفواتير المتأخرة لتجنب انقطاع الخدمة',
       
       // Family Management  
       'family_management': 'إدارة أفراد الأسرة',

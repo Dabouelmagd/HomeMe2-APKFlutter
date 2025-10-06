@@ -25,6 +25,29 @@ import {
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Provider functions for multi-country support
+const getElectricityProviders = () => {
+  return [
+    'شركة شمال القاهرة لتوزيع الكهرباء',
+    'شركة جنوب القاهرة لتوزيع الكهرباء',
+    'شركة الإسكندرية لتوزيع الكهرباء',
+    'شركة القناة لتوزيع الكهرباء',
+    'شركة مصر الوسطى لتوزيع الكهرباء',
+    'شركة مصر العليا لتوزيع الكهرباء',
+    'شركة شمال الدلتا لتوزيع الكهرباء'
+  ];
+};
+
+const getWaterProviders = () => {
+  return [
+    'شركة مياه الشرب والصرف الصحي بالقاهرة الكبرى',
+    'شركة مياه الشرب والصرف الصحي بالإسكندرية',
+    'شركة مياه الشرب والصرف الصحي بالجيزة',
+    'شركة مياه الشرب والصرف الصحي بالقليوبية',
+    'شركة مياه الشرب والصرف الصحي بالشرقية'
+  ];
+};
+
 const UtilityBills = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();

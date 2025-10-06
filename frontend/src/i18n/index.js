@@ -256,6 +256,7 @@ const resources = {
       'confirmed': 'Confirmed',
       'in_progress': 'In Progress',
       'completed': 'Completed',
+      'paid': 'Paid',
       'resident': 'Resident',
       'unit': 'Unit',
       'issue': 'Issue',

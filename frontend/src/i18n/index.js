@@ -223,6 +223,7 @@ const resources = {
       'host_name': 'Host Name',
       'host_phone': 'Host Phone',
       'vehicle_plate': 'Vehicle Plate',
+      'visit_purpose': 'Visit Purpose',
       'landscaping': 'Landscaping',
       'personal': 'Personal',
       'delivery': 'Delivery',

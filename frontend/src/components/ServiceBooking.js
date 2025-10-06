@@ -916,7 +916,7 @@ const ServiceBooking = () => {
                           <div className="flex items-center">
                             {getStatusIcon(booking.status)}
                             <span className="ml-2 text-sm text-gray-900 capitalize">
-                              {booking.status.replace('_', ' ')}
+                              {translateStatus(booking.status)}
                             </span>
                           </div>
                         </td>

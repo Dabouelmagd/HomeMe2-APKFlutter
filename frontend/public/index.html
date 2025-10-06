@@ -57,71 +57,33 @@
     
     <!-- Aggressive cache clearing and service worker management -->
     <script>
-      const CACHE_BUSTER = Date.now();
+      const APP_VERSION = 'v1.2.1'; // Static version - only update on app changes
       
-      // Comprehensive cache clearing function
-      async function forceClearAllCaches() {
-        console.log('HomeMe: Starting comprehensive cache clear...');
-        
-        // 1. Clear all browser caches
-        if ('caches' in window) {
-          const cacheNames = await caches.keys();
-          await Promise.all(
-            cacheNames.map(async (name) => {
-              console.log('HomeMe: Deleting cache:', name);
-              await caches.delete(name);
-            })
-          );
-        }
-        
-        // 2. Unregister all service workers
-        if ('serviceWorker' in navigator) {
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(
-            registrations.map(registration => {
-              console.log('HomeMe: Unregistering service worker...');
-              return registration.unregister();
-            })
-          );
-        }
-        
-        // 3. Clear localStorage cache markers
+      // Light cache refresh for better user experience
+      async function lightCacheRefresh() {
         try {
-          localStorage.removeItem('homeme-cache-version');
-          localStorage.setItem('homeme-force-reload', CACHE_BUSTER);
-        } catch (e) {
-          console.warn('HomeMe: Could not access localStorage');
-        }
-        
-        // 4. Clear sessionStorage
-        try {
-          sessionStorage.clear();
-        } catch (e) {
-          console.warn('HomeMe: Could not clear sessionStorage');
-        }
-        
-        console.log('HomeMe: Cache clearing complete, scheduling reload...');
-        return true;
-      }
-      
-      // Check if we need to force reload due to updates
-      async function checkForceReload() {
-        try {
-          const lastReload = localStorage.getItem('homeme-force-reload');
           const currentVersion = localStorage.getItem('homeme-cache-version');
           
-          // If no version stored or different from current, clear caches
-          if (!currentVersion || currentVersion !== String(CACHE_BUSTER)) {
-            console.log('HomeMe: Detected new version, clearing caches...');
-            await forceClearAllCaches();
-            localStorage.setItem('homeme-cache-version', String(CACHE_BUSTER));
+          // Only clear cache if version has actually changed (manual update)
+          if (!currentVersion || currentVersion !== APP_VERSION) {
+            console.log('HomeMe: New app version detected, updating cache...');
             
-            // Reload with cache bypass
-            window.location.reload(true);
-            return;
+            // Clear old caches selectively
+            if ('caches' in window) {
+              const cacheNames = await caches.keys();
+              for (const name of cacheNames) {
+                if (name.includes('homeme') && !name.includes(APP_VERSION)) {
+                  console.log('HomeMe: Removing old cache:', name);
+                  await caches.delete(name);
+                }
+              }
+            }
+            
+            localStorage.setItem('homeme-cache-version', APP_VERSION);
+            console.log('HomeMe: Cache updated successfully');
           }
         } catch (e) {
-          console.error('HomeMe: Error checking version:', e);
+          console.error('HomeMe: Error updating cache:', e);
         }
       }
       

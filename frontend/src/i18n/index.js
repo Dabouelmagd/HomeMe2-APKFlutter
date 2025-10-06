@@ -2722,6 +2722,7 @@ const resources = {
       'host_name': 'اسم المضيف',
       'host_phone': 'هاتف المضيف',
       'vehicle_plate': 'لوحة السيارة',
+      'visit_purpose': 'غرض الزيارة',
       'guest_visitor': 'زائر ضيف',
       'service_provider': 'مقدم خدمة',
       'delivery_person': 'عامل توصيل',

@@ -306,6 +306,8 @@ const resources = {
       'no_utility_connections': 'No utility connections found',
       'add_connection': 'Add Connection',
       'add_first_connection': 'Add your first utility connection',
+      'overdue_bills_alert': 'You have {{count}} overdue bill(s)',
+      'pay_overdue_bills_message': 'Please pay your overdue bills to avoid service interruption',
       
       // Family Management
       'family_management': 'Family Management',

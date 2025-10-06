@@ -1935,6 +1935,11 @@ const resources = {
       'natural_gas': 'الغاز الطبيعي',
       'government_services': 'الخدمات الحكومية',
       'reference_number': 'الرقم المرجعي',
+      'enter_phone_number': 'أدخل رقم الهاتف',
+      'enter_reference_number': 'أدخل الرقم المرجعي',
+      'subscriber_name': 'اسم المشترك',
+      'enter_subscriber_name': 'أدخل اسم المشترك',
+      'enter_address': 'أدخل العنوان',
       
       // Family Management  
       'family_management': 'إدارة أفراد الأسرة',

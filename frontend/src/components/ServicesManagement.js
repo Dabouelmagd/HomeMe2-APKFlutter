@@ -769,7 +769,7 @@ const ServicesManagement = () => {
     e.preventDefault();
     try {
       await axios.post(`${API}/services/${bookingForm.service_id}/bookings`, bookingForm);
-      toast.success('Service booked successfully!');
+      toast.success(t('service_booked_successfully'));
       setShowBookService(false);
       setBookingForm({
         service_id: '',

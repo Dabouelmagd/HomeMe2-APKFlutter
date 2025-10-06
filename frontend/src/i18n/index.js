@@ -1945,6 +1945,8 @@ const resources = {
       'subscriber_name': 'اسم المشترك',
       'enter_subscriber_name': 'أدخل اسم المشترك',
       'enter_address': 'أدخل العنوان',
+      'subscriber_number': 'رقم المشترك',
+      'enter_subscriber_number': 'أدخل رقم المشترك',
       'connection_added_successfully': 'تم إضافة الاتصال بنجاح!',
       'connection_and_bill_added': 'تم إضافة الاتصال وتم العثور على فاتورة معلقة!',
       'failed_to_add_connection': 'فشل في إضافة الاتصال',

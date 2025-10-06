@@ -314,6 +314,12 @@ const resources = {
       'meter_number': 'Meter Number',
       'add_utility_connection': 'Add Utility Connection',
       'select_provider': 'Select Provider',
+      'enter_account_number': 'Enter your account number',
+      'enter_meter_number': 'Enter your meter number (optional)',
+      'electricity': 'Electricity',
+      'water': 'Water',
+      'gas': 'Gas',
+      'internet': 'Internet',
       
       // Family Management
       'family_management': 'Family Management',

@@ -325,12 +325,21 @@ const UtilityBills = () => {
   const handlePayBill = async (billId, amount) => {
     setProcessingPayment(billId);
     try {
-      const response = await axios.post(`${API}/utility-bills/${billId}/pay`);
-      toast.success(`Payment successful! Gov Ref: ${response.data.government_transaction_id}`);
-      fetchBills();
+      const timestamp = Date.now();
+      const response = await axios.post(`${API}/payments/create-session?_t=${timestamp}`, {
+        utility_bill_id: billId,
+        amount: amount,
+        currency: 'EGP'
+      }, {
+        headers: { 'Cache-Control': 'no-cache' }
+      });
+      
+      // Redirect to Stripe checkout
+      window.location.href = response.data.checkout_url;
+      
     } catch (error) {
-      toast.error('Payment failed. Please try again.');
-    } finally {
+      console.error('Payment session creation error:', error);
+      toast.error(t('payment_failed_try_again'));
       setProcessingPayment(null);
     }
   };

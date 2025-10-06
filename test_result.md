@@ -168,9 +168,9 @@ backend:
 frontend:
   - task: "Cache Busting Fix for Government & Utility Gateway Visibility Issue"
     implemented: true
-    working: false
+    working: true
     file: "/app/frontend/public/sw.js, /app/frontend/public/index.html, /app/frontend/src/components/UtilityBills.js"
-    stuck_count: 1
+    stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:

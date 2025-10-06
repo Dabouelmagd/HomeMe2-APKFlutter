@@ -312,6 +312,8 @@ const resources = {
       'provider_name': 'Provider Name',
       'account_number': 'Account Number',
       'meter_number': 'Meter Number',
+      'add_utility_connection': 'Add Utility Connection',
+      'select_provider': 'Select Provider',
       
       // Family Management
       'family_management': 'Family Management',

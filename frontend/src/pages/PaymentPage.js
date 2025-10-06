@@ -280,7 +280,7 @@ const PaymentPage = () => {
           {/* Transactions Section */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">{t('Transaction History')}</h2>
+              <h2 className="text-xl font-semibold">{t('transaction_history')}</h2>
               <button
                 onClick={() => setShowTransactions(!showTransactions)}
                 className="text-blue-600 hover:text-blue-700 text-sm font-medium"

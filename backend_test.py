@@ -4428,7 +4428,20 @@ class HomeMeFlutterTestSuite:
             # Test some core endpoints that Flutter app would use
             self.test_flutter_compatible_endpoints()
         
-        # 6. PHASE 3 BACKEND SYSTEMS TESTING - As requested in review
+        # 6. STRIPE PAYMENT INTEGRATION TESTING - Priority Focus
+        if self.admin_token:
+            print("\n" + "="*60)
+            print("🔥 PRIORITY: STRIPE PAYMENT INTEGRATION TESTING")
+            print("="*60)
+            
+            self.test_stripe_api_key_configuration()
+            self.test_emergentintegrations_library_import()
+            self.test_create_payment_session_endpoint()
+            self.test_payment_status_endpoint()
+            self.test_stripe_webhook_endpoint()
+            self.test_payment_transaction_database_model()
+        
+        # 7. PHASE 3 BACKEND SYSTEMS TESTING - As requested in review
         if self.admin_token:
             print("\n" + "="*50)
             print("🚀 TESTING PHASE 3 BACKEND SYSTEMS")

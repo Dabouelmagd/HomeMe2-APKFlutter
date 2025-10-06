@@ -3440,6 +3440,8 @@ const resources = {
       'provider_name': 'Nom du Fournisseur',
       'account_number': 'Numéro de Compte',
       'meter_number': 'Numéro de Compteur',
+      'add_utility_connection': 'Ajouter Connexion de Service Public',
+      'select_provider': 'Sélectionner Fournisseur',
       
       // Family Management
       'family_management': 'Gestion Familiale',

@@ -267,7 +267,7 @@ const ServiceBooking = () => {
       await loadBookings();
     } catch (error) {
       console.error('Failed to book service:', error);
-      toast.error(error.response?.data?.detail || 'Failed to book service');
+      toast.error(error.response?.data?.detail || t('failed_to_book_service'));
     }
   };
 

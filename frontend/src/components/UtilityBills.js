@@ -217,12 +217,7 @@ const UtilityBills = () => {
       name: t('landline_telephone'), 
       icon: PhoneIcon, 
       color: 'bg-green-500',
-      providers: [
-        'المصرية للاتصالات (WE)',
-        'أورانج مصر',
-        'فودافون مصر',
-        'اتصالات مصر'
-      ],
+      providers: getTelecomProviders(selectedCountry),
       identifierLabel: t('phone_number'),
       identifierType: 'phone'
     },
@@ -230,12 +225,7 @@ const UtilityBills = () => {
       name: t('mobile_phone'), 
       icon: DevicePhoneMobileIcon, 
       color: 'bg-indigo-500',
-      providers: [
-        'أورانج مصر',
-        'فودافون مصر',
-        'اتصالات مصر',
-        'المصرية للاتصالات (WE)'
-      ],
+      providers: getTelecomProviders(selectedCountry),
       identifierLabel: t('phone_number'),
       identifierType: 'phone'
     },
@@ -243,12 +233,7 @@ const UtilityBills = () => {
       name: t('natural_gas'), 
       icon: FireIcon, 
       color: 'bg-red-500',
-      providers: [
-        'الشركة المصرية للغازات الطبيعية (إيجاس)',
-        'شركة بتروجاس',
-        'شركة غاز مصر',
-        'شركة توزيع الغاز الطبيعي للمدن الجديدة'
-      ],
+      providers: getGasProviders(selectedCountry),
       identifierLabel: t('meter_number'),
       identifierType: 'meter'
     },
@@ -256,13 +241,7 @@ const UtilityBills = () => {
       name: t('internet'), 
       icon: GlobeAltIcon, 
       color: 'bg-purple-500',
-      providers: [
-        'المصرية للاتصالات (WE)',
-        'أورانج مصر',
-        'فودافون مصر',
-        'اتصالات مصر',
-        'نور للاتصالات'
-      ],
+      providers: getTelecomProviders(selectedCountry),
       identifierLabel: t('subscriber_number'),
       identifierType: 'subscriber'
     },

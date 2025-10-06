@@ -327,7 +327,7 @@ const Layout = ({ children }) => {
         },
         {
           name: t('enterprise.dashboard'),
-          href: '/account-type-selection',
+          href: '/enterprise-dashboard',
           icon: BuildingOffice2Icon,
           show: user?.role === 'admin'
         }

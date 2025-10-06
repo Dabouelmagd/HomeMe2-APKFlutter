@@ -330,6 +330,9 @@ const resources = {
       'subscriber_name': 'Subscriber Name',
       'enter_subscriber_name': 'Enter subscriber name',
       'enter_address': 'Enter address',
+      'connection_added_successfully': 'Connection added successfully!',
+      'connection_and_bill_added': 'Connection added and pending bill found!',
+      'failed_to_add_connection': 'Failed to add connection',
       
       // Family Management
       'family_management': 'Family Management',

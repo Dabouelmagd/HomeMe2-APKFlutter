@@ -27,6 +27,7 @@ const resources = {
       'additional_notes': 'Additional Notes',
       'any_additional_info': 'Any additional information or special requests',
       'preferred_date': 'Preferred Date',
+      'optional': 'Optional',
       'signing_in': 'Signing in...',
       'creating_account': 'Creating account...',
       'already_have_account': 'Already have an account?',

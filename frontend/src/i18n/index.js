@@ -3330,6 +3330,7 @@ const resources = {
       'host_name': 'Nom de l\'Hôte',
       'host_phone': 'Téléphone de l\'Hôte',
       'vehicle_plate': 'Plaque du Véhicule',
+      'visit_purpose': 'But de la Visite',
       'landscaping': 'Aménagement Paysager',
       'personal': 'Personnel',
       'delivery': 'Livraison',

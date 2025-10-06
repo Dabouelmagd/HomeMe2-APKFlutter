@@ -674,7 +674,7 @@ const ServiceBooking = () => {
                   className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   <PlusIcon className="h-5 w-5 mr-2" />
-                  Book Service
+                  {t('book_service')}
                 </button>
               </div>
             ) : (
@@ -1244,7 +1244,7 @@ const ServiceBooking = () => {
                       className="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-base font-medium text-white hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm transition-all duration-200"
                     >
                       <CalendarIcon className="h-5 w-5 mr-2" />
-                      Book Service
+                      {t('book_service')}
                     </button>
                     <button 
                       type="button" 

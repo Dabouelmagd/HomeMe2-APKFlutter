@@ -900,7 +900,7 @@ const ServiceBooking = () => {
                         <td className="px-6 py-4">
                           <div>
                             <div className="text-sm font-medium text-gray-900">{booking.title}</div>
-                            <div className="text-sm text-gray-500">{booking.service_specialty}</div>
+                            <div className="text-sm text-gray-500">{translateService(booking.service_specialty)}</div>
                           </div>
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">

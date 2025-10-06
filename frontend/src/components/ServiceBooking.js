@@ -721,7 +721,7 @@ const ServiceBooking = () => {
                           <p className="text-sm text-gray-600 mt-1">{booking.provider_name}</p>
                         </div>
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(booking.status)}`}>
-                          {booking.status?.replace('_', ' ').toUpperCase() || 'PENDING'}
+                          {translateStatus(booking.status) || t('pending')}
                         </span>
                       </div>
                     </div>

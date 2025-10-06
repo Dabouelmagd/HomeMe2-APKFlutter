@@ -304,6 +304,8 @@ const resources = {
       'overdue_bills': 'Overdue Bills',
       'paid_bills': 'Paid Bills',
       'no_utility_connections': 'No utility connections found',
+      'add_connection': 'Add Connection',
+      'add_first_connection': 'Add your first utility connection',
       
       // Family Management
       'family_management': 'Family Management',

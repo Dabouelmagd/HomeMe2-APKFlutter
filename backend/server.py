@@ -11144,7 +11144,7 @@ async def get_payment_status(
         raise HTTPException(status_code=500, detail="Failed to get payment status")
 
 @api_router.post("/webhook/stripe")
-async def stripe_webhook(request):
+async def stripe_webhook(request: Request):
     """Handle Stripe webhook events"""
     try:
         # Get Stripe API key

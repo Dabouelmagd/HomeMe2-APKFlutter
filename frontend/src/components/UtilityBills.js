@@ -63,31 +63,99 @@ const UtilityBills = () => {
       name: t('electricity'), 
       icon: BoltIcon, 
       color: 'bg-yellow-500',
-      providers: ['National Electric Company', 'Cairo Electricity', 'Alexandria Power']
+      providers: [
+        'شركة شمال القاهرة لتوزيع الكهرباء',
+        'شركة جنوب القاهرة لتوزيع الكهرباء',
+        'شركة شمال الدلتا لتوزيع الكهرباء',
+        'شركة جنوب الدلتا لتوزيع الكهرباء',
+        'شركة الإسكندرية لتوزيع الكهرباء',
+        'شركة القناة لتوزيع الكهرباء',
+        'شركة الجيزة لتوزيع الكهرباء'
+      ],
+      identifierLabel: t('meter_number'),
+      identifierType: 'meter'
     },
     water: { 
       name: t('water'), 
       icon: BeakerIcon, 
       color: 'bg-blue-500',
-      providers: ['National Water Authority', 'Cairo Water', 'Giza Water Company']
+      providers: [
+        'شركة مياه الشرب والصرف الصحي بالقاهرة الكبرى',
+        'شركة مياه الشرب والصرف الصحي بالإسكندرية',
+        'شركة مياه الشرب والصرف الصحي بالجيزة',
+        'شركة مياه الشرب والصرف الصحي بالقليوبية',
+        'شركة مياه الشرب والصرف الصحي بالدقهلية'
+      ],
+      identifierLabel: t('meter_number'),
+      identifierType: 'meter'
     },
     telephone: { 
-      name: t('telephone'), 
+      name: t('landline_telephone'), 
       icon: PhoneIcon, 
       color: 'bg-green-500',
-      providers: ['Telecom Egypt', 'Orange Egypt', 'Vodafone Egypt', 'Etisalat Egypt']
+      providers: [
+        'المصرية للاتصالات (WE)',
+        'أورانج مصر',
+        'فودافون مصر',
+        'اتصالات مصر'
+      ],
+      identifierLabel: t('phone_number'),
+      identifierType: 'phone'
     },
-    gas: { 
-      name: t('gas'), 
+    mobile: { 
+      name: t('mobile_phone'), 
+      icon: DevicePhoneMobileIcon, 
+      color: 'bg-indigo-500',
+      providers: [
+        'أورانج مصر',
+        'فودافون مصر',
+        'اتصالات مصر',
+        'المصرية للاتصالات (WE)'
+      ],
+      identifierLabel: t('phone_number'),
+      identifierType: 'phone'
+    },
+    natural_gas: { 
+      name: t('natural_gas'), 
       icon: FireIcon, 
       color: 'bg-red-500',
-      providers: ['Egyptian Natural Gas', 'Cairo Gas', 'National Gas Company']
+      providers: [
+        'الشركة المصرية للغازات الطبيعية (إيجاس)',
+        'شركة بتروجاس',
+        'شركة غاز مصر',
+        'شركة توزيع الغاز الطبيعي للمدن الجديدة'
+      ],
+      identifierLabel: t('meter_number'),
+      identifierType: 'meter'
     },
     internet: { 
       name: t('internet'), 
-      icon: WifiIcon, 
+      icon: GlobeAltIcon, 
       color: 'bg-purple-500',
-      providers: ['TE Data', 'Orange Internet', 'Vodafone Internet', 'Etisalat Internet']
+      providers: [
+        'المصرية للاتصالات (WE)',
+        'أورانج مصر',
+        'فودافون مصر',
+        'اتصالات مصر',
+        'نور للاتصالات'
+      ],
+      identifierLabel: t('account_number'),
+      identifierType: 'account'
+    },
+    government: { 
+      name: t('government_services'), 
+      icon: BuildingLibraryIcon, 
+      color: 'bg-gray-600',
+      providers: [
+        'ضريبة العقارات',
+        'رسوم الترخيص',
+        'المخالفات المرورية',
+        'رسوم التوثيق',
+        'الضرائب على الدخل',
+        'رسوم الخدمات الحكومية'
+      ],
+      identifierLabel: t('reference_number'),
+      identifierType: 'reference'
     }
   };
 

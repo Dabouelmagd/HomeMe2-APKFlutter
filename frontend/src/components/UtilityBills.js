@@ -64,15 +64,7 @@ const UtilityBills = () => {
       name: t('electricity'), 
       icon: BoltIcon, 
       color: 'bg-yellow-500',
-      providers: [
-        'شركة شمال القاهرة لتوزيع الكهرباء',
-        'شركة جنوب القاهرة لتوزيع الكهرباء',
-        'شركة شمال الدلتا لتوزيع الكهرباء',
-        'شركة جنوب الدلتا لتوزيع الكهرباء',
-        'شركة الإسكندرية لتوزيع الكهرباء',
-        'شركة القناة لتوزيع الكهرباء',
-        'شركة الجيزة لتوزيع الكهرباء'
-      ],
+      providers: getElectricityProviders(),
       identifierLabel: t('meter_number'),
       identifierType: 'meter'
     },
@@ -80,13 +72,7 @@ const UtilityBills = () => {
       name: t('water'), 
       icon: BeakerIcon, 
       color: 'bg-blue-500',
-      providers: [
-        'شركة مياه الشرب والصرف الصحي بالقاهرة الكبرى',
-        'شركة مياه الشرب والصرف الصحي بالإسكندرية',
-        'شركة مياه الشرب والصرف الصحي بالجيزة',
-        'شركة مياه الشرب والصرف الصحي بالقليوبية',
-        'شركة مياه الشرب والصرف الصحي بالدقهلية'
-      ],
+      providers: getWaterProviders(),
       identifierLabel: t('meter_number'),
       identifierType: 'meter'
     },

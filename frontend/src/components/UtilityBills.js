@@ -187,21 +187,95 @@ const UtilityBills = () => {
     }
   };
 
+  // محاكاة نظام جلب الفواتير
+  const mockBillData = {
+    electricity: {
+      'شركة شمال القاهرة لتوزيع الكهرباء': [
+        { meter: '123456789', name: 'أحمد محمد علي', amount: 245.50, due_date: '2024-01-15' },
+        { meter: '987654321', name: 'فاطمة أحمد حسن', amount: 189.25, due_date: '2024-01-20' },
+      ]
+    },
+    water: {
+      'شركة مياه الشرب والصرف الصحي بالقاهرة الكبرى': [
+        { meter: '555666777', name: 'محمد أحمد السيد', amount: 78.40, due_date: '2024-01-18' },
+      ]
+    },
+    telephone: {
+      'المصرية للاتصالات (WE)': [
+        { phone: '0225551234', name: 'سارة محمود عبدالله', amount: 65.80, due_date: '2024-01-25' },
+      ]
+    }
+  };
+
+  // البحث عن فاتورة بالرقم المرجعي
+  const findBillByIdentifier = (utilityType, provider, identifier) => {
+    const bills = mockBillData[utilityType]?.[provider] || [];
+    const field = utilityTypes[utilityType]?.identifierType;
+    
+    if (field === 'meter') {
+      return bills.find(bill => bill.meter === identifier);
+    } else if (field === 'phone') {
+      return bills.find(bill => bill.phone === identifier);
+    }
+    return null;
+  };
+
+  // Handle creating connection
   const handleCreateConnection = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/compounds/${user.compound_id}/utility-connections`, connectionForm);
-      toast.success('Utility connection added successfully!');
-      setShowAddConnection(false);
+      // محاولة العثور على فاتورة
+      const foundBill = findBillByIdentifier(
+        connectionForm.utility_type, 
+        connectionForm.provider_name, 
+        connectionForm.identifier
+      );
+
+      const newConnection = {
+        ...connectionForm,
+        id: Date.now(),
+        created_at: new Date().toISOString(),
+        status: 'active',
+        has_pending_bill: !!foundBill,
+        pending_amount: foundBill?.amount || 0,
+        last_bill_date: foundBill?.due_date
+      };
+      
+      setConnections([...connections, newConnection]);
+
+      // إضافة الفاتورة إذا وُجدت
+      if (foundBill) {
+        const newBill = {
+          id: Date.now() + 1,
+          family_id: user?.family_id || 'default',
+          unit_number: user?.unit_number || 'A-101',
+          utility_type: connectionForm.utility_type,
+          provider_name: connectionForm.provider_name,
+          account_number: connectionForm.identifier,
+          subscriber_name: foundBill.name,
+          billing_period: 'ديسمبر 2024',
+          issue_date: new Date().toISOString().split('T')[0],
+          due_date: foundBill.due_date,
+          amount: foundBill.amount,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        };
+        setBills([...bills, newBill]);
+        toast.success(t('connection_and_bill_added'));
+      } else {
+        toast.success(t('connection_added_successfully'));
+      }
+
       setConnectionForm({
         utility_type: 'electricity',
         provider_name: '',
-        account_number: '',
-        meter_number: ''
+        identifier: '',
+        subscriber_name: '',
+        address: ''
       });
-      fetchConnections();
+      setShowAddConnection(false);
     } catch (error) {
-      toast.error('Failed to add utility connection');
+      toast.error(t('failed_to_add_connection'));
     }
   };
 

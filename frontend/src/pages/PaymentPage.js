@@ -293,7 +293,7 @@ const PaymentPage = () => {
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {transactions.length === 0 ? (
                   <p className="text-gray-500 text-center py-4">
-                    {t('No transactions found')}
+                    {t('no_transactions_found')}
                   </p>
                 ) : (
                   transactions.slice(0, showTransactions ? transactions.length : 5).map((transaction) => (

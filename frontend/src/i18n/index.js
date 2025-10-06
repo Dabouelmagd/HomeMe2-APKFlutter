@@ -308,6 +308,10 @@ const resources = {
       'add_first_connection': 'Add your first utility connection',
       'overdue_bills_alert': 'You have {{count}} overdue bill(s)',
       'pay_overdue_bills_message': 'Please pay your overdue bills to avoid service interruption',
+      'utility_type': 'Utility Type',
+      'provider_name': 'Provider Name',
+      'account_number': 'Account Number',
+      'meter_number': 'Meter Number',
       
       // Family Management
       'family_management': 'Family Management',

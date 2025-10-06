@@ -754,8 +754,6 @@ const resources = {
       'completed_polls': 'Completed Polls',
       'draft_polls': 'Draft Polls',
       'pending_requests': 'Pending Requests',
-      'pending_bills': 'Pending Bills',
-      'overdue_bills': 'Overdue Bills',
       'outstanding_payments': 'Outstanding Payments',
       'pending_approvals': 'Pending Approvals',
       'active_visits': 'Active Visits',

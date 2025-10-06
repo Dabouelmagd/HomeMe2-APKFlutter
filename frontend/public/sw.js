@@ -1,8 +1,8 @@
 // HomeMe PWA Service Worker
-const CACHE_VERSION = Date.now(); // Force new cache on every update
-const CACHE_NAME = `homeme-pwa-v${CACHE_VERSION}`;
-const STATIC_CACHE = `homeme-static-v${CACHE_VERSION}`;
-const DYNAMIC_CACHE = `homeme-dynamic-v${CACHE_VERSION}`;
+const CACHE_VERSION = 'v1.2.1'; // Static version - only update on app changes
+const CACHE_NAME = `homeme-pwa-${CACHE_VERSION}`;
+const STATIC_CACHE = `homeme-static-${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `homeme-dynamic-${CACHE_VERSION}`;
 
 // Cache resources for offline functionality
 const STATIC_ASSETS = [

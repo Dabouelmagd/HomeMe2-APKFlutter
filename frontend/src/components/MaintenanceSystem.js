@@ -106,7 +106,7 @@ const MaintenanceSystem = () => {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      toast.success('Maintenance request created successfully!');
+      toast.success(t('maintenance_request_created_successfully'));
       setShowCreateModal(false);
       setNewRequest({
         title: '',

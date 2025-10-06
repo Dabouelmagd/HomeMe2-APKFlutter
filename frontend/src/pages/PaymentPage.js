@@ -233,7 +233,7 @@ const PaymentPage = () => {
                   onChange={(e) => setSelectedPackage(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="">{t('Choose a payment option')}</option>
+                  <option value="">{t('choose_payment_option')}</option>
                   {Object.entries(packages).map(([key, pkg]) => (
                     <option key={key} value={key}>
                       {pkg.name} - {formatCurrency(pkg.amount, pkg.currency)}

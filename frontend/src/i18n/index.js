@@ -3333,6 +3333,7 @@ const resources = {
       'host_phone': 'Téléphone de l\'Hôte',
       'vehicle_plate': 'Plaque du Véhicule',
       'visit_purpose': 'But de la Visite',
+      'unit_number': 'Numéro d\'Unité',
       'landscaping': 'Aménagement Paysager',
       'personal': 'Personnel',
       'delivery': 'Livraison',

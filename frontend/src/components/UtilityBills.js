@@ -163,7 +163,74 @@ const UtilityBills = () => {
   useEffect(() => {
     fetchBills();
     fetchConnections();
+    checkPaymentStatus();
   }, [user]);
+
+  const checkPaymentStatus = async () => {
+    // Check if returning from Stripe payment
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    const paymentStatus = urlParams.get('payment');
+    
+    if (sessionId && paymentStatus === 'success') {
+      try {
+        const timestamp = Date.now();
+        const response = await axios.get(`${API}/payments/status/${sessionId}?_t=${timestamp}`, {
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+        
+        if (response.data.payment_status === 'paid') {
+          toast.success(t('payment_successful'));
+          fetchBills(); // Refresh bills to show updated status
+        } else {
+          // Poll for status if not yet confirmed
+          pollPaymentStatus(sessionId, 0);
+        }
+      } catch (error) {
+        console.error('Error checking payment status:', error);
+        toast.error(t('payment_status_check_failed'));
+      }
+      
+      // Clean up URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (paymentStatus === 'cancelled') {
+      toast.info(t('payment_cancelled'));
+      // Clean up URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  };
+
+  const pollPaymentStatus = async (sessionId, attempts) => {
+    const maxAttempts = 5;
+    const pollInterval = 2000; // 2 seconds
+
+    if (attempts >= maxAttempts) {
+      toast.warning(t('payment_check_timeout'));
+      return;
+    }
+
+    try {
+      const timestamp = Date.now();
+      const response = await axios.get(`${API}/payments/status/${sessionId}?_t=${timestamp}`, {
+        headers: { 'Cache-Control': 'no-cache' }
+      });
+      
+      if (response.data.payment_status === 'paid') {
+        toast.success(t('payment_successful'));
+        fetchBills(); // Refresh bills
+        return;
+      } else if (response.data.status === 'expired') {
+        toast.error(t('payment_expired'));
+        return;
+      }
+
+      // Continue polling
+      setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+    } catch (error) {
+      console.error('Error polling payment status:', error);
+      toast.error(t('payment_status_check_failed'));
+    }
+  };
 
   const fetchBills = async () => {
     try {

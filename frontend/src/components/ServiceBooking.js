@@ -614,8 +614,8 @@ const ServiceBooking = () => {
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center text-sm text-gray-600">
                       <SparklesIcon className="h-4 w-4 mr-3 text-blue-500" />
-                      <span className="font-medium">Services:</span>
-                      <span className="ml-2">{provider.services?.join(', ') || 'Various services'}</span>
+                      <span className="font-medium">{t('services')}:</span>
+                      <span className="ml-2">{provider.services?.map(service => translateService(service)).join('، ') || t('various_services')}</span>
                     </div>
                     
                     {provider.hourly_rate && (

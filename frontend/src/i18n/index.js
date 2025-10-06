@@ -1900,6 +1900,10 @@ const resources = {
       'add_first_connection': 'أضف أول اتصال مرافق',
       'overdue_bills_alert': 'لديك {{count}} فاتورة متأخرة',
       'pay_overdue_bills_message': 'يرجى دفع الفواتير المتأخرة لتجنب انقطاع الخدمة',
+      'utility_type': 'نوع المرافق',
+      'provider_name': 'اسم المزود',
+      'account_number': 'رقم الحساب',
+      'meter_number': 'رقم العداد',
       
       // Family Management  
       'family_management': 'إدارة أفراد الأسرة',

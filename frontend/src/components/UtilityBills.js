@@ -140,8 +140,8 @@ const UtilityBills = () => {
         'اتصالات مصر',
         'نور للاتصالات'
       ],
-      identifierLabel: t('account_number'),
-      identifierType: 'account'
+      identifierLabel: t('subscriber_number'),
+      identifierType: 'subscriber'
     },
     government: { 
       name: t('government_services'), 

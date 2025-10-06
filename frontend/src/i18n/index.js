@@ -3851,8 +3851,6 @@ const resources = {
       'completed_polls': 'Sondages terminés',
       'draft_polls': 'Brouillons de sondages',
       'pending_requests': 'Demandes en attente',
-      'pending_bills': 'Factures en attente',
-      'overdue_bills': 'Factures en retard',
       'outstanding_payments': 'Paiements en souffrance',
       
       // Quick Actions
@@ -3892,8 +3890,6 @@ const resources = {
       'completed_polls': 'Sondages terminés',
       'draft_polls': 'Brouillons de sondages',
       'pending_requests': 'Demandes en attente',
-      'pending_bills': 'Factures en attente',
-      'overdue_bills': 'Factures en retard',
       'outstanding_payments': 'Paiements en souffrance',
       'pending_approvals': 'Approbations en attente',
       'active_visits': 'Visites actives',

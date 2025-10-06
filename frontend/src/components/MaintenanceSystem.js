@@ -120,7 +120,7 @@ const MaintenanceSystem = () => {
       });
       fetchMaintenanceData();
     } catch (error) {
-      toast.error('Failed to create maintenance request');
+      toast.error(t('failed_to_create_maintenance_request'));
       console.error('Create request error:', error);
     }
   };

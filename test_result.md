@@ -49,9 +49,9 @@
 ##
 test_plan:
   current_focus: 
+    - "Book Service Form Translation Testing - COMPLETED ❌ (78% Success Rate - Missing Translation Keys)"
     - "Guest Management Visitor Request Form Translation Testing - COMPLETED ✅ (85% Success Rate)"
     - "Registration Links Translation Testing After Fixes - COMPLETED ✅"
-    - "Arabic Interface Tab Translation Verification - COMPLETED ✅"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

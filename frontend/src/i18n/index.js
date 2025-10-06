@@ -3416,6 +3416,8 @@ const resources = {
       'overdue_bills': 'Factures en Retard',
       'paid_bills': 'Factures Payées',
       'no_utility_connections': 'Aucune connexion aux services publics trouvée',
+      'add_connection': 'Ajouter Connexion',
+      'add_first_connection': 'Ajoutez votre première connexion aux services publics',
       
       // Family Management
       'family_management': 'Gestion Familiale',

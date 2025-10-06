@@ -1914,6 +1914,12 @@ const resources = {
       'meter_number': 'رقم العداد',
       'add_utility_connection': 'إضافة اتصال مرافق',
       'select_provider': 'اختر المزود',
+      'enter_account_number': 'أدخل رقم حسابك',
+      'enter_meter_number': 'أدخل رقم العداد (اختياري)',
+      'electricity': 'كهرباء',
+      'water': 'مياه',
+      'gas': 'غاز',
+      'internet': 'إنترنت',
       
       // Family Management  
       'family_management': 'إدارة أفراد الأسرة',

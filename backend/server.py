@@ -11216,9 +11216,14 @@ except ImportError:
 
 # Include the API router after all endpoints are defined
 app.include_router(api_router)
-app.include_router(payments_router)
-app.include_router(push_notifications_router)
-app.include_router(ratings_router)
+
+# Include optional routers if they exist
+if payments_router:
+    app.include_router(payments_router)
+if push_notifications_router:
+    app.include_router(push_notifications_router)
+if ratings_router:
+    app.include_router(ratings_router)
 
 @app.on_event("startup")
 async def startup_db_client():

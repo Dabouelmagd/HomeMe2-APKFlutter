@@ -2373,8 +2373,6 @@ const resources = {
       'completed_polls': 'استطلاعات مكتملة',
       'draft_polls': 'مسودات استطلاعات',
       'pending_requests': 'طلبات معلقة',
-      'pending_bills': 'فواتير معلقة',
-      'overdue_bills': 'فواتير متأخرة',
       'outstanding_payments': 'مدفوعات مستحقة',
       'pending_approvals': 'موافقات معلقة',
       'active_visits': 'زيارات نشطة',

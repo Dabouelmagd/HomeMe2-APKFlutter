@@ -138,7 +138,7 @@ const GuestManagement = () => {
       });
       fetchGuestData();
     } catch (error) {
-      toast.error('Failed to create visit request');
+      toast.error(t('failed_to_create_visit_request'));
       console.error('Create guest error:', error);
     }
   };

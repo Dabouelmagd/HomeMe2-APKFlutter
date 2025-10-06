@@ -49,13 +49,14 @@
 ##
 test_plan:
   current_focus: 
-    - "Stripe Payment Integration for Utility Bills Testing - COMPLETED ✅ (83% Success Rate)"
-    - "Book Service Form Translation Testing - COMPLETED ❌ (78% Success Rate - Missing Translation Keys)"
-    - "Guest Management Visitor Request Form Translation Testing - COMPLETED ✅ (85% Success Rate)"
-    - "Registration Links Translation Testing After Fixes - COMPLETED ✅"
-  stuck_tasks: []
+    - "Cache Busting Fix for Government & Utility Gateway Visibility Issue - CRITICAL FAILURE ❌ (Infinite Reload Loop)"
+    - "Multi-Country Support Testing - BLOCKED ❌ (Cannot test due to cache busting issue)"
+    - "Stripe Payment Integration Testing - BLOCKED ❌ (Cannot test due to cache busting issue)"
+    - "Translation System Testing - BLOCKED ❌ (Cannot test due to cache busting issue)"
+  stuck_tasks: 
+    - "Cache Busting Fix for Government & Utility Gateway Visibility Issue"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "critical_first"
 
 agent_communication:
     - agent: "testing"

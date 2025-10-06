@@ -1925,6 +1925,11 @@ const resources = {
       'water': 'مياه',
       'gas': 'غاز',
       'internet': 'إنترنت',
+      'landline_telephone': 'التليفون الأرضي',
+      'mobile_phone': 'الهاتف المحمول',
+      'natural_gas': 'الغاز الطبيعي',
+      'government_services': 'الخدمات الحكومية',
+      'reference_number': 'الرقم المرجعي',
       
       // Family Management  
       'family_management': 'إدارة أفراد الأسرة',

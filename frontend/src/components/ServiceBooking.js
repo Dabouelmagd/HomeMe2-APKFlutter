@@ -41,6 +41,24 @@ const API = `${BACKEND_URL}/api`;
 const ServiceBooking = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+
+  // Function to translate service types
+  const translateService = (service) => {
+    const serviceTranslations = {
+      'maintenance': t('maintenance'),
+      'cleaning': t('cleaning'),
+      'plumbing': t('plumbing'),
+      'electrical': t('electrical'),
+      'painting': t('painting'),
+      'gardening': t('gardening'),
+      'security': t('security'),
+      'pest_control': t('pest_control'),
+      'hvac': t('hvac'),
+      'carpentry': t('carpentry')
+    };
+    
+    return serviceTranslations[service?.toLowerCase()] || service;
+  };
   const [providers, setProviders] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);

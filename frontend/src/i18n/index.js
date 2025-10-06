@@ -325,6 +325,11 @@ const resources = {
       'natural_gas': 'Natural Gas',
       'government_services': 'Government Services',
       'reference_number': 'Reference Number',
+      'enter_phone_number': 'Enter phone number',
+      'enter_reference_number': 'Enter reference number',
+      'subscriber_name': 'Subscriber Name',
+      'enter_subscriber_name': 'Enter subscriber name',
+      'enter_address': 'Enter address',
       
       // Family Management
       'family_management': 'Family Management',

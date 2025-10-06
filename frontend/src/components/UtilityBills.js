@@ -167,9 +167,14 @@ const UtilityBills = () => {
 
   const fetchBills = async () => {
     try {
+      const timestamp = Date.now();
       const response = user?.role === 'admin' 
-        ? await axios.get(`${API}/compounds/${user.compound_id}/utility-bills`)
-        : await axios.get(`${API}/utility-bills/my`);
+        ? await axios.get(`${API}/compounds/${user.compound_id}/utility-bills?_t=${timestamp}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+          })
+        : await axios.get(`${API}/utility-bills/my?_t=${timestamp}`, {
+            headers: { 'Cache-Control': 'no-cache' }
+          });
       setBills(response.data.bills);
     } catch (error) {
       toast.error('Failed to load utility bills');
@@ -180,7 +185,10 @@ const UtilityBills = () => {
 
   const fetchConnections = async () => {
     try {
-      const response = await axios.get(`${API}/compounds/${user.compound_id}/utility-connections`);
+      const timestamp = Date.now();
+      const response = await axios.get(`${API}/compounds/${user.compound_id}/utility-connections?_t=${timestamp}`, {
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       setConnections(response.data.connections);
     } catch (error) {
       console.error('Failed to load utility connections:', error);

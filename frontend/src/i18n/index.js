@@ -4082,6 +4082,8 @@ const resources = {
       'service_type': 'Type de Service',
       'provider_rating': 'Évaluation du Prestataire',
       'completed_jobs': 'Emplois Terminés',
+      'services': 'Services',
+      'various_services': 'Services Divers',
       'help_topic_getting_started': 'Commencer',
       'help_topic_compound_management': 'Gestion des Complexes',
       'help_topic_services_maintenance': 'Services et Maintenance',

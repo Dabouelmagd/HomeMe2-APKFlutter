@@ -320,6 +320,11 @@ const resources = {
       'water': 'Water',
       'gas': 'Gas',
       'internet': 'Internet',
+      'landline_telephone': 'Landline Telephone',
+      'mobile_phone': 'Mobile Phone',
+      'natural_gas': 'Natural Gas',
+      'government_services': 'Government Services',
+      'reference_number': 'Reference Number',
       
       // Family Management
       'family_management': 'Family Management',

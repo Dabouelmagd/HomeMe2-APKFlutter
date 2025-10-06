@@ -3485,6 +3485,11 @@ const resources = {
       'natural_gas': 'Gaz Naturel',
       'government_services': 'Services Gouvernementaux',
       'reference_number': 'Numéro de Référence',
+      'enter_phone_number': 'Entrez le numéro de téléphone',
+      'enter_reference_number': 'Entrez le numéro de référence',
+      'subscriber_name': 'Nom de l\'Abonné',
+      'enter_subscriber_name': 'Entrez le nom de l\'abonné',
+      'enter_address': 'Entrez l\'adresse',
       
       // Family Management
       'family_management': 'Gestion Familiale',

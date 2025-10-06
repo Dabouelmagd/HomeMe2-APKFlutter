@@ -285,7 +285,7 @@ const PaymentPage = () => {
                 onClick={() => setShowTransactions(!showTransactions)}
                 className="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
-                {showTransactions ? t('Hide') : t('Show All')}
+                {showTransactions ? t('hide') : t('show_all')}
               </button>
             </div>
 

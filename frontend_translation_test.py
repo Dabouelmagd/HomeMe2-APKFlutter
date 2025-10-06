@@ -23,8 +23,8 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 # Configuration
-FRONTEND_URL = "https://compound-manager.preview.emergentagent.com"
-BACKEND_URL = "https://compound-manager.preview.emergentagent.com/api"
+FRONTEND_URL = "https://compound-manager-1.preview.emergentagent.com"
+BACKEND_URL = "https://compound-manager-1.preview.emergentagent.com/api"
 
 class FrontendTranslationTestSuite:
     def __init__(self):

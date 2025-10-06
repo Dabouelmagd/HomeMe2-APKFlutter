@@ -6,7 +6,7 @@ Debug the families endpoint response format
 import requests
 import json
 
-BASE_URL = "https://compound-manager.preview.emergentagent.com/api"
+BASE_URL = "https://compound-manager-1.preview.emergentagent.com/api"
 
 def debug_families_endpoint():
     # Login as admin

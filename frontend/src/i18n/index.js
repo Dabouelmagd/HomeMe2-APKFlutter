@@ -2035,6 +2035,8 @@ const resources = {
       'service_type': 'نوع الخدمة',
       'provider_rating': 'تقييم المزود',
       'completed_jobs': 'الوظائف المكتملة',
+      'services': 'الخدمات',
+      'various_services': 'خدمات متنوعة',
       'help_topic_getting_started': 'البدء',
       'help_topic_compound_management': 'إدارة المجمع',
       'help_topic_services_maintenance': 'الخدمات والصيانة',

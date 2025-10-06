@@ -3454,6 +3454,12 @@ const resources = {
       'meter_number': 'Numéro de Compteur',
       'add_utility_connection': 'Ajouter Connexion de Service Public',
       'select_provider': 'Sélectionner Fournisseur',
+      'enter_account_number': 'Entrez votre numéro de compte',
+      'enter_meter_number': 'Entrez votre numéro de compteur (optionnel)',
+      'electricity': 'Électricité',
+      'water': 'Eau',
+      'gas': 'Gaz',
+      'internet': 'Internet',
       
       // Family Management
       'family_management': 'Gestion Familiale',

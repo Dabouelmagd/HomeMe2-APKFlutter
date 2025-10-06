@@ -574,6 +574,26 @@ const UtilityBills = () => {
         <p className="text-gray-600 mt-2 text-center">
           {t('manage_government_utility_bills')}
         </p>
+        
+        {/* Country Selector */}
+        <div className="mt-4 flex justify-center">
+          <div className="bg-white rounded-lg border border-gray-300 px-4 py-2 min-w-64">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('select_country')}:
+            </label>
+            <select
+              value={selectedCountry}
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="EG">🇪🇬 {t('egypt')}</option>
+              <option value="AE">🇦🇪 {t('uae')}</option>
+              <option value="SA">🇸🇦 {t('saudi_arabia')}</option>
+              <option value="KW">🇰🇼 {t('kuwait')}</option>
+              <option value="QA">🇶🇦 {t('qatar')}</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Summary Cards */}

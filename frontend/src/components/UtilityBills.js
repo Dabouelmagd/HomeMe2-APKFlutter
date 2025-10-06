@@ -729,6 +729,8 @@ const UtilityBills = () => {
                         ? t('enter_phone_number')
                         : connectionForm.utility_type && utilityTypes[connectionForm.utility_type]?.identifierType === 'reference'
                         ? t('enter_reference_number')
+                        : connectionForm.utility_type && utilityTypes[connectionForm.utility_type]?.identifierType === 'subscriber'
+                        ? t('enter_subscriber_number')
                         : t('enter_account_number')
                     }
                   />

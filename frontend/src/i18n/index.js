@@ -3357,6 +3357,7 @@ const resources = {
       'additional_notes': 'Notes Supplémentaires',
       'any_additional_info': 'Toute information supplémentaire ou demande spéciale',
       'preferred_date': 'Date Préférée',
+      'optional': 'Optionnel',
       'landscaping': 'Aménagement Paysager',
       'personal': 'Personnel',
       'delivery': 'Livraison',

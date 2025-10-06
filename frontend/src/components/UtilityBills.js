@@ -639,28 +639,50 @@ const UtilityBills = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('account_number')}
+                    {connectionForm.utility_type && utilityTypes[connectionForm.utility_type]?.identifierLabel || t('account_number')}
                   </label>
                   <input
                     type="text"
-                    value={connectionForm.account_number}
-                    onChange={(e) => setConnectionForm({...connectionForm, account_number: e.target.value})}
+                    value={connectionForm.identifier}
+                    onChange={(e) => setConnectionForm({...connectionForm, identifier: e.target.value})}
                     className="form-input"
                     required
-                    placeholder={t('enter_account_number')}
+                    placeholder={
+                      connectionForm.utility_type && utilityTypes[connectionForm.utility_type]?.identifierType === 'meter' 
+                        ? t('enter_meter_number')
+                        : connectionForm.utility_type && utilityTypes[connectionForm.utility_type]?.identifierType === 'phone'
+                        ? t('enter_phone_number')
+                        : connectionForm.utility_type && utilityTypes[connectionForm.utility_type]?.identifierType === 'reference'
+                        ? t('enter_reference_number')
+                        : t('enter_account_number')
+                    }
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('meter_number')} ({t('optional')})
+                    {t('subscriber_name')}
                   </label>
                   <input
                     type="text"
-                    value={connectionForm.meter_number}
-                    onChange={(e) => setConnectionForm({...connectionForm, meter_number: e.target.value})}
+                    value={connectionForm.subscriber_name}
+                    onChange={(e) => setConnectionForm({...connectionForm, subscriber_name: e.target.value})}
                     className="form-input"
-                    placeholder={t('enter_meter_number')}
+                    required
+                    placeholder={t('enter_subscriber_name')}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('address')} ({t('optional')})
+                  </label>
+                  <textarea
+                    value={connectionForm.address}
+                    onChange={(e) => setConnectionForm({...connectionForm, address: e.target.value})}
+                    className="form-input"
+                    rows="2"
+                    placeholder={t('enter_address')}
                   />
                 </div>
 

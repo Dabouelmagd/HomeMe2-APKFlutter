@@ -26,6 +26,7 @@ const resources = {
       'describe_issue': 'Describe the issue you need help with',
       'additional_notes': 'Additional Notes',
       'any_additional_info': 'Any additional information or special requests',
+      'preferred_date': 'Preferred Date',
       'signing_in': 'Signing in...',
       'creating_account': 'Creating account...',
       'already_have_account': 'Already have an account?',

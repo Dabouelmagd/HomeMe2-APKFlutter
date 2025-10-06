@@ -145,43 +145,38 @@ async function handleApiRequest(request) {
   }
 }
 
-// Handle static assets with network-first strategy for JS files during development
+// Handle static assets with aggressive network-first strategy
 async function handleStaticRequest(request) {
   const url = new URL(request.url);
   
-  // For JS files, try network first to get latest changes
-  if (url.pathname.includes('.js') || url.pathname.includes('main.')) {
-    try {
-      console.log('HomeMe PWA: Fetching latest JS from network:', url.pathname);
-      const networkResponse = await fetch(request);
+  // ALWAYS try network first for all static assets to ensure latest updates
+  try {
+    console.log('HomeMe PWA: Fetching latest from network (cache-bypass):', url.pathname);
+    const networkResponse = await fetch(request.clone(), {
+      cache: 'no-cache', // Bypass browser cache
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
+    
+    if (networkResponse.ok) {
       const cache = await caches.open(STATIC_CACHE);
       await cache.put(request, networkResponse.clone());
       return networkResponse;
-    } catch (error) {
-      console.log('HomeMe PWA: Network failed for JS, trying cache:', url.pathname);
-      const cachedResponse = await caches.match(request);
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      throw error;
     }
+  } catch (error) {
+    console.log('HomeMe PWA: Network failed, trying cache:', url.pathname);
   }
   
-  // For other static assets, use cache-first
+  // Fallback to cache only if network fails
   const cachedResponse = await caches.match(request);
   if (cachedResponse) {
     return cachedResponse;
   }
   
-  try {
-    const networkResponse = await fetch(request);
-    const cache = await caches.open(STATIC_CACHE);
-    await cache.put(request, networkResponse.clone());
-    return networkResponse;
-  } catch (error) {
-    console.error('HomeMe PWA: Failed to fetch static asset:', request.url);
-    throw error;
-  }
+  throw new Error(`Failed to fetch: ${request.url}`);
 }
 
 // Handle navigation requests

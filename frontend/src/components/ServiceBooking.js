@@ -952,7 +952,7 @@ const ServiceBooking = () => {
                   <div className="bg-white px-4 pt-5 pb-4 sm:p-6">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h3 className="text-lg leading-6 font-medium text-gray-900 text-center">Book Service</h3>
+                        <h3 className="text-lg leading-6 font-medium text-gray-900 text-center">{t('book_service')}</h3>
                         {selectedProvider && (
                           <p className="text-sm text-gray-600 mt-1">with {selectedProvider.full_name}</p>
                         )}

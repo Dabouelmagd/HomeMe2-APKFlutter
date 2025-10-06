@@ -248,6 +248,8 @@ const resources = {
       'service_type': 'Service Type',
       'provider_rating': 'Provider Rating',
       'completed_jobs': 'Completed Jobs',
+      'services': 'Services',
+      'various_services': 'Various services',
       'help_topic_getting_started': 'Getting Started',
       'help_topic_compound_management': 'Compound Management',
       'help_topic_services_maintenance': 'Services & Maintenance',

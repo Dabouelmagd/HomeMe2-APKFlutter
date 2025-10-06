@@ -1890,6 +1890,8 @@ const resources = {
       'overdue_bills': 'الفواتير المتأخرة',
       'paid_bills': 'الفواتير المدفوعة',
       'no_utility_connections': 'لم يتم العثور على اتصالات مرافق',
+      'add_connection': 'إضافة اتصال',
+      'add_first_connection': 'أضف أول اتصال مرافق',
       
       // Family Management  
       'family_management': 'إدارة أفراد الأسرة',

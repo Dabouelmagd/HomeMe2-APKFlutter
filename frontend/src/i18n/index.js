@@ -2334,8 +2334,6 @@ const resources = {
       'completed_polls': 'الاستطلاعات المكتملة',
       'draft_polls': 'مسودات الاستطلاعات',
       'pending_requests': 'الطلبات المعلقة',
-      'pending_bills': 'الفواتير المعلقة',
-      'overdue_bills': 'الفواتير المتأخرة',
       'outstanding_payments': 'المدفوعات المستحقة',
       
       // Quick Actions

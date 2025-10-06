@@ -1906,6 +1906,8 @@ const resources = {
       'provider_name': 'اسم المزود',
       'account_number': 'رقم الحساب',
       'meter_number': 'رقم العداد',
+      'add_utility_connection': 'إضافة اتصال مرافق',
+      'select_provider': 'اختر المزود',
       
       // Family Management  
       'family_management': 'إدارة أفراد الأسرة',

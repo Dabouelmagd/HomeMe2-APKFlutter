@@ -474,11 +474,7 @@ function App() {
                   <LocationsPage />
                 } />
                 
-                {/* Enterprise Routes */}
-                <Route path="account-type-selection" element={
-                  <AccountTypeSelection />
-                } />
-                
+                {/* Enterprise Routes - Individual and Enterprise registration are inside Layout */}
                 <Route path="individual-register" element={
                   <IndividualRegistration />
                 } />

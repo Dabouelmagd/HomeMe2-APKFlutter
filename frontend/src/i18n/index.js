@@ -3354,6 +3354,7 @@ const resources = {
       'describe_issue': 'Décrivez le problème pour lequel vous avez besoin d\'aide',
       'additional_notes': 'Notes Supplémentaires',
       'any_additional_info': 'Toute information supplémentaire ou demande spéciale',
+      'preferred_date': 'Date Préférée',
       'landscaping': 'Aménagement Paysager',
       'personal': 'Personnel',
       'delivery': 'Livraison',

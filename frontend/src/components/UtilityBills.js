@@ -179,6 +179,8 @@ const UtilityBills = () => {
     address: '' // العنوان
   });
 
+  const [selectedCountry, setSelectedCountry] = useState('EG'); // Default to Egypt
+
   const [billForm, setBillForm] = useState({
     family_id: '',
     unit_number: '',

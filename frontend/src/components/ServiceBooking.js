@@ -261,7 +261,7 @@ const ServiceBooking = () => {
         }
       });
       
-      toast.success('Service booked successfully!');
+      toast.success(t('service_booked_successfully'));
       setShowBookingForm(false);
       resetBookingForm();
       await loadBookings();

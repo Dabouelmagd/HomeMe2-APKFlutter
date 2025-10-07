@@ -5494,6 +5494,7 @@ const resources = {
       'try_adjusting_search': 'Essayez d\'ajuster votre terme de recherche pour trouver des résidents',
       'no_residents_yet': 'Il n\'y a pas encore de résidents enregistrés dans votre complexe',
       'add_member': 'Ajouter Membre',
+      'update_member': 'Mettre à jour le Membre',
       'adding_to_unit': 'Ajout à l\'Unité',
       'resident': 'résident',
       'residents': 'résidents',

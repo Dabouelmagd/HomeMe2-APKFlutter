@@ -49,10 +49,10 @@
 ##
 test_plan:
   current_focus: 
-    - "Subscription Codes Language Contamination Fix Testing - COMPLETED ✅ (75% Success Rate)"
+    - "Subscription Codes Modals Translation Fix Testing - COMPLETED ✅ (95% Success Rate)"
   stuck_tasks: []
   test_all: false
-  test_priority: "subscription_codes_language_contamination_fix"
+  test_priority: "subscription_codes_modals_translation_fix"
 
 agent_communication:
     - agent: "testing"

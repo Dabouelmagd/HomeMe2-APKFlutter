@@ -49,13 +49,14 @@
 ##
 test_plan:
   current_focus: 
+    - "Add Family Member Form Translation System Fix - CRITICAL ❌ (Major Arabic Translation Gaps)"
     - "Cache Busting Fix for Government & Utility Gateway Visibility Issue - RESOLVED ✅ (Infinite Reload Loop Fixed)"
     - "Multi-Country Support Testing - COMPLETED ✅ (All 5 Countries Working)"
     - "Stripe Payment Integration Testing - COMPLETED ✅ (Backend Ready, Frontend Integrated)"
     - "Translation System Testing - COMPLETED ✅ (All 3 Languages Working)"
   stuck_tasks: []
   test_all: true
-  test_priority: "comprehensive_verification_complete"
+  test_priority: "critical_translation_fix_needed"
 
 agent_communication:
     - agent: "testing"

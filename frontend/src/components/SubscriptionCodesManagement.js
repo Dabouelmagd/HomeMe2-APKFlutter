@@ -581,7 +581,7 @@ const SubscriptionCodesManagement = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">عدد الاستخدامات لكل كود</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('uses_per_code')}</label>
                 <input
                   type="number"
                   min="1"

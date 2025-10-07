@@ -4187,6 +4187,8 @@ const resources = {
       'max_attendees': 'Nombre Maximum de Participants',
       'scheduled_for': 'Programmé pour',
       'expires_at': 'Expire le',
+      'attendees': 'participants',
+      'by': 'par',
       'content': 'Contenu',
       'content_placeholder': 'Saisir le contenu de l\'annonce...',
       'emergency_notification': 'Notification d\'Urgence',

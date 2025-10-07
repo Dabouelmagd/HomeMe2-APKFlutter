@@ -472,13 +472,13 @@ const FamilyManagement = () => {
                     onClick={resetForm}
                     className="px-4 py-2 text-gray-600 hover:text-gray-800"
                   >
-                    Cancel
+                    {t('cancel')}
                   </button>
                   <button
                     type="submit"
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
-                    {editingMember ? 'Update Member' : 'Add Member'}
+                    {editingMember ? t('update_member') : t('add_member')}
                   </button>
                 </div>
               </form>

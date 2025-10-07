@@ -550,7 +550,7 @@ const SubscriptionCodesManagement = () => {
       {showBulkModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg max-w-md w-full mx-4 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">إنشاء أكواد متعددة</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">{t('create_multiple_codes')}</h2>
             
             <form onSubmit={handleBulkCreate} className="space-y-4">
               <div>

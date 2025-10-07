@@ -295,7 +295,7 @@ const SubscriptionCodesManagement = () => {
               <CheckCircleIcon className="h-8 w-8 text-green-600" />
               <div className="mr-4">
                 <p className="text-2xl font-bold text-green-900">{stats.active_codes}</p>
-                <p className="text-green-600">أكواد نشطة</p>
+                <p className="text-green-600">{t('active_codes')}</p>
               </div>
             </div>
           </div>

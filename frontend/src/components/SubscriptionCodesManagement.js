@@ -513,7 +513,7 @@ const SubscriptionCodesManagement = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">المجمع السكني (اختياري)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('compound_optional')}</label>
                 <select
                   value={newCode.compound_id}
                   onChange={(e) => setNewCode(prev => ({ ...prev, compound_id: e.target.value }))}

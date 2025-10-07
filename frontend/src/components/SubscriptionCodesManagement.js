@@ -353,7 +353,7 @@ const SubscriptionCodesManagement = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">المجمع السكني</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('compound')}</label>
             <select
               value={filters.compound}
               onChange={(e) => setFilters(prev => ({ ...prev, compound: e.target.value }))}

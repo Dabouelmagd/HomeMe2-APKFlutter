@@ -465,20 +465,43 @@ const GuestManagement = () => {
                             </div>
                           </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
-                          <div className="flex items-center">
-                            <PhoneIcon className="w-4 h-4 mr-2" />
-                            {guest.visitor_phone}
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                            <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border-l-4 border-green-400">
+                              <div className="flex items-center">
+                                <div className="bg-green-100 p-2 rounded-lg mr-3">
+                                  <PhoneIcon className="w-4 h-4 text-green-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-green-600 font-medium">{t('phone')}</p>
+                                  <p className="text-sm font-semibold text-green-800">{guest.visitor_phone}</p>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-3 rounded-lg border-l-4 border-blue-400">
+                              <div className="flex items-center">
+                                <div className="bg-blue-100 p-2 rounded-lg mr-3">
+                                  <BuildingOfficeIcon className="w-4 h-4 text-blue-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-blue-600 font-medium">{t('unit')}</p>
+                                  <p className="text-sm font-semibold text-blue-800">{guest.unit_number}</p>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-3 rounded-lg border-l-4 border-purple-400">
+                              <div className="flex items-center">
+                                <div className="bg-purple-100 p-2 rounded-lg mr-3">
+                                  <CalendarDaysIcon className="w-4 h-4 text-purple-600" />
+                                </div>
+                                <div>
+                                  <p className="text-xs text-purple-600 font-medium">{t('visit_date')}</p>
+                                  <p className="text-sm font-semibold text-purple-800">{formatDate(guest.visit_date)}</p>
+                                </div>
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex items-center">
-                            <BuildingOfficeIcon className="w-4 h-4 mr-2" />
-                            {t('unit')} {guest.unit_number}
-                          </div>
-                          <div className="flex items-center">
-                            <CalendarDaysIcon className="w-4 h-4 mr-2" />
-                            {formatDate(guest.visit_date)}
-                          </div>
-                        </div>
                         
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <span>{t('purpose')}: {visitPurposes.find(p => p.value === guest.visit_purpose)?.label}</span>

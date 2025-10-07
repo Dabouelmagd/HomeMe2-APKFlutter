@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://compound-manager-1.preview.emergentagent.com/api"
+BASE_URL = "https://guest-portal-4.preview.emergentagent.com/api"
 
 # Complete Arabic service data to replace English content
 ARABIC_SERVICES_DATA = {

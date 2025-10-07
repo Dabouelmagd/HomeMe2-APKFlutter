@@ -594,7 +594,7 @@ const SubscriptionCodesManagement = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">صلاحية الأكواد (بالأيام - اختياري)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('codes_expiry_days')}</label>
                 <input
                   type="number"
                   min="1"
@@ -602,7 +602,7 @@ const SubscriptionCodesManagement = () => {
                   value={bulkCreate.expires_in_days}
                   onChange={(e) => setBulkCreate(prev => ({ ...prev, expires_in_days: e.target.value }))}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
-                  placeholder="اتركه فارغاً للأكواد دائمة"
+                  placeholder={t('leave_empty_for_permanent_codes')}
                 />
               </div>
               

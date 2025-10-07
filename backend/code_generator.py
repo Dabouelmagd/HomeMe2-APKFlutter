@@ -63,7 +63,7 @@ class HomeCodeGenerator:
         # التحقق من الأحرف المسموحة فقط
         allowed_chars = set(cls.CODE_CHARS + "-")
         if not all(c in allowed_chars for c in cleaned_code):
-            raise ValueError("الكود يحتوي على أحرف غير مسموحة")
+            raise ValueError("الكود يحتوي على أحرف غير مسموحة. الأحرف المسموحة: " + cls.CODE_CHARS + "-")
         
         # إضافة البادئة إذا لم تكن موجودة
         prefix = cls.DURATION_PREFIXES[duration]

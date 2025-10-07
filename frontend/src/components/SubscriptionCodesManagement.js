@@ -345,7 +345,7 @@ const SubscriptionCodesManagement = () => {
               onChange={(e) => setFilters(prev => ({ ...prev, duration: e.target.value }))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2"
             >
-              <option value="all">جميع المدد</option>
+              <option value="all">{t('all_durations')}</option>
               {durations.map(duration => (
                 <option key={duration.value} value={duration.value}>{duration.label}</option>
               ))}

@@ -1,0 +1,699 @@
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import { 
+  KeyIcon, 
+  PlusIcon, 
+  TrashIcon,
+  ClipboardDocumentListIcon,
+  ChartBarIcon,
+  CalendarDaysIcon,
+  UsersIcon,
+  ClockIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  DocumentDuplicateIcon,
+  EyeIcon,
+  MagnifyingGlassIcon
+} from '@heroicons/react/24/outline';
+
+const SubscriptionCodesManagement = () => {
+  const { t } = useTranslation();
+  const [codes, setCodes] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [compounds, setCompounds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
+  const [selectedCode, setSelectedCode] = useState(null);
+  const [filters, setFilters] = useState({
+    status: 'all',
+    duration: 'all',
+    compound: 'all'
+  });
+
+  // نموذج إنشاء كود جديد
+  const [newCode, setNewCode] = useState({
+    duration: '1_month',
+    max_uses: 1,
+    compound_id: '',
+    expires_in_days: '',
+    custom_code: ''
+  });
+
+  // نموذج الإنشاء الجماعي
+  const [bulkCreate, setBulkCreate] = useState({
+    duration: '1_month',
+    count: 10,
+    max_uses_per_code: 1,
+    compound_id: '',
+    expires_in_days: ''
+  });
+
+  const durations = [
+    { value: '1_month', label: 'شهر واحد', labelEn: '1 Month' },
+    { value: '2_months', label: 'شهرين', labelEn: '2 Months' },
+    { value: '3_months', label: 'ثلاثة شهور', labelEn: '3 Months' },
+    { value: '6_months', label: 'ستة شهور', labelEn: '6 Months' },
+    { value: '1_year', label: 'سنة كاملة', labelEn: '1 Year' }
+  ];
+
+  const statusOptions = [
+    { value: 'all', label: 'جميع الحالات', color: 'bg-gray-100 text-gray-800' },
+    { value: 'active', label: 'نشط', color: 'bg-green-100 text-green-800' },
+    { value: 'used', label: 'مستخدم', color: 'bg-blue-100 text-blue-800' },
+    { value: 'expired', label: 'منتهي الصلاحية', color: 'bg-red-100 text-red-800' },
+    { value: 'disabled', label: 'معطل', color: 'bg-gray-100 text-gray-800' }
+  ];
+
+  useEffect(() => {
+    fetchCodes();
+    fetchStats();
+    fetchCompounds();
+  }, [filters]);
+
+  const fetchCodes = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const params = new URLSearchParams();
+      
+      if (filters.status !== 'all') params.append('status', filters.status);
+      if (filters.duration !== 'all') params.append('duration', filters.duration);
+      if (filters.compound !== 'all') params.append('compound_id', filters.compound);
+      
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/admin/subscription-codes?${params}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setCodes(response.data);
+    } catch (error) {
+      console.error('Error fetching codes:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/admin/subscription-codes/stats`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setStats(response.data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const fetchCompounds = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/compounds`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setCompounds(response.data || []);
+    } catch (error) {
+      console.error('Error fetching compounds:', error);
+    }
+  };
+
+  const handleCreateCode = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/admin/subscription-codes`,
+        {
+          ...newCode,
+          expires_in_days: newCode.expires_in_days ? parseInt(newCode.expires_in_days) : null
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        alert(response.data.message);
+        setShowCreateModal(false);
+        setNewCode({
+          duration: '1_month',
+          max_uses: 1,
+          compound_id: '',
+          expires_in_days: '',
+          custom_code: ''
+        });
+        fetchCodes();
+        fetchStats();
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.error('Error creating code:', error);
+      alert('حدث خطأ في إنشاء الكود');
+    }
+  };
+
+  const handleBulkCreate = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/admin/subscription-codes/bulk`,
+        {
+          ...bulkCreate,
+          expires_in_days: bulkCreate.expires_in_days ? parseInt(bulkCreate.expires_in_days) : null
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data.success) {
+        alert(response.data.message);
+        setShowBulkModal(false);
+        setBulkCreate({
+          duration: '1_month',
+          count: 10,
+          max_uses_per_code: 1,
+          compound_id: '',
+          expires_in_days: ''
+        });
+        fetchCodes();
+        fetchStats();
+      } else {
+        alert(response.data.message);
+      }
+    } catch (error) {
+      console.error('Error creating bulk codes:', error);
+      alert('حدث خطأ في إنشاء الأكواد');
+    }
+  };
+
+  const handleDeleteCode = async (codeId) => {
+    if (window.confirm('هل أنت متأكد من حذف هذا الكود؟')) {
+      try {
+        const token = localStorage.getItem('token');
+        await axios.delete(
+          `${process.env.REACT_APP_BACKEND_URL}/api/admin/subscription-codes/${codeId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        alert('تم حذف الكود بنجاح');
+        fetchCodes();
+        fetchStats();
+      } catch (error) {
+        console.error('Error deleting code:', error);
+        alert('حدث خطأ في حذف الكود');
+      }
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    alert('تم نسخ الكود');
+  };
+
+  const getStatusBadge = (status) => {
+    const statusConfig = statusOptions.find(s => s.value === status) || statusOptions[0];
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusConfig.color}`}>
+        {statusConfig.label}
+      </span>
+    );
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('ar-EG');
+  };
+
+  const getDurationLabel = (duration) => {
+    const durationConfig = durations.find(d => d.value === duration);
+    return durationConfig ? durationConfig.label : duration;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+            <KeyIcon className="h-8 w-8 mr-3 text-blue-600" />
+            إدارة أكواد الاشتراك
+          </h1>
+          <p className="text-gray-600 mt-2">إنشاء وإدارة أكواد اشتراك HomeMe</p>
+        </div>
+        
+        <div className="flex space-x-4">
+          <button
+            onClick={() => setShowStatsModal(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
+          >
+            <ChartBarIcon className="h-5 w-5 mr-2" />
+            الإحصائيات
+          </button>
+          
+          <button
+            onClick={() => setShowBulkModal(true)}
+            className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 flex items-center"
+          >
+            <ClipboardDocumentListIcon className="h-5 w-5 mr-2" />
+            إنشاء جماعي
+          </button>
+          
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
+          >
+            <PlusIcon className="h-5 w-5 mr-2" />
+            إنشاء كود جديد
+          </button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      {stats && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-blue-50 rounded-lg p-6">
+            <div className="flex items-center">
+              <KeyIcon className="h-8 w-8 text-blue-600" />
+              <div className="mr-4">
+                <p className="text-2xl font-bold text-blue-900">{stats.total_codes}</p>
+                <p className="text-blue-600">إجمالي الأكواد</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-green-50 rounded-lg p-6">
+            <div className="flex items-center">
+              <CheckCircleIcon className="h-8 w-8 text-green-600" />
+              <div className="mr-4">
+                <p className="text-2xl font-bold text-green-900">{stats.active_codes}</p>
+                <p className="text-green-600">أكواد نشطة</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-purple-50 rounded-lg p-6">
+            <div className="flex items-center">
+              <UsersIcon className="h-8 w-8 text-purple-600" />
+              <div className="mr-4">
+                <p className="text-2xl font-bold text-purple-900">{stats.total_activations}</p>
+                <p className="text-purple-600">إجمالي التفعيلات</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-orange-50 rounded-lg p-6">
+            <div className="flex items-center">
+              <ClockIcon className="h-8 w-8 text-orange-600" />
+              <div className="mr-4">
+                <p className="text-2xl font-bold text-orange-900">{stats.active_subscriptions}</p>
+                <p className="text-orange-600">اشتراكات نشطة</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+            <select
+              value={filters.status}
+              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            >
+              {statusOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">المدة</label>
+            <select
+              value={filters.duration}
+              onChange={(e) => setFilters(prev => ({ ...prev, duration: e.target.value }))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            >
+              <option value="all">جميع المدد</option>
+              {durations.map(duration => (
+                <option key={duration.value} value={duration.value}>{duration.label}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">المجمع السكني</label>
+            <select
+              value={filters.compound}
+              onChange={(e) => setFilters(prev => ({ ...prev, compound: e.target.value }))}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2"
+            >
+              <option value="all">جميع المجمعات</option>
+              {compounds.map(compound => (
+                <option key={compound.id} value={compound.id}>{compound.name}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Codes Table */}
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">قائمة الأكواد ({codes.length})</h2>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الكود</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المدة</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الاستخدامات</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاريخ الإنشاء</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {codes.map((code) => (
+                <tr key={code.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <code className="bg-gray-100 px-3 py-1 rounded text-sm font-mono">
+                        {code.code}
+                      </code>
+                      <button
+                        onClick={() => copyToClipboard(code.code)}
+                        className="mr-2 text-gray-400 hover:text-blue-600"
+                      >
+                        <DocumentDuplicateIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                  
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="text-sm font-medium text-gray-900">
+                      {getDurationLabel(code.duration)}
+                    </span>
+                  </td>
+                  
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {getStatusBadge(code.status)}
+                  </td>
+                  
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {code.current_uses}/{code.max_uses}
+                  </td>
+                  
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatDate(code.created_at)}
+                  </td>
+                  
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => setSelectedCode(code)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        <EyeIcon className="h-4 w-4" />
+                      </button>
+                      
+                      <button
+                        onClick={() => handleDeleteCode(code.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          
+          {codes.length === 0 && (
+            <div className="text-center py-12">
+              <KeyIcon className="mx-auto h-12 w-12 text-gray-400" />
+              <h3 className="mt-2 text-sm font-medium text-gray-900">لا توجد أكواد</h3>
+              <p className="mt-1 text-sm text-gray-500">ابدأ بإنشاء كود اشتراك جديد</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Create Code Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-md w-full mx-4 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">إنشاء كود اشتراك جديد</h2>
+            
+            <form onSubmit={handleCreateCode} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">مدة الاشتراك</label>
+                <select
+                  value={newCode.duration}
+                  onChange={(e) => setNewCode(prev => ({ ...prev, duration: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  required
+                >
+                  {durations.map(duration => (
+                    <option key={duration.value} value={duration.value}>{duration.label}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">عدد الاستخدامات المسموحة</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value={newCode.max_uses}
+                  onChange={(e) => setNewCode(prev => ({ ...prev, max_uses: parseInt(e.target.value) }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">كود مخصص (اختياري)</label>
+                <input
+                  type="text"
+                  value={newCode.custom_code}
+                  onChange={(e) => setNewCode(prev => ({ ...prev, custom_code: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  placeholder="اتركه فارغاً لإنشاء كود تلقائي"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">صلاحية الكود (بالأيام - اختياري)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="365"
+                  value={newCode.expires_in_days}
+                  onChange={(e) => setNewCode(prev => ({ ...prev, expires_in_days: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  placeholder="اتركه فارغاً للكود دائم"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">المجمع السكني (اختياري)</label>
+                <select
+                  value={newCode.compound_id}
+                  onChange={(e) => setNewCode(prev => ({ ...prev, compound_id: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                >
+                  <option value="">جميع المجمعات</option>
+                  {compounds.map(compound => (
+                    <option key={compound.id} value={compound.id}>{compound.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="flex space-x-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+                >
+                  إنشاء الكود
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Create Modal */}
+      {showBulkModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-md w-full mx-4 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">إنشاء أكواد متعددة</h2>
+            
+            <form onSubmit={handleBulkCreate} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">مدة الاشتراك</label>
+                <select
+                  value={bulkCreate.duration}
+                  onChange={(e) => setBulkCreate(prev => ({ ...prev, duration: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  required
+                >
+                  {durations.map(duration => (
+                    <option key={duration.value} value={duration.value}>{duration.label}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">عدد الأكواد</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value={bulkCreate.count}
+                  onChange={(e) => setBulkCreate(prev => ({ ...prev, count: parseInt(e.target.value) }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">عدد الاستخدامات لكل كود</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="1000"
+                  value={bulkCreate.max_uses_per_code}
+                  onChange={(e) => setBulkCreate(prev => ({ ...prev, max_uses_per_code: parseInt(e.target.value) }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">صلاحية الأكواد (بالأيام - اختياري)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="365"
+                  value={bulkCreate.expires_in_days}
+                  onChange={(e) => setBulkCreate(prev => ({ ...prev, expires_in_days: e.target.value }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  placeholder="اتركه فارغاً للأكواد دائمة"
+                />
+              </div>
+              
+              <div className="flex space-x-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowBulkModal(false)}
+                  className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
+                >
+                  إلغاء
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700"
+                >
+                  إنشاء الأكواد
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Stats Modal */}
+      {showStatsModal && stats && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-2xl w-full mx-4 p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-6">إحصائيات مفصلة</h2>
+            
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">الإحصائيات العامة</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="text-sm text-gray-600">إجمالي الأكواد</p>
+                    <p className="text-2xl font-bold text-gray-900">{stats.total_codes}</p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="text-sm text-gray-600">أكواد نشطة</p>
+                    <p className="text-2xl font-bold text-green-600">{stats.active_codes}</p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="text-sm text-gray-600">أكواد مستخدمة</p>
+                    <p className="text-2xl font-bold text-blue-600">{stats.used_codes}</p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="text-sm text-gray-600">أكواد منتهية</p>
+                    <p className="text-2xl font-bold text-red-600">{stats.expired_codes}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">الأكواد حسب المدة</h3>
+                <div className="space-y-2">
+                  {Object.entries(stats.codes_by_duration).map(([duration, count]) => (
+                    <div key={duration} className="flex justify-between py-2 border-b">
+                      <span>{getDurationLabel(duration)}</span>
+                      <span className="font-semibold">{count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">إحصائيات الاشتراكات</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="text-sm text-gray-600">إجمالي التفعيلات</p>
+                    <p className="text-2xl font-bold text-purple-600">{stats.total_activations}</p>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded">
+                    <p className="text-sm text-gray-600">اشتراكات نشطة</p>
+                    <p className="text-2xl font-bold text-orange-600">{stats.active_subscriptions}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end pt-6">
+              <button
+                onClick={() => setShowStatsModal(false)}
+                className="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SubscriptionCodesManagement;

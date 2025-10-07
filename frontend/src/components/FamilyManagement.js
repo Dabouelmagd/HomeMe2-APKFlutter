@@ -405,7 +405,7 @@ const FamilyManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('phone_number')}</label>
                     <input
                       type="tel"
                       value={memberForm.phone}
@@ -415,7 +415,7 @@ const FamilyManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('email_address')}</label>
                     <input
                       type="email"
                       value={memberForm.email}
@@ -425,13 +425,13 @@ const FamilyManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">ID Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('government_id_passport')}</label>
                     <input
                       type="text"
                       value={memberForm.id_number}
                       onChange={(e) => setMemberForm({...memberForm, id_number: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      placeholder="Government ID/Passport number"
+                      placeholder={t('enter_government_id')}
                     />
                   </div>
 

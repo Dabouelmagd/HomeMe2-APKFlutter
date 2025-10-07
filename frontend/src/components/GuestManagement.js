@@ -584,8 +584,7 @@ const GuestManagement = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                ))
             )}
           </>
         )}

@@ -1695,6 +1695,7 @@ const resources = {
       'try_adjusting_search': 'Try adjusting your search term to find residents',
       'no_residents_yet': 'There are no residents registered in your compound yet',
       'add_member': 'Add Member',
+      'update_member': 'Update Member',
       'adding_to_unit': 'Adding to Unit',
       'resident': 'resident',
       'residents': 'residents',

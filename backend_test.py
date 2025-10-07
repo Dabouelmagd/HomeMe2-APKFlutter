@@ -5029,6 +5029,63 @@ class HomeMeFlutterTestSuite:
             self.test_get_category_ratings()
         
         return self.print_summary()
+    
+    def run_subscription_codes_tests(self):
+        """Run Subscription Codes System Tests - Focus on Critical Fixes"""
+        print("\n🎫 STARTING SUBSCRIPTION CODES SYSTEM TESTING")
+        print("=" * 60)
+        print("🔥 PRIORITY: Testing Critical Fixes After Bug Resolution")
+        print("   - Fixed Code Characters (0,1 inclusion)")
+        print("   - Improved Code Format Validation") 
+        print("   - Fixed Date Parsing (2025 dates)")
+        print("   - Better Error Messages")
+        print("=" * 60)
+        
+        # Authentication test
+        if not self.test_admin_authentication():
+            print("❌ Admin authentication failed - stopping tests")
+            return self.print_summary()
+        
+        # Initialize test variables
+        self.test_subscription_code = None
+        self.test_bulk_code = None
+        
+        # PRIORITY 1: Code Creation System Tests (was 0/9)
+        print("\n🎯 PRIORITY 1: CODE CREATION SYSTEM TESTING")
+        print("-" * 50)
+        self.test_subscription_code_creation_single()
+        self.test_subscription_code_creation_custom_with_numbers()
+        self.test_subscription_code_bulk_creation()
+        
+        # PRIORITY 2: Code Activation System Tests (was 0/6)
+        print("\n🎯 PRIORITY 2: CODE ACTIVATION SYSTEM TESTING")
+        print("-" * 50)
+        self.test_subscription_code_activation_valid()
+        self.test_subscription_code_activation_invalid_format()
+        self.test_subscription_code_activation_nonexistent()
+        
+        # PRIORITY 3: Format Validation Tests (was broken)
+        print("\n🎯 PRIORITY 3: FORMAT VALIDATION TESTING")
+        print("-" * 50)
+        self.test_subscription_code_format_validation()
+        
+        # PRIORITY 4: Date Parsing Tests (critical fix)
+        print("\n🎯 PRIORITY 4: DATE PARSING TESTING")
+        print("-" * 50)
+        self.test_subscription_code_date_parsing()
+        
+        # Additional System Tests
+        print("\n📊 ADDITIONAL SYSTEM TESTS")
+        print("-" * 30)
+        self.test_subscription_code_info_retrieval()
+        self.test_subscription_codes_stats()
+        
+        # End-to-End Flow Test
+        print("\n🔄 END-TO-END FLOW TESTING")
+        print("-" * 30)
+        self.test_subscription_end_to_end_flow()
+        
+        return self.print_summary()
 
     def test_flutter_compatible_endpoints(self):
         """Test additional endpoints that Flutter app might use"""

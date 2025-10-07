@@ -2037,6 +2037,8 @@ const resources = {
       'three_months': 'ثلاثة شهور',
       'six_months': 'ستة شهور',
       'one_year': 'سنة كاملة',
+      'all_durations': 'جميع المدد',
+      'all_compounds': 'جميع المجمعات',
       'content_placeholder': 'أدخل محتوى الإعلان...',
       'emergency_notification': 'إشعار طوارئ',
       'send_push_notification': 'إرسال إشعار فوري',

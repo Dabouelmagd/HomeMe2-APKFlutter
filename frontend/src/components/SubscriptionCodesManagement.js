@@ -60,11 +60,11 @@ const SubscriptionCodesManagement = () => {
   ];
 
   const statusOptions = [
-    { value: 'all', label: 'جميع الحالات', color: 'bg-gray-100 text-gray-800' },
-    { value: 'active', label: 'نشط', color: 'bg-green-100 text-green-800' },
-    { value: 'used', label: 'مستخدم', color: 'bg-blue-100 text-blue-800' },
-    { value: 'expired', label: 'منتهي الصلاحية', color: 'bg-red-100 text-red-800' },
-    { value: 'disabled', label: 'معطل', color: 'bg-gray-100 text-gray-800' }
+    { value: 'all', label: t('all_statuses'), color: 'bg-gray-100 text-gray-800' },
+    { value: 'active', label: t('active'), color: 'bg-green-100 text-green-800' },
+    { value: 'used', label: t('used'), color: 'bg-blue-100 text-blue-800' },
+    { value: 'expired', label: t('expired'), color: 'bg-red-100 text-red-800' },
+    { value: 'disabled', label: t('disabled'), color: 'bg-gray-100 text-gray-800' }
   ];
 
   useEffect(() => {

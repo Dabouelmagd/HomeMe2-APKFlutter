@@ -52,11 +52,11 @@ const SubscriptionCodesManagement = () => {
   });
 
   const durations = [
-    { value: '1_month', label: 'شهر واحد', labelEn: '1 Month' },
-    { value: '2_months', label: 'شهرين', labelEn: '2 Months' },
-    { value: '3_months', label: 'ثلاثة شهور', labelEn: '3 Months' },
-    { value: '6_months', label: 'ستة شهور', labelEn: '6 Months' },
-    { value: '1_year', label: 'سنة كاملة', labelEn: '1 Year' }
+    { value: '1_month', label: t('one_month') },
+    { value: '2_months', label: t('two_months') },
+    { value: '3_months', label: t('three_months') },
+    { value: '6_months', label: t('six_months') },
+    { value: '1_year', label: t('one_year') }
   ];
 
   const statusOptions = [

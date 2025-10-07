@@ -436,7 +436,7 @@ const FamilyManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('emergency_contact_name')}</label>
                     <input
                       type="text"
                       value={memberForm.emergency_contact_name}
@@ -446,7 +446,7 @@ const FamilyManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Contact Phone</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('emergency_contact_phone')}</label>
                     <input
                       type="tel"
                       value={memberForm.emergency_contact_phone}
@@ -456,7 +456,7 @@ const FamilyManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Move-in Date</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('move_in_date')}</label>
                     <input
                       type="date"
                       value={memberForm.move_in_date}

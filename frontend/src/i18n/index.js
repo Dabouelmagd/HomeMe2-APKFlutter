@@ -3679,6 +3679,8 @@ const resources = {
       'email_address': 'عنوان البريد الإلكتروني',
       'id_number': 'رقم الهوية',
       'enter_id_number': 'أدخل رقم الهوية',
+      'government_id_passport': 'رقم الهوية الحكومية/جواز السفر',
+      'enter_government_id': 'أدخل رقم الهوية الحكومية أو جواز السفر',
       'move_in_date': 'تاريخ الانتقال',
       'emergency_contact_name': 'اسم جهة الاتصال للطوارئ',
       'emergency_contact_phone': 'هاتف جهة الاتصال للطوارئ',

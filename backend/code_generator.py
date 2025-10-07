@@ -104,14 +104,25 @@ class HomeCodeGenerator:
             # تنظيف الكود
             code = code.strip().upper()
             
-            # التحقق من الطول الأساسي
+            # التحقق من الطول الأساسي (على الأقل 10 أحرف)
             if len(code) < 10:
                 return False
             
             # التحقق من وجود بادئة صحيحة
             has_valid_prefix = any(code.startswith(prefix) for prefix in cls.DURATION_PREFIXES.values())
+            if not has_valid_prefix:
+                return False
             
-            return has_valid_prefix
+            # التحقق من الأحرف المسموحة
+            allowed_chars = set(cls.CODE_CHARS + "-")
+            if not all(c in allowed_chars for c in code):
+                return False
+            
+            # التحقق من وجود شرطات في المكان الصحيح (تنسيق أساسي)
+            if "-" not in code:
+                return False
+            
+            return True
         except:
             return False
     

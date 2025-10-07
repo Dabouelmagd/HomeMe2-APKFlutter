@@ -315,7 +315,7 @@ const SubscriptionCodesManagement = () => {
               <ClockIcon className="h-8 w-8 text-orange-600" />
               <div className="mr-4">
                 <p className="text-2xl font-bold text-orange-900">{stats.active_subscriptions}</p>
-                <p className="text-orange-600">اشتراكات نشطة</p>
+                <p className="text-orange-600">{t('active_subscriptions')}</p>
               </div>
             </div>
           </div>

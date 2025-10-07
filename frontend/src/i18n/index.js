@@ -4296,6 +4296,8 @@ const resources = {
       'code_deleted_successfully': 'Code supprimé avec succès',
       'error_deleting_code': 'Erreur lors de la suppression du code',
       'code_copied': 'Code copié',
+      'subscription_management': 'Gestion d\'Abonnement',
+      'activate_subscription_code': 'Activer Code d\'Abonnement',
       'content_placeholder': 'Saisir le contenu de l\'annonce...',
       'emergency_notification': 'Notification d\'Urgence',
       'send_push_notification': 'Envoyer une Notification Push',

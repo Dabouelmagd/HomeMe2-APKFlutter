@@ -4272,6 +4272,8 @@ const resources = {
       'three_months': '3 Mois', 
       'six_months': '6 Mois',
       'one_year': '1 An',
+      'all_durations': 'Toutes les Durées',
+      'all_compounds': 'Tous les Complexes',
       'content_placeholder': 'Saisir le contenu de l\'annonce...',
       'emergency_notification': 'Notification d\'Urgence',
       'send_push_notification': 'Envoyer une Notification Push',

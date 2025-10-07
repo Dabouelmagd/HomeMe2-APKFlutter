@@ -7937,9 +7937,11 @@ if __name__ == "__main__":
             success_rate = test_suite.run_individual_account_system_tests()
         elif test_type == "auth_investigation":
             success_rate = test_suite.run_authentication_investigation()
+        elif test_type == "subscription":
+            success_rate = test_suite.run_subscription_codes_tests()
         else:
             print(f"Unknown test type: {test_type}")
-            print("Available types: flutter, maintenance, voting, individual_account_system, auth_investigation")
+            print("Available types: flutter, maintenance, voting, individual_account_system, auth_investigation, subscription")
             sys.exit(1)
     else:
         # Run Flutter mobile app tests by default

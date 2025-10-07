@@ -510,30 +510,42 @@ const GuestManagement = () => {
                         </div>
                       </div>
                       
-                      <div className="flex items-center space-x-2 ml-4">
+                      <div className="flex flex-col space-y-3 ml-6">
                         {guest.status === 'approved' && (
                           <button
                             onClick={() => handleCheckIn(guest.id)}
-                            className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                            className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-medium hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center"
                           >
+                            <CheckCircleIcon className="w-4 h-4 mr-2" />
                             {t('check_in')}
                           </button>
                         )}
                         {guest.status === 'checked_in' && (
                           <button
                             onClick={() => handleCheckOut(guest.id)}
-                            className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg text-sm font-medium hover:from-blue-600 hover:to-cyan-600 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center"
                           >
+                            <XCircleIcon className="w-4 h-4 mr-2" />
                             {t('check_out')}
                           </button>
                         )}
-                        <button
-                          onClick={() => generateQRCode(guest)}
-                          className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                          title={t('generate_qr_code')}
-                        >
-                          <QrCodeIcon className="w-4 h-4" />
-                        </button>
+                        
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => generateQRCode(guest)}
+                            className="p-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all transform hover:scale-105 shadow-lg"
+                            title={t('generate_qr_code')}
+                          >
+                            <QrCodeIcon className="w-4 h-4" />
+                          </button>
+                          
+                          <button
+                            className="p-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 shadow-lg"
+                            title={t('print_visitor_badge')}
+                          >
+                            <PrinterIcon className="w-4 h-4" />
+                          </button>
+                        </div>
                         <button
                           onClick={() => {
                             setSelectedGuest(guest);

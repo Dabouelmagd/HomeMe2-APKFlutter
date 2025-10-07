@@ -208,7 +208,7 @@ const SubscriptionCodesManagement = () => {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    alert('تم نسخ الكود');
+    alert(t('code_copied'));
   };
 
   const getStatusBadge = (status) => {

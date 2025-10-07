@@ -1980,6 +1980,8 @@ const resources = {
       'max_attendees': 'الحد الأقصى للحضور',
       'scheduled_for': 'مجدول لـ',
       'expires_at': 'ينتهي في',
+      'attendees': 'حاضر',
+      'by': 'بواسطة',
       'content': 'المحتوى',
       'content_placeholder': 'أدخل محتوى الإعلان...',
       'emergency_notification': 'إشعار طوارئ',

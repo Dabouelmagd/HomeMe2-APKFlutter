@@ -56,20 +56,28 @@ class HomeCodeGenerator:
         # إزالة المسافات وتحويل للأحرف الكبيرة
         cleaned_code = custom_code.strip().upper()
         
-        # التحقق من الطول (8-20 حرف)
-        if len(cleaned_code) < 8 or len(cleaned_code) > 20:
-            raise ValueError("الكود المخصص يجب أن يكون بين 8-20 حرف")
-        
-        # التحقق من الأحرف المسموحة فقط
-        allowed_chars = set(cls.CODE_CHARS + "-")
-        if not all(c in allowed_chars for c in cleaned_code):
-            raise ValueError("الكود يحتوي على أحرف غير مسموحة. الأحرف المسموحة: " + cls.CODE_CHARS + "-")
-        
         # إضافة البادئة إذا لم تكن موجودة
         prefix = cls.DURATION_PREFIXES[duration]
         if not cleaned_code.startswith(prefix):
             year = datetime.now().year
-            cleaned_code = f"{prefix}-{year}-{cleaned_code}"
+            # للكود المخصص الجزئي، تحقق من الأحرف المسموحة
+            custom_part = cleaned_code
+            allowed_chars = set(cls.CODE_CHARS)
+            if not all(c in allowed_chars for c in custom_part):
+                raise ValueError("الكود يحتوي على أحرف غير مسموحة. الأحرف المسموحة: " + cls.CODE_CHARS)
+            
+            if len(custom_part) < 4 or len(custom_part) > 15:
+                raise ValueError("الكود المخصص يجب أن يكون بين 4-15 حرف")
+            
+            cleaned_code = f"{prefix}-{year}-{custom_part}"
+        else:
+            # للكود الكامل، تحقق من جميع الأحرف
+            allowed_chars = set(cls.CODE_CHARS + "-")
+            if not all(c in allowed_chars for c in cleaned_code):
+                raise ValueError("الكود يحتوي على أحرف غير مسموحة. الأحرف المسموحة: " + cls.CODE_CHARS + "-")
+            
+            if len(cleaned_code) < 10 or len(cleaned_code) > 25:
+                raise ValueError("الكود الكامل يجب أن يكون بين 10-25 حرف")
         
         return cleaned_code
     

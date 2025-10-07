@@ -395,36 +395,62 @@ const GuestManagement = () => {
 
       {/* Tabs */}
       <div className="border-b border-gray-200 mb-6">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="flex bg-gray-100 rounded-xl p-1" aria-label="Tabs">
           <button
             onClick={() => setActiveTab('guests')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all transform ${
               activeTab === 'guests'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg scale-105'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white hover:shadow-md'
             }`}
           >
-            {t('active_visitors')}
+            <div className="flex items-center justify-center space-x-2">
+              <UsersIcon className="w-4 h-4" />
+              <span>{t('active_visitors')}</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                activeTab === 'guests' ? 'bg-white bg-opacity-20 text-white' : 'bg-blue-100 text-blue-600'
+              }`}>
+                {filteredGuests.length}
+              </span>
+            </div>
           </button>
+          
           <button
             onClick={() => setActiveTab('requests')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all transform ${
               activeTab === 'requests'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg scale-105'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white hover:shadow-md'
             }`}
           >
-            {t('visit_requests')}
+            <div className="flex items-center justify-center space-x-2">
+              <ClockIcon className="w-4 h-4" />
+              <span>{t('visit_requests')}</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                activeTab === 'requests' ? 'bg-white bg-opacity-20 text-white' : 'bg-green-100 text-green-600'
+              }`}>
+                {visitRequests.length}
+              </span>
+            </div>
           </button>
+          
           <button
             onClick={() => setActiveTab('history')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all transform ${
               activeTab === 'history'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg scale-105'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white hover:shadow-md'
             }`}
           >
-            {t('visit_history')}
+            <div className="flex items-center justify-center space-x-2">
+              <CalendarDaysIcon className="w-4 h-4" />
+              <span>{t('visit_history')}</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                activeTab === 'history' ? 'bg-white bg-opacity-20 text-white' : 'bg-purple-100 text-purple-600'
+              }`}>
+                {stats.total_visits || 0}
+              </span>
+            </div>
           </button>
         </nav>
       </div>

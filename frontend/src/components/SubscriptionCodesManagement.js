@@ -245,9 +245,9 @@ const SubscriptionCodesManagement = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center">
             <KeyIcon className="h-8 w-8 mr-3 text-blue-600" />
-            إدارة أكواد الاشتراك
+            {t('subscription_codes_management')}
           </h1>
-          <p className="text-gray-600 mt-2">إنشاء وإدارة أكواد اشتراك HomeMe</p>
+          <p className="text-gray-600 mt-2">{t('subscription_codes_description')}</p>
         </div>
         
         <div className="flex space-x-4">

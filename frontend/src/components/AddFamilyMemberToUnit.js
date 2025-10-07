@@ -39,6 +39,7 @@ const AddFamilyMemberToUnit = () => {
     phone: '',
     email: '',
     id_number: '',
+    government_id: '',
     emergency_contact_name: '',
     emergency_contact_phone: '',
     move_in_date: '',

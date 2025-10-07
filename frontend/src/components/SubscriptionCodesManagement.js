@@ -150,7 +150,7 @@ const SubscriptionCodesManagement = () => {
       }
     } catch (error) {
       console.error('Error creating code:', error);
-      alert('حدث خطأ في إنشاء الكود');
+      alert(t('error_creating_code'));
     }
   };
 

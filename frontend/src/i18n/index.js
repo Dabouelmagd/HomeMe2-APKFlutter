@@ -73,6 +73,8 @@ const resources = {
       'max_attendees': 'Maximum Attendees',
       'scheduled_for': 'Scheduled For',
       'expires_at': 'Expires At',
+      'attendees': 'attendees',
+      'by': 'by',
       'content': 'Content',
       'content_placeholder': 'Enter announcement content...',
       'emergency_notification': 'Emergency Notification',

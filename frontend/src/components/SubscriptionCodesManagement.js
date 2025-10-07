@@ -326,7 +326,7 @@ const SubscriptionCodesManagement = () => {
       <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('status')}</label>
             <select
               value={filters.status}
               onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}

@@ -318,10 +318,10 @@ const Layout = ({ children }) => {
       ]
     },
     {
-      title: 'إدارة الاشتراك',
+      title: t('subscription_management'),
       items: [
         {
-          name: 'تفعيل كود اشتراك',
+          name: t('activate_subscription_code'),
           href: '/activate-subscription',
           icon: KeyIcon,
           show: user?.role !== 'admin'

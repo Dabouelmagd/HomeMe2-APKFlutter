@@ -11403,16 +11403,27 @@ async def activate_subscription_code(
         
         # التحقق من انتهاء صلاحية الكود
         if subscription_code.get("expires_at"):
-            expires_at = datetime.fromisoformat(subscription_code["expires_at"].replace('Z', '+00:00'))
-            if datetime.now() > expires_at:
-                await db.subscription_codes.update_one(
-                    {"code": code},
-                    {"$set": {"status": "expired"}}
-                )
-                return SubscriptionCodeResponse(
-                    success=False,
-                    message="انتهت صلاحية الكود"
-                )
+            try:
+                expires_at = subscription_code["expires_at"]
+                if isinstance(expires_at, str):
+                    expires_at = datetime.fromisoformat(expires_at.replace('Z', '+00:00'))
+                elif hasattr(expires_at, 'replace'):  # datetime object
+                    pass  # keep as is
+                else:
+                    expires_at = datetime.now()  # fallback
+                
+                if datetime.now() > expires_at:
+                    await db.subscription_codes.update_one(
+                        {"code": code},
+                        {"$set": {"status": "expired"}}
+                    )
+                    return SubscriptionCodeResponse(
+                        success=False,
+                        message="انتهت صلاحية الكود"
+                    )
+            except Exception as e:
+                logging.warning(f"Error parsing expires_at date: {e}")
+                # Continue with activation if date parsing fails
         
         # التحقق من عدد الاستخدامات
         if subscription_code["current_uses"] >= subscription_code["max_uses"]:
@@ -11822,16 +11833,27 @@ async def activate_subscription_code(
         
         # التحقق من انتهاء صلاحية الكود
         if subscription_code.get("expires_at"):
-            expires_at = datetime.fromisoformat(subscription_code["expires_at"].replace('Z', '+00:00'))
-            if datetime.now() > expires_at:
-                await db.subscription_codes.update_one(
-                    {"code": code},
-                    {"$set": {"status": "expired"}}
-                )
-                return SubscriptionCodeResponse(
-                    success=False,
-                    message="انتهت صلاحية الكود"
-                )
+            try:
+                expires_at = subscription_code["expires_at"]
+                if isinstance(expires_at, str):
+                    expires_at = datetime.fromisoformat(expires_at.replace('Z', '+00:00'))
+                elif hasattr(expires_at, 'replace'):  # datetime object
+                    pass  # keep as is
+                else:
+                    expires_at = datetime.now()  # fallback
+                
+                if datetime.now() > expires_at:
+                    await db.subscription_codes.update_one(
+                        {"code": code},
+                        {"$set": {"status": "expired"}}
+                    )
+                    return SubscriptionCodeResponse(
+                        success=False,
+                        message="انتهت صلاحية الكود"
+                    )
+            except Exception as e:
+                logging.warning(f"Error parsing expires_at date: {e}")
+                # Continue with activation if date parsing fails
         
         # التحقق من عدد الاستخدامات
         if subscription_code["current_uses"] >= subscription_code["max_uses"]:

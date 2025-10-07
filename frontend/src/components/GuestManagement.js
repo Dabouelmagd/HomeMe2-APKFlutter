@@ -434,21 +434,36 @@ const GuestManagement = () => {
         {activeTab === 'guests' && (
           <>
             {filteredGuests.length === 0 ? (
-              <div className="text-center py-12">
-                <UsersIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">{t('no_active_visitors')}</h3>
-                <p className="mt-1 text-sm text-gray-500">{t('no_active_visitors_description')}</p>
+              <div className="text-center py-16 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl">
+                <div className="bg-white rounded-full w-24 h-24 mx-auto flex items-center justify-center shadow-lg mb-6">
+                  <UsersIcon className="h-12 w-12 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t('no_active_visitors')}</h3>
+                <p className="text-gray-600 max-w-md mx-auto">{t('no_active_visitors_description')}</p>
+                <button 
+                  onClick={() => setShowAddModal(true)}
+                  className="mt-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg"
+                >
+                  <UserPlusIcon className="h-5 w-5 inline mr-2" />
+                  {t('add_new_visitor')}
+                </button>
               </div>
             ) : (
-              filteredGuests.map((guest) => (
-                <div key={guest.id} className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{guest.visitor_name}</h3>
-                          {getStatusBadge(guest.status)}
-                        </div>
+              <div className="grid gap-4">
+                {filteredGuests.map((guest) => (
+                  <div key={guest.id} className="bg-white rounded-xl border-2 border-gray-100 shadow-lg hover:shadow-xl transition-all hover:border-blue-200 transform hover:-translate-y-1">
+                    <div className="p-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-4 mb-4">
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
+                              <IdentificationIcon className="h-6 w-6 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-gray-900">{guest.visitor_name}</h3>
+                              {getStatusBadge(guest.status)}
+                            </div>
+                          </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600 mb-3">
                           <div className="flex items-center">

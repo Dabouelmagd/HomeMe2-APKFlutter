@@ -344,7 +344,7 @@ const Layout = ({ children }) => {
           show: user?.role === 'admin'
         },
         {
-          name: 'إدارة أكواد الاشتراك',
+          name: t('subscription_codes_management'),
           href: '/subscription-codes',
           icon: KeyIcon,
           show: user?.role === 'admin'

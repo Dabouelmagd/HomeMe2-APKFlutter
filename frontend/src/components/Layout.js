@@ -33,7 +33,8 @@ import {
   EnvelopeIcon,
   NewspaperIcon,
   PhoneIcon,
-  QuestionMarkCircleIcon
+  QuestionMarkCircleIcon,
+  KeyIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';

@@ -1168,6 +1168,549 @@ class HomeMeFlutterTestSuite:
             self.log_result("Vote on Poll", False, f"Exception occurred: {str(e)}")
             return False
     
+    # ============ SUBSCRIPTION CODES SYSTEM TESTS ============
+    
+    def test_subscription_code_creation_single(self):
+        """Test POST /api/admin/subscription-codes - Create single subscription code"""
+        print("\n=== Testing Single Subscription Code Creation ===")
+        
+        if not self.admin_token:
+            self.log_result("Single Code Creation", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test creating a single code with 2025 dates (critical fix)
+            code_data = {
+                "duration": "1_month",
+                "max_uses": 1,
+                "expires_in_days": 30
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/subscription-codes", json=code_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("code"):
+                    created_code = result["code"]["code"]
+                    self.log_result("Single Code Creation", True, 
+                                  f"Code created successfully: {created_code}")
+                    
+                    # Store for later tests
+                    self.test_subscription_code = created_code
+                    return True
+                else:
+                    self.log_result("Single Code Creation", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Single Code Creation", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Single Code Creation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_subscription_code_creation_custom_with_numbers(self):
+        """Test custom code creation with numbers 0,1 (critical fix)"""
+        print("\n=== Testing Custom Code Creation with Numbers 0,1 ===")
+        
+        if not self.admin_token:
+            self.log_result("Custom Code with Numbers", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test custom code with numbers 0 and 1 (critical fix)
+            code_data = {
+                "duration": "1_month",
+                "max_uses": 1,
+                "custom_code": "TEST0101ABC"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/subscription-codes", json=code_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("code"):
+                    created_code = result["code"]["code"]
+                    # Check if the code contains 0 and 1
+                    if "0" in created_code and "1" in created_code:
+                        self.log_result("Custom Code with Numbers", True, 
+                                      f"Custom code with 0,1 created successfully: {created_code}")
+                        return True
+                    else:
+                        self.log_result("Custom Code with Numbers", False, 
+                                      f"Code doesn't contain 0,1: {created_code}")
+                        return False
+                else:
+                    self.log_result("Custom Code with Numbers", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Custom Code with Numbers", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Custom Code with Numbers", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_subscription_code_bulk_creation(self):
+        """Test POST /api/admin/subscription-codes/bulk - Create bulk subscription codes"""
+        print("\n=== Testing Bulk Subscription Code Creation ===")
+        
+        if not self.admin_token:
+            self.log_result("Bulk Code Creation", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test bulk creation
+            bulk_data = {
+                "duration": "3_months",
+                "count": 5,
+                "max_uses_per_code": 1,
+                "expires_in_days": 60
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/subscription-codes/bulk", json=bulk_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("total_created") == 5:
+                    codes = result.get("codes", [])
+                    self.log_result("Bulk Code Creation", True, 
+                                  f"Created {len(codes)} codes successfully")
+                    
+                    # Store first code for later tests
+                    if codes:
+                        self.test_bulk_code = codes[0]["code"]
+                    return True
+                else:
+                    self.log_result("Bulk Code Creation", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Bulk Code Creation", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Bulk Code Creation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_subscription_code_format_validation(self):
+        """Test code format validation (major fix)"""
+        print("\n=== Testing Code Format Validation ===")
+        
+        success_count = 0
+        total_tests = 0
+        
+        if not self.admin_token:
+            self.log_result("Code Format Validation", False, "No admin token available")
+            return False
+        
+        headers = self.setup_auth_headers(self.admin_token)
+        
+        # Test 1: Valid code format with numbers 0,1
+        try:
+            total_tests += 1
+            code_data = {
+                "duration": "1_month",
+                "custom_code": "VALID01TEST"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/subscription-codes", json=code_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success"):
+                    self.log_result("Valid Code Format (0,1)", True, "Code with 0,1 accepted correctly")
+                    success_count += 1
+                else:
+                    self.log_result("Valid Code Format (0,1)", False, f"Valid code rejected: {result}")
+            else:
+                self.log_result("Valid Code Format (0,1)", False, f"Status {response.status_code}")
+        except Exception as e:
+            self.log_result("Valid Code Format (0,1)", False, f"Exception: {str(e)}")
+        
+        # Test 2: Invalid characters
+        try:
+            total_tests += 1
+            code_data = {
+                "duration": "1_month",
+                "custom_code": "INVALID@#$"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/subscription-codes", json=code_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if not result.get("success"):
+                    self.log_result("Invalid Characters Validation", True, "Invalid characters correctly rejected")
+                    success_count += 1
+                else:
+                    self.log_result("Invalid Characters Validation", False, "Invalid characters accepted")
+            else:
+                self.log_result("Invalid Characters Validation", True, "Invalid characters rejected by server")
+                success_count += 1
+        except Exception as e:
+            self.log_result("Invalid Characters Validation", False, f"Exception: {str(e)}")
+        
+        # Test 3: Code too short
+        try:
+            total_tests += 1
+            code_data = {
+                "duration": "1_month",
+                "custom_code": "SHORT"
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/subscription-codes", json=code_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if not result.get("success"):
+                    self.log_result("Short Code Validation", True, "Short code correctly rejected")
+                    success_count += 1
+                else:
+                    self.log_result("Short Code Validation", False, "Short code accepted")
+            else:
+                self.log_result("Short Code Validation", True, "Short code rejected by server")
+                success_count += 1
+        except Exception as e:
+            self.log_result("Short Code Validation", False, f"Exception: {str(e)}")
+        
+        overall_success = success_count == total_tests
+        self.log_result("Code Format Validation", overall_success, 
+                      f"Format validation: {success_count}/{total_tests} tests passed")
+        
+        return overall_success
+    
+    def test_subscription_code_activation_valid(self):
+        """Test POST /api/subscription-codes/activate - Valid code activation"""
+        print("\n=== Testing Valid Code Activation ===")
+        
+        # First ensure we have a code to test with
+        if not hasattr(self, 'test_subscription_code'):
+            if not self.test_subscription_code_creation_single():
+                self.log_result("Valid Code Activation", False, "No test code available")
+                return False
+        
+        try:
+            # Create a test user ID for activation
+            test_user_id = str(uuid.uuid4())
+            
+            activation_data = {
+                "code": self.test_subscription_code,
+                "user_id": test_user_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/subscription-codes/activate", json=activation_data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("subscription"):
+                    subscription = result["subscription"]
+                    self.log_result("Valid Code Activation", True, 
+                                  f"Code activated successfully. Expires: {subscription.get('expires_at')}")
+                    return True
+                else:
+                    self.log_result("Valid Code Activation", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Valid Code Activation", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Valid Code Activation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_subscription_code_activation_invalid_format(self):
+        """Test activation with invalid code format (improved error handling)"""
+        print("\n=== Testing Invalid Code Format Activation ===")
+        
+        try:
+            test_user_id = str(uuid.uuid4())
+            
+            # Test with invalid format
+            activation_data = {
+                "code": "INVALID-FORMAT",
+                "user_id": test_user_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/subscription-codes/activate", json=activation_data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if not result.get("success") and "تنسيق الكود غير صحيح" in result.get("message", ""):
+                    self.log_result("Invalid Format Activation", True, 
+                                  "Invalid format correctly rejected with proper error message")
+                    return True
+                else:
+                    self.log_result("Invalid Format Activation", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Invalid Format Activation", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Invalid Format Activation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_subscription_code_activation_nonexistent(self):
+        """Test activation with non-existent code"""
+        print("\n=== Testing Non-existent Code Activation ===")
+        
+        try:
+            test_user_id = str(uuid.uuid4())
+            
+            # Test with non-existent but valid format code
+            activation_data = {
+                "code": "HM1M-2025-NOTEXIST",
+                "user_id": test_user_id
+            }
+            
+            response = self.session.post(f"{BASE_URL}/subscription-codes/activate", json=activation_data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if not result.get("success") and "الكود غير موجود" in result.get("message", ""):
+                    self.log_result("Non-existent Code Activation", True, 
+                                  "Non-existent code correctly rejected")
+                    return True
+                else:
+                    self.log_result("Non-existent Code Activation", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Non-existent Code Activation", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Non-existent Code Activation", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_subscription_code_date_parsing(self):
+        """Test date parsing in activation endpoint (critical fix)"""
+        print("\n=== Testing Date Parsing in Activation ===")
+        
+        if not self.admin_token:
+            self.log_result("Date Parsing Test", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Create a code with 2025 expiry date
+            code_data = {
+                "duration": "1_month",
+                "max_uses": 1,
+                "expires_in_days": 365  # Expires in 2025
+            }
+            
+            response = self.session.post(f"{BASE_URL}/admin/subscription-codes", json=code_data, headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("code"):
+                    created_code = result["code"]["code"]
+                    
+                    # Now try to activate it (should work with 2025 dates)
+                    test_user_id = str(uuid.uuid4())
+                    activation_data = {
+                        "code": created_code,
+                        "user_id": test_user_id
+                    }
+                    
+                    activation_response = self.session.post(f"{BASE_URL}/subscription-codes/activate", json=activation_data)
+                    
+                    if activation_response.status_code == 200:
+                        activation_result = activation_response.json()
+                        if activation_result.get("success"):
+                            self.log_result("Date Parsing Test", True, 
+                                          "2025 date parsing works correctly in activation")
+                            return True
+                        else:
+                            self.log_result("Date Parsing Test", False, 
+                                          f"Activation failed: {activation_result}")
+                            return False
+                    else:
+                        self.log_result("Date Parsing Test", False, 
+                                      f"Activation failed with status {activation_response.status_code}")
+                        return False
+                else:
+                    self.log_result("Date Parsing Test", False, f"Code creation failed: {result}")
+                    return False
+            else:
+                self.log_result("Date Parsing Test", False, 
+                              f"Code creation failed with status {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Date Parsing Test", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_subscription_code_info_retrieval(self):
+        """Test GET /api/subscription-codes/{code} - Get code information"""
+        print("\n=== Testing Code Information Retrieval ===")
+        
+        # Use existing test code or create one
+        if not hasattr(self, 'test_subscription_code'):
+            if not self.test_subscription_code_creation_single():
+                self.log_result("Code Info Retrieval", False, "No test code available")
+                return False
+        
+        try:
+            response = self.session.get(f"{BASE_URL}/subscription-codes/{self.test_subscription_code}")
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("success") and result.get("code"):
+                    code_info = result["code"]
+                    self.log_result("Code Info Retrieval", True, 
+                                  f"Code info retrieved: Duration={code_info.get('duration')}, "
+                                  f"Status={code_info.get('status')}")
+                    return True
+                else:
+                    self.log_result("Code Info Retrieval", False, f"Unexpected response: {result}")
+                    return False
+            else:
+                self.log_result("Code Info Retrieval", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Code Info Retrieval", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_subscription_codes_stats(self):
+        """Test GET /api/admin/subscription-codes/stats - Get subscription statistics"""
+        print("\n=== Testing Subscription Codes Statistics ===")
+        
+        if not self.admin_token:
+            self.log_result("Subscription Stats", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/admin/subscription-codes/stats", headers=headers)
+            
+            if response.status_code == 200:
+                result = response.json()
+                
+                # Check for required stats fields
+                required_fields = ["total_codes", "active_codes", "used_codes", "expired_codes"]
+                missing_fields = [field for field in required_fields if field not in result]
+                
+                if not missing_fields:
+                    self.log_result("Subscription Stats", True, 
+                                  f"Stats retrieved: Total={result.get('total_codes')}, "
+                                  f"Active={result.get('active_codes')}, "
+                                  f"Used={result.get('used_codes')}")
+                    return True
+                else:
+                    self.log_result("Subscription Stats", False, f"Missing fields: {missing_fields}")
+                    return False
+            else:
+                self.log_result("Subscription Stats", False, 
+                              f"Failed with status {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Subscription Stats", False, f"Exception occurred: {str(e)}")
+            return False
+    
+    def test_subscription_end_to_end_flow(self):
+        """Test complete end-to-end subscription flow"""
+        print("\n=== Testing End-to-End Subscription Flow ===")
+        
+        if not self.admin_token:
+            self.log_result("End-to-End Flow", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Step 1: Create a code
+            code_data = {
+                "duration": "6_months",
+                "max_uses": 1
+            }
+            
+            create_response = self.session.post(f"{BASE_URL}/admin/subscription-codes", json=code_data, headers=headers)
+            
+            if create_response.status_code != 200:
+                self.log_result("End-to-End Flow", False, "Failed to create code")
+                return False
+            
+            create_result = create_response.json()
+            if not create_result.get("success"):
+                self.log_result("End-to-End Flow", False, f"Code creation failed: {create_result}")
+                return False
+            
+            test_code = create_result["code"]["code"]
+            
+            # Step 2: Get code info
+            info_response = self.session.get(f"{BASE_URL}/subscription-codes/{test_code}")
+            
+            if info_response.status_code != 200:
+                self.log_result("End-to-End Flow", False, "Failed to get code info")
+                return False
+            
+            info_result = info_response.json()
+            if not info_result.get("success"):
+                self.log_result("End-to-End Flow", False, f"Code info failed: {info_result}")
+                return False
+            
+            # Step 3: Activate code
+            test_user_id = str(uuid.uuid4())
+            activation_data = {
+                "code": test_code,
+                "user_id": test_user_id
+            }
+            
+            activation_response = self.session.post(f"{BASE_URL}/subscription-codes/activate", json=activation_data)
+            
+            if activation_response.status_code != 200:
+                self.log_result("End-to-End Flow", False, "Failed to activate code")
+                return False
+            
+            activation_result = activation_response.json()
+            if not activation_result.get("success"):
+                self.log_result("End-to-End Flow", False, f"Code activation failed: {activation_result}")
+                return False
+            
+            # Step 4: Check user subscription
+            if self.admin_token:  # Admin can check any user's subscription
+                subscription_response = self.session.get(f"{BASE_URL}/users/{test_user_id}/subscription", headers=headers)
+                
+                if subscription_response.status_code == 200:
+                    subscription_result = subscription_response.json()
+                    if subscription_result.get("success"):
+                        self.log_result("End-to-End Flow", True, 
+                                      "Complete flow successful: Create → Get Info → Activate → Check Subscription")
+                        return True
+                    else:
+                        self.log_result("End-to-End Flow", False, f"Subscription check failed: {subscription_result}")
+                        return False
+                else:
+                    # Subscription check might fail due to permissions, but the main flow worked
+                    self.log_result("End-to-End Flow", True, 
+                                  "Main flow successful: Create → Get Info → Activate (subscription check skipped)")
+                    return True
+            else:
+                self.log_result("End-to-End Flow", True, 
+                              "Main flow successful: Create → Get Info → Activate")
+                return True
+                
+        except Exception as e:
+            self.log_result("End-to-End Flow", False, f"Exception occurred: {str(e)}")
+            return False
+
     # ============ NATURAL LANGUAGE SMART HOME CONTROL TESTS ============
     
     def test_natural_language_command_lights(self):

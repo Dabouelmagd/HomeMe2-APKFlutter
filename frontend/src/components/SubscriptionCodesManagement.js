@@ -184,7 +184,7 @@ const SubscriptionCodesManagement = () => {
       }
     } catch (error) {
       console.error('Error creating bulk codes:', error);
-      alert('حدث خطأ في إنشاء الأكواد');
+      alert(t('error_creating_codes'));
     }
   };
 

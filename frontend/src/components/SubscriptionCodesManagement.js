@@ -201,7 +201,7 @@ const SubscriptionCodesManagement = () => {
         fetchStats();
       } catch (error) {
         console.error('Error deleting code:', error);
-        alert('حدث خطأ في حذف الكود');
+        alert(t('error_deleting_code'));
       }
     }
   };

@@ -196,7 +196,7 @@ const SubscriptionCodesManagement = () => {
           `${process.env.REACT_APP_BACKEND_URL}/api/admin/subscription-codes/${codeId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        alert('تم حذف الكود بنجاح');
+        alert(t('code_deleted_successfully'));
         fetchCodes();
         fetchStats();
       } catch (error) {

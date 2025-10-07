@@ -256,7 +256,7 @@ const SubscriptionCodesManagement = () => {
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
           >
             <ChartBarIcon className="h-5 w-5 mr-2" />
-            الإحصائيات
+            {t('statistics')}
           </button>
           
           <button
@@ -264,7 +264,7 @@ const SubscriptionCodesManagement = () => {
             className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 flex items-center"
           >
             <ClipboardDocumentListIcon className="h-5 w-5 mr-2" />
-            إنشاء جماعي
+            {t('bulk_create')}
           </button>
           
           <button
@@ -272,7 +272,7 @@ const SubscriptionCodesManagement = () => {
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"
           >
             <PlusIcon className="h-5 w-5 mr-2" />
-            إنشاء كود جديد
+            {t('create_new_code')}
           </button>
         </div>
       </div>

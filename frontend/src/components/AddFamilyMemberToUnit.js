@@ -456,6 +456,19 @@ const AddFamilyMemberToUnit = () => {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {t('government_id_passport')}
+                        </label>
+                        <input
+                          type="text"
+                          value={memberForm.government_id}
+                          onChange={(e) => setMemberForm(prev => ({ ...prev, government_id: e.target.value }))}
+                          className="form-input w-full"
+                          placeholder={t('enter_government_id')}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                           {t('move_in_date')}
                         </label>
                         <input

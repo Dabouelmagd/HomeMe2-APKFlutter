@@ -222,7 +222,8 @@ const SubscriptionCodesManagement = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('ar-EG');
+    const locale = i18n.language === 'ar' ? 'ar-EG' : 'en-US';
+    return new Date(dateString).toLocaleDateString(locale);
   };
 
   const getDurationLabel = (duration) => {

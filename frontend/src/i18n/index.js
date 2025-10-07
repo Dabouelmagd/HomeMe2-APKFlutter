@@ -110,6 +110,8 @@ const resources = {
       'code_deleted_successfully': 'Code deleted successfully',
       'error_deleting_code': 'Error deleting code',
       'code_copied': 'Code copied',
+      'subscription_management': 'Subscription Management',
+      'activate_subscription_code': 'Activate Subscription Code',
       'content_placeholder': 'Enter announcement content...',
       'emergency_notification': 'Emergency Notification',
       'send_push_notification': 'Send Push Notification',

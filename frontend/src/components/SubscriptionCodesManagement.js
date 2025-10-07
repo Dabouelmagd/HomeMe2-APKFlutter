@@ -476,7 +476,7 @@ const SubscriptionCodesManagement = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">عدد الاستخدامات المسموحة</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('max_uses_allowed')}</label>
                 <input
                   type="number"
                   min="1"

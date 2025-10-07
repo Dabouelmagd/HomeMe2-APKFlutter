@@ -285,7 +285,7 @@ const SubscriptionCodesManagement = () => {
               <KeyIcon className="h-8 w-8 text-blue-600" />
               <div className="mr-4">
                 <p className="text-2xl font-bold text-blue-900">{stats.total_codes}</p>
-                <p className="text-blue-600">إجمالي الأكواد</p>
+                <p className="text-blue-600">{t('total_codes')}</p>
               </div>
             </div>
           </div>

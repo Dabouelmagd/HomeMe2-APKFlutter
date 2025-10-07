@@ -14,7 +14,7 @@
 # Main and testing agents must follow this exact format to maintain testing data. 
 # The testing data must be entered in yaml format Below is the data structure:
 # 
-## user_problem_statement: "SUBSCRIPTION CODES SYSTEM COMPREHENSIVE TESTING - Please test the entire subscription codes system I just built."
+## user_problem_statement: "SUBSCRIPTION CODES LANGUAGE CONTAMINATION FIX TESTING - Please test the subscription codes management page to verify that Arabic text no longer appears in the English interface."
 ## backend:
 ##   - task: "Task name"
 ##     implemented: true

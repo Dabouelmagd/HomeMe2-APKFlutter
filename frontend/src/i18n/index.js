@@ -5515,6 +5515,8 @@ const resources = {
       'email_address': 'Adresse Email',
       'id_number': 'Numéro d\'Identité',
       'enter_id_number': 'Entrez le numéro d\'identité',
+      'government_id_passport': 'Numéro d\'Identité Gouvernementale/Passeport',
+      'enter_government_id': 'Entrez le numéro d\'identité gouvernementale ou passeport',
       'move_in_date': 'Date d\'Emménagement',
       'emergency_contact_name': 'Nom du Contact d\'Urgence',
       'emergency_contact_phone': 'Téléphone du Contact d\'Urgence',

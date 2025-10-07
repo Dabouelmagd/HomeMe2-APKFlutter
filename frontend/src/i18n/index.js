@@ -1718,6 +1718,8 @@ const resources = {
       'email_address': 'Email Address',
       'id_number': 'ID Number',
       'enter_id_number': 'Enter ID number',
+      'government_id_passport': 'Government ID/Passport Number',
+      'enter_government_id': 'Enter government ID or passport number',
       'move_in_date': 'Move-in Date',
       'emergency_contact_name': 'Emergency Contact Name',
       'emergency_contact_phone': 'Emergency Contact Phone',

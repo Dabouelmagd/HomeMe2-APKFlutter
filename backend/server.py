@@ -48,6 +48,10 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 # Import Stripe integration from emergentintegrations
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
+# Import subscription models and code generator
+from subscription_models import *
+from code_generator import HomeCodeGenerator
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')

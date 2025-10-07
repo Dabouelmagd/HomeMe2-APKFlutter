@@ -554,7 +554,7 @@ const SubscriptionCodesManagement = () => {
             
             <form onSubmit={handleBulkCreate} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">مدة الاشتراك</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('subscription_duration')}</label>
                 <select
                   value={bulkCreate.duration}
                   onChange={(e) => setBulkCreate(prev => ({ ...prev, duration: e.target.value }))}

@@ -11236,6 +11236,414 @@ try:
 except ImportError:
     ratings_router = None
 
+# ================================
+# SUBSCRIPTION CODES APIs
+# ================================
+
+@api_router.post("/admin/subscription-codes", response_model=SubscriptionCodeResponse)
+async def create_subscription_code(
+    request: CreateSubscriptionCodeRequest,
+    current_user: User = Depends(require_admin)
+):
+    """إنشاء كود اشتراك جديد"""
+    try:
+        # إنشاء الكود
+        if request.custom_code:
+            code = HomeCodeGenerator._validate_and_format_custom_code(
+                request.custom_code, request.duration
+            )
+        else:
+            code = HomeCodeGenerator.generate_code(request.duration)
+        
+        # التحقق من عدم وجود الكود
+        existing_code = await db.subscription_codes.find_one({"code": code})
+        if existing_code:
+            return SubscriptionCodeResponse(
+                success=False,
+                message="هذا الكود موجود بالفعل"
+            )
+        
+        # إنشاء كائن الكود
+        duration_days = HomeCodeGenerator.get_duration_days(request.duration)
+        expires_at = None
+        if request.expires_in_days:
+            expires_at = datetime.now() + timedelta(days=request.expires_in_days)
+        
+        subscription_code = SubscriptionCode(
+            code=code,
+            duration=request.duration,
+            duration_days=duration_days,
+            max_uses=request.max_uses,
+            compound_id=request.compound_id,
+            created_by=current_user.username,
+            expires_at=expires_at
+        )
+        
+        # إضافة معلومات المجمع إذا تم تحديده
+        if request.compound_id:
+            compound = await db.compounds.find_one({"id": request.compound_id})
+            if compound:
+                subscription_code.compound_name = compound.get("name", "Unknown")
+        
+        # حفظ في قاعدة البيانات
+        await db.subscription_codes.insert_one(subscription_code.dict())
+        
+        return SubscriptionCodeResponse(
+            success=True,
+            message=f"تم إنشاء كود {HomeCodeGenerator.get_duration_name_arabic(request.duration)} بنجاح",
+            code=subscription_code
+        )
+        
+    except ValueError as e:
+        return SubscriptionCodeResponse(
+            success=False,
+            message=str(e)
+        )
+    except Exception as e:
+        logging.error(f"Error creating subscription code: {e}")
+        return SubscriptionCodeResponse(
+            success=False,
+            message="حدث خطأ في إنشاء الكود"
+        )
+
+@api_router.post("/admin/subscription-codes/bulk", response_model=BulkCodesResponse)
+async def create_bulk_subscription_codes(
+    request: BulkCreateCodesRequest,
+    current_user: User = Depends(require_admin)
+):
+    """إنشاء عدة أكواد اشتراك"""
+    try:
+        # التحقق من العدد
+        if request.count > 1000:
+            return BulkCodesResponse(
+                success=False,
+                message="لا يمكن إنشاء أكثر من 1000 كود في المرة الواحدة"
+            )
+        
+        # إنشاء الأكواد
+        codes = HomeCodeGenerator.generate_bulk_codes(request.duration, request.count)
+        duration_days = HomeCodeGenerator.get_duration_days(request.duration)
+        
+        expires_at = None
+        if request.expires_in_days:
+            expires_at = datetime.now() + timedelta(days=request.expires_in_days)
+        
+        # معلومات المجمع
+        compound_name = None
+        if request.compound_id:
+            compound = await db.compounds.find_one({"id": request.compound_id})
+            if compound:
+                compound_name = compound.get("name", "Unknown")
+        
+        # إنشاء قائمة كائنات الأكواد
+        subscription_codes = []
+        for code in codes:
+            subscription_code = SubscriptionCode(
+                code=code,
+                duration=request.duration,
+                duration_days=duration_days,
+                max_uses=request.max_uses_per_code,
+                compound_id=request.compound_id,
+                compound_name=compound_name,
+                created_by=current_user.username,
+                expires_at=expires_at
+            )
+            subscription_codes.append(subscription_code)
+        
+        # حفظ جماعي في قاعدة البيانات
+        codes_dicts = [code.dict() for code in subscription_codes]
+        await db.subscription_codes.insert_many(codes_dicts)
+        
+        return BulkCodesResponse(
+            success=True,
+            message=f"تم إنشاء {len(subscription_codes)} كود بنجاح",
+            codes=subscription_codes,
+            total_created=len(subscription_codes)
+        )
+        
+    except Exception as e:
+        logging.error(f"Error creating bulk subscription codes: {e}")
+        return BulkCodesResponse(
+            success=False,
+            message="حدث خطأ في إنشاء الأكواد"
+        )
+
+@api_router.post("/subscription-codes/activate", response_model=SubscriptionCodeResponse)
+async def activate_subscription_code(
+    request: ActivateSubscriptionCodeRequest,
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """تفعيل كود اشتراك"""
+    try:
+        # تنظيف الكود
+        code = request.code.strip().upper()
+        user_id = request.user_id
+        
+        # التحقق من صحة تنسيق الكود
+        if not HomeCodeGenerator.validate_code_format(code):
+            return SubscriptionCodeResponse(
+                success=False,
+                message="تنسيق الكود غير صحيح"
+            )
+        
+        # البحث عن الكود
+        subscription_code = await db.subscription_codes.find_one({"code": code})
+        if not subscription_code:
+            return SubscriptionCodeResponse(
+                success=False,
+                message="الكود غير موجود"
+            )
+        
+        # التحقق من حالة الكود
+        if subscription_code["status"] != "active":
+            return SubscriptionCodeResponse(
+                success=False,
+                message="الكود غير نشط"
+            )
+        
+        # التحقق من انتهاء صلاحية الكود
+        if subscription_code.get("expires_at"):
+            expires_at = datetime.fromisoformat(subscription_code["expires_at"].replace('Z', '+00:00'))
+            if datetime.now() > expires_at:
+                await db.subscription_codes.update_one(
+                    {"code": code},
+                    {"$set": {"status": "expired"}}
+                )
+                return SubscriptionCodeResponse(
+                    success=False,
+                    message="انتهت صلاحية الكود"
+                )
+        
+        # التحقق من عدد الاستخدامات
+        if subscription_code["current_uses"] >= subscription_code["max_uses"]:
+            await db.subscription_codes.update_one(
+                {"code": code},
+                {"$set": {"status": "used"}}
+            )
+            return SubscriptionCodeResponse(
+                success=False,
+                message="تم استخدام الكود بالحد الأقصى المسموح"
+            )
+        
+        # التحقق من المستخدم السابق
+        if user_id in subscription_code.get("used_by_users", []):
+            return SubscriptionCodeResponse(
+                success=False,
+                message="تم استخدام هذا الكود من قبل هذا المستخدم"
+            )
+        
+        # التحقق من وجود اشتراك نشط للمستخدم
+        existing_subscription = await db.user_subscriptions.find_one({
+            "user_id": user_id,
+            "is_active": True,
+            "expires_at": {"$gt": datetime.now()}
+        })
+        
+        if existing_subscription:
+            return SubscriptionCodeResponse(
+                success=False,
+                message="لديك اشتراك نشط بالفعل"
+            )
+        
+        # إنشاء اشتراك جديد
+        starts_at = datetime.now()
+        expires_at = starts_at + timedelta(days=subscription_code["duration_days"])
+        
+        user_subscription = UserSubscription(
+            user_id=user_id,
+            code_id=subscription_code["id"],
+            code=code,
+            duration=subscription_code["duration"],
+            starts_at=starts_at,
+            expires_at=expires_at,
+            compound_id=subscription_code.get("compound_id")
+        )
+        
+        # حفظ الاشتراك
+        await db.user_subscriptions.insert_one(user_subscription.dict())
+        
+        # تحديث إحصائيات الكود
+        usage_record = {
+            "user_id": user_id,
+            "activated_at": datetime.now().isoformat(),
+            "user_info": current_user.dict() if current_user else {"id": user_id}
+        }
+        
+        await db.subscription_codes.update_one(
+            {"code": code},
+            {
+                "$inc": {"current_uses": 1},
+                "$push": {
+                    "used_by_users": user_id,
+                    "usage_history": usage_record
+                },
+                "$set": {
+                    "status": "used" if subscription_code["current_uses"] + 1 >= subscription_code["max_uses"] else "active"
+                }
+            }
+        )
+        
+        return SubscriptionCodeResponse(
+            success=True,
+            message=f"تم تفعيل اشتراك {HomeCodeGenerator.get_duration_name_arabic(subscription_code['duration'])} بنجاح",
+            subscription=user_subscription
+        )
+        
+    except Exception as e:
+        logging.error(f"Error activating subscription code: {e}")
+        return SubscriptionCodeResponse(
+            success=False,
+            message="حدث خطأ في تفعيل الكود"
+        )
+
+@api_router.get("/admin/subscription-codes", response_model=List[SubscriptionCode])
+async def get_all_subscription_codes(
+    status: Optional[str] = None,
+    duration: Optional[str] = None,
+    compound_id: Optional[str] = None,
+    limit: int = 100,
+    offset: int = 0,
+    current_user: User = Depends(require_admin)
+):
+    """الحصول على جميع أكواد الاشتراك"""
+    try:
+        # بناء الاستعلام
+        query = {}
+        if status:
+            query["status"] = status
+        if duration:
+            query["duration"] = duration
+        if compound_id:
+            query["compound_id"] = compound_id
+        
+        # البحث في قاعدة البيانات
+        cursor = db.subscription_codes.find(query).sort("created_at", -1).skip(offset).limit(limit)
+        codes = await cursor.to_list(None)
+        
+        # تحويل إلى نماذج Pydantic
+        subscription_codes = [SubscriptionCode(**code) for code in codes]
+        return subscription_codes
+        
+    except Exception as e:
+        logging.error(f"Error getting subscription codes: {e}")
+        raise HTTPException(status_code=500, detail="خطأ في الحصول على الأكواد")
+
+@api_router.get("/admin/subscription-codes/stats", response_model=SubscriptionCodeStats)
+async def get_subscription_codes_stats(current_user: User = Depends(require_admin)):
+    """الحصول على إحصائيات أكواد الاشتراك"""
+    try:
+        # إحصائيات الأكواد
+        total_codes = await db.subscription_codes.count_documents({})
+        active_codes = await db.subscription_codes.count_documents({"status": "active"})
+        used_codes = await db.subscription_codes.count_documents({"status": "used"})
+        expired_codes = await db.subscription_codes.count_documents({"status": "expired"})
+        
+        # إحصائيات حسب المدة
+        pipeline = [
+            {"$group": {"_id": "$duration", "count": {"$sum": 1}}}
+        ]
+        duration_stats = await db.subscription_codes.aggregate(pipeline).to_list(None)
+        codes_by_duration = {item["_id"]: item["count"] for item in duration_stats}
+        
+        # إحصائيات الاشتراكات
+        total_activations = await db.user_subscriptions.count_documents({})
+        active_subscriptions = await db.user_subscriptions.count_documents({
+            "is_active": True,
+            "expires_at": {"$gt": datetime.now()}
+        })
+        
+        return SubscriptionCodeStats(
+            total_codes=total_codes,
+            active_codes=active_codes,
+            used_codes=used_codes,
+            expired_codes=expired_codes,
+            codes_by_duration=codes_by_duration,
+            total_activations=total_activations,
+            active_subscriptions=active_subscriptions
+        )
+        
+    except Exception as e:
+        logging.error(f"Error getting subscription stats: {e}")
+        raise HTTPException(status_code=500, detail="خطأ في الحصول على الإحصائيات")
+
+@api_router.get("/subscription-codes/{code}", response_model=SubscriptionCodeResponse)
+async def get_subscription_code_info(code: str):
+    """الحصول على معلومات كود اشتراك"""
+    try:
+        code = code.strip().upper()
+        subscription_code = await db.subscription_codes.find_one({"code": code})
+        
+        if not subscription_code:
+            return SubscriptionCodeResponse(
+                success=False,
+                message="الكود غير موجود"
+            )
+        
+        return SubscriptionCodeResponse(
+            success=True,
+            message="تم العثور على الكود",
+            code=SubscriptionCode(**subscription_code)
+        )
+        
+    except Exception as e:
+        logging.error(f"Error getting subscription code info: {e}")
+        return SubscriptionCodeResponse(
+            success=False,
+            message="خطأ في الحصول على معلومات الكود"
+        )
+
+@api_router.delete("/admin/subscription-codes/{code_id}")
+async def delete_subscription_code(code_id: str, current_user: User = Depends(require_admin)):
+    """حذف كود اشتراك"""
+    try:
+        result = await db.subscription_codes.delete_one({"id": code_id})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="الكود غير موجود")
+        
+        return {"success": True, "message": "تم حذف الكود بنجاح"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting subscription code: {e}")
+        raise HTTPException(status_code=500, detail="خطأ في حذف الكود")
+
+@api_router.get("/users/{user_id}/subscription", response_model=SubscriptionCodeResponse)
+async def get_user_subscription(user_id: str, current_user: User = Depends(get_current_user)):
+    """الحصول على اشتراك المستخدم"""
+    try:
+        # التحقق من الصلاحيات
+        if current_user.id != user_id and current_user.role != "admin":
+            raise HTTPException(status_code=403, detail="غير مسموح")
+        
+        # البحث عن الاشتراك النشط
+        subscription = await db.user_subscriptions.find_one({
+            "user_id": user_id,
+            "is_active": True
+        }, sort=[("created_at", -1)])
+        
+        if not subscription:
+            return SubscriptionCodeResponse(
+                success=False,
+                message="لا يوجد اشتراك نشط"
+            )
+        
+        return SubscriptionCodeResponse(
+            success=True,
+            message="تم العثور على الاشتراك",
+            subscription=UserSubscription(**subscription)
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting user subscription: {e}")
+        return SubscriptionCodeResponse(
+            success=False,
+            message="خطأ في الحصول على الاشتراك"
+        )
+
 # Include the API router after all endpoints are defined
 app.include_router(api_router)
 

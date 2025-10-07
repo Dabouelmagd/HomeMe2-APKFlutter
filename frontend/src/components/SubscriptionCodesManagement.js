@@ -189,7 +189,7 @@ const SubscriptionCodesManagement = () => {
   };
 
   const handleDeleteCode = async (codeId) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا الكود؟')) {
+    if (window.confirm(t('confirm_delete_code'))) {
       try {
         const token = localStorage.getItem('token');
         await axios.delete(

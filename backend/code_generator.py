@@ -18,7 +18,7 @@ class HomeCodeGenerator:
     }
     
     # أحرف وأرقام للكود (بدون أحرف مشبهة)
-    CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ0123456789"
     
     @classmethod
     def generate_code(cls, duration: SubscriptionDuration, custom_code: Optional[str] = None) -> str:

@@ -7944,8 +7944,8 @@ if __name__ == "__main__":
             print("Available types: flutter, maintenance, voting, individual_account_system, auth_investigation, subscription")
             sys.exit(1)
     else:
-        # Run Flutter mobile app tests by default
-        success_rate = test_suite.run_flutter_mobile_app_tests()
+        # Run Subscription Codes tests by default (as per review request)
+        success_rate = test_suite.run_subscription_codes_tests()
     
     # Exit with appropriate code
     if success_rate >= 80:

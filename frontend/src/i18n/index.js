@@ -3657,6 +3657,7 @@ const resources = {
       'try_adjusting_search': 'جرب تعديل مصطلح البحث للعثور على السكان',
       'no_residents_yet': 'لا يوجد سكان مسجلون في المجمع بعد',
       'add_member': 'إضافة عضو',
+      'update_member': 'تحديث العضو',
       'adding_to_unit': 'إضافة للوحدة',
       'resident': 'مقيم',
       'residents': 'مقيمين',

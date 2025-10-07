@@ -363,7 +363,7 @@ const FamilyManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('age')}</label>
                     <input
                       type="number"
                       value={memberForm.age}
@@ -378,7 +378,7 @@ const FamilyManagement = () => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <CalendarIcon className="h-4 w-4 inline mr-1" />
-                      Birthday
+                      {t('date_of_birth')}
                     </label>
                     <input
                       type="date"
@@ -389,7 +389,7 @@ const FamilyManagement = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Relationship</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('relationship')}</label>
                     <select
                       value={memberForm.relationship}
                       onChange={(e) => setMemberForm({...memberForm, relationship: e.target.value})}

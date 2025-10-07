@@ -102,6 +102,8 @@ const resources = {
       'three_months': '3 Months',
       'six_months': '6 Months',
       'one_year': '1 Year',
+      'all_durations': 'All Durations',
+      'all_compounds': 'All Compounds',
       'content_placeholder': 'Enter announcement content...',
       'emergency_notification': 'Emergency Notification',
       'send_push_notification': 'Send Push Notification',

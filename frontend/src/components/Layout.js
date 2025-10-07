@@ -318,6 +318,17 @@ const Layout = ({ children }) => {
       ]
     },
     {
+      title: 'إدارة الاشتراك',
+      items: [
+        {
+          name: 'تفعيل كود اشتراك',
+          href: '/activate-subscription',
+          icon: KeyIcon,
+          show: user?.role !== 'admin'
+        }
+      ]
+    },
+    {
       title: t('admin_tools'),
       items: [
         {

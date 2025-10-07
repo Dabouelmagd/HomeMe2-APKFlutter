@@ -305,7 +305,7 @@ const SubscriptionCodesManagement = () => {
               <UsersIcon className="h-8 w-8 text-purple-600" />
               <div className="mr-4">
                 <p className="text-2xl font-bold text-purple-900">{stats.total_activations}</p>
-                <p className="text-purple-600">إجمالي التفعيلات</p>
+                <p className="text-purple-600">{t('total_activations')}</p>
               </div>
             </div>
           </div>

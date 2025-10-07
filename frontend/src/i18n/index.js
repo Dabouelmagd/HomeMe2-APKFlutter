@@ -112,6 +112,29 @@ const resources = {
       'code_copied': 'Code copied',
       'subscription_management': 'Subscription Management',
       'activate_subscription_code': 'Activate Subscription Code',
+      
+      // Create Code Modal
+      'create_new_subscription_code': 'Create New Subscription Code',
+      'subscription_duration': 'Subscription Duration',
+      'max_uses_allowed': 'Maximum Uses Allowed',
+      'custom_code_optional': 'Custom Code (Optional)',
+      'leave_empty_for_auto': 'Leave empty for auto-generated code',
+      'code_expiry_days': 'Code Expiry (Days - Optional)',
+      'leave_empty_for_permanent': 'Leave empty for permanent code',
+      'compound_optional': 'Compound (Optional)',
+      'create_code': 'Create Code',
+      
+      // Bulk Create Modal
+      'create_multiple_codes': 'Create Multiple Codes',
+      'number_of_codes': 'Number of Codes',
+      'uses_per_code': 'Uses Per Code',
+      'codes_expiry_days': 'Codes Expiry (Days - Optional)',
+      'leave_empty_for_permanent_codes': 'Leave empty for permanent codes',
+      'create_codes': 'Create Codes',
+      
+      // Empty States
+      'no_codes_found': 'No codes found',
+      'start_creating_codes': 'Start by creating a new subscription code',
       'content_placeholder': 'Enter announcement content...',
       'emergency_notification': 'Emergency Notification',
       'send_push_notification': 'Send Push Notification',

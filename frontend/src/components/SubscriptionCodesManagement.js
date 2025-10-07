@@ -519,7 +519,7 @@ const SubscriptionCodesManagement = () => {
                   onChange={(e) => setNewCode(prev => ({ ...prev, compound_id: e.target.value }))}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
-                  <option value="">جميع المجمعات</option>
+                  <option value="">{t('all_compounds')}</option>
                   {Array.isArray(compounds) && compounds.map(compound => (
                     <option key={compound.id} value={compound.id}>{compound.name}</option>
                   ))}

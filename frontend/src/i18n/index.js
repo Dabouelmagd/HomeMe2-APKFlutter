@@ -2078,6 +2078,29 @@ const resources = {
       'code_copied': 'تم نسخ الكود',
       'subscription_management': 'إدارة الاشتراك',
       'activate_subscription_code': 'تفعيل كود اشتراك',
+      
+      // Create Code Modal
+      'create_new_subscription_code': 'إنشاء كود اشتراك جديد',
+      'subscription_duration': 'مدة الاشتراك',
+      'max_uses_allowed': 'عدد الاستخدامات المسموحة',
+      'custom_code_optional': 'كود مخصص (اختياري)',
+      'leave_empty_for_auto': 'اتركه فارغاً لإنشاء كود تلقائي',
+      'code_expiry_days': 'صلاحية الكود (بالأيام - اختياري)',
+      'leave_empty_for_permanent': 'اتركه فارغاً للكود دائم',
+      'compound_optional': 'المجمع السكني (اختياري)',
+      'create_code': 'إنشاء الكود',
+      
+      // Bulk Create Modal
+      'create_multiple_codes': 'إنشاء أكواد متعددة',
+      'number_of_codes': 'عدد الأكواد',
+      'uses_per_code': 'عدد الاستخدامات لكل كود',
+      'codes_expiry_days': 'صلاحية الأكواد (بالأيام - اختياري)',
+      'leave_empty_for_permanent_codes': 'اتركه فارغاً للأكواد دائمة',
+      'create_codes': 'إنشاء الأكواد',
+      
+      // Empty States
+      'no_codes_found': 'لا توجد أكواد',
+      'start_creating_codes': 'ابدأ بإنشاء كود اشتراك جديد',
       'content_placeholder': 'أدخل محتوى الإعلان...',
       'emergency_notification': 'إشعار طوارئ',
       'send_push_notification': 'إرسال إشعار فوري',

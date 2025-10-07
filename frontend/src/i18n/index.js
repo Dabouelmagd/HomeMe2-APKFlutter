@@ -2053,6 +2053,8 @@ const resources = {
       'code_deleted_successfully': 'تم حذف الكود بنجاح',
       'error_deleting_code': 'حدث خطأ في حذف الكود',
       'code_copied': 'تم نسخ الكود',
+      'subscription_management': 'إدارة الاشتراك',
+      'activate_subscription_code': 'تفعيل كود اشتراك',
       'content_placeholder': 'أدخل محتوى الإعلان...',
       'emergency_notification': 'إشعار طوارئ',
       'send_push_notification': 'إرسال إشعار فوري',

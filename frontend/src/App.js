@@ -54,6 +54,8 @@ import ContactUs from './components/ContactUs';
 import Newsletter from './components/Newsletter';
 import HelpCenter from './components/HelpCenter';
 import MobileOptimized from './components/MobileOptimized';
+import SubscriptionCodesManagement from './components/SubscriptionCodesManagement';
+import SubscriptionActivation from './components/SubscriptionActivation';
 import { Toaster } from './components/ui/sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;

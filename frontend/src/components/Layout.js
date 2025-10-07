@@ -330,6 +330,12 @@ const Layout = ({ children }) => {
           href: '/enterprise-dashboard',
           icon: BuildingOffice2Icon,
           show: user?.role === 'admin'
+        },
+        {
+          name: 'إدارة أكواد الاشتراك',
+          href: '/subscription-codes',
+          icon: KeyIcon,
+          show: user?.role === 'admin'
         }
       ]
     },

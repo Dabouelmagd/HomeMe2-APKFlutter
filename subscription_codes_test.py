@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 """
-HomeMe Subscription Codes System Comprehensive Testing Suite
-Tests all subscription codes functionality as requested:
-
-1. Admin Code Creation Testing (single & bulk)
-2. Code Information API Testing  
-3. Code Activation Testing
-4. User Subscription Management
-5. Data Validation Testing
-
-All endpoints tested with admin/admin123 credentials as specified.
+SUBSCRIPTION CODES SYSTEM COMPREHENSIVE TESTING
+Tests all subscription code functionality after critical fixes:
+1. Code Creation (All Types) - single, custom, bulk, with expiration/usage limits
+2. Code Activation (Full Flow) - valid/invalid codes, duplicate prevention, expired/used handling
+3. Code Information Management - get code details, list codes, statistics, admin access
+4. End-to-End Workflow - complete user journey
+5. Edge Cases - uniqueness, character validation, date parsing, authentication
 """
 
 import requests

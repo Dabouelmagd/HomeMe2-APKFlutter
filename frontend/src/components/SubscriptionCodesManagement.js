@@ -447,8 +447,8 @@ const SubscriptionCodesManagement = () => {
           {codes.length === 0 && (
             <div className="text-center py-12">
               <KeyIcon className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">لا توجد أكواد</h3>
-              <p className="mt-1 text-sm text-gray-500">ابدأ بإنشاء كود اشتراك جديد</p>
+              <h3 className="mt-2 text-sm font-medium text-gray-900">{t('no_codes_found')}</h3>
+              <p className="mt-1 text-sm text-gray-500">{t('start_creating_codes')}</p>
             </div>
           )}
         </div>

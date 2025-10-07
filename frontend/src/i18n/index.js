@@ -4344,6 +4344,29 @@ const resources = {
       'code_copied': 'Code copié',
       'subscription_management': 'Gestion d\'Abonnement',
       'activate_subscription_code': 'Activer Code d\'Abonnement',
+      
+      // Create Code Modal
+      'create_new_subscription_code': 'Créer Nouveau Code d\'Abonnement',
+      'subscription_duration': 'Durée d\'Abonnement',
+      'max_uses_allowed': 'Nombre Maximum d\'Utilisations',
+      'custom_code_optional': 'Code Personnalisé (Optionnel)',
+      'leave_empty_for_auto': 'Laisser vide pour code auto-généré',
+      'code_expiry_days': 'Expiration du Code (Jours - Optionnel)',
+      'leave_empty_for_permanent': 'Laisser vide pour code permanent',
+      'compound_optional': 'Complexe (Optionnel)',
+      'create_code': 'Créer le Code',
+      
+      // Bulk Create Modal
+      'create_multiple_codes': 'Créer Codes Multiples',
+      'number_of_codes': 'Nombre de Codes',
+      'uses_per_code': 'Utilisations par Code',
+      'codes_expiry_days': 'Expiration des Codes (Jours - Optionnel)',
+      'leave_empty_for_permanent_codes': 'Laisser vide pour codes permanents',
+      'create_codes': 'Créer les Codes',
+      
+      // Empty States
+      'no_codes_found': 'Aucun code trouvé',
+      'start_creating_codes': 'Commencer par créer un nouveau code d\'abonnement',
       'content_placeholder': 'Saisir le contenu de l\'annonce...',
       'emergency_notification': 'Notification d\'Urgence',
       'send_push_notification': 'Envoyer une Notification Push',

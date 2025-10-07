@@ -519,7 +519,7 @@ const SubscriptionCodesManagement = () => {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
                 >
                   <option value="">جميع المجمعات</option>
-                  {compounds.map(compound => (
+                  {Array.isArray(compounds) && compounds.map(compound => (
                     <option key={compound.id} value={compound.id}>{compound.name}</option>
                   ))}
                 </select>

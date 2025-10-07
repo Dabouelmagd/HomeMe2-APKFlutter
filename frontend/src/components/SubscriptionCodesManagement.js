@@ -18,7 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const SubscriptionCodesManagement = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [codes, setCodes] = useState([]);
   const [stats, setStats] = useState(null);
   const [compounds, setCompounds] = useState([]);

@@ -436,6 +436,14 @@ function App() {
                   <SmartHomeIntegration />
                 } />
                 
+                <Route path="subscription-codes" element={
+                  <SubscriptionCodesManagement />
+                } />
+                
+                <Route path="activate-subscription" element={
+                  <SubscriptionActivation />
+                } />
+                
                 <Route path="terms-privacy" element={
                   <TermsPrivacy />
                 } />

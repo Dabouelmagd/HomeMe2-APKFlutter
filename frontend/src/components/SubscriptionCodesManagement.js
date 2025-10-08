@@ -637,19 +637,19 @@ const SubscriptionCodesManagement = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('general_statistics')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-4 rounded">
-                    <p className="text-sm text-gray-600">إجمالي الأكواد</p>
+                    <p className="text-sm text-gray-600">{t('total_codes')}</p>
                     <p className="text-2xl font-bold text-gray-900">{stats.total_codes}</p>
                   </div>
                   <div className="bg-gray-50 p-4 rounded">
-                    <p className="text-sm text-gray-600">أكواد نشطة</p>
+                    <p className="text-sm text-gray-600">{t('active_codes')}</p>
                     <p className="text-2xl font-bold text-green-600">{stats.active_codes}</p>
                   </div>
                   <div className="bg-gray-50 p-4 rounded">
-                    <p className="text-sm text-gray-600">أكواد مستخدمة</p>
+                    <p className="text-sm text-gray-600">{t('used_codes')}</p>
                     <p className="text-2xl font-bold text-blue-600">{stats.used_codes}</p>
                   </div>
                   <div className="bg-gray-50 p-4 rounded">
-                    <p className="text-sm text-gray-600">أكواد منتهية</p>
+                    <p className="text-sm text-gray-600">{t('expired_codes')}</p>
                     <p className="text-2xl font-bold text-red-600">{stats.expired_codes}</p>
                   </div>
                 </div>

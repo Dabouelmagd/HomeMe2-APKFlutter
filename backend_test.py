@@ -108,23 +108,31 @@ class HomeMeAuthTestSuite:
             return False
 
     def test_admin_authentication(self):
-        """Test admin authentication with both possible credential sets"""
-        print("\n=== Testing Admin Authentication ===")
+        """Test admin authentication - LOGIN ISSUE INVESTIGATION"""
+        print("\n=== Testing Admin Authentication - LOGIN ISSUE INVESTIGATION ===")
         
-        # Try both credential sets mentioned in the review request
+        # Try multiple credential sets as mentioned in the review request
         credential_sets = [
+            {"username": "admin", "password": "admin123"},
             {"username": "admin@homeme.com", "password": "admin123"},
-            {"username": "admin", "password": "admin123"}
+            {"username": "admin@example.com", "password": "admin123"},
+            {"email": "admin@homeme.com", "password": "admin123"},  # Try email field
+            {"email": "admin", "password": "admin123"}  # Try email field with username
         ]
         
         for i, credentials in enumerate(credential_sets, 1):
             try:
+                print(f"Attempting login with credentials set {i}: {list(credentials.keys())}")
                 response = self.session.post(f"{BASE_URL}/auth/login", json=credentials)
+                
+                print(f"Response status: {response.status_code}")
+                if response.status_code != 200:
+                    print(f"Response text: {response.text}")
                 
                 if response.status_code == 200:
                     data = response.json()
                     
-                    # Verify response structure for Flutter compatibility
+                    # Verify response structure
                     required_fields = ["access_token", "user"]
                     missing_fields = [field for field in required_fields if field not in data]
                     
@@ -144,17 +152,30 @@ class HomeMeAuthTestSuite:
                         self.log_result(f"Admin Authentication (Set {i})", False, f"User object missing fields: {user_missing_fields}")
                         continue
                     
+                    # Verify token format
+                    if not self.admin_token or len(self.admin_token) < 10:
+                        self.log_result(f"Admin Authentication (Set {i})", False, "Invalid token format")
+                        continue
+                    
                     self.log_result(f"Admin Authentication (Set {i})", True, 
-                                  f"Admin authenticated successfully - Username: {credentials['username']}, "
-                                  f"Role: {self.admin_user.get('role')}, Compound: {self.compound_id}")
+                                  f"✅ LOGIN SUCCESSFUL - Username: {credentials.get('username', credentials.get('email'))}, "
+                                  f"Role: {self.admin_user.get('role')}, Compound: {self.compound_id}, "
+                                  f"Token: {self.admin_token[:20]}...")
                     return True
+                elif response.status_code == 401:
+                    self.log_result(f"Admin Authentication (Set {i})", False, 
+                                  f"❌ INVALID CREDENTIALS - {response.status_code}: {response.text}")
+                elif response.status_code == 422:
+                    self.log_result(f"Admin Authentication (Set {i})", False, 
+                                  f"❌ VALIDATION ERROR - {response.status_code}: {response.text}")
                 else:
                     self.log_result(f"Admin Authentication (Set {i})", False, 
-                                  f"Failed with status {response.status_code}", response.text)
+                                  f"❌ UNEXPECTED ERROR - {response.status_code}: {response.text}")
                     
             except Exception as e:
-                self.log_result(f"Admin Authentication (Set {i})", False, f"Exception occurred: {str(e)}")
+                self.log_result(f"Admin Authentication (Set {i})", False, f"❌ EXCEPTION: {str(e)}")
         
+        self.log_result("Admin Authentication", False, "❌ ALL LOGIN ATTEMPTS FAILED - Cannot login to preview website")
         return False
     
     def test_admin_dashboard_endpoint(self):

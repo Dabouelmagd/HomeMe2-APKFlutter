@@ -1,33 +1,31 @@
-# Optimized Single-Stage Dockerfile for HomeMe Application
-FROM node:18-alpine AS base
+# Fast Single-Stage Dockerfile for HomeMe
+FROM python:3.11-slim
 
-# Install Python and system dependencies
-RUN apk add --no-cache python3 py3-pip gcc musl-dev python3-dev
+# Install Node.js quickly
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl gcc \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g yarn \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Build Frontend (parallel with Python setup)
-COPY frontend/package.json frontend/yarn.lock frontend/
-WORKDIR /app/frontend
-RUN yarn install --network-timeout 100000 --production --silent && yarn cache clean
-
-COPY frontend/ ./
-RUN yarn build --silent
-
-# Setup Backend
-WORKDIR /app
+# Install Python deps first (faster caching)
 COPY backend/requirements.txt ./
-RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code and frontend build
+# Build frontend quickly
+COPY frontend/ ./frontend/
+WORKDIR /app/frontend
+RUN yarn install --silent --network-timeout 60000 \
+    && yarn build \
+    && mv build /app/static \
+    && cd /app && rm -rf frontend
+
+# Copy backend
+WORKDIR /app
 COPY backend/ ./
-COPY --from=0 /app/frontend/build ./static
 
-# Cleanup to reduce image size
-RUN rm -rf /app/frontend && apk del gcc musl-dev python3-dev
-
-# Expose port
 EXPOSE 8001
-
-# Start the application
-CMD ["python3", "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]

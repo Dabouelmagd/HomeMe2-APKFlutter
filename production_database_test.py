@@ -132,7 +132,7 @@ class ProductionDatabaseTestSuite:
         """Create admin user for production database"""
         print("\n=== Creating Admin User for Production ===")
         
-        if not self.db:
+        if self.db is None:
             self.log_result("Create Admin User", False, "No database connection available")
             return False
         

@@ -1,0 +1,31 @@
+# Exclude heavy directories and files
+desktop-app/
+*.tar.gz  
+*.zip
+uploads/
+*.log
+
+# Node modules (will be installed in container)
+frontend/node_modules/
+backend/__pycache__/
+backend/.pytest_cache/
+
+# Development files
+frontend/.env.local
+backend/.env.local
+.git/
+.emergent/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test files
+test_*.py
+*_test.py

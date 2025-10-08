@@ -556,9 +556,79 @@ class HomeMeAuthTestSuite:
             self.log_result("Routing Investigation", False, f"❌ EXCEPTION: {str(e)}")
             return False
 
+    def test_auth_me_endpoint(self):
+        """Test GET /api/auth/me - NEW ENDPOINT for current user information"""
+        print("\n=== Testing /auth/me Endpoint - NEW ENDPOINT ADDED ===")
+        
+        if not self.admin_token:
+            self.log_result("Auth Me Endpoint", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/auth/me", headers=headers)
+            
+            print(f"/auth/me Response Status: {response.status_code}")
+            if response.status_code != 200:
+                print(f"/auth/me Response Text: {response.text}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify response structure
+                if "user" in data:
+                    user_from_token = data["user"]
+                    
+                    # Verify user data matches login user
+                    if user_from_token.get("id") == self.admin_user.get("id"):
+                        self.log_result("Auth Me Endpoint", True, 
+                                      f"✅ NEW /auth/me ENDPOINT WORKING - User ID: {user_from_token.get('id')}, "
+                                      f"Role: {user_from_token.get('role')}, Username: {user_from_token.get('username')}")
+                        
+                        # Verify all expected user fields are present
+                        expected_fields = ["id", "username", "email", "role", "compound_id", "full_name"]
+                        missing_fields = [field for field in expected_fields if field not in user_from_token]
+                        
+                        if missing_fields:
+                            self.log_result("Auth Me User Data", False, 
+                                          f"❌ MISSING USER FIELDS: {missing_fields}")
+                            return False
+                        else:
+                            self.log_result("Auth Me User Data", True, 
+                                          f"✅ COMPLETE USER DATA - All expected fields present")
+                        
+                        return True
+                    else:
+                        self.log_result("Auth Me Endpoint", False, 
+                                      f"❌ USER MISMATCH - Expected: {self.admin_user.get('id')}, Got: {user_from_token.get('id')}")
+                        return False
+                else:
+                    self.log_result("Auth Me Endpoint", False, 
+                                  f"❌ INVALID RESPONSE STRUCTURE - Missing 'user' field: {data}")
+                    return False
+                    
+            elif response.status_code == 404:
+                self.log_result("Auth Me Endpoint", False, 
+                              f"❌ ENDPOINT NOT FOUND - /auth/me endpoint was not added")
+                return False
+                
+            elif response.status_code == 401:
+                self.log_result("Auth Me Endpoint", False, 
+                              f"❌ AUTHENTICATION FAILED - Token not accepted")
+                return False
+                
+            else:
+                self.log_result("Auth Me Endpoint", False, 
+                              f"❌ UNEXPECTED STATUS {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Auth Me Endpoint", False, f"❌ EXCEPTION: {str(e)}")
+            return False
+
     def test_token_validation(self):
-        """Test token generation and validation"""
-        print("\n=== Testing Token Generation and Validation ===")
+        """Test token generation and validation with /auth/me endpoint"""
+        print("\n=== Testing Token Validation with /auth/me ===")
         
         if not self.admin_token:
             self.log_result("Token Validation", False, "No admin token available")
@@ -572,7 +642,7 @@ class HomeMeAuthTestSuite:
                 self.log_result("Token Format", False, f"❌ TOKEN TOO SHORT: {len(self.admin_token)} characters")
                 return False
             
-            # Test 2: Test token with a protected endpoint
+            # Test 2: Test token with the new /auth/me endpoint
             response = self.session.get(f"{BASE_URL}/auth/me", headers=headers)
             
             if response.status_code == 200:
@@ -581,16 +651,16 @@ class HomeMeAuthTestSuite:
                 
                 if user_from_token.get("id") == self.admin_user.get("id"):
                     self.log_result("Token Validation", True, 
-                                  f"✅ TOKEN VALID - User ID matches: {user_from_token.get('id')}")
+                                  f"✅ TOKEN VALID - User ID matches via /auth/me: {user_from_token.get('id')}")
                 else:
                     self.log_result("Token Validation", False, 
                                   f"❌ TOKEN USER MISMATCH - Expected: {self.admin_user.get('id')}, Got: {user_from_token.get('id')}")
                     return False
                     
             elif response.status_code == 404:
-                # Try alternative endpoint
+                # Fallback to dashboard endpoint if /auth/me not available
                 alt_response = self.session.get(f"{BASE_URL}/dashboard/admin", headers=headers)
-                if alt_response.status_code in [200, 500]:  # 500 might be serialization issue
+                if alt_response.status_code == 200:
                     self.log_result("Token Validation", True, 
                                   f"✅ TOKEN VALID - Verified via dashboard endpoint")
                 else:
@@ -604,11 +674,11 @@ class HomeMeAuthTestSuite:
             
             # Test 3: Test with invalid token
             invalid_headers = {"Authorization": "Bearer invalid_token_123", "Content-Type": "application/json"}
-            invalid_response = self.session.get(f"{BASE_URL}/dashboard/admin", headers=invalid_headers)
+            invalid_response = self.session.get(f"{BASE_URL}/auth/me", headers=invalid_headers)
             
             if invalid_response.status_code == 401:
                 self.log_result("Invalid Token Rejection", True, 
-                              f"✅ INVALID TOKEN CORRECTLY REJECTED")
+                              f"✅ INVALID TOKEN CORRECTLY REJECTED by /auth/me")
             else:
                 self.log_result("Invalid Token Rejection", False, 
                               f"❌ INVALID TOKEN NOT REJECTED - Status {invalid_response.status_code}")

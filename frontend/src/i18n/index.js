@@ -4385,6 +4385,15 @@ const resources = {
       // Empty States
       'no_codes_found': 'Aucun code trouvé',
       'start_creating_codes': 'Commencer par créer un nouveau code d\'abonnement',
+      
+      // Statistics Modal
+      'detailed_statistics': 'Statistiques Détaillées',
+      'general_statistics': 'Statistiques Générales',
+      'used_codes': 'Codes Utilisés',
+      'expired_codes': 'Codes Expirés',
+      'codes_by_duration': 'Codes par Durée',
+      'subscription_statistics': 'Statistiques d\'Abonnement',
+      'close': 'Fermer',
       'content_placeholder': 'Saisir le contenu de l\'annonce...',
       'emergency_notification': 'Notification d\'Urgence',
       'send_push_notification': 'Envoyer une Notification Push',

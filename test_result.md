@@ -70,6 +70,13 @@ frontend:
     stuck_count: 0
     priority: "high"
     needs_retesting: false
+  - task: "Subscription Codes Statistics Modal Translation Fix"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/SubscriptionCodesManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
     status_history:
         - working: false
           agent: "testing"

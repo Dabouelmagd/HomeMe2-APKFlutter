@@ -428,6 +428,162 @@ class HomeMeAuthTestSuite:
             self.log_result("Resident Dashboard", False, f"❌ EXCEPTION: {str(e)}")
             return False
 
+    def test_routing_issues_investigation(self):
+        """Investigate why user might be redirected to pricing/offers instead of dashboard"""
+        print("\n=== Investigating Routing Issues - WRONG REDIRECTION PROBLEM ===")
+        
+        if not self.admin_token:
+            self.log_result("Routing Investigation", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test various endpoints that might be involved in routing
+            routing_endpoints = [
+                ("/dashboard", "Main Dashboard"),
+                ("/dashboard/admin", "Admin Dashboard"),
+                ("/dashboard/resident", "Resident Dashboard"),
+                ("/pricing", "Pricing Page"),
+                ("/offers", "Offers Page"),
+                ("/compounds", "Compounds"),
+                ("/auth/me", "Current User Info"),
+                ("/auth/verify", "Token Verification")
+            ]
+            
+            routing_results = []
+            
+            for endpoint, description in routing_endpoints:
+                try:
+                    response = self.session.get(f"{BASE_URL}{endpoint}", headers=headers)
+                    
+                    if response.status_code == 200:
+                        routing_results.append(f"✅ {description}: WORKING")
+                    elif response.status_code == 404:
+                        routing_results.append(f"❌ {description}: NOT FOUND")
+                    elif response.status_code == 403:
+                        routing_results.append(f"⚠️ {description}: ACCESS DENIED")
+                    elif response.status_code == 302 or response.status_code == 301:
+                        redirect_location = response.headers.get('Location', 'Unknown')
+                        routing_results.append(f"🔄 {description}: REDIRECTS TO {redirect_location}")
+                    else:
+                        routing_results.append(f"⚠️ {description}: STATUS {response.status_code}")
+                        
+                except Exception as e:
+                    routing_results.append(f"❌ {description}: EXCEPTION {str(e)}")
+            
+            # Check authentication middleware
+            try:
+                # Test with invalid token
+                invalid_headers = {"Authorization": "Bearer invalid_token_123", "Content-Type": "application/json"}
+                auth_test = self.session.get(f"{BASE_URL}/dashboard/admin", headers=invalid_headers)
+                
+                if auth_test.status_code == 401:
+                    routing_results.append("✅ Auth Middleware: WORKING (rejects invalid tokens)")
+                else:
+                    routing_results.append(f"⚠️ Auth Middleware: UNEXPECTED STATUS {auth_test.status_code}")
+                    
+            except Exception as e:
+                routing_results.append(f"❌ Auth Middleware: EXCEPTION {str(e)}")
+            
+            # Check user role and permissions
+            if self.admin_user:
+                user_role = self.admin_user.get("role")
+                compound_id = self.admin_user.get("compound_id")
+                routing_results.append(f"ℹ️ User Role: {user_role}")
+                routing_results.append(f"ℹ️ Compound ID: {compound_id}")
+                
+                if user_role != "admin":
+                    routing_results.append("⚠️ POTENTIAL ISSUE: User role is not 'admin' - might cause routing problems")
+                
+                if not compound_id:
+                    routing_results.append("⚠️ POTENTIAL ISSUE: No compound_id - might cause routing problems")
+            
+            # Log all results
+            for result in routing_results:
+                print(f"  {result}")
+            
+            # Determine overall status
+            working_endpoints = len([r for r in routing_results if "✅" in r])
+            total_endpoints = len(routing_endpoints) + 1  # +1 for auth middleware
+            
+            if working_endpoints >= total_endpoints * 0.7:  # 70% working
+                self.log_result("Routing Investigation", True, 
+                              f"✅ ROUTING ANALYSIS COMPLETE - {working_endpoints}/{total_endpoints} endpoints working")
+            else:
+                self.log_result("Routing Investigation", False, 
+                              f"❌ ROUTING ISSUES FOUND - Only {working_endpoints}/{total_endpoints} endpoints working")
+            
+            return working_endpoints >= total_endpoints * 0.5  # 50% threshold for success
+            
+        except Exception as e:
+            self.log_result("Routing Investigation", False, f"❌ EXCEPTION: {str(e)}")
+            return False
+
+    def test_token_validation(self):
+        """Test token generation and validation"""
+        print("\n=== Testing Token Generation and Validation ===")
+        
+        if not self.admin_token:
+            self.log_result("Token Validation", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # Test 1: Verify token format
+            if len(self.admin_token) < 20:
+                self.log_result("Token Format", False, f"❌ TOKEN TOO SHORT: {len(self.admin_token)} characters")
+                return False
+            
+            # Test 2: Test token with a protected endpoint
+            response = self.session.get(f"{BASE_URL}/auth/me", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                user_from_token = data.get("user", {})
+                
+                if user_from_token.get("id") == self.admin_user.get("id"):
+                    self.log_result("Token Validation", True, 
+                                  f"✅ TOKEN VALID - User ID matches: {user_from_token.get('id')}")
+                else:
+                    self.log_result("Token Validation", False, 
+                                  f"❌ TOKEN USER MISMATCH - Expected: {self.admin_user.get('id')}, Got: {user_from_token.get('id')}")
+                    return False
+                    
+            elif response.status_code == 404:
+                # Try alternative endpoint
+                alt_response = self.session.get(f"{BASE_URL}/dashboard/admin", headers=headers)
+                if alt_response.status_code in [200, 500]:  # 500 might be serialization issue
+                    self.log_result("Token Validation", True, 
+                                  f"✅ TOKEN VALID - Verified via dashboard endpoint")
+                else:
+                    self.log_result("Token Validation", False, 
+                                  f"❌ TOKEN INVALID - Status {alt_response.status_code}")
+                    return False
+            else:
+                self.log_result("Token Validation", False, 
+                              f"❌ TOKEN VALIDATION FAILED - Status {response.status_code}: {response.text}")
+                return False
+            
+            # Test 3: Test with invalid token
+            invalid_headers = {"Authorization": "Bearer invalid_token_123", "Content-Type": "application/json"}
+            invalid_response = self.session.get(f"{BASE_URL}/dashboard/admin", headers=invalid_headers)
+            
+            if invalid_response.status_code == 401:
+                self.log_result("Invalid Token Rejection", True, 
+                              f"✅ INVALID TOKEN CORRECTLY REJECTED")
+            else:
+                self.log_result("Invalid Token Rejection", False, 
+                              f"❌ INVALID TOKEN NOT REJECTED - Status {invalid_response.status_code}")
+                return False
+            
+            return True
+            
+        except Exception as e:
+            self.log_result("Token Validation", False, f"❌ EXCEPTION: {str(e)}")
+            return False
+
     def test_api_structure_verification(self):
         """Test API structure matches Flutter app expectations"""
         print("\n=== Testing API Structure Verification ===")

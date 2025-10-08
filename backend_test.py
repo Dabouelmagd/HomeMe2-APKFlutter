@@ -464,6 +464,88 @@ class HomeMeAuthTestSuite:
             self.log_result("Resident Dashboard", False, f"❌ EXCEPTION: {str(e)}")
             return False
 
+    def test_general_dashboard_endpoint(self):
+        """Test GET /api/dashboard - NEW ENDPOINT that redirects based on user role"""
+        print("\n=== Testing General Dashboard Endpoint - NEW ROLE-BASED ROUTING ===")
+        
+        if not self.admin_token:
+            self.log_result("General Dashboard", False, "No admin token available")
+            return False
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            response = self.session.get(f"{BASE_URL}/dashboard", headers=headers)
+            
+            print(f"General Dashboard Response Status: {response.status_code}")
+            if response.status_code not in [200, 302, 301]:
+                print(f"General Dashboard Response Text: {response.text}")
+            
+            if response.status_code == 200:
+                # Should return dashboard data appropriate for user role
+                data = response.json()
+                
+                # For admin user, should get admin dashboard data
+                if self.admin_user.get("role") == "admin":
+                    # Check if response indicates admin dashboard
+                    admin_indicators = ["statistics", "total_residents", "compound_id", "admin", "management"]
+                    found_admin_indicators = []
+                    
+                    def check_admin_indicators(obj, path=""):
+                        if isinstance(obj, dict):
+                            for key, value in obj.items():
+                                if any(indicator in key.lower() for indicator in admin_indicators):
+                                    found_admin_indicators.append(key)
+                                if isinstance(value, (dict, list)):
+                                    check_admin_indicators(value, f"{path}.{key}")
+                        elif isinstance(obj, list):
+                            for i, item in enumerate(obj):
+                                check_admin_indicators(item, f"{path}[{i}]")
+                    
+                    check_admin_indicators(data)
+                    
+                    if found_admin_indicators or "role" in data and data.get("role") == "admin":
+                        self.log_result("General Dashboard Role-Based Routing", True, 
+                                      f"✅ ADMIN ROUTING WORKING - Admin user gets admin dashboard data, "
+                                      f"Admin indicators: {found_admin_indicators}")
+                        return True
+                    else:
+                        self.log_result("General Dashboard Role-Based Routing", False, 
+                                      f"❌ ADMIN ROUTING FAILED - Admin user not getting admin dashboard: {list(data.keys())}")
+                        return False
+                        
+            elif response.status_code in [302, 301]:
+                # Check redirect location
+                redirect_location = response.headers.get('Location', '')
+                
+                if self.admin_user.get("role") == "admin":
+                    if "/dashboard/admin" in redirect_location or "admin" in redirect_location.lower():
+                        self.log_result("General Dashboard Role-Based Routing", True, 
+                                      f"✅ ADMIN REDIRECT WORKING - Admin user redirected to: {redirect_location}")
+                        return True
+                    else:
+                        self.log_result("General Dashboard Role-Based Routing", False, 
+                                      f"❌ WRONG ADMIN REDIRECT - Expected admin dashboard, got: {redirect_location}")
+                        return False
+                        
+            elif response.status_code == 404:
+                self.log_result("General Dashboard", False, 
+                              f"❌ ENDPOINT NOT FOUND - /api/dashboard endpoint was not added")
+                return False
+                
+            elif response.status_code == 403:
+                self.log_result("General Dashboard", False, 
+                              f"❌ ACCESS DENIED - Admin user cannot access general dashboard")
+                return False
+                
+            else:
+                self.log_result("General Dashboard", False, 
+                              f"❌ UNEXPECTED STATUS {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_result("General Dashboard", False, f"❌ EXCEPTION: {str(e)}")
+            return False
+
     def test_routing_issues_investigation(self):
         """Investigate why user might be redirected to pricing/offers instead of dashboard"""
         print("\n=== Investigating Routing Issues - WRONG REDIRECTION PROBLEM ===")

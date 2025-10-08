@@ -14,7 +14,7 @@
 # Main and testing agents must follow this exact format to maintain testing data. 
 # The testing data must be entered in yaml format Below is the data structure:
 # 
-## user_problem_statement: "MOBILE APP PAGE ARABIC TRANSLATION TESTING - Please test the Mobile App page to verify Arabic translations are now working correctly."
+## user_problem_statement: "AUTHENTICATION AND DASHBOARD SYSTEM TESTING - Please test the fixed authentication and dashboard system for HomeMe application. Test the following fixes: 1) Fixed ObjectId Serialization in admin dashboard endpoint, 2) Added /auth/me endpoint for current user information, 3) Added general /dashboard endpoint that redirects based on user role, 4) Fixed Data Serialization for compound, messages, and payments data."
 ## backend:
 ##   - task: "Task name"
 ##     implemented: true

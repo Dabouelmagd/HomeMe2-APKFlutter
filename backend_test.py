@@ -26,7 +26,7 @@ from PIL import Image
 BASE_URL = "https://homeme-subscriptions.preview.emergentagent.com/api"
 WS_URL = "wss://translate-home.preview.emergentagent.com/ws/notifications"
 
-class HomeMeFlutterTestSuite:
+class HomeMeAuthTestSuite:
     def __init__(self):
         self.session = requests.Session()
         self.admin_token = None
@@ -34,10 +34,8 @@ class HomeMeFlutterTestSuite:
         self.admin_user = None
         self.resident_user = None
         self.compound_id = None
-        self.test_maintenance_request_id = None
-        self.test_notification_id = None
-        self.test_poll_id = None
-        self.websocket_connection = None
+        self.test_users = []
+        self.database_connection_verified = False
         self.results = []
         
     def log_result(self, test_name: str, success: bool, message: str, details: str = ""):

@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "HomeMe - Complete residential compound management solution",
   "author": "HomeMe Team",
-  "main": "public/electron.js",
   "homepage": "./",
   "private": true,
   "dependencies": {

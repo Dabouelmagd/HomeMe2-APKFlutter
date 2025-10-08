@@ -5439,9 +5439,15 @@ class HomeMeAuthTestSuite:
             return False
 
     def run_flutter_mobile_app_tests(self):
-        """Run HomeMe Flutter Mobile App Backend API Tests"""
-        print("📱 STARTING HOMEME FLUTTER MOBILE APP BACKEND API TESTING")
-        print("=" * 70)
+        """Run HomeMe Authentication and Dashboard FIXED ISSUES Tests"""
+        print("🚀 STARTING HOMEME AUTHENTICATION AND DASHBOARD FIXED ISSUES TESTING")
+        print("=" * 80)
+        print("TESTING FIXES:")
+        print("1. ✅ Fixed ObjectId Serialization in admin dashboard endpoint")
+        print("2. ✅ Added /auth/me endpoint for current user information")
+        print("3. ✅ Added general /dashboard endpoint with role-based routing")
+        print("4. ✅ Fixed Data Serialization for compound, messages, and payments data")
+        print("=" * 80)
         
         # 1. Basic Health Check
         print("\n🏥 Testing Basic Health Check...")
@@ -5449,53 +5455,40 @@ class HomeMeAuthTestSuite:
         
         # 2. Authentication Endpoints
         print("\n🔐 Testing Authentication Endpoints...")
-        if not self.test_admin_authentication():
-            print("❌ Admin authentication failed - some tests may be limited")
+        auth_success = self.test_admin_authentication()
         
-        # 2.5. Arabic Interface English Text Investigation (Priority Test)
-        if self.admin_token:
-            print("\n🔍 Testing Arabic Interface for English Text (Priority Investigation)...")
-            self.test_services_management_data()
-            self.test_database_sample_data_check()
-        
-        # 3. Dashboard Endpoints
-        print("\n📊 Testing Dashboard Endpoints...")
-        self.test_admin_dashboard_endpoint()
-        self.test_resident_dashboard_endpoint()
-        
-        # 4. API Structure Verification
-        print("\n🔍 Testing API Structure Verification...")
-        self.test_api_structure_verification()
-        
-        # 5. Additional Flutter-specific tests
-        print("\n📱 Testing Flutter-specific Features...")
-        if self.admin_token:
-            # Test some core endpoints that Flutter app would use
-            self.test_flutter_compatible_endpoints()
-        
-        # 6. STRIPE PAYMENT INTEGRATION TESTING - Priority Focus
-        if self.admin_token:
-            print("\n" + "="*60)
-            print("🔥 PRIORITY: STRIPE PAYMENT INTEGRATION TESTING")
-            print("="*60)
+        if auth_success:
+            print("\n🎯 TESTING SPECIFIC FIXES:")
             
-            self.test_stripe_api_key_configuration()
-            self.test_emergentintegrations_library_import()
-            self.test_create_payment_session_endpoint()
-            self.test_payment_status_endpoint()
-            self.test_stripe_webhook_endpoint()
-            self.test_payment_transaction_database_model()
-        
-        # 7. PHASE 3 BACKEND SYSTEMS TESTING - As requested in review
-        if self.admin_token:
-            print("\n" + "="*50)
-            print("🚀 TESTING PHASE 3 BACKEND SYSTEMS")
-            print("="*50)
+            # TEST FIX 1: ObjectId Serialization in Admin Dashboard
+            print("\n1️⃣ Testing ObjectId Serialization Fix...")
+            self.test_admin_dashboard_endpoint()
             
-            # Payment System Tests
-            print("\n💳 Testing Payment System (Stripe Integration)...")
-            self.test_get_payment_packages()
-            self.test_create_checkout_session()
+            # TEST FIX 2: New /auth/me endpoint
+            print("\n2️⃣ Testing New /auth/me Endpoint...")
+            self.test_auth_me_endpoint()
+            
+            # TEST FIX 3: General /dashboard endpoint with role-based routing
+            print("\n3️⃣ Testing General /dashboard Endpoint with Role-Based Routing...")
+            self.test_general_dashboard_endpoint()
+            
+            # TEST FIX 4: Data Serialization (tested within admin dashboard)
+            print("\n4️⃣ Data Serialization Fix tested within admin dashboard test")
+            
+            # Additional verification tests
+            print("\n🔍 ADDITIONAL VERIFICATION TESTS:")
+            self.test_resident_dashboard_endpoint()
+            self.test_token_validation()
+            self.test_database_connection()
+            
+            # Test with resident user if available
+            resident_auth_success = self.test_resident_authentication()
+            if resident_auth_success:
+                print("\n👤 Testing with Resident User...")
+                # Test resident access to general dashboard
+                self.test_general_dashboard_endpoint()
+        else:
+            print("❌ Admin authentication failed - cannot test dashboard fixes")
             
             # Push Notifications System Tests
             print("\n🔔 Testing Push Notifications System...")

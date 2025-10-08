@@ -156,13 +156,13 @@
                     const trialData = await trialResponse.json();
                     updateStatus(`🎉 ${trialData.message} Redirecting to dashboard...`);
                     setTimeout(() => {
-                        window.location.href = 'http://localhost:3000/dashboard';
+                        window.location.href = '/dashboard';
                     }, 2000);
                 } else {
                     // Trial might already be active, just go to dashboard
                     updateStatus('✅ Login successful! Redirecting to dashboard...');
                     setTimeout(() => {
-                        window.location.href = 'http://localhost:3000/dashboard';
+                        window.location.href = '/dashboard';
                     }, 2000);
                 }
                 

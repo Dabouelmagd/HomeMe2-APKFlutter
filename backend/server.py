@@ -1974,6 +1974,42 @@ async def register(user_data: UserCreate):
     
     return {"message": "User registered successfully", "user_id": user.id}
 
+@api_router.post("/auth/create-admin")
+async def create_admin_user():
+    """Create default admin user for production - TEMPORARY ENDPOINT"""
+    
+    # Check if admin already exists
+    existing_admin = await db.users.find_one({"username": "admin"})
+    if existing_admin:
+        return {"message": "Admin user already exists", "admin_id": existing_admin["id"]}
+    
+    # Create default compound
+    compound = Compound(
+        name="Default Compound",
+        address="Default Address"
+    )
+    await db.compounds.insert_one(compound.dict())
+    
+    # Create admin user
+    admin_user = User(
+        username="admin",
+        password_hash=hash_password("admin123"),
+        role=UserRole.ADMIN,
+        compound_id=compound.id,
+        full_name="System Administrator",
+        phone="1234567890"
+    )
+    
+    await db.users.insert_one(admin_user.dict())
+    
+    return {
+        "message": "Admin user created successfully", 
+        "username": "admin",
+        "password": "admin123",
+        "admin_id": admin_user.id,
+        "compound_id": compound.id
+    }
+
 @api_router.post("/auth/login")
 async def login(user_data: UserLogin):
     user = await db.users.find_one({"username": user_data.username})

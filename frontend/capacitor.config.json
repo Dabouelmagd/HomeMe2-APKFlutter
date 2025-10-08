@@ -1,5 +1,5 @@
 {
-  "appId": "homeme.app",
+  "appId": "net.homemeapp",
   "appName": "HomeMe",
   "webDir": "build",
   "server": {

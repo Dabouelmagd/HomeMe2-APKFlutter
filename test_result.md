@@ -159,6 +159,18 @@ backend:
           agent: "testing"
           comment: "❌ RESIDENT DASHBOARD RETURNING 500 ERROR - /api/dashboard/resident endpoint returns Internal Server Error when accessed by resident users. This affects general dashboard routing as well. Admin dashboard works fine. Issue likely in resident-specific data serialization or database queries. Needs investigation and fix."
 
+  - task: "URGENT: Production Database Admin User Issue"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "testing"
+          comment: "🚨 CRITICAL PRODUCTION ISSUE IDENTIFIED - User cannot login because production database (Atlas MongoDB) is different from development. PROBLEM CONFIRMED: User accessing https://homeme-subscriptions.emergent.host returns 401 'Invalid credentials' for admin/admin123, while preview environment (https://homeme-subscriptions.preview.emergentagent.com) works correctly. ROOT CAUSE: Two different databases - preview environment has admin user, production environment does not. SOLUTION PROVIDED: Created /app/create_production_admin.py script to create admin user directly in production database. URGENT ACTION REQUIRED: Run the script on production server to create admin user with username: admin, password: admin123."
+
 test_plan:
   current_focus: 
     - "Frontend Login Functionality Testing - COMPLETED ✅ (100% Success Rate)"

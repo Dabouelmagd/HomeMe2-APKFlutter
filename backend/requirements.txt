@@ -124,5 +124,4 @@ watchfiles==1.1.0
 websockets==15.0.1
 yarl==1.20.1
 zipp==3.23.0
-emergentintegrations
 # Subscription codes dependencies already covered by existing packages

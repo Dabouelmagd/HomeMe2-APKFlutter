@@ -947,21 +947,22 @@ def generate_waveform_data(audio_file_path: str, samples: int = 100) -> List[flo
         # Try to read as WAV file first
         with wave.open(audio_file_path, 'rb') as wav_file:
             frames = wav_file.readframes(-1)
-            sound_info = np.frombuffer(frames, dtype=np.int16)
+            # Simple waveform generation without numpy (for deployment optimization)
+            sound_data = struct.unpack(f'{len(frames)//2}h', frames)
             
             # Normalize to 0-1 range
-            if len(sound_info) > 0:
-                sound_info = np.abs(sound_info)
-                max_val = np.max(sound_info) if np.max(sound_info) > 0 else 1
-                sound_info = sound_info / max_val
+            if len(sound_data) > 0:
+                abs_data = [abs(x) for x in sound_data]
+                max_val = max(abs_data) if abs_data else 1
+                normalized_data = [x / max_val for x in abs_data]
                 
                 # Downsample to desired number of samples
-                chunk_size = len(sound_info) // samples
+                chunk_size = len(normalized_data) // samples
                 if chunk_size > 0:
                     waveform = []
-                    for i in range(0, len(sound_info), chunk_size)[:samples]:
-                        chunk = sound_info[i:i + chunk_size]
-                        waveform.append(float(np.mean(chunk)))
+                    for i in range(0, len(normalized_data), chunk_size)[:samples]:
+                        chunk = normalized_data[i:i + chunk_size]
+                        waveform.append(sum(chunk) / len(chunk))
                     return waveform
             
         return [0.0] * samples

@@ -135,6 +135,15 @@ const resources = {
       // Empty States
       'no_codes_found': 'No codes found',
       'start_creating_codes': 'Start by creating a new subscription code',
+      
+      // Statistics Modal
+      'detailed_statistics': 'Detailed Statistics',
+      'general_statistics': 'General Statistics',
+      'used_codes': 'Used Codes',
+      'expired_codes': 'Expired Codes',
+      'codes_by_duration': 'Codes by Duration',
+      'subscription_statistics': 'Subscription Statistics',
+      'close': 'Close',
       'content_placeholder': 'Enter announcement content...',
       'emergency_notification': 'Emergency Notification',
       'send_push_notification': 'Send Push Notification',

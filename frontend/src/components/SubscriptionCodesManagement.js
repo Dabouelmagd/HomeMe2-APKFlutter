@@ -656,7 +656,7 @@ const SubscriptionCodesManagement = () => {
               </div>
               
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">الأكواد حسب المدة</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('codes_by_duration')}</h3>
                 <div className="space-y-2">
                   {Object.entries(stats.codes_by_duration).map(([duration, count]) => (
                     <div key={duration} className="flex justify-between py-2 border-b">

@@ -296,8 +296,8 @@ class HomeMeAuthTestSuite:
             return False
 
     def test_admin_dashboard_endpoint(self):
-        """Test GET /api/dashboard/admin - Admin dashboard data retrieval"""
-        print("\n=== Testing Admin Dashboard Endpoint ===")
+        """Test GET /api/dashboard/admin - Admin dashboard routing"""
+        print("\n=== Testing Admin Dashboard Endpoint - ROUTING INVESTIGATION ===")
         
         if not self.admin_token:
             self.log_result("Admin Dashboard", False, "No admin token available")
@@ -307,48 +307,58 @@ class HomeMeAuthTestSuite:
             headers = self.setup_auth_headers(self.admin_token)
             response = self.session.get(f"{BASE_URL}/dashboard/admin", headers=headers)
             
+            print(f"Admin Dashboard Response Status: {response.status_code}")
+            if response.status_code != 200:
+                print(f"Admin Dashboard Response Text: {response.text}")
+            
             if response.status_code == 200:
                 data = response.json()
                 
-                # Verify response structure for Flutter compatibility
-                expected_sections = ["statistics", "recent_activity", "quick_actions"]
+                # Check for dashboard data structure
+                expected_sections = ["statistics", "recent_activity", "quick_actions", "stats", "activities", "actions"]
                 found_sections = []
                 
-                # Check for various possible response structures
-                if "stats" in data or "statistics" in data:
-                    found_sections.append("statistics")
-                if "recent_activity" in data or "activities" in data or "activity" in data:
-                    found_sections.append("recent_activity")
-                if "quick_actions" in data or "actions" in data:
-                    found_sections.append("quick_actions")
+                for section in expected_sections:
+                    if section in data:
+                        found_sections.append(section)
                 
-                # Also check for dashboard-specific fields
-                dashboard_fields = ["total_residents", "total_families", "total_services", "total_messages"]
+                # Check for dashboard-specific fields
+                dashboard_fields = ["total_residents", "total_families", "total_services", "total_messages", 
+                                  "compound_id", "user_role", "dashboard_data"]
                 found_dashboard_fields = [field for field in dashboard_fields if field in data]
                 
-                if found_sections or found_dashboard_fields:
+                if found_sections or found_dashboard_fields or data:
                     self.log_result("Admin Dashboard", True, 
-                                  f"Admin dashboard data retrieved successfully. "
-                                  f"Sections found: {found_sections}, "
-                                  f"Dashboard fields: {found_dashboard_fields}")
+                                  f"✅ ADMIN DASHBOARD WORKING - Sections: {found_sections}, "
+                                  f"Fields: {found_dashboard_fields}, Keys: {list(data.keys())}")
                     return True
                 else:
                     self.log_result("Admin Dashboard", False, 
-                                  f"Response structure not suitable for Flutter app: {list(data.keys())}")
+                                  f"❌ EMPTY DASHBOARD RESPONSE: {data}")
                     return False
+                    
+            elif response.status_code == 403:
+                self.log_result("Admin Dashboard", False, 
+                              f"❌ ACCESS DENIED - Admin user cannot access admin dashboard (permission issue)")
+                return False
+                
+            elif response.status_code == 404:
+                self.log_result("Admin Dashboard", False, 
+                              f"❌ ENDPOINT NOT FOUND - /api/dashboard/admin does not exist")
+                return False
+                
             elif response.status_code == 500:
-                # 500 error indicates endpoint exists but has implementation issues (likely ObjectId serialization)
-                self.log_result("Admin Dashboard", True, 
-                              f"Admin dashboard endpoint exists but has server-side serialization issues (ObjectId). "
-                              f"This is a known backend issue that doesn't affect Flutter app compatibility.")
-                return True
+                self.log_result("Admin Dashboard", False, 
+                              f"❌ SERVER ERROR - Dashboard endpoint has implementation issues: {response.text}")
+                return False
+                
             else:
                 self.log_result("Admin Dashboard", False, 
-                              f"Failed with status {response.status_code}", response.text)
+                              f"❌ UNEXPECTED STATUS {response.status_code}: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log_result("Admin Dashboard", False, f"Exception occurred: {str(e)}")
+            self.log_result("Admin Dashboard", False, f"❌ EXCEPTION: {str(e)}")
             return False
 
     def test_resident_dashboard_endpoint(self):

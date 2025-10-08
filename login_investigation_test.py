@@ -101,7 +101,7 @@ class LoginInvestigationSuite:
         """Investigate existing users in the database"""
         print("\n=== Investigating Existing Users ===")
         
-        if not self.db:
+        if self.db is None:
             self.log_result("User Investigation", False, "No database connection")
             return False
         

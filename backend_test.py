@@ -8233,33 +8233,101 @@ class HomeMeAuthTestSuite:
         
         return self.print_summary()
 
+    def run_authentication_tests(self):
+        """Run all authentication and dashboard routing tests"""
+        print("🚀 STARTING HOMEME AUTHENTICATION SYSTEM AND DASHBOARD ROUTING TESTS")
+        print("=" * 80)
+        
+        # Test sequence based on review request requirements
+        test_sequence = [
+            ("Basic Health Check", self.test_basic_health_check),
+            ("Database Connection", self.test_database_connection),
+            ("Admin Authentication", self.test_admin_authentication),
+            ("Token Validation", self.test_token_validation),
+            ("Default User Creation", self.test_default_user_creation),
+            ("Admin Dashboard Endpoint", self.test_admin_dashboard_endpoint),
+            ("Resident Dashboard Endpoint", self.test_resident_dashboard_endpoint),
+            ("Routing Issues Investigation", self.test_routing_issues_investigation),
+            ("API Structure Verification", self.test_api_structure_verification)
+        ]
+        
+        passed_tests = 0
+        total_tests = len(test_sequence)
+        
+        for test_name, test_method in test_sequence:
+            print(f"\n{'='*60}")
+            print(f"Running: {test_name}")
+            print(f"{'='*60}")
+            
+            try:
+                if test_method():
+                    passed_tests += 1
+                    print(f"✅ {test_name}: PASSED")
+                else:
+                    print(f"❌ {test_name}: FAILED")
+            except Exception as e:
+                print(f"❌ {test_name}: EXCEPTION - {str(e)}")
+                self.log_result(test_name, False, f"Exception: {str(e)}")
+        
+        # Print final summary
+        print(f"\n{'='*80}")
+        print("🏁 AUTHENTICATION SYSTEM TESTING COMPLETE")
+        print(f"{'='*80}")
+        print(f"📊 RESULTS: {passed_tests}/{total_tests} tests passed ({(passed_tests/total_tests)*100:.1f}%)")
+        
+        # Print detailed results
+        print(f"\n📋 DETAILED RESULTS:")
+        for result in self.results:
+            print(f"  {result['status']} - {result['test']}: {result['message']}")
+            if result['details']:
+                print(f"    Details: {result['details']}")
+        
+        # Determine overall success
+        success_rate = (passed_tests / total_tests) * 100
+        
+        if success_rate >= 80:
+            print(f"\n🎉 OVERALL STATUS: SUCCESS ({success_rate:.1f}%)")
+            return success_rate
+        elif success_rate >= 60:
+            print(f"\n⚠️ OVERALL STATUS: PARTIAL SUCCESS ({success_rate:.1f}%)")
+            return success_rate
+        else:
+            print(f"\n❌ OVERALL STATUS: FAILURE ({success_rate:.1f}%)")
+            return success_rate
+
+
 if __name__ == "__main__":
     import sys
     
-    test_suite = HomeMeFlutterTestSuite()
+    test_suite = HomeMeAuthTestSuite()
     
     if len(sys.argv) > 1:
         test_type = sys.argv[1].lower()
         
-        if test_type == "flutter":
-            success_rate = test_suite.run_flutter_mobile_app_tests()
-        elif test_type == "maintenance":
-            success_rate = test_suite.run_phase1_tests()
-        elif test_type == "voting":
-            success_rate = test_suite.run_voting_and_smart_home_tests()
-        elif test_type == "individual_account_system":
-            success_rate = test_suite.run_individual_account_system_tests()
-        elif test_type == "auth_investigation":
-            success_rate = test_suite.run_authentication_investigation()
-        elif test_type == "subscription":
-            success_rate = test_suite.run_subscription_codes_tests()
+        if test_type == "auth":
+            success_rate = test_suite.run_authentication_tests()
         else:
-            print(f"Unknown test type: {test_type}")
-            print("Available types: flutter, maintenance, voting, individual_account_system, auth_investigation, subscription")
-            sys.exit(1)
+            # For backward compatibility, create the old test suite
+            old_test_suite = HomeMeFlutterTestSuite()
+            if test_type == "flutter":
+                success_rate = old_test_suite.run_flutter_mobile_app_tests()
+            elif test_type == "maintenance":
+                success_rate = old_test_suite.run_phase1_tests()
+            elif test_type == "voting":
+                success_rate = old_test_suite.run_voting_and_smart_home_tests()
+            elif test_type == "individual_account_system":
+                success_rate = old_test_suite.run_individual_account_system_tests()
+            elif test_type == "auth_investigation":
+                success_rate = old_test_suite.run_authentication_investigation()
+            elif test_type == "subscription":
+                success_rate = old_test_suite.run_subscription_codes_tests()
+            else:
+                print(f"Unknown test type: {test_type}")
+                print("Available types: auth, flutter, maintenance, voting, individual_account_system, auth_investigation, subscription")
+                sys.exit(1)
     else:
-        # Run Subscription Codes tests by default (as per review request)
-        success_rate = test_suite.run_subscription_codes_tests()
+        # Run Authentication tests by default (as per review request)
+        success_rate = test_suite.run_authentication_tests()
     
     # Exit with appropriate code
     if success_rate >= 80:

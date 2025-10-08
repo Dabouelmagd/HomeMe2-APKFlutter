@@ -177,7 +177,7 @@
             const token = localStorage.getItem('token');
             if (token) {
                 updateStatus('✅ Already logged in! Redirecting...');
-                window.location.href = 'http://localhost:3000/dashboard';
+                window.location.href = '/dashboard';
             } else {
                 updateStatus('⚠️ Please activate trial first to get logged in.');
             }

@@ -23,7 +23,7 @@ emergentintegrations==0.1.0
 fastapi==0.110.1
 fastuuid==0.12.0
 filelock==3.19.1
-flake8==7.3.0
+# flake8==7.3.0  # Linting tool - removed for production
 frozenlist==1.7.0
 fsspec==2025.9.0
 # google-ai-generativelanguage==0.6.15  # Google AI - not used, removed for faster build  

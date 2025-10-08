@@ -630,11 +630,11 @@ const SubscriptionCodesManagement = () => {
       {showStatsModal && stats && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg max-w-2xl w-full mx-4 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">إحصائيات مفصلة</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">{t('detailed_statistics')}</h2>
             
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">الإحصائيات العامة</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('general_statistics')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-4 rounded">
                     <p className="text-sm text-gray-600">إجمالي الأكواد</p>

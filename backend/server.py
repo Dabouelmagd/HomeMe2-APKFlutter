@@ -11047,7 +11047,7 @@ async def create_payment_session(
             raise HTTPException(status_code=403, detail="Bill not in your compound")
         
         # Get frontend origin from request headers (for success/cancel URLs)
-        frontend_origin = "http://localhost:3000"  # Default fallback
+        frontend_origin = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
         
         # Initialize Stripe checkout
         webhook_url = f"{frontend_origin}/api/webhook/stripe"

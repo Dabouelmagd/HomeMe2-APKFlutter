@@ -302,8 +302,8 @@ class HomeMeAuthTestSuite:
             return False
 
     def test_admin_dashboard_endpoint(self):
-        """Test GET /api/dashboard/admin - Admin dashboard routing"""
-        print("\n=== Testing Admin Dashboard Endpoint - ROUTING INVESTIGATION ===")
+        """Test GET /api/dashboard/admin - FIXED ObjectId Serialization and Data Issues"""
+        print("\n=== Testing Admin Dashboard Endpoint - FIXED OBJECTID SERIALIZATION ===")
         
         if not self.admin_token:
             self.log_result("Admin Dashboard", False, "No admin token available")
@@ -318,44 +318,74 @@ class HomeMeAuthTestSuite:
                 print(f"Admin Dashboard Response Text: {response.text}")
             
             if response.status_code == 200:
-                data = response.json()
+                # CRITICAL TEST: Verify JSON response is properly serialized (no ObjectId errors)
+                try:
+                    data = response.json()
+                    self.log_result("ObjectId Serialization Fix", True, 
+                                  "✅ FIXED - Admin dashboard returns properly serialized JSON without ObjectId errors")
+                except json.JSONDecodeError as e:
+                    self.log_result("ObjectId Serialization Fix", False, 
+                                  f"❌ JSON DECODE ERROR - Serialization still broken: {str(e)}")
+                    return False
                 
-                # Check for dashboard data structure
-                expected_sections = ["statistics", "recent_activity", "quick_actions", "stats", "activities", "actions"]
+                # Test for proper data structure and serialized fields
+                expected_sections = ["statistics", "recent_activity", "quick_actions", "stats", "activities", "actions", 
+                                   "compound", "messages", "payments"]  # Added compound, messages, payments
                 found_sections = []
                 
                 for section in expected_sections:
                     if section in data:
                         found_sections.append(section)
                 
-                # Check for dashboard-specific fields
-                dashboard_fields = ["total_residents", "total_families", "total_services", "total_messages", 
-                                  "compound_id", "user_role", "dashboard_data"]
-                found_dashboard_fields = [field for field in dashboard_fields if field in data]
+                # Check for properly serialized datetime and ObjectId fields
+                serialization_issues = []
+                def check_serialization(obj, path=""):
+                    if isinstance(obj, dict):
+                        for key, value in obj.items():
+                            current_path = f"{path}.{key}" if path else key
+                            if isinstance(value, str) and "ObjectId(" in value:
+                                serialization_issues.append(f"Unserialised ObjectId at {current_path}")
+                            elif isinstance(value, (dict, list)):
+                                check_serialization(value, current_path)
+                    elif isinstance(obj, list):
+                        for i, item in enumerate(obj):
+                            check_serialization(item, f"{path}[{i}]")
                 
-                if found_sections or found_dashboard_fields or data:
-                    self.log_result("Admin Dashboard", True, 
+                check_serialization(data)
+                
+                if serialization_issues:
+                    self.log_result("Data Serialization Fix", False, 
+                                  f"❌ SERIALIZATION ISSUES FOUND: {serialization_issues}")
+                    return False
+                else:
+                    self.log_result("Data Serialization Fix", True, 
+                                  "✅ FIXED - All compound, messages, and payments data properly serialized")
+                
+                # Verify dashboard content
+                if found_sections or data:
+                    self.log_result("Admin Dashboard Content", True, 
                                   f"✅ ADMIN DASHBOARD WORKING - Sections: {found_sections}, "
-                                  f"Fields: {found_dashboard_fields}, Keys: {list(data.keys())}")
+                                  f"Total Keys: {len(data.keys())}")
                     return True
                 else:
-                    self.log_result("Admin Dashboard", False, 
+                    self.log_result("Admin Dashboard Content", False, 
                                   f"❌ EMPTY DASHBOARD RESPONSE: {data}")
                     return False
                     
+            elif response.status_code == 500:
+                # This was the main issue - should now return 200 instead of 500
+                self.log_result("Admin Dashboard Fix", False, 
+                              f"❌ STILL RETURNING 500 ERROR - Fix not working: {response.text}")
+                return False
+                
             elif response.status_code == 403:
                 self.log_result("Admin Dashboard", False, 
-                              f"❌ ACCESS DENIED - Admin user cannot access admin dashboard (permission issue)")
+                              f"❌ ACCESS DENIED - Admin user cannot access admin dashboard")
                 return False
                 
             elif response.status_code == 404:
                 self.log_result("Admin Dashboard", False, 
                               f"❌ ENDPOINT NOT FOUND - /api/dashboard/admin does not exist")
-                return False
-                
-            elif response.status_code == 500:
-                self.log_result("Admin Dashboard", False, 
-                              f"❌ SERVER ERROR - Dashboard endpoint has implementation issues: {response.text}")
                 return False
                 
             else:

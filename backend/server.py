@@ -24,7 +24,7 @@ import aiofiles
 import asyncio
 import wave
 import struct
-import numpy as np
+# import numpy as np  # Removed to reduce deployment size
 from io import BytesIO
 from PIL import Image
 from datetime import timezone

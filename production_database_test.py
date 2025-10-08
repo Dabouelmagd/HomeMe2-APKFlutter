@@ -86,7 +86,7 @@ class ProductionDatabaseTestSuite:
         """Check production database status and existing users"""
         print("\n=== Checking Production Database Status ===")
         
-        if not self.db:
+        if self.db is None:
             self.log_result("Database Status Check", False, "No database connection available")
             return False
         

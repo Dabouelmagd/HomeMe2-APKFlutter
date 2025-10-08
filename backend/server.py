@@ -3247,6 +3247,14 @@ async def update_booking_status(
     return {"message": "Booking status updated successfully"}
 
 # Dashboard Routes
+@api_router.get("/dashboard")
+async def get_dashboard(current_user: User = Depends(get_current_user)):
+    """Redirect to appropriate dashboard based on user role"""
+    if current_user.role == UserRole.ADMIN:
+        return await get_admin_dashboard(current_user)
+    else:
+        return await get_resident_dashboard(current_user)
+
 @api_router.get("/dashboard/admin")
 async def get_admin_dashboard(current_user: User = Depends(require_admin)):
     # Get compound info

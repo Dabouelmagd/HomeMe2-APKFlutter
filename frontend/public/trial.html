@@ -93,7 +93,10 @@
     </div>
 
     <script>
-        const BACKEND_URL = 'https://homeme-subscriptions.emergent.host';
+        // Get backend URL from environment or use current host with port 8001
+        const BACKEND_URL = '%REACT_APP_BACKEND_URL%' !== '%' + 'REACT_APP_BACKEND_URL%' 
+            ? '%REACT_APP_BACKEND_URL%' 
+            : window.location.protocol + '//' + window.location.hostname + ':8001';
         
         function updateStatus(message, isError = false) {
             const status = document.getElementById('status');

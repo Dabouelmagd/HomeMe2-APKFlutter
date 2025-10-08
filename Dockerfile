@@ -1,36 +1,33 @@
-# Multi-stage Dockerfile for HomeMe Application
-# Stage 1: Build React Frontend
-FROM node:18-alpine AS frontend-builder
+# Optimized Single-Stage Dockerfile for HomeMe Application
+FROM node:18-alpine AS base
 
-WORKDIR /app/frontend
-COPY frontend/package.json frontend/yarn.lock ./
-RUN yarn install --frozen-lockfile
-
-COPY frontend/ ./
-RUN yarn build
-
-# Stage 2: Setup Python Backend  
-FROM python:3.11-slim AS backend
+# Install Python and system dependencies
+RUN apk add --no-cache python3 py3-pip gcc musl-dev python3-dev
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+# Build Frontend (parallel with Python setup)
+COPY frontend/package.json frontend/yarn.lock frontend/
+WORKDIR /app/frontend
+RUN yarn install --network-timeout 100000 --production --silent && yarn cache clean
 
-# Copy and install Python dependencies
+COPY frontend/ ./
+RUN yarn build --silent
+
+# Setup Backend
+WORKDIR /app
 COPY backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 
-# Copy backend code
+# Copy backend code and frontend build
 COPY backend/ ./
+COPY --from=0 /app/frontend/build ./static
 
-# Copy built frontend from previous stage
-COPY --from=frontend-builder /app/frontend/build ./static
+# Cleanup to reduce image size
+RUN rm -rf /app/frontend && apk del gcc musl-dev python3-dev
 
 # Expose port
 EXPOSE 8001
 
 # Start the application
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["python3", "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]

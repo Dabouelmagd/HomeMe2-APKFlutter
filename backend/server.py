@@ -11123,7 +11123,7 @@ async def get_payment_status(
             raise HTTPException(status_code=403, detail="Access denied")
         
         # Initialize Stripe checkout
-        webhook_url = f"http://localhost:3000/api/webhook/stripe"
+        webhook_url = f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/api/webhook/stripe"
         stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
         
         # Get checkout status from Stripe
@@ -11179,7 +11179,7 @@ async def stripe_webhook(request: Request):
         signature = request.headers.get("stripe-signature")
         
         # Initialize Stripe checkout
-        webhook_url = f"http://localhost:3000/api/webhook/stripe"
+        webhook_url = f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/api/webhook/stripe"
         stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
         
         # Handle webhook

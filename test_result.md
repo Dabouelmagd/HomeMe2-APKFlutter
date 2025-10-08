@@ -49,10 +49,10 @@
 ##
 test_plan:
   current_focus: 
-    - "Subscription Codes Statistics Modal Translation Fix Testing - COMPLETED ✅ (100% Success Rate)"
+    - "Mobile App Page Arabic Translation Testing - COMPLETED ✅ (88.2% Success Rate)"
   stuck_tasks: []
   test_all: false
-  test_priority: "subscription_codes_statistics_modal_translation_fix"
+  test_priority: "mobile_app_page_arabic_translation"
 
 agent_communication:
     - agent: "testing"

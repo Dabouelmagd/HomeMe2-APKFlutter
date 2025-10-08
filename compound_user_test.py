@@ -7,7 +7,7 @@ Testing if the issue is related to compound-specific user filtering
 import requests
 import json
 
-BASE_URL = "https://guest-portal-4.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-subscriptions.preview.emergentagent.com/api"
 
 def test_compound_users():
     print("🔍 COMPOUND-SPECIFIC USER TESTING")

@@ -23,8 +23,8 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 # Configuration
-FRONTEND_URL = "https://guest-portal-4.preview.emergentagent.com"
-BACKEND_URL = "https://guest-portal-4.preview.emergentagent.com/api"
+FRONTEND_URL = "https://homeme-subscriptions.preview.emergentagent.com"
+BACKEND_URL = "https://homeme-subscriptions.preview.emergentagent.com/api"
 
 class FrontendTranslationTestSuite:
     def __init__(self):

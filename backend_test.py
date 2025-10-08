@@ -21,7 +21,7 @@ from typing import Dict, List, Optional
 from PIL import Image
 
 # Configuration - Using the production URL as specified in the review request
-BASE_URL = "https://guest-portal-4.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-subscriptions.preview.emergentagent.com/api"
 WS_URL = "wss://translate-home.preview.emergentagent.com/ws/notifications"
 
 class HomeMeFlutterTestSuite:
@@ -90,7 +90,7 @@ class HomeMeFlutterTestSuite:
                 
                 # If no health endpoint works, check if we can reach the base URL
                 try:
-                    base_response = self.session.get("https://guest-portal-4.preview.emergentagent.com")
+                    base_response = self.session.get("https://homeme-subscriptions.preview.emergentagent.com")
                     if base_response.status_code in [200, 404]:  # 404 is OK, means server is responding
                         self.log_result("Basic Health Check", True, f"Backend server is responding (status: {base_response.status_code})")
                         return True
@@ -4628,8 +4628,8 @@ class HomeMeFlutterTestSuite:
             # Create checkout session data
             checkout_data = {
                 "package_id": "basic_package",
-                "success_url": "https://guest-portal-4.preview.emergentagent.com/payment/success",
-                "cancel_url": "https://guest-portal-4.preview.emergentagent.com/payment/cancel",
+                "success_url": "https://homeme-subscriptions.preview.emergentagent.com/payment/success",
+                "cancel_url": "https://homeme-subscriptions.preview.emergentagent.com/payment/cancel",
                 "customer_email": "admin@homeme.com"
             }
             

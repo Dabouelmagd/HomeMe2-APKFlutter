@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """
-HomeMe Flutter Mobile App Backend API Testing Suite
-Tests backend functionality specifically for Flutter mobile app integration:
-1. Basic Health Check
-2. Authentication Endpoints (admin credentials)
-3. Dashboard Endpoints (admin and resident)
-4. API Structure Verification for Flutter compatibility
+HomeMe Authentication System and Dashboard Routing Testing Suite
+Tests authentication system and dashboard routing for the HomeMe application:
+1. Authentication Testing (login endpoint with valid credentials)
+2. Token Generation and Validation
+3. Dashboard Routing (admin and resident endpoints)
+4. Database Connection Testing
+5. Default User Creation and Testing
+6. Routing Issues Investigation
 """
 
 import asyncio
@@ -20,7 +22,7 @@ from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional
 from PIL import Image
 
-# Configuration - Using the production URL as specified in the review request
+# Configuration - Using the production URL from frontend/.env
 BASE_URL = "https://homeme-subscriptions.preview.emergentagent.com/api"
 WS_URL = "wss://translate-home.preview.emergentagent.com/ws/notifications"
 

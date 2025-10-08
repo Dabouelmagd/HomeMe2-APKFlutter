@@ -3276,16 +3276,47 @@ async def get_admin_dashboard(current_user: User = Depends(require_admin)):
         {"$limit": 5}
     ]).to_list(None)
     
+    # Serialize compound data to avoid ObjectId issues
+    compound_data = None
+    if compound:
+        compound_data = {
+            "id": compound.get("id"),
+            "name": compound.get("name"),
+            "address": compound.get("address"),
+            "created_at": compound.get("created_at").isoformat() if compound.get("created_at") and hasattr(compound.get("created_at"), 'isoformat') else compound.get("created_at")
+        }
+    
+    # Serialize recent messages to avoid ObjectId issues
+    serialized_messages = []
+    for msg in recent_messages:
+        serialized_messages.append({
+            "id": msg.get("id"),
+            "sender_name": msg.get("sender_name"),
+            "message": msg.get("message"),
+            "status": msg.get("status"),
+            "created_at": msg.get("created_at").isoformat() if msg.get("created_at") and hasattr(msg.get("created_at"), 'isoformat') else msg.get("created_at")
+        })
+    
+    # Serialize recent payments to avoid ObjectId issues
+    serialized_payments = []
+    for payment in recent_payments:
+        serialized_payments.append({
+            "id": payment.get("id"),
+            "amount": payment.get("amount"),
+            "paid_at": payment.get("paid_at").isoformat() if payment.get("paid_at") and hasattr(payment.get("paid_at"), 'isoformat') else payment.get("paid_at"),
+            "invoice": payment.get("invoice", [{}])[0].get("description") if payment.get("invoice") else None
+        })
+    
     return {
-        "compound": compound,
+        "compound": compound_data,
         "statistics": {
             "total_residents": total_residents,
             "total_families": total_families,
             "pending_payments": pending_payments,
             "open_messages": open_messages
         },
-        "recent_messages": recent_messages,
-        "recent_payments": recent_payments
+        "recent_messages": serialized_messages,
+        "recent_payments": serialized_payments
     }
 
 @api_router.get("/dashboard/resident")

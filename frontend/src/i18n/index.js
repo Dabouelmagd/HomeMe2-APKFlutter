@@ -2110,6 +2110,15 @@ const resources = {
       // Empty States
       'no_codes_found': 'لا توجد أكواد',
       'start_creating_codes': 'ابدأ بإنشاء كود اشتراك جديد',
+      
+      // Statistics Modal
+      'detailed_statistics': 'إحصائيات مفصلة',
+      'general_statistics': 'الإحصائيات العامة',
+      'used_codes': 'أكواد مستخدمة',
+      'expired_codes': 'أكواد منتهية',
+      'codes_by_duration': 'الأكواد حسب المدة',
+      'subscription_statistics': 'إحصائيات الاشتراكات',
+      'close': 'إغلاق',
       'content_placeholder': 'أدخل محتوى الإعلان...',
       'emergency_notification': 'إشعار طوارئ',
       'send_push_notification': 'إرسال إشعار فوري',

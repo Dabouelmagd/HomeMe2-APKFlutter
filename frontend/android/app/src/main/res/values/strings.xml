@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">HomeMe</string>
     <string name="title_activity_main">HomeMe</string>
-    <string name="package_name">homeme.app</string>
-    <string name="custom_url_scheme">homeme.app</string>
+    <string name="package_name">net.homemeapp</string>
+    <string name="custom_url_scheme">net.homemeapp</string>
 </resources>

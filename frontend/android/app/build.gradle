@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "homeme.app"
+    namespace "net.homemeapp"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "homeme.app"
+        applicationId "net.homemeapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

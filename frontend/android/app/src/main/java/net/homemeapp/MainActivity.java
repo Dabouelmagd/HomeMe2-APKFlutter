@@ -1,4 +1,4 @@
-package homeme.app;
+package net.homemeapp;
 
 import com.getcapacitor.BridgeActivity;
 

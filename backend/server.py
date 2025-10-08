@@ -1999,6 +1999,19 @@ async def login(user_data: UserLogin):
         }
     }
 
+@api_router.get("/auth/me")
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    """Get current authenticated user information"""
+    return {
+        "id": current_user.id,
+        "username": current_user.username,
+        "role": current_user.role,
+        "compound_id": current_user.compound_id,
+        "full_name": current_user.full_name,
+        "is_family_head": getattr(current_user, 'is_family_head', False),
+        "family_id": getattr(current_user, 'family_id', None)
+    }
+
 # Compound Management Routes
 @api_router.post("/compounds")
 async def create_compound(compound_data: CompoundCreate, current_user: User = Depends(require_admin)):

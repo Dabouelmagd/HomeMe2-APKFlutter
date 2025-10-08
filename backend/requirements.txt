@@ -113,7 +113,7 @@ tenacity==9.1.2
 # tiktoken==0.11.0  # AI tokenizer - not used, removed
 # tokenizers==0.22.1  # AI tokenizer - not used, removed
 tqdm==4.67.1
-typer==0.17.4
+# typer==0.17.4  # CLI framework - not used, removed
 typing-inspection==0.4.1
 typing_extensions==4.15.0
 tzdata==2025.2

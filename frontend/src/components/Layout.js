@@ -322,7 +322,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         {
           name: t('activate_subscription_code'),
-          href: '/activate-subscription',
+          href: 'activate-subscription',
           icon: KeyIcon,
           show: user?.role !== 'admin'
         }

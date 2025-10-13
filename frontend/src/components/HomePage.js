@@ -514,6 +514,7 @@ const HomePage = () => {
               >
                 {t('choose_plan', 'Choose Plan')}
               </button>
+              </div>
             </div>
           </div>
 

@@ -6,7 +6,7 @@ import ResidentDashboard from './ResidentDashboard';
 import Layout from './Layout';
 
 // مكون Dashboard التجريبي
-const TrialDashboard = () => {
+const TrialDashboard = ({ exitTrial }) => {
   const { t } = useTranslation();
   
   return (

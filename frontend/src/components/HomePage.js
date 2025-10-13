@@ -385,7 +385,7 @@ const HomePage = () => {
             </div>
 
             {/* Basic Plan */}
-            <div className="border-2 border-blue-200 rounded-lg p-4">
+            <div className="border-2 border-blue-200 rounded-lg p-4 w-64 min-w-48">
               <h4 className="font-semibold text-lg mb-2">{t('basic_plan', 'Basic Plan')}</h4>
               <p className="text-3xl font-bold text-blue-600 mb-2">
                 {formatPrice(getDiscountedPrice(20))}

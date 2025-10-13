@@ -148,9 +148,10 @@ const TrialDashboard = ({ exitTrial }) => {
             </button>
             <button 
               onClick={exitTrial}
-              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors flex items-center justify-center gap-3"
             >
               {t('back_to_homepage', 'Back to Homepage')}
+              <span className="text-2xl font-bold">↩</span>
             </button>
           </div>
         </div>

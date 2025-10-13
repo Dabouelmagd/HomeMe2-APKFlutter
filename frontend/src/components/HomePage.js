@@ -237,13 +237,13 @@ const HomePage = () => {
       <header className="bg-white shadow-lg">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <img
                 src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
                 alt="HomeMe"
-                className="h-24 w-auto shadow-lg rounded-xl"
+                className="h-32 w-auto shadow-xl rounded-2xl"
               />
-              <h1 className="text-2xl font-bold text-gray-900">{t('homeme_brand', 'HomeMe')}</h1>
+              <h1 className="text-5xl font-bold text-gray-900">{t('homeme_brand', 'HomeMe')}</h1>
             </div>
             <LanguageSwitcher />
           </div>

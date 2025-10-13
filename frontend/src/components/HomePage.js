@@ -489,8 +489,8 @@ const HomePage = () => {
               </button>
             </div>
 
-            {/* Community Plan - Most Popular */}
-            <div className="border-2 border-indigo-300 rounded-lg p-4 bg-gradient-to-b from-indigo-50 to-blue-50 relative w-64 min-w-48">
+              {/* Community Plan - Most Popular */}
+              <div className="border-2 border-indigo-300 rounded-lg p-4 bg-gradient-to-b from-indigo-50 to-blue-50 relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-medium">
                   {t('most_popular', 'Most Popular')}

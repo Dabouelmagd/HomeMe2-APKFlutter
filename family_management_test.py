@@ -336,6 +336,148 @@ class FamilyManagementTestSuite:
             self.log_result("Add Family Member", False, f"❌ EXCEPTION: {str(e)}")
             return False
 
+    def test_add_family_member_to_unit_endpoint(self):
+        """Test POST /api/family-members/add-to-unit - Add family member to specific unit"""
+        print("\n=== Testing Add Family Member to Unit Endpoint (Alternative) ===")
+        
+        try:
+            headers = self.setup_auth_headers(self.admin_token)
+            
+            # First, get a list of users to find a resident with a unit
+            users_response = self.session.get(f"{BASE_URL}/admin/users", headers=headers)
+            
+            if users_response.status_code != 200:
+                self.log_result("Get Users for Unit", False, 
+                              f"❌ CANNOT GET USERS - Status: {users_response.status_code}")
+                return False
+            
+            users_data = users_response.json()
+            users = users_data.get("users", [])
+            
+            # Find a resident user with a unit_number
+            target_unit_id = None
+            target_unit_number = None
+            
+            for user in users:
+                if user.get("role") == "resident" and user.get("unit_number"):
+                    target_unit_id = user.get("id")
+                    target_unit_number = user.get("unit_number")
+                    break
+            
+            if not target_unit_id:
+                # Create a test unit if no residents exist
+                self.log_result("No Resident Units", False, 
+                              f"❌ NO RESIDENT UNITS FOUND - Cannot test family member addition")
+                return False
+            
+            # Create test family member data using form data (as the endpoint expects)
+            unique_id = str(uuid.uuid4())[:8]
+            
+            form_data = {
+                "unit_id": target_unit_id,
+                "full_name": f"أحمد محمد علي {unique_id}",
+                "relationship": "son",
+                "age": "25",
+                "birthday": "1999-01-15",
+                "phone": "+966501234567",
+                "email": f"ahmed.{unique_id}@example.com",
+                "id_number": f"ID{unique_id}",
+                "emergency_contact_name": "فاطمة أحمد",
+                "emergency_contact_phone": "+966509876543",
+                "move_in_date": "2024-01-01"
+            }
+            
+            # Remove Content-Type header for form data
+            form_headers = {"Authorization": f"Bearer {self.admin_token}"}
+            
+            response = self.session.post(f"{BASE_URL}/family-members/add-to-unit", 
+                                       data=form_data, headers=form_headers)
+            
+            print(f"Add Family Member to Unit Response Status: {response.status_code}")
+            if response.status_code != 200:
+                print(f"Add Family Member to Unit Response Text: {response.text}")
+            
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                    
+                    # Verify response structure
+                    if "message" not in data:
+                        self.log_result("Add Family Member to Unit", False, 
+                                      f"❌ INVALID RESPONSE - Missing 'message' field: {data}")
+                        return False
+                    
+                    if "family_member" not in data:
+                        self.log_result("Add Family Member to Unit", False, 
+                                      f"❌ INVALID RESPONSE - Missing 'family_member' field: {data}")
+                        return False
+                    
+                    created_member = data["family_member"]
+                    
+                    # Verify created member has ID
+                    if "id" not in created_member:
+                        self.log_result("Add Family Member to Unit", False, 
+                                      f"❌ CREATED MEMBER MISSING ID: {created_member}")
+                        return False
+                    
+                    # Store the created member ID for update/delete tests
+                    self.test_member_id = created_member["id"]
+                    
+                    self.log_result("Add Family Member to Unit", True, 
+                                  f"✅ FAMILY MEMBER ADDED TO UNIT SUCCESSFULLY - Name: {form_data['full_name']}, "
+                                  f"Unit: {target_unit_number}, ID: {self.test_member_id}")
+                    
+                    # Verify the data was stored correctly
+                    if created_member.get("full_name") == form_data["full_name"]:
+                        self.log_result("Family Member Data Storage", True, 
+                                      f"✅ DATA STORED CORRECTLY - Name matches: {created_member.get('full_name')}")
+                    else:
+                        self.log_result("Family Member Data Storage", False, 
+                                      f"❌ DATA MISMATCH - Expected: {form_data['full_name']}, "
+                                      f"Got: {created_member.get('full_name')}")
+                        return False
+                    
+                    return True
+                    
+                except json.JSONDecodeError as e:
+                    self.log_result("Add Family Member to Unit", False, 
+                                  f"❌ JSON DECODE ERROR - Invalid JSON response: {str(e)}")
+                    return False
+                    
+            elif response.status_code == 400:
+                self.log_result("Add Family Member to Unit", False, 
+                              f"❌ BAD REQUEST - Invalid family member data: {response.text}")
+                return False
+                
+            elif response.status_code == 401:
+                self.log_result("Add Family Member to Unit", False, 
+                              f"❌ AUTHENTICATION FAILED - Token not accepted")
+                return False
+                
+            elif response.status_code == 403:
+                self.log_result("Add Family Member to Unit", False, 
+                              f"❌ ACCESS DENIED - User cannot add family members")
+                return False
+                
+            elif response.status_code == 404:
+                self.log_result("Add Family Member to Unit", False, 
+                              f"❌ ENDPOINT NOT FOUND - /api/family-members/add-to-unit does not exist")
+                return False
+                
+            elif response.status_code == 500:
+                self.log_result("Add Family Member to Unit", False, 
+                              f"❌ SERVER ERROR - Internal server error: {response.text}")
+                return False
+                
+            else:
+                self.log_result("Add Family Member to Unit", False, 
+                              f"❌ UNEXPECTED STATUS {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Add Family Member to Unit", False, f"❌ EXCEPTION: {str(e)}")
+            return False
+
     def test_update_family_member_endpoint(self):
         """Test PUT /api/family-members/{member_id} - Update family member"""
         print("\n=== Testing Update Family Member Endpoint ===")

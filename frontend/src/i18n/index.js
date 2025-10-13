@@ -3033,6 +3033,7 @@ const resources = {
       'dashboard.total': 'الإجمالي',
       'dashboard.messages_sent': 'الرسائل المرسلة',
       'dashboard.this_month': 'هذا الشهر',
+      'dashboard.my_messages': 'رسائلي',
       'dashboard.no_family_members': 'لم يتم العثور على أفراد العائلة',
       'dashboard.all_payments_up_to_date': 'جميع المدفوعات محدثة!',
       'dashboard.no_messages_sent': 'لم يتم إرسال رسائل',

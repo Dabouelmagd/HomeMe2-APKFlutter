@@ -161,7 +161,7 @@ const TrialDashboard = ({ exitTrial }) => {
 };
 
 const HomePage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [isTrial, setIsTrial] = useState(false);
   const [currency, setCurrency] = useState('USD'); // USD or EGP

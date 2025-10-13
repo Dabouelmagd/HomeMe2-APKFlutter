@@ -4044,7 +4044,7 @@ const resources = {
       'white_label_options': 'خيارات العلامة البيضاء',
       'custom_development': 'تطوير مخصص',
       'start_free': 'ابدأ مجاناً',
-      'choose_plan': 'اختر {{plan}}',
+      'choose_plan': 'اختر الخطة',
       'no_credit_card_required': 'لا يلزم بطاقة ائتمان',
       'per_month': '/شهر',
       'per_year': '/سنة',

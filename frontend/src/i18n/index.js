@@ -5442,6 +5442,15 @@ const resources = {
       'newsletter.all_categories': 'Toutes les catégories',
       'newsletter.no_newsletters': 'Aucun bulletin trouvé',
       'newsletter.no_newsletters_desc': 'Revenez plus tard pour les mises à jour de la communauté.',
+      'newsletter.category_general': 'Général',
+      'newsletter.category_events': 'Événements',
+      'newsletter.category_maintenance': 'Maintenance',
+      'newsletter.category_community': 'Communauté',
+      'newsletter.category_announcements': 'Annonces',
+      'newsletter.category_safety': 'Sécurité',
+      'newsletter.status_draft': 'Brouillon',
+      'newsletter.status_published': 'Publié',
+      'newsletter.status_archived': 'Archivé',
       
       // Descriptions
       'guest_management_description': 'Gérer efficacement les invités et les demandes de visite',

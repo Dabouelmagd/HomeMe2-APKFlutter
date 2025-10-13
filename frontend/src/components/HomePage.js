@@ -282,10 +282,10 @@ const HomePage = () => {
             {t('pricing_intro', 'Start with our free trial or choose a subscription plan that fits your compound size.')}
           </p>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div className="border-2 border-gray-200 rounded-lg p-4">
               <h4 className="font-semibold text-lg mb-2">{t('free_trial', 'Free Trial')}</h4>
-              <p className="text-3xl font-bold text-green-600 mb-2">0$</p>
+              <p className="text-3xl font-bold text-green-600 mb-2">$0</p>
               <p className="text-sm text-gray-600 mb-4">{t('trial_duration', '30 Days')}</p>
               <button
                 onClick={startTrial}
@@ -299,6 +299,10 @@ const HomePage = () => {
               <h4 className="font-semibold text-lg mb-2">{t('basic_plan', 'Basic Plan')}</h4>
               <p className="text-3xl font-bold text-blue-600 mb-2">$29</p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
+              <ul className="text-xs text-gray-600 mb-4 space-y-1">
+                <li>• {t('up_to_50_units', 'Up to 50 units')}</li>
+                <li>• {t('basic_features', 'Basic features')}</li>
+              </ul>
               <button
                 onClick={handleSubscribe}
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
@@ -311,6 +315,10 @@ const HomePage = () => {
               <h4 className="font-semibold text-lg mb-2">{t('pro_plan', 'Pro Plan')}</h4>
               <p className="text-3xl font-bold text-purple-600 mb-2">$59</p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
+              <ul className="text-xs text-gray-600 mb-4 space-y-1">
+                <li>• {t('up_to_200_units', 'Up to 200 units')}</li>
+                <li>• {t('advanced_features', 'Advanced features')}</li>
+              </ul>
               <button
                 onClick={handleSubscribe}
                 className="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition-colors"
@@ -319,13 +327,40 @@ const HomePage = () => {
               </button>
             </div>
 
-            <div className="border-2 border-gold-200 rounded-lg p-4 bg-gradient-to-b from-yellow-50 to-orange-50">
+            <div className="border-2 border-orange-200 rounded-lg p-4 bg-gradient-to-b from-yellow-50 to-orange-50">
               <h4 className="font-semibold text-lg mb-2">{t('enterprise_plan', 'Enterprise')}</h4>
               <p className="text-3xl font-bold text-orange-600 mb-2">$99</p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
+              <ul className="text-xs text-gray-600 mb-4 space-y-1">
+                <li>• {t('up_to_500_units', 'Up to 500 units')}</li>
+                <li>• {t('premium_features', 'Premium features')}</li>
+              </ul>
               <button
                 onClick={handleSubscribe}
                 className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-colors"
+              >
+                {t('choose_plan', 'Choose Plan')}
+              </button>
+            </div>
+
+            <div className="border-2 border-indigo-200 rounded-lg p-4 bg-gradient-to-b from-indigo-50 to-blue-50 relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                  {t('most_popular', 'Most Popular')}
+                </span>
+              </div>
+              <h4 className="font-semibold text-lg mb-2">{t('community_plan', 'Community')}</h4>
+              <p className="text-3xl font-bold text-indigo-600 mb-2">$199</p>
+              <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
+              <ul className="text-xs text-gray-600 mb-4 space-y-1">
+                <li>• {t('unlimited_units', 'Unlimited units')}</li>
+                <li>• {t('multiple_compounds', 'Multiple compounds')}</li>
+                <li>• {t('community_management', 'Community management')}</li>
+                <li>• {t('priority_support', 'Priority support')}</li>
+              </ul>
+              <button
+                onClick={handleSubscribe}
+                className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
               >
                 {t('choose_plan', 'Choose Plan')}
               </button>

@@ -289,33 +289,112 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Pricing Preview */}
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-          <h3 className="text-2xl font-bold mb-4">{t('choose_your_plan', 'Choose Your Plan')}</h3>
-          <p className="text-gray-600 mb-6">
-            {t('pricing_intro', 'Start with our free trial or choose a subscription plan that fits your compound size.')}
+        {/* Free Trial Section - Separate from pricing */}
+        <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6 mb-8 text-center">
+          <h3 className="text-2xl font-bold text-green-800 mb-2">{t('try_free_demo', 'Try Free Demo')}</h3>
+          <p className="text-green-700 mb-4">
+            {t('demo_description', 'Experience all features with our interactive demo - no signup required!')}
           </p>
+          <button
+            onClick={startTrial}
+            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+          >
+            {t('start_demo_now', 'Start Demo Now')} ✨
+          </button>
+        </div>
+
+        {/* Pricing Plans */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold mb-4">{t('choose_your_plan', 'Choose Your Plan')}</h3>
+            <p className="text-gray-600 mb-6">
+              {t('pricing_intro', 'Choose a subscription plan that fits your compound size.')}
+            </p>
+
+            {/* Currency and Billing Toggle */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+              {/* Currency Selector */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setCurrency('USD')}
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    currency === 'USD' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  🇺🇸 USD
+                </button>
+                <button
+                  onClick={() => setCurrency('EGP')}
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    currency === 'EGP' 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  🇪🇬 EGP
+                </button>
+              </div>
+
+              {/* Billing Toggle */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setIsYearly(false)}
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    !isYearly 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {t('monthly', 'Monthly')}
+                </button>
+                <button
+                  onClick={() => setIsYearly(true)}
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    isYearly 
+                      ? 'bg-white text-blue-600 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  {t('yearly', 'Yearly')} 
+                  <span className="ml-1 bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-xs">
+                    {t('save_10', '10% OFF')}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="border-2 border-gray-200 rounded-lg p-4">
-              <h4 className="font-semibold text-lg mb-2">{t('free_trial', 'Free Trial')}</h4>
-              <p className="text-3xl font-bold text-green-600 mb-2">$0</p>
-              <p className="text-sm text-gray-600 mb-4">{t('trial_duration', '30 Days')}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+            {/* Free Plan */}
+            <div className="border-2 border-green-200 rounded-lg p-4 bg-green-50">
+              <h4 className="font-semibold text-lg mb-2">{t('free_plan', 'Free Plan')}</h4>
+              <p className="text-3xl font-bold text-green-600 mb-2">{t('free', 'Free')}</p>
+              <p className="text-sm text-gray-600 mb-4">{t('forever', 'Forever')}</p>
+              <ul className="text-xs text-gray-600 mb-4 space-y-1">
+                <li>• {t('up_to_5_units', 'Up to 5 units')}</li>
+                <li>• {t('basic_features', 'Basic features')}</li>
+              </ul>
               <button
-                onClick={startTrial}
+                onClick={handleSubscribe}
                 className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
               >
-                {t('start_trial', 'Start Trial')}
+                {t('get_started', 'Get Started')}
               </button>
             </div>
 
+            {/* Basic Plan */}
             <div className="border-2 border-blue-200 rounded-lg p-4">
               <h4 className="font-semibold text-lg mb-2">{t('basic_plan', 'Basic Plan')}</h4>
-              <p className="text-3xl font-bold text-blue-600 mb-2">$29</p>
+              <p className="text-3xl font-bold text-blue-600 mb-2">
+                {formatPrice(getDiscountedPrice(20))}
+                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(20)}</span>}
+              </p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
               <ul className="text-xs text-gray-600 mb-4 space-y-1">
                 <li>• {t('up_to_50_units', 'Up to 50 units')}</li>
-                <li>• {t('basic_features', 'Basic features')}</li>
+                <li>• {t('standard_features', 'Standard features')}</li>
               </ul>
               <button
                 onClick={handleSubscribe}
@@ -325,13 +404,57 @@ const HomePage = () => {
               </button>
             </div>
 
-            <div className="border-2 border-purple-200 rounded-lg p-4">
-              <h4 className="font-semibold text-lg mb-2">{t('pro_plan', 'Pro Plan')}</h4>
-              <p className="text-3xl font-bold text-purple-600 mb-2">$59</p>
+            {/* Silver Plan */}
+            <div className="border-2 border-gray-300 rounded-lg p-4 bg-gray-50">
+              <h4 className="font-semibold text-lg mb-2">{t('silver_plan', 'Silver Plan')}</h4>
+              <p className="text-3xl font-bold text-gray-600 mb-2">
+                {formatPrice(getDiscountedPrice(45))}
+                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(45)}</span>}
+              </p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
               <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('up_to_200_units', 'Up to 200 units')}</li>
+                <li>• {t('51_to_100_units', '51-100 units')}</li>
+                <li>• {t('enhanced_features', 'Enhanced features')}</li>
+              </ul>
+              <button
+                onClick={handleSubscribe}
+                className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
+              >
+                {t('choose_plan', 'Choose Plan')}
+              </button>
+            </div>
+
+            {/* Gold Plan */}
+            <div className="border-2 border-yellow-300 rounded-lg p-4 bg-yellow-50">
+              <h4 className="font-semibold text-lg mb-2">{t('gold_plan', 'Gold Plan')}</h4>
+              <p className="text-3xl font-bold text-yellow-600 mb-2">
+                {formatPrice(getDiscountedPrice(90))}
+                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(90)}</span>}
+              </p>
+              <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
+              <ul className="text-xs text-gray-600 mb-4 space-y-1">
+                <li>• {t('101_to_200_units', '101-200 units')}</li>
                 <li>• {t('advanced_features', 'Advanced features')}</li>
+              </ul>
+              <button
+                onClick={handleSubscribe}
+                className="w-full bg-yellow-600 text-white py-2 px-4 rounded-md hover:bg-yellow-700 transition-colors"
+              >
+                {t('choose_plan', 'Choose Plan')}
+              </button>
+            </div>
+
+            {/* Platinum Plan */}
+            <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
+              <h4 className="font-semibold text-lg mb-2">{t('platinum_plan', 'Platinum Plan')}</h4>
+              <p className="text-3xl font-bold text-purple-600 mb-2">
+                {formatPrice(getDiscountedPrice(199))}
+                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(199)}</span>}
+              </p>
+              <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
+              <ul className="text-xs text-gray-600 mb-4 space-y-1">
+                <li>• {t('201_to_500_units', '201-500 units')}</li>
+                <li>• {t('premium_features', 'Premium features')}</li>
               </ul>
               <button
                 onClick={handleSubscribe}
@@ -341,13 +464,17 @@ const HomePage = () => {
               </button>
             </div>
 
-            <div className="border-2 border-orange-200 rounded-lg p-4 bg-gradient-to-b from-yellow-50 to-orange-50">
+            {/* Enterprise Plan */}
+            <div className="border-2 border-orange-300 rounded-lg p-4 bg-orange-50">
               <h4 className="font-semibold text-lg mb-2">{t('enterprise_plan', 'Enterprise')}</h4>
-              <p className="text-3xl font-bold text-orange-600 mb-2">$99</p>
+              <p className="text-3xl font-bold text-orange-600 mb-2">
+                {formatPrice(getDiscountedPrice(299))}
+                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(299)}</span>}
+              </p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
               <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('up_to_500_units', 'Up to 500 units')}</li>
-                <li>• {t('premium_features', 'Premium features')}</li>
+                <li>• {t('501_plus_units', '501+ units')}</li>
+                <li>• {t('enterprise_features', 'Enterprise features')}</li>
               </ul>
               <button
                 onClick={handleSubscribe}
@@ -357,14 +484,18 @@ const HomePage = () => {
               </button>
             </div>
 
-            <div className="border-2 border-indigo-200 rounded-lg p-4 bg-gradient-to-b from-indigo-50 to-blue-50 relative">
+            {/* Community Plan - Most Popular */}
+            <div className="border-2 border-indigo-300 rounded-lg p-4 bg-gradient-to-b from-indigo-50 to-blue-50 relative">
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                 <span className="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-medium">
                   {t('most_popular', 'Most Popular')}
                 </span>
               </div>
               <h4 className="font-semibold text-lg mb-2">{t('community_plan', 'Community')}</h4>
-              <p className="text-3xl font-bold text-indigo-600 mb-2">$199</p>
+              <p className="text-2xl font-bold text-indigo-600 mb-2">
+                {formatPrice(getDiscountedPrice(0.25))} {t('per_person', 'per person')}
+                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(0.25)}</span>}
+              </p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
               <ul className="text-xs text-gray-600 mb-4 space-y-1">
                 <li>• {t('unlimited_units', 'Unlimited units')}</li>
@@ -380,6 +511,14 @@ const HomePage = () => {
               </button>
             </div>
           </div>
+
+          {isYearly && (
+            <div className="mt-6 text-center">
+              <p className="text-sm text-green-600 font-medium">
+                ✨ {t('yearly_discount_note', 'Save 10% on your first year with yearly billing!')}
+              </p>
+            </div>
+          )}
         </div>
       </main>
 

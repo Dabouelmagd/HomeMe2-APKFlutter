@@ -356,37 +356,37 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         {
           name: t('help_center'),
-          href: '/help',
+          href: 'help',
           icon: QuestionMarkCircleIcon,
           show: true
         },
         {
           name: t('mobile_app'),
-          href: '/mobile-app',
+          href: 'mobile-app',
           icon: PhoneIcon,
           show: true
         },
         {
           name: t('settings_nav'),
-          href: '/settings',
+          href: 'settings',
           icon: Cog6ToothIcon,
           show: true
         },
         {
           name: t('legal.title'),
-          href: '/terms-privacy',
+          href: 'terms-privacy',
           icon: DocumentTextIcon,
           show: true
         },
         {
           name: t('legal_contact_title'),
-          href: '/contact',
+          href: 'contact',
           icon: EnvelopeIcon,
           show: true
         },
         {
           name: t('community_newsletter'),
-          href: '/newsletter',
+          href: 'newsletter',
           icon: NewspaperIcon,
           show: true
         }

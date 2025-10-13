@@ -39,7 +39,7 @@ import {
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, isTrialMode = false }) => {
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

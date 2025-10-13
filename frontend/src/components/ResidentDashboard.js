@@ -141,7 +141,7 @@ const ResidentDashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">Family Members</h3>
+              <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('dashboard.family_members')}</h3>
               <UsersIcon className="h-5 w-5 text-gray-400" />
             </div>
           </div>

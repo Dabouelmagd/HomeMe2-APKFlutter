@@ -333,19 +333,19 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         {
           name: t('advanced_analytics'),
-          href: '/analytics',
+          href: 'analytics',
           icon: ChartBarIcon,
           show: user?.role === 'admin'
         },
         {
           name: t('enterprise.dashboard'),
-          href: '/enterprise-dashboard',
+          href: 'enterprise-dashboard',
           icon: BuildingOffice2Icon,
           show: user?.role === 'admin'
         },
         {
           name: t('subscription_codes_management'),
-          href: '/subscription-codes',
+          href: 'subscription-codes',
           icon: KeyIcon,
           show: user?.role === 'admin'
         }

@@ -287,31 +287,31 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         {
           name: t('gallery.title'),
-          href: '/gallery',
+          href: 'gallery',
           icon: PhotoIcon,
           show: true
         },
         {
           name: t('document_management'),
-          href: '/documents',
+          href: 'documents',
           icon: DocumentTextIcon,
           show: true
         },
         {
           name: t('voting_system'),
-          href: '/voting',
+          href: 'voting',
           icon: HandRaisedIcon,
           show: true
         },
         {
           name: t('smart_home'),
-          href: '/smart-home',
+          href: 'smart-home',
           icon: HomeModernIcon,
           show: true
         },
         {
           name: t('schedule.title'),
-          href: '/schedule',
+          href: 'schedule',
           icon: ClockIcon,
           show: true
         }

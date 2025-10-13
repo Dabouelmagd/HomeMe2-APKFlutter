@@ -4965,6 +4965,10 @@ const resources = {
       'documents.no_documents_desc': 'Commencez par télécharger un document.',
       'documents.upload_document': 'Télécharger un document',
       
+      // Common
+      'common.all': 'Tout',
+      'common.clear_filters': 'Effacer les filtres',
+      
       'voting_system': 'Système de vote',
       'smart_home': 'Maison intelligente',
       'government_utility_gateway': 'Passerelle gouvernementale et services',

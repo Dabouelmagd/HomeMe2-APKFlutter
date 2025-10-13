@@ -29,18 +29,18 @@ const Newsletter = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const categories = [
-    { value: 'general', label: 'General' },
-    { value: 'events', label: 'Events' },
-    { value: 'maintenance', label: 'Maintenance' },
-    { value: 'community', label: 'Community' },
-    { value: 'announcements', label: 'Announcements' },
-    { value: 'safety', label: 'Safety' }
+    { value: 'general', label: t('newsletter.category_general', 'General') },
+    { value: 'events', label: t('newsletter.category_events', 'Events') },
+    { value: 'maintenance', label: t('newsletter.category_maintenance', 'Maintenance') },
+    { value: 'community', label: t('newsletter.category_community', 'Community') },
+    { value: 'announcements', label: t('newsletter.category_announcements', 'Announcements') },
+    { value: 'safety', label: t('newsletter.category_safety', 'Safety') }
   ];
 
   const statuses = [
-    { value: 'draft', label: 'Draft' },
-    { value: 'published', label: 'Published' },
-    { value: 'archived', label: 'Archived' }
+    { value: 'draft', label: t('newsletter.status_draft', 'Draft') },
+    { value: 'published', label: t('newsletter.status_published', 'Published') },
+    { value: 'archived', label: t('newsletter.status_archived', 'Archived') }
   ];
 
   useEffect(() => {

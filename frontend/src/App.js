@@ -336,7 +336,7 @@ function App() {
                   <Layout />
                 </ProtectedRoute>
               }>
-                <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route index element={<Navigate to="/app/dashboard" replace />} />
                 
                 <Route path="dashboard" element={
                   <DashboardRouter />

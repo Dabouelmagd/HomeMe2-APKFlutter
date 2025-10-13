@@ -55,25 +55,25 @@ const ResidentDashboard = () => {
 
   const stats = [
     {
-      name: 'Family Members',
+      name: t('dashboard.family_members', 'Family Members'),
       value: dashboardData?.family_members?.length || 1,
       icon: UsersIcon,
       color: 'bg-blue-500',
-      description: 'Total in your family'
+      description: t('dashboard.total_in_family', 'Total in your family')
     },
     {
-      name: 'Pending Payments',
+      name: t('dashboard.pending_payments', 'Pending Payments'),
       value: pendingInvoicesCount,
       icon: CurrencyDollarIcon,
       color: 'bg-yellow-500',
-      description: `$${totalPendingAmount.toFixed(2)} total`
+      description: `$${totalPendingAmount.toFixed(2)} ${t('dashboard.total', 'total')}`
     },
     {
-      name: 'Messages Sent',
+      name: t('dashboard.messages_sent', 'Messages Sent'),
       value: dashboardData?.my_messages?.length || 0,
       icon: ChatBubbleLeftEllipsisIcon,
       color: 'bg-purple-500',
-      description: 'This month'
+      description: t('dashboard.this_month', 'This month')
     },
     {
       name: t('notifications'),

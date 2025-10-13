@@ -5418,6 +5418,13 @@ const resources = {
       },
       'community_newsletter': 'Bulletin communautaire',
       
+      // Newsletter
+      'newsletter.subtitle': 'Restez informé des actualités et annonces de la communauté',
+      'newsletter.search_placeholder': 'Rechercher des bulletins...',
+      'newsletter.all_categories': 'Toutes les catégories',
+      'newsletter.no_newsletters': 'Aucun bulletin trouvé',
+      'newsletter.no_newsletters_desc': 'Revenez plus tard pour les mises à jour de la communauté.',
+      
       // Descriptions
       'guest_management_description': 'Gérer efficacement les invités et les demandes de visite',
       'maintenance_system_description': 'Traiter les demandes de maintenance et suivre les progrès',

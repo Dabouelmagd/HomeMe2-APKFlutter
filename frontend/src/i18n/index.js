@@ -2978,6 +2978,10 @@ const resources = {
       'documents.no_documents_desc': 'ابدأ برفع وثيقة.',
       'documents.upload_document': 'رفع وثيقة',
       
+      // Common
+      'common.all': 'الكل',
+      'common.clear_filters': 'مسح الفلاتر',
+      
       'voting_system': 'نظام التصويت',
       'smart_home': 'المنزل الذكي',
       'government_utility_gateway': 'بوابة الحكومة والمرافق',

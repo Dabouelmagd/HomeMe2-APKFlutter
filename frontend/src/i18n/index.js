@@ -837,6 +837,10 @@ const resources = {
       'documents.no_documents_desc': 'Get started by uploading a document.',
       'documents.upload_document': 'Upload Document',
       
+      // Common
+      'common.all': 'All',
+      'common.clear_filters': 'Clear Filters',
+      
       'voting_system': 'Voting System',
       'smart_home': 'Smart Home',
       'government_utility_gateway': 'Government & Utility Gateway',

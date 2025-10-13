@@ -328,7 +328,10 @@ function App() {
               <Route path="/account-type-selection" element={<PublicAccountTypeSelection />} />
               <Route path="/public-account-type-selection" element={<PublicAccountTypeSelection />} />
               
-              <Route path="/" element={
+              {/* Homepage - no authentication required */}
+              <Route path="/" element={<HomePage />} />
+              
+              <Route path="/app" element={
                 <ProtectedRoute>
                   <Layout />
                 </ProtectedRoute>

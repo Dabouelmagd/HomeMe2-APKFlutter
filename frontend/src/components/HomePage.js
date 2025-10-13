@@ -162,6 +162,10 @@ const HomePage = () => {
     setIsTrial(true);
   };
 
+  const exitTrial = () => {
+    setIsTrial(false);
+  };
+
   const handleSubscribe = () => {
     navigate('/register');
   };

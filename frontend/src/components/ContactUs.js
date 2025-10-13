@@ -94,16 +94,15 @@ const ContactUs = () => {
         {/* Additional Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-xl font-semibold text-center text-center text-gray-900 text-center mb-4">
-            Get in Touch
+            {t('legal_contact_get_in_touch')}
           </h2>
           <div className="prose prose-gray max-w-none">
             <p className="text-gray-600 mb-4">
-              We're here to help! Whether you have questions about using the HomeMe application, 
-              need technical support, or want to provide feedback, we'd love to hear from you.
+              {t('legal_contact_get_in_touch_desc')}
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h3 className="text-lg font-medium text-center text-center text-blue-900 mb-2">
-                Primary Contact
+                {t('legal_contact_primary')}
               </h3>
               <div className="space-y-2">
                 <div className="flex items-center">
@@ -128,7 +127,7 @@ const ContactUs = () => {
                 </div>
               </div>
               <p className="text-blue-800 text-sm mt-2">
-                We typically respond to emails within 24 hours during business days.
+                {t('legal_contact_primary_desc')}
               </p>
             </div>
           </div>
@@ -137,11 +136,10 @@ const ContactUs = () => {
         {/* FAQ Notice */}
         <div className="mt-8 bg-gray-100 rounded-lg p-6">
           <h3 className="text-lg font-medium text-center text-center text-gray-900 text-center mb-2">
-            Before You Contact Us
+            {t('legal_contact_before_contact')}
           </h3>
           <p className="text-gray-600">
-            For faster support, please check our in-app help section or FAQ. 
-            Many common questions can be resolved quickly through our self-service resources.
+            {t('legal_contact_before_contact_desc')}
           </p>
         </div>
       </div>

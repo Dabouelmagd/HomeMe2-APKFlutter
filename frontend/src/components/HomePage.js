@@ -5,6 +5,152 @@ import LanguageSwitcher from './LanguageSwitcher';
 import ResidentDashboard from './ResidentDashboard';
 import Layout from './Layout';
 
+// مكون Dashboard التجريبي
+const TrialDashboard = () => {
+  const { t } = useTranslation();
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {t('welcome_home', 'Welcome home,')}
+          </h1>
+          <p className="text-gray-600">
+            {t('trial_demo_description', 'This is a demo of the HomeMe dashboard. Sign up to access your real compound data.')}
+          </p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-xl p-6 shadow-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-700">{t('family_members', 'Family Members')}</h3>
+                <p className="text-3xl font-bold text-blue-600">4</p>
+                <p className="text-sm text-gray-500">{t('total_in_family', 'Total in your family')}</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span className="text-2xl">👨‍👩‍👧‍👦</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-700">{t('pending_payments', 'Pending Payments')}</h3>
+                <p className="text-3xl font-bold text-yellow-600">2</p>
+                <p className="text-sm text-gray-500">$150 {t('total', 'total')}</p>
+              </div>
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <span className="text-2xl">💰</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-700">{t('messages', 'Messages')}</h3>
+                <p className="text-3xl font-bold text-green-600">5</p>
+                <p className="text-sm text-gray-500">{t('this_month', 'This month')}</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <span className="text-2xl">💬</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-md">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-700">{t('notifications', 'Notifications')}</h3>
+                <p className="text-3xl font-bold text-purple-600">3</p>
+                <p className="text-sm text-gray-500">{t('recent_updates', 'Recent updates')}</p>
+              </div>
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <span className="text-2xl">🔔</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Demo Features */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white rounded-xl p-6 shadow-md">
+            <h3 className="text-xl font-semibold mb-4">{t('family_management', 'Family Management')}</h3>
+            <div className="space-y-3">
+              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-sm">👨</span>
+                </div>
+                <div>
+                  <p className="font-medium">John Smith</p>
+                  <p className="text-sm text-gray-500">{t('family_head', 'Family Head')}</p>
+                </div>
+              </div>
+              <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-sm">👩</span>
+                </div>
+                <div>
+                  <p className="font-medium">Sarah Smith</p>
+                  <p className="text-sm text-gray-500">{t('spouse', 'Spouse')}</p>
+                </div>
+              </div>
+            </div>
+            <button className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+              {t('manage_family', 'Manage Family')}
+            </button>
+          </div>
+
+          <div className="bg-white rounded-xl p-6 shadow-md">
+            <h3 className="text-xl font-semibold mb-4">{t('recent_activities', 'Recent Activities')}</h3>
+            <div className="space-y-3">
+              <div className="flex items-start p-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3 mt-1">
+                  <span className="text-xs">✓</span>
+                </div>
+                <div>
+                  <p className="font-medium">{t('maintenance_completed', 'Maintenance Completed')}</p>
+                  <p className="text-sm text-gray-500">{t('ac_repair_completed', 'AC repair in living room completed')}</p>
+                  <p className="text-xs text-gray-400">2 hours ago</p>
+                </div>
+              </div>
+              <div className="flex items-start p-3 bg-gray-50 rounded-lg">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3 mt-1">
+                  <span className="text-xs">📄</span>
+                </div>
+                <div>
+                  <p className="font-medium">{t('new_invoice', 'New Invoice')}</p>
+                  <p className="text-sm text-gray-500">{t('electricity_bill_generated', 'Monthly electricity bill generated')}</p>
+                  <p className="text-xs text-gray-400">1 day ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="mt-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-center text-white">
+          <h3 className="text-2xl font-bold mb-4">{t('ready_to_get_started', 'Ready to get started?')}</h3>
+          <p className="mb-6 opacity-90">
+            {t('trial_cta_description', 'This is just a preview. Sign up to access all features and manage your real compound data.')}
+          </p>
+          <button 
+            onClick={() => window.location.href = '/register'}
+            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+          >
+            {t('sign_up_now', 'Sign Up Now')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const HomePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();

@@ -469,8 +469,8 @@ const HomePage = () => {
               </button>
             </div>
 
-            {/* Enterprise Plan */}
-            <div className="border-2 border-orange-300 rounded-lg p-4 bg-orange-50 w-64 min-w-48">
+              {/* Enterprise Plan */}
+              <div className="border-2 border-orange-300 rounded-lg p-4 bg-orange-50">
               <h4 className="font-semibold text-lg mb-2">{t('enterprise_plan', 'Enterprise')}</h4>
               <p className="text-3xl font-bold text-orange-600 mb-2">
                 {formatPrice(getDiscountedPrice(299))}

@@ -445,7 +445,7 @@ const HomePage = () => {
             </div>
 
             {/* Platinum Plan */}
-            <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
+            <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50 w-64 min-w-48">
               <h4 className="font-semibold text-lg mb-2">{t('platinum_plan', 'Platinum Plan')}</h4>
               <p className="text-3xl font-bold text-purple-600 mb-2">
                 {formatPrice(getDiscountedPrice(199))}

@@ -1871,7 +1871,7 @@ const resources = {
       'white_label_options': 'White-label options',
       'custom_development': 'Custom development',
       'start_free': 'Start Free',
-      'choose_plan': 'Choose {{plan}}',
+      'choose_plan': 'Choose Plan',
       'no_credit_card_required': 'No credit card required',
       'per_month': '/mo',
       'per_year': '/yr',

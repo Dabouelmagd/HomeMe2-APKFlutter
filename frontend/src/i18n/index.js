@@ -1246,6 +1246,13 @@ const resources = {
       },
       'community_newsletter': 'Community Newsletter',
       
+      // Newsletter
+      'newsletter.subtitle': 'Stay updated with community news and announcements',
+      'newsletter.search_placeholder': 'Search newsletters...',
+      'newsletter.all_categories': 'All Categories',
+      'newsletter.no_newsletters': 'No newsletters found',
+      'newsletter.no_newsletters_desc': 'Check back later for community updates.',
+      
       // Descriptions
       'guest_management_description': 'Manage guests and visitor requests efficiently',
       'maintenance_system_description': 'Handle maintenance requests and track progress',

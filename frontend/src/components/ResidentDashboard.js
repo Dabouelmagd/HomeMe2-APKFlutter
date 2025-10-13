@@ -325,8 +325,8 @@ const ResidentDashboard = () => {
                 <ChatBubbleLeftEllipsisIcon className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">Send Message</p>
-                <p className="text-sm text-gray-600">Contact management</p>
+                <p className="font-medium text-gray-900">{t('dashboard.send_message')}</p>
+                <p className="text-sm text-gray-600">{t('dashboard.contact_management')}</p>
               </div>
             </div>
           </button>
@@ -337,8 +337,8 @@ const ResidentDashboard = () => {
                 <CurrencyDollarIcon className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">Pay Bills</p>
-                <p className="text-sm text-gray-600">Make payments</p>
+                <p className="font-medium text-gray-900">{t('dashboard.pay_bills')}</p>
+                <p className="text-sm text-gray-600">{t('dashboard.make_payments')}</p>
               </div>
             </div>
           </button>
@@ -352,8 +352,8 @@ const ResidentDashboard = () => {
                 <UsersIcon className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">Family</p>
-                <p className="text-sm text-gray-600">Manage family members</p>
+                <p className="font-medium text-gray-900">{t('dashboard.family')}</p>
+                <p className="text-sm text-gray-600">{t('dashboard.manage_family_members')}</p>
               </div>
             </div>
           </button>

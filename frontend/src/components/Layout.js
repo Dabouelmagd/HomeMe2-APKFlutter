@@ -229,25 +229,25 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         {
           name: t('financial_management'),
-          href: '/finances',
+          href: 'finances',
           icon: CurrencyDollarIcon,
           show: true
         },
         {
           name: t('payment_center'),
-          href: '/payments',
+          href: 'payments',
           icon: CreditCardIcon,
           show: true
         },
         {
           name: t('government_utility_gateway'),
-          href: '/utilities',
+          href: 'utilities',
           icon: BoltIcon,
           show: true
         },
         {
           name: t('pricing_plans'),
-          href: '/pricing',
+          href: 'pricing',
           icon: CurrencyDollarIcon,
           show: true
         }

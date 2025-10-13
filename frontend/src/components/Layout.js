@@ -258,25 +258,25 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         {
           name: t('message_center'),
-          href: '/messages',
+          href: 'messages',
           icon: ChatBubbleLeftEllipsisIcon,
           show: true
         },
         {
           name: t('chat.chats'),
-          href: '/chat',
+          href: 'chat',
           icon: ChatBubbleLeftEllipsisIcon,
           show: true
         },
         {
           name: t('notifications_nav'),
-          href: '/notifications',
+          href: 'notifications',
           icon: BellIcon,
           show: true
         },
         {
           name: t('events_announcements'),
-          href: '/events',
+          href: 'events',
           icon: SpeakerWaveIcon,
           show: true
         }

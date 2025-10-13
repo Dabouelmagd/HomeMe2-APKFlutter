@@ -42,8 +42,10 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* التطبيق الكامل */}
-        <Layout isTrialMode={true} />
+        {/* التطبيق الكامل - Trial Mode */}
+        <div className="trial-dashboard">
+          <ResidentDashboard isTrialMode={true} />
+        </div>
       </div>
     );
   }

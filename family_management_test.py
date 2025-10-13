@@ -486,9 +486,17 @@ class FamilyManagementTestSuite:
             self.log_result("Update Family Member", False, "No admin token available")
             return False
         
+        # Check if we have a test member ID from the add test, or use existing family member
         if not hasattr(self, 'test_member_id'):
-            self.log_result("Update Family Member", False, "No test member ID available (add test must run first)")
-            return False
+            # Try to find an existing family member to update
+            if self.test_family_members and len(self.test_family_members) > 0:
+                self.test_member_id = self.test_family_members[0].get("id")
+                self.log_result("Using Existing Member", True, 
+                              f"✅ USING EXISTING FAMILY MEMBER - ID: {self.test_member_id}")
+            else:
+                self.log_result("Update Family Member", False, 
+                              "No test member ID available and no existing family members found")
+                return False
         
         try:
             headers = self.setup_auth_headers(self.admin_token)

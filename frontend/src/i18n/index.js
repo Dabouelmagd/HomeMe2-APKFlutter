@@ -112,6 +112,33 @@ const resources = {
       'priority_support': 'Priority support',
       'community_plan': 'Community',
       'most_popular': 'Most Popular',
+      
+      // New pricing plans
+      'free_plan': 'Free Plan',
+      'silver_plan': 'Silver Plan',
+      'gold_plan': 'Gold Plan',
+      'platinum_plan': 'Platinum Plan',
+      'free': 'Free',
+      'forever': 'Forever',
+      'up_to_5_units': 'Up to 5 units',
+      'standard_features': 'Standard features',
+      'enhanced_features': 'Enhanced features',
+      'enterprise_features': 'Enterprise features',
+      '51_to_100_units': '51-100 units',
+      '101_to_200_units': '101-200 units',
+      '201_to_500_units': '201-500 units',
+      '501_plus_units': '501+ units',
+      'per_person': 'per person',
+      
+      // Currency and billing
+      'monthly': 'Monthly',
+      'yearly': 'Yearly',
+      'save_10': '10% OFF',
+      'yearly_discount_note': 'Save 10% on your first year with yearly billing!',
+      
+      // Demo section
+      'demo_description': 'Experience all features with our interactive demo - no signup required!',
+      'start_demo_now': 'Start Demo Now',
       'payment_cancelled': 'Payment was cancelled',
       'payment_check_timeout': 'Payment check timed out. Please check your payment history.',
       'payment_expired': 'Payment session expired',

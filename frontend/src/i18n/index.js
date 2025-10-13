@@ -5997,7 +5997,7 @@ const resources = {
       'white_label_options': 'Options marque blanche',
       'custom_development': 'Développement personnalisé',
       'start_free': 'Commencer Gratuitement',
-      'choose_plan': 'Choisir {{plan}}',
+      'choose_plan': 'Choisir le plan',
       'no_credit_card_required': 'Aucune carte de crédit requise',
       'per_month': '/mois',
       'per_year': '/an',

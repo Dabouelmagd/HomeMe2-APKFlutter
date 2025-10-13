@@ -160,25 +160,25 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         {
           name: t('dashboard'),
-          href: '/dashboard',
+          href: 'dashboard',
           icon: HomeIcon,
           show: true
         },
         {
           name: t('compound_management'),
-          href: '/compound',
+          href: 'compound',
           icon: BuildingOfficeIcon,
           show: user?.role === 'admin'
         },
         {
           name: t('residents_list'),
-          href: '/residents',
+          href: 'residents',
           icon: UserGroupIcon,
           show: user?.role === 'admin'
         },
         {
           name: t('user_management'),
-          href: '/users',
+          href: 'users',
           icon: UsersIcon,
           show: user?.role === 'admin'
         }

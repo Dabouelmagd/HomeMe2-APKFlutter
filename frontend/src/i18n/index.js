@@ -852,6 +852,7 @@ const resources = {
       'dashboard.total': 'total',
       'dashboard.messages_sent': 'Messages Sent',
       'dashboard.this_month': 'This month',
+      'dashboard.my_messages': 'My Messages',
       'dashboard.no_family_members': 'No family members found',
       'dashboard.all_payments_up_to_date': 'All payments are up to date!',
       'dashboard.no_messages_sent': 'No messages sent',

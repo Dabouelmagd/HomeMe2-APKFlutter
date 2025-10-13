@@ -1252,6 +1252,15 @@ const resources = {
       'newsletter.all_categories': 'All Categories',
       'newsletter.no_newsletters': 'No newsletters found',
       'newsletter.no_newsletters_desc': 'Check back later for community updates.',
+      'newsletter.category_general': 'General',
+      'newsletter.category_events': 'Events',
+      'newsletter.category_maintenance': 'Maintenance',
+      'newsletter.category_community': 'Community',
+      'newsletter.category_announcements': 'Announcements',
+      'newsletter.category_safety': 'Safety',
+      'newsletter.status_draft': 'Draft',
+      'newsletter.status_published': 'Published',
+      'newsletter.status_archived': 'Archived',
       
       // Descriptions
       'guest_management_description': 'Manage guests and visitor requests efficiently',

@@ -212,13 +212,13 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         {
           name: t('family_management'),
-          href: '/family',
+          href: 'family',
           icon: UsersIcon,
           show: true
         },
         {
           name: t('add_family_member'),
-          href: '/add-family-member',
+          href: 'add-family-member',
           icon: UserPlusIcon,
           show: true
         }

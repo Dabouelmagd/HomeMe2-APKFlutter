@@ -4946,6 +4946,17 @@ const resources = {
       'events_announcements': 'Événements et annonces',
       'advanced_analytics': 'Analyses avancées',
       'document_management': 'Gestion des documents',
+      
+      // Documents
+      'documents.subtitle': 'Organiser et partager les documents du complexe',
+      'documents.create_folder': 'Nouveau dossier',
+      'documents.upload': 'Télécharger un document',
+      'documents.search_placeholder': 'Rechercher des documents...',
+      'documents.category': 'Catégorie',
+      'documents.no_documents': 'Aucun document trouvé',
+      'documents.no_documents_desc': 'Commencez par télécharger un document.',
+      'documents.upload_document': 'Télécharger un document',
+      
       'voting_system': 'Système de vote',
       'smart_home': 'Maison intelligente',
       'government_utility_gateway': 'Passerelle gouvernementale et services',

@@ -140,6 +140,9 @@ const resources = {
       'demo_description': 'Experience all features with our interactive demo - no signup required!',
       'start_demo_now': 'Start Demo Now',
       'back_to_homepage': 'Back to Homepage',
+      
+      // Brand name
+      'homeme_brand': 'HomeMe',
       'payment_cancelled': 'Payment was cancelled',
       'payment_check_timeout': 'Payment check timed out. Please check your payment history.',
       'payment_expired': 'Payment session expired',

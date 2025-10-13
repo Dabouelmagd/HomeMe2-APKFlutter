@@ -139,12 +139,20 @@ const TrialDashboard = () => {
           <p className="mb-6 opacity-90">
             {t('trial_cta_description', 'This is just a preview. Sign up to access all features and manage your real compound data.')}
           </p>
-          <button 
-            onClick={() => window.location.href = '/register'}
-            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-          >
-            {t('sign_up_now', 'Sign Up Now')}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={() => window.location.href = '/register'}
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+            >
+              {t('sign_up_now', 'Sign Up Now')}
+            </button>
+            <button 
+              onClick={exitTrial}
+              className="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors"
+            >
+              {t('back_to_homepage', 'Back to Homepage')}
+            </button>
+          </div>
         </div>
       </div>
     </div>

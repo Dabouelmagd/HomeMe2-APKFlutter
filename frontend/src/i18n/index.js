@@ -2972,6 +2972,7 @@ const resources = {
       'document_management': 'إدارة الوثائق',
       
       // Documents
+      'documents.title': 'إدارة الوثائق',
       'documents.subtitle': 'تنظيم ومشاركة وثائق المجمع',
       'documents.create_folder': 'مجلد جديد',
       'documents.upload': 'رفع وثيقة',

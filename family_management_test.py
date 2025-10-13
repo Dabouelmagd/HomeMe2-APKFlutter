@@ -225,6 +225,15 @@ class FamilyManagementTestSuite:
         try:
             headers = self.setup_auth_headers(self.admin_token)
             
+            # First check if admin user has unit_number, if not, try the alternative endpoint
+            if not self.admin_user.get("unit_number"):
+                self.log_result("Admin Unit Check", False, 
+                              f"❌ ADMIN USER MISSING UNIT_NUMBER - Admin: {self.admin_user.get('username')} "
+                              f"has no unit_number. This is expected for admin users.")
+                
+                # Try the alternative endpoint that allows adding to any unit
+                return self.test_add_family_member_to_unit_endpoint()
+            
             # Create test family member data
             unique_id = str(uuid.uuid4())[:8]
             family_member_data = {

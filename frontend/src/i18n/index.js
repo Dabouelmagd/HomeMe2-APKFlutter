@@ -2220,6 +2220,33 @@ const resources = {
       'priority_support': 'دعم أولوي',
       'community_plan': 'المجتمعات السكنية',
       'most_popular': 'الأكثر شيوعاً',
+      
+      // New pricing plans
+      'free_plan': 'الخطة المجانية',
+      'silver_plan': 'الخطة الفضية',
+      'gold_plan': 'الخطة الذهبية',
+      'platinum_plan': 'الخطة البلاتينية',
+      'free': 'مجاناً',
+      'forever': 'إلى الأبد',
+      'up_to_5_units': 'حتى 5 وحدات',
+      'standard_features': 'الميزات القياسية',
+      'enhanced_features': 'الميزات المحسنة',
+      'enterprise_features': 'ميزات الشركات',
+      '51_to_100_units': '51-100 وحدة',
+      '101_to_200_units': '101-200 وحدة',
+      '201_to_500_units': '201-500 وحدة',
+      '501_plus_units': '501+ وحدة',
+      'per_person': 'للشخص الواحد',
+      
+      // Currency and billing
+      'monthly': 'شهرياً',
+      'yearly': 'سنوياً',
+      'save_10': 'خصم 10%',
+      'yearly_discount_note': 'وفر 10% على السنة الأولى مع الفوترة السنوية!',
+      
+      // Demo section
+      'demo_description': 'جرب جميع الميزات مع العرض التوضيحي التفاعلي - لا يتطلب تسجيل!',
+      'start_demo_now': 'ابدأ العرض الآن',
       'payment_cancelled': 'تم إلغاء الدفع',
       'payment_check_timeout': 'انتهت مهلة فحص الدفع. يرجى مراجعة تاريخ الدفع.',
       'payment_expired': 'انتهت صلاحية جلسة الدفع',

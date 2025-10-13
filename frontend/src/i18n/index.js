@@ -5060,6 +5060,7 @@ const resources = {
       'dashboard.total': 'total',
       'dashboard.messages_sent': 'Messages envoyés',
       'dashboard.this_month': 'Ce mois-ci',
+      'dashboard.my_messages': 'Mes messages',
       'dashboard.no_family_members': 'Aucun membre de la famille trouvé',
       'dashboard.all_payments_up_to_date': 'Tous les paiements sont à jour!',
       'dashboard.no_messages_sent': 'Aucun message envoyé',

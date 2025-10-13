@@ -2252,6 +2252,9 @@ const resources = {
       'demo_description': 'جرب جميع الميزات مع العرض التوضيحي التفاعلي - لا يتطلب تسجيل!',
       'start_demo_now': 'ابدأ العرض الآن',
       'back_to_homepage': 'العودة للصفحة الرئيسية',
+      
+      // Brand name
+      'homeme_brand': 'هوم مي',
       'payment_cancelled': 'تم إلغاء الدفع',
       'payment_check_timeout': 'انتهت مهلة فحص الدفع. يرجى مراجعة تاريخ الدفع.',
       'payment_expired': 'انتهت صلاحية جلسة الدفع',

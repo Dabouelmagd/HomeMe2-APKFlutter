@@ -234,8 +234,8 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Header */}
-      <header className="bg-white shadow-lg">
-        <div className="max-w-6xl mx-auto px-4 py-6">
+      <header className="bg-white shadow-xl">
+        <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-6">
               <img

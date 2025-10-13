@@ -167,7 +167,7 @@ const Newsletter = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 text-center">{t('community_newsletter')}</h1>
-              <p className="text-gray-600 mt-2">Stay updated with community news and announcements</p>
+              <p className="text-gray-600 mt-2">{t('newsletter.subtitle')}</p>
             </div>
             {user?.role === 'admin' && (
               <button
@@ -189,7 +189,7 @@ const Newsletter = () => {
               <MagnifyingGlassIcon className="h-5 w-5 absolute left-3 top-3 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search newsletters..."
+                placeholder={t('newsletter.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -202,7 +202,7 @@ const Newsletter = () => {
               onChange={(e) => setFilterCategory(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">All Categories</option>
+              <option value="">{t('newsletter.all_categories')}</option>
               {categories.map(cat => (
                 <option key={cat.value} value={cat.value}>{cat.label}</option>
               ))}

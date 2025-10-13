@@ -17,26 +17,26 @@ const ContactUs = () => {
       label: t('legal_contact_email'),
       value: 'info@datalifeai.com',
       href: 'mailto:info@datalifeai.com',
-      description: 'Send us an email for general inquiries and support'
+      description: t('legal_contact_email_desc')
     },
     {
       icon: GlobeAltIcon,
-      label: 'Website',
+      label: t('legal_contact_website'),
       value: 'www.homemeapp.net',
       href: 'https://www.homemeapp.net',
-      description: 'Visit our official website for more information'
+      description: t('legal_contact_website_desc')
     },
     {
       icon: MapPinIcon,
       label: t('legal_contact_address'),
       value: t('legal_contact_addressValue'),
-      description: 'Our office location'
+      description: t('legal_contact_address_desc')
     },
     {
       icon: ChatBubbleLeftRightIcon,
-      label: 'Support',
-      value: 'In-app support',
-      description: 'Use our messaging system for quick support'
+      label: t('legal_contact_support'),
+      value: t('legal_contact_support_method'),
+      description: t('legal_contact_support_desc')
     }
   ];
 

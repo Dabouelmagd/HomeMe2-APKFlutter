@@ -826,6 +826,17 @@ const resources = {
       'events_announcements': 'Events & Announcements',
       'advanced_analytics': 'Advanced Analytics',
       'document_management': 'Document Management',
+      
+      // Documents
+      'documents.subtitle': 'Organize and share compound documents',
+      'documents.create_folder': 'New Folder',
+      'documents.upload': 'Upload Document',
+      'documents.search_placeholder': 'Search documents...',
+      'documents.category': 'Category',
+      'documents.no_documents': 'No documents found',
+      'documents.no_documents_desc': 'Get started by uploading a document.',
+      'documents.upload_document': 'Upload Document',
+      
       'voting_system': 'Voting System',
       'smart_home': 'Smart Home',
       'government_utility_gateway': 'Government & Utility Gateway',

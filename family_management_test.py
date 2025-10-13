@@ -40,7 +40,7 @@ from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional
 
 # Configuration - Using the production URL from frontend/.env
-BASE_URL = "https://homeme-subscriptions.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-container-fix.preview.emergentagent.com/api"
 
 class FamilyManagementTestSuite:
     def __init__(self):

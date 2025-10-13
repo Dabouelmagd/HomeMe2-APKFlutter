@@ -828,6 +828,7 @@ const resources = {
       'document_management': 'Document Management',
       
       // Documents
+      'documents.title': 'Document Management',
       'documents.subtitle': 'Organize and share compound documents',
       'documents.create_folder': 'New Folder',
       'documents.upload': 'Upload Document',

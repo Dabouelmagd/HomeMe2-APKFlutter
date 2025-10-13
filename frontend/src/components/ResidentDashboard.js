@@ -309,7 +309,7 @@ const ResidentDashboard = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">No messages sent</p>
+              <p className="text-gray-500 text-center py-4">{t('dashboard.no_messages_sent')}</p>
             )}
           </div>
         </div>
@@ -317,7 +317,7 @@ const ResidentDashboard = () => {
 
       {/* Quick Actions */}
       <div className="mt-8">
-        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4 text-center">Quick Actions</h3>
+        <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-4 text-center">{t('dashboard.quick_actions')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow text-left">
             <div className="flex items-center space-x-3">

@@ -166,6 +166,18 @@ const HomePage = () => {
     navigate('/register');
   };
 
+  const formatPrice = (usdPrice) => {
+    if (currency === 'EGP') {
+      const egpPrice = usdPrice * 50; // تحويل تقريبي للجنيه المصري
+      return `${egpPrice} ج.م`;
+    }
+    return `$${usdPrice}`;
+  };
+
+  const getDiscountedPrice = (price) => {
+    return isYearly ? Math.round(price * 0.9) : price; // خصم 10% للسنة
+  };
+
   if (isTrial) {
     // إظهار النسخة التجريبية للتطبيق
     return (

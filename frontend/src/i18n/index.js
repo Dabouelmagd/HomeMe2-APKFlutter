@@ -3430,6 +3430,13 @@ const resources = {
       },
       'community_newsletter': 'النشرة الإخبارية للمجتمع',
       
+      // Newsletter
+      'newsletter.subtitle': 'ابق على اطلاع بأخبار وإعلانات المجتمع',
+      'newsletter.search_placeholder': 'البحث عن نشرات إخبارية...',
+      'newsletter.all_categories': 'جميع الفئات',
+      'newsletter.no_newsletters': 'لم يتم العثور على نشرات إخبارية',
+      'newsletter.no_newsletters_desc': 'تحقق لاحقاً للحصول على تحديثات المجتمع.',
+      
       // Descriptions
       'guest_management_description': 'إدارة الضيوف وطلبات الزيارة بكفاءة',
       'maintenance_system_description': 'التعامل مع طلبات الصيانة وتتبع التقدم',

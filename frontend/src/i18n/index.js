@@ -3445,6 +3445,15 @@ const resources = {
       'newsletter.all_categories': 'جميع الفئات',
       'newsletter.no_newsletters': 'لم يتم العثور على نشرات إخبارية',
       'newsletter.no_newsletters_desc': 'تحقق لاحقاً للحصول على تحديثات المجتمع.',
+      'newsletter.category_general': 'عام',
+      'newsletter.category_events': 'الفعاليات',
+      'newsletter.category_maintenance': 'الصيانة',
+      'newsletter.category_community': 'المجتمع',
+      'newsletter.category_announcements': 'الإعلانات',
+      'newsletter.category_safety': 'السلامة',
+      'newsletter.status_draft': 'مسودة',
+      'newsletter.status_published': 'منشور',
+      'newsletter.status_archived': 'مؤرشف',
       
       // Descriptions
       'guest_management_description': 'إدارة الضيوف وطلبات الزيارة بكفاءة',

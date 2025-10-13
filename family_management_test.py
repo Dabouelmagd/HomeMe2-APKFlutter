@@ -422,6 +422,7 @@ class FamilyManagementTestSuite:
                     
                     # Store the created member ID for update/delete tests
                     self.test_member_id = created_member["id"]
+                    self.created_test_member = True  # Flag to indicate we created this member
                     
                     self.log_result("Add Family Member to Unit", True, 
                                   f"✅ FAMILY MEMBER ADDED TO UNIT SUCCESSFULLY - Name: {form_data['full_name']}, "

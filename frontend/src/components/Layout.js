@@ -189,19 +189,19 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         {
           name: t('services_management'),
-          href: '/services',
+          href: 'services',
           icon: WrenchScrewdriverIcon,
           show: true
         },
         {
           name: t('maintenance_system'),
-          href: '/maintenance',
+          href: 'maintenance',
           icon: CogIcon,
           show: true
         },
         {
           name: t('guest_management'),
-          href: '/guests',
+          href: 'guests',
           icon: UsersIcon,
           show: true
         }

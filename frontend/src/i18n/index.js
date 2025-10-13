@@ -2963,6 +2963,17 @@ const resources = {
       'events_announcements': 'الأحداث والإعلانات',
       'advanced_analytics': 'التحليلات المتقدمة',
       'document_management': 'إدارة الوثائق',
+      
+      // Documents
+      'documents.subtitle': 'تنظيم ومشاركة وثائق المجمع',
+      'documents.create_folder': 'مجلد جديد',
+      'documents.upload': 'رفع وثيقة',
+      'documents.search_placeholder': 'البحث عن وثائق...',
+      'documents.category': 'الفئة',
+      'documents.no_documents': 'لم يتم العثور على وثائق',
+      'documents.no_documents_desc': 'ابدأ برفع وثيقة.',
+      'documents.upload_document': 'رفع وثيقة',
+      
       'voting_system': 'نظام التصويت',
       'smart_home': 'المنزل الذكي',
       'government_utility_gateway': 'بوابة الحكومة والمرافق',

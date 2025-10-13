@@ -621,8 +621,10 @@ class FamilyManagementTestSuite:
             self.log_result("Delete Family Member", False, "No admin token available")
             return False
         
-        if not hasattr(self, 'test_member_id'):
-            self.log_result("Delete Family Member", False, "No test member ID available (add test must run first)")
+        # Only delete if we created a test member, not existing ones
+        if not hasattr(self, 'test_member_id') or not hasattr(self, 'created_test_member'):
+            self.log_result("Delete Family Member", False, 
+                          "No test member to delete (will not delete existing family members)")
             return False
         
         try:

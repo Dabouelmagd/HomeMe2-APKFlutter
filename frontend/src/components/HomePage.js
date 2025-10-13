@@ -222,7 +222,7 @@ const HomePage = () => {
 
         {/* التطبيق الكامل - Trial Mode */}
         <div className="trial-dashboard">
-          <TrialDashboard />
+          <TrialDashboard exitTrial={exitTrial} />
         </div>
       </div>
     );

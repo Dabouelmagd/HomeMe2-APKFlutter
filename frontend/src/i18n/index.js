@@ -4962,6 +4962,7 @@ const resources = {
       'document_management': 'Gestion des documents',
       
       // Documents
+      'documents.title': 'Gestion des documents',
       'documents.subtitle': 'Organiser et partager les documents du complexe',
       'documents.create_folder': 'Nouveau dossier',
       'documents.upload': 'Télécharger un document',

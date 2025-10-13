@@ -155,6 +155,8 @@ const HomePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isTrial, setIsTrial] = useState(false);
+  const [currency, setCurrency] = useState('USD'); // USD or EGP
+  const [isYearly, setIsYearly] = useState(false);
 
   const startTrial = () => {
     setIsTrial(true);

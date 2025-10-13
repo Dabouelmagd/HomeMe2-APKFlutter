@@ -368,7 +368,7 @@ const HomePage = () => {
           
           <div className="flex flex-wrap gap-4 justify-center">
             {/* Free Plan */}
-            <div className="border-2 border-green-200 rounded-lg p-4 bg-green-50">
+            <div className="border-2 border-green-200 rounded-lg p-4 bg-green-50 w-64 min-w-48">
               <h4 className="font-semibold text-lg mb-2">{t('free_plan', 'Free Plan')}</h4>
               <p className="text-3xl font-bold text-green-600 mb-2">{t('free', 'Free')}</p>
               <p className="text-sm text-gray-600 mb-4">{t('forever', 'Forever')}</p>

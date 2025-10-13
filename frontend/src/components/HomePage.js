@@ -190,6 +190,12 @@ const HomePage = () => {
         <div className="bg-yellow-100 border-b-2 border-yellow-300 p-3 text-center">
           <div className="flex justify-between items-center max-w-6xl mx-auto">
             <div className="flex items-center space-x-4">
+              <button
+                onClick={exitTrial}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-md text-sm font-medium transition-colors flex items-center gap-2"
+              >
+                ← {t('back_to_homepage', 'Back to Homepage')}
+              </button>
               <span className="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                 {t('trial_mode', 'Trial Mode')}
               </span>

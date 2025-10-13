@@ -365,7 +365,7 @@ const ResidentDashboard = () => {
               </div>
               <div>
                 <p className="font-medium text-gray-900">{t('notifications')}</p>
-                <p className="text-sm text-gray-600">View all updates</p>
+                <p className="text-sm text-gray-600">{t('dashboard.view_all_updates')}</p>
               </div>
             </div>
           </button>

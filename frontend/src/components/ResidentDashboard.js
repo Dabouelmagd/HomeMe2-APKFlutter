@@ -343,7 +343,10 @@ const ResidentDashboard = () => {
             </div>
           </button>
 
-          <button className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow text-left">
+          <button 
+            onClick={() => navigate('/app/family')}
+            className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow text-left"
+          >
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <UsersIcon className="h-5 w-5 text-blue-600" />

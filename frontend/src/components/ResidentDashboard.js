@@ -223,7 +223,7 @@ const ResidentDashboard = () => {
             ) : (
               <div className="text-center py-8">
                 <CheckCircleIcon className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                <p className="text-gray-500">All payments are up to date!</p>
+                <p className="text-gray-500">{t('dashboard.all_payments_up_to_date')}</p>
               </div>
             )}
           </div>

@@ -992,11 +992,10 @@ const HomePage = () => {
             <p className="text-center">&copy; 2025 HomeMe. {t('all_rights_reserved', 'All rights reserved.')}</p>
             <div className="flex items-center gap-3">
               <span className="text-gray-400">|</span>
-              <span className="text-sm text-gray-400">{t('powered_by', 'Powered by')}</span>
               <img 
-                src={i18n.language === 'ar' ? '/images/datalife-logo-ar.jpg' : '/images/datalife-logo-en.jpg'}
-                alt="Data Life Logo"
-                className="h-16 w-auto md:h-20"
+                src={i18n.language === 'ar' ? '/images/homeme-logo-ar.jpg' : 'https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg'}
+                alt="HomeMe Logo"
+                className="h-20 w-auto md:h-24"
               />
             </div>
           </div>

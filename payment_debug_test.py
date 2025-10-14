@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, date
 from typing import Dict, List, Optional
 
 # Configuration
-BASE_URL = "https://residence-central.preview.emergentagent.com/api"
+BASE_URL = "https://dwelling-hub-1.preview.emergentagent.com/api"
 
 class PaymentDebugTestSuite:
     def __init__(self):

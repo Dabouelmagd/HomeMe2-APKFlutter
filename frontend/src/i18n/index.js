@@ -2319,7 +2319,7 @@ const resources = {
       
       // New pricing plans
       'free_plan': 'الخطة المجانية',
-      'silver_plan': 'الخطة الفضية',
+      'professional_plan': 'الخطة المهنية',
       'gold_plan': 'الخطة الذهبية',
       'platinum_plan': 'الخطة البلاتينية',
       'free': 'مجاناً',

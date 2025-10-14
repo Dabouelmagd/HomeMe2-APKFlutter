@@ -926,16 +926,19 @@ const HomePage = () => {
                   </tr>
                   <tr className="hover:bg-gray-50">
                     <td className="py-3 px-4 text-gray-700 font-medium">{t('service_messaging', 'الرسائل والإشعارات')}</td>
-                    <td className="text-center py-3 px-3">
+                    <td className="text-center py-3 px-2">
                       <span className="text-red-500 text-2xl">✗</span>
                     </td>
-                    <td className="text-center py-3 px-3">
+                    <td className="text-center py-3 px-2">
                       <span className="text-red-500 text-2xl">✗</span>
                     </td>
-                    <td className="text-center py-3 px-3">
+                    <td className="text-center py-3 px-2">
                       <span className="text-green-500 text-2xl">✓</span>
                     </td>
-                    <td className="text-center py-3 px-3">
+                    <td className="text-center py-3 px-2">
+                      <span className="text-green-500 text-2xl">✓</span>
+                    </td>
+                    <td className="text-center py-3 px-2">
                       <span className="text-green-500 text-2xl">✓</span>
                     </td>
                   </tr>

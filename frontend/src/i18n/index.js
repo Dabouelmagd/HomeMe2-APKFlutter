@@ -4872,6 +4872,7 @@ const resources = {
       // Homepage translations
       'login': 'Connexion',
       'register_now': 'Inscrivez-vous Maintenant',
+      'homeme_brand': 'HomeMe',
       'welcome_to_homeme': 'Bienvenue à HomeMe',
       'homeme_description': 'La solution complète pour la gestion des résidences. Gérez les résidents, les services, les services publics et plus encore avec notre plateforme avancée.',
       'try_free_demo': 'Essayer la Démo Gratuite',

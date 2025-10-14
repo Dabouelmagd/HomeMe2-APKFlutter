@@ -50,6 +50,8 @@ const resources = {
       'payment_status_check_failed': 'Failed to check payment status',
       
       // Homepage translations
+      'login': 'Login',
+      'register_now': 'Register Now',
       'welcome_to_homeme': 'Welcome to HomeMe',
       'homeme_description': 'The complete solution for residential compound management. Manage residents, services, utilities, and more with our advanced platform.',
       'try_free_demo': 'Try Free Demo',

@@ -130,6 +130,18 @@ const resources = {
       'dedicated_support': 'Dedicated support',
       'full_api_access': 'Full API access',
       'most_popular': 'Most Popular',
+      'multi_compound_plan': 'Multi-Compound Plan',
+      'person_month': 'person/month',
+      'best_value': 'Best Value',
+      'unlimited_compounds': 'Unlimited compounds',
+      'pay_per_person': 'Pay per person only',
+      'centralized_management': 'Centralized management',
+      'for_small_compounds': 'For small compounds',
+      'for_growing_compounds': 'For growing compounds',
+      'for_medium_compounds': 'For medium compounds',
+      'for_large_compounds': 'For large organizations',
+      'for_multiple_compounds': 'For multiple compounds',
+      'month': 'month',
       
       // New pricing plans
       'free_plan': 'Free Plan',

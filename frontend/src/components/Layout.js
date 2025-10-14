@@ -663,9 +663,9 @@ const Layout = ({ children, isTrialMode = false }) => {
                   <span className="text-gray-400">|</span>
                   <span className="text-gray-500">{t('powered_by', 'Powered by')}</span>
                   <img 
-                    src="https://ocr.dev.spl.so/images/4297568324737076480/2191758441455522816.png" 
+                    src={i18n.language === 'ar' ? '/images/datalife-logo-ar.svg' : '/images/datalife-logo-en.svg'}
                     alt="Data Life Logo"
-                    className="h-6 w-auto"
+                    className="h-8 w-auto"
                   />
                 </div>
               </div>

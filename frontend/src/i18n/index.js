@@ -106,6 +106,7 @@ const resources = {
       'pro_plan': 'Pro Plan',
       'enterprise_plan': 'Enterprise',
       'all_rights_reserved': 'All rights reserved.',
+      'powered_by': 'Powered by',
       
       // Trial Dashboard
       'welcome_home': 'Welcome home,',

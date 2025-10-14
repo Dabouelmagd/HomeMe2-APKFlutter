@@ -873,7 +873,7 @@ const HomePage = () => {
                   <tr className="hover:bg-gray-50">
                     <td className="py-3 px-4 text-gray-700 font-medium">{t('service_booking', 'حجز الخدمات')}</td>
                     <td className="text-center py-3 px-2">
-                      <span className="text-xs text-yellow-600 font-semibold">2 حجز</span>
+                      <span className="text-xs text-yellow-600 font-semibold">{t('bookings_2', '2 حجز')}</span>
                     </td>
                     <td className="text-center py-3 px-2">
                       <span className="text-green-500 text-2xl">✓</span>

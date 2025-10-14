@@ -653,6 +653,24 @@ const Layout = ({ children, isTrialMode = false }) => {
         {/* Page content */}
         <main className="flex-1 overflow-y-auto">
           {children || <Outlet />}
+          
+          {/* Footer */}
+          <footer className="bg-gray-50 border-t border-gray-200 py-4 mt-8">
+            <div className="max-w-7xl mx-auto px-4">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-3 text-sm text-gray-600">
+                <p className="text-center">&copy; 2025 HomeMe. {t('all_rights_reserved', 'All rights reserved.')}</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-400">|</span>
+                  <span className="text-gray-500">{t('powered_by', 'Powered by')}</span>
+                  <img 
+                    src="https://ocr.dev.spl.so/images/4297568324737076480/2191758441455522816.png" 
+                    alt="Data Life Logo"
+                    className="h-6 w-auto"
+                  />
+                </div>
+              </div>
+            </div>
+          </footer>
         </main>
       </div>
     </div>

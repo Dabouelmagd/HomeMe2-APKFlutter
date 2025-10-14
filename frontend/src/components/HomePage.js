@@ -970,7 +970,7 @@ const HomePage = () => {
               <img 
                 src={i18n.language === 'ar' ? '/images/datalife-logo-ar.jpg' : '/images/datalife-logo-en.jpg'}
                 alt="Data Life Logo"
-                className="h-12 w-auto"
+                className="h-16 w-auto md:h-20"
               />
             </div>
           </div>

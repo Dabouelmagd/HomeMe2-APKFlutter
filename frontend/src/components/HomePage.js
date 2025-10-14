@@ -392,108 +392,219 @@ const HomePage = () => {
             </div>
           </div>
           
-          <div className="space-y-6">
-            {/* First Row - Main Plans */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {/* Free/Community Plan */}
-              <div className="border-2 border-green-200 rounded-lg p-4 bg-green-50">
-              <h4 className="font-semibold text-lg mb-2">{t('community_plan', 'Community Plan')}</h4>
-              <p className="text-3xl font-bold text-green-600 mb-2">{t('free', 'Free')}</p>
-              <p className="text-sm text-gray-600 mb-4">{t('forever', 'Forever')}</p>
-              <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('up_to_5_residents', 'Up to 5 residents')}</li>
-                <li>• {t('two_bookings_per_person', '2 bookings per person')}</li>
-                <li>• {t('storage_500mb', '500 MB storage')}</li>
-                <li>• {t('basic_features', 'Basic features')}</li>
-              </ul>
-              <button
-                onClick={handleSubscribe}
-                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors"
-              >
-                {t('get_started', 'Get Started')}
-              </button>
-            </div>
+          <div className="space-y-8">
+            {/* Plans Grid - Classic Design */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              
+              {/* Community Plan - Free */}
+              <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border-2 border-green-500">
+                <div className="bg-gradient-to-br from-green-500 to-green-600 px-6 py-8 text-white">
+                  <h3 className="text-2xl font-bold mb-2">{t('community_plan', 'Community')}</h3>
+                  <div className="flex items-baseline">
+                    <span className="text-5xl font-extrabold">{t('free', 'Free')}</span>
+                  </div>
+                  <p className="text-green-100 mt-2">{t('forever', 'Forever')}</p>
+                </div>
+                
+                <div className="p-6">
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('up_to_5_residents', 'Up to 5 residents')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('two_bookings_per_person', '2 bookings per person')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('storage_500mb', '500 MB storage')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('basic_features', 'Basic features')}</span>
+                    </li>
+                  </ul>
+                  
+                  <button
+                    onClick={handleSubscribe}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md"
+                  >
+                    {t('get_started', 'Get Started')}
+                  </button>
+                </div>
+              </div>
 
               {/* Basic Plan */}
-              <div className="border-2 border-blue-200 rounded-lg p-4">
-              <h4 className="font-semibold text-lg mb-2">{t('basic_plan', 'Basic Plan')}</h4>
-              <p className="text-3xl font-bold text-blue-600 mb-2">
-                {formatPrice(getDiscountedPrice(12))}
-                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(12)}</span>}
-              </p>
-              <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
-              <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('up_to_100_residents', 'Up to 100 residents')}</li>
-                <li>• {t('unlimited_services', 'Unlimited services')}</li>
-                <li>• {t('free_advanced_messaging', 'Free & advanced messaging')}</li>
-                <li>• {t('family_management_photos', 'Family management with photos')}</li>
-                <li>• {t('storage_5gb', '5 GB storage')}</li>
-                <li>• {t('priority_support', 'Priority support')}</li>
-                <li>• {t('custom_branding', 'Custom branding')}</li>
-                <li>• {t('advanced_reporting', 'Advanced reporting')}</li>
-              </ul>
-              <button
-                onClick={handleSubscribe}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-              >
-                {t('choose_plan', 'Choose Plan')}
-              </button>
-            </div>
+              <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border-2 border-blue-500">
+                <div className="bg-gradient-to-br from-blue-500 to-blue-600 px-6 py-8 text-white">
+                  <h3 className="text-2xl font-bold mb-2">{t('basic_plan', 'Basic')}</h3>
+                  <div className="flex items-baseline">
+                    <span className="text-5xl font-extrabold">{formatPrice(getDiscountedPrice(12))}</span>
+                    <span className="text-xl ml-2">{currency === 'USD' ? '/mo' : t('per_month', '/month')}</span>
+                  </div>
+                  {isYearly && (
+                    <p className="text-blue-100 mt-2">
+                      <span className="line-through">{formatPrice(12)}</span>
+                      <span className="ml-2 bg-blue-400 px-2 py-1 rounded text-xs">{t('save_10', '10% OFF')}</span>
+                    </p>
+                  )}
+                </div>
+                
+                <div className="p-6">
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('up_to_100_residents', 'Up to 100 residents')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('unlimited_services', 'Unlimited services')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('storage_5gb', '5 GB storage')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('priority_support', 'Priority support')}</span>
+                    </li>
+                  </ul>
+                  
+                  <button
+                    onClick={handleSubscribe}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md"
+                  >
+                    {t('choose_plan', 'Choose Plan')}
+                  </button>
+                </div>
+              </div>
 
-              {/* Professional Plan (formerly Silver) */}
-              <div className="border-2 border-gray-300 rounded-lg p-4 bg-gray-50">
-              <h4 className="font-semibold text-lg mb-2">{t('professional_plan', 'Professional Plan')}</h4>
-              <p className="text-3xl font-bold text-gray-600 mb-2">
-                {formatPrice(getDiscountedPrice(40))}
-                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(40)}</span>}
-              </p>
-              <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
-              <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('up_to_500_residents', 'Up to 500 residents')}</li>
-                <li>• {t('unlimited_services', 'Unlimited services')}</li>
-                <li>• {t('free_advanced_messaging', 'Free & advanced messaging')}</li>
-                <li>• {t('family_management_photos', 'Family management with photos')}</li>
-                <li>• {t('storage_50gb', '50 GB storage')}</li>
-                <li>• {t('priority_support', 'Priority support')}</li>
-                <li>• {t('custom_branding', 'Custom branding')}</li>
-                <li>• {t('advanced_analytics', 'Advanced Analytics')}</li>
-              </ul>
-              <button
-                onClick={handleSubscribe}
-                className="w-full bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 transition-colors"
-              >
-                {t('choose_plan', 'Choose Plan')}
-              </button>
-            </div>
-
-              {/* Gold Plan - Removed */}
+              {/* Professional Plan */}
+              <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border-2 border-purple-500 transform scale-105">
+                <div className="absolute top-0 right-0 bg-yellow-400 text-gray-900 px-4 py-1 text-sm font-semibold rounded-bl-lg">
+                  {t('most_popular', 'Popular')}
+                </div>
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 px-6 py-8 text-white">
+                  <h3 className="text-2xl font-bold mb-2">{t('professional_plan', 'Professional')}</h3>
+                  <div className="flex items-baseline">
+                    <span className="text-5xl font-extrabold">{formatPrice(getDiscountedPrice(40))}</span>
+                    <span className="text-xl ml-2">{currency === 'USD' ? '/mo' : t('per_month', '/month')}</span>
+                  </div>
+                  {isYearly && (
+                    <p className="text-purple-100 mt-2">
+                      <span className="line-through">{formatPrice(40)}</span>
+                      <span className="ml-2 bg-purple-400 px-2 py-1 rounded text-xs">{t('save_10', '10% OFF')}</span>
+                    </p>
+                  )}
+                </div>
+                
+                <div className="p-6">
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-purple-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('up_to_500_residents', 'Up to 500 residents')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-purple-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('unlimited_services', 'Unlimited services')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-purple-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('storage_50gb', '50 GB storage')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-purple-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('advanced_analytics', 'Advanced Analytics')}</span>
+                    </li>
+                  </ul>
+                  
+                  <button
+                    onClick={handleSubscribe}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md"
+                  >
+                    {t('choose_plan', 'Choose Plan')}
+                  </button>
+                </div>
+              </div>
 
               {/* Enterprise Plan */}
-              <div className="border-2 border-orange-300 rounded-lg p-4 bg-orange-50">
-              <h4 className="font-semibold text-lg mb-2">{t('enterprise_plan', 'Enterprise')}</h4>
-              <p className="text-3xl font-bold text-orange-600 mb-2">
-                {formatPrice(getDiscountedPrice(70))}
-                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(70)}</span>}
-              </p>
-              <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
-              <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('unlimited_residents', 'Unlimited residents')}</li>
-                <li>• {t('unlimited_services', 'Unlimited services')}</li>
-                <li>• {t('free_advanced_messaging', 'Free & advanced messaging')}</li>
-                <li>• {t('family_management_photos', 'Family management with photos')}</li>
-                <li>• {t('unlimited_storage', 'Unlimited storage')}</li>
-                <li>• {t('dedicated_support', 'Dedicated support')}</li>
-                <li>• {t('custom_branding', 'Custom branding')}</li>
-                <li>• {t('advanced_analytics', 'Advanced Analytics')}</li>
-                <li>• {t('full_api_access', 'Full API access')}</li>
-              </ul>
-              <button
-                onClick={handleSubscribe}
-                className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-colors"
-              >
-                {t('choose_plan', 'Choose Plan')}
-              </button>
-            </div>
+              <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border-2 border-orange-500">
+                <div className="bg-gradient-to-br from-orange-500 to-orange-600 px-6 py-8 text-white">
+                  <h3 className="text-2xl font-bold mb-2">{t('enterprise_plan', 'Enterprise')}</h3>
+                  <div className="flex items-baseline">
+                    <span className="text-5xl font-extrabold">{formatPrice(getDiscountedPrice(70))}</span>
+                    <span className="text-xl ml-2">{currency === 'USD' ? '/mo' : t('per_month', '/month')}</span>
+                  </div>
+                  {isYearly && (
+                    <p className="text-orange-100 mt-2">
+                      <span className="line-through">{formatPrice(70)}</span>
+                      <span className="ml-2 bg-orange-400 px-2 py-1 rounded text-xs">{t('save_10', '10% OFF')}</span>
+                    </p>
+                  )}
+                </div>
+                
+                <div className="p-6">
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-orange-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('unlimited_residents', 'Unlimited residents')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-orange-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('unlimited_storage', 'Unlimited storage')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-orange-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('dedicated_support', 'Dedicated support')}</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="w-5 h-5 text-orange-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                      </svg>
+                      <span className="text-gray-700">{t('full_api_access', 'Full API access')}</span>
+                    </li>
+                  </ul>
+                  
+                  <button
+                    onClick={handleSubscribe}
+                    className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-md"
+                  >
+                    {t('choose_plan', 'Choose Plan')}
+                  </button>
+                </div>
+              </div>
+
             </div>
           </div>
 

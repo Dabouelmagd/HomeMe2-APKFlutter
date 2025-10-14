@@ -4619,6 +4619,11 @@ const resources = {
       'unlimited_compounds': 'Complexes Illimités',
       'pay_per_person': 'Payer par personne uniquement',
       'centralized_management': 'Gestion Centralisée',
+      'services_comparison': 'Comparaison des Services par Plan',
+      'service': 'Service',
+      'multi_compound': 'Communautés',
+      'multiple_compounds_support': 'Support Multi-Complexes',
+      'person_month': 'personne/mois',
       
       'choose_your_plan': 'Choisissez Votre Plan',
       'pricing_intro': 'Commencez avec notre essai gratuit ou choisissez un plan d\'abonnement adapté à votre résidence',

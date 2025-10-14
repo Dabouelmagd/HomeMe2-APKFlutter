@@ -908,16 +908,19 @@ const HomePage = () => {
                   </tr>
                   <tr className="hover:bg-gray-50">
                     <td className="py-3 px-4 text-gray-700 font-medium">{t('service_document_management', 'إدارة المستندات')}</td>
-                    <td className="text-center py-3 px-3">
+                    <td className="text-center py-3 px-2">
                       <span className="text-xs text-blue-600 font-semibold">500MB</span>
                     </td>
-                    <td className="text-center py-3 px-3">
+                    <td className="text-center py-3 px-2">
                       <span className="text-xs text-blue-600 font-semibold">5GB</span>
                     </td>
-                    <td className="text-center py-3 px-3">
+                    <td className="text-center py-3 px-2">
                       <span className="text-xs text-blue-600 font-semibold">50GB</span>
                     </td>
-                    <td className="text-center py-3 px-3">
+                    <td className="text-center py-3 px-2">
+                      <span className="text-green-500 text-2xl">∞</span>
+                    </td>
+                    <td className="text-center py-3 px-2">
                       <span className="text-green-500 text-2xl">∞</span>
                     </td>
                   </tr>

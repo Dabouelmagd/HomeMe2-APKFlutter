@@ -970,7 +970,8 @@ const HomePage = () => {
               <img 
                 src={i18n.language === 'ar' ? '/images/datalife-logo-ar.svg' : '/images/datalife-logo-en.svg'}
                 alt="Data Life Logo"
-                className="h-10 w-auto"
+                className="h-12 w-auto"
+                style={{minWidth: '180px'}}
               />
             </div>
           </div>

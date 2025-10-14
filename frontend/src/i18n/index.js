@@ -4572,6 +4572,28 @@ const resources = {
       'service_providers_appear': 'Les prestataires de services apparaîtront ici une fois ajoutés',
       'book_services_multiple_payment': 'Réservez des services avec plusieurs options de paiement et niveaux de priorité',
       
+      // Services Section
+      'our_services': 'Nos Services',
+      'services_intro': 'Tout ce dont vous avez besoin pour gérer votre résidence efficacement',
+      'service_family_management': 'Gestion des Familles',
+      'service_family_management_desc': 'Gérer les membres de la famille, les relations et les profils',
+      'service_guest_management': 'Gestion des Invités',
+      'service_guest_management_desc': 'Contrôler l\'accès des visiteurs et suivre les demandes',
+      'service_booking': 'Réservation de Services',
+      'service_booking_desc': 'Réserver facilement les services de maintenance et communautaires',
+      'service_utility_bills': 'Factures de Services Publics',
+      'service_utility_bills_desc': 'Gérer et payer toutes les factures en un seul endroit',
+      'service_document_management': 'Gestion des Documents',
+      'service_document_management_desc': 'Stocker et organiser tous les documents de la résidence',
+      'service_messaging': 'Messages et Notifications',
+      'service_messaging_desc': 'Communication en temps réel avec les résidents et la gestion',
+      'service_analytics': 'Rapports et Analyses',
+      'service_analytics_desc': 'Informations détaillées et rapports de performance',
+      'service_maintenance': 'Gestion de la Maintenance',
+      'service_maintenance_desc': 'Suivre et gérer toutes les demandes de maintenance',
+      'choose_your_plan': 'Choisissez Votre Plan',
+      'pricing_intro': 'Commencez avec notre essai gratuit ou choisissez un plan d\'abonnement adapté à votre résidence',
+      
       // Service Names  
       'plumbing_services': 'Services de Plomberie',
       'electrical_services': 'Services Électriques',

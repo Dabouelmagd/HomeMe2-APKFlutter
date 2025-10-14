@@ -1,11 +1,22 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import io from 'socket.io-client';
 import './App.css';
 import './styles/mobile.css';
 import './i18n'; // Initialize i18n
+
+// Scroll to top component
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  
+  return null;
+}
 
 // Components
 import Login from './components/Login';

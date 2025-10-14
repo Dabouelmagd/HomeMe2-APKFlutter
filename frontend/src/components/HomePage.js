@@ -395,13 +395,15 @@ const HomePage = () => {
           <div className="space-y-6">
             {/* First Row - Main Plans */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {/* Free Plan */}
+              {/* Free/Community Plan */}
               <div className="border-2 border-green-200 rounded-lg p-4 bg-green-50">
-              <h4 className="font-semibold text-lg mb-2">{t('free_plan', 'Free Plan')}</h4>
+              <h4 className="font-semibold text-lg mb-2">{t('community_plan', 'Community Plan')}</h4>
               <p className="text-3xl font-bold text-green-600 mb-2">{t('free', 'Free')}</p>
               <p className="text-sm text-gray-600 mb-4">{t('forever', 'Forever')}</p>
               <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('up_to_5_units', 'Up to 5 units')}</li>
+                <li>• {t('up_to_5_residents', 'Up to 5 residents')}</li>
+                <li>• {t('two_bookings_per_person', '2 bookings per person')}</li>
+                <li>• {t('storage_500mb', '500 MB storage')}</li>
                 <li>• {t('basic_features', 'Basic features')}</li>
               </ul>
               <button
@@ -416,13 +418,19 @@ const HomePage = () => {
               <div className="border-2 border-blue-200 rounded-lg p-4">
               <h4 className="font-semibold text-lg mb-2">{t('basic_plan', 'Basic Plan')}</h4>
               <p className="text-3xl font-bold text-blue-600 mb-2">
-                {formatPrice(getDiscountedPrice(20))}
-                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(20)}</span>}
+                {formatPrice(getDiscountedPrice(12))}
+                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(12)}</span>}
               </p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
               <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('up_to_50_units', 'Up to 50 units')}</li>
-                <li>• {t('standard_features', 'Standard features')}</li>
+                <li>• {t('up_to_100_residents', 'Up to 100 residents')}</li>
+                <li>• {t('unlimited_services', 'Unlimited services')}</li>
+                <li>• {t('free_advanced_messaging', 'Free & advanced messaging')}</li>
+                <li>• {t('family_management_photos', 'Family management with photos')}</li>
+                <li>• {t('storage_5gb', '5 GB storage')}</li>
+                <li>• {t('priority_support', 'Priority support')}</li>
+                <li>• {t('custom_branding', 'Custom branding')}</li>
+                <li>• {t('advanced_reporting', 'Advanced reporting')}</li>
               </ul>
               <button
                 onClick={handleSubscribe}
@@ -436,13 +444,19 @@ const HomePage = () => {
               <div className="border-2 border-gray-300 rounded-lg p-4 bg-gray-50">
               <h4 className="font-semibold text-lg mb-2">{t('silver_plan', 'Silver Plan')}</h4>
               <p className="text-3xl font-bold text-gray-600 mb-2">
-                {formatPrice(getDiscountedPrice(45))}
-                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(45)}</span>}
+                {formatPrice(getDiscountedPrice(40))}
+                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(40)}</span>}
               </p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
               <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('51_to_100_units', '51-100 units')}</li>
-                <li>• {t('enhanced_features', 'Enhanced features')}</li>
+                <li>• {t('up_to_500_residents', 'Up to 500 residents')}</li>
+                <li>• {t('unlimited_services', 'Unlimited services')}</li>
+                <li>• {t('free_advanced_messaging', 'Free & advanced messaging')}</li>
+                <li>• {t('family_management_photos', 'Family management with photos')}</li>
+                <li>• {t('storage_50gb', '50 GB storage')}</li>
+                <li>• {t('priority_support', 'Priority support')}</li>
+                <li>• {t('custom_branding', 'Custom branding')}</li>
+                <li>• {t('advanced_analytics', 'Advanced Analytics')}</li>
               </ul>
               <button
                 onClick={handleSubscribe}
@@ -452,30 +466,39 @@ const HomePage = () => {
               </button>
             </div>
 
-              {/* Gold Plan */}
-              <div className="border-2 border-yellow-300 rounded-lg p-4 bg-yellow-50">
-              <h4 className="font-semibold text-lg mb-2">{t('gold_plan', 'Gold Plan')}</h4>
-              <p className="text-3xl font-bold text-yellow-600 mb-2">
-                {formatPrice(getDiscountedPrice(90))}
-                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(90)}</span>}
+              {/* Gold Plan - Removed */}
+
+              {/* Enterprise Plan */}
+              <div className="border-2 border-orange-300 rounded-lg p-4 bg-orange-50">
+              <h4 className="font-semibold text-lg mb-2">{t('enterprise_plan', 'Enterprise')}</h4>
+              <p className="text-3xl font-bold text-orange-600 mb-2">
+                {formatPrice(getDiscountedPrice(70))}
+                {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(70)}</span>}
               </p>
               <p className="text-sm text-gray-600 mb-4">{t('per_month', 'per month')}</p>
               <ul className="text-xs text-gray-600 mb-4 space-y-1">
-                <li>• {t('101_to_200_units', '101-200 units')}</li>
-                <li>• {t('advanced_features', 'Advanced features')}</li>
+                <li>• {t('unlimited_residents', 'Unlimited residents')}</li>
+                <li>• {t('unlimited_services', 'Unlimited services')}</li>
+                <li>• {t('free_advanced_messaging', 'Free & advanced messaging')}</li>
+                <li>• {t('family_management_photos', 'Family management with photos')}</li>
+                <li>• {t('unlimited_storage', 'Unlimited storage')}</li>
+                <li>• {t('dedicated_support', 'Dedicated support')}</li>
+                <li>• {t('custom_branding', 'Custom branding')}</li>
+                <li>• {t('advanced_analytics', 'Advanced Analytics')}</li>
+                <li>• {t('full_api_access', 'Full API access')}</li>
               </ul>
               <button
                 onClick={handleSubscribe}
-                className="w-full bg-yellow-600 text-white py-2 px-4 rounded-md hover:bg-yellow-700 transition-colors"
+                className="w-full bg-orange-600 text-white py-2 px-4 rounded-md hover:bg-orange-700 transition-colors"
               >
                 {t('choose_plan', 'Choose Plan')}
               </button>
-              </div>
+            </div>
             </div>
             
-            {/* Second Row - Premium Plans */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-center">
-                {/* Platinum Plan */}
+            {/* Second Row - Removed Old Premium Plans */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-center" style={{display: 'none'}}>
+                {/* Platinum Plan - Hidden */}
               <div className="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
               <h4 className="font-semibold text-lg mb-2">{t('platinum_plan', 'Platinum Plan')}</h4>
               <p className="text-3xl font-bold text-purple-600 mb-2">

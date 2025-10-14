@@ -4868,6 +4868,17 @@ const resources = {
       'payment_cancelled': 'Paiement annulé',
       'payment_check_timeout': 'Délai d\'attente de vérification de paiement. Vérifiez votre historique.',
       'payment_expired': 'Session de paiement expirée',
+      
+      // Homepage translations
+      'login': 'Connexion',
+      'register_now': 'Inscrivez-vous Maintenant',
+      'welcome_to_homeme': 'Bienvenue à HomeMe',
+      'homeme_description': 'La solution complète pour la gestion des résidences. Gérez les résidents, les services, les services publics et plus encore avec notre plateforme avancée.',
+      'try_free_demo': 'Essayer la Démo Gratuite',
+      'get_started': 'Commencer',
+      'trial_mode': 'Mode d\'Essai',
+      'trial_description': 'Vous utilisez HomeMe en mode d\'essai. Abonnez-vous pour déverrouiller toutes les fonctionnalités.',
+      'subscribe_now': 'S\'abonner Maintenant',
       'select_country': 'Sélectionner le pays',
       'egypt': 'Égypte',
       'uae': 'Émirats arabes unis',

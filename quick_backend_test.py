@@ -12,7 +12,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://homeme-container-fix.preview.emergentagent.com/api"
+BASE_URL = "https://residence-central.preview.emergentagent.com/api"
 
 class QuickBackendTest:
     def __init__(self):
@@ -201,7 +201,7 @@ class QuickBackendTest:
             elif response.status_code == 404:
                 # Try base URL
                 try:
-                    base_response = self.session.get("https://homeme-container-fix.preview.emergentagent.com")
+                    base_response = self.session.get("https://residence-central.preview.emergentagent.com")
                     if base_response.status_code in [200, 404]:  # 404 is OK, means server is responding
                         self.log_result("Basic Health Check", True, f"Backend server is responding (status: {base_response.status_code})")
                         return True

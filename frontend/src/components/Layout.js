@@ -655,15 +655,15 @@ const Layout = ({ children, isTrialMode = false }) => {
           {children || <Outlet />}
           
           {/* Footer */}
-          <footer className="bg-gray-50 border-t border-gray-200 py-4 mt-8">
+          <footer className="bg-blue-900 border-t border-blue-800 py-4 mt-8">
             <div className="max-w-7xl mx-auto px-4">
-              <div className="flex flex-col md:flex-row items-center justify-center gap-3 text-sm text-gray-600">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-3 text-sm text-white">
                 <p className="text-center">&copy; 2025 HomeMe. {t('all_rights_reserved', 'All rights reserved.')}</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-400">|</span>
-                  <span className="text-gray-500">{t('powered_by', 'Powered by')}</span>
+                  <span className="text-blue-300">|</span>
+                  <span className="text-blue-100">{t('powered_by', 'Powered by')}</span>
                   <img 
-                    src={i18n.language === 'ar' ? '/images/datalife-logo-ar-dark.jpg' : '/images/datalife-logo-en-dark.jpg'}
+                    src={i18n.language === 'ar' ? '/images/datalife-logo-ar.jpg' : '/images/datalife-logo-en.jpg'}
                     alt="Data Life Logo"
                     className="h-10 w-auto"
                   />

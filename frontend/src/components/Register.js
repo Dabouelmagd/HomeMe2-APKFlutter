@@ -158,6 +158,25 @@ const Register = () => {
             </div>
           </div>
 
+          {/* Subscription Code Field */}
+          <div className="form-group">
+            <label htmlFor="subscription_code" className="form-label">
+              Subscription Code (Optional)
+            </label>
+            <input
+              type="text"
+              id="subscription_code"
+              name="subscription_code"
+              value={formData.subscription_code}
+              onChange={handleChange}
+              className="form-input"
+              placeholder="Enter subscription code for free access"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Have a subscription code? Enter it here to get free access for 3, 6, 12 months or lifetime!
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-group">
               <label htmlFor="role" className="form-label">

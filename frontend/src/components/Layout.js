@@ -665,7 +665,8 @@ const Layout = ({ children, isTrialMode = false }) => {
                   <img 
                     src={i18n.language === 'ar' ? '/images/datalife-logo-ar-dark.svg' : '/images/datalife-logo-en-dark.svg'}
                     alt="Data Life Logo"
-                    className="h-8 w-auto"
+                    className="h-10 w-auto"
+                    style={{minWidth: '180px'}}
                   />
                 </div>
               </div>

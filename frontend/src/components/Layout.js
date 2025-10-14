@@ -665,7 +665,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                   <img 
                     src={i18n.language === 'ar' ? '/images/datalife-logo-ar.jpg' : '/images/datalife-logo-en.jpg'}
                     alt="Data Life Logo"
-                    className="h-10 w-auto"
+                    className="h-14 w-auto md:h-16"
                   />
                 </div>
               </div>

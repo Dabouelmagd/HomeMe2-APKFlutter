@@ -968,10 +968,9 @@ const HomePage = () => {
               <span className="text-gray-400">|</span>
               <span className="text-sm text-gray-400">{t('powered_by', 'Powered by')}</span>
               <img 
-                src={i18n.language === 'ar' ? '/images/datalife-logo-ar.svg' : '/images/datalife-logo-en.svg'}
+                src={i18n.language === 'ar' ? '/images/datalife-logo-ar.jpg' : '/images/datalife-logo-en.jpg'}
                 alt="Data Life Logo"
                 className="h-12 w-auto"
-                style={{minWidth: '180px'}}
               />
             </div>
           </div>

@@ -834,21 +834,18 @@ const HomePage = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   <tr className="hover:bg-gray-50">
-                    <td className="py-3 px-4 text-gray-700">{t('service_family_management', 'إدارة العائلات')}</td>
-                    <td className="text-center py-3 px-2">
-                      <span className="text-yellow-500">⚠️ محدودة</span>
+                    <td className="py-3 px-4 text-gray-700 font-medium">{t('service_family_management', 'إدارة العائلات')}</td>
+                    <td className="text-center py-3 px-3">
+                      <span className="text-xs text-yellow-600 font-semibold">محدودة</span>
                     </td>
-                    <td className="text-center py-3 px-2">
-                      <span className="text-green-500 text-xl">✓</span>
+                    <td className="text-center py-3 px-3">
+                      <span className="text-green-500 text-2xl">✓</span>
                     </td>
-                    <td className="text-center py-3 px-2">
-                      <span className="text-green-500 text-xl">✓</span>
+                    <td className="text-center py-3 px-3">
+                      <span className="text-green-500 text-2xl">✓</span>
                     </td>
-                    <td className="text-center py-3 px-2">
-                      <span className="text-green-500 text-xl">✓</span>
-                    </td>
-                    <td className="text-center py-3 px-2">
-                      <span className="text-green-500 text-xl">✓</span>
+                    <td className="text-center py-3 px-3">
+                      <span className="text-green-500 text-2xl">✓</span>
                     </td>
                   </tr>
                   <tr className="hover:bg-gray-50">

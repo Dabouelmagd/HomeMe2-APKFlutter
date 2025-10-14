@@ -2365,6 +2365,8 @@ const resources = {
       'ready_to_get_started': 'مستعد للبدء؟',
       'trial_cta_description': 'هذه مجرد معاينة. سجل للوصول لجميع الميزات وإدارة بيانات مجمعك الحقيقية.',
       'trial_feature_message': 'هذه ميزة تجريبية. سجل للوصول إلى إدارة العائلة الكاملة!',
+      'demo_feature': 'ميزة تجريبية',
+      'close': 'إغلاق',
       'sign_up_now': 'سجل الآن',
       
       // Plan features 

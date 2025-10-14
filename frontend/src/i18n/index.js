@@ -2321,6 +2321,11 @@ const resources = {
       'unlimited_compounds': 'مجمعات غير محدودة',
       'pay_per_person': 'ادفع لكل شخص فقط',
       'centralized_management': 'إدارة مركزية',
+      'services_comparison': 'مقارنة الخدمات حسب الخطة',
+      'service': 'الخدمة',
+      'multi_compound': 'مجتمعات',
+      'multiple_compounds_support': 'دعم المجمعات المتعددة',
+      'person_month': 'شخص/شهر',
       
       'free_trial': 'تجربة مجانية',
       'trial_duration': '30 يوم',

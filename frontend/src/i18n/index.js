@@ -6348,6 +6348,8 @@ const resources = {
       'free_invitations_answer': 'Les utilisateurs payants peuvent inviter jusqu\'à 20 résidents qui ont un accès complet à toutes les fonctionnalités.',
       'what_payment_methods_accept': 'Quelles méthodes de paiement acceptez-vous?',
       'payment_methods_answer': 'Nous acceptons toutes les principales cartes de crédit, PayPal, et les virements bancaires.',
+      'all_rights_reserved': 'Tous droits réservés.',
+      'powered_by': 'Propulsé par',
       
       // Add Family Member Page
       'add_family_member_to_unit': 'Ajouter un Membre de Famille à l\'Unité',

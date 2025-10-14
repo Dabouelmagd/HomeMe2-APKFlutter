@@ -91,6 +91,11 @@ const resources = {
       'unlimited_compounds': 'Unlimited Compounds',
       'pay_per_person': 'Pay per person only',
       'centralized_management': 'Centralized Management',
+      'services_comparison': 'Services Comparison by Plan',
+      'service': 'Service',
+      'multi_compound': 'Communities',
+      'multiple_compounds_support': 'Multiple Compounds Support',
+      'person_month': 'person/month',
       
       'free_trial': 'Free Trial',
       'trial_duration': '30 Days',

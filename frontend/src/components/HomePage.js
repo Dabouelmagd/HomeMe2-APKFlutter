@@ -961,8 +961,19 @@ const HomePage = () => {
 
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8 mt-12">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p>&copy; 2025 HomeMe. {t('all_rights_reserved', 'All rights reserved.')}</p>
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+            <p className="text-center">&copy; 2025 HomeMe. {t('all_rights_reserved', 'All rights reserved.')}</p>
+            <div className="flex items-center gap-3">
+              <span className="text-gray-400">|</span>
+              <span className="text-sm text-gray-400">{t('powered_by', 'Powered by')}</span>
+              <img 
+                src="https://ocr.dev.spl.so/images/4297568324737076480/2191758441455522816.png" 
+                alt="Data Life Logo"
+                className="h-8 w-auto"
+              />
+            </div>
+          </div>
         </div>
       </footer>
     </div>

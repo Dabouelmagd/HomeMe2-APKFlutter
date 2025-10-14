@@ -133,7 +133,7 @@ const resources = {
       
       // New pricing plans
       'free_plan': 'Free Plan',
-      'silver_plan': 'Silver Plan',
+      'professional_plan': 'Professional Plan',
       'gold_plan': 'Gold Plan',
       'platinum_plan': 'Platinum Plan',
       'free': 'Free',

@@ -96,6 +96,11 @@ const resources = {
       'multi_compound': 'Communities',
       'multiple_compounds_support': 'Multiple Compounds Support',
       'person_month': 'person/month',
+      'limited': 'Limited',
+      'bookings_2': '2 bookings',
+      'all_services': 'All Services',
+      'advanced_with_plus': 'Advanced',
+      'in_different_locations': 'in different locations',
       
       'free_trial': 'Free Trial',
       'trial_duration': '30 Days',

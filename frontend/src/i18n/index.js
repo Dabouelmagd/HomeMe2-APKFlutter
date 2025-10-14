@@ -2291,6 +2291,8 @@ const resources = {
       'payment_status_check_failed': 'فشل في التحقق من حالة الدفع',
       
       // Homepage translations
+      'login': 'تسجيل الدخول',
+      'register_now': 'سجل الآن',
       'welcome_to_homeme': 'مرحباً بك في هوم مي',
       'homeme_description': 'الحل الشامل لإدارة المجمعات السكنية. إدارة السكان والخدمات والمرافق والمزيد من خلال منصتنا المتطورة.',
       'try_free_demo': 'جرب النسخة المجانية',

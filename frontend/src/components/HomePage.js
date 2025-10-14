@@ -605,6 +605,7 @@ const HomePage = () => {
               </div>
 
             </div>
+          </div>
 
           {isYearly && (
             <div className="mt-6 text-center">
@@ -613,7 +614,7 @@ const HomePage = () => {
               </p>
             </div>
           )}
-          </div>
+        </div>
       </main>
 
       {/* Footer */}

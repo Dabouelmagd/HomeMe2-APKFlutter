@@ -394,7 +394,7 @@ const HomePage = () => {
           
           <div className="max-w-7xl mx-auto px-4">
             {/* Pricing Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               
               {/* Community Plan - Free */}
               <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col">

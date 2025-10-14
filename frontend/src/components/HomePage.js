@@ -440,9 +440,9 @@ const HomePage = () => {
               </button>
             </div>
 
-              {/* Silver Plan */}
+              {/* Professional Plan (formerly Silver) */}
               <div className="border-2 border-gray-300 rounded-lg p-4 bg-gray-50">
-              <h4 className="font-semibold text-lg mb-2">{t('silver_plan', 'Silver Plan')}</h4>
+              <h4 className="font-semibold text-lg mb-2">{t('professional_plan', 'Professional Plan')}</h4>
               <p className="text-3xl font-bold text-gray-600 mb-2">
                 {formatPrice(getDiscountedPrice(40))}
                 {isYearly && <span className="text-sm line-through text-gray-400 ml-1">{formatPrice(40)}</span>}

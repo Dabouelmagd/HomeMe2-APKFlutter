@@ -297,12 +297,20 @@ const HomePage = () => {
             </div>
             
             <div className="flex items-center gap-4">
+              {/* Login Button */}
+              <button
+                onClick={() => navigate('/login')}
+                className="bg-white text-blue-600 border-2 border-blue-600 px-6 py-3 rounded-xl font-semibold text-base hover:bg-blue-50 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                {t('login', 'Login')}
+              </button>
+              
               {/* Register Button */}
               <button
                 onClick={() => navigate('/register')}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-xl hover:shadow-2xl"
               >
-                {t('register_now', 'سجل الآن')}
+                {t('register_now', 'Register Now')}
               </button>
               
               <LanguageSwitcher />

@@ -86,6 +86,12 @@ const resources = {
       'service_maintenance': 'Maintenance Management',
       'service_maintenance_desc': 'Track and manage all maintenance requests',
       
+      'for_multiple_locations': 'For multiple compounds in different locations',
+      'unlimited': 'Unlimited',
+      'unlimited_compounds': 'Unlimited Compounds',
+      'pay_per_person': 'Pay per person only',
+      'centralized_management': 'Centralized Management',
+      
       'free_trial': 'Free Trial',
       'trial_duration': '30 Days',
       'start_trial': 'Start Trial',

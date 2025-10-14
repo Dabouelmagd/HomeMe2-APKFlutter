@@ -663,10 +663,9 @@ const Layout = ({ children, isTrialMode = false }) => {
                   <span className="text-gray-400">|</span>
                   <span className="text-gray-500">{t('powered_by', 'Powered by')}</span>
                   <img 
-                    src={i18n.language === 'ar' ? '/images/datalife-logo-ar-dark.svg' : '/images/datalife-logo-en-dark.svg'}
+                    src={i18n.language === 'ar' ? '/images/datalife-logo-ar-dark.jpg' : '/images/datalife-logo-en-dark.jpg'}
                     alt="Data Life Logo"
                     className="h-10 w-auto"
-                    style={{minWidth: '180px'}}
                   />
                 </div>
               </div>

@@ -622,6 +622,7 @@ const resources = {
       'my_bookings': 'My Bookings',
       'view_available_services': 'View available services and manage your bookings',
       'add_first_service': 'Add your first service',
+      'no_services': 'No Services',
       'no_services_available': 'No services available',
       'available_service_providers': 'Available Service Providers',
       'no_service_providers_available': 'No service providers available',

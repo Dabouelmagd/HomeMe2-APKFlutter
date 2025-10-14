@@ -2765,6 +2765,7 @@ const resources = {
       'bookings_will_appear_here': 'ستظهر الحجوزات هنا عند إضافتها',
       'view_available_services': 'عرض الخدمات المتاحة وإدارة حجوزاتك',
       'add_first_service': 'أضف خدمتك الأولى',
+      'no_services': 'لا توجد خدمات',
       'no_services_available': 'لا توجد خدمات متاحة',
       'available_service_providers': 'مقدمو الخدمات المتاحون',
       'no_service_providers_available': 'لا يوجد مقدمو خدمات متاحون',

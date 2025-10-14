@@ -283,7 +283,9 @@ const HomePage = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-6 rtl:space-x-reverse rtl:space-x-6">
               <img
-                src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
+                src={i18n.language === 'ar' 
+                  ? '/images/homeme-logo-ar.jpg' 
+                  : 'https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg'}
                 alt="HomeMe"
                 className="h-32 w-auto shadow-xl rounded-2xl hover:shadow-2xl transition-all duration-300"
               />

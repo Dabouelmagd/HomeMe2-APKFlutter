@@ -826,11 +826,11 @@ const HomePage = () => {
                 <thead>
                   <tr className="border-b-2 border-gray-200">
                     <th className="text-left py-4 px-4 font-semibold text-gray-900 w-1/4">{t('service', 'الخدمة')}</th>
-                    <th className="text-center py-4 px-2 font-semibold text-green-600">Community</th>
-                    <th className="text-center py-4 px-2 font-semibold text-blue-600">Basic</th>
-                    <th className="text-center py-4 px-2 font-semibold text-purple-600">Professional</th>
-                    <th className="text-center py-4 px-2 font-semibold text-orange-600">Enterprise</th>
-                    <th className="text-center py-4 px-2 font-semibold text-indigo-600">Multi-Compound</th>
+                    <th className="text-center py-4 px-2 font-semibold text-green-600">{t('community_plan', 'Community')}</th>
+                    <th className="text-center py-4 px-2 font-semibold text-blue-600">{t('basic_plan', 'Basic')}</th>
+                    <th className="text-center py-4 px-2 font-semibold text-purple-600">{t('professional_plan', 'Professional')}</th>
+                    <th className="text-center py-4 px-2 font-semibold text-orange-600">{t('enterprise_plan', 'Enterprise')}</th>
+                    <th className="text-center py-4 px-2 font-semibold text-indigo-600">{t('multi_compound_plan', 'Multi-Compound')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">

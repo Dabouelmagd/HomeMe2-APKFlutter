@@ -2335,6 +2335,11 @@ const resources = {
       'multi_compound': 'مجتمعات',
       'multiple_compounds_support': 'دعم المجمعات المتعددة',
       'person_month': 'شخص/شهر',
+      'limited': 'محدودة',
+      'bookings_2': '2 حجز',
+      'all_services': 'جميع الخدمات',
+      'advanced_with_plus': 'متقدمة',
+      'in_different_locations': 'في مواقع مختلفة',
       
       'free_trial': 'تجربة مجانية',
       'trial_duration': '30 يوم',

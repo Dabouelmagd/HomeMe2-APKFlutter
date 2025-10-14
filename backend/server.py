@@ -1956,6 +1956,36 @@ async def register(user_data: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Username or email already exists")
     
+    # Check subscription code if provided
+    subscription_expiry = None
+    if user_data.subscription_code:
+        code = await db.subscription_codes.find_one({
+            "code": user_data.subscription_code,
+            "is_active": True,
+            "used_by": None
+        })
+        
+        if not code:
+            raise HTTPException(status_code=400, detail="Invalid or already used subscription code")
+        
+        # Calculate expiry date
+        if code["duration_months"] == -1:
+            # Lifetime access (set to 100 years from now)
+            subscription_expiry = datetime.utcnow() + timedelta(days=36500)
+        else:
+            subscription_expiry = datetime.utcnow() + timedelta(days=30 * code["duration_months"])
+        
+        # Mark code as used
+        await db.subscription_codes.update_one(
+            {"id": code["id"]},
+            {
+                "$set": {
+                    "used_by": user_data.username,
+                    "used_at": datetime.utcnow()
+                }
+            }
+        )
+    
     # Hash password
     password_hash = hash_password(user_data.password)
     
@@ -1972,7 +2002,13 @@ async def register(user_data: UserCreate):
         is_family_head=(user_data.role == UserRole.RESIDENT)
     )
     
-    await db.users.insert_one(user.dict())
+    # Add subscription info if code was used
+    user_dict = user.dict()
+    if subscription_expiry:
+        user_dict["subscription_expiry"] = subscription_expiry
+        user_dict["subscription_type"] = "code_activated"
+    
+    await db.users.insert_one(user_dict)
     
     # Create family if resident
     if user_data.role == UserRole.RESIDENT and user_data.unit_number:
@@ -1990,7 +2026,12 @@ async def register(user_data: UserCreate):
             {"$set": {"family_id": family.id}}
         )
     
-    return {"message": "User registered successfully", "user_id": user.id}
+    return {
+        "message": "User registered successfully",
+        "user_id": user.id,
+        "subscription_active": subscription_expiry is not None,
+        "subscription_expiry": subscription_expiry.isoformat() if subscription_expiry else None
+    }
 
 @api_router.post("/auth/create-admin")
 async def create_admin_user():

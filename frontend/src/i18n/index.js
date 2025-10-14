@@ -4463,6 +4463,7 @@ const resources = {
       'my_bookings': 'Mes réservations',
       'view_available_services': 'Voir les services disponibles et gérer vos réservations',
       'add_first_service': 'Ajoutez votre premier service',
+      'no_services': 'Aucun service',
       'no_services_available': 'Aucun service disponible',
       'available_service_providers': 'Prestataires de Services Disponibles',
       'no_service_providers_available': 'Aucun prestataire de services disponible',

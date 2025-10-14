@@ -988,17 +988,32 @@ const HomePage = () => {
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8 mt-12">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-            <p className="text-center">&copy; 2025 HomeMe. {t('all_rights_reserved', 'All rights reserved.')}</p>
-            <div className="flex items-center gap-3">
-              <span className="text-gray-400">|</span>
-              <span className="text-sm text-gray-400">{t('powered_by', 'Powered by')}</span>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            {/* HomeMe Logo - Left/Right based on language */}
+            <div className={`flex items-center ${i18n.language === 'ar' ? 'order-2 md:order-1' : 'order-1'}`}>
               <img 
-                src={i18n.language === 'ar' ? '/images/datalife-logo-ar.jpg' : '/images/datalife-logo-en.jpg'}
-                alt="Data Life Logo"
-                className="h-16 w-auto md:h-20"
+                src={i18n.language === 'ar' ? '/images/homeme-logo-ar.jpg' : 'https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg'}
+                alt="HomeMe Logo"
+                className="h-20 w-auto md:h-24"
               />
             </div>
+
+            {/* Center - Copyright & Data Life */}
+            <div className={`flex flex-col items-center gap-3 ${i18n.language === 'ar' ? 'order-1 md:order-2' : 'order-2'}`}>
+              <p className="text-center text-sm">&copy; 2025 HomeMe. {t('all_rights_reserved', 'All rights reserved.')}</p>
+              <div className="flex items-center gap-3">
+                <span className="text-gray-400">|</span>
+                <span className="text-sm text-gray-400">{t('powered_by', 'Powered by')}</span>
+                <img 
+                  src={i18n.language === 'ar' ? '/images/datalife-logo-ar.jpg' : '/images/datalife-logo-en.jpg'}
+                  alt="Data Life Logo"
+                  className="h-16 w-auto md:h-20"
+                />
+              </div>
+            </div>
+
+            {/* Empty space for balance */}
+            <div className={`hidden md:block ${i18n.language === 'ar' ? 'order-3' : 'order-3'} w-24`}></div>
           </div>
         </div>
       </footer>

@@ -2362,6 +2362,7 @@ const resources = {
       'electricity_bill_generated': 'تم إنشاء فاتورة الكهرباء الشهرية',
       'ready_to_get_started': 'مستعد للبدء؟',
       'trial_cta_description': 'هذه مجرد معاينة. سجل للوصول لجميع الميزات وإدارة بيانات مجمعك الحقيقية.',
+      'trial_feature_message': 'هذه ميزة تجريبية. سجل للوصول إلى إدارة العائلة الكاملة!',
       'sign_up_now': 'سجل الآن',
       
       // Plan features 

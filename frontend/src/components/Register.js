@@ -13,7 +13,8 @@ const Register = () => {
     compound_id: '',
     full_name: '',
     phone: '',
-    unit_number: ''
+    unit_number: '',
+    subscription_code: ''
   });
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();

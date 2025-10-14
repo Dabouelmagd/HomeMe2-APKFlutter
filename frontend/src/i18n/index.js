@@ -2311,6 +2311,12 @@ const resources = {
       'service_maintenance': 'إدارة الصيانة',
       'service_maintenance_desc': 'تتبع وإدارة جميع طلبات الصيانة',
       
+      'for_multiple_locations': 'لأكثر من مجمع في مواقع متعددة',
+      'unlimited': 'غير محدود',
+      'unlimited_compounds': 'مجمعات غير محدودة',
+      'pay_per_person': 'ادفع لكل شخص فقط',
+      'centralized_management': 'إدارة مركزية',
+      
       'free_trial': 'تجربة مجانية',
       'trial_duration': '30 يوم',
       'start_trial': 'ابدأ التجربة',

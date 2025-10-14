@@ -436,6 +436,24 @@ class UserCreate(BaseModel):
     full_name: str
     phone: Optional[str] = None
     unit_number: Optional[str] = None
+    subscription_code: Optional[str] = None
+
+# Subscription Code Models
+class SubscriptionCode(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    code: str
+    duration_months: int  # 3, 6, 12, or -1 for lifetime
+    is_active: bool = True
+    used_by: Optional[str] = None  # user_id who used the code
+    used_at: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_by: Optional[str] = None  # admin who created it
+    description: Optional[str] = None
+
+class SubscriptionCodeCreate(BaseModel):
+    code: str
+    duration_months: int  # 3, 6, 12, or -1 for lifetime
+    description: Optional[str] = None
 
 class UserLogin(BaseModel):
     username: str

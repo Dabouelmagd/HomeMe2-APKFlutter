@@ -130,6 +130,7 @@ const resources = {
       'electricity_bill_generated': 'Monthly electricity bill generated',
       'ready_to_get_started': 'Ready to get started?',
       'trial_cta_description': 'This is just a preview. Sign up to access all features and manage your real compound data.',
+      'trial_feature_message': 'This is a demo feature. Sign up to access full family management!',
       'sign_up_now': 'Sign Up Now',
       
       // Plan features

@@ -2316,6 +2316,18 @@ const resources = {
       'dedicated_support': 'دعم مخصص',
       'full_api_access': 'وصول كامل لواجهة برمجة التطبيقات',
       'most_popular': 'الأكثر شيوعاً',
+      'multi_compound_plan': 'خطة المجمعات المتعددة',
+      'person_month': 'شخص/شهر',
+      'best_value': 'أفضل قيمة',
+      'unlimited_compounds': 'مجمعات غير محدودة',
+      'pay_per_person': 'ادفع لكل شخص فقط',
+      'centralized_management': 'إدارة مركزية',
+      'for_small_compounds': 'للمجمعات الصغيرة',
+      'for_growing_compounds': 'للمجمعات النامية',
+      'for_medium_compounds': 'للمجمعات المتوسطة',
+      'for_large_compounds': 'للمؤسسات الكبيرة',
+      'for_multiple_compounds': 'لأكثر من مجمع',
+      'month': 'شهر',
       
       // New pricing plans
       'free_plan': 'الخطة المجانية',

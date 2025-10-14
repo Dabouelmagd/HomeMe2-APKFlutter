@@ -2337,6 +2337,7 @@ const resources = {
       'pro_plan': 'الخطة المتقدمة',
       'enterprise_plan': 'خطة الشركات',
       'all_rights_reserved': 'جميع الحقوق محفوظة.',
+      'powered_by': 'مدعوم من',
       
       // Trial Dashboard  
       'welcome_home': 'أهلاً وسهلاً بك،',

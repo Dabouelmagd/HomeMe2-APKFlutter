@@ -103,7 +103,7 @@ const TrialDashboard = ({ exitTrial }) => {
               </div>
             </div>
             <button 
-              onClick={() => alert(t('trial_feature_message', 'This is a demo feature. Sign up to access full family management!'))}
+              onClick={() => setShowModal(true)}
               className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
             >
               {t('manage_family', 'Manage Family')}

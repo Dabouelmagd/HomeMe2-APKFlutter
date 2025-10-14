@@ -4603,6 +4603,13 @@ const resources = {
       'service_analytics_desc': 'Informations détaillées et rapports de performance',
       'service_maintenance': 'Gestion de la Maintenance',
       'service_maintenance_desc': 'Suivre et gérer toutes les demandes de maintenance',
+      
+      'for_multiple_locations': 'Pour plusieurs complexes à différents emplacements',
+      'unlimited': 'Illimité',
+      'unlimited_compounds': 'Complexes Illimités',
+      'pay_per_person': 'Payer par personne uniquement',
+      'centralized_management': 'Gestion Centralisée',
+      
       'choose_your_plan': 'Choisissez Votre Plan',
       'pricing_intro': 'Commencez avec notre essai gratuit ou choisissez un plan d\'abonnement adapté à votre résidence',
       

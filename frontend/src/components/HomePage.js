@@ -8,6 +8,7 @@ import Layout from './Layout';
 // مكون Dashboard التجريبي
 const TrialDashboard = ({ exitTrial }) => {
   const { t } = useTranslation();
+  const [showModal, setShowModal] = useState(false);
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 p-6">

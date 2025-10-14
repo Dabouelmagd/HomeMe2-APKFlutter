@@ -683,8 +683,8 @@ const HomePage = () => {
               </div>
 
               {/* Multi-Compound Plan */}
-              <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col border-2 border-indigo-400">
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+              <div className="relative bg-white rounded-xl shadow-lg p-8 flex flex-col border-2 border-indigo-400">
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-1 rounded-full text-sm font-semibold z-10">
                   {t('best_value', 'أفضل قيمة')}
                 </div>
                 <div className="text-center mb-6">

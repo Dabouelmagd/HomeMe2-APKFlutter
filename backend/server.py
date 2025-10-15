@@ -12076,6 +12076,153 @@ async def get_user_subscription(user_id: str, current_user: User = Depends(get_c
         logging.error(f"Error getting user subscription: {e}")
         raise HTTPException(status_code=500, detail="خطأ في الحصول على الاشتراك")
 
+# ============================================
+# PayPal Payment Endpoints
+# ============================================
+
+from paypal_payment import create_paypal_payment, execute_paypal_payment, get_payment_details
+
+@api_router.post("/payment/create-paypal-order")
+async def create_paypal_order(
+    plan_name: str,
+    amount: float,
+    currency: str = "USD",
+    duration: str = "monthly",
+    plan_type: str = "basic",
+    current_user: User = Depends(get_current_user)
+):
+    """إنشاء طلب دفع PayPal"""
+    try:
+        # Get backend URL from environment or use default
+        backend_url = os.environ.get('REACT_APP_BACKEND_URL', 'http://localhost:3000')
+        
+        # Create return and cancel URLs
+        return_url = f"{backend_url}/payment/paypal-success"
+        cancel_url = f"{backend_url}/"
+        
+        # Create PayPal payment
+        payment_result = create_paypal_payment(
+            amount=amount,
+            currency=currency,
+            plan_name=plan_name,
+            return_url=return_url,
+            cancel_url=cancel_url
+        )
+        
+        # Store payment info in database
+        payment_record = {
+            "user_id": current_user.id,
+            "payment_id": payment_result["payment_id"],
+            "plan_name": plan_name,
+            "plan_type": plan_type,
+            "amount": amount,
+            "currency": currency,
+            "duration": duration,
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        await db.payments.insert_one(payment_record)
+        
+        return {
+            "payment_id": payment_result["payment_id"],
+            "approval_url": payment_result["approval_url"],
+            "status": "created"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating PayPal order: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@api_router.post("/payment/capture-paypal-payment")
+async def capture_paypal_payment(
+    payment_id: str,
+    payer_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """تأكيد دفع PayPal وتفعيل الاشتراك"""
+    try:
+        # Execute PayPal payment
+        payment_result = execute_paypal_payment(payment_id, payer_id)
+        
+        if payment_result["state"] != "approved":
+            raise HTTPException(status_code=400, detail="Payment not approved")
+        
+        # Get payment record from database
+        payment_record = await db.payments.find_one({"payment_id": payment_id})
+        
+        if not payment_record:
+            raise HTTPException(status_code=404, detail="Payment record not found")
+        
+        # Update payment status
+        await db.payments.update_one(
+            {"payment_id": payment_id},
+            {
+                "$set": {
+                    "status": "completed",
+                    "payer_email": payment_result.get("payer_email"),
+                    "completed_at": datetime.now(timezone.utc),
+                    "payment_details": payment_result
+                }
+            }
+        )
+        
+        # Calculate subscription end date
+        from datetime import timedelta
+        duration_days = 365 if payment_record["duration"] == "yearly" else 30
+        end_date = datetime.now(timezone.utc) + timedelta(days=duration_days)
+        
+        # Create or update subscription
+        subscription = {
+            "user_id": current_user.id,
+            "plan_name": payment_record["plan_name"],
+            "plan_type": payment_record["plan_type"],
+            "amount": payment_record["amount"],
+            "currency": payment_record["currency"],
+            "duration": payment_record["duration"],
+            "payment_id": payment_id,
+            "start_date": datetime.now(timezone.utc),
+            "end_date": end_date,
+            "is_active": True,
+            "created_at": datetime.now(timezone.utc)
+        }
+        
+        # Deactivate any existing active subscriptions
+        await db.user_subscriptions.update_many(
+            {"user_id": current_user.id, "is_active": True},
+            {"$set": {"is_active": False}}
+        )
+        
+        # Insert new subscription
+        await db.user_subscriptions.insert_one(subscription)
+        
+        # Update user role if needed
+        if payment_record["plan_type"] in ["enterprise", "multi_compound"]:
+            await db.users.update_one(
+                {"id": current_user.id},
+                {"$set": {"role": "admin"}}
+            )
+        
+        return {
+            "success": True,
+            "message": "Payment successful and subscription activated",
+            "subscription": {
+                "plan_name": subscription["plan_name"],
+                "start_date": subscription["start_date"].isoformat(),
+                "end_date": subscription["end_date"].isoformat()
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error capturing PayPal payment: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.on_event("startup")
 async def startup_db_client():
     """Initialize database connection and indexes"""

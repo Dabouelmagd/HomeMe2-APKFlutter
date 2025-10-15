@@ -686,7 +686,7 @@ const HomePage = () => {
                   </li>
                 </ul>
                 <button
-                  onClick={handleSubscribe}
+                  onClick={() => handleChoosePlan('basic_plan', getDiscountedPrice(12), 'basic')}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
                 >
                   {t('choose_plan', 'اختر الخطة')}

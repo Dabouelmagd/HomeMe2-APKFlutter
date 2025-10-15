@@ -223,6 +223,28 @@ const HomePage = () => {
     navigate('/register');
   };
 
+  const handleChoosePlan = (planName, price, planType) => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      // If not logged in, redirect to register
+      navigate('/register');
+      return;
+    }
+
+    // If logged in, go to checkout
+    navigate('/checkout', {
+      state: {
+        planName,
+        price,
+        currency,
+        duration: isYearly ? 'yearly' : 'monthly',
+        planType
+      }
+    });
+  };
+
   const formatPrice = (usdPrice) => {
     if (currency === 'EGP') {
       const egpPrice = usdPrice * 50; // تحويل تقريبي للجنيه المصري

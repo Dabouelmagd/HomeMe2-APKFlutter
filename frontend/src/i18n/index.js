@@ -52,6 +52,8 @@ const resources = {
       // Homepage translations
       'login': 'Login',
       'register_now': 'Register Now',
+      'per_year': '/year',
+      'per_person_year': '/person/year',
       'welcome_to_homeme': 'Welcome to HomeMe',
       'homeme_description': 'The complete solution for residential compound management. Manage residents, services, utilities, and more with our advanced platform.',
       'try_free_demo': 'Try Free Demo',

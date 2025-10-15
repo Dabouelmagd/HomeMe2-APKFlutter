@@ -803,7 +803,7 @@ const HomePage = () => {
                   </li>
                 </ul>
                 <button
-                  onClick={handleSubscribe}
+                  onClick={() => handleChoosePlan('enterprise_plan', getDiscountedPrice(70), 'enterprise')}
                   className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
                 >
                   {t('choose_plan', 'اختر الخطة')}

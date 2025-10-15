@@ -1047,7 +1047,7 @@ const HomePage = () => {
               <img 
                 src="/images/datalife-logo.jpg"
                 alt="Data Life Logo"
-                className="h-16 w-auto md:h-20"
+                className="h-20 w-auto md:h-24"
               />
             </div>
           </div>

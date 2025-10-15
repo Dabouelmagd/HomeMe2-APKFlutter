@@ -1043,11 +1043,11 @@ const HomePage = () => {
                 className="h-20 w-auto md:h-24"
               />
               <span className="text-gray-400">|</span>
-              {/* HomeMe Logo */}
+              {/* HomeMe Logo - Same as in header */}
               <img 
-                src={i18n.language === 'ar' ? '/images/homeme-logo-ar.jpg' : 'https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg'}
+                src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
                 alt="HomeMe Logo"
-                className="h-20 w-auto md:h-24"
+                className="h-20 w-auto md:h-24 rounded-xl"
               />
             </div>
           </div>

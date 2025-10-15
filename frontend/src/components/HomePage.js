@@ -235,6 +235,11 @@ const HomePage = () => {
     return isYearly ? Math.round(price * 0.9) : price; // خصم 10% للسنة
   };
 
+  const getYearlyTotal = (monthlyPrice) => {
+    const discountedMonthly = getDiscountedPrice(monthlyPrice);
+    return discountedMonthly * 12;
+  };
+
   if (isTrial) {
     // إظهار النسخة التجريبية للتطبيق
     return (

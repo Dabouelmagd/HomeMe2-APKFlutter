@@ -1038,7 +1038,7 @@ const HomePage = () => {
               <span className="text-gray-400">|</span>
               {/* Data Life Logo - Arabic or English based on language */}
               <img 
-                src={i18n.language === 'ar' ? '/images/datalife-logo-ar.jpg' : '/images/datalife-logo.jpg'}
+                src={i18n.language === 'ar' ? '/images/datalife-logo-ar-new.jpg' : '/images/datalife-logo.jpg'}
                 alt="Data Life Logo"
                 className="h-20 w-auto md:h-24"
               />

@@ -1032,14 +1032,22 @@ const HomePage = () => {
       {/* Footer */}
       <footer className="bg-gray-800 text-white py-8 mt-12">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
             <p className="text-center">&copy; 2025 HomeMe. {t('all_rights_reserved', 'All rights reserved.')}</p>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-6">
               <span className="text-gray-400">|</span>
+              {/* HomeMe Logo */}
               <img 
                 src={i18n.language === 'ar' ? '/images/homeme-logo-ar.jpg' : 'https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg'}
                 alt="HomeMe Logo"
                 className="h-20 w-auto md:h-24"
+              />
+              <span className="text-gray-400">|</span>
+              {/* Data Life Logo */}
+              <img 
+                src="/images/datalife-logo.jpg"
+                alt="Data Life Logo"
+                className="h-16 w-auto md:h-20"
               />
             </div>
           </div>

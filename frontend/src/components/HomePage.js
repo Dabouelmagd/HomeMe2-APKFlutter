@@ -684,12 +684,17 @@ const HomePage = () => {
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('professional_plan', 'المحترف')}</h3>
                   <p className="text-sm text-gray-500 mb-4">{t('for_medium_compounds', 'للمجمعات المتوسطة')}</p>
-                  <div className="mb-4">
+                  <div className="mb-2">
                     <span className="text-4xl font-bold text-purple-600">{formatPrice(getDiscountedPrice(40))}</span>
                     <span className="text-gray-500">/{t('month', 'mo')}</span>
                   </div>
                   {isYearly && (
-                    <p className="text-sm text-green-600">{t('save_10', 'وفر 10%')}</p>
+                    <>
+                      <p className="text-sm text-green-600 mb-1">{t('save_10', 'وفر 10%')}</p>
+                      <p className="text-lg font-semibold text-gray-700">
+                        {formatPrice(getYearlyTotal(40))} {t('per_year', '/year')}
+                      </p>
+                    </>
                   )}
                 </div>
                 <ul className="space-y-3 mb-8 flex-grow">

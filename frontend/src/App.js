@@ -498,6 +498,14 @@ function App() {
                   <PaymentCancelPage />
                 } />
                 
+                <Route path="checkout" element={
+                  <CheckoutPage />
+                } />
+                
+                <Route path="payment/paypal-success" element={
+                  <PayPalSuccessPage />
+                } />
+                
                 <Route path="locations" element={
                   <LocationsPage />
                 } />

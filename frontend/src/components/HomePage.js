@@ -863,7 +863,7 @@ const HomePage = () => {
                   </li>
                 </ul>
                 <button
-                  onClick={handleSubscribe}
+                  onClick={() => handleChoosePlan('multi_compound_plan', getDiscountedPrice(0.25), 'multi_compound')}
                   className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
                 >
                   {t('choose_plan', 'اختر الخطة')}

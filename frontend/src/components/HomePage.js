@@ -1043,10 +1043,10 @@ const HomePage = () => {
                 className="h-20 w-auto md:h-24"
               />
               <span className="text-gray-400">|</span>
-              {/* Data Life Logo */}
+              {/* Second Logo - Data Life for EN/FR, HomeMe for AR */}
               <img 
-                src="/images/datalife-logo.jpg"
-                alt="Data Life Logo"
+                src={i18n.language === 'ar' ? '/images/homeme-logo-ar.jpg' : '/images/datalife-logo.jpg'}
+                alt={i18n.language === 'ar' ? 'HomeMe Logo' : 'Data Life Logo'}
                 className="h-20 w-auto md:h-24"
               />
             </div>

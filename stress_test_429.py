@@ -10,7 +10,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 import json
 
-BASE_URL = "https://dwelling-hub-1.preview.emergentagent.com/api"
+BASE_URL = "https://tenant-dashboard-10.preview.emergentagent.com/api"
 
 def test_stress_scenario():
     """Stress test with high volume requests"""

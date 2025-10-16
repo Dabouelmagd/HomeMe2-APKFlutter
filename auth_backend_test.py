@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 # Configuration - Using the production URL from frontend/.env
-BASE_URL = "https://dwelling-hub-1.preview.emergentagent.com/api"
+BASE_URL = "https://tenant-dashboard-10.preview.emergentagent.com/api"
 
 class AuthBackendTestSuite:
     def __init__(self):

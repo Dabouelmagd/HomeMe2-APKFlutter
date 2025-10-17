@@ -4519,6 +4519,7 @@ const resources = {
       'family_can_start_using_homeme': 'يمكن للعائلة البدء في استخدام نظام HomeMe فوراً',
       'view_all_residential': 'عرض جميع الوحدات السكنية وإشغالها',
       'add_resident_family': 'إضافة مقيم + عائلة',
+      'add_resident_family_description': 'إنشاء حساب مقيم جديد مع إعداد إدارة العائلة الكامل',
       'create_new_resident': 'إنشاء حساب مقيم جديد مع إعداد إدارة العائلة الكامل',
       'total_units': 'إجمالي الوحدات',
       'sort_by': 'ترتيب حسب',

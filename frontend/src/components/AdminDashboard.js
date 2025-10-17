@@ -82,19 +82,19 @@ const AdminDashboard = () => {
   const handleQuickAction = (action) => {
     switch (action) {
       case 'add_resident':
-        navigate('/residents');
+        navigate('/app/residents');
         toast.success(t('navigating_to_residents', 'الانتقال إلى قائمة السكان...'));
         break;
       case 'manage_users':
-        navigate('/users');
+        navigate('/app/users');
         toast.success(t('navigating_to_users', 'الانتقال إلى إدارة المستخدمين...'));
         break;
       case 'send_notice':
-        navigate('/messages');
+        navigate('/app/messages');
         toast.success(t('opening_message_center', 'فتح مركز الرسائل...'));
         break;
       case 'view_payments':
-        navigate('/finances');
+        navigate('/app/finances');
         toast.success(t('opening_financial_management', 'فتح الإدارة المالية...'));
         break;
       default:

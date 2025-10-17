@@ -289,30 +289,55 @@ const Pricing = () => {
             {t('select_plan_best_fits')}
           </p>
           
-          {/* Billing Toggle */}
-          <div className="mt-8 flex justify-center">
-            <div className="bg-white rounded-lg p-1 shadow-sm border border-gray-200">
+          {/* Currency and Billing Toggle */}
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {/* Currency Selector */}
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setCurrency('USD')}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  currency === 'USD' 
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                🇺🇸 USD
+              </button>
+              <button
+                onClick={() => setCurrency('EGP')}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  currency === 'EGP' 
+                    ? 'bg-white text-blue-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                🇪🇬 EGP
+              </button>
+            </div>
+
+            {/* Billing Toggle */}
+            <div className="flex bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setBillingPeriod('monthly')}
                 className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
                   billingPeriod === 'monthly'
-                    ? 'bg-blue-600 text-white shadow-sm'
+                    ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                {t('monthly')}
+                {t('monthly', 'شهرياً')}
               </button>
               <button
                 onClick={() => setBillingPeriod('yearly')}
-                className={`px-6 py-2 rounded-md text-sm font-medium transition-all relative ${
+                className={`px-6 py-2 rounded-md text-sm font-medium transition-all ${
                   billingPeriod === 'yearly'
-                    ? 'bg-blue-600 text-white shadow-sm'
+                    ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                {t('yearly')}
-                <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                  {t('save_17_percent')}
+                {t('yearly', 'سنوياً')}
+                <span className="ml-1 bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-xs">
+                  {t('save_10', 'وفر 10%')}
                 </span>
               </button>
             </div>

@@ -51,7 +51,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
   };
 
   const upgradeToPaid = () => {
-    navigate('/pricing');
+    navigate('/app/pricing');
   };
 
   if (loading) {

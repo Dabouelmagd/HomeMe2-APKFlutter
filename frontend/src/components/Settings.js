@@ -953,7 +953,12 @@ const Settings = () => {
             
             {/* Content Body */}
             <div className="p-8">
-              <ActiveComponent />
+              {activeTab === 'overview' && <OverviewSettings />}
+              {activeTab === 'residences' && <ResidencesSettings />}
+              {activeTab === 'registration_links' && <RegistrationLinksSettings />}
+              {activeTab === 'user_management' && <UserManagementSettings />}
+              {activeTab === 'add_admin' && <AddAdminSettings />}
+              {ActiveComponent && <ActiveComponent />}
             </div>
           </div>
 

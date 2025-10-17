@@ -6600,6 +6600,7 @@ const resources = {
       'family_can_start_using_homeme': 'La famille peut commencer à utiliser le système HomeMe immédiatement',
       'view_all_residential': 'Voir toutes les unités résidentielles et leur occupation',
       'add_resident_family': 'Ajouter Résident + Famille',
+      'add_resident_family_description': 'Créer un nouveau compte résident avec configuration complète de gestion familiale',
       'create_new_resident': 'Créer un nouveau compte résident avec configuration complète de gestion familiale',
       'total_units': 'Total des Unités',
       'sort_by': 'Trier par',

@@ -430,26 +430,43 @@ const Pricing = () => {
                   
                   {/* Pricing */}
                   <div className="text-center mb-6">
-                    <div className="flex items-baseline justify-center">
+                    <div className="flex items-baseline justify-center mb-2">
                       <span className="text-4xl font-bold text-gray-900">
-                        ${currentPrice}
+                        {formatPrice(currentPrice)}
                       </span>
-                      {plan.id !== 'community' && (
-                        <span className="text-gray-600 ml-1">
-                          {billingPeriod === 'monthly' ? t('per_month') : t('per_year')}
+                      {plan.id !== 'community' && !plan.perPerson && (
+                        <span className="text-gray-600 ml-2">
+                          /{billingPeriod === 'monthly' ? t('month', 'شهر') : t('year', 'سنة')}
+                        </span>
+                      )}
+                      {plan.perPerson && (
+                        <span className="text-gray-600 ml-2">
+                          /{t('person_month', 'شخص/شهر')}
                         </span>
                       )}
                     </div>
                     
-                    {appliedDiscount && currentPrice !== originalPrice && plan.id !== 'community' && (
-                      <div className="text-sm text-gray-500 line-through mt-1">
-                        {t('was_price', { price: `$${originalPrice}${billingPeriod === 'monthly' ? t('per_month') : t('per_year')}` })}
+                    {/* Yearly Pricing Details */}
+                    {billingPeriod === 'yearly' && plan.id !== 'community' && !plan.perPerson && (
+                      <div className="mt-3 text-sm space-y-1">
+                        {/* Original Price (Before Discount) */}
+                        <div className="text-gray-500 line-through">
+                          {t('before_discount', 'قبل الخصم')}: {formatPrice(getOriginalYearlyTotal(plan.price.monthly))}
+                        </div>
+                        {/* Price After Discount */}
+                        <div className="text-blue-600 font-semibold">
+                          {t('after_discount', 'بعد الخصم')}: {formatPrice(getYearlyTotal(plan.price.monthly))} {t('per_year', '/سنة')}
+                        </div>
+                        {/* Savings Amount */}
+                        <div className="text-green-600 font-semibold">
+                          {t('you_save', 'توفر')}: {formatPrice(getSavings(plan.price.monthly))} {t('annually', 'سنوياً')}
+                        </div>
                       </div>
                     )}
                     
-                    {billingPeriod === 'yearly' && plan.id !== 'community' && (
-                      <div className="text-sm text-green-600 mt-1">
-                        {t('save_amount_annually', { amount: plan.originalPrice.yearly - plan.price.yearly })}
+                    {appliedDiscount && currentPrice !== originalPrice && plan.id !== 'community' && (
+                      <div className="text-sm text-gray-500 line-through mt-1">
+                        {t('was_price', { price: `${formatPrice(originalPrice)}` })}
                       </div>
                     )}
                   </div>

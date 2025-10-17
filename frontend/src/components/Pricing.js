@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
-import Layout from './Layout';
 import {
   CheckIcon, 
   XMarkIcon,

@@ -23,9 +23,40 @@ const Pricing = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [billingPeriod, setBillingPeriod] = useState('monthly');
+  const [currency, setCurrency] = useState('USD');
   const [showDiscountCode, setShowDiscountCode] = useState(false);
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(null);
+
+  // Format price based on currency
+  const formatPrice = (usdPrice) => {
+    if (currency === 'EGP') {
+      const egpPrice = usdPrice * 50; // Approximate conversion to Egyptian Pound
+      return `${egpPrice.toFixed(0)} ج.م`;
+    }
+    return `$${usdPrice}`;
+  };
+
+  // Get discounted price (10% off for yearly)
+  const getDiscountedPrice = (price) => {
+    return billingPeriod === 'yearly' ? Math.round(price * 0.9) : price;
+  };
+
+  // Get yearly total
+  const getYearlyTotal = (monthlyPrice) => {
+    const discountedMonthly = getDiscountedPrice(monthlyPrice);
+    return discountedMonthly * 12;
+  };
+
+  // Get original yearly total (before discount)
+  const getOriginalYearlyTotal = (monthlyPrice) => {
+    return monthlyPrice * 12;
+  };
+
+  // Get savings amount
+  const getSavings = (monthlyPrice) => {
+    return getOriginalYearlyTotal(monthlyPrice) - getYearlyTotal(monthlyPrice);
+  };
 
   const plans = [
     {

@@ -514,6 +514,174 @@ const Pricing = () => {
           </div>
         </div>
 
+        {/* Services Comparison Table */}
+        <div className="mt-16 bg-white rounded-xl shadow-lg p-8">
+          <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">
+            {t('services_comparison', 'مقارنة الخدمات حسب الخطة')}
+          </h3>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b-2 border-gray-200">
+                  <th className="text-left py-4 px-4 font-semibold text-gray-900 w-1/4">{t('service', 'الخدمة')}</th>
+                  <th className="text-center py-4 px-2 font-semibold text-green-600">{t('community_plan', 'المجتمع')}</th>
+                  <th className="text-center py-4 px-2 font-semibold text-blue-600">{t('essential_plan', 'الأساسية')}</th>
+                  <th className="text-center py-4 px-2 font-semibold text-purple-600">{t('professional_plan', 'المحترف')}</th>
+                  <th className="text-center py-4 px-2 font-semibold text-orange-600">{t('enterprise_plan', 'المؤسسة')}</th>
+                  <th className="text-center py-4 px-2 font-semibold text-indigo-600">{t('multi_compound_plan', 'المجمعات المتعددة')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <tr className="hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-700 font-medium">{t('service_family_management', 'إدارة العائلات')}</td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-xs text-yellow-600 font-semibold">{t('limited', 'محدودة')}</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-700 font-medium">{t('service_guest_management', 'إدارة الضيوف')}</td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-red-500 text-2xl">✗</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-700 font-medium">{t('service_booking', 'حجز الخدمات')}</td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-xs text-yellow-600 font-semibold">{t('bookings_2', '2 حجز')}</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-700 font-medium">{t('service_utility_bills', 'فواتير المرافق')}</td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-red-500 text-2xl">✗</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-red-500 text-2xl">✗</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-700 font-medium">{t('service_document_management', 'إدارة المستندات')}</td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-xs text-blue-600 font-semibold">500MB</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-xs text-blue-600 font-semibold">5GB</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-xs text-blue-600 font-semibold">50GB</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">∞</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">∞</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-700 font-medium">{t('service_messaging', 'الرسائل والإشعارات')}</td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-red-500 text-2xl">✗</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-red-500 text-2xl">✗</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-700 font-medium">{t('service_analytics', 'التقارير والتحليلات')}</td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-red-500 text-2xl">✗</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-red-500 text-2xl">✗</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-700 font-medium">{t('service_maintenance', 'إدارة الصيانة')}</td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-red-500 text-2xl">✗</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-red-500 text-2xl">✗</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                  <td className="text-center py-3 px-2">
+                    <span className="text-green-500 text-2xl">✓</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* FAQ Section */}
         <div className="mt-16 text-center">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">{t('frequently_asked_questions')}</h2>

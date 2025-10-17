@@ -956,10 +956,15 @@ const Settings = () => {
                 {activeTabData?.name}
               </h2>
               <p className="text-white/90 text-lg leading-relaxed max-w-2xl mx-auto">
-                {activeTab === 'notifications' && t('notification_settings_description')}
-                {activeTab === 'profile' && t('profile_settings_description')}
-                {activeTab === 'privacy' && t('privacy_settings_description')}
-                {activeTab === 'language' && t('language_settings_description')}
+                {activeTab === 'overview' && t('compound_overview_description', 'عرض معلومات شاملة عن المجمع السكني')}
+                {activeTab === 'residences' && t('residences_description', 'إدارة وعرض جميع الإقامات في المجمع')}
+                {activeTab === 'registration_links' && t('registration_links_description', 'إنشاء روابط تسجيل للسكان الجدد')}
+                {activeTab === 'user_management' && t('user_management_description', 'إدارة جميع مستخدمي المجمع')}
+                {activeTab === 'add_admin' && t('add_admin_description', 'إضافة مدير جديد إلى المجمع')}
+                {activeTab === 'notifications' && t('notification_settings_description', 'إدارة إعدادات الإشعارات')}
+                {activeTab === 'profile' && t('profile_settings_description', 'تحديث معلومات الملف الشخصي')}
+                {activeTab === 'privacy' && t('privacy_settings_description', 'التحكم في إعدادات الخصوصية')}
+                {activeTab === 'language' && t('language_settings_description', 'اختيار لغة التطبيق')}
               </p>
             </div>
             

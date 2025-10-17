@@ -5432,6 +5432,8 @@ const resources = {
       'services_maintenance': 'Services et Maintenance',
       'family_management_section': 'Gestion de Famille',
       'residents_list': 'Liste des Résidents',
+      'manage_residents_subtitle': 'Gérer et voir tous les résidents du complexe',
+      'oldest_first': 'Plus Ancien d\'Abord',
       'user_management': 'Gestion des Utilisateurs',
       'add_manage_user_accounts': 'Ajouter et gérer les comptes utilisateur',
       'add_new_user': 'Ajouter Nouvel Utilisateur',

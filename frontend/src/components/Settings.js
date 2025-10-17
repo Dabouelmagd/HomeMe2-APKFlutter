@@ -891,12 +891,24 @@ const Settings = () => {
                     }`}>
                       <IconComponent className={`h-8 w-8 ${isActive ? 'text-white' : 'text-gray-600'}`} />
                     </div>
-                    <div className="text-sm font-bold mb-2">{tab.name}</div>
+                    <div className="text-sm font-bold mb-2">
+                      {tab.name}
+                      {tab.badge && (
+                        <span className={`ml-2 inline-block ${isActive ? 'bg-white text-gray-700' : 'bg-blue-500 text-white'} text-xs px-2 py-1 rounded-full`}>
+                          {tab.badge}
+                        </span>
+                      )}
+                    </div>
                     <div className={`text-xs ${isActive ? 'text-white/80' : 'text-gray-500'}`}>
-                      {tab.id === 'notifications' && t('manage_notifications_desc')}
-                      {tab.id === 'profile' && t('update_profile_desc')}
-                      {tab.id === 'privacy' && t('control_privacy_desc')}
-                      {tab.id === 'language' && t('choose_language_desc')}
+                      {tab.id === 'overview' && t('view_compound_overview', 'عرض نظرة عامة على المجمع')}
+                      {tab.id === 'residences' && t('manage_residences', 'إدارة الإقامات')}
+                      {tab.id === 'registration_links' && t('create_registration_links', 'إنشاء روابط التسجيل')}
+                      {tab.id === 'user_management' && t('manage_all_users', 'إدارة جميع المستخدمين')}
+                      {tab.id === 'add_admin' && t('add_new_admin', 'إضافة مدير جديد')}
+                      {tab.id === 'notifications' && t('manage_notifications_desc', 'إدارة الإشعارات')}
+                      {tab.id === 'profile' && t('update_profile_desc', 'تحديث الملف الشخصي')}
+                      {tab.id === 'privacy' && t('control_privacy_desc', 'التحكم في الخصوصية')}
+                      {tab.id === 'language' && t('choose_language_desc', 'اختيار اللغة')}
                     </div>
                     
                     {isActive && (

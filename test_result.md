@@ -199,7 +199,7 @@ test_plan:
   stuck_tasks: 
     - "URGENT: Production Database Admin User Issue - Different databases between preview and production environments"
   test_all: false
-  test_priority: "pricing_page_verification_complete"
+  test_priority: "pricing_page_sidebar_fix_verified"
 
 agent_communication:
     - agent: "testing"

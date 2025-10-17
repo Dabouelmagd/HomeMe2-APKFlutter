@@ -136,6 +136,33 @@ const Pricing = () => {
         customDev: t('custom_development')
       },
       limitations: []
+    },
+    {
+      id: 'multi_compound',
+      name: t('multi_compound_plan'),
+      subtitle: t('for_multiple_locations'),
+      price: { monthly: 0.25, yearly: 2.7 },
+      originalPrice: { monthly: 0.25, yearly: 3 },
+      icon: BuildingOfficeIcon,
+      gradient: 'from-indigo-500 to-purple-600',
+      popular: false,
+      features: {
+        residents: t('unlimited_residents'),
+        services: t('unlimited_services'),
+        chat: t('advanced_chat_messaging'),
+        family: t('family_management_photos'),
+        storage: t('unlimited_storage'),
+        mobile: t('mobile_app_access'),
+        support: t('dedicated_support'),
+        branding: t('custom_branding'),
+        analytics: t('advanced_analytics'),
+        api: t('full_api_access'),
+        multiCompound: t('unlimited_compounds'),
+        whiteLabel: t('white_label_options'),
+        customDev: t('custom_development')
+      },
+      limitations: [],
+      perPerson: true
     }
   ];
 

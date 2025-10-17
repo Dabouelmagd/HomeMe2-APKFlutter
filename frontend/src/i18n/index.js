@@ -2189,6 +2189,7 @@ const resources = {
       'family_can_start_using_homeme': 'The family can start using the HomeMe system immediately',
       'view_all_residential': 'View all residential units and their occupancy',
       'add_resident_family': 'Add Resident + Family',
+      'add_resident_family_description': 'Create new resident account with complete family management setup',
       'create_new_resident': 'Create new resident account with complete family management setup',
       'total_units': 'Total Units',
       'sort_by': 'Sort by',

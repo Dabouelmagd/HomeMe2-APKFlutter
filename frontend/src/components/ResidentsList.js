@@ -179,26 +179,39 @@ const ResidentsList = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`}>
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${isRTL ? 'rtl' : 'ltr'}`}>
+      {/* Enhanced Header with Gradient */}
+      <div className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <UserGroupIcon className="h-8 w-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{t('residents_list')}</h1>
-                <p className="text-sm text-gray-500">{t('manage_view_residents')}</p>
+          <div className="py-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-4 rounded-2xl shadow-xl">
+                  <UserGroupIcon className="h-10 w-10 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    {t('residents_list', 'قائمة المساكن')}
+                  </h1>
+                  <p className="text-gray-600 mt-1">{t('manage_view_residents', 'عرض جميع الوحدات السكنية ومعدل الإشغال')}</p>
+                </div>
               </div>
+              
+              <button
+                onClick={() => setShowAddResident(true)}
+                className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl flex items-center space-x-3 rtl:space-x-reverse transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <UserPlusIcon className="h-6 w-6 group-hover:rotate-12 transition-transform" />
+                <span className="font-semibold text-lg">{t('add_resident_family', 'Add Resident + Family')}</span>
+              </button>
             </div>
             
-            <button
-              onClick={() => setShowAddResident(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-            >
-              <UserPlusIcon className="h-5 w-5" />
-              <span>{t('add_new_resident')}</span>
-            </button>
+            {/* Subtitle Banner */}
+            <div className="mt-6 bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200 rounded-xl p-4">
+              <p className="text-blue-800 text-center font-medium">
+                {t('add_resident_family_description', 'Create new resident account with complete family management setup')}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -206,78 +219,114 @@ const ResidentsList = () => {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* Search and Filters */}
-        <div className="mb-6 flex flex-col sm:flex-row gap-4">
-          <div className="flex-1 relative">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder={t('search_resident')}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+        {/* Enhanced Search and Filters */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 relative">
+              <MagnifyingGlassIcon className="absolute left-4 rtl:right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder={t('search_resident', 'بحث عن ساكن...')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 rtl:pr-12 pr-4 rtl:pl-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              />
+            </div>
+            
+            <select
+              value={selectedUnit}
+              onChange={(e) => setSelectedUnit(e.target.value)}
+              className="px-6 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium bg-white transition-all"
+            >
+              <option value="">{t('all_units', 'جميع الوحدات')}</option>
+              {units.map(unit => (
+                <option key={unit.id} value={unit.id}>{unit.unit_number}</option>
+              ))}
+            </select>
+            
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              className="px-6 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium bg-white transition-all"
+            >
+              <option value="">{t('all_relationships', 'جميع العلاقات')}</option>
+              <option value="head">{t('family_head', 'رب الأسرة')}</option>
+              <option value="spouse">{t('spouse', 'الزوج/ة')}</option>
+              <option value="child">{t('child', 'طفل')}</option>
+              <option value="other">{t('other', 'أخرى')}</option>
+            </select>
           </div>
           
-          <select
-            value={selectedUnit}
-            onChange={(e) => setSelectedUnit(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">{t('all_units')}</option>
-            {units.map(unit => (
-              <option key={unit.id} value={unit.id}>{unit.unit_number}</option>
-            ))}
-          </select>
+          {/* Sort Options */}
+          <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-semibold text-gray-700">{t('total_units', 'Total Units')}:</span>
+              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow-md">
+                {residents.length}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-semibold text-gray-700">{t('sort_by', 'Sort by')}:</span>
+              <select className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm font-medium">
+                <option>{t('newest_first', 'Newest First')}</option>
+                <option>{t('oldest_first', 'Oldest First')}</option>
+                <option>{t('unit_number', 'Unit Number')}</option>
+              </select>
+            </div>
+          </div>
           
-          <select
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">{t('all_relationships') || 'جميع العلاقات'}</option>
-            <option value="head">{t('family_head') || 'رب الأسرة'}</option>
-            <option value="spouse">{t('spouse') || 'الزوج/ة'}</option>
-            <option value="child">{t('child') || 'طفل'}</option>
-            <option value="other">{t('other') || 'أخرى'}</option>
-          </select>
+          {/* Tip Banner */}
+          <div className="mt-6 bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-xl p-4">
+            <p className="text-amber-800 text-sm flex items-center gap-2">
+              <span className="text-2xl">💡</span>
+              <span className="font-medium">{t('use_add_resident_tip', 'Use "Add Resident + Family" to set up complete family profiles with photos')}</span>
+            </p>
+          </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* Enhanced Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-blue-100">
-                <UserGroupIcon className="h-6 w-6 text-blue-600" />
+          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-xl border border-blue-300 overflow-hidden transform hover:scale-105 transition-all duration-300">
+            <div className="p-6 text-white">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-white/20 p-3 rounded-xl">
+                  <UserGroupIcon className="h-8 w-8 text-white" />
+                </div>
+                <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold">
+                  100%
+                </div>
               </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">{t('total_residents')}</p>
-                <p className="text-2xl font-bold text-gray-900">{residents.length}</p>
-              </div>
+              <p className="text-white/80 text-sm font-medium mb-2">{t('total_residents', 'إجمالي السكان')}</p>
+              <p className="text-4xl font-bold">{residents.length}</p>
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-green-100">
-                <HomeIcon className="h-6 w-6 text-green-600" />
+          <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-xl border border-green-300 overflow-hidden transform hover:scale-105 transition-all duration-300">
+            <div className="p-6 text-white">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-white/20 p-3 rounded-xl">
+                  <HomeIcon className="h-8 w-8 text-white" />
+                </div>
+                <div className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold">
+                  {Math.round((new Set(residents.filter(r => r.unit_id).map(r => r.unit_id)).size / (units.length || 1)) * 100)}%
+                </div>
               </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">{t('occupied_units')}</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {new Set(residents.filter(r => r.unit_id).map(r => r.unit_id)).size}
-                </p>
-              </div>
+              <p className="text-white/80 text-sm font-medium mb-2">{t('occupied_units', 'الوحدات المشغولة')}</p>
+              <p className="text-4xl font-bold">
+                {new Set(residents.filter(r => r.unit_id).map(r => r.unit_id)).size}
+              </p>
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-purple-100">
-                <UserGroupIcon className="h-6 w-6 text-purple-600" />
+          <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-xl border border-purple-300 overflow-hidden transform hover:scale-105 transition-all duration-300">
+            <div className="p-6 text-white">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-white/20 p-3 rounded-xl">
+                  <UserGroupIcon className="h-8 w-8 text-white" />
+                </div>
               </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">{t('family_heads')}</p>
+              <p className="text-white/80 text-sm font-medium mb-2">{t('family_heads', 'أرباب الأسر')}</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {residents.filter(r => r.relationship === 'head').length}
                 </p>

@@ -347,107 +347,112 @@ const ResidentsList = () => {
         </div>
 
         {/* Residents List */}
-        <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">{t('residents_list')}</h2>
-          </div>
-          
-          {filteredResidents.length === 0 ? (
-            <div className="text-center py-12">
-              <UserGroupIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">{t('no_results')}</h3>
-              <p className="text-gray-500">{t('no_residents_found')}</p>
+        {/* Residents Grid - Card Layout */}
+        {filteredResidents.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center">
+            <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-full p-6 w-24 h-24 mx-auto mb-6">
+              <UserGroupIcon className="h-12 w-12 text-gray-400" />
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('resident_info')}
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('unit')}
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('contact_info')}
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('relationship')}
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('age')}
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('actions')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredResidents.map((resident) => (
-                    <tr key={resident.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-12 w-12">
-                            <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
-                              resident.relationship === 'head' ? 'bg-blue-100 border-2 border-blue-300' :
-                              resident.relationship === 'spouse' ? 'bg-green-100' :
-                              resident.relationship === 'child' ? 'bg-purple-100' :
-                              'bg-gray-100'
-                            }`}>
-                              <span className={`text-sm font-bold ${
-                                resident.relationship === 'head' ? 'text-blue-700' :
-                                resident.relationship === 'spouse' ? 'text-green-700' :
-                                resident.relationship === 'child' ? 'text-purple-700' :
-                                'text-gray-700'
-                              }`}>
-                                {resident.name?.charAt(0)?.toUpperCase() || '؟'}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="mr-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {resident.name || `${t('resident') || 'مقيم'} ${resident.id?.substr(-4)}`}
-                            </div>
-                            <div className="text-xs text-gray-500 flex items-center">
-                              <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                                ID: {resident.id?.substr(-8) || t('not_specified')}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <HomeIcon className="h-4 w-4 text-gray-400 ml-2" />
-                          <span className="text-sm text-gray-900">
-                            {resident.unit_number || t('not_specified')}
-                          </span>
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="space-y-1">
-                          {resident.phone && (
-                            <div className="flex items-center text-sm text-gray-900">
-                              <PhoneIcon className="h-4 w-4 text-gray-400 ml-2" />
-                              {resident.phone}
-                            </div>
-                          )}
-                          {resident.email && (
-                            <div className="flex items-center text-sm text-gray-500">
-                              <EnvelopeIcon className="h-4 w-4 text-gray-400 ml-2" />
-                              {resident.email}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          resident.relationship === 'head' ? 'bg-blue-100 text-blue-800' :
-                          resident.relationship === 'spouse' ? 'bg-green-100 text-green-800' :
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('no_results', 'لا توجد نتائج')}</h3>
+            <p className="text-gray-600 mb-6">{t('no_residents_found', 'لم يتم العثور على سكان')}</p>
+            <button
+              onClick={() => setShowAddResident(true)}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition-all"
+            >
+              {t('add_first_resident', 'إضافة أول ساكن')}
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredResidents.map((resident) => (
+              <div
+                key={resident.id}
+                className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              >
+                {/* Card Header with Gradient */}
+                <div className={`p-6 ${
+                  resident.relationship === 'head' ? 'bg-gradient-to-r from-blue-500 to-indigo-600' :
+                  resident.relationship === 'spouse' ? 'bg-gradient-to-r from-green-500 to-emerald-600' :
+                  resident.relationship === 'child' ? 'bg-gradient-to-r from-purple-500 to-pink-600' :
+                  'bg-gradient-to-r from-gray-500 to-gray-600'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                      <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/30">
+                        <span className="text-2xl font-bold text-white">
+                          {resident.name?.charAt(0)?.toUpperCase() || '؟'}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-white">
+                          {resident.name || `${t('resident', 'مقيم')} ${resident.id?.substr(-4)}`}
+                        </h3>
+                        <span className="inline-block bg-white/20 text-white text-xs px-3 py-1 rounded-full mt-1 font-semibold">
+                          {resident.relationship === 'head' ? t('family_head', 'رب الأسرة') :
+                           resident.relationship === 'spouse' ? t('spouse', 'زوج/ة') :
+                           resident.relationship === 'child' ? t('child', 'طفل') :
+                           t('other', 'أخرى')}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="bg-green-500 text-white text-xs px-3 py-1.5 rounded-full font-bold">
+                      {t('active', 'Active')}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card Body */}
+                <div className="p-6 space-y-4">
+                  {/* Unit Info */}
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="bg-blue-100 p-2 rounded-lg">
+                      <HomeIcon className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-gray-500 font-medium">{t('unit', 'Unit')}</p>
+                      <p className="text-sm font-bold text-gray-900">
+                        {resident.unit_number || t('not_specified', 'TEST001')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Contact Info */}
+                  {resident.email && (
+                    <div className="flex items-center gap-3">
+                      <EnvelopeIcon className="h-5 w-5 text-gray-400" />
+                      <span className="text-sm text-gray-700">{resident.email}</span>
+                    </div>
+                  )}
+                  
+                  {resident.phone && (
+                    <div className="flex items-center gap-3">
+                      <PhoneIcon className="h-5 w-5 text-gray-400" />
+                      <span className="text-sm text-gray-700">{resident.phone}</span>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="grid grid-cols-3 gap-2 pt-4 border-t border-gray-200">
+                    <button className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-blue-50 transition-colors group">
+                      <PencilIcon className="h-5 w-5 text-gray-600 group-hover:text-blue-600" />
+                      <span className="text-xs font-medium text-gray-600 group-hover:text-blue-600">{t('edit', 'Edit')}</span>
+                    </button>
+                    
+                    <button className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-red-50 transition-colors group">
+                      <TrashIcon className="h-5 w-5 text-gray-600 group-hover:text-red-600" />
+                      <span className="text-xs font-medium text-gray-600 group-hover:text-red-600">{t('delete', 'Delete')}</span>
+                    </button>
+                    
+                    <button className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-purple-50 transition-colors group">
+                      <EyeIcon className="h-5 w-5 text-gray-600 group-hover:text-purple-600" />
+                      <span className="text-xs font-medium text-gray-600 group-hover:text-purple-600">{t('view_family', 'View Family')}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
                           resident.relationship === 'child' ? 'bg-purple-100 text-purple-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>

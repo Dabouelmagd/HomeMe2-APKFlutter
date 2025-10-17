@@ -1048,6 +1048,8 @@ const resources = {
       'services_maintenance': 'Services & Maintenance',
       'family_management_section': 'Family Management',
       'residents_list': 'Residents List',
+      'manage_residents_subtitle': 'Manage and view all compound residents',
+      'oldest_first': 'Oldest First',
       'user_management': 'User Management',
       'all_relationships': 'All Relationships',
       'family_head': 'Family Head',

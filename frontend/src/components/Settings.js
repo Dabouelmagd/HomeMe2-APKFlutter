@@ -459,21 +459,64 @@ const LanguageSettings = () => {
 
 const Settings = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('notifications');
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
     {
-      id: 'notifications',
-      name: t('settings_notifications'),
-      icon: BellIcon,
-      component: PushNotifications,
+      id: 'overview',
+      name: t('overview', 'نظرة عامة'),
+      icon: CogIcon,
       color: 'from-blue-600 to-indigo-600',
       bgColor: 'from-blue-50 to-indigo-50',
       accent: 'bg-blue-500'
     },
     {
+      id: 'residences',
+      name: t('residences_list', 'قائمة الإقامات'),
+      icon: UserIcon,
+      badge: '1',
+      color: 'from-green-600 to-emerald-600',
+      bgColor: 'from-green-50 to-emerald-50',
+      accent: 'bg-green-500'
+    },
+    {
+      id: 'registration_links',
+      name: t('registration_links', 'روابط التسجيل'),
+      icon: KeyIcon,
+      badge: '0',
+      color: 'from-purple-600 to-pink-600',
+      bgColor: 'from-purple-50 to-pink-50',
+      accent: 'bg-purple-500'
+    },
+    {
+      id: 'user_management',
+      name: t('user_management', 'إدارة المستخدمين'),
+      icon: UserIcon,
+      color: 'from-orange-600 to-red-600',
+      bgColor: 'from-orange-50 to-red-50',
+      accent: 'bg-orange-500'
+    },
+    {
+      id: 'add_admin',
+      name: t('add_admin', 'إضافة مدير'),
+      icon: ShieldCheckIcon,
+      color: 'from-red-600 to-pink-600',
+      bgColor: 'from-red-50 to-pink-50',
+      accent: 'bg-red-500'
+    },
+    {
+      id: 'notifications',
+      name: t('settings_notifications', 'الإشعارات'),
+      icon: BellIcon,
+      component: PushNotifications,
+      color: 'from-cyan-600 to-blue-600',
+      bgColor: 'from-cyan-50 to-blue-50',
+      accent: 'bg-cyan-500'
+    },
+    {
       id: 'profile',
-      name: t('settings_profile'),
+      name: t('settings_profile', 'الملف الشخصي'),
       icon: UserIcon,
       component: ProfileSettings,
       color: 'from-emerald-600 to-teal-600',
@@ -482,25 +525,25 @@ const Settings = () => {
     },
     {
       id: 'privacy',
-      name: t('settings_privacy'),
+      name: t('settings_privacy', 'الخصوصية'),
       icon: ShieldCheckIcon,
       component: PrivacySettings,
-      color: 'from-purple-600 to-pink-600',
-      bgColor: 'from-purple-50 to-pink-50',
-      accent: 'bg-purple-500'
+      color: 'from-violet-600 to-purple-600',
+      bgColor: 'from-violet-50 to-purple-50',
+      accent: 'bg-violet-500'
     },
     {
       id: 'language',
-      name: t('settings_language'),
+      name: t('settings_language', 'اللغة'),
       icon: LanguageIcon,
       component: LanguageSettings,
-      color: 'from-orange-600 to-red-600',
-      bgColor: 'from-orange-50 to-red-50',
-      accent: 'bg-orange-500'
+      color: 'from-amber-600 to-orange-600',
+      bgColor: 'from-amber-50 to-orange-50',
+      accent: 'bg-amber-500'
     }
   ];
 
-  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || (() => null);
+  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component || null;
   const activeTabData = tabs.find(tab => tab.id === activeTab);
 
   return (

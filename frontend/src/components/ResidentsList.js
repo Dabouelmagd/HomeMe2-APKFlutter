@@ -327,22 +327,21 @@ const ResidentsList = () => {
                 </div>
               </div>
               <p className="text-white/80 text-sm font-medium mb-2">{t('family_heads', 'أرباب الأسر')}</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {residents.filter(r => r.relationship === 'head').length}
-                </p>
-              </div>
+              <p className="text-4xl font-bold">
+                {residents.filter(r => r.relationship === 'head').length}
+              </p>
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center">
-              <div className="p-3 rounded-full bg-orange-100">
-                <MagnifyingGlassIcon className="h-6 w-6 text-orange-600" />
+          <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl shadow-xl border border-orange-300 overflow-hidden transform hover:scale-105 transition-all duration-300">
+            <div className="p-6 text-white">
+              <div className="flex items-center justify-between mb-4">
+                <div className="bg-white/20 p-3 rounded-xl">
+                  <MagnifyingGlassIcon className="h-8 w-8 text-white" />
+                </div>
               </div>
-              <div className="mr-4">
-                <p className="text-sm font-medium text-gray-500">{t('search_results')}</p>
-                <p className="text-2xl font-bold text-gray-900">{filteredResidents.length}</p>
-              </div>
+              <p className="text-white/80 text-sm font-medium mb-2">{t('search_results', 'نتائج البحث')}</p>
+              <p className="text-4xl font-bold">{filteredResidents.length}</p>
             </div>
           </div>
         </div>

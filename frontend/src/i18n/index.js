@@ -3330,6 +3330,8 @@ const resources = {
       'services_maintenance': 'الخدمات والصيانة',
       'family_management_section': 'إدارة العائلة',
       'residents_list': 'قائمة السكان',
+      'manage_residents_subtitle': 'إدارة وعرض جميع سكان المجمع',
+      'oldest_first': 'الأقدم أولاً',
       'user_management': 'إدارة المستخدمين',
       'add_manage_user_accounts': 'إضافة وإدارة حسابات المستخدمين',
       'add_new_user': 'إضافة مستخدم جديد',

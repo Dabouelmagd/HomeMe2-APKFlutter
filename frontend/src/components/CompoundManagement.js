@@ -301,7 +301,7 @@ const CompoundManagement = () => {
 
   const handleUploadLogo = async () => {
     if (!logoFile) {
-      toast.error('Please select a logo file first');
+      toast.error(t('please_select_logo', 'Please select a logo file first'));
       return;
     }
 

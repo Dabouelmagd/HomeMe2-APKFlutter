@@ -4567,6 +4567,7 @@ const resources = {
       'settings': 'الإعدادات',
       'compound_id': 'معرف المجمع',
       'created': 'تم الإنشاء',
+      'timestamp': 'الطابع الزمني',
       'click_to_upload_logo': 'اضغط لتحميل الشعار',
       'compound_logo': 'شعار المجمع',
       'add_new_admin': 'إضافة مدير جديد',

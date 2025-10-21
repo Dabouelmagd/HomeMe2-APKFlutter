@@ -1939,7 +1939,7 @@ const CompoundManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Profile Picture
+                    {t('profile_picture')}
                   </label>
                   <input
                     type="file"
@@ -1948,7 +1948,7 @@ const CompoundManagement = () => {
                       const file = e.target.files[0];
                       if (file) {
                         if (!file.type.startsWith('image/')) {
-                          toast.error(t('please_select_image', 'Please select an image file'));
+                          toast.error(t('please_select_image'));
                           return;
                         }
                         
@@ -1969,7 +1969,7 @@ const CompoundManagement = () => {
                     <div className="mt-2">
                       <img
                         src={adminForm.profile_picture_preview}
-                        alt="Profile preview"
+                        alt={t('profile_preview')}
                         className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
                       />
                     </div>

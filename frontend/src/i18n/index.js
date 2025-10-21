@@ -2214,6 +2214,8 @@ const resources = {
       'edit': 'Edit',
       'delete': 'Delete',
       'view_family': 'View Family',
+      'hide_family': 'Hide Family',
+      'add_resident_family': 'Add Resident + Family',
       'unit': 'Unit',
       'registration_links': 'Registration Links',
       'manage_users': 'Manage Users',

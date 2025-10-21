@@ -128,10 +128,11 @@ const ResidentsList = () => {
               </div>
               
               <button
+                onClick={() => window.location.href = '/app/add-family-member'}
                 className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl flex items-center space-x-3 rtl:space-x-reverse transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <UserPlusIcon className="h-6 w-6 group-hover:rotate-12 transition-transform" />
-                <span className="font-semibold text-lg">{t('add_resident_family', 'Add Resident + Family')}</span>
+                <span className="font-semibold text-lg">{t('add_resident_family')}</span>
               </button>
             </div>
             

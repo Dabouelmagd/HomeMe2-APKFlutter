@@ -118,6 +118,8 @@ const resources = {
       'unlimited_compounds': 'Unlimited Compounds',
       'pay_per_person': 'Pay per person only',
       'centralized_management': 'Centralized Management',
+      'flexible_pricing': 'Flexible pricing',
+      'for_all_compounds': 'for all compounds',
       'services_comparison': 'Services Comparison by Plan',
       'service': 'Service',
       'multi_compound': 'Communities',

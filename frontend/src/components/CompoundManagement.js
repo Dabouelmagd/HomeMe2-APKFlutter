@@ -1428,10 +1428,10 @@ const CompoundManagement = () => {
                           <div>
                             <div className="flex items-center space-x-2">
                               <h3 className="text-lg font-semibold text-center text-gray-900 text-center">
-                                Unit {residence.unit_number}
+                                {t('unit')} {residence.unit_number}
                               </h3>
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Active
+                                {t('active')}
                               </span>
                             </div>
                             <p className="text-gray-600 font-medium">{residence.family_head?.full_name}</p>
@@ -1441,7 +1441,7 @@ const CompoundManagement = () => {
                             )}
                             {residence.family_head?.created_at && (
                               <p className="text-xs text-gray-400">
-                                Joined: {formatDate(residence.family_head.created_at)}
+                                {t('joined')}: {formatDate(residence.family_head.created_at)}
                               </p>
                             )}
                           </div>

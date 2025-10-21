@@ -52,6 +52,10 @@ from emergentintegrations.payments.stripe.checkout import StripeCheckout, Checko
 from subscription_models import *
 from code_generator import HomeCodeGenerator
 
+# Import monitoring and activity logging
+from monitoring import MonitoringService
+from activity_logger import ActivityLogger, ErrorLogger
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')

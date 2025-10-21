@@ -1912,7 +1912,7 @@ const CompoundManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Password *
+                    {t('password')} *
                   </label>
                   <input
                     type="password"

@@ -202,7 +202,7 @@ const ResidentsList = () => {
           <div className="mt-6 bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-xl p-4">
             <p className="text-amber-800 text-sm flex items-center gap-2">
               <span className="text-2xl">💡</span>
-              <span className="font-medium">{t('use_add_resident_tip', 'Use "Add Resident + Family" to set up complete family profiles with photos')}</span>
+              <span className="font-medium">{t('use_add_resident_tip')}</span>
             </p>
           </div>
         </div>

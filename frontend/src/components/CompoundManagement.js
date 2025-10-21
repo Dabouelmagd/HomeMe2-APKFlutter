@@ -283,7 +283,7 @@ const CompoundManagement = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('please_select_image', 'Please select an image file'));
         return;
       }
       
@@ -519,7 +519,7 @@ const CompoundManagement = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('please_select_image', 'Please select an image file'));
         return;
       }
       
@@ -734,7 +734,7 @@ const CompoundManagement = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('please_select_image', 'Please select an image file'));
         return;
       }
       
@@ -752,7 +752,7 @@ const CompoundManagement = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('please_select_image', 'Please select an image file'));
         return;
       }
       
@@ -770,7 +770,7 @@ const CompoundManagement = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('please_select_image', 'Please select an image file'));
         return;
       }
       
@@ -788,7 +788,7 @@ const CompoundManagement = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('please_select_image', 'Please select an image file'));
         return;
       }
       
@@ -979,7 +979,7 @@ const CompoundManagement = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('please_select_image', 'Please select an image file'));
         return;
       }
       
@@ -1948,7 +1948,7 @@ const CompoundManagement = () => {
                       const file = e.target.files[0];
                       if (file) {
                         if (!file.type.startsWith('image/')) {
-                          toast.error('Please select an image file');
+                          toast.error(t('please_select_image', 'Please select an image file'));
                           return;
                         }
                         

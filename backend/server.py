@@ -2074,15 +2074,40 @@ async def create_admin_user():
     }
 
 @api_router.post("/auth/login")
-async def login(user_data: UserLogin):
+async def login(user_data: UserLogin, request: Request):
     user = await db.users.find_one({"username": user_data.username})
     if not user or not verify_password(user_data.password, user["password_hash"]):
+        # Log failed login attempt
+        await ActivityLogger.log_activity(
+            action_type="login",
+            username=user_data.username,
+            details="Failed login attempt - Invalid credentials",
+            ip_address=request.client.host if request.client else None,
+            status="failed"
+        )
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     if not user["is_active"]:
+        # Log inactive account login attempt
+        await ActivityLogger.log_activity(
+            action_type="login",
+            username=user_data.username,
+            details="Failed login attempt - Account disabled",
+            ip_address=request.client.host if request.client else None,
+            status="failed"
+        )
         raise HTTPException(status_code=401, detail="Account is disabled")
     
     access_token = create_access_token(data={"sub": user["id"]})
+    
+    # Log successful login
+    await ActivityLogger.log_activity(
+        action_type="login",
+        username=user_data.username,
+        details=f"Successful login - Role: {user['role']}",
+        ip_address=request.client.host if request.client else None,
+        status="success"
+    )
     
     return {
         "access_token": access_token,

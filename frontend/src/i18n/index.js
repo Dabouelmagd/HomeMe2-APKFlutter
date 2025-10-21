@@ -5486,6 +5486,7 @@ const resources = {
       'user': 'Utilisateur',
       'created_date': 'Date de Création',
       'inactive': 'Inactif',
+      'no_phone': 'Pas de téléphone',
       'add_user_success': 'Utilisateur ajouté avec succès!',
       'add_user_failed': 'Échec de l\'ajout de l\'utilisateur',
       'user_activated': 'Utilisateur activé',

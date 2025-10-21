@@ -139,7 +139,7 @@ const ResidentsList = () => {
             {/* Subtitle Banner */}
             <div className="mt-6 bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200 rounded-xl p-4">
               <p className="text-blue-800 text-center font-medium">
-                {t('create_new_resident', 'Create new resident account with complete family management setup')}
+                {t('create_new_resident')}
               </p>
             </div>
           </div>

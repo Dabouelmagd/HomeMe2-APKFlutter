@@ -1870,7 +1870,7 @@ const CompoundManagement = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Username *
+                    {t('username')} *
                   </label>
                   <input
                     type="text"
@@ -1884,7 +1884,7 @@ const CompoundManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    الاسم الكامل *
+                    {t('full_name')} *
                   </label>
                   <input
                     type="text"

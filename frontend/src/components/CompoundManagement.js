@@ -1092,75 +1092,96 @@ const CompoundManagement = () => {
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="mb-6">
-        <nav className="flex space-x-8" aria-label="Tabs">
+      {/* Enhanced Tab Navigation with Icons */}
+      <div className="mb-8 bg-white rounded-2xl shadow-lg border border-gray-200 p-2">
+        <nav className="flex flex-wrap gap-2" aria-label="Tabs">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
               activeTab === 'overview'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
+            <HomeIcon className="h-5 w-5" />
             {t('overview')}
           </button>
+          
           <button
             onClick={() => setActiveTab('residences')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
               activeTab === 'residences'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
-            {t('residence_list')} ({residences.length})
+            <UserGroupIcon className="h-5 w-5" />
+            {t('residence_list')}
+            <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+              activeTab === 'residences' ? 'bg-white/20' : 'bg-gray-200 text-gray-700'
+            }`}>
+              {residences.length}
+            </span>
           </button>
+          
           {user?.role === 'admin' && (
             <button
               onClick={() => setActiveTab('registration-links')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
                 activeTab === 'registration-links'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                  : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              {t('registration_links')} ({registrationLinks.length})
+              <LinkIcon className="h-5 w-5" />
+              {t('registration_links')}
+              <span className={`ml-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                activeTab === 'registration-links' ? 'bg-white/20' : 'bg-gray-200 text-gray-700'
+              }`}>
+                {registrationLinks.length}
+              </span>
             </button>
           )}
+          
           {user?.role === 'admin' && (
             <button
               id="manage-users-tab-v2"
               onClick={() => setActiveTab('manage-users')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
                 activeTab === 'manage-users'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg'
+                  : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              👤 {t('manage_users')}
+              <UsersIcon className="h-5 w-5" />
+              {t('manage_users')}
             </button>
           )}
+          
           {user?.role === 'admin' && (
             <button
               id="add-admin-tab-v2"
               onClick={() => setActiveTab('add-admin')}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
                 activeTab === 'add-admin'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg'
+                  : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
-              🛡️ {t('add_admin')}
+              <ShieldCheckIcon className="h-5 w-5" />
+              {t('add_admin')}
             </button>
           )}
+          
           <button
             onClick={() => setActiveTab('settings')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+            className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
               activeTab === 'settings'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'bg-gradient-to-r from-gray-600 to-slate-600 text-white shadow-lg'
+                : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
+            <CogIcon className="h-5 w-5" />
             {t('settings')}
           </button>
         </nav>

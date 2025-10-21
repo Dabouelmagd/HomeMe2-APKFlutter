@@ -4810,6 +4810,8 @@ const resources = {
       'unlimited_compounds': 'Complexes Illimités',
       'pay_per_person': 'Payer par personne uniquement',
       'centralized_management': 'Gestion Centralisée',
+      'flexible_pricing': 'Tarification flexible',
+      'for_all_compounds': 'pour tous les complexes',
       'services_comparison': 'Comparaison des Services par Plan',
       'service': 'Service',
       'multi_compound': 'Communautés',

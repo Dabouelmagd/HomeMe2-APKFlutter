@@ -451,15 +451,15 @@ const Pricing = () => {
                       <div className="mt-3 text-sm space-y-1">
                         {/* Original Price (Before Discount) */}
                         <div className="text-gray-500 line-through">
-                          {t('before_discount', 'قبل الخصم')}: {formatPrice(getOriginalYearlyTotal(plan.price.monthly))}
+                          {t('before_discount')}: {formatPrice(getOriginalYearlyTotal(plan.price.monthly))}
                         </div>
                         {/* Price After Discount */}
                         <div className="text-blue-600 font-semibold">
-                          {t('after_discount', 'بعد الخصم')}: {formatPrice(getYearlyTotal(plan.price.monthly))} {t('per_year', '/سنة')}
+                          {t('after_discount')}: {formatPrice(getYearlyTotal(plan.price.monthly))} {t('per_year')}
                         </div>
                         {/* Savings Amount */}
                         <div className="text-green-600 font-semibold">
-                          {t('you_save', 'توفر')}: {formatPrice(getSavings(plan.price.monthly))} {t('annually', 'سنوياً')}
+                          {t('you_save')}: {formatPrice(getSavings(plan.price.monthly))} {t('annually')}
                         </div>
                       </div>
                     )}

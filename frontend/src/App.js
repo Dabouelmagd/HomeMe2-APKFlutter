@@ -43,6 +43,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
 import ResidentsList from './components/ResidentsList';
 import UserManagement from './components/UserManagement';
+import MonitoringDashboard from './components/MonitoringDashboard';
 import MobileAppPage from './pages/MobileAppPage';
 import PaymentPage from './pages/PaymentPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';

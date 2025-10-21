@@ -1487,13 +1487,13 @@ const CompoundManagement = () => {
                     {expandedUnits.has(residence.family_head?.id || residence.id) && (
                       <div className="p-4 bg-gray-50">
                         <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-sm font-medium text-gray-900">Family Members</h4>
+                          <h4 className="text-sm font-medium text-gray-900">{t('family_members', 'Family Members')}</h4>
                           <Link
                             to="/add-family-member"
                             className="btn btn-primary btn-sm flex items-center space-x-1"
                           >
                             <UserPlusIcon className="h-4 w-4" />
-                            <span>Add Member</span>
+                            <span>{t('add_member')}</span>
                           </Link>
                         </div>
 

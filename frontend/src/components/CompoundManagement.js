@@ -1370,7 +1370,7 @@ const CompoundManagement = () => {
                   <span>{t('add_resident_family')}</span>
                 </button>
                 <p className="text-xs text-gray-500 max-w-xs">
-                  {t('create_new_resident_account_description', 'Create new resident account with complete family management setup')}
+                  {t('create_new_resident')}
                 </p>
               </div>
             </div>

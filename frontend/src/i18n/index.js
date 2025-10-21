@@ -6648,6 +6648,8 @@ const resources = {
       'edit': 'Modifier',
       'delete': 'Supprimer',
       'view_family': 'Voir la Famille',
+      'hide_family': 'Masquer la Famille',
+      'add_resident_family': 'Ajouter Résident + Famille',
       'unit': 'Unité',
       'registration_links': 'Liens d\'Inscription',
       'manage_users': 'Gérer les Utilisateurs',

@@ -1367,10 +1367,10 @@ const CompoundManagement = () => {
                   className="btn btn-primary flex items-center space-x-2 mb-2"
                 >
                   <PlusIcon className="h-4 w-4" />
-                  <span>Add Resident + Family</span>
+                  <span>{t('add_resident_family')}</span>
                 </button>
                 <p className="text-xs text-gray-500 max-w-xs">
-                  Create new resident account with complete family management setup
+                  {t('create_new_resident_account_description', 'Create new resident account with complete family management setup')}
                 </p>
               </div>
             </div>

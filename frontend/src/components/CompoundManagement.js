@@ -222,7 +222,7 @@ const CompoundManagement = () => {
       await fetchAllUsers();
     } catch (error) {
       console.error('Failed to create admin:', error);
-      toast.error(error.response?.data?.detail || 'Failed to create admin account');
+      toast.error(error.response?.data?.detail || t('failed_create_admin', 'Failed to create admin account'));
     }
   };
 

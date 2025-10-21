@@ -6659,6 +6659,7 @@ const resources = {
       'settings': 'Paramètres',
       'compound_id': 'ID du Complexe',
       'created': 'Créé',
+      'timestamp': 'Horodatage',
       'click_to_upload_logo': 'Cliquez pour télécharger le logo',
       'compound_logo': 'Logo du Complexe',
       'add_new_admin': 'Ajouter un Nouvel Administrateur',

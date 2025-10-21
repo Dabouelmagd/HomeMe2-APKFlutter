@@ -1378,26 +1378,26 @@ const CompoundManagement = () => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-4">
                 <div className="text-sm text-gray-600">
-                  Total Units: <span className="font-semibold text-center">{residences.length}</span>
+                  {t('total_units')}: <span className="font-semibold text-center">{residences.length}</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <label className="text-sm font-medium text-gray-700">Sort by:</label>
+                  <label className="text-sm font-medium text-gray-700">{t('sort_by')}:</label>
                   <select
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value)}
                     className="form-input text-sm"
                   >
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="unit_number">Unit Number</option>
-                    <option value="name_asc">Name A-Z</option>
-                    <option value="name_desc">Name Z-A</option>
-                    <option value="family_size">Family Size</option>
+                    <option value="newest">{t('newest_first')}</option>
+                    <option value="oldest">{t('oldest_first')}</option>
+                    <option value="unit_number">{t('unit_number')}</option>
+                    <option value="name_asc">{t('name_asc')}</option>
+                    <option value="name_desc">{t('name_desc')}</option>
+                    <option value="family_size">{t('family_size')}</option>
                   </select>
                 </div>
               </div>
               <div className="text-xs text-gray-500">
-                Use "Add Resident + Family" to set up complete family profiles with photos
+                {t('use_add_resident_tip')}
               </div>
             </div>
 

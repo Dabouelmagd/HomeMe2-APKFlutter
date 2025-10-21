@@ -1764,7 +1764,10 @@ const resources = {
         'logo_uploaded_successfully': 'Logo uploaded successfully!',
         'logo_upload_failed': 'Logo upload failed. Please try again.',
         'logo_processing_failed': 'Logo processing failed. Please try again.',
-        'company_logo_placeholder': 'Company Logo'
+        'company_logo_placeholder': 'Company Logo',
+        'please_select_image': 'Please select an image file',
+        'please_select_logo': 'Please select a logo file first',
+        'failed_create_admin': 'Failed to create admin account'
       },
       
       // Account Selection System (English)

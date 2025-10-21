@@ -119,10 +119,10 @@ const ResidentsList = () => {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    {t('residents_list', 'قائمة المساكن')}
+                    {t('residents_list')}
                   </h1>
                   <p className="text-gray-600 mt-1">
-                    {t('view_all_residential', 'عرض جميع الوحدات السكنية ومعدل الإشغال')}
+                    {t('view_all_residential')}
                   </p>
                 </div>
               </div>

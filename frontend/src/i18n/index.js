@@ -3372,6 +3372,7 @@ const resources = {
       'user': 'المستخدم',
       'created_date': 'تاريخ الإنشاء',
       'inactive': 'غير نشط',
+      'no_phone': 'لا يوجد هاتف',
       'add_user_success': 'تم إضافة المستخدم بنجاح!',
       'add_user_failed': 'فشل في إضافة المستخدم',
       'user_activated': 'تم تفعيل المستخدم',

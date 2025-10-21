@@ -1454,14 +1454,14 @@ const CompoundManagement = () => {
                             className="btn btn-secondary btn-sm flex items-center space-x-1"
                           >
                             <PencilIcon className="h-4 w-4" />
-                            <span>Edit</span>
+                            <span>{t('edit')}</span>
                           </button>
                           <button
                             onClick={() => handleDeleteClick('unit', residence)}
                             className="btn btn-danger btn-sm flex items-center space-x-1"
                           >
                             <TrashIcon className="h-4 w-4" />
-                            <span>Delete</span>
+                            <span>{t('delete')}</span>
                           </button>
                           <button
                             onClick={() => toggleUnitExpansion(residence.family_head?.id || residence.id)}
@@ -1470,12 +1470,12 @@ const CompoundManagement = () => {
                             {expandedUnits.has(residence.family_head?.id || residence.id) ? (
                               <>
                                 <ChevronUpIcon className="h-4 w-4" />
-                                <span>Hide Family</span>
+                                <span>{t('hide_family')}</span>
                               </>
                             ) : (
                               <>
                                 <ChevronDownIcon className="h-4 w-4" />
-                                <span>View Family</span>
+                                <span>{t('view_family')}</span>
                               </>
                             )}
                           </button>

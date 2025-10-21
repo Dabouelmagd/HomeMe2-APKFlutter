@@ -341,7 +341,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/debug-login" element={<DebugLogin />} />
               <Route path="/account-type-selection" element={<PublicAccountTypeSelection />} />
-              <Route path="/public-account-type-selection" element={<PublicAccountTypeSelection />} />
+              <Route path="/public-account-type-selection" element={<Navigate to="/" replace />} />
               
               {/* Homepage - no authentication required */}
               <Route path="/" element={<HomePage />} />

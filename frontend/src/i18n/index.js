@@ -233,6 +233,10 @@ const resources = {
       'yearly': 'Yearly',
       'save_10': '10% OFF',
       'yearly_discount_note': 'Save 10% on your first year with yearly billing!',
+      'before_discount': 'Before discount',
+      'after_discount': 'After discount',
+      'you_save': 'You save',
+      'annually': 'annually',
       
       // Demo section
       'demo_description': 'Experience all features with our interactive demo - no signup required!',

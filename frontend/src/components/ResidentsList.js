@@ -168,7 +168,7 @@ const ResidentsList = () => {
               onChange={(e) => setSelectedUnit(e.target.value)}
               className="px-6 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-medium bg-white transition-all"
             >
-              <option value="">{t('all_units', 'جميع الوحدات')}</option>
+              <option value="">{t('all_units')}</option>
               {units.map(unit => (
                 <option key={unit.id} value={unit.id}>{unit.unit_number}</option>
               ))}

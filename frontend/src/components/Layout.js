@@ -182,6 +182,12 @@ const Layout = ({ children, isTrialMode = false }) => {
           href: 'users',
           icon: UsersIcon,
           show: user?.role === 'admin'
+        },
+        {
+          name: t('monitoring_dashboard'),
+          href: 'monitoring',
+          icon: ChartPieIcon,
+          show: user?.role === 'admin'
         }
       ]
     },

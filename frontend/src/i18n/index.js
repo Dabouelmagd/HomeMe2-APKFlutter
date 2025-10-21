@@ -2517,6 +2517,10 @@ const resources = {
       'yearly': 'سنوياً',
       'save_10': 'خصم 10%',
       'yearly_discount_note': 'وفر 10% على السنة الأولى مع الفوترة السنوية!',
+      'before_discount': 'قبل الخصم',
+      'after_discount': 'بعد الخصم',
+      'you_save': 'توفر',
+      'annually': 'سنوياً',
       
       // Demo section
       'demo_description': 'جرب جميع الميزات مع العرض التوضيحي التفاعلي - لا يتطلب تسجيل!',

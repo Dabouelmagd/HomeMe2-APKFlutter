@@ -1984,10 +1984,10 @@ const CompoundManagement = () => {
                   </div>
                   <div className="ml-3">
                     <h4 className="text-sm font-medium text-purple-800">
-                      Admin Account Creation
+                      {t('admin_account_creation')}
                     </h4>
                     <p className="text-sm text-purple-700 mt-1">
-                      This will create a new administrator account with full access to compound management features. The admin will be able to log in immediately with the provided credentials.
+                      {t('admin_account_creation_description')}
                     </p>
                   </div>
                 </div>
@@ -1999,14 +1999,14 @@ const CompoundManagement = () => {
                   onClick={resetAdminForm}
                   className="btn btn-secondary"
                 >
-                  Reset Form
+                  {t('reset_form')}
                 </button>
                 <button
                   type="submit"
                   className="btn btn-primary flex items-center space-x-2"
                 >
                   <UserPlusIcon className="h-4 w-4 text-current" style={{minWidth: '16px', minHeight: '16px'}} />
-                  <span>Create Admin Account</span>
+                  <span>{t('create_admin_account')}</span>
                 </button>
               </div>
             </form>

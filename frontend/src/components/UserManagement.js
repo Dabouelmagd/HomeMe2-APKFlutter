@@ -365,12 +365,10 @@ const UserManagement = () => {
                               {userItem.email}
                             </div>
                           )}
-                          {userItem.phone && (
-                            <div className="flex items-center text-sm text-gray-500">
-                              <PhoneIcon className="h-4 w-4 text-gray-400 ml-2" />
-                              {userItem.phone}
-                            </div>
-                          )}
+                          <div className="flex items-center text-sm text-gray-500">
+                            <PhoneIcon className="h-4 w-4 text-gray-400 ml-2" />
+                            {userItem.phone || t('no_phone')}
+                          </div>
                         </div>
                       </td>
                       

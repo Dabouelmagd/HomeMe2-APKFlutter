@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -7,6 +7,14 @@ const PublicAccountTypeSelection = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isRtl = i18n.language === 'ar';
+
+  // Redirect to homepage if accessing this page directly
+  useEffect(() => {
+    // Check if we're on the public URL (not account-type-selection which is used internally)
+    if (window.location.pathname === '/public-account-type-selection') {
+      navigate('/', { replace: true });
+    }
+  }, [navigate]);
 
   const handleAccountTypeSelect = (accountType) => {
     if (accountType === 'individual') {

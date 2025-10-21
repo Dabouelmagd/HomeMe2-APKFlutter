@@ -1035,7 +1035,7 @@ const CompoundManagement = () => {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toast.error(t('please_select_image', 'Please select an image file'));
       return;
     }
 

@@ -11,6 +11,7 @@ import {
   UserGroupIcon,
   SpeakerWaveIcon,
   ChartBarIcon,
+  ChartPieIcon,
   CurrencyDollarIcon,
   ChatBubbleLeftEllipsisIcon,
   BellIcon,

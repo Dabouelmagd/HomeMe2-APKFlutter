@@ -785,6 +785,7 @@ const resources = {
       'created_date': 'Created Date',
       'active': 'Active',
       'inactive': 'Inactive',
+      'no_phone': 'No phone',
       'add_user_success': 'User added successfully!',
       'add_user_failed': 'Failed to add user',
       'user_activated': 'User activated',

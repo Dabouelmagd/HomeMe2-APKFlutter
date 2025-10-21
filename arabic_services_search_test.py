@@ -13,7 +13,7 @@ import json
 from typing import Dict, List, Optional
 
 # Configuration
-BASE_URL = "https://tenant-dashboard-10.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-multilingual.preview.emergentagent.com/api"
 
 class ArabicServicesSearchTest:
     def __init__(self):

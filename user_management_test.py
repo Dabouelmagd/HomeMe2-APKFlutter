@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 # Configuration - Using the production URL from frontend/.env
-BASE_URL = "https://tenant-dashboard-10.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-multilingual.preview.emergentagent.com/api"
 
 class UserManagementTestSuite:
     def __init__(self):

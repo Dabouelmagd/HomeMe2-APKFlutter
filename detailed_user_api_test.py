@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://tenant-dashboard-10.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-multilingual.preview.emergentagent.com/api"
 
 def test_detailed_user_api():
     print("🔍 DETAILED USER API TESTING FOR FRONTEND INTEGRATION")
@@ -152,7 +152,7 @@ def test_detailed_user_api():
     # Step 8: Check for CORS issues
     print(f"\n8. Checking CORS Headers...")
     cors_headers = {
-        "Origin": "https://tenant-dashboard-10.preview.emergentagent.com",
+        "Origin": "https://homeme-multilingual.preview.emergentagent.com",
         "Authorization": f"Bearer {admin_token}",
         "Content-Type": "application/json"
     }

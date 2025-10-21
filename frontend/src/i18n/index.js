@@ -4089,7 +4089,10 @@ const resources = {
         'logo_uploaded_successfully': 'تم رفع الشعار بنجاح!',
         'logo_upload_failed': 'فشل رفع الشعار. يرجى المحاولة مرة أخرى.',
         'logo_processing_failed': 'فشل معالجة الشعار. يرجى المحاولة مرة أخرى.',
-        'company_logo_placeholder': 'شعار الشركة'
+        'company_logo_placeholder': 'شعار الشركة',
+        'please_select_image': 'يرجى اختيار ملف صورة',
+        'please_select_logo': 'يرجى اختيار ملف الشعار أولاً',
+        'failed_create_admin': 'فشل في إنشاء حساب المدير'
       },
       
       // Account Selection System (Arabic)

@@ -2223,6 +2223,7 @@ const resources = {
       'settings': 'Settings',
       'compound_id': 'Compound ID',
       'created': 'Created',
+      'timestamp': 'Timestamp',
       'click_to_upload_logo': 'Click to upload logo',
       'compound_logo': 'Compound Logo',
       'add_new_admin': 'Add New Admin',

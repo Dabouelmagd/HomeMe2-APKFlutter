@@ -216,7 +216,7 @@ const CompoundManagement = () => {
         },
       });
 
-      toast.success('Admin account created successfully!');
+      toast.success(t('admin_created_successfully', 'Admin account created successfully!'));
       setShowAddAdmin(false);
       resetAdminForm();
       await fetchAllUsers();

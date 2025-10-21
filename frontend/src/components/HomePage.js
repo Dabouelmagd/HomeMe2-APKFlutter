@@ -813,7 +813,7 @@ const HomePage = () => {
               {/* Multi-Compound Plan */}
               <div className="relative bg-white rounded-xl shadow-lg p-8 flex flex-col border-2 border-indigo-500">
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-1 rounded-full text-sm font-semibold z-10">
-                  {t('unlimited', 'غير محدود')}
+                  {t('unlimited')}
                 </div>
                 <div className="text-center mb-6">
                   <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -821,17 +821,17 @@ const HomePage = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('multi_compound_plan', 'مجتمعات سكنية')}</h3>
-                  <p className="text-sm text-gray-500 mb-4">{t('for_multiple_locations', 'لأكثر من مجمع في مواقع متعددة')}</p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('multi_compound_plan')}</h3>
+                  <p className="text-sm text-gray-500 mb-4">{t('for_multiple_locations')}</p>
                   <div className="mb-2">
                     <span className="text-4xl font-bold text-indigo-600">{formatPrice(getDiscountedPrice(0.25))}</span>
-                    <span className="text-gray-500 text-sm">/{t('person_month', 'شخص/شهر')}</span>
+                    <span className="text-gray-500 text-sm">/{t('person_month')}</span>
                   </div>
                   {isYearly && (
                     <>
-                      <p className="text-sm text-green-600 mb-1">{t('save_10', 'وفر 10%')}</p>
+                      <p className="text-sm text-green-600 mb-1">{t('save_10')}</p>
                       <p className="text-lg font-semibold text-gray-700">
-                        {formatPrice(getYearlyTotal(0.25))} {t('per_person_year', '/person/year')}
+                        {formatPrice(getYearlyTotal(0.25))} {t('per_person_year')}
                       </p>
                     </>
                   )}
@@ -841,32 +841,32 @@ const HomePage = () => {
                     <svg className="w-5 h-5 text-indigo-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                     </svg>
-                    <span className="text-gray-600 text-sm">{t('unlimited_compounds', 'مجمعات غير محدودة')} {t('in_different_locations', 'في مواقع مختلفة')}</span>
+                    <span className="text-gray-600 text-sm">{t('unlimited_compounds')} {t('in_different_locations')}</span>
                   </li>
                   <li className="flex items-start">
                     <svg className="w-5 h-5 text-indigo-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                     </svg>
-                    <span className="text-gray-600 text-sm">{t('pay_per_person', 'ادفع لكل شخص فقط')} - تسعير مرن</span>
+                    <span className="text-gray-600 text-sm">{t('pay_per_person')} - {t('flexible_pricing')}</span>
                   </li>
                   <li className="flex items-start">
                     <svg className="w-5 h-5 text-indigo-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                     </svg>
-                    <span className="text-gray-600 text-sm">{t('centralized_management', 'إدارة مركزية')} لجميع المجمعات</span>
+                    <span className="text-gray-600 text-sm">{t('centralized_management')} {t('for_all_compounds')}</span>
                   </li>
                   <li className="flex items-start">
                     <svg className="w-5 h-5 text-indigo-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
                     </svg>
-                    <span className="text-gray-600 text-sm">{t('all_services', 'جميع الخدمات')} + {t('service_analytics', 'تقارير متقدمة')}</span>
+                    <span className="text-gray-600 text-sm">{t('all_services')} + {t('service_analytics')}</span>
                   </li>
                 </ul>
                 <button
                   onClick={() => handleChoosePlan('multi_compound_plan', getDiscountedPrice(0.25), 'multi_compound')}
                   className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200"
                 >
-                  {t('choose_plan', 'اختر الخطة')}
+                  {t('choose_plan')}
                 </button>
               </div>
 

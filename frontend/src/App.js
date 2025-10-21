@@ -375,6 +375,12 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
+                <Route path="monitoring" element={
+                  <ProtectedRoute adminOnly>
+                    <MonitoringDashboard />
+                  </ProtectedRoute>
+                } />
+                
                 <Route path="services" element={
                   <ServicesManagement />
                 } />

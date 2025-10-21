@@ -2446,6 +2446,8 @@ const resources = {
       'unlimited_compounds': 'مجمعات غير محدودة',
       'pay_per_person': 'ادفع لكل شخص فقط',
       'centralized_management': 'إدارة مركزية',
+      'flexible_pricing': 'تسعير مرن',
+      'for_all_compounds': 'لجميع المجمعات',
       'services_comparison': 'مقارنة الخدمات حسب الخطة',
       'service': 'الخدمة',
       'multi_compound': 'مجتمعات',

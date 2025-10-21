@@ -317,7 +317,7 @@ const CompoundManagement = () => {
 
       setEditableCompound(prev => ({ ...prev, logo_url: response.data.logo_url }));
       setCompound(prev => ({ ...prev, logo_url: response.data.logo_url }));
-      toast.success('Logo uploaded successfully!');
+      toast.success(t('logo_uploaded_successfully', 'Logo uploaded successfully!'));
       setLogoFile(null);
     } catch (error) {
       console.error('Failed to upload logo:', error);
@@ -1059,7 +1059,7 @@ const CompoundManagement = () => {
         logo_url: response.data.logo_url
       }));
 
-      toast.success('Logo uploaded successfully!');
+      toast.success(t('logo_uploaded_successfully', 'Logo uploaded successfully!'));
     } catch (error) {
       toast.error('Failed to upload logo');
     } finally {

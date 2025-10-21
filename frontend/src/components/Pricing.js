@@ -335,9 +335,9 @@ const Pricing = () => {
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                {t('yearly', 'سنوياً')}
+                {t('yearly')}
                 <span className="ml-1 bg-green-100 text-green-600 px-2 py-0.5 rounded-full text-xs">
-                  {t('save_10', 'وفر 10%')}
+                  {t('save_10')}
                 </span>
               </button>
             </div>

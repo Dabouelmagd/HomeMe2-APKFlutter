@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import axios from 'axios';
 import {
   CheckIcon, 
   XMarkIcon,
@@ -15,8 +16,11 @@ import {
   TagIcon,
   UserIcon,
   PlusIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  TicketIcon
 } from '@heroicons/react/24/outline';
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 const Pricing = () => {
   const { t } = useTranslation();

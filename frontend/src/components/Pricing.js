@@ -31,6 +31,12 @@ const Pricing = () => {
   const [showDiscountCode, setShowDiscountCode] = useState(false);
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(null);
+  
+  // Subscription Code states
+  const [showSubscriptionCode, setShowSubscriptionCode] = useState(false);
+  const [subscriptionCode, setSubscriptionCode] = useState('');
+  const [verifiedCode, setVerifiedCode] = useState(null);
+  const [verifyingCode, setVerifyingCode] = useState(false);
 
   // Format price based on currency
   const formatPrice = (usdPrice) => {

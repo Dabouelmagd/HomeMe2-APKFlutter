@@ -14,7 +14,7 @@
 # Main and testing agents must follow this exact format to maintain testing data. 
 # The testing data must be entered in yaml format Below is the data structure:
 # 
-## user_problem_statement: "AUTHENTICATION AND DASHBOARD SYSTEM TESTING - Please test the fixed authentication and dashboard system for HomeMe application. Test the following fixes: 1) Fixed ObjectId Serialization in admin dashboard endpoint, 2) Added /auth/me endpoint for current user information, 3) Added general /dashboard endpoint that redirects based on user role, 4) Fixed Data Serialization for compound, messages, and payments data."
+## user_problem_statement: "SUBSCRIPTION CODE SYSTEM COMPLETION - Complete the integration of subscription code feature by: 1) Adding subscription code input field to Pricing page, 2) Implement frontend functionality in SubscriptionCodes.js for Super Admin management, 3) Enhance backend logic for code validation and activation, 4) Create Super Admin account (dalia.abouelmagd@gmail.com), 5) Test complete workflow: Super Admin creates codes, users register with codes, subscription activated automatically"
 ## backend:
 ##   - task: "Task name"
 ##     implemented: true

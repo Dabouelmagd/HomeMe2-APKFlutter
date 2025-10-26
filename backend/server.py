@@ -12398,6 +12398,193 @@ async def mark_error_resolved(
 # ==================== END MONITORING ENDPOINTS ====================
 
 
+# ==================== SUBSCRIPTION CODES ENDPOINTS ====================
+
+@app.post("/api/subscription-codes/create")
+async def create_subscription_code(
+    code_type: str,
+    duration_months: int = None,
+    discount_percentage: float = None,
+    max_uses: int = 1,
+    expires_at: str = None,
+    notes: str = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new subscription code (Super Admin only)"""
+    try:
+        # Check if user is super admin (you can check by email or specific username)
+        # For now, only allow specific admin email
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com"]:
+            raise HTTPException(
+                status_code=403,
+                detail="Only the application owner can create subscription codes"
+            )
+        
+        code = await SubscriptionCodeManager.create_code(
+            code_type=code_type,
+            duration_months=duration_months,
+            discount_percentage=discount_percentage,
+            created_by=current_user.username,
+            max_uses=max_uses,
+            expires_at=expires_at,
+            notes=notes
+        )
+        
+        if code:
+            await ActivityLogger.log_activity(
+                action_type="create_subscription_code",
+                username=current_user.username,
+                details=f"Created {code_type} code: {code['code']}"
+            )
+            return {"success": True, "code": code}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to create code")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating subscription code: {e}")
+        await ErrorLogger.log_error(
+            error_type="subscription_code_creation",
+            error_message=str(e),
+            username=current_user.username
+        )
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/subscription-codes/verify")
+async def verify_subscription_code(code: str, user_id: str = None):
+    """Verify a subscription code (public endpoint)"""
+    try:
+        result = await SubscriptionCodeManager.verify_code(code, user_id)
+        return result
+    except Exception as e:
+        logging.error(f"Error verifying code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/subscription-codes/apply")
+async def apply_subscription_code(
+    code: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Apply a subscription code to the current user's account"""
+    try:
+        result = await SubscriptionCodeManager.apply_code(
+            code=code,
+            user_id=current_user.id,
+            username=current_user.username
+        )
+        
+        if result.get("success"):
+            await ActivityLogger.log_activity(
+                action_type="apply_subscription_code",
+                username=current_user.username,
+                details=f"Applied code: {code} - Type: {result.get('subscription_type')}"
+            )
+            return result
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=result.get("error", "Failed to apply code")
+            )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error applying code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/subscription-codes/list")
+async def list_subscription_codes(
+    include_inactive: bool = False,
+    current_user: User = Depends(get_current_user)
+):
+    """List all subscription codes (Super Admin only)"""
+    try:
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com"]:
+            raise HTTPException(
+                status_code=403,
+                detail="Only the application owner can view subscription codes"
+            )
+        
+        codes = await SubscriptionCodeManager.get_all_codes(include_inactive)
+        return {"codes": codes}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error listing codes: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/subscription-codes/{code}/deactivate")
+async def deactivate_subscription_code(
+    code: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Deactivate a subscription code (Super Admin only)"""
+    try:
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com"]:
+            raise HTTPException(
+                status_code=403,
+                detail="Only the application owner can deactivate codes"
+            )
+        
+        success = await SubscriptionCodeManager.deactivate_code(code)
+        
+        if success:
+            await ActivityLogger.log_activity(
+                action_type="deactivate_subscription_code",
+                username=current_user.username,
+                details=f"Deactivated code: {code}"
+            )
+            return {"success": True, "message": "Code deactivated"}
+        else:
+            raise HTTPException(status_code=404, detail="Code not found")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deactivating code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/subscription-codes/{code}")
+async def delete_subscription_code(
+    code: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a subscription code (Super Admin only)"""
+    try:
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com"]:
+            raise HTTPException(
+                status_code=403,
+                detail="Only the application owner can delete codes"
+            )
+        
+        success = await SubscriptionCodeManager.delete_code(code)
+        
+        if success:
+            await ActivityLogger.log_activity(
+                action_type="delete_subscription_code",
+                username=current_user.username,
+                details=f"Deleted code: {code}"
+            )
+            return {"success": True, "message": "Code deleted"}
+        else:
+            raise HTTPException(status_code=404, detail="Code not found")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== END SUBSCRIPTION CODES ENDPOINTS ====================
+
+
 @app.on_event("startup")
 async def startup_db_client():
     """Initialize database connection and indexes"""

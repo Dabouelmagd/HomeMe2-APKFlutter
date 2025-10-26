@@ -246,6 +246,38 @@ const Pricing = () => {
       toast.error('Invalid discount code');
     }
   };
+  
+  // Verify subscription code
+  const verifySubscriptionCode = async () => {
+    if (!subscriptionCode.trim()) {
+      toast.error(t('please_enter_subscription_code'));
+      return;
+    }
+    
+    setVerifyingCode(true);
+    try {
+      const response = await axios.post(`${API}/api/subscription-codes/verify`, null, {
+        params: {
+          code: subscriptionCode.trim(),
+          user_id: user?.id
+        }
+      });
+      
+      if (response.data.valid) {
+        setVerifiedCode(response.data);
+        toast.success(t('subscription_code_valid'));
+      } else {
+        toast.error(t(response.data.error || 'invalid_subscription_code'));
+        setVerifiedCode(null);
+      }
+    } catch (error) {
+      console.error('Error verifying subscription code:', error);
+      toast.error(t('failed_to_verify_code'));
+      setVerifiedCode(null);
+    } finally {
+      setVerifyingCode(false);
+    }
+  };
 
   const calculatePrice = (plan) => {
     const basePrice = plan.price[billingPeriod];

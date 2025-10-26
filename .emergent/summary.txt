@@ -1,22 +1,28 @@
 <analysis>
-The AI engineer's work in this trajectory focused on enhancing the HomeMe application's public-facing  and integrating a payment system. Initially tasked with adding a Register Now button, the scope quickly expanded to include a Login button, ensuring modern styling and comprehensive localization across English, Arabic, and French. This involved extensive updates to  and . Subsequently, the user requested the display of annual pricing under monthly plans, which necessitated logic changes in  and further translation updates. A significant portion of the work involved iterative refinement of Data Life and HomeMe logo integration in the footer, addressing size, language specificity, and correct Arabic logo usage across multiple user clarifications. Finally, the engineer began integrating PayPal for electronic payments, adding environment variables, installing , creating new frontend pages and routes for checkout, and implementing backend endpoints. The trajectory concludes with a final verification that all implemented features, including the PayPal integration's initiation, are visually and functionally correct within the application.
+The AI engineer's work primarily focused on enhancing the HomeMe application's frontend by rigorously addressing UI inconsistencies, extensive translation gaps across multiple pages (English, Arabic, French), and critical functionality issues. Key accomplishments include harmonizing the pricing display with dynamic annual calculations, resolving button navigation and modal issues in the Admin and Compound Management dashboards, and thoroughly localizing content on the , , , , and  pages through iterative fixes based on user feedback. A significant new feature implemented is the **Monitoring Dashboard**, providing real-time statistics and activity logs for Super Admins. The trajectory also initiated the development of a **Subscription Code system**, with initial backend setup and frontend integration into the registration process. User interactions highlighted the importance of distinguishing between preview and production environments for visible changes.
 </analysis>
 
 <product_requirements>
-The HomeMe application is a multilingual residential compound management platform supporting English, Arabic, and French, aiming for an intuitive, fully localized UI with perfect Arabic RTL support. Key development areas and implemented features include:
+The HomeMe application is a multilingual residential compound management platform supporting English, Arabic, and French, with a focus on an intuitive, fully localized UI and Arabic RTL support. Key features developed or enhanced include:
 
-1.  **User Authentication & Public Homepage**: Enhanced the public homepage () to include prominent Login and Register Now buttons in the header, fully localized and styled for a modern user experience. The existing pricing section was refined to display five plans (Community, Basic, Professional, Enterprise, Multi-Compound) with unit-based pricing, currency toggles, and newly added *total annual price* display under the monthly price for each plan.
-2.  **Full Localization**: Achieved 100% translation for all new UI elements, including login/register buttons, annual pricing details, and corrected existing hardcoded strings and missing translations in  for Arabic and French, ensuring RTL support.
-3.  **Branding Integration**: Incorporated partner logos (Data Life, HomeMe) into application footers, dynamically adjusting logo visibility, color, and size. This involved multiple iterations to ensure both logos are displayed with consistent sizing and that language-specific Data Life logos (English, Arabic) are correctly rendered alongside the HomeMe logo.
-4.  **Subscription Code System**: (Pre-existing, verified in initial analysis) Development of a system for static free trial codes, including an input field on the registration page and backend validation APIs.
-5.  **Electronic Payment Integration**: Initiated the integration of PayPal for electronic payment of subscription plans. This involves redirecting users to a checkout page upon selecting a plan and processing payments via PayPal, linking them to existing backend subscription management.
+1.  **User Authentication & Public Homepage**: Refined public homepage with localized login/register buttons and a pricing section displaying five plans, unit-based pricing, currency toggles, and total annual prices.
+2.  **Full Localization**: Achieved comprehensive translation for new UI elements, pricing details, footer logos, and corrected numerous hardcoded strings across , , , , , and .
+3.  **Branding Integration**: Incorporated dynamic partner logos in footers.
+4.  **Electronic Payment Integration**: PayPal integration initiated.
+5.  **Admin Dashboard & Internal Navigation**: Fixed navigation for quick actions and upgrade buttons.
+6.  **Internal Pricing Page Design**: Mirrored homepage's pricing, including five plans, comparison table, currency toggle, and detailed annual pricing.
+7.  **UI Consistency**: Resolved double sidebars, redesigned Settings and Residents List pages.
+8.  **Compound Management Improvements**: Updated tab icons, ensured comprehensive translation, and fixed form elements on the Add New Admin section.
+9.  **Monitoring Dashboard (New)**: Implemented a new dashboard for Super Admins to view user statistics, system health, and activity logs.
+10. **Subscription Code System (New)**: Initiated development to allow Super Admins to create and customers to use codes for trials, fixed-duration subscriptions, or discounts, integrated into the registration process.
 </product_requirements>
 
 <key_technical_concepts>
--   **Frontend Framework**: React.js,  (for routing),  (for internationalization), Tailwind CSS (for modern UI).
--   **Backend Framework**: FastAPI (Python), MongoDB (data storage).
--   **Payment Gateway**: PayPal (via  library).
--   **Containerization/Deployment**: Docker, Kubernetes, Supervisor.
+-   **Frontend**: React.js, ,  (for internationalization), Hero Icons (for UI icons), Tailwind CSS.
+-   **Backend**: FastAPI (Python), MongoDB (data storage).
+-   **Payment Gateway**: PayPal (via ).
+-   **Deployment**: Docker, Kubernetes, Supervisor, Emergent platform.
+-   **Development Tools**: , ,  (for analysis and assistance).
 </key_technical_concepts>
 
 <code_architecture>
@@ -25,57 +31,76 @@ The application uses a monorepo structure with a React frontend and FastAPI back
 
 
 -   ****
-    -   **Importance**: Main FastAPI application handling API routes.
-    -   **Summary of Changes**: Modified to integrate PayPal payment endpoints (, ) by importing functionality from .
+    -   **Importance**: Main FastAPI application.
+    -   **Summary of Changes**: Added new API endpoints for monitoring and subscription code management (, , , , ). Integrated activity logging into the  endpoint.
 -   **** (NEW FILE)
-    -   **Importance**: Encapsulates all PayPal-specific backend logic, including creating and executing payments.
-    -   **Summary of Changes**: New file created to manage PayPal API interactions.
--   ****
-    -   **Importance**: Stores environment variables for the backend.
-    -   **Summary of Changes**: Added  for PayPal API integration.
--   ****
-    -   **Importance**: Lists Python dependencies.
-    -   **Summary of Changes**: Added  to support PayPal integration.
--   ****
-    -   **Importance**: Stores static image assets.
-    -   **Summary of Changes**: Added  (English) and  (updated Arabic) to support dynamic logo display in the footer.
+    -   **Importance**: Handles logging user activities and system events.
+    -   **Summary of Changes**: Created to provide functions for recording system activities.
+-   **** (NEW FILE)
+    -   **Importance**: Contains backend logic for generating various statistics for the monitoring dashboard.
+    -   **Summary of Changes**: Created to encapsulate logic for retrieving user, compound, and system health metrics.
+-   **** (NEW FILE)
+    -   **Importance**: Defines models and API logic for managing subscription codes (creation, validation, activation).
+    -   **Summary of Changes**: Created to handle the new subscription code feature.
+-   **** (NEW FILE)
+    -   **Importance**: A temporary utility script to create a Super Admin user.
+    -   **Summary of Changes**: Created to provision a Super Admin account programmatically.
 -   ****
     -   **Importance**: Centralized file for all internationalization strings.
-    -   **Summary of Changes**: Extensively updated to include new translation keys for Login and Register Now buttons, annual pricing display, various footer logo strings, and missing French translations for .
+    -   **Summary of Changes**: Extensively updated to include new translation keys for pricing details,  messages,  table elements,  buttons and descriptions,  form fields,  elements,  features, and  page prompts across English, Arabic, and French.
 -   ****
     -   **Importance**: Main application entry point, handles global routing.
-    -   **Summary of Changes**: Added new  definitions for  (linking to ) and  (linking to ) to support the new payment flow.
+    -   **Summary of Changes**: Added new  definitions for  and . An attempted redirect for  to  was added but not fully deployed to production.
 -   ****
     -   **Importance**: The public-facing landing page.
-    -   **Summary of Changes**:
-        -   Added Login and Register Now buttons to the header, with modern styling and correct navigation.
-        -   Modified pricing sections to display a calculated *total annual price* beneath the monthly price for all five plans.
-        -   The footer was iteratively updated to dynamically display Data Life and HomeMe logos, adjusting for language, size consistency, and specific Arabic versions of the Data Life logo.
-        -   Updated Choose Plan buttons to trigger a  function, redirecting to the new  with plan details.
+    -   **Summary of Changes**: Translation keys implemented for the Multi-Compound plan section, removing hardcoded fallback text.
+-   ****
+    -   **Importance**: Provides consistent layout (header, sidebar, footer) for internal pages.
+    -   **Summary of Changes**: Added new sidebar navigation links for Monitoring Dashboard and Subscription Codes, visible only to Super Admins.
+-   ****
+    -   **Importance**: Internal page for displaying subscription plans.
+    -   **Summary of Changes**: Updated to use proper translation keys for annual pricing details (e.g., before discount, you save), removing previous fallback Arabic text to fix shortened display.
+-   ****
+    -   **Importance**: Displays a list of residential units and residents.
+    -   **Summary of Changes**: Added  handler for Add Resident + Family button to navigate to . Replaced all hardcoded strings with translation keys (, , , , , , ).
+-   ****
+    -   **Importance**: Manages various aspects of the residential compound.
+    -   **Summary of Changes**: Comprehensive translation fixes for Residence List tab elements (buttons, statuses, titles, , , ), and Add New Admin form fields and descriptions, replacing hardcoded strings with  calls and ensuring  keys.
+-   ****
+    -   **Importance**: Manages application users.
+    -   **Summary of Changes**: Extensive translation fixes for , table headers, statuses (), roles (, ), and the No phone display.
+-   ****
+    -   **Importance**: User registration page.
+    -   **Summary of Changes**: Added  hook. Integrated an optional  input field, replacing hardcoded texts with  for localization.
+-   ****
+    -   **Importance**: A component for testing updates.
+    -   **Summary of Changes**: Fixed hardcoded Timestamp string to use a translation key.
 -   **** (NEW FILE)
-    -   **Importance**: Initiates the PayPal payment process for selected plans.
-    -   **Summary of Changes**: New file created to handle frontend aspects of the PayPal checkout, including sending plan details to the backend.
+    -   **Importance**: New component for Super Admin to monitor system statistics.
+    -   **Summary of Changes**: Created to display real-time user, compound, and system health statistics, activity logs, and error logs.
 -   **** (NEW FILE)
-    -   **Importance**: Handles the redirection after a successful PayPal payment.
-    -   **Summary of Changes**: New file created to process the return from PayPal and update payment status.
+    -   **Importance**: New component for Super Admin to manage subscription codes.
+    -   **Summary of Changes**: Created to provide an interface for creating, viewing, and managing subscription codes.
 </code_architecture>
 
 <pending_tasks>
-- No explicit pending tasks. All requested features in this trajectory (Login/Register buttons, annual pricing, footer logos, PayPal integration initiation) have been implemented and verified.
+-   **Subscription Code System Completion**: Complete the integration of the subscription code input field into the Pricing/Checkout pages.
+-   **Subscription Code System Functionality**: Implement full frontend functionality within  for Super Admins (create, view, manage codes).
+-   **Backend Code Logic**: Enhance backend logic for comprehensive code validation and activation upon user submission.
+-   **Testing**: Thoroughly test the newly implemented Monitoring Dashboard and the Subscription Code system across all languages.
+-   **Deployment**: Deploy all recent changes to the production environment so users can access the new features and fixes.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer had completed the initial integration of PayPal electronic payment functionality for the subscription plans. This involved:
-1.  Adding  to .
-2.  Installing the  Python library and updating .
-3.  Creating two new frontend pages:  (to initiate the payment process) and  (to handle successful payment redirection).
-4.  Updating  to include routing for these new payment pages.
-5.  Modifying  to ensure that clicking Choose Plan buttons now navigates the user to the  with relevant plan details.
-6.  Creating a new backend file  to house PayPal-specific logic.
-7.  Integrating new PayPal API endpoints (, ) into .
-The backend was restarted, and preliminary testing (navigation, visual display) was conducted. The current state is that the PayPal integration setup is complete, and the application is ready for the user to conduct end-to-end payment testing using a PayPal sandbox account. All previously requested features (Login/Register buttons, annual pricing, footer logos, and full localization) are also confirmed to be working correctly.
+Immediately before this summary request, the AI engineer was actively implementing the **Subscription Code system**. This involved:
+1.  **Backend Setup**: Creating  to define code models and API logic, and integrating new endpoints into  for code management, validation, and activation.
+2.  **Frontend Admin Interface**: Creating  for Super Admin to manage codes.
+3.  **Routing and Navigation**: Adding a new route () in  and a corresponding link in the  sidebar, restricted to Super Admins.
+4.  **Registration Integration**: Modifying  to include an optional subscription code input field, ensuring it uses  and replaces hardcoded texts with translation keys.
+5.  **Localization**: Adding all necessary new translation keys related to subscription codes to  across English, Arabic, and French.
+The last action was **updating the  script** to set the Super Admin's email to  as requested by the user.
 </current_work>
 
 <optional_next_step>
-Wait for user feedback after their final verification, or suggest full end-to-end PayPal payment testing.
+Complete the integration of the subscription code feature by adding the input field to the Pricing/Checkout pages.
 </optional_next_step>

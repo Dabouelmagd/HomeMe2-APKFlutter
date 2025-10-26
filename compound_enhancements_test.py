@@ -15,7 +15,7 @@ from PIL import Image
 from backend_test import CompoundManagementTestSuite
 
 # Configuration
-BASE_URL = "https://homeme-multilingual.preview.emergentagent.com/api"
+BASE_URL = "https://compound-dashboard.preview.emergentagent.com/api"
 
 class CompoundEnhancementsTestSuite(CompoundManagementTestSuite):
     def __init__(self):

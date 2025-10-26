@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://homeme-multilingual.preview.emergentagent.com/api"
+BASE_URL = "https://compound-dashboard.preview.emergentagent.com/api"
 
 class ArabicVerificationTest:
     def __init__(self):

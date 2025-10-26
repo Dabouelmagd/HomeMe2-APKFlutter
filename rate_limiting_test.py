@@ -22,7 +22,7 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 
 # Configuration - Using the production URL from frontend/.env
-BASE_URL = "https://homeme-multilingual.preview.emergentagent.com/api"
+BASE_URL = "https://compound-dashboard.preview.emergentagent.com/api"
 
 class RateLimitingTestSuite:
     def __init__(self):

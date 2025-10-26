@@ -1964,34 +1964,29 @@ async def register(user_data: UserCreate):
         raise HTTPException(status_code=400, detail="Username or email already exists")
     
     # Check subscription code if provided
-    subscription_expiry = None
+    subscription_info = None
     if user_data.subscription_code:
-        code = await db.subscription_codes.find_one({
-            "code": user_data.subscription_code,
-            "is_active": True,
-            "used_by": None
-        })
-        
-        if not code:
-            raise HTTPException(status_code=400, detail="Invalid or already used subscription code")
-        
-        # Calculate expiry date
-        if code["duration_months"] == -1:
-            # Lifetime access (set to 100 years from now)
-            subscription_expiry = datetime.utcnow() + timedelta(days=36500)
-        else:
-            subscription_expiry = datetime.utcnow() + timedelta(days=30 * code["duration_months"])
-        
-        # Mark code as used
-        await db.subscription_codes.update_one(
-            {"id": code["id"]},
-            {
-                "$set": {
-                    "used_by": user_data.username,
-                    "used_at": datetime.utcnow()
-                }
-            }
+        # Use SubscriptionCodeManager to verify and apply code
+        verification = await SubscriptionCodeManager.verify_code(
+            user_data.subscription_code.upper().strip(),
+            None  # No user_id yet since user not created
         )
+        
+        if not verification.get("valid"):
+            error_message = verification.get("error", "invalid_code")
+            error_messages = {
+                "code_not_found": "Invalid subscription code",
+                "code_deactivated": "This code has been deactivated",
+                "code_expired": "This code has expired",
+                "code_max_uses_reached": "This code has reached maximum uses",
+                "verification_error": "Error verifying code"
+            }
+            raise HTTPException(
+                status_code=400, 
+                detail=error_messages.get(error_message, "Invalid subscription code")
+            )
+        
+        subscription_info = verification
     
     # Hash password
     password_hash = hash_password(user_data.password)
@@ -2011,11 +2006,23 @@ async def register(user_data: UserCreate):
     
     # Add subscription info if code was used
     user_dict = user.dict()
-    if subscription_expiry:
-        user_dict["subscription_expiry"] = subscription_expiry
-        user_dict["subscription_type"] = "code_activated"
+    if subscription_info:
+        subscription_end = datetime.now(timezone.utc) + timedelta(days=subscription_info["duration_days"])
+        user_dict["subscription_active"] = True
+        user_dict["subscription_type"] = subscription_info["type"]
+        user_dict["subscription_start"] = datetime.now(timezone.utc).isoformat()
+        user_dict["subscription_end"] = subscription_end.isoformat()
+        user_dict["subscription_code_used"] = user_data.subscription_code.upper().strip()
     
     await db.users.insert_one(user_dict)
+    
+    # Apply subscription code after user is created
+    if subscription_info:
+        await SubscriptionCodeManager.apply_code(
+            user_data.subscription_code.upper().strip(),
+            user.id,
+            user.username
+        )
     
     # Create family if resident
     if user_data.role == UserRole.RESIDENT and user_data.unit_number:

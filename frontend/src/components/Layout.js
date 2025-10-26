@@ -12,6 +12,7 @@ import {
   SpeakerWaveIcon,
   ChartBarIcon,
   ChartPieIcon,
+  TicketIcon,
   CurrencyDollarIcon,
   ChatBubbleLeftEllipsisIcon,
   BellIcon,

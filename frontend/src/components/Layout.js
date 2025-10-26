@@ -188,6 +188,12 @@ const Layout = ({ children, isTrialMode = false }) => {
           href: 'monitoring',
           icon: ChartPieIcon,
           show: user?.role === 'admin'
+        },
+        {
+          name: t('subscription_codes'),
+          href: 'subscription-codes',
+          icon: TicketIcon,
+          show: user?.role === 'admin' && user?.email === 'ahmedshamandy.eg@gmail.com'
         }
       ]
     },

@@ -161,7 +161,7 @@ const Register = () => {
           {/* Subscription Code Field */}
           <div className="form-group">
             <label htmlFor="subscription_code" className="form-label">
-              Subscription Code (Optional)
+              {t('subscription_code_optional')}
             </label>
             <input
               type="text"
@@ -170,10 +170,10 @@ const Register = () => {
               value={formData.subscription_code}
               onChange={handleChange}
               className="form-input"
-              placeholder="Enter subscription code for free access"
+              placeholder={t('enter_subscription_code_placeholder')}
             />
             <p className="text-xs text-gray-500 mt-1">
-              Have a subscription code? Enter it here to get free access for 3, 6, 12 months or lifetime!
+              {t('subscription_code_register_hint')}
             </p>
           </div>
 

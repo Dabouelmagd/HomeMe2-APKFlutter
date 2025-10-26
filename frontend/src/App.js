@@ -382,6 +382,12 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
+                <Route path="subscription-codes" element={
+                  <ProtectedRoute adminOnly>
+                    <SubscriptionCodes />
+                  </ProtectedRoute>
+                } />
+                
                 <Route path="services" element={
                   <ServicesManagement />
                 } />

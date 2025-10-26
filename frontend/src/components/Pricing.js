@@ -438,6 +438,60 @@ const Pricing = () => {
           )}
         </div>
 
+        {/* Subscription Code Section */}
+        <div className="mb-8 text-center">
+          <button
+            onClick={() => setShowSubscriptionCode(!showSubscriptionCode)}
+            className="inline-flex items-center space-x-2 text-purple-600 hover:text-purple-800 font-medium"
+          >
+            <TicketIcon className="h-5 w-5" />
+            <span>{t('have_subscription_code')}</span>
+          </button>
+          
+          {showSubscriptionCode && (
+            <div className="mt-4 max-w-md mx-auto">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-purple-800">
+                  {t('subscription_code_pricing_hint')}
+                </p>
+              </div>
+              
+              <div className="flex rounded-lg shadow-sm">
+                <input
+                  type="text"
+                  value={subscriptionCode}
+                  onChange={(e) => setSubscriptionCode(e.target.value.toUpperCase())}
+                  placeholder={t('enter_subscription_code_placeholder')}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 uppercase"
+                  maxLength={14}
+                />
+                <button
+                  onClick={verifySubscriptionCode}
+                  disabled={verifyingCode}
+                  className="px-6 py-2 bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {verifyingCode ? t('verifying') : t('verify')}
+                </button>
+              </div>
+            </div>
+          )}
+          
+          {verifiedCode && (
+            <div className="mt-4 inline-flex flex-col items-center space-y-2 bg-purple-50 text-purple-800 px-6 py-3 rounded-lg border border-purple-200">
+              <div className="flex items-center space-x-2">
+                <CheckIcon className="h-5 w-5" />
+                <span className="font-semibold">{t('valid_subscription_code')}</span>
+              </div>
+              <div className="text-sm">
+                {t('duration')}: {verifiedCode.duration_months} {t('months')}
+              </div>
+              <div className="text-xs text-purple-600">
+                {t('code_will_be_applied_at_registration')}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {plans.map((plan) => {

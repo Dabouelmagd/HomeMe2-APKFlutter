@@ -25,7 +25,7 @@ async def create_super_admin():
     db = client[DB_NAME]
     
     # Super Admin details
-    email = "ahmedshamandy.eg@gmail.com"
+    email = "dalia.abouelmagd@gmail.com"
     username = "superadmin"
     password = "SuperAdmin@2024"  # Change this password after first login!
     

@@ -89,38 +89,57 @@ const SubscriptionCodes = () => {
   };
 
   const handleDeactivateCode = async (code) => {
-    if (!window.confirm(t('confirm_deactivate_code'))) return;
-
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(
-        `${API}/api/subscription-codes/${code}/deactivate`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      toast.success(t('code_deactivated'));
-      fetchCodes();
-    } catch (error) {
-      console.error('Error deactivating code:', error);
-      toast.error(t('failed_to_deactivate_code'));
-    }
+    setConfirmAction({
+      type: 'deactivate',
+      code: code,
+      title: t('confirm_deactivate'),
+      message: t('deactivate_code_warning'),
+      confirmText: t('deactivate'),
+      confirmColor: 'orange'
+    });
+    setShowConfirmModal(true);
   };
 
   const handleDeleteCode = async (code) => {
-    if (!window.confirm(t('confirm_delete_code'))) return;
+    setConfirmAction({
+      type: 'delete',
+      code: code,
+      title: t('confirm_delete'),
+      message: t('delete_code_warning'),
+      confirmText: t('delete'),
+      confirmColor: 'red'
+    });
+    setShowConfirmModal(true);
+  };
+
+  const executeAction = async () => {
+    if (!confirmAction) return;
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API}/api/subscription-codes/${code}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      toast.success(t('code_deleted'));
+      
+      if (confirmAction.type === 'deactivate') {
+        await axios.post(
+          `${API}/api/subscription-codes/${confirmAction.code}/deactivate`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast.success(t('code_deactivated'));
+      } else if (confirmAction.type === 'delete') {
+        await axios.delete(
+          `${API}/api/subscription-codes/${confirmAction.code}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        toast.success(t('code_deleted'));
+      }
+      
       fetchCodes();
     } catch (error) {
-      console.error('Error deleting code:', error);
-      toast.error(t('failed_to_delete_code'));
+      console.error(`Error ${confirmAction.type}ing code:`, error);
+      toast.error(t(`failed_to_${confirmAction.type}_code`));
+    } finally {
+      setShowConfirmModal(false);
+      setConfirmAction(null);
     }
   };
 

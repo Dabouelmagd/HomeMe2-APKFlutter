@@ -11852,6 +11852,66 @@ async def list_subscription_codes_public(
         logging.error(f"Error listing codes: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/subscription-codes/{code}/deactivate")
+async def deactivate_code_public(
+    code: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Deactivate a subscription code (Super Admin only)"""
+    try:
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com", "dalia.abouelmagd@gmail.com"]:
+            raise HTTPException(
+                status_code=403,
+                detail="Only the application owner can deactivate codes"
+            )
+        
+        success = await SubscriptionCodeManager.deactivate_code(code)
+        
+        if success:
+            await ActivityLogger.log_activity(
+                action_type="deactivate_subscription_code",
+                username=current_user.username,
+                details=f"Deactivated code: {code}"
+            )
+            return {"success": True, "message": "Code deactivated successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="Code not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deactivating code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/api/subscription-codes/{code}")
+async def delete_code_public(
+    code: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a subscription code (Super Admin only)"""
+    try:
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com", "dalia.abouelmagd@gmail.com"]:
+            raise HTTPException(
+                status_code=403,
+                detail="Only the application owner can delete codes"
+            )
+        
+        success = await SubscriptionCodeManager.delete_code(code)
+        
+        if success:
+            await ActivityLogger.log_activity(
+                action_type="delete_subscription_code",
+                username=current_user.username,
+                details=f"Deleted code: {code}"
+            )
+            return {"success": True, "message": "Code deleted successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="Code not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error deleting code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include optional routers if they exist
 if payments_router:
     app.include_router(payments_router)

@@ -12503,7 +12503,7 @@ async def apply_subscription_code(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/api/subscription-codes/list")
+@api_router.get("/subscription-codes/list")
 async def list_subscription_codes(
     include_inactive: bool = False,
     current_user: User = Depends(get_current_user)
@@ -12525,7 +12525,7 @@ async def list_subscription_codes(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/subscription-codes/{code}/deactivate")
+@api_router.post("/subscription-codes/{code}/deactivate")
 async def deactivate_subscription_code(
     code: str,
     current_user: User = Depends(get_current_user)

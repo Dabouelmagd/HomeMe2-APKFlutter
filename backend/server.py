@@ -12415,7 +12415,7 @@ async def create_subscription_code(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/subscription-codes/verify")
+@api_router.post("/subscription-codes/verify")
 async def verify_subscription_code(code: str, user_id: str = None):
     """Verify a subscription code (public endpoint)"""
     try:
@@ -12426,7 +12426,7 @@ async def verify_subscription_code(code: str, user_id: str = None):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/api/subscription-codes/apply")
+@api_router.post("/subscription-codes/apply")
 async def apply_subscription_code(
     code: str,
     current_user: User = Depends(get_current_user)

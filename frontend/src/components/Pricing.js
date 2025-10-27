@@ -862,9 +862,97 @@ const Pricing = () => {
               <h3 className="font-semibold text-center text-gray-900 text-center mb-2">{t('how_free_invitations_work')}</h3>
               <p className="text-gray-600">{t('free_invitations_answer')}</p>
             </div>
-            <div>
-              <h3 className="font-semibold text-center text-gray-900 text-center mb-2">{t('what_payment_methods_accept')}</h3>
-              <p className="text-gray-600">{t('payment_methods_answer')}</p>
+          </div>
+        </div>
+
+        {/* Payment Methods Section */}
+        <div className="mt-16 mb-12">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">{t('what_payment_methods_accept')}</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">{t('payment_methods_subtitle')}</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            {/* Cash */}
+            <div className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-green-200 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-50 to-green-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-3xl">💵</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 text-center mb-2">{t('cash_payment')}</h3>
+              <p className="text-sm text-gray-500 text-center">{t('cash_payment_desc')}</p>
+            </div>
+
+            {/* Credit/Debit Card */}
+            <div className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-blue-200 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-3xl">💳</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 text-center mb-2">{t('card_payment')}</h3>
+              <p className="text-sm text-gray-500 text-center">{t('card_payment_desc')}</p>
+            </div>
+
+            {/* Bank Transfer */}
+            <div className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-purple-200 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-3xl">🏦</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 text-center mb-2">{t('bank_transfer')}</h3>
+              <p className="text-sm text-gray-500 text-center">{t('bank_transfer_desc')}</p>
+            </div>
+
+            {/* InstaPay */}
+            <div className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-yellow-200 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-3xl">⚡</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 text-center mb-2">{t('instapay')}</h3>
+              <p className="text-sm text-gray-500 text-center">{t('instapay_desc')}</p>
+            </div>
+
+            {/* Mobile Payment */}
+            <div className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-pink-200 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-3xl">📱</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 text-center mb-2">{t('mobile_payment')}</h3>
+              <p className="text-sm text-gray-500 text-center">{t('mobile_payment_desc')}</p>
+            </div>
+
+            {/* Digital Wallet */}
+            <div className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-indigo-200 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-3xl">👛</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 text-center mb-2">{t('digital_wallet')}</h3>
+              <p className="text-sm text-gray-500 text-center">{t('digital_wallet_desc')}</p>
+            </div>
+
+            {/* QR Code */}
+            <div className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-teal-200 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-3xl">📊</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 text-center mb-2">{t('qr_payment')}</h3>
+              <p className="text-sm text-gray-500 text-center">{t('qr_payment_desc')}</p>
+            </div>
+
+            {/* PayPal */}
+            <div className="group bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-blue-300 transition-all duration-300 transform hover:-translate-y-1">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-3xl">🌐</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 text-center mb-2">{t('paypal')}</h3>
+              <p className="text-sm text-gray-500 text-center">{t('paypal_desc')}</p>
+            </div>
+          </div>
+
+          {/* Security Badge */}
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center space-x-2 bg-green-50 text-green-700 px-6 py-3 rounded-full border border-green-200">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span className="font-medium">{t('secure_payment_guarantee')}</span>
             </div>
           </div>
         </div>

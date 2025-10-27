@@ -20,6 +20,8 @@ const SubscriptionCodes = () => {
   const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmAction, setConfirmAction] = useState(null);
   const [formData, setFormData] = useState({
     code_type: '3_months',
     duration_months: 3,

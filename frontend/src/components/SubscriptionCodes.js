@@ -447,27 +447,54 @@ const SubscriptionCodes = () => {
 
       {/* Confirmation Modal */}
       {showConfirmModal && confirmAction && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all animate-slideUp">
+            {/* Icon */}
+            <div className={`mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 ${
+              confirmAction.confirmColor === 'red' ? 'bg-red-100' : 'bg-orange-100'
+            }`}>
+              {confirmAction.confirmColor === 'red' ? (
+                <TrashIcon className="h-8 w-8 text-red-600" />
+              ) : (
+                <XCircleIcon className="h-8 w-8 text-orange-600" />
+              )}
+            </div>
+            
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
               {confirmAction.title}
             </h2>
-            <p className="text-gray-600 mb-6">
+            
+            {/* Message */}
+            <p className="text-gray-600 mb-2 text-center leading-relaxed">
               {confirmAction.message}
             </p>
-            <div className="flex justify-end space-x-3">
+            
+            {/* Code Display */}
+            <div className="bg-gray-50 rounded-lg p-3 mb-6">
+              <code className="text-sm font-mono text-gray-900 block text-center">
+                {confirmAction.code}
+              </code>
+            </div>
+            
+            {/* Buttons */}
+            <div className="flex justify-center space-x-3">
               <button
                 onClick={() => {
                   setShowConfirmModal(false);
                   setConfirmAction(null);
                 }}
-                className="btn btn-secondary"
+                className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200"
               >
                 {t('cancel')}
               </button>
               <button
                 onClick={executeAction}
-                className={`btn ${confirmAction.confirmColor === 'red' ? 'btn-danger' : 'btn-warning'}`}
+                className={`px-6 py-2.5 font-medium rounded-lg transition-all duration-200 transform hover:scale-105 ${
+                  confirmAction.confirmColor === 'red'
+                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-200'
+                    : 'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-200'
+                }`}
               >
                 {confirmAction.confirmText}
               </button>

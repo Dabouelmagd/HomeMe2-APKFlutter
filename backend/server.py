@@ -12557,7 +12557,7 @@ async def deactivate_subscription_code(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.delete("/api/subscription-codes/{code}")
+@api_router.delete("/subscription-codes/{code}")
 async def delete_subscription_code(
     code: str,
     current_user: User = Depends(get_current_user)

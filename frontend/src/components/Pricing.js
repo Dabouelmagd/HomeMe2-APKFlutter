@@ -256,12 +256,7 @@ const Pricing = () => {
     
     setVerifyingCode(true);
     try {
-      const response = await axios.post(`${API}/api/subscription-codes/verify`, null, {
-        params: {
-          code: subscriptionCode.trim(),
-          user_id: user?.id
-        }
-      });
+      const response = await axios.get(`${API}/api/subscription-codes/check/${subscriptionCode.trim().toUpperCase()}`);
       
       if (response.data.valid) {
         setVerifiedCode(response.data);

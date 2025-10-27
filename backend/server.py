@@ -12564,7 +12564,7 @@ async def delete_subscription_code(
 ):
     """Delete a subscription code (Super Admin only)"""
     try:
-        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com"]:
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com", "dalia.abouelmagd@gmail.com"]:
             raise HTTPException(
                 status_code=403,
                 detail="Only the application owner can delete codes"

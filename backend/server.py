@@ -11819,6 +11819,18 @@ async def get_user_subscription(user_id: str, current_user: User = Depends(get_c
 # Include the API router after all endpoints are defined
 app.include_router(api_router)
 
+# Subscription code check endpoint (must be after router include)
+@app.get("/api/subscription-codes/check/{code}")
+async def check_subscription_code_public(code: str):
+    """Check/verify a subscription code (public endpoint)"""
+    try:
+        code = code.strip().upper()
+        result = await SubscriptionCodeManager.verify_code(code, None)
+        return result
+    except Exception as e:
+        logging.error(f"Error checking code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include optional routers if they exist
 if payments_router:
     app.include_router(payments_router)

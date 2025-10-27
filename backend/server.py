@@ -12415,6 +12415,19 @@ async def create_subscription_code(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# Subscription Code Public Endpoints (must be before /{code} routes)
+@api_router.get("/subscription-codes/check/{code}")
+async def check_subscription_code(code: str):
+    """Check/verify a subscription code (public endpoint)"""
+    try:
+        code = code.strip().upper()
+        result = await SubscriptionCodeManager.verify_code(code, None)
+        return result
+    except Exception as e:
+        logging.error(f"Error checking code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.post("/subscription-codes/verify")
 async def verify_subscription_code(code: str, user_id: str = None):
     """Verify a subscription code (public endpoint)"""

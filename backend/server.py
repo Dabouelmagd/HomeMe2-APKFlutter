@@ -12421,7 +12421,7 @@ async def create_subscription_code(
     try:
         # Check if user is super admin (you can check by email or specific username)
         # For now, only allow specific admin email
-        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com"]:
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com", "dalia.abouelmagd@gmail.com"]:
             raise HTTPException(
                 status_code=403,
                 detail="Only the application owner can create subscription codes"

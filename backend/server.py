@@ -12510,7 +12510,7 @@ async def list_subscription_codes(
 ):
     """List all subscription codes (Super Admin only)"""
     try:
-        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com"]:
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com", "dalia.abouelmagd@gmail.com"]:
             raise HTTPException(
                 status_code=403,
                 detail="Only the application owner can view subscription codes"

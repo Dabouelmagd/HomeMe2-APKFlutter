@@ -11764,32 +11764,6 @@ async def get_subscription_codes_stats(current_user: User = Depends(require_admi
         logging.error(f"Error getting subscription stats: {e}")
         raise HTTPException(status_code=500, detail="خطأ في الحصول على الإحصائيات")
 
-@api_router.get("/subscription-codes/{code}", response_model=SubscriptionCodeResponse)
-async def get_subscription_code_info(code: str):
-    """الحصول على معلومات كود اشتراك"""
-    try:
-        code = code.strip().upper()
-        subscription_code = await db.subscription_codes.find_one({"code": code})
-        
-        if not subscription_code:
-            return SubscriptionCodeResponse(
-                success=False,
-                message="الكود غير موجود"
-            )
-        
-        return SubscriptionCodeResponse(
-            success=True,
-            message="تم العثور على الكود",
-            code=SubscriptionCode(**subscription_code)
-        )
-        
-    except Exception as e:
-        logging.error(f"Error getting subscription code info: {e}")
-        return SubscriptionCodeResponse(
-            success=False,
-            message="خطأ في الحصول على معلومات الكود"
-        )
-
 @api_router.delete("/admin/subscription-codes/{code_id}")
 async def delete_subscription_code(code_id: str, current_user: User = Depends(require_admin)):
     """حذف كود اشتراك"""

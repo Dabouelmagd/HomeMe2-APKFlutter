@@ -11819,7 +11819,7 @@ async def get_user_subscription(user_id: str, current_user: User = Depends(get_c
 # Include the API router after all endpoints are defined
 app.include_router(api_router)
 
-# Subscription code check endpoint (must be after router include)
+# Subscription code public endpoints (must be after router include)
 @app.get("/api/subscription-codes/check/{code}")
 async def check_subscription_code_public(code: str):
     """Check/verify a subscription code (public endpoint)"""
@@ -11829,6 +11829,27 @@ async def check_subscription_code_public(code: str):
         return result
     except Exception as e:
         logging.error(f"Error checking code: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/subscription-codes/list")
+async def list_subscription_codes_public(
+    include_inactive: bool = False,
+    current_user: User = Depends(get_current_user)
+):
+    """List all subscription codes (Super Admin only)"""
+    try:
+        if current_user.email not in ["ahmedshamandy.eg@gmail.com", "admin@homeme.com", "dalia.abouelmagd@gmail.com"]:
+            raise HTTPException(
+                status_code=403,
+                detail="Only the application owner can view subscription codes"
+            )
+        
+        codes = await SubscriptionCodeManager.get_all_codes(include_inactive)
+        return {"codes": codes}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error listing codes: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Include optional routers if they exist

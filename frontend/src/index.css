@@ -11,6 +11,42 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Payment Card Hover Animation */
+@keyframes payment-card-hover {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes icon-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.payment-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.payment-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.payment-card:hover .payment-icon {
+  animation: icon-bounce 0.6s ease-in-out;
+}
+
+.payment-card:active {
+  transform: translateY(-4px);
+}
+
 /* PWA Install Prompt Animation */
 @keyframes slide-up {
   from {

@@ -875,7 +875,7 @@ const Pricing = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {/* Cash */}
             <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-green-300 cursor-pointer">
-              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-green-50 to-green-100 rounded-xl flex items-center justify-center mx-auto mb-4"">
+              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-green-50 to-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">💵</span>
               </div>
               <h3 className="font-semibold text-gray-900 text-center mb-2">{t('cash_payment')}</h3>
@@ -884,7 +884,7 @@ const Pricing = () => {
 
             {/* Credit/Debit Card */}
             <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-blue-300 cursor-pointer">
-              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4"">
+              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">💳</span>
               </div>
               <h3 className="font-semibold text-gray-900 text-center mb-2">{t('card_payment')}</h3>
@@ -893,7 +893,7 @@ const Pricing = () => {
 
             {/* Bank Transfer */}
             <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-purple-300 cursor-pointer">
-              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4"">
+              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">🏦</span>
               </div>
               <h3 className="font-semibold text-gray-900 text-center mb-2">{t('bank_transfer')}</h3>
@@ -902,7 +902,7 @@ const Pricing = () => {
 
             {/* InstaPay */}
             <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-yellow-300 cursor-pointer">
-              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl flex items-center justify-center mx-auto mb-4"">
+              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">⚡</span>
               </div>
               <h3 className="font-semibold text-gray-900 text-center mb-2">{t('instapay')}</h3>
@@ -911,7 +911,7 @@ const Pricing = () => {
 
             {/* Mobile Payment */}
             <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-pink-300 cursor-pointer">
-              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl flex items-center justify-center mx-auto mb-4"">
+              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">📱</span>
               </div>
               <h3 className="font-semibold text-gray-900 text-center mb-2">{t('mobile_payment')}</h3>
@@ -920,7 +920,7 @@ const Pricing = () => {
 
             {/* Digital Wallet */}
             <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-indigo-300 cursor-pointer">
-              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-4"">
+              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">👛</span>
               </div>
               <h3 className="font-semibold text-gray-900 text-center mb-2">{t('digital_wallet')}</h3>
@@ -929,7 +929,7 @@ const Pricing = () => {
 
             {/* QR Code */}
             <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-teal-300 cursor-pointer">
-              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl flex items-center justify-center mx-auto mb-4"">
+              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">📊</span>
               </div>
               <h3 className="font-semibold text-gray-900 text-center mb-2">{t('qr_payment')}</h3>
@@ -938,7 +938,7 @@ const Pricing = () => {
 
             {/* PayPal */}
             <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:border-blue-300 transition-all duration-300 transform hover:-translate-y-1">
-              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4"">
+              <div className="payment-icon w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">🌐</span>
               </div>
               <h3 className="font-semibold text-gray-900 text-center mb-2">{t('paypal')}</h3>

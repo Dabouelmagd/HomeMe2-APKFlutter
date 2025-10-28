@@ -1457,12 +1457,15 @@ const ServicesManagement = () => {
             <div className="mb-12">
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('supported_payment_methods')}</h3>
-                <p className="text-gray-600">{t('payment_methods_subtitle')}</p>
+                <p className="text-gray-600">{t('click_to_enter_payment_details')}</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {/* Cash */}
-                <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-green-300 cursor-pointer">
+                <div 
+                  onClick={() => handlePaymentMethodClick({value: 'cash', label: t('cash_payment'), icon: '💵'})}
+                  className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-green-300 cursor-pointer"
+                >
                   <div className="payment-icon w-16 h-16 bg-gradient-to-br from-green-50 to-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">💵</span>
                   </div>
@@ -1471,7 +1474,10 @@ const ServicesManagement = () => {
                 </div>
 
                 {/* Credit/Debit Card */}
-                <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-blue-300 cursor-pointer">
+                <div 
+                  onClick={() => handlePaymentMethodClick({value: 'card', label: t('card_payment'), icon: '💳'})}
+                  className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-blue-300 cursor-pointer"
+                >
                   <div className="payment-icon w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">💳</span>
                   </div>
@@ -1480,7 +1486,10 @@ const ServicesManagement = () => {
                 </div>
 
                 {/* Bank Transfer */}
-                <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-purple-300 cursor-pointer">
+                <div 
+                  onClick={() => handlePaymentMethodClick({value: 'bank_transfer', label: t('bank_transfer'), icon: '🏦'})}
+                  className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-purple-300 cursor-pointer"
+                >
                   <div className="payment-icon w-16 h-16 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">🏦</span>
                   </div>
@@ -1489,7 +1498,10 @@ const ServicesManagement = () => {
                 </div>
 
                 {/* InstaPay */}
-                <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-yellow-300 cursor-pointer">
+                <div 
+                  onClick={() => handlePaymentMethodClick({value: 'instapay', label: t('instapay'), icon: '⚡'})}
+                  className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-yellow-300 cursor-pointer"
+                >
                   <div className="payment-icon w-16 h-16 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">⚡</span>
                   </div>
@@ -1498,7 +1510,10 @@ const ServicesManagement = () => {
                 </div>
 
                 {/* Mobile Payment */}
-                <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-pink-300 cursor-pointer">
+                <div 
+                  onClick={() => handlePaymentMethodClick({value: 'mobile_pay', label: t('mobile_payment'), icon: '📱'})}
+                  className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-pink-300 cursor-pointer"
+                >
                   <div className="payment-icon w-16 h-16 bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">📱</span>
                   </div>
@@ -1507,7 +1522,10 @@ const ServicesManagement = () => {
                 </div>
 
                 {/* Digital Wallet */}
-                <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-indigo-300 cursor-pointer">
+                <div 
+                  onClick={() => handlePaymentMethodClick({value: 'digital_wallet', label: t('digital_wallet'), icon: '👛'})}
+                  className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-indigo-300 cursor-pointer"
+                >
                   <div className="payment-icon w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">👛</span>
                   </div>
@@ -1516,7 +1534,10 @@ const ServicesManagement = () => {
                 </div>
 
                 {/* QR Code */}
-                <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-teal-300 cursor-pointer">
+                <div 
+                  onClick={() => handlePaymentMethodClick({value: 'qr_code', label: t('qr_payment'), icon: '📊'})}
+                  className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-teal-300 cursor-pointer"
+                >
                   <div className="payment-icon w-16 h-16 bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">📊</span>
                   </div>
@@ -1525,7 +1546,10 @@ const ServicesManagement = () => {
                 </div>
 
                 {/* PayPal */}
-                <div className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-blue-400 cursor-pointer">
+                <div 
+                  onClick={() => handlePaymentMethodClick({value: 'paypal', label: t('paypal'), icon: '🌐'})}
+                  className="payment-card bg-white rounded-2xl p-6 shadow-sm border-2 border-gray-100 hover:border-blue-400 cursor-pointer"
+                >
                   <div className="payment-icon w-16 h-16 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">🌐</span>
                   </div>

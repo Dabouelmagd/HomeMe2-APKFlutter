@@ -1681,6 +1681,254 @@ const ServicesManagement = () => {
           </div>
         </div>
       )}
+      
+      {/* Payment Method Details Modal */}
+      {showPaymentModal && selectedPaymentMethod && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <span className="text-4xl">{selectedPaymentMethod.icon}</span>
+                <h2 className="text-2xl font-bold text-gray-900">{selectedPaymentMethod.label}</h2>
+              </div>
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content based on payment method */}
+            <div className="space-y-4">
+              {/* Cash Payment */}
+              {selectedPaymentMethod.value === 'cash' && (
+                <div className="text-center py-4">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('cash_payment_ready')}</h3>
+                  <p className="text-gray-600">{t('cash_payment_instruction')}</p>
+                </div>
+              )}
+
+              {/* Card Payment */}
+              {selectedPaymentMethod.value === 'card' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('card_number')}</label>
+                    <input
+                      type="text"
+                      placeholder="1234 5678 9012 3456"
+                      value={paymentDetails.card_number}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, card_number: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      maxLength="19"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('card_holder_name')}</label>
+                    <input
+                      type="text"
+                      placeholder="JOHN DOE"
+                      value={paymentDetails.card_holder}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, card_holder: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">{t('expiry_date')}</label>
+                      <input
+                        type="text"
+                        placeholder="MM/YY"
+                        value={paymentDetails.expiry_date}
+                        onChange={(e) => setPaymentDetails({...paymentDetails, expiry_date: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        maxLength="5"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                      <input
+                        type="text"
+                        placeholder="123"
+                        value={paymentDetails.cvv}
+                        onChange={(e) => setPaymentDetails({...paymentDetails, cvv: e.target.value})}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        maxLength="4"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Bank Transfer */}
+              {selectedPaymentMethod.value === 'bank_transfer' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('account_holder_name')}</label>
+                    <input
+                      type="text"
+                      value={paymentDetails.account_holder}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, account_holder: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('bank_name')}</label>
+                    <input
+                      type="text"
+                      value={paymentDetails.bank_name}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, bank_name: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('account_number')}</label>
+                    <input
+                      type="text"
+                      value={paymentDetails.account_number}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, account_number: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">IBAN</label>
+                    <input
+                      type="text"
+                      value={paymentDetails.iban}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, iban: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* InstaPay */}
+              {selectedPaymentMethod.value === 'instapay' && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('phone_number')}</label>
+                    <input
+                      type="tel"
+                      placeholder="+20 123 456 7890"
+                      value={paymentDetails.phone_number}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, phone_number: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
+                    />
+                  </div>
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <p className="text-sm text-yellow-800">{t('instapay_instruction')}</p>
+                  </div>
+                </>
+              )}
+
+              {/* Mobile Payment / Digital Wallet */}
+              {(selectedPaymentMethod.value === 'mobile_pay' || selectedPaymentMethod.value === 'digital_wallet') && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('phone_number')}</label>
+                    <input
+                      type="tel"
+                      placeholder="+20 123 456 7890"
+                      value={paymentDetails.phone_number}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, phone_number: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('wallet_provider')}</label>
+                    <select
+                      value={paymentDetails.wallet_provider}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, wallet_provider: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500"
+                    >
+                      <option value="">{t('select_provider')}</option>
+                      <option value="vodafone_cash">Vodafone Cash</option>
+                      <option value="orange_cash">Orange Cash</option>
+                      <option value="etisalat_cash">Etisalat Cash</option>
+                      <option value="fawry">Fawry</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* QR Code */}
+              {selectedPaymentMethod.value === 'qr_code' && (
+                <>
+                  <div className="text-center py-4">
+                    <div className="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-32 h-32 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm text-gray-600">{t('scan_qr_code_instruction')}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{t('reference_number')}</label>
+                    <input
+                      type="text"
+                      placeholder="QR-123456"
+                      value={paymentDetails.qr_reference}
+                      onChange={(e) => setPaymentDetails({...paymentDetails, qr_reference: e.target.value})}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* PayPal */}
+              {selectedPaymentMethod.value === 'paypal' && (
+                <div className="text-center py-4">
+                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-4xl">🌐</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">PayPal</h3>
+                  <p className="text-gray-600 mb-4">{t('paypal_redirect_instruction')}</p>
+                  <button className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium">
+                    {t('continue_with_paypal')}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Footer Buttons */}
+            {selectedPaymentMethod.value !== 'paypal' && selectedPaymentMethod.value !== 'cash' && (
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setShowPaymentModal(false)}
+                  className="px-6 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg"
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  onClick={handlePaymentSubmit}
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+                >
+                  {t('confirm_payment')}
+                </button>
+              </div>
+            )}
+            
+            {selectedPaymentMethod.value === 'cash' && (
+              <div className="mt-6">
+                <button
+                  onClick={() => setShowPaymentModal(false)}
+                  className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg"
+                >
+                  {t('ok_got_it')}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

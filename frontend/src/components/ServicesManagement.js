@@ -468,6 +468,17 @@ const ServicesManagement = () => {
     { value: 'digital_wallet', label: t('digital_wallet'), icon: '👛' },
     { value: 'qr_code', label: t('qr_code_payment'), icon: '📊' }
   ];
+  
+  const handlePaymentMethodClick = (method) => {
+    setSelectedPaymentMethod(method);
+    setShowPaymentModal(true);
+  };
+  
+  const handlePaymentSubmit = () => {
+    // Handle payment submission
+    toast.success(t('payment_details_saved'));
+    setShowPaymentModal(false);
+  };
 
   useEffect(() => {
     fetchServices();

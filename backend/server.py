@@ -2051,8 +2051,9 @@ async def register(user_data: UserCreate):
     return {
         "message": "User registered successfully",
         "user_id": user.id,
-        "subscription_active": subscription_expiry is not None,
-        "subscription_expiry": subscription_expiry.isoformat() if subscription_expiry else None
+        "subscription_active": True,
+        "subscription_type": user_dict.get("subscription_type", "trial"),
+        "subscription_end": user_dict.get("subscription_end")
     }
 
 @api_router.post("/auth/create-admin")

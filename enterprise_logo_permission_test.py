@@ -24,7 +24,7 @@ from PIL import Image
 from pathlib import Path
 
 # Configuration
-BASE_URL = "https://compound-dashboard.preview.emergentagent.com/api"
+BASE_URL = "https://payment-methods-ui.preview.emergentagent.com/api"
 
 class EnterpriseLogoPermissionTestSuite:
     def __init__(self):

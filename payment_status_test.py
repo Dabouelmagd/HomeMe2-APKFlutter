@@ -6,7 +6,7 @@ Quick test to verify payment status mapping issue
 import requests
 import json
 
-BASE_URL = "https://compound-dashboard.preview.emergentagent.com/api"
+BASE_URL = "https://payment-methods-ui.preview.emergentagent.com/api"
 
 def test_payment_status_mapping():
     """Test to verify payment status after payment processing"""

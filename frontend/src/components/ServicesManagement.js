@@ -430,6 +430,27 @@ const ServicesManagement = () => {
     amount: 0,
     currency: 'USD'
   });
+  
+  // Payment method modal
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState({
+    // For Card
+    card_number: '',
+    card_holder: '',
+    expiry_date: '',
+    cvv: '',
+    // For Bank Transfer
+    account_holder: '',
+    bank_name: '',
+    account_number: '',
+    iban: '',
+    // For Mobile/Digital Wallet
+    phone_number: '',
+    wallet_provider: '',
+    // For QR Code
+    qr_reference: ''
+  });
 
   const priorityOptions = [
     { value: 'emergency', label: t('emergency'), color: 'bg-red-100 text-red-800', description: t('immediate_response_1_hour') },

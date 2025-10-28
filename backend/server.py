@@ -2013,6 +2013,14 @@ async def register(user_data: UserCreate):
         user_dict["subscription_start"] = datetime.now(timezone.utc).isoformat()
         user_dict["subscription_end"] = subscription_end.isoformat()
         user_dict["subscription_code_used"] = user_data.subscription_code.upper().strip()
+    else:
+        # No subscription code - give automatic 30-day free trial
+        trial_end = datetime.now(timezone.utc) + timedelta(days=30)
+        user_dict["subscription_active"] = True
+        user_dict["subscription_type"] = "trial"
+        user_dict["subscription_start"] = datetime.now(timezone.utc).isoformat()
+        user_dict["subscription_end"] = trial_end.isoformat()
+        user_dict["trial_used"] = True
     
     await db.users.insert_one(user_dict)
     

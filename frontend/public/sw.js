@@ -1,5 +1,5 @@
 // HomeMe PWA Service Worker
-const CACHE_VERSION = 'v2.0.0'; // Static version - only update on app changes
+const CACHE_VERSION = 'v2.1.0'; // Static version - only update on app changes
 const CACHE_NAME = `homeme-pwa-${CACHE_VERSION}`;
 const STATIC_CACHE = `homeme-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `homeme-dynamic-${CACHE_VERSION}`;

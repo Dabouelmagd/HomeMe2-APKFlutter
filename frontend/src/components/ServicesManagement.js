@@ -222,168 +222,264 @@ const ServicesManagement = () => {
     // Get current language from state 
     const currentLang = currentLanguage || i18n.language || i18n.resolvedLanguage || 'en';
     
-    // Always force English for testing
-    const forceEnglish = currentLang.startsWith('en') || currentLang === 'en-US@posix';
-    
-    // Translation debug removed
-    
-    // Create comprehensive English translations
+    // English to Arabic/French translations
     const serviceTranslations = {
-      'خدمات السباكة': {
-        name: 'Plumbing Services',
-        specialty: 'Emergency plumbing, pipe repairs, water heater maintenance',
-        description: 'Professional plumbing services including emergency repairs, pipe installation, and water heater maintenance'
+      'Plumbing Services': {
+        ar: {
+          name: 'خدمات السباكة',
+          specialty: 'سباكة الطوارئ، إصلاح الأنابيب، صيانة سخانات المياه',
+          description: 'خدمات سباكة احترافية تشمل إصلاحات الطوارئ، تركيب الأنابيب، وصيانة سخانات المياه'
+        },
+        fr: {
+          name: 'Services de Plomberie',
+          specialty: 'Plomberie d\'urgence, réparation de tuyaux, entretien de chauffe-eau',
+          description: 'Services de plomberie professionnels incluant réparations d\'urgence, installation de tuyaux et entretien de chauffe-eau'
+        }
       },
-      'الخدمات الكهربائية': {
-        name: 'Electrical Services',
-        specialty: 'Electrical repairs, installations, emergency services',
-        description: 'Licensed electricians for all electrical needs including installations, repairs, and emergency services'
+      'Electrical Services': {
+        ar: {
+          name: 'الخدمات الكهربائية',
+          specialty: 'إصلاحات كهربائية، تركيبات، خدمات طوارئ',
+          description: 'كهربائيون مرخصون لجميع الاحتياجات الكهربائية بما في ذلك التركيبات والإصلاحات وخدمات الطوارئ'
+        },
+        fr: {
+          name: 'Services Électriques',
+          specialty: 'Réparations électriques, installations, services d\'urgence',
+          description: 'Électriciens agréés pour tous les besoins électriques incluant installations, réparations et services d\'urgence'
+        }
       },
-      'خدمات التكييف والتهوية': {
-        name: 'HVAC Services',
-        specialty: 'Air conditioning, heating, ventilation systems',
-        description: 'Comprehensive HVAC services including air conditioning repair, heating maintenance, and air quality solutions'
+      'HVAC Services': {
+        ar: {
+          name: 'خدمات التكييف والتهوية',
+          specialty: 'تكييف الهواء، التدفئة، أنظمة التهوية',
+          description: 'خدمات تكييف شاملة بما في ذلك إصلاح التكييف وصيانة أنظمة التدفئة وحلول جودة الهواء'
+        },
+        fr: {
+          name: 'Services CVC',
+          specialty: 'Climatisation, chauffage, systèmes de ventilation',
+          description: 'Services CVC complets incluant réparation de climatisation, maintenance de chauffage et solutions de qualité d\'air'
+        }
       },
-      'الفني العام': {
-        name: 'General Handyman',
-        specialty: 'Minor repairs, installations, home improvements',
-        description: 'Skilled handyman for general repairs, furniture assembly, and minor home improvements'
+      'General Handyman': {
+        ar: {
+          name: 'الفني العام',
+          specialty: 'إصلاحات صغيرة، تركيبات، تحسينات منزلية',
+          description: 'فني ماهر للإصلاحات العامة وتجميع الأثاث والتحسينات المنزلية الصغيرة'
+        },
+        fr: {
+          name: 'Homme à Tout Faire',
+          specialty: 'Réparations mineures, installations, améliorations',
+          description: 'Homme à tout faire qualifié pour réparations générales, assemblage de meubles et améliorations mineures'
+        }
       },
-      'تنظيف المنازل': {
-        name: 'House Cleaning',
-        specialty: 'Regular cleaning, deep cleaning, move-out cleaning',
-        description: 'Professional house cleaning services with flexible scheduling and eco-friendly options'
+      'House Cleaning': {
+        ar: {
+          name: 'تنظيف المنازل',
+          specialty: 'تنظيف منتظم، تنظيف عميق، تنظيف عند الانتقال',
+          description: 'خدمات تنظيف منازل احترافية مع جدولة مرنة وخيارات صديقة للبيئة'
+        },
+        fr: {
+          name: 'Nettoyage de Maison',
+          specialty: 'Nettoyage régulier, nettoyage en profondeur, nettoyage déménagement',
+          description: 'Services de nettoyage professionnels avec horaires flexibles et options écologiques'
+        }
       },
-      'تنظيف السجاد': {
-        name: 'Carpet Cleaning',
-        specialty: 'Deep carpet cleaning, stain removal, upholstery cleaning',
-        description: 'Professional carpet and upholstery cleaning using advanced equipment and safe cleaning solutions'
+      'Carpet Cleaning': {
+        ar: {
+          name: 'تنظيف السجاد',
+          specialty: 'تنظيف السجاد العميق، إزالة البقع، تنظيف الأثاث المنجد',
+          description: 'تنظيف احترافي للسجاد والأثاث المنجد باستخدام معدات متقدمة ومحاليل تنظيف آمنة'
+        },
+        fr: {
+          name: 'Nettoyage de Tapis',
+          specialty: 'Nettoyage profond de tapis, élimination de taches, nettoyage de rembourrage',
+          description: 'Nettoyage professionnel de tapis et rembourrage avec équipement avancé et solutions sûres'
+        }
       },
-      'تنظيف النوافذ': {
-        name: 'Window Cleaning',
-        specialty: 'Interior and exterior window cleaning',
-        description: 'Professional window cleaning for crystal clear views, available for interior and exterior'
+      'Window Cleaning': {
+        ar: {
+          name: 'تنظيف النوافذ',
+          specialty: 'تنظيف النوافذ الداخلية والخارجية',
+          description: 'تنظيف نوافذ احترافي للحصول على رؤية واضحة، خدمة داخلية وخارجية متاحة'
+        },
+        fr: {
+          name: 'Nettoyage de Vitres',
+          specialty: 'Nettoyage de vitres intérieur et extérieur',
+          description: 'Nettoyage professionnel de vitres pour une vue cristalline, service intérieur et extérieur disponible'
+        }
       },
-      'حارس الأمن': {
-        name: 'Security Guard',
-        specialty: '24/7 security, patrol services, event security',
-        description: 'Professional security services including patrol, monitoring, and special event security'
+      'Security Guard': {
+        ar: {
+          name: 'حارس الأمن',
+          specialty: 'أمن على مدار الساعة، خدمات دورية، أمن الفعاليات',
+          description: 'خدمات أمن احترافية تشمل الدوريات والمراقبة وأمن الفعاليات الخاصة'
+        },
+        fr: {
+          name: 'Agent de Sécurité',
+          specialty: 'Sécurité 24/7, services de patrouille, sécurité événements',
+          description: 'Services de sécurité professionnels incluant patrouille, surveillance et sécurité événements spéciaux'
+        }
       },
-      'إعداد نظام التحكم بالدخول': {
-        name: 'Access Control Setup',
-        specialty: 'Key card systems, door locks, security cameras',
-        description: 'Installation and maintenance of access control systems, smart locks, and surveillance equipment'
+      'Access Control Setup': {
+        ar: {
+          name: 'إعداد نظام التحكم بالدخول',
+          specialty: 'أنظمة البطاقات، أقفال الأبواب، كاميرات الأمن',
+          description: 'تركيب وصيانة أنظمة التحكم بالدخول والأقفال الذكية ومعدات المراقبة'
+        },
+        fr: {
+          name: 'Configuration Contrôle d\'Accès',
+          specialty: 'Systèmes de cartes, serrures, caméras de sécurité',
+          description: 'Installation et maintenance de systèmes de contrôle d\'accès, serrures intelligentes et équipement de surveillance'
+        }
       },
-      'تنسيق الحدائق والبستنة': {
-        name: 'Landscaping & Gardening',
-        specialty: 'Garden maintenance, lawn care, plant installation',
-        description: 'Complete landscaping services including garden design, lawn maintenance, and seasonal plant care'
+      'Landscaping & Gardening': {
+        ar: {
+          name: 'تنسيق الحدائق والبستنة',
+          specialty: 'صيانة الحدائق، العناية بالعشب، تركيب النباتات',
+          description: 'خدمات تنسيق حدائق كاملة بما في ذلك تصميم الحدائق وصيانة العشب والعناية الموسمية بالنباتات'
+        },
+        fr: {
+          name: 'Aménagement Paysager',
+          specialty: 'Entretien de jardin, soins de pelouse, installation de plantes',
+          description: 'Services complets d\'aménagement paysager incluant conception de jardin, entretien de pelouse et soins saisonniers'
+        }
       },
-      'صيانة المسابح': {
-        name: 'Pool Maintenance',
-        specialty: 'Pool cleaning, chemical balancing, equipment repair',
-        description: 'Professional pool maintenance including cleaning, chemical treatment, and equipment servicing'
+      'Pool Maintenance': {
+        ar: {
+          name: 'صيانة المسابح',
+          specialty: 'تنظيف المسابح، موازنة المواد الكيميائية، إصلاح المعدات',
+          description: 'صيانة احترافية للمسابح تشمل التنظيف والمعالجة الكيميائية وخدمة المعدات'
+        },
+        fr: {
+          name: 'Entretien de Piscine',
+          specialty: 'Nettoyage de piscine, équilibrage chimique, réparation équipement',
+          description: 'Entretien professionnel de piscine incluant nettoyage, traitement chimique et service d\'équipement'
+        }
       },
-      'خدمات رعاية الحيوانات الأليفة': {
-        name: 'Pet Care Services',
-        specialty: 'Dog walking, pet sitting, grooming',
-        description: 'Trusted pet care services including walking, sitting, feeding, and basic grooming'
+      'Pet Care Services': {
+        ar: {
+          name: 'خدمات رعاية الحيوانات الأليفة',
+          specialty: 'تمشية الكلاب، رعاية الحيوانات، التنظيف',
+          description: 'خدمات رعاية حيوانات موثوقة تشمل التمشية والجلوس والإطعام والتنظيف الأساسي'
+        },
+        fr: {
+          name: 'Services de Soins aux Animaux',
+          specialty: 'Promenade de chiens, garde d\'animaux, toilettage',
+          description: 'Services fiables de soins aux animaux incluant promenade, garde, alimentation et toilettage de base'
+        }
       },
-      'مدرب شخصي': {
-        name: 'Personal Trainer',
-        specialty: 'Physical training, health coaching, group classes',
-        description: 'Certified personal trainers for individual sessions, group fitness, and wellness programs'
+      'Personal Trainer': {
+        ar: {
+          name: 'مدرب شخصي',
+          specialty: 'التدريب البدني، التدريب الصحي، دروس جماعية',
+          description: 'مدربون شخصيون معتمدون لجلسات فردية واللياقة الجماعية وبرامج العافية'
+        },
+        fr: {
+          name: 'Entraîneur Personnel',
+          specialty: 'Entraînement physique, coaching bien-être, cours collectifs',
+          description: 'Entraîneurs personnels certifiés pour séances individuelles, fitness collectif et programmes de bien-être'
+        }
       },
-      'توصيل الطرود': {
-        name: 'Package Delivery',
-        specialty: 'Local delivery, grocery delivery, courier services',
-        description: 'Reliable delivery services for packages, groceries, and courier needs within the compound'
+      'Package Delivery': {
+        ar: {
+          name: 'توصيل الطرود',
+          specialty: 'توصيل محلي، توصيل البقالة، خدمات البريد السريع',
+          description: 'خدمات توصيل موثوقة للطرود والبقالة واحتياجات البريد السريع داخل المجمع'
+        },
+        fr: {
+          name: 'Livraison de Colis',
+          specialty: 'Livraison locale, livraison épicerie, services de messagerie',
+          description: 'Services de livraison fiables pour colis, épicerie et besoins de messagerie dans le complexe'
+        }
       },
-      'خدمات النقل': {
-        name: 'Moving Services',
-        specialty: 'Local moving, furniture moving, packing services',
-        description: 'Professional moving services for relocating within or outside the compound, including packing'
+      'Moving Services': {
+        ar: {
+          name: 'خدمات النقل',
+          specialty: 'نقل محلي، نقل الأثاث، خدمات التعبئة',
+          description: 'خدمات نقل احترافية للانتقال داخل أو خارج المجمع، بما في ذلك التعبئة'
+        },
+        fr: {
+          name: 'Services de Déménagement',
+          specialty: 'Déménagement local, déplacement de meubles, services d\'emballage',
+          description: 'Services de déménagement professionnels pour déplacer dans ou hors du complexe, incluant emballage'
+        }
       },
-      'تخطيط الفعاليات': {
-        name: 'Event Planning',
-        specialty: 'Party planning, corporate events, wedding coordination',
-        description: 'Comprehensive event planning for parties, corporate events, and special occasions'
+      'Event Planning': {
+        ar: {
+          name: 'تخطيط الفعاليات',
+          specialty: 'تخطيط الحفلات، فعاليات الشركات، تنسيق الأعراس',
+          description: 'تخطيط شامل للفعاليات للحفلات وفعاليات الشركات والمناسبات الخاصة'
+        },
+        fr: {
+          name: 'Planification d\'Événements',
+          specialty: 'Planification de fêtes, événements d\'entreprise, coordination mariage',
+          description: 'Planification complète d\'événements pour fêtes, événements d\'entreprise et occasions spéciales'
+        }
       },
-      'خدمات التموين': {
-        name: 'Catering Services',
-        specialty: 'Event catering, meal prep, special dietary needs',
-        description: 'Professional catering for events of all sizes with customizable menus and dietary accommodations'
+      'Catering Services': {
+        ar: {
+          name: 'خدمات التموين',
+          specialty: 'تموين الفعاليات، إعداد الوجبات، احتياجات غذائية خاصة',
+          description: 'تموين احترافي للفعاليات من جميع الأحجام مع قوائم قابلة للتخصيص وتلبية احتياجات غذائية'
+        },
+        fr: {
+          name: 'Services de Restauration',
+          specialty: 'Restauration événements, préparation repas, besoins diététiques spéciaux',
+          description: 'Restauration professionnelle pour événements de toutes tailles avec menus personnalisables et accommodations diététiques'
+        }
       }
     };
     
-    if (forceEnglish || currentLang === 'en' || currentLang.startsWith('en')) {
-      const translation = serviceTranslations[service.name];
-      
-      // Convert working hours from Arabic to English
-      let workingHours = service.working_hours || '';
+    // Convert working hours from Arabic/English
+    let workingHours = service.working_hours || '';
+    if (currentLang === 'ar') {
+      workingHours = workingHours
+        .replace(/AM/g, 'ص')
+        .replace(/PM/g, 'م')
+        .replace(/Emergency service/g, 'خدمة طوارئ')
+        .replace(/Service available/g, 'خدمة متاحة')
+        .replace(/24\/7/g, '24/7');
+    } else if (currentLang === 'fr') {
+      workingHours = workingHours
+        .replace(/AM/g, '')
+        .replace(/PM/g, '')
+        .replace(/Emergency service/g, 'Service d\'urgence')
+        .replace(/Service available/g, 'Service disponible')
+        .replace(/24\/7/g, '24/7');
+    } else {
       workingHours = workingHours
         .replace(/ص/g, 'AM')
         .replace(/م/g, 'PM')
         .replace(/خدمة طوارئ/g, 'Emergency service')
         .replace(/خدمة متاحة/g, 'Service available')
         .replace(/طوارئ/g, 'emergencies');
-      
-      const result = {
-        name: service.name_en || translation?.name || service.name,
-        description: service.description_en || translation?.description || service.description,
-        specialty: service.specialty_en || translation?.specialty || service.specialty,
-        working_hours: service.working_hours_en || workingHours
-      };
-      
-      // English translation applied successfully
-      
-      return result;
-    } else if (currentLang === 'ar') {
+    }
+    
+    // Get translation for current language
+    const translation = serviceTranslations[service.name];
+    
+    if (currentLang === 'ar' && translation?.ar) {
       return {
-        name: service.name_ar || service.name,
-        description: service.description_ar || service.description,
-        specialty: service.specialty_ar || service.specialty,
-        working_hours: service.working_hours_ar || service.working_hours
+        name: translation.ar.name,
+        description: translation.ar.description,
+        specialty: translation.ar.specialty,
+        working_hours: workingHours
       };
-    } else if (currentLang === 'fr') {
-      const translation = serviceTranslations[service.name];
-      const frenchTranslations = {
-        'خدمات السباكة': { name: 'Services de Plomberie', description: 'Services de plomberie professionnels' },
-        'الخدمات الكهربائية': { name: 'Services Électriques', description: 'Services électriques professionnels' },
-        'خدمات التكييف والتهوية': { name: 'Services CVC', description: 'Services de climatisation et ventilation' },
-        'الفني العام': { name: 'Homme à Tout Faire', description: 'Services d\'homme à tout faire' },
-        'تنظيف المنازل': { name: 'Nettoyage de Maison', description: 'Services de nettoyage de maison' },
-        'تنظيف السجاد': { name: 'Nettoyage de Tapis', description: 'Services de nettoyage de tapis' },
-        'تنظيف النوافذ': { name: 'Nettoyage de Vitres', description: 'Services de nettoyage de vitres' },
-        'حارس الأمن': { name: 'Agent de Sécurité', description: 'Services de sécurité professionnels' },
-        'إعداد نظام التحكم بالدخول': { name: 'Configuration Contrôle d\'Accès', description: 'Installation de systèmes de contrôle d\'accès' },
-        'تنسيق الحدائق والبستنة': { name: 'Aménagement Paysager', description: 'Services d\'aménagement paysager' },
-        'صيانة المسابح': { name: 'Entretien de Piscine', description: 'Services d\'entretien de piscine' },
-        'خدمات رعاية الحيوانات الأليفة': { name: 'Services de Soins aux Animaux', description: 'Services de soins pour animaux domestiques' },
-        'مدرب شخصي': { name: 'Entraîneur Personnel', description: 'Services d\'entraînement personnel' },
-        'توصيل الطرود': { name: 'Livraison de Colis', description: 'Services de livraison de colis' },
-        'خدمات النقل': { name: 'Services de Déménagement', description: 'Services de déménagement professionnels' },
-        'تخطيط الفعاليات': { name: 'Planification d\'Événements', description: 'Services de planification d\'événements' },
-        'خدمات التموين': { name: 'Services de Restauration', description: 'Services de restauration professionnels' }
-      };
-      
-      const frenchTranslation = frenchTranslations[service.name];
-      
+    } else if (currentLang === 'fr' && translation?.fr) {
       return {
-        name: service.name_fr || frenchTranslation?.name || service.name,
-        description: service.description_fr || frenchTranslation?.description || service.description,
-        specialty: service.specialty_fr || service.specialty,
-        working_hours: service.working_hours_fr || service.working_hours
+        name: translation.fr.name,
+        description: translation.fr.description,
+        specialty: translation.fr.specialty,
+        working_hours: workingHours
       };
     }
     
-    // No translation applied - using original data
-    
+    // Return English (default)
     return {
       name: service.name,
       description: service.description,
       specialty: service.specialty,
-      working_hours: service.working_hours
+      working_hours: workingHours
     };
   }, [currentLanguage, i18n.language, i18n.resolvedLanguage]);
   const [services, setServices] = useState([]);

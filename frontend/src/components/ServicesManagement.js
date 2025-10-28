@@ -398,6 +398,22 @@ const ServicesManagement = () => {
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [editingService, setEditingService] = useState(null);
+  
+  // Payment method states
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState({
+    card_number: '',
+    card_holder: '',
+    expiry_date: '',
+    cvv: '',
+    account_holder: '',
+    bank_name: '',
+    account_number: '',
+    iban: '',
+    phone_number: '',
+    wallet_provider: '',
+    qr_reference: ''
+  });
 
   const [serviceForm, setServiceForm] = useState({
     name: '',

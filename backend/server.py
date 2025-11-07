@@ -12794,6 +12794,261 @@ async def send_code_to_compound(
 
 # ==================== END SUPER ADMIN COMPOUNDS MANAGEMENT ====================
 
+# ==================== FINANCIAL MANAGEMENT ENDPOINTS ====================
+
+from financial_models import (
+    ExpenseCreate, Expense, RevenueCreate, Revenue,
+    ResidentCharge, ResidentPayment, ResidentAccountSummary,
+    MonthlyReport, FinancialSummary,
+    ExpenseCategory, RevenueSource, PaymentMethod, TransactionStatus
+)
+
+@api_router.post("/financial/expenses")
+async def create_expense(
+    expense_data: ExpenseCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new expense record"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        expense = {
+            "id": str(uuid.uuid4()),
+            "category": expense_data.category,
+            "amount": expense_data.amount,
+            "description": expense_data.description,
+            "date": expense_data.date,
+            "payment_method": expense_data.payment_method,
+            "vendor": expense_data.vendor,
+            "receipt_url": expense_data.receipt_url,
+            "compound_id": expense_data.compound_id,
+            "created_by": current_user.username,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "status": "completed"
+        }
+        
+        await db.expenses.insert_one(expense)
+        
+        await ActivityLogger.log_activity(
+            action_type="expense_created",
+            username=current_user.username,
+            details=f"Created expense: {expense_data.description} - ${expense_data.amount}",
+            status="success"
+        )
+        
+        return {"success": True, "expense": expense}
+    except Exception as e:
+        logging.error(f"Error creating expense: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create expense")
+
+@api_router.get("/financial/expenses")
+async def get_expenses(
+    compound_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    category: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get expenses with filters"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        query = {}
+        if compound_id:
+            query["compound_id"] = compound_id
+        if category:
+            query["category"] = category
+        if start_date and end_date:
+            query["date"] = {"$gte": start_date, "$lte": end_date}
+        
+        expenses = await db.expenses.find(query).sort("date", -1).to_list(None)
+        return {"expenses": expenses}
+    except Exception as e:
+        logging.error(f"Error fetching expenses: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch expenses")
+
+@api_router.post("/financial/revenue")
+async def create_revenue(
+    revenue_data: RevenueCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new revenue record"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        revenue = {
+            "id": str(uuid.uuid4()),
+            "source": revenue_data.source,
+            "amount": revenue_data.amount,
+            "description": revenue_data.description,
+            "date": revenue_data.date,
+            "payment_method": revenue_data.payment_method,
+            "resident_id": revenue_data.resident_id,
+            "compound_id": revenue_data.compound_id,
+            "created_by": current_user.username,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "status": "completed"
+        }
+        
+        await db.revenue.insert_one(revenue)
+        
+        # If payment from resident, update their account
+        if revenue_data.resident_id:
+            await db.resident_payments.insert_one({
+                "id": str(uuid.uuid4()),
+                "resident_id": revenue_data.resident_id,
+                "compound_id": revenue_data.compound_id,
+                "amount": revenue_data.amount,
+                "payment_method": revenue_data.payment_method,
+                "payment_date": revenue_data.date,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            })
+        
+        await ActivityLogger.log_activity(
+            action_type="revenue_created",
+            username=current_user.username,
+            details=f"Created revenue: {revenue_data.description} - ${revenue_data.amount}",
+            status="success"
+        )
+        
+        return {"success": True, "revenue": revenue}
+    except Exception as e:
+        logging.error(f"Error creating revenue: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create revenue")
+
+@api_router.get("/financial/revenue")
+async def get_revenue(
+    compound_id: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    source: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get revenue with filters"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        query = {}
+        if compound_id:
+            query["compound_id"] = compound_id
+        if source:
+            query["source"] = source
+        if start_date and end_date:
+            query["date"] = {"$gte": start_date, "$lte": end_date}
+        
+        revenue = await db.revenue.find(query).sort("date", -1).to_list(None)
+        return {"revenue": revenue}
+    except Exception as e:
+        logging.error(f"Error fetching revenue: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch revenue")
+
+@api_router.get("/financial/reports/summary")
+async def get_financial_summary(
+    compound_id: str,
+    start_date: str,
+    end_date: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get financial summary report"""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        # Get expenses
+        expenses = await db.expenses.find({
+            "compound_id": compound_id,
+            "date": {"$gte": start_date, "$lte": end_date}
+        }).to_list(None)
+        
+        # Get revenue
+        revenue = await db.revenue.find({
+            "compound_id": compound_id,
+            "date": {"$gte": start_date, "$lte": end_date}
+        }).to_list(None)
+        
+        # Calculate totals
+        total_expenses = sum(e["amount"] for e in expenses)
+        total_revenue = sum(r["amount"] for r in revenue)
+        net_profit = total_revenue - total_expenses
+        profit_margin = (net_profit / total_revenue * 100) if total_revenue > 0 else 0
+        
+        # Group by category
+        expenses_by_category = {}
+        for e in expenses:
+            cat = e["category"]
+            expenses_by_category[cat] = expenses_by_category.get(cat, 0) + e["amount"]
+        
+        revenue_by_source = {}
+        for r in revenue:
+            src = r["source"]
+            revenue_by_source[src] = revenue_by_source.get(src, 0) + r["amount"]
+        
+        return {
+            "period": "custom",
+            "start_date": start_date,
+            "end_date": end_date,
+            "total_expenses": total_expenses,
+            "total_revenue": total_revenue,
+            "net_profit": net_profit,
+            "profit_margin": round(profit_margin, 2),
+            "expenses_by_category": expenses_by_category,
+            "revenue_by_source": revenue_by_source
+        }
+    except Exception as e:
+        logging.error(f"Error generating financial summary: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate summary")
+
+@api_router.get("/financial/residents/{resident_id}/account")
+async def get_resident_account(
+    resident_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get financial account details for a specific resident"""
+    if current_user.role != "admin" and current_user.id != resident_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    try:
+        # Get resident info
+        resident = await db.users.find_one({"id": resident_id})
+        if not resident:
+            raise HTTPException(status_code=404, detail="Resident not found")
+        
+        # Get charges
+        charges = await db.resident_charges.find({"resident_id": resident_id}).to_list(None)
+        
+        # Get payments
+        payments = await db.resident_payments.find({"resident_id": resident_id}).sort("payment_date", -1).to_list(None)
+        
+        # Calculate totals
+        total_charges = sum(c["amount"] for c in charges)
+        total_payments = sum(p["amount"] for p in payments)
+        balance = total_charges - total_payments
+        
+        # Get pending charges
+        pending_charges = [c for c in charges if c.get("status") == "pending"]
+        
+        return {
+            "resident_id": resident_id,
+            "resident_name": resident.get("full_name"),
+            "unit_number": resident.get("unit_number"),
+            "total_charges": total_charges,
+            "total_payments": total_payments,
+            "balance": balance,
+            "pending_charges": pending_charges,
+            "recent_payments": payments[:10]  # Last 10 payments
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error fetching resident account: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch account")
+
+# ==================== END FINANCIAL MANAGEMENT ====================
+
 
 @app.on_event("startup")
 async def startup_db_client():

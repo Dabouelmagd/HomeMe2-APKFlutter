@@ -191,10 +191,16 @@ const Layout = ({ children, isTrialMode = false }) => {
           show: user?.role === 'admin'
         },
         {
+          name: 'Compounds Management',
+          href: 'compounds-management',
+          icon: HomeIcon,
+          show: user?.role === 'admin' && user?.compound_id === 'super_admin'
+        },
+        {
           name: t('subscription_codes'),
           href: 'subscription-codes',
           icon: TicketIcon,
-          show: user?.role === 'admin' && user?.email === 'ahmedshamandy.eg@gmail.com'
+          show: user?.role === 'admin' && user?.compound_id === 'super_admin'
         }
       ]
     },

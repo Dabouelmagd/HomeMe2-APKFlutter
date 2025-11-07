@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import {
   ChartBarIcon,
   UsersIcon,
@@ -13,7 +13,11 @@ import {
   ArrowPathIcon,
   CalendarIcon,
   UserGroupIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  BoltIcon,
+  FireIcon,
+  SparklesIcon,
+  ChartPieIcon
 } from '@heroicons/react/24/outline';
 
 const API = process.env.REACT_APP_BACKEND_URL;

@@ -229,9 +229,9 @@ const MonitoringDashboard = () => {
             <div className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Recent Activities
+                  {t('recent_activities')}
                   <span className="ml-3 text-sm font-normal text-gray-500">
-                    Last {activities.length} events
+                    {t('last_events', { count: activities.length })}
                   </span>
                 </h2>
               </div>
@@ -239,7 +239,7 @@ const MonitoringDashboard = () => {
               {activities.length === 0 ? (
                 <div className="text-center py-16">
                   <ClockIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg font-medium">No activities recorded yet</p>
+                  <p className="text-gray-500 text-lg font-medium">{t('no_activities_found')}</p>
                   <p className="text-gray-400 text-sm mt-2">Activity logs will appear here</p>
                 </div>
               ) : (

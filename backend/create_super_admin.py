@@ -6,13 +6,10 @@ Run this once to create the super admin account
 
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
-from passlib.context import CryptContext
+import bcrypt  # Use bcrypt directly like server.py
 import os
 import uuid
 from datetime import datetime, timezone
-
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Database connection
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/homeme_prod')
@@ -31,14 +28,26 @@ async def create_super_admin():
     # Check if user already exists
     existing = await db.users.find_one({"email": email})
     if existing:
-        print(f"✓ Super Admin account already exists!")
+        print(f"✓ Updating existing Super Admin account...")
+        # Update password with bcrypt (same method as server.py)
+        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        await db.users.update_one(
+            {"email": email},
+            {"$set": {
+                "password_hash": password_hash,
+                "username": username,
+                "full_name": "Dalia Abouelmagd"
+            }}
+        )
+        print(f"✅ Password updated!")
         print(f"Email: {email}")
-        print(f"Username: {existing.get('username')}")
-        print("\nIf you forgot the password, you can reset it in the database.")
+        print(f"Username: {username}")
+        print(f"Password: {password}")
+        client.close()
         return
     
-    # Hash password
-    password_hash = pwd_context.hash(password)
+    # Hash password using bcrypt (same as server.py)
+    password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     
     # Create super admin user
     user_id = str(uuid.uuid4())

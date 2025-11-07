@@ -122,9 +122,9 @@ const MonitoringDashboard = () => {
                 </div>
                 <div>
                   <h1 className="text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    System Monitor
+                    {t('monitoring_dashboard')}
                   </h1>
-                  <p className="text-gray-600 font-medium">Real-time activity tracking & system health</p>
+                  <p className="text-gray-600 font-medium">{t('system_monitoring_overview')}</p>
                 </div>
               </div>
             </div>
@@ -135,7 +135,7 @@ const MonitoringDashboard = () => {
               className="group relative px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50"
             >
               <ArrowPathIcon className={`w-5 h-5 inline-block mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+              <span>{refreshing ? t('verifying') : t('refresh')}</span>
             </button>
           </div>
 
@@ -307,11 +307,11 @@ const MonitoringDashboard = () => {
                   <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
                     <CheckCircleIcon className="w-14 h-14 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">All Clear! 🎉</h3>
-                  <p className="text-gray-600 text-lg">No errors detected - System running smoothly</p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('all_clear')}</h3>
+                  <p className="text-gray-600 text-lg">{t('no_errors_detected')}</p>
                   <div className="mt-6 inline-flex items-center px-6 py-3 bg-green-100 text-green-800 rounded-full font-semibold">
                     <ShieldCheckIcon className="w-5 h-5 mr-2" />
-                    100% System Health
+                    {t('system_health_percent')}
                   </div>
                 </div>
               ) : (

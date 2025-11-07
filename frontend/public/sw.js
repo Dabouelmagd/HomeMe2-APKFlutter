@@ -1,5 +1,87 @@
 // HomeMe PWA Service Worker
-const CACHE_VERSION = 'v2.4.0'; // Static version - only update on app changes
+const CACHE_VERSION = 'v3.0.0'; // FORCE UPDATE - Fixed backend URL issue
+
+const CACHE_NAME = `homeme-static-${CACHE_VERSION}`;
+
+// Install event - cache essential files
+self.addEventListener('install', (event) => {
+  console.log('HomeMe PWA: Service Worker installing with version:', CACHE_VERSION);
+  
+  // Force immediate activation
+  self.skipWaiting();
+  
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('HomeMe PWA: Cache opened');
+      // Cache only static assets, NOT API calls
+      return cache.addAll([
+        '/',
+        '/index.html',
+        '/static/css/main.css',
+        '/static/js/main.js'
+      ]).catch((error) => {
+        console.log('HomeMe PWA: Some files not cached:', error);
+        // Continue even if some files fail
+        return Promise.resolve();
+      });
+    })
+  );
+});
+
+// Activate event - clear old caches
+self.addEventListener('activate', (event) => {
+  console.log('HomeMe PWA: Service Worker activating...');
+  
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('HomeMe PWA: Removing old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    }).then(() => {
+      console.log('HomeMe PWA: Service Worker activated');
+      // Take control of all pages immediately
+      return self.clients.claim();
+    })
+  );
+});
+
+// Fetch event - NETWORK FIRST for all requests
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
+  
+  // NEVER cache API calls - always go to network
+  if (request.url.includes('/api/')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+  
+  // For static assets, try network first, then cache
+  event.respondWith(
+    fetch(request)
+      .then((response) => {
+        // Clone the response before caching
+        const responseClone = response.clone();
+        
+        // Cache successful responses
+        if (response.status === 200) {
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, responseClone);
+          });
+        }
+        
+        return response;
+      })
+      .catch(() => {
+        // If network fails, try cache
+        return caches.match(request);
+      })
+  );
+});
 const CACHE_NAME = `homeme-pwa-${CACHE_VERSION}`;
 const STATIC_CACHE = `homeme-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `homeme-dynamic-${CACHE_VERSION}`;

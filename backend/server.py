@@ -1991,13 +1991,16 @@ async def register(user_data: UserCreate):
     # Hash password
     password_hash = hash_password(user_data.password)
     
+    # Use default compound_id if not provided
+    compound_id = user_data.compound_id if user_data.compound_id else "default-compound"
+    
     # Create user
     user = User(
         username=user_data.username,
         email=user_data.email,
         password_hash=password_hash,
         role=user_data.role,
-        compound_id=user_data.compound_id,
+        compound_id=compound_id,
         full_name=user_data.full_name,
         phone=user_data.phone,
         unit_number=user_data.unit_number,

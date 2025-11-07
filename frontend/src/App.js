@@ -389,6 +389,12 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
+                <Route path="compounds-management" element={
+                  <ProtectedRoute adminOnly>
+                    <CompoundsManagement />
+                  </ProtectedRoute>
+                } />
+                
                 <Route path="services" element={
                   <ServicesManagement />
                 } />

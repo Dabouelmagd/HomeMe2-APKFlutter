@@ -31,6 +31,7 @@ import UtilityBills from './components/UtilityBills';
 import FamilyManagement from './components/FamilyManagement';
 import AddFamilyMemberToUnit from './components/AddFamilyMemberToUnit';
 import FinancialManagement from './components/FinancialManagement';
+import FinancialDashboard from './components/FinancialDashboard';
 import MessageCenter from './components/MessageCenter';
 import NotificationCenter from './components/NotificationCenter';
 import Chat from './components/Chat';

@@ -110,17 +110,31 @@ const AuthProvider = ({ children }) => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
-      // Verify token and get user info
-      const userData = localStorage.getItem('user');
-      if (userData) {
-        const parsedUser = JSON.parse(userData);
-        setUser(parsedUser);
-        
-        // Initialize WebSocket connection
-        initializeSocket(parsedUser.id);
-      }
+      // Verify token by calling /auth/me endpoint
+      axios.get(`${API}/auth/me`)
+        .then(response => {
+          const userData = response.data;
+          setUser(userData);
+          
+          // Update localStorage with fresh user data
+          localStorage.setItem('user', JSON.stringify(userData));
+          
+          // Initialize WebSocket connection
+          initializeSocket(userData.id);
+        })
+        .catch(error => {
+          console.log('Token verification failed:', error);
+          // Token is invalid or expired, clear it
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          delete axios.defaults.headers.common['Authorization'];
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   const initializeSocket = (userId) => {

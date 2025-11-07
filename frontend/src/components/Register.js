@@ -49,8 +49,11 @@ const Register = () => {
       const result = await register(registerData);
       
       if (result.success) {
-        toast.success('Registration successful! Please login.');
-        navigate('/');
+        toast.success('Registration successful! Redirecting to login...');
+        // Redirect to login page so user can login with their new credentials
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
       } else {
         toast.error(result.error);
       }

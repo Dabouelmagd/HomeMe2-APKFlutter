@@ -151,9 +151,9 @@ const MonitoringDashboard = () => {
                     Live
                   </span>
                 </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">Total Activities</h3>
+                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('total_activities')}</h3>
                 <p className="text-white text-4xl font-black">{activities.length}</p>
-                <p className="text-white/70 text-sm mt-2">Tracked events</p>
+                <p className="text-white/70 text-sm mt-2">{t('tracked_events')}</p>
               </div>
             </div>
 
@@ -169,10 +169,10 @@ const MonitoringDashboard = () => {
                     </span>
                   )}
                 </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">System Errors</h3>
+                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('system_errors')}</h3>
                 <p className="text-white text-4xl font-black">{errors.length}</p>
                 <p className="text-white/70 text-sm mt-2">
-                  {errors.length === 0 ? 'All systems operational' : 'Needs attention'}
+                  {errors.length === 0 ? t('all_systems_operational') : t('needs_attention')}
                 </p>
               </div>
             </div>
@@ -187,9 +187,9 @@ const MonitoringDashboard = () => {
                     100%
                   </span>
                 </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">System Health</h3>
-                <p className="text-white text-4xl font-black">Excellent</p>
-                <p className="text-white/70 text-sm mt-2">No issues detected</p>
+                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('system_health')}</h3>
+                <p className="text-white text-4xl font-black">{t('excellent')}</p>
+                <p className="text-white/70 text-sm mt-2">{t('no_issues_detected')}</p>
               </div>
             </div>
           </div>

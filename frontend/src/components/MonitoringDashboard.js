@@ -28,11 +28,11 @@ const MonitoringDashboard = () => {
       setRefreshing(true);
 
       const token = localStorage.getItem('token');
-      const headers = { Authorization: \`Bearer \${token}\` };
+      const headers = { Authorization: `Bearer \${token}` };
 
       const [activitiesRes, errorsRes] = await Promise.all([
-        axios.get(\`\${API}/api/monitoring/activities?limit=50\`, { headers }),
-        axios.get(\`\${API}/api/monitoring/errors?limit=20\`, { headers })
+        axios.get(`\${API}/api/monitoring/activities?limit=50`, { headers }),
+        axios.get(`\${API}/api/monitoring/errors?limit=20`, { headers })
       ]);
 
       setActivities(activitiesRes.data.activities || []);
@@ -165,21 +165,21 @@ const MonitoringDashboard = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab('activities')}
-              className={\`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 \${
+              className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 \${
                 activeTab === 'activities'
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                   : 'text-gray-600 hover:bg-gray-100'
-              }\`}
+              }`}
             >
               🕐 {t('activity_log')} ({activities.length})
             </button>
             <button
               onClick={() => setActiveTab('errors')}
-              className={\`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 \${
+              className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 \${
                 activeTab === 'errors'
                   ? 'bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-lg'
                   : 'text-gray-600 hover:bg-gray-100'
-              }\`}
+              }`}
             >
               ⚠️ {t('error_log')} ({errors.length})
             </button>
@@ -218,7 +218,7 @@ const MonitoringDashboard = () => {
                             <h3 className="text-sm font-bold text-gray-900 capitalize">
                               {activity.action_type?.replace(/_/g, ' ')}
                             </h3>
-                            <span className={\`px-3 py-1 text-xs font-semibold rounded-full border \${getStatusColor(activity.status)}\`}>
+                            <span className={`px-3 py-1 text-xs font-semibold rounded-full border \${getStatusColor(activity.status)}`}>
                               {activity.status}
                             </span>
                           </div>

@@ -207,7 +207,7 @@ const MonitoringDashboard = () => {
               }`}
             >
               <ClockIcon className="w-5 h-5 inline-block mr-2" />
-              Activity Log ({activities.length})
+              {t('activity_log')} ({activities.length})
             </button>
             <button
               onClick={() => setActiveTab('errors')}
@@ -218,7 +218,7 @@ const MonitoringDashboard = () => {
               }`}
             >
               <ExclamationTriangleIcon className="w-5 h-5 inline-block mr-2" />
-              Error Log ({errors.length})
+              {t('error_log')} ({errors.length})
             </button>
           </div>
         </div>

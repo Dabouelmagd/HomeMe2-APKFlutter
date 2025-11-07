@@ -12665,6 +12665,135 @@ async def delete_subscription_code(
 
 # ==================== END SUBSCRIPTION CODES ENDPOINTS ====================
 
+# ==================== SUPER ADMIN COMPOUNDS MANAGEMENT ====================
+
+@api_router.get("/compounds/all")
+async def get_all_compounds_for_superadmin(current_user: User = Depends(get_current_user)):
+    """Get all compounds for Super Admin management"""
+    # Check if user is Super Admin
+    if current_user.role != "admin" or current_user.compound_id != "super_admin":
+        raise HTTPException(status_code=403, detail="Super Admin access required")
+    
+    try:
+        # Get all compounds
+        compounds = await db.compounds.find({}).to_list(None)
+        
+        # Enrich compound data with admin info
+        enriched_compounds = []
+        for compound in compounds:
+            # Get compound admin
+            admin = await db.users.find_one({
+                "compound_id": compound.get("id"),
+                "role": "admin"
+            })
+            
+            # Count total units/residents
+            total_units = await db.users.count_documents({
+                "compound_id": compound.get("id"),
+                "role": "resident"
+            })
+            
+            compound_data = {
+                "id": compound.get("id"),
+                "name": compound.get("name", "Unnamed Compound"),
+                "location": compound.get("location", ""),
+                "address": compound.get("address", ""),
+                "total_units": total_units,
+                "admin_name": admin.get("full_name") if admin else "Not assigned",
+                "admin_email": admin.get("email") if admin else "",
+                "is_active": compound.get("is_active", True),
+                "subscription_active": admin.get("subscription_active", False) if admin else False,
+                "subscription_type": admin.get("subscription_type", "") if admin else "",
+                "subscription_end": admin.get("subscription_end", "") if admin else "",
+                "created_at": compound.get("created_at", "")
+            }
+            enriched_compounds.append(compound_data)
+        
+        return enriched_compounds
+    except Exception as e:
+        logging.error(f"Error fetching compounds: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch compounds")
+
+@api_router.post("/compounds/{compound_id}/send-code")
+async def send_code_to_compound(
+    compound_id: str,
+    request: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Send subscription code to a compound admin"""
+    # Check if user is Super Admin
+    if current_user.role != "admin" or current_user.compound_id != "super_admin":
+        raise HTTPException(status_code=403, detail="Super Admin access required")
+    
+    try:
+        code = request.get("code")
+        if not code:
+            raise HTTPException(status_code=400, detail="Code is required")
+        
+        # Verify code exists and is active
+        subscription_code = await db.subscription_codes.find_one({"code": code.upper()})
+        if not subscription_code:
+            raise HTTPException(status_code=404, detail="Code not found")
+        
+        if not subscription_code.get("is_active"):
+            raise HTTPException(status_code=400, detail="Code is not active")
+        
+        # Get compound admin
+        admin = await db.users.find_one({
+            "compound_id": compound_id,
+            "role": "admin"
+        })
+        
+        if not admin:
+            raise HTTPException(status_code=404, detail="Compound admin not found")
+        
+        # Update admin subscription
+        subscription_end = None
+        if subscription_code.get("type") == "lifetime":
+            subscription_end = "2099-12-31T23:59:59+00:00"
+        else:
+            duration_months = subscription_code.get("duration_months", 1)
+            subscription_end = (datetime.now(timezone.utc) + timedelta(days=duration_months * 30)).isoformat()
+        
+        await db.users.update_one(
+            {"id": admin["id"]},
+            {
+                "$set": {
+                    "subscription_active": True,
+                    "subscription_type": subscription_code.get("type", "standard"),
+                    "subscription_start": datetime.now(timezone.utc).isoformat(),
+                    "subscription_end": subscription_end,
+                    "subscription_code_used": code.upper()
+                }
+            }
+        )
+        
+        # Increment code usage
+        await db.subscription_codes.update_one(
+            {"code": code.upper()},
+            {"$inc": {"current_uses": 1}}
+        )
+        
+        # Log activity
+        await ActivityLogger.log_activity(
+            action_type="subscription_code_sent",
+            username=current_user.username,
+            details=f"Sent code {code} to compound {compound_id}",
+            status="success"
+        )
+        
+        return {
+            "success": True,
+            "message": f"Code {code} successfully sent to compound admin"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error sending code: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send code")
+
+# ==================== END SUPER ADMIN COMPOUNDS MANAGEMENT ====================
+
 
 @app.on_event("startup")
 async def startup_db_client():

@@ -431,6 +431,10 @@ function App() {
                 } />
                 
                 <Route path="finances" element={
+                  <FinancialDashboard />
+                } />
+                
+                <Route path="financial-old" element={
                   <FinancialManagement />
                 } />
                 

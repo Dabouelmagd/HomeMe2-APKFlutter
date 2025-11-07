@@ -15,19 +15,18 @@ from datetime import datetime, timezone
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Database connection
-MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-DB_NAME = os.environ.get('DB_NAME', 'homeme_db')
+MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017/homeme_prod')
 
 async def create_super_admin():
     """Create Super Admin account"""
     
     client = AsyncIOMotorClient(MONGO_URL)
-    db = client[DB_NAME]
+    db = client.homeme_prod  # Use homeme_prod database directly
     
     # Super Admin details
     email = "dalia.abouelmagd@gmail.com"
-    username = "superadmin"
-    password = "SuperAdmin@2024"  # Change this password after first login!
+    username = "dalia"  # Changed to dalia as confirmed
+    password = "Admin2024!"  # New simple password
     
     # Check if user already exists
     existing = await db.users.find_one({"email": email})

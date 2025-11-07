@@ -3,15 +3,21 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import {
-  ArrowPathIcon,
+  ChartBarIcon,
+  UsersIcon,
+  BuildingOfficeIcon,
+  ExclamationTriangleIcon,
+  ClockIcon,
   CheckCircleIcon,
   XCircleIcon,
-  ClockIcon,
-  ExclamationTriangleIcon,
+  ArrowPathIcon,
+  CalendarIcon,
+  UserGroupIcon,
+  ShieldCheckIcon,
   BoltIcon,
   FireIcon,
-  ShieldCheckIcon,
-  ChartBarIcon
+  SparklesIcon,
+  ChartPieIcon
 } from '@heroicons/react/24/outline';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -19,14 +25,17 @@ const API = process.env.REACT_APP_BACKEND_URL;
 const MonitoringDashboard = () => {
   const { t } = useTranslation();
   
+  const [stats, setStats] = useState(null);
   const [activities, setActivities] = useState([]);
   const [errors, setErrors] = useState([]);
+  const [charts, setCharts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState('activities');
+  const [activeTab, setActiveTab] = useState('overview');
 
   useEffect(() => {
     fetchMonitoringData();
+    // Auto-refresh every 30 seconds
     const interval = setInterval(() => {
       fetchMonitoringData(true);
     }, 30000);
@@ -41,16 +50,24 @@ const MonitoringDashboard = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [activitiesRes, errorsRes] = await Promise.all([
+      // Fetch all monitoring data in parallel
+      const [statsRes, activitiesRes, errorsRes, chartsRes] = await Promise.all([
+        axios.get(`${API}/api/monitoring/stats`, { headers }),
         axios.get(`${API}/api/monitoring/activities?limit=50`, { headers }),
-        axios.get(`${API}/api/monitoring/errors?limit=20`, { headers })
+        axios.get(`${API}/api/monitoring/errors?limit=30`, { headers }),
+        axios.get(`${API}/api/monitoring/charts?days=7`, { headers })
       ]);
 
+      setStats(statsRes.data);
       setActivities(activitiesRes.data.activities || []);
       setErrors(errorsRes.data.errors || []);
+      setCharts(chartsRes.data);
+
     } catch (error) {
       console.error('Error fetching monitoring data:', error);
-      if (!silent) toast.error('Failed to load monitoring data');
+      if (!silent) {
+        toast.error(t('failed_to_load_monitoring_data'));
+      }
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -59,304 +76,303 @@ const MonitoringDashboard = () => {
 
   const handleRefresh = () => {
     fetchMonitoringData();
-    toast.success('Data refreshed!');
+    toast.success(t('data_refreshed'));
   };
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
+    return date.toLocaleString();
   };
 
   const getActivityIcon = (actionType) => {
-    const icons = {
-      login: '🔐',
-      logout: '🚪',
-      create_user: '➕',
-      delete_user: '🗑️',
-      update_user: '✏️',
-      create_compound: '🏘️',
-      payment: '💳',
-      subscription_code_sent: '🎫',
-      default: '📝'
-    };
-    return icons[actionType] || icons.default;
+    switch (actionType) {
+      case 'login':
+        return '🔐';
+      case 'logout':
+        return '🚪';
+      case 'create_user':
+        return '➕';
+      case 'delete_user':
+        return '🗑️';
+      case 'update_user':
+        return '✏️';
+      default:
+        return '📝';
+    }
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      success: 'text-green-600 bg-green-50 border-green-200',
-      failed: 'text-red-600 bg-red-50 border-red-200',
-      error: 'text-red-600 bg-red-50 border-red-200',
-      pending: 'text-yellow-600 bg-yellow-50 border-yellow-200'
+  const getStatusBadge = (status) => {
+    const statusClasses = {
+      success: 'bg-green-100 text-green-800',
+      failed: 'bg-red-100 text-red-800',
+      error: 'bg-red-100 text-red-800'
     };
-    return colors[status] || 'text-gray-600 bg-gray-50 border-gray-200';
+
+    return (
+      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusClasses[status] || 'bg-gray-100 text-gray-800'}`}>
+        {t(status) || status}
+      </span>
+    );
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Loading monitoring data...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Modern Header with Glassmorphism */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-lg">
-                  <ChartBarIcon className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    {t('monitoring_dashboard')}
-                  </h1>
-                  <p className="text-gray-600 font-medium">{t('system_monitoring_overview')}</p>
-                </div>
-              </div>
-            </div>
-            
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="group relative px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 disabled:opacity-50"
-            >
-              <ArrowPathIcon className={`w-5 h-5 inline-block mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              <span>{refreshing ? t('verifying') : t('refresh')}</span>
-            </button>
+    <div className="p-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">{t('monitoring_dashboard')}</h1>
+          <p className="text-gray-600 mt-1">{t('system_monitoring_overview')}</p>
+        </div>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="btn btn-primary flex items-center space-x-2"
+        >
+          <ArrowPathIcon className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
+          <span>{t('refresh')}</span>
+        </button>
+      </div>
+
+      {/* System Health Status */}
+      <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">{t('system_health')}</h2>
+            <p className="text-sm text-gray-600">{t('last_updated')}: {formatDate(stats?.system?.last_updated)}</p>
           </div>
+          <div className="flex items-center space-x-2">
+            {stats?.system?.database_status === 'connected' ? (
+              <CheckCircleIcon className="h-6 w-6 text-green-600" />
+            ) : (
+              <XCircleIcon className="h-6 w-6 text-red-600" />
+            )}
+            <span className={`text-sm font-semibold ${stats?.system?.database_status === 'connected' ? 'text-green-600' : 'text-red-600'}`}>
+              {t(stats?.system?.database_status)}
+            </span>
+          </div>
+        </div>
+        <div className="mt-4 flex items-center space-x-2 text-sm text-gray-600">
+          <ClockIcon className="h-4 w-4" />
+          <span>{t('uptime')}: {stats?.system?.uptime}</span>
+        </div>
+      </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            {/* Total Activities */}
-            <div className="group relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-              <div className="relative">
-                <div className="flex items-center justify-between mb-4">
-                  <BoltIcon className="w-12 h-12 text-white/90" />
-                  <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-semibold">
-                    Live
-                  </span>
-                </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('total_activities')}</h3>
-                <p className="text-white text-4xl font-black">{activities.length}</p>
-                <p className="text-white/70 text-sm mt-2">{t('tracked_events')}</p>
-              </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {/* Total Users */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-blue-100">
+              <UsersIcon className="h-6 w-6 text-blue-600" />
             </div>
-
-            {/* System Errors */}
-            <div className="group relative overflow-hidden bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-6 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-              <div className="relative">
-                <div className="flex items-center justify-between mb-4">
-                  <FireIcon className="w-12 h-12 text-white/90" />
-                  {errors.length === 0 && (
-                    <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-semibold">
-                      ✓ Healthy
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('system_errors')}</h3>
-                <p className="text-white text-4xl font-black">{errors.length}</p>
-                <p className="text-white/70 text-sm mt-2">
-                  {errors.length === 0 ? t('all_systems_operational') : t('needs_attention')}
-                </p>
-              </div>
-            </div>
-
-            {/* System Health */}
-            <div className="group relative overflow-hidden bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-6 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-              <div className="relative">
-                <div className="flex items-center justify-between mb-4">
-                  <ShieldCheckIcon className="w-12 h-12 text-white/90" />
-                  <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-semibold">
-                    100%
-                  </span>
-                </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('system_health')}</h3>
-                <p className="text-white text-4xl font-black">{t('excellent')}</p>
-                <p className="text-white/70 text-sm mt-2">{t('no_issues_detected')}</p>
-              </div>
+            <div className="mr-4">
+              <p className="text-sm font-medium text-gray-500">{t('total_users')}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats?.users?.total || 0}</p>
             </div>
           </div>
         </div>
 
-        {/* Modern Tabs */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-2 mb-6">
-          <div className="flex gap-2">
+        {/* Active Users */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-green-100">
+              <CheckCircleIcon className="h-6 w-6 text-green-600" />
+            </div>
+            <div className="mr-4">
+              <p className="text-sm font-medium text-gray-500">{t('active_users')}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats?.users?.active || 0}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Admins */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-purple-100">
+              <ShieldCheckIcon className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="mr-4">
+              <p className="text-sm font-medium text-gray-500">{t('administrators')}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats?.users?.admins || 0}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Total Compounds */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-orange-100">
+              <BuildingOfficeIcon className="h-6 w-6 text-orange-600" />
+            </div>
+            <div className="mr-4">
+              <p className="text-sm font-medium text-gray-500">{t('total_compounds')}</p>
+              <p className="text-2xl font-bold text-gray-900">{stats?.compounds?.total || 0}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Activity Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="flex items-center space-x-2 mb-4">
+            <CalendarIcon className="h-5 w-5 text-gray-600" />
+            <h3 className="text-lg font-semibold text-gray-900">{t('logins_today')}</h3>
+          </div>
+          <p className="text-3xl font-bold text-blue-600">{stats?.activity?.logins_today || 0}</p>
+        </div>
+
+        <div className="bg-white p-6 rounded-xl shadow-sm border">
+          <div className="flex items-center space-x-2 mb-4">
+            <ChartBarIcon className="h-5 w-5 text-gray-600" />
+            <h3 className="text-lg font-semibold text-gray-900">{t('logins_this_week')}</h3>
+          </div>
+          <p className="text-3xl font-bold text-green-600">{stats?.activity?.logins_week || 0}</p>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="bg-white rounded-xl shadow-sm border">
+        <div className="border-b border-gray-200">
+          <div className="flex space-x-8 px-6">
             <button
-              onClick={() => setActiveTab('activities')}
-              className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                activeTab === 'activities'
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
+              onClick={() => setActiveTab('overview')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'overview'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <ClockIcon className="w-5 h-5 inline-block mr-2" />
+              {t('overview')}
+            </button>
+            <button
+              onClick={() => setActiveTab('activities')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'activities'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
               {t('activity_log')} ({activities.length})
             </button>
             <button
               onClick={() => setActiveTab('errors')}
-              className={`flex-1 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'errors'
-                  ? 'bg-gradient-to-r from-red-500 to-pink-600 text-white shadow-lg'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              <ExclamationTriangleIcon className="w-5 h-5 inline-block mr-2" />
               {t('error_log')} ({errors.length})
             </button>
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
-          {activeTab === 'activities' ? (
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {t('recent_activities')}
-                  <span className="ml-3 text-sm font-normal text-gray-500">
-                    {t('last_events', { count: activities.length })}
-                  </span>
-                </h2>
+        <div className="p-6">
+          {/* Overview Tab */}
+          {activeTab === 'overview' && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('system_overview')}</h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <span className="text-gray-700">{t('total_residents')}</span>
+                  <span className="font-bold text-gray-900">{stats?.users?.residents || 0}</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <span className="text-gray-700">{t('total_units')}</span>
+                  <span className="font-bold text-gray-900">{stats?.compounds?.total_units || 0}</span>
+                </div>
+                <div className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
+                  <span className="text-gray-700">{t('inactive_users')}</span>
+                  <span className="font-bold text-gray-900">{stats?.users?.inactive || 0}</span>
+                </div>
               </div>
-
-              {activities.length === 0 ? (
-                <div className="text-center py-16">
-                  <ClockIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg font-medium">{t('no_activities_found')}</p>
-                  <p className="text-gray-400 text-sm mt-2">Activity logs will appear here</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {activities.map((activity, index) => (
-                    <div
-                      key={activity.id || index}
-                      className="group bg-gradient-to-r from-gray-50 to-transparent hover:from-blue-50 border border-gray-200 hover:border-blue-300 rounded-xl p-4 transition-all duration-200 hover:shadow-md"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-2xl shadow-lg">
-                            {getActivityIcon(activity.action_type)}
-                          </div>
-                        </div>
-                        
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-sm font-bold text-gray-900 capitalize">
-                              {activity.action_type?.replace(/_/g, ' ')}
-                            </h3>
-                            <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(activity.status)}`}>
-                              {activity.status}
-                            </span>
-                          </div>
-                          
-                          <p className="text-sm text-gray-600 mb-2">{activity.details}</p>
-                          
-                          <div className="flex items-center gap-4 text-xs text-gray-500">
-                            <span className="flex items-center gap-1">
-                              <ClockIcon className="w-4 h-4" />
-                              {formatDate(activity.timestamp)}
-                            </span>
-                            {activity.username && (
-                              <span className="flex items-center gap-1 font-medium">
-                                👤 {activity.username}
-                              </span>
-                            )}
-                            {activity.ip_address && (
-                              <span className="flex items-center gap-1">
-                                🌐 {activity.ip_address}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
-          ) : (
-            <div className="p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Error Log
-                  <span className="ml-3 text-sm font-normal text-gray-500">
-                    {errors.length} errors found
-                  </span>
-                </h2>
-              </div>
+          )}
 
-              {errors.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
-                    <CheckCircleIcon className="w-14 h-14 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('all_clear')}</h3>
-                  <p className="text-gray-600 text-lg">{t('no_errors_detected')}</p>
-                  <div className="mt-6 inline-flex items-center px-6 py-3 bg-green-100 text-green-800 rounded-full font-semibold">
-                    <ShieldCheckIcon className="w-5 h-5 mr-2" />
-                    {t('system_health_percent')}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {errors.map((error, index) => (
-                    <div
-                      key={error.id || index}
-                      className="bg-gradient-to-r from-red-50 to-transparent border border-red-200 rounded-xl p-4 hover:shadow-md transition-all duration-200"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0">
-                          <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
-                            <XCircleIcon className="w-7 h-7 text-white" />
-                          </div>
+          {/* Activities Tab */}
+          {activeTab === 'activities' && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('recent_activities')}</h3>
+              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                {activities.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">{t('no_activities_found')}</p>
+                ) : (
+                  activities.map((activity, index) => (
+                    <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                      <span className="text-2xl">{getActivityIcon(activity.action_type)}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-gray-900">
+                            {activity.username}
+                          </p>
+                          {getStatusBadge(activity.status)}
                         </div>
-                        
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-sm font-bold text-red-900">
-                              {error.error_type || 'System Error'}
-                            </h3>
-                            <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full border border-red-200">
-                              Critical
+                        <p className="text-sm text-gray-600 mt-1">
+                          {t(activity.action_type)} - {activity.details}
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {formatDate(activity.timestamp)}
+                          {activity.ip_address && ` • IP: ${activity.ip_address}`}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Errors Tab */}
+          {activeTab === 'errors' && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('recent_errors')}</h3>
+              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                {errors.length === 0 ? (
+                  <div className="text-center py-8">
+                    <CheckCircleIcon className="h-12 w-12 text-green-500 mx-auto mb-2" />
+                    <p className="text-gray-500">{t('no_errors_found')}</p>
+                  </div>
+                ) : (
+                  errors.map((error, index) => (
+                    <div key={index} className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-start space-x-3">
+                        <ExclamationTriangleIcon className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-red-900">
+                              {error.error_type}
+                            </p>
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              error.severity === 'critical' ? 'bg-red-100 text-red-800' :
+                              error.severity === 'error' ? 'bg-orange-100 text-orange-800' :
+                              error.severity === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-blue-100 text-blue-800'
+                            }`}>
+                              {t(error.severity)}
                             </span>
                           </div>
-                          
-                          <p className="text-sm text-red-700 mb-2">{error.message || error.details}</p>
-                          
-                          <div className="flex items-center gap-4 text-xs text-red-600">
-                            <span className="flex items-center gap-1">
-                              <ClockIcon className="w-4 h-4" />
-                              {formatDate(error.timestamp)}
-                            </span>
-                            {error.endpoint && (
-                              <span className="font-mono bg-red-100 px-2 py-1 rounded">
-                                {error.endpoint}
-                              </span>
-                            )}
-                          </div>
+                          <p className="text-sm text-red-700 mt-1">
+                            {error.error_message}
+                          </p>
+                          <p className="text-xs text-red-500 mt-1">
+                            {t('user')}: {error.username} • {formatDate(error.timestamp)}
+                          </p>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  ))
+                )}
+              </div>
             </div>
           )}
         </div>

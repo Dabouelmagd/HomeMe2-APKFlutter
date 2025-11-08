@@ -13047,6 +13047,9 @@ async def get_resident_account(
 
 # ==================== END FINANCIAL MANAGEMENT ====================
 
+# Include the API router after ALL endpoints are defined
+app.include_router(api_router)
+
 
 @app.on_event("startup")
 async def startup_db_client():

@@ -13045,6 +13045,92 @@ async def get_resident_account(
         logging.error(f"Error fetching resident account: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch account")
 
+@api_router.post("/financial/residents/payments")
+async def create_resident_payment(
+    payment_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a payment for a resident"""
+    try:
+        resident_id = payment_data.get("resident_id")
+        
+        # Check authorization - resident can only pay their own charges, admin can pay for anyone
+        if current_user.role != "admin" and current_user.id != resident_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        payment = {
+            "id": str(uuid.uuid4()),
+            "resident_id": resident_id,
+            "compound_id": payment_data.get("compound_id"),
+            "amount": payment_data.get("amount"),
+            "payment_method": payment_data.get("payment_method"),
+            "payment_date": datetime.now(timezone.utc).isoformat(),
+            "reference": payment_data.get("reference"),
+            "notes": payment_data.get("notes"),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.resident_payments.insert_one(payment)
+        
+        # Update charge status if reference is provided
+        if payment_data.get("reference") and payment_data["reference"].startswith("CHARGE-"):
+            charge_id = payment_data["reference"].replace("CHARGE-", "")
+            await db.resident_charges.update_one(
+                {"id": charge_id},
+                {"$set": {"status": "paid"}}
+            )
+        
+        # Log activity
+        await ActivityLogger.log_activity(
+            action_type="payment_created",
+            username=current_user.username,
+            details=f"Payment of ${payment_data.get('amount')} made by resident",
+            status="success"
+        )
+        
+        return {"success": True, "payment": payment}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating payment: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create payment")
+
+@api_router.get("/financial/residents/payments/{payment_id}/receipt")
+async def get_payment_receipt(
+    payment_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Generate and download payment receipt (placeholder for now)"""
+    try:
+        payment = await db.resident_payments.find_one({"id": payment_id})
+        if not payment:
+            raise HTTPException(status_code=404, detail="Payment not found")
+        
+        # Check authorization
+        if current_user.role != "admin" and current_user.id != payment.get("resident_id"):
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # TODO: Generate actual PDF receipt
+        # For now, return a simple text receipt
+        receipt_text = f"""
+        PAYMENT RECEIPT
+        ================
+        Receipt ID: {payment_id}
+        Date: {payment.get('payment_date')}
+        Amount: ${payment.get('amount')}
+        Payment Method: {payment.get('payment_method')}
+        Reference: {payment.get('reference')}
+        
+        Thank you for your payment!
+        """
+        
+        return {"receipt": receipt_text, "payment": payment}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error generating receipt: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate receipt")
+
 # ==================== END FINANCIAL MANAGEMENT ====================
 
 # Include the API router after ALL endpoints are defined

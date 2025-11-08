@@ -59,6 +59,14 @@ from activity_logger import ActivityLogger, ErrorLogger
 # Import subscription codes manager
 from subscription_codes import SubscriptionCodeManager
 
+# Import financial models
+from financial_models import (
+    ExpenseCreate, Expense, RevenueCreate, Revenue,
+    ResidentCharge, ResidentPayment, ResidentAccountSummary,
+    MonthlyReport, FinancialSummary,
+    ExpenseCategory, RevenueSource, PaymentMethod, TransactionStatus
+)
+
 # Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')

@@ -79,7 +79,7 @@ async def create_super_admin():
     print(f"   Username: {username}")
     print(f"   Password: {password}")
     print("\n⚠️  IMPORTANT: Please change this password after first login!")
-    print("\n📍 Login URL: https://payment-methods-ui.preview.emergentagent.com/login")
+    print("\n📍 Login URL: https://compound-manager-2.preview.emergentagent.com/login")
     print("=" * 60)
     
     client.close()

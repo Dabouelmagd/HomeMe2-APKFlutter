@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional
 
-BASE_URL = "https://payment-methods-ui.preview.emergentagent.com/api"
+BASE_URL = "https://compound-manager-2.preview.emergentagent.com/api"
 
 class FinalFinancialTest:
     def __init__(self):

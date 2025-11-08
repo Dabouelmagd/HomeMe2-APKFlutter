@@ -11836,9 +11836,6 @@ async def get_user_subscription(user_id: str, current_user: User = Depends(get_c
             message="خطأ في الحصول على الاشتراك"
         )
 
-# Include the API router after all endpoints are defined
-app.include_router(api_router)
-
 # Subscription code public endpoints (must be after router include)
 @app.get("/api/subscription-codes/check/{code}")
 async def check_subscription_code_public(code: str):

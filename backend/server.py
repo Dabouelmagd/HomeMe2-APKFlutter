@@ -12804,13 +12804,6 @@ async def send_code_to_compound(
 
 # ==================== FINANCIAL MANAGEMENT ENDPOINTS ====================
 
-from financial_models import (
-    ExpenseCreate, Expense, RevenueCreate, Revenue,
-    ResidentCharge, ResidentPayment, ResidentAccountSummary,
-    MonthlyReport, FinancialSummary,
-    ExpenseCategory, RevenueSource, PaymentMethod, TransactionStatus
-)
-
 @api_router.post("/financial/expenses")
 async def create_expense(
     expense_data: ExpenseCreate,

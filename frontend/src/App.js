@@ -432,7 +432,7 @@ function App() {
                 } />
                 
                 <Route path="finances" element={
-                  <FinancialDashboard />
+                  user?.role === 'admin' ? <FinancialDashboard /> : <ResidentFinancialDashboard />
                 } />
                 
                 <Route path="financial-old" element={

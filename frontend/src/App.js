@@ -431,7 +431,7 @@ function App() {
                 } />
                 
                 <Route path="finances" element={
-                  user?.role === 'admin' ? <FinancialDashboard /> : <ResidentFinancialDashboard />
+                  <FinancialRoute />
                 } />
                 
                 <Route path="financial-old" element={

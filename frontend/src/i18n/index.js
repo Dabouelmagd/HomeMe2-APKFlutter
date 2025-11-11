@@ -3303,6 +3303,11 @@ const resources = {
       'hour': 'ساعة',
       'per_hour': 'في الساعة',
       
+      // Navigation
+      'go_back': 'رجوع',
+      'back': 'رجوع',
+      'return_to_previous': 'العودة إلى الصفحة السابقة',
+      
       // Payment Methods
       'supported_payment_methods': 'طرق الدفع المدعومة',
       'cash_on_service': 'نقداً عند الخدمة',

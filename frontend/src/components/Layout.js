@@ -50,11 +50,35 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
+
+  // Keyboard shortcuts for advanced search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ctrl/Cmd + K
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowAdvancedSearch(true);
+      }
+      // Forward slash /
+      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        e.preventDefault();
+        setShowAdvancedSearch(true);
+      }
+      // Escape to close
+      if (e.key === 'Escape') {
+        setShowAdvancedSearch(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Search functionality
   const handleSearch = async (query) => {

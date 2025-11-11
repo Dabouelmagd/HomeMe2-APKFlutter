@@ -763,17 +763,12 @@ const Layout = ({ children, isTrialMode = false }) => {
           </footer>
         </main>
       </div>
+      <AdvancedSearchModal 
+        isOpen={showAdvancedSearch} 
+        onClose={() => setShowAdvancedSearch(false)} 
+      />
     </div>
   );
 };
 
-// Create wrapper component that includes Layout and Modal
-const LayoutWithModal = ({ children, isTrialMode }) => {
-  return (
-    <>
-      <Layout children={children} isTrialMode={isTrialMode} />
-    </>
-  );
-};
-
-export default LayoutWithModal;
+export default Layout;

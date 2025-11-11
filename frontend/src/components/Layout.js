@@ -655,7 +655,40 @@ const Layout = ({ children, isTrialMode = false }) => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3 rtl:space-x-reverse">
+              {/* User Info Card */}
+              <div className="hidden md:flex items-center bg-white/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
+                <div className="flex flex-col items-end text-right mr-2 rtl:mr-0 rtl:ml-2 rtl:text-left">
+                  <span className="text-sm font-semibold text-gray-900">{user?.full_name || user?.username}</span>
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    {user?.unit_number && (
+                      <span className="flex items-center gap-1">
+                        <HomeIcon className="h-3 w-3" />
+                        {user.unit_number}
+                      </span>
+                    )}
+                    {user?.compound_name && (
+                      <>
+                        {user?.unit_number && <span>•</span>}
+                        <span className="flex items-center gap-1">
+                          <BuildingOffice2Icon className="h-3 w-3" />
+                          {user.compound_name}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                  {(user?.full_name || user?.username || 'U').charAt(0).toUpperCase()}
+                </div>
+              </div>
+
+              {/* Language Switcher */}
+              <div className="hidden sm:block">
+                <LanguageSwitcher />
+              </div>
+
+              {/* Notifications Bell */}
               <Link
                 to="/app/notifications"
                 className="p-2 text-gray-500 hover:text-gray-700 relative transition-all hover:bg-gray-100 rounded-lg"

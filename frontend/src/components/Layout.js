@@ -655,10 +655,13 @@ const Layout = ({ children, isTrialMode = false }) => {
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 rtl:space-x-reverse">
+            <div className="flex items-center gap-3 rtl:flex-row-reverse">
               {/* User Info Card */}
-              <div className="hidden md:flex items-center bg-white/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
-                <div className="flex flex-col items-end text-right mr-2 rtl:mr-0 rtl:ml-2 rtl:text-left">
+              <div className="flex items-center bg-white/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm mr-2 rtl:mr-0 rtl:ml-2">
+                  {(user?.full_name || user?.username || 'U').charAt(0).toUpperCase()}
+                </div>
+                <div className="flex flex-col items-start rtl:items-end">
                   <span className="text-sm font-semibold text-gray-900">{user?.full_name || user?.username}</span>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     {user?.unit_number && (
@@ -678,13 +681,10 @@ const Layout = ({ children, isTrialMode = false }) => {
                     )}
                   </div>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
-                  {(user?.full_name || user?.username || 'U').charAt(0).toUpperCase()}
-                </div>
               </div>
 
               {/* Language Switcher */}
-              <div className="hidden sm:block">
+              <div className="flex items-center">
                 <LanguageSwitcher />
               </div>
 

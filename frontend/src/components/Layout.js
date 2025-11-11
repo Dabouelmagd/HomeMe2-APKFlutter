@@ -763,10 +763,6 @@ const Layout = ({ children, isTrialMode = false }) => {
           </footer>
         </main>
       </div>
-      <AdvancedSearchModal 
-        isOpen={showAdvancedSearch} 
-        onClose={() => setShowAdvancedSearch(false)} 
-      />
     </div>
   );
 };

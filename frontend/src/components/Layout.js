@@ -609,25 +609,16 @@ const Layout = ({ children, isTrialMode = false }) => {
             </button>
 
             <div className="flex-1 min-w-0 mx-4">
-              {/* Advanced Search Trigger Button */}
+              {/* Advanced Search Trigger Button - DISABLED TEMPORARILY */}
               <button
-                onClick={() => setShowAdvancedSearch(true)}
-                className="w-full max-w-lg flex items-center gap-3 px-4 py-2.5 bg-white border-2 border-gray-200 hover:border-blue-400 rounded-xl transition-all group hover:shadow-md"
+                onClick={() => {}}
+                disabled
+                className="w-full max-w-lg flex items-center gap-3 px-4 py-2.5 bg-gray-100 border-2 border-gray-200 rounded-xl cursor-not-allowed opacity-60"
               >
-                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                <span className="text-gray-500 group-hover:text-gray-700 transition-colors text-sm flex-1 text-left rtl:text-right">
-                  {t('search_placeholder', 'ابحث عن المستخدمين، الوحدات، الخدمات...')}
+                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
+                <span className="text-gray-500 text-sm flex-1 text-left rtl:text-right">
+                  {t('search_placeholder', 'البحث قريباً...')}
                 </span>
-                <div className="flex items-center gap-1">
-                  <kbd className="hidden sm:inline-flex items-center px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono text-gray-600">
-                    <CommandLineIcon className="h-3 w-3 mr-1" />
-                    Ctrl K
-                  </kbd>
-                  <span className="hidden sm:inline text-gray-400 text-xs">{t('or', 'أو')}</span>
-                  <kbd className="hidden sm:inline-flex items-center px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono text-gray-600">
-                    /
-                  </kbd>
-                </div>
               </button>
 
               {/* Old Search Results Dropdown - Keeping for backward compatibility */}

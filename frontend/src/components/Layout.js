@@ -609,31 +609,29 @@ const Layout = ({ children, isTrialMode = false }) => {
             </button>
 
             <div className="flex-1 min-w-0 mx-4">
-              <div className="search-container relative max-w-lg">
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MagnifyingGlassIcon 
-                      className={`h-5 w-5 ${isSearching ? 'text-blue-500' : 'text-gray-400'}`} 
-                    />
-                  </div>
-                  <input
-                    id="global-search-input"
-                    type="text"
-                    value={searchQuery}
-                    onChange={handleSearchInputChange}
-                    placeholder={t('search_placeholder', 'Search users, residences, services...')}
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  />
-                  <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                    <kbd className="inline-flex items-center px-2 py-1 border border-gray-200 rounded text-xs font-sans font-medium text-gray-400 bg-gray-50">
-                      <CommandLineIcon className="h-3 w-3 mr-1" />
-                      K
-                    </kbd>
-                  </div>
+              {/* Advanced Search Trigger Button */}
+              <button
+                onClick={() => setShowAdvancedSearch(true)}
+                className="w-full max-w-lg flex items-center gap-3 px-4 py-2.5 bg-white border-2 border-gray-200 hover:border-blue-400 rounded-xl transition-all group hover:shadow-md"
+              >
+                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                <span className="text-gray-500 group-hover:text-gray-700 transition-colors text-sm flex-1 text-left rtl:text-right">
+                  {t('search_placeholder', 'ابحث عن المستخدمين، الوحدات، الخدمات...')}
+                </span>
+                <div className="flex items-center gap-1">
+                  <kbd className="hidden sm:inline-flex items-center px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono text-gray-600">
+                    <CommandLineIcon className="h-3 w-3 mr-1" />
+                    Ctrl K
+                  </kbd>
+                  <span className="hidden sm:inline text-gray-400 text-xs">{t('or', 'أو')}</span>
+                  <kbd className="hidden sm:inline-flex items-center px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono text-gray-600">
+                    /
+                  </kbd>
                 </div>
+              </button>
 
-                {/* Search Results Dropdown */}
-                {showSearchResults && (
+              {/* Old Search Results Dropdown - Keeping for backward compatibility */}
+              {showSearchResults && searchResults.length > 0 && (
                   <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50">
                     {isSearching ? (
                       <div className="px-4 py-6 text-center">

@@ -2130,6 +2130,13 @@ async def login(user_data: UserLogin, request: Request):
     
     access_token = create_access_token(data={"sub": user["id"]})
     
+    # Get compound name if compound_id exists
+    compound_name = None
+    if user.get("compound_id"):
+        compound = await db.compounds.find_one({"id": user["compound_id"]})
+        if compound:
+            compound_name = compound.get("name", "Unknown Compound")
+    
     # Log successful login
     await ActivityLogger.log_activity(
         action_type="login",
@@ -2147,6 +2154,8 @@ async def login(user_data: UserLogin, request: Request):
             "username": user["username"],
             "role": user["role"],
             "compound_id": user["compound_id"],
+            "compound_name": compound_name,
+            "unit_number": user.get("unit_number"),
             "full_name": user["full_name"],
             "is_family_head": user.get("is_family_head", False),
             "family_id": user.get("family_id")

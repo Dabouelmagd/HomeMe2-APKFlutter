@@ -41,7 +41,7 @@ import {
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
 import BackButton from './BackButton';
-import AdvancedSearchModal from './AdvancedSearchModal';
+// import AdvancedSearchModal from './AdvancedSearchModal';
 
 const Layout = ({ children, isTrialMode = false }) => {
   const { t, i18n } = useTranslation();

@@ -40,6 +40,7 @@ import {
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
+import BackButton from './BackButton';
 
 const Layout = ({ children, isTrialMode = false }) => {
   const { t, i18n } = useTranslation();

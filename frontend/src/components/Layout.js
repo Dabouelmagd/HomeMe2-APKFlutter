@@ -762,11 +762,13 @@ const Layout = ({ children, isTrialMode = false }) => {
             </div>
           </footer>
         </main>
-        <AdvancedSearchModal 
-          isOpen={showAdvancedSearch} 
-          onClose={() => setShowAdvancedSearch(false)} 
-        />
       </div>
+
+      {/* Advanced Search Modal - Rendered via Portal */}
+      <AdvancedSearchModal 
+        isOpen={showAdvancedSearch} 
+        onClose={() => setShowAdvancedSearch(false)} 
+      />
     </div>
   );
 };

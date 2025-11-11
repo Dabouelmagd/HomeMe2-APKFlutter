@@ -767,4 +767,13 @@ const Layout = ({ children, isTrialMode = false }) => {
   );
 };
 
-export default Layout;
+// Create wrapper component that includes Layout and Modal
+const LayoutWithModal = ({ children, isTrialMode }) => {
+  return (
+    <>
+      <Layout children={children} isTrialMode={isTrialMode} />
+    </>
+  );
+};
+
+export default LayoutWithModal;

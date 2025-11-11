@@ -873,6 +873,11 @@ const resources = {
       'hour': 'Hour',
       'per_hour': 'Per Hour',
       
+      // Navigation
+      'go_back': 'Back',
+      'back': 'Back',
+      'return_to_previous': 'Return to previous page',
+      
       // Payment Methods
       'supported_payment_methods': 'Supported Payment Methods',
       'cash_on_service': 'Cash on Service',

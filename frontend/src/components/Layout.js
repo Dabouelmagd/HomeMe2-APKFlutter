@@ -762,6 +762,7 @@ const Layout = ({ children, isTrialMode = false }) => {
             </div>
           </footer>
         </main>
+      </div>
 
       {/* Advanced Search Modal */}
       <AdvancedSearchModal 

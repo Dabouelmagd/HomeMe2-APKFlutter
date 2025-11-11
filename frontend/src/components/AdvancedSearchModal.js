@@ -128,7 +128,7 @@ const AdvancedSearchModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  return (
+  const modalContent = (
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-start justify-center pt-20 px-4"
       onClick={onClose}

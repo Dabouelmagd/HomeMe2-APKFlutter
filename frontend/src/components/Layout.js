@@ -57,28 +57,28 @@ const Layout = ({ children, isTrialMode = false }) => {
   const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
 
-  // Keyboard shortcuts for advanced search
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      // Ctrl/Cmd + K
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        setShowAdvancedSearch(true);
-      }
-      // Forward slash /
-      if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-        e.preventDefault();
-        setShowAdvancedSearch(true);
-      }
-      // Escape to close
-      if (e.key === 'Escape') {
-        setShowAdvancedSearch(false);
-      }
-    };
+  // Keyboard shortcuts for advanced search - DISABLED TEMPORARILY
+  // useEffect(() => {
+  //   const handleKeyDown = (e) => {
+  //     // Ctrl/Cmd + K
+  //     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+  //       e.preventDefault();
+  //       setShowAdvancedSearch(true);
+  //     }
+  //     // Forward slash /
+  //     if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+  //       e.preventDefault();
+  //       setShowAdvancedSearch(true);
+  //     }
+  //     // Escape to close
+  //     if (e.key === 'Escape') {
+  //       setShowAdvancedSearch(false);
+  //     }
+  //   };
 
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  //   document.addEventListener('keydown', handleKeyDown);
+  //   return () => document.removeEventListener('keydown', handleKeyDown);
+  // }, []);
 
   // Search functionality
   const handleSearch = async (query) => {

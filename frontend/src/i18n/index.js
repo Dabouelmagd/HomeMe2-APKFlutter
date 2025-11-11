@@ -3325,6 +3325,23 @@ const resources = {
       'back': 'رجوع',
       'return_to_previous': 'العودة إلى الصفحة السابقة',
       
+      // Advanced Search
+      'advanced_search': 'البحث المتقدم',
+      'search_everything': 'ابحث عن أي شيء...',
+      'all': 'الكل',
+      'units': 'الوحدات',
+      'payments': 'المدفوعات',
+      'visitors': 'الزوار',
+      'announcements': 'الإعلانات',
+      'search_results': 'نتائج البحث',
+      'no_results_found': 'لا توجد نتائج',
+      'try_different_keywords': 'جرب كلمات بحث مختلفة',
+      'quick_access': 'وصول سريع',
+      'recent_searches': 'عمليات البحث الأخيرة',
+      'clear_all': 'مسح الكل',
+      'keyboard_shortcuts': 'اختصارات لوحة المفاتيح',
+      'or': 'أو',
+      
       // Payment Methods
       'supported_payment_methods': 'طرق الدفع المدعومة',
       'cash_on_service': 'نقداً عند الخدمة',

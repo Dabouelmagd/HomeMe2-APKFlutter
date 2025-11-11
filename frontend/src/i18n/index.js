@@ -878,6 +878,23 @@ const resources = {
       'back': 'Back',
       'return_to_previous': 'Return to previous page',
       
+      // Advanced Search
+      'advanced_search': 'Advanced Search',
+      'search_everything': 'Search everything...',
+      'all': 'All',
+      'units': 'Units',
+      'payments': 'Payments',
+      'visitors': 'Visitors',
+      'announcements': 'Announcements',
+      'search_results': 'Search Results',
+      'no_results_found': 'No results found',
+      'try_different_keywords': 'Try different keywords',
+      'quick_access': 'Quick Access',
+      'recent_searches': 'Recent Searches',
+      'clear_all': 'Clear All',
+      'keyboard_shortcuts': 'Keyboard Shortcuts',
+      'or': 'or',
+      
       // Payment Methods
       'supported_payment_methods': 'Supported Payment Methods',
       'cash_on_service': 'Cash on Service',

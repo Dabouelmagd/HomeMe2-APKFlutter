@@ -13142,6 +13142,162 @@ async def get_payment_receipt(
 
 # ==================== END FINANCIAL MANAGEMENT ====================
 
+# ==================== ADVANCED SEARCH ENDPOINT ====================
+
+@api_router.get("/advanced-search")
+async def advanced_search(
+    q: str,
+    category: str = "all",
+    current_user: User = Depends(get_current_user)
+):
+    """Advanced search across multiple categories"""
+    try:
+        results = []
+        query = q.lower().strip()
+        
+        if not query:
+            return {"results": []}
+        
+        # Search Users
+        if category in ["all", "users"]:
+            users = await db.users.find({
+                "$or": [
+                    {"username": {"$regex": query, "$options": "i"}},
+                    {"full_name": {"$regex": query, "$options": "i"}},
+                    {"email": {"$regex": query, "$options": "i"}},
+                    {"phone": {"$regex": query, "$options": "i"}}
+                ],
+                "compound_id": current_user.compound_id
+            }).limit(10).to_list(length=10)
+            
+            for user in users:
+                results.append({
+                    "title": user.get("full_name", user.get("username")),
+                    "description": f"{user.get('role', '')} • {user.get('email', '')}",
+                    "category": "users",
+                    "path": f"/app/users",
+                    "metadata": {
+                        "id": user.get("id"),
+                        "role": user.get("role")
+                    }
+                })
+        
+        # Search Units/Residences
+        if category in ["all", "units"]:
+            residences = await db.residences.find({
+                "$or": [
+                    {"unit_number": {"$regex": query, "$options": "i"}},
+                    {"owner_name": {"$regex": query, "$options": "i"}}
+                ],
+                "compound_id": current_user.compound_id
+            }).limit(10).to_list(length=10)
+            
+            for residence in residences:
+                results.append({
+                    "title": f"Unit {residence.get('unit_number')}",
+                    "description": f"Owner: {residence.get('owner_name', 'N/A')}",
+                    "category": "units",
+                    "path": f"/app/residences",
+                    "metadata": {
+                        "id": residence.get("id"),
+                        "unit_number": residence.get("unit_number")
+                    }
+                })
+        
+        # Search Services
+        if category in ["all", "services"]:
+            services = await db.services.find({
+                "$or": [
+                    {"name": {"$regex": query, "$options": "i"}},
+                    {"category": {"$regex": query, "$options": "i"}},
+                    {"description": {"$regex": query, "$options": "i"}}
+                ]
+            }).limit(10).to_list(length=10)
+            
+            for service in services:
+                results.append({
+                    "title": service.get("name"),
+                    "description": f"{service.get('category', '')} • {service.get('price', 'N/A')}",
+                    "category": "services",
+                    "path": f"/app/services",
+                    "metadata": {
+                        "id": service.get("id"),
+                        "category": service.get("category")
+                    }
+                })
+        
+        # Search Payments
+        if category in ["all", "payments"]:
+            payments = await db.resident_payments.find({
+                "resident_id": current_user.id if current_user.role != "admin" else None,
+                "amount": {"$exists": True}
+            }).limit(10).to_list(length=10)
+            
+            for payment in payments:
+                results.append({
+                    "title": f"Payment ${payment.get('amount')}",
+                    "description": f"{payment.get('payment_method', '')} • {payment.get('payment_date', '')}",
+                    "category": "payments",
+                    "path": f"/app/finances",
+                    "metadata": {
+                        "id": payment.get("id"),
+                        "amount": payment.get("amount")
+                    }
+                })
+        
+        # Search Visitors
+        if category in ["all", "visitors"]:
+            visitors = await db.visitors.find({
+                "$or": [
+                    {"name": {"$regex": query, "$options": "i"}},
+                    {"phone": {"$regex": query, "$options": "i"}},
+                    {"purpose": {"$regex": query, "$options": "i"}}
+                ],
+                "compound_id": current_user.compound_id
+            }).limit(10).to_list(length=10)
+            
+            for visitor in visitors:
+                results.append({
+                    "title": visitor.get("name"),
+                    "description": f"{visitor.get('purpose', '')} • {visitor.get('visit_date', '')}",
+                    "category": "visitors",
+                    "path": f"/app/visitors",
+                    "metadata": {
+                        "id": visitor.get("id"),
+                        "visit_date": visitor.get("visit_date")
+                    }
+                })
+        
+        # Search Announcements
+        if category in ["all", "announcements"]:
+            announcements = await db.announcements.find({
+                "$or": [
+                    {"title": {"$regex": query, "$options": "i"}},
+                    {"content": {"$regex": query, "$options": "i"}}
+                ],
+                "compound_id": current_user.compound_id
+            }).limit(10).to_list(length=10)
+            
+            for announcement in announcements:
+                results.append({
+                    "title": announcement.get("title"),
+                    "description": announcement.get("content", "")[:100] + "...",
+                    "category": "announcements",
+                    "path": f"/app/announcements",
+                    "metadata": {
+                        "id": announcement.get("id"),
+                        "date": announcement.get("created_at")
+                    }
+                })
+        
+        return {"results": results, "total": len(results)}
+        
+    except Exception as e:
+        logging.error(f"Advanced search error: {e}")
+        return {"results": [], "error": str(e)}
+
+# ==================== END ADVANCED SEARCH ====================
+
 # Include the API router after ALL endpoints are defined
 app.include_router(api_router)
 

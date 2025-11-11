@@ -765,8 +765,6 @@ const Layout = ({ children, isTrialMode = false }) => {
         </main>
       </div>
     </div>
-
-    {/* Advanced Search Modal */}
     <AdvancedSearchModal 
       isOpen={showAdvancedSearch} 
       onClose={() => setShowAdvancedSearch(false)} 

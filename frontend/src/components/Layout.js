@@ -762,14 +762,12 @@ const Layout = ({ children, isTrialMode = false }) => {
             </div>
           </footer>
         </main>
+        <AdvancedSearchModal 
+          isOpen={showAdvancedSearch} 
+          onClose={() => setShowAdvancedSearch(false)} 
+        />
       </div>
     </div>
-
-    <AdvancedSearchModal 
-      isOpen={showAdvancedSearch} 
-      onClose={() => setShowAdvancedSearch(false)} 
-    />
-    </>
   );
 };
 

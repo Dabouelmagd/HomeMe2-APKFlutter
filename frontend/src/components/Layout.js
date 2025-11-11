@@ -673,6 +673,11 @@ const Layout = ({ children, isTrialMode = false }) => {
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto">
+          {/* Back Button */}
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <BackButton />
+          </div>
+          
           {children || <Outlet />}
           
           {/* Footer */}

@@ -349,6 +349,12 @@ const AdvancedSearchModal = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
+
+  // Use Portal to render modal outside of parent DOM hierarchy
+  return ReactDOM.createPortal(
+    modalContent,
+    document.body
+  );
 };
 
 export default AdvancedSearchModal;

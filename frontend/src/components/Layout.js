@@ -755,7 +755,7 @@ const Layout = ({ children, isTrialMode = false }) => {
           </footer>
         </main>
       </div>
-      </div>
+    </div>
     </React.Fragment>
   );
 };

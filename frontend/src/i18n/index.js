@@ -5804,6 +5804,15 @@ const resources = {
       'events_announcements': 'Événements et annonces',
       'advanced_analytics': 'Analyses avancées',
       'document_management': 'Gestion des documents',
+      'search_results': 'Résultats de Recherche',
+      'no_results': 'Aucun résultat trouvé',
+      'no_results_found': 'Aucun résultat trouvé',
+      'try_different_keywords': 'Essayez des mots-clés différents ou vérifiez l\'orthographe',
+      'user': 'Utilisateur',
+      'service': 'Service',
+      'message': 'Message',
+      'family': 'Famille',
+      'residence': 'Résidence',
       
       // Documents
       'documents.title': 'Gestion des documents',

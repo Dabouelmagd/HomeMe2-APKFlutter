@@ -635,51 +635,77 @@ const Layout = ({ children, isTrialMode = false }) => {
                   </div>
                 </div>
 
-              {/* Old Search Results Dropdown - Keeping for backward compatibility */}
-              {showSearchResults && searchResults.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-96 overflow-y-auto z-50">
-                    {isSearching ? (
-                      <div className="px-4 py-6 text-center">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
-                        <p className="text-sm text-gray-500 mt-2">Searching...</p>
-                      </div>
-                    ) : searchResults.length > 0 ? (
-                      <div className="py-2">
+                {/* Modern Search Results Dropdown */}
+                {showSearchResults && (
+                  <div className={`absolute top-full ${isRTL ? 'right-0 left-0' : 'left-0 right-0'} mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 max-h-[32rem] overflow-hidden z-50 backdrop-blur-xl bg-white/95`}>
+                    {searchResults.length > 0 ? (
+                      <div className="overflow-y-auto max-h-[30rem] p-2">
+                        <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                          {t('search_results', 'Search Results')} ({searchResults.length})
+                        </div>
                         {searchResults.map((result, index) => (
                           <button
                             key={index}
                             onClick={() => handleSearchResultClick(result)}
-                            className="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+                            className={`w-full px-4 py-3.5 text-${isRTL ? 'right' : 'left'} hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 
+                              focus:bg-gradient-to-r focus:from-blue-50 focus:to-indigo-50 focus:outline-none 
+                              rounded-xl transition-all duration-200 group mb-1`}
                           >
-                            <div className="flex items-center">
+                            <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
                               <div className="flex-shrink-0">
-                                {result.type === 'user' && <UsersIcon className="h-5 w-5 text-gray-400" />}
-                                {result.type === 'residence' && <HomeIcon className="h-5 w-5 text-gray-400" />}
-                                {result.type === 'service' && <WrenchScrewdriverIcon className="h-5 w-5 text-gray-400" />}
-                                {result.type === 'message' && <ChatBubbleLeftEllipsisIcon className="h-5 w-5 text-gray-400" />}
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center
+                                  ${result.type === 'user' ? 'bg-purple-100 text-purple-600' : ''}
+                                  ${result.type === 'residence' ? 'bg-green-100 text-green-600' : ''}
+                                  ${result.type === 'service' ? 'bg-blue-100 text-blue-600' : ''}
+                                  ${result.type === 'message' ? 'bg-orange-100 text-orange-600' : ''}
+                                  ${result.type === 'family' ? 'bg-pink-100 text-pink-600' : ''}
+                                  group-hover:scale-110 transition-transform duration-200`}>
+                                  {result.type === 'user' && <UsersIcon className="h-5 w-5" />}
+                                  {result.type === 'residence' && <HomeIcon className="h-5 w-5" />}
+                                  {result.type === 'service' && <WrenchScrewdriverIcon className="h-5 w-5" />}
+                                  {result.type === 'message' && <ChatBubbleLeftEllipsisIcon className="h-5 w-5" />}
+                                  {result.type === 'family' && <UserGroupIcon className="h-5 w-5" />}
+                                </div>
                               </div>
-                              <div className="ml-3 flex-1">
-                                <p className="text-sm font-medium text-gray-900">{result.title}</p>
-                                <p className="text-sm text-gray-500">{result.description}</p>
+                              <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-blue-700 transition-colors">
+                                  {result.title}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate mt-0.5">
+                                  {result.description}
+                                </p>
                               </div>
-                              <div className="ml-3 flex-shrink-0">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 capitalize">
-                                  {result.type}
+                              <div className={`flex-shrink-0 ${isRTL ? 'mr-auto' : 'ml-auto'}`}>
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+                                  ${result.type === 'user' ? 'bg-purple-50 text-purple-700 border border-purple-200' : ''}
+                                  ${result.type === 'residence' ? 'bg-green-50 text-green-700 border border-green-200' : ''}
+                                  ${result.type === 'service' ? 'bg-blue-50 text-blue-700 border border-blue-200' : ''}
+                                  ${result.type === 'message' ? 'bg-orange-50 text-orange-700 border border-orange-200' : ''}
+                                  ${result.type === 'family' ? 'bg-pink-50 text-pink-700 border border-pink-200' : ''}
+                                  capitalize group-hover:shadow-sm transition-shadow`}>
+                                  {t(result.type, result.type)}
                                 </span>
                               </div>
                             </div>
                           </button>
                         ))}
                       </div>
-                    ) : searchQuery ? (
-                      <div className="px-4 py-6 text-center">
-                        <MagnifyingGlassIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-sm font-medium text-gray-900">No results found</p>
-                        <p className="text-sm text-gray-500">Try different keywords or check spelling</p>
+                    ) : searchQuery && !isSearching ? (
+                      <div className="px-6 py-12 text-center">
+                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <MagnifyingGlassIcon className="h-8 w-8 text-gray-400" />
+                        </div>
+                        <p className="text-base font-semibold text-gray-900 mb-1">
+                          {t('no_results', 'No results found')}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {t('try_different_keywords', 'Try different keywords or check spelling')}
+                        </p>
                       </div>
                     ) : null}
                   </div>
                 )}
+              </div>
             </div>
 
             <div className="flex items-center gap-3 rtl:flex-row-reverse">

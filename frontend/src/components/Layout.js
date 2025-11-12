@@ -755,7 +755,6 @@ const Layout = ({ children, isTrialMode = false }) => {
         </main>
       </div>
     </div>
-    </React.Fragment>
   );
 };
 

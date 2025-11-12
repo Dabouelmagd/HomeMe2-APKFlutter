@@ -3508,44 +3508,62 @@ async def get_resident_dashboard(current_user: User = Depends(get_current_user))
     if current_user.role != UserRole.RESIDENT:
         raise HTTPException(status_code=403, detail="Resident access required")
     
-    # Get family info
-    family = None
-    family_members = []
-    if current_user.family_id:
-        family = await db.families.find_one({"id": current_user.family_id})
-        if family:
-            family_members = await db.users.find(
-                {"id": {"$in": family["members"]}},
-                {"password_hash": 0}
-            ).to_list(None)
-    
-    # Get pending invoices
-    pending_invoices = await db.invoices.find({
-        "family_id": current_user.family_id,
-        "status": PaymentStatus.PENDING
-    }).to_list(None)
-    
-    # Get recent notifications
-    recent_notifications = await db.notifications.find({
-        "compound_id": current_user.compound_id,
-        "$or": [
-            {"recipient_ids": {"$size": 0}},
-            {"recipient_ids": current_user.id}
-        ]
-    }).sort("created_at", -1).limit(5).to_list(None)
-    
-    # Get my messages
-    my_messages = await db.messages.find({
-        "sender_id": current_user.id
-    }).sort("created_at", -1).limit(5).to_list(None)
-    
-    return {
-        "family": family,
-        "family_members": family_members,
-        "pending_invoices": pending_invoices,
-        "recent_notifications": recent_notifications,
-        "my_messages": my_messages
-    }
+    try:
+        # Get family info
+        family = None
+        family_members = []
+        if current_user.family_id:
+            family = await db.families.find_one({"id": current_user.family_id})
+            if family:
+                family_members = await db.users.find(
+                    {"id": {"$in": family.get("members", [])}},
+                    {"password_hash": 0}
+                ).to_list(None)
+                # Serialize family members
+                family_members = [serialize_datetime(member) for member in family_members]
+        
+        # Get pending invoices (using string instead of enum)
+        pending_invoices = []
+        if current_user.family_id:
+            pending_invoices = await db.invoices.find({
+                "family_id": current_user.family_id,
+                "status": "pending"
+            }).to_list(None)
+            pending_invoices = [serialize_datetime(inv) for inv in pending_invoices]
+        
+        # Get recent notifications
+        recent_notifications = await db.notifications.find({
+            "compound_id": current_user.compound_id,
+            "$or": [
+                {"recipient_ids": {"$size": 0}},
+                {"recipient_ids": current_user.id}
+            ]
+        }).sort("created_at", -1).limit(5).to_list(None)
+        recent_notifications = [serialize_datetime(notif) for notif in recent_notifications]
+        
+        # Get my messages
+        my_messages = await db.messages.find({
+            "sender_id": current_user.id
+        }).sort("created_at", -1).limit(5).to_list(None)
+        my_messages = [serialize_datetime(msg) for msg in my_messages]
+        
+        return {
+            "family": serialize_datetime(family) if family else None,
+            "family_members": family_members,
+            "pending_invoices": pending_invoices,
+            "recent_notifications": recent_notifications,
+            "my_messages": my_messages
+        }
+    except Exception as e:
+        logging.error(f"Error in resident dashboard: {str(e)}")
+        # Return safe defaults if there's an error
+        return {
+            "family": None,
+            "family_members": [],
+            "pending_invoices": [],
+            "recent_notifications": [],
+            "my_messages": []
+        }
 
 # ============ CHAT ENDPOINTS ============
 

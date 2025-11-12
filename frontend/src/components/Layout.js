@@ -608,18 +608,32 @@ const Layout = ({ children, isTrialMode = false }) => {
               <Bars3Icon className="h-6 w-6 text-gray-500" />
             </button>
 
-            <div className="flex-1 min-w-0 mx-4">
-              {/* Advanced Search Trigger Button - DISABLED TEMPORARILY */}
-              <button
-                onClick={() => {}}
-                disabled
-                className="w-full max-w-lg flex items-center gap-3 px-4 py-2.5 bg-gray-100 border-2 border-gray-200 rounded-xl cursor-not-allowed opacity-60"
-              >
-                <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-500 text-sm flex-1 text-left rtl:text-right">
-                  {t('search_placeholder', 'البحث قريباً...')}
-                </span>
-              </button>
+            <div className="flex-1 min-w-0 mx-4 search-container relative">
+              {/* Modern Search Bar */}
+              <div className="relative w-full max-w-2xl">
+                <div className="relative">
+                  <MagnifyingGlassIcon className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-4' : 'left-4'}`} />
+                  <input
+                    id="global-search-input"
+                    type="text"
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                    placeholder={t('search_placeholder', 'Search users, services, messages...')}
+                    className={`w-full ${isRTL ? 'pr-12 pl-24' : 'pl-12 pr-24'} py-3 bg-white border-2 border-gray-200 rounded-xl
+                      text-gray-900 placeholder-gray-400 text-sm
+                      focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none
+                      transition-all duration-200 shadow-sm hover:shadow-md`}
+                  />
+                  <div className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? 'left-3' : 'right-3'} flex items-center gap-2`}>
+                    {isSearching && (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-500 border-t-transparent"></div>
+                    )}
+                    <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded border border-gray-300">
+                      <CommandLineIcon className="w-3 h-3" />
+                      K
+                    </kbd>
+                  </div>
+                </div>
 
               {/* Old Search Results Dropdown - Keeping for backward compatibility */}
               {showSearchResults && searchResults.length > 0 && (

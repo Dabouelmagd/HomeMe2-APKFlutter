@@ -443,7 +443,8 @@ const Layout = ({ children, isTrialMode = false }) => {
   const isActive = (href) => location.pathname === href || location.pathname.startsWith(href + '/');
 
   return (
-    <div className={`flex h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`}>
+    <React.Fragment>
+      <div className={`flex h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div

@@ -752,7 +752,6 @@ const Layout = ({ children, isTrialMode = false }) => {
               </div>
             </div>
           </footer>
-          </footer>
         </main>
       </div>
     </div>

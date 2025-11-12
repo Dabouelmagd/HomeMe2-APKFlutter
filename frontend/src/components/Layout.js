@@ -666,7 +666,6 @@ const Layout = ({ children, isTrialMode = false }) => {
                     ) : null}
                   </div>
                 )}
-              </div>
             </div>
 
             <div className="flex items-center gap-3 rtl:flex-row-reverse">

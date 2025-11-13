@@ -1214,6 +1214,7 @@ const resources = {
       'code_renewed_successfully': 'Code renewed successfully!',
       'error_renewing_code': 'Failed to renew code. Please try again.',
       'view_details': 'View Details',
+      'select_compound_for_code': 'Select a specific compound or leave empty for all compounds',
       'logins_today': 'Logins Today',
       'logins_this_week': 'Logins This Week',
       'overview': 'Overview',

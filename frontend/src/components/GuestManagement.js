@@ -506,6 +506,25 @@ const GuestManagement = () => {
               </span>
             </div>
           </button>
+          
+          <button
+            onClick={() => setActiveTab('security')}
+            className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm transition-all transform ${
+              activeTab === 'security'
+                ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg scale-105'
+                : 'text-gray-600 hover:text-gray-800 hover:bg-white hover:shadow-md'
+            }`}
+          >
+            <div className="flex items-center justify-center space-x-2">
+              <IdentificationIcon className="w-4 h-4" />
+              <span>{t('security_log')}</span>
+              <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                activeTab === 'security' ? 'bg-white bg-opacity-20 text-white' : 'bg-red-100 text-red-600'
+              }`}>
+                {securityLogs.length}
+              </span>
+            </div>
+          </button>
         </nav>
       </div>
 

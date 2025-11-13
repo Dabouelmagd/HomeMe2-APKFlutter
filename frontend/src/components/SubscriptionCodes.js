@@ -18,6 +18,7 @@ const SubscriptionCodes = () => {
   const { t } = useTranslation();
   
   const [codes, setCodes] = useState([]);
+  const [compounds, setCompounds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -28,7 +29,8 @@ const SubscriptionCodes = () => {
     discount_percentage: null,
     max_uses: 1,
     expires_at: '',
-    notes: ''
+    notes: '',
+    compound_id: ''
   });
 
   useEffect(() => {

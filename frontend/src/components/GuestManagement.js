@@ -34,15 +34,24 @@ const GuestManagement = () => {
   const [activeTab, setActiveTab] = useState('guests');
   const [guests, setGuests] = useState([]);
   const [visitRequests, setVisitRequests] = useState([]);
+  const [securityLogs, setSecurityLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showSecurityCheckModal, setShowSecurityCheckModal] = useState(false);
   const [stats, setStats] = useState({});
   const [filters, setFilters] = useState({
     status: 'all',
     dateRange: 'all',
     search: ''
+  });
+  const [securityCheckForm, setSecurityCheckForm] = useState({
+    action: 'check_in', // check_in or check_out
+    security_notes: '',
+    id_verified: false,
+    temperature_check: '',
+    photo_taken: false
   });
 
   // Form state for new guest/visit request

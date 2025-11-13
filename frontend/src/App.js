@@ -25,6 +25,7 @@ import DebugLogin from './components/DebugLogin';
 import HomePage from './components/HomePage';
 import AdminDashboard from './components/AdminDashboard';
 import ResidentDashboard from './components/ResidentDashboard';
+import SecurityDashboard from './components/SecurityDashboard';
 import CompoundManagement from './components/CompoundManagement';
 import ServicesManagement from './components/ServicesManagement';
 import UtilityBills from './components/UtilityBills';

@@ -78,10 +78,10 @@ const CompoundsManagement = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          🏘️ Compounds Management
+          🏘️ {t('compounds_management', 'Compounds Management')}
         </h1>
         <p className="text-gray-600">
-          Manage all residential compounds and assign subscription codes
+          {t('compounds_management_desc', 'Manage all residential compounds and assign subscription codes')}
         </p>
       </div>
 
@@ -90,7 +90,7 @@ const CompoundsManagement = () => {
         <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-600 text-sm font-medium">Total Compounds</p>
+              <p className="text-blue-600 text-sm font-medium">{t('total_compounds', 'Total Compounds')}</p>
               <p className="text-3xl font-bold text-blue-800">{compounds.length}</p>
             </div>
             <div className="bg-blue-100 p-3 rounded-lg">

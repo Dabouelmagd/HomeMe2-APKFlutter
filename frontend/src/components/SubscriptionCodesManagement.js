@@ -206,6 +206,34 @@ const SubscriptionCodesManagement = () => {
     }
   };
 
+  const handleRenewCode = async (code) => {
+    if (window.confirm(t('confirm_renew_code', 'Are you sure you want to renew this code? This will reset its usage and extend its validity.'))) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/api/admin/subscription-codes/${code.id}/renew`,
+          {
+            duration: code.duration,
+            max_uses: code.max_uses,
+            expires_in_days: 365
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        if (response.data.success) {
+          alert(t('code_renewed_successfully', 'Code renewed successfully!'));
+          fetchCodes();
+          fetchStats();
+        } else {
+          alert(response.data.message || t('error_renewing_code', 'Failed to renew code'));
+        }
+      } catch (error) {
+        console.error('Error renewing code:', error);
+        alert(t('error_renewing_code', 'Failed to renew code. Please try again.'));
+      }
+    }
+  };
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     alert(t('code_copied'));

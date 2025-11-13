@@ -254,7 +254,7 @@ const SubscriptionCodes = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {codes.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
                     {t('no_codes_found')}
                   </td>
                 </tr>

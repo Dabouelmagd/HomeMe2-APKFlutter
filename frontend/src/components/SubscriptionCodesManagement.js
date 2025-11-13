@@ -440,13 +440,23 @@ const SubscriptionCodesManagement = () => {
                       <button
                         onClick={() => setSelectedCode(code)}
                         className="text-blue-600 hover:text-blue-900"
+                        title={t('view_details', 'View Details')}
                       >
                         <EyeIcon className="h-4 w-4" />
                       </button>
                       
                       <button
+                        onClick={() => handleRenewCode(code)}
+                        className="text-green-600 hover:text-green-900"
+                        title={t('renew_code', 'Renew Code')}
+                      >
+                        <ClockIcon className="h-4 w-4" />
+                      </button>
+                      
+                      <button
                         onClick={() => handleDeleteCode(code.id)}
                         className="text-red-600 hover:text-red-900"
+                        title={t('delete', 'Delete')}
                       >
                         <TrashIcon className="h-4 w-4" />
                       </button>

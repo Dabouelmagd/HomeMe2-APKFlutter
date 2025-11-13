@@ -11828,6 +11828,56 @@ async def delete_subscription_code(code_id: str, current_user: User = Depends(re
         logging.error(f"Error deleting subscription code: {e}")
         raise HTTPException(status_code=500, detail="خطأ في حذف الكود")
 
+@api_router.post("/admin/subscription-codes/{code_id}/renew")
+async def renew_subscription_code(
+    code_id: str, 
+    duration: str = "1_month",
+    max_uses: int = 1,
+    expires_in_days: int = 365,
+    current_user: User = Depends(require_admin)
+):
+    """تجديد كود اشتراك - إعادة تعيين الاستخدام وتمديد الصلاحية"""
+    try:
+        # البحث عن الكود
+        existing_code = await db.subscription_codes.find_one({"id": code_id})
+        
+        if not existing_code:
+            raise HTTPException(status_code=404, detail="الكود غير موجود")
+        
+        # تحديث الكود
+        from datetime import datetime, timedelta, timezone
+        new_expiry = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
+        
+        update_data = {
+            "current_uses": 0,  # إعادة تعيين الاستخدام
+            "max_uses": max_uses,
+            "expires_at": new_expiry.isoformat(),
+            "is_active": True,
+            "status": "active",
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        result = await db.subscription_codes.update_one(
+            {"id": code_id},
+            {"$set": update_data}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=500, detail="فشل تجديد الكود")
+        
+        return {
+            "success": True, 
+            "message": "تم تجديد الكود بنجاح",
+            "code": existing_code.get("code"),
+            "new_expiry": new_expiry.isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error renewing subscription code: {e}")
+        raise HTTPException(status_code=500, detail="خطأ في تجديد الكود")
+
 @api_router.get("/users/{user_id}/subscription", response_model=SubscriptionCodeResponse)
 async def get_user_subscription(user_id: str, current_user: User = Depends(get_current_user)):
     """الحصول على اشتراك المستخدم"""

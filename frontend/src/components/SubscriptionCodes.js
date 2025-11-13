@@ -324,6 +324,13 @@ const SubscriptionCodes = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
+                        <button
+                          onClick={() => handleRenewCode(code)}
+                          className="text-green-600 hover:text-green-900"
+                          title={t('renew_code')}
+                        >
+                          <ClockIcon className="h-5 w-5" />
+                        </button>
                         {code.is_active && (
                           <button
                             onClick={() => handleDeactivateCode(code.code)}

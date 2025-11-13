@@ -239,7 +239,7 @@ const CompoundsManagement = () => {
                             )}
                           </div>
                         ) : (
-                          <span className="text-red-600 font-medium">No Subscription</span>
+                          <span className="text-red-600 font-medium">{t('no_subscription', 'No Subscription')}</span>
                         )}
                       </div>
                     </td>

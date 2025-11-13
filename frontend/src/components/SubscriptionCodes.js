@@ -94,7 +94,8 @@ const SubscriptionCodes = () => {
           discount_percentage: null,
           max_uses: 1,
           expires_at: '',
-          notes: ''
+          notes: '',
+          compound_id: ''
         });
       }
     } catch (error) {

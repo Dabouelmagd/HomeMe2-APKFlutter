@@ -6067,6 +6067,7 @@ const resources = {
       'code_renewed_successfully': 'Code renouvelé avec succès!',
       'error_renewing_code': 'Échec du renouvellement du code. Veuillez réessayer.',
       'view_details': 'Voir les Détails',
+      'select_compound_for_code': 'Sélectionnez un complexe spécifique ou laissez vide pour tous les complexes',
       'logins_today': 'Connexions Aujourd\'hui',
       'logins_this_week': 'Connexions Cette Semaine',
       'overview': 'Vue d\'ensemble',

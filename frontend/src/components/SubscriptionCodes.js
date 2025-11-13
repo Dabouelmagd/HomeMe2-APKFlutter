@@ -468,6 +468,27 @@ const SubscriptionCodes = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('compound')} ({t('optional')})
+                </label>
+                <select
+                  value={formData.compound_id}
+                  onChange={(e) => setFormData({ ...formData, compound_id: e.target.value })}
+                  className="form-input w-full border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">{t('all_compounds')}</option>
+                  {Array.isArray(compounds) && compounds.map(compound => (
+                    <option key={compound.id} value={compound.id}>
+                      {compound.name || compound.compound_name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  {t('select_compound_for_code', 'Select a specific compound or leave empty for all compounds')}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   {t('expiry_date')} ({t('optional')})
                 </label>
                 <input

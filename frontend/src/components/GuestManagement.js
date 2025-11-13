@@ -729,6 +729,77 @@ const GuestManagement = () => {
             )}
           </>
         )}
+        
+        {/* Security Log Tab */}
+        {activeTab === 'security' && (
+          <>
+            {securityLogs.length === 0 ? (
+              <div className="text-center py-16 bg-gradient-to-br from-red-50 to-orange-100 rounded-xl">
+                <div className="bg-white rounded-full w-24 h-24 mx-auto flex items-center justify-center shadow-lg mb-6">
+                  <IdentificationIcon className="h-12 w-12 text-red-500" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('no_security_logs')}</h3>
+                <p className="text-gray-600">{t('security_logs_appear_here')}</p>
+              </div>
+            ) : (
+              securityLogs.map((log) => (
+                <div key={log.id || log._id} className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-all">
+                  <div className="p-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-3">
+                          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                            log.action === 'check_in' ? 'bg-green-100' : 'bg-orange-100'
+                          }`}>
+                            {log.action === 'check_in' ? (
+                              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+                            ) : (
+                              <XCircleIcon className="w-6 h-6 text-orange-600" />
+                            )}
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900">{log.visitor_name}</h3>
+                            <p className="text-sm text-gray-500">{log.action === 'check_in' ? t('checked_in') : t('checked_out')}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-xs text-gray-500 mb-1">{t('checked_by')}</p>
+                            <p className="text-sm font-semibold text-gray-900">{log.checked_by}</p>
+                          </div>
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-xs text-gray-500 mb-1">{t('time')}</p>
+                            <p className="text-sm font-semibold text-gray-900">{formatRelativeTime(log.timestamp || log.created_at)}</p>
+                          </div>
+                          <div className="bg-gray-50 rounded-lg p-3">
+                            <p className="text-xs text-gray-500 mb-1">{t('id_verified')}</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                              {log.id_verified ? '✓ ' + t('yes') : '✗ ' + t('no')}
+                            </p>
+                          </div>
+                          {log.temperature_check && (
+                            <div className="bg-gray-50 rounded-lg p-3">
+                              <p className="text-xs text-gray-500 mb-1">{t('temperature')}</p>
+                              <p className="text-sm font-semibold text-gray-900">{log.temperature_check}°C</p>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {log.security_notes && (
+                          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+                            <p className="text-xs text-yellow-700 font-semibold mb-1">{t('security_notes')}:</p>
+                            <p className="text-sm text-yellow-800">{log.security_notes}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </>
+        )}
       </div>
 
       {/* Add Visitor Modal */}

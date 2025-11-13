@@ -22,6 +22,8 @@ const SubscriptionCodes = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showRenewModal, setShowRenewModal] = useState(false);
+  const [selectedCodeForRenew, setSelectedCodeForRenew] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
   const [formData, setFormData] = useState({
     code_type: '3_months',

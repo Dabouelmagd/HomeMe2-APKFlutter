@@ -406,6 +406,18 @@ const SubscriptionCodesManagement = () => {
                   </td>
                   
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="text-sm text-gray-900">
+                      {code.compound_name || code.compound_id ? (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {code.compound_name || code.compound_id}
+                        </span>
+                      ) : (
+                        <span className="text-gray-500 italic">{t('all_compounds')}</span>
+                      )}
+                    </span>
+                  </td>
+                  
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-sm font-medium text-gray-900">
                       {getDurationLabel(code.duration)}
                     </span>

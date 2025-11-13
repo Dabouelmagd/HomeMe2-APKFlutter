@@ -35,7 +35,20 @@ const SubscriptionCodes = () => {
 
   useEffect(() => {
     fetchCodes();
+    fetchCompounds();
   }, []);
+
+  const fetchCompounds = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API}/api/compounds/all`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCompounds(response.data || []);
+    } catch (error) {
+      console.error('Error fetching compounds:', error);
+    }
+  };
 
   const fetchCodes = async () => {
     try {

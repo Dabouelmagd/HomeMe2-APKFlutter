@@ -1145,6 +1145,131 @@ const GuestManagement = () => {
           </div>
         </div>
       )}
+
+      {/* Security Check Modal */}
+      {showSecurityCheckModal && selectedGuest && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 transform transition-all">
+            {/* Icon */}
+            <div className="flex justify-center mb-6">
+              <div className={`rounded-full p-4 ${
+                securityCheckForm.action === 'check_in' 
+                  ? 'bg-gradient-to-br from-green-100 to-green-200' 
+                  : 'bg-gradient-to-br from-orange-100 to-orange-200'
+              }`}>
+                <IdentificationIcon className={`h-12 w-12 ${
+                  securityCheckForm.action === 'check_in' ? 'text-green-600' : 'text-orange-600'
+                }`} />
+              </div>
+            </div>
+            
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+              {securityCheckForm.action === 'check_in' ? t('security_check_in') : t('security_check_out')}
+            </h2>
+            <p className="text-gray-600 text-center mb-6">
+              {t('visitor')}: <span className="font-semibold">{selectedGuest.visitor_name}</span>
+            </p>
+            
+            {/* Form */}
+            <div className="space-y-4">
+              {/* ID Verification */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex items-center">
+                  <IdentificationIcon className="h-6 w-6 text-blue-600 mr-3" />
+                  <span className="font-medium text-gray-900">{t('id_verified')}</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={securityCheckForm.id_verified}
+                    onChange={(e) => setSecurityCheckForm({ ...securityCheckForm, id_verified: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+              
+              {/* Temperature Check */}
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <label className="block font-medium text-gray-900 mb-2 flex items-center">
+                  <ExclamationTriangleIcon className="h-6 w-6 text-orange-600 mr-2" />
+                  {t('temperature_check')} (°C)
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  value={securityCheckForm.temperature_check}
+                  onChange={(e) => setSecurityCheckForm({ ...securityCheckForm, temperature_check: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="36.5"
+                />
+              </div>
+              
+              {/* Photo Taken */}
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex items-center">
+                  <PhoneIcon className="h-6 w-6 text-purple-600 mr-3" />
+                  <span className="font-medium text-gray-900">{t('photo_taken')}</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={securityCheckForm.photo_taken}
+                    onChange={(e) => setSecurityCheckForm({ ...securityCheckForm, photo_taken: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+              
+              {/* Security Notes */}
+              <div className="p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                <label className="block font-medium text-gray-900 mb-2">
+                  {t('security_notes')}
+                </label>
+                <textarea
+                  value={securityCheckForm.security_notes}
+                  onChange={(e) => setSecurityCheckForm({ ...securityCheckForm, security_notes: e.target.value })}
+                  className="w-full px-4 py-2 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 resize-none"
+                  rows="3"
+                  placeholder={t('add_any_security_observations')}
+                />
+              </div>
+            </div>
+            
+            {/* Buttons */}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowSecurityCheckModal(false);
+                  setSelectedGuest(null);
+                  setSecurityCheckForm({
+                    action: 'check_in',
+                    security_notes: '',
+                    id_verified: false,
+                    temperature_check: '',
+                    photo_taken: false
+                  });
+                }}
+                className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all duration-200"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleSecurityCheck}
+                className={`flex-1 px-6 py-3 font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 text-white ${
+                  securityCheckForm.action === 'check_in'
+                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+                    : 'bg-gradient-to-r from-orange-600 to-red-700 hover:from-orange-700 hover:to-red-800'
+                }`}
+              >
+                {securityCheckForm.action === 'check_in' ? t('confirm_check_in') : t('confirm_check_out')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

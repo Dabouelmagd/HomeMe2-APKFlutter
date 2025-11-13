@@ -104,7 +104,7 @@ const CompoundsManagement = () => {
         <div className="bg-green-50 rounded-xl p-6 border border-green-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-600 text-sm font-medium">Active Compounds</p>
+              <p className="text-green-600 text-sm font-medium">{t('active_compounds', 'Active Compounds')}</p>
               <p className="text-3xl font-bold text-green-800">
                 {compounds.filter(c => c.is_active).length}
               </p>

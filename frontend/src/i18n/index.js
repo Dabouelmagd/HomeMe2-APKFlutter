@@ -3754,6 +3754,7 @@ const resources = {
       'code_renewed_successfully': 'تم تجديد الكود بنجاح!',
       'error_renewing_code': 'فشل تجديد الكود. يرجى المحاولة مرة أخرى.',
       'view_details': 'عرض التفاصيل',
+      'select_compound_for_code': 'اختر مجمع محدد أو اتركه فارغاً لجميع المجمعات',
       'logins_today': 'تسجيلات الدخول اليوم',
       'logins_this_week': 'تسجيلات الدخول هذا الأسبوع',
       'overview': 'نظرة عامة',

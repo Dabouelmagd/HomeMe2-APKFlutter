@@ -581,6 +581,8 @@ const DashboardRouter = () => {
   
   if (user?.role === 'admin') {
     return <AdminDashboard />;
+  } else if (user?.role === 'security') {
+    return <SecurityDashboard />;
   } else {
     return <ResidentDashboard />;
   }

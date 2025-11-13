@@ -180,6 +180,49 @@ const GuestManagement = () => {
     }
   };
 
+  const handleSecurityCheck = async () => {
+    if (!selectedGuest) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${API}/security/visitor-check`,
+        {
+          guest_id: selectedGuest.id || selectedGuest._id,
+          visitor_name: selectedGuest.visitor_name,
+          action: securityCheckForm.action,
+          security_notes: securityCheckForm.security_notes,
+          id_verified: securityCheckForm.id_verified,
+          temperature_check: securityCheckForm.temperature_check,
+          photo_taken: securityCheckForm.photo_taken,
+          checked_by: user.username || user.email,
+          compound_id: user.compound_id
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success(
+        securityCheckForm.action === 'check_in' 
+          ? t('visitor_checked_in_successfully', 'Visitor checked in successfully!')
+          : t('visitor_checked_out_successfully', 'Visitor checked out successfully!')
+      );
+      
+      setShowSecurityCheckModal(false);
+      setSelectedGuest(null);
+      setSecurityCheckForm({
+        action: 'check_in',
+        security_notes: '',
+        id_verified: false,
+        temperature_check: '',
+        photo_taken: false
+      });
+      fetchGuestData();
+    } catch (error) {
+      toast.error(t('security_check_failed', 'Security check failed. Please try again.'));
+      console.error('Security check error:', error);
+    }
+  };
+
   const handleCheckIn = async (guestId) => {
     try {
       await axios.patch(`${API}/guests/${guestId}/checkin`);

@@ -217,7 +217,7 @@ const Layout = ({ children, isTrialMode = false }) => {
           show: user?.role === 'admin'
         },
         {
-          name: 'Compounds Management',
+          name: t('compounds_management', 'Compounds Management'),
           href: 'compounds-management',
           icon: HomeIcon,
           show: user?.role === 'admin' && user?.compound_id === 'super_admin'

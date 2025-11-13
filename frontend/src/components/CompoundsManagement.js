@@ -120,7 +120,7 @@ const CompoundsManagement = () => {
         <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-purple-600 text-sm font-medium">Total Units</p>
+              <p className="text-purple-600 text-sm font-medium">{t('total_units', 'Total Units')}</p>
               <p className="text-3xl font-bold text-purple-800">
                 {compounds.reduce((sum, c) => sum + (c.total_units || 0), 0)}
               </p>

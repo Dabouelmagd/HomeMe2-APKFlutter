@@ -11951,6 +11951,41 @@ async def get_security_visitor_logs(current_user: User = Depends(get_current_use
         logging.error(f"Error fetching security logs: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch security logs")
 
+@api_router.get("/security/messages")
+async def get_security_messages(current_user: User = Depends(get_current_user)):
+    """جلب الرسائل من السكان لموظف الأمن"""
+    try:
+        query = {
+            "recipient_type": "security",
+            "compound_id": current_user.compound_id
+        }
+        
+        messages = await db.messages.find(query).sort("created_at", -1).limit(50).to_list(None)
+        
+        return {
+            "success": True,
+            "messages": [serialize_datetime(msg) for msg in messages]
+        }
+        
+    except Exception as e:
+        logging.error(f"Error fetching security messages: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch messages")
+
+@api_router.patch("/security/messages/{message_id}/read")
+async def mark_security_message_read(message_id: str, current_user: User = Depends(get_current_user)):
+    """تحديد رسالة كمقروءة"""
+    try:
+        await db.messages.update_one(
+            {"_id": message_id},
+            {"$set": {"read": True}}
+        )
+        
+        return {"success": True, "message": "Message marked as read"}
+        
+    except Exception as e:
+        logging.error(f"Error marking message as read: {e}")
+        raise HTTPException(status_code=500, detail="Failed to mark message as read")
+
 @api_router.get("/users/{user_id}/subscription", response_model=SubscriptionCodeResponse)
 async def get_user_subscription(user_id: str, current_user: User = Depends(get_current_user)):
     """الحصول على اشتراك المستخدم"""

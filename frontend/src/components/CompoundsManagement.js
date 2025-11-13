@@ -136,7 +136,7 @@ const CompoundsManagement = () => {
         <div className="bg-orange-50 rounded-xl p-6 border border-orange-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-600 text-sm font-medium">Available Codes</p>
+              <p className="text-orange-600 text-sm font-medium">{t('available_codes', 'Available Codes')}</p>
               <p className="text-3xl font-bold text-orange-800">
                 {subscriptionCodes.filter(c => c.is_active).length}
               </p>

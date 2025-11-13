@@ -611,21 +611,31 @@ const GuestManagement = () => {
                         
                         <div className="flex flex-col space-y-3 ml-6">
                           {guest.status === 'approved' && (
-                            <button
-                              onClick={() => handleCheckIn(guest.id)}
-                              className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-medium hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center"
-                            >
-                              <CheckCircleIcon className="w-4 h-4 mr-2" />
-                              {t('check_in')}
-                            </button>
+                            <>
+                              <button
+                                onClick={() => {
+                                  setSelectedGuest(guest);
+                                  setSecurityCheckForm({ ...securityCheckForm, action: 'check_in' });
+                                  setShowSecurityCheckModal(true);
+                                }}
+                                className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg text-sm font-medium hover:from-green-600 hover:to-emerald-600 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center"
+                              >
+                                <CheckCircleIcon className="w-4 h-4 mr-2" />
+                                {t('security_check_in')}
+                              </button>
+                            </>
                           )}
                           {guest.status === 'checked_in' && (
                             <button
-                              onClick={() => handleCheckOut(guest.id)}
-                              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg text-sm font-medium hover:from-blue-600 hover:to-cyan-600 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center"
+                              onClick={() => {
+                                setSelectedGuest(guest);
+                                setSecurityCheckForm({ ...securityCheckForm, action: 'check_out' });
+                                setShowSecurityCheckModal(true);
+                              }}
+                              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg text-sm font-medium hover:from-orange-600 hover:to-red-600 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center"
                             >
                               <XCircleIcon className="w-4 h-4 mr-2" />
-                              {t('check_out')}
+                              {t('security_check_out')}
                             </button>
                           )}
                           

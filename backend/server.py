@@ -11878,6 +11878,79 @@ async def renew_subscription_code(
         logging.error(f"Error renewing subscription code: {e}")
         raise HTTPException(status_code=500, detail="خطأ في تجديد الكود")
 
+@api_router.post("/security/visitor-check")
+async def security_visitor_check(
+    guest_id: str = None,
+    visitor_name: str = None,
+    action: str = "check_in",
+    security_notes: str = "",
+    id_verified: bool = False,
+    temperature_check: str = "",
+    photo_taken: bool = False,
+    checked_by: str = "",
+    compound_id: str = "",
+    current_user: User = Depends(get_current_user)
+):
+    """تسجيل دخول/خروج الزائر بواسطة الأمن"""
+    try:
+        from datetime import datetime, timezone
+        import uuid
+        
+        # إنشاء سجل أمني
+        security_log = {
+            "id": str(uuid.uuid4()),
+            "guest_id": guest_id,
+            "visitor_name": visitor_name,
+            "action": action,  # check_in or check_out
+            "security_notes": security_notes,
+            "id_verified": id_verified,
+            "temperature_check": temperature_check,
+            "photo_taken": photo_taken,
+            "checked_by": checked_by,
+            "compound_id": compound_id or current_user.compound_id,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.security_logs.insert_one(security_log)
+        
+        # تحديث حالة الزائر
+        if guest_id:
+            new_status = "checked_in" if action == "check_in" else "checked_out"
+            await db.guests.update_one(
+                {"id": guest_id},
+                {"$set": {"status": new_status}}
+            )
+        
+        return {
+            "success": True,
+            "message": "Security check completed successfully",
+            "log": serialize_datetime(security_log)
+        }
+        
+    except Exception as e:
+        logging.error(f"Error in security visitor check: {e}")
+        raise HTTPException(status_code=500, detail="Security check failed")
+
+@api_router.get("/security/visitor-logs")
+async def get_security_visitor_logs(current_user: User = Depends(get_current_user)):
+    """جلب سجلات الأمن للزوار"""
+    try:
+        query = {}
+        if current_user.compound_id and current_user.compound_id != "super_admin":
+            query["compound_id"] = current_user.compound_id
+        
+        logs = await db.security_logs.find(query).sort("created_at", -1).limit(100).to_list(None)
+        
+        return {
+            "success": True,
+            "logs": [serialize_datetime(log) for log in logs]
+        }
+        
+    except Exception as e:
+        logging.error(f"Error fetching security logs: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch security logs")
+
 @api_router.get("/users/{user_id}/subscription", response_model=SubscriptionCodeResponse)
 async def get_user_subscription(user_id: str, current_user: User = Depends(get_current_user)):
     """الحصول على اشتراك المستخدم"""

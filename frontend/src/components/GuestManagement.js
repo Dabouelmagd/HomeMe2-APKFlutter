@@ -99,14 +99,16 @@ const GuestManagement = () => {
   const fetchGuestData = async () => {
     try {
       setLoading(true);
-      const [guestsRes, requestsRes, statsRes] = await Promise.all([
+      const [guestsRes, requestsRes, statsRes, securityLogsRes] = await Promise.all([
         axios.get(`${API}/guests`),
         axios.get(`${API}/visit-requests`),
-        axios.get(`${API}/guests/stats`)
+        axios.get(`${API}/guests/stats`),
+        axios.get(`${API}/security/visitor-logs`).catch(() => ({ data: { logs: [] } }))
       ]);
       
       setGuests(guestsRes.data.guests || []);
       setVisitRequests(requestsRes.data.requests || []);
+      setSecurityLogs(securityLogsRes.data.logs || []);
       setStats(statsRes.data.stats || {});
     } catch (error) {
       toast.error('Failed to load guest data');

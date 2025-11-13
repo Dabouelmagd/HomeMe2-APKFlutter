@@ -161,30 +161,37 @@ const SubscriptionCodes = () => {
     }
   };
 
-  const handleRenewCode = async (code) => {
-    if (window.confirm(t('confirm_renew_code', 'Are you sure you want to renew this code? This will reset its usage and extend its validity.'))) {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.post(
-          `${API}/api/admin/subscription-codes/${code._id}/renew`,
-          {
-            duration: code.duration_months + '_months',
-            max_uses: code.max_uses,
-            expires_in_days: 365
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        if (response.data.success) {
-          toast.success(t('code_renewed_successfully', 'Code renewed successfully!'));
-          fetchCodes();
-        } else {
-          toast.error(response.data.message || t('error_renewing_code', 'Failed to renew code'));
-        }
-      } catch (error) {
-        console.error('Error renewing code:', error);
-        toast.error(t('error_renewing_code', 'Failed to renew code. Please try again.'));
+  const handleRenewCode = (code) => {
+    setSelectedCodeForRenew(code);
+    setShowRenewModal(true);
+  };
+
+  const confirmRenewCode = async () => {
+    if (!selectedCodeForRenew) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${API}/api/admin/subscription-codes/${selectedCodeForRenew._id}/renew`,
+        {
+          duration: selectedCodeForRenew.duration_months + '_months',
+          max_uses: selectedCodeForRenew.max_uses,
+          expires_in_days: 365
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      if (response.data.success) {
+        toast.success(t('code_renewed_successfully', 'Code renewed successfully!'));
+        fetchCodes();
+        setShowRenewModal(false);
+        setSelectedCodeForRenew(null);
+      } else {
+        toast.error(response.data.message || t('error_renewing_code', 'Failed to renew code'));
       }
+    } catch (error) {
+      console.error('Error renewing code:', error);
+      toast.error(t('error_renewing_code', 'Failed to renew code. Please try again.'));
     }
   };
 

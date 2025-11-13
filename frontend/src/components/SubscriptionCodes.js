@@ -596,6 +596,77 @@ const SubscriptionCodes = () => {
           </div>
         </div>
       )}
+
+      {/* Renew Code Confirmation Modal */}
+      {showRenewModal && selectedCodeForRenew && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all animate-fadeIn">
+            {/* Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-full p-4">
+                <ClockIcon className="h-12 w-12 text-green-600" />
+              </div>
+            </div>
+            
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+              {t('renew_code', 'Renew Code')}
+            </h2>
+            
+            {/* Message */}
+            <p className="text-gray-600 mb-4 text-center leading-relaxed">
+              {t('confirm_renew_code_message', 'Are you sure you want to renew this code? This will:')}
+            </p>
+            
+            {/* Benefits List */}
+            <div className="bg-green-50 rounded-xl p-4 mb-4 border border-green-200">
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <span>{t('reset_usage_counter', 'Reset usage counter to 0')}</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <span>{t('extend_validity_365', 'Extend validity for 365 days')}</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircleIcon className="h-5 w-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <span>{t('reactivate_code', 'Reactivate the code if disabled')}</span>
+                </li>
+              </ul>
+            </div>
+            
+            {/* Code Display */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-6 border border-blue-200">
+              <div className="text-center">
+                <p className="text-xs text-gray-600 mb-1">{t('code')}</p>
+                <code className="text-lg font-mono font-bold text-gray-900">
+                  {selectedCodeForRenew.code}
+                </code>
+              </div>
+            </div>
+            
+            {/* Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowRenewModal(false);
+                  setSelectedCodeForRenew(null);
+                }}
+                className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-all duration-200"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={confirmRenewCode}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold rounded-xl shadow-lg shadow-green-200 hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              >
+                {t('confirm_renew', 'Confirm Renew')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

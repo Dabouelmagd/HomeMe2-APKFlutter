@@ -222,7 +222,7 @@ const CompoundsManagement = () => {
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-red-100 text-red-800'
                       }`}>
-                        {compound.is_active ? '✓ Active' : '✗ Inactive'}
+                        {compound.is_active ? `✓ ${t('active', 'Active')}` : `✗ ${t('inactive', 'Inactive')}`}
                       </span>
                     </td>
                     <td className="px-6 py-4">

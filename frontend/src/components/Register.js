@@ -80,7 +80,7 @@ const Register = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-group">
               <label htmlFor="full_name" className="form-label">
-                Full Name
+                {t('full_name')}
               </label>
               <input
                 type="text"
@@ -90,13 +90,13 @@ const Register = () => {
                 onChange={handleChange}
                 className="form-input"
                 required
-                placeholder="Enter your full name"
+                placeholder={t('enter_full_name', 'Enter your full name')}
               />
             </div>
 
             <div className="form-group">
               <label htmlFor="username" className="form-label">
-                Username
+                {t('username')}
               </label>
               <input
                 type="text"

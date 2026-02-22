@@ -106,7 +106,7 @@ const Register = () => {
                 onChange={handleChange}
                 className="form-input"
                 required
-                placeholder="Choose a username"
+                placeholder={t('choose_username', 'Choose a username')}
               />
             </div>
           </div>

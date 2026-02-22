@@ -1,14 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import Layout from '../components/Layout';
 
 const PaymentCancelPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
-    <Layout>
+    <>
       <div className="min-h-96 flex items-center justify-center">
         <div className="max-w-md w-full mx-auto">
           <div className="bg-white shadow-lg rounded-lg p-6">

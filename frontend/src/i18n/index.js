@@ -7553,7 +7553,33 @@ const resources = {
         }
       },
       'enterprise': {
-        'dashboard': 'Tableau de Bord Entreprise'
+        'dashboard': 'Tableau de Bord Entreprise',
+        'step1_title': 'Informations de l\'Entreprise',
+        'step2_title': 'Contact et Détails',
+        'step3_title': 'Configuration',
+        'step4_title': 'Révision et Soumission',
+        'company_name': 'Nom de l\'Entreprise',
+        'company_description': 'Description de l\'Entreprise',
+        'company_email': 'Email de l\'Entreprise',
+        'phone': 'Numéro de Téléphone',
+        'website': 'Site Web',
+        'address': 'Adresse',
+        'company_code': 'Code de l\'Entreprise',
+        'timezone': 'Fuseau Horaire',
+        'currency': 'Devise',
+        'language': 'Langue',
+        'upload_logo': 'Télécharger le Logo de l\'Entreprise',
+        'drag_drop_image': 'Glissez et déposez une image, ou cliquez pour sélectionner',
+        'register_company': 'Enregistrer l\'Entreprise',
+        'registering': 'Enregistrement en cours...',
+        'previous': 'Précédent',
+        'next': 'Suivant',
+        'submit': 'Soumettre l\'Enregistrement',
+        'invalid_image_type': 'Type d\'image invalide. Veuillez télécharger un fichier image.',
+        'file_too_large': 'Le fichier est trop volumineux. Taille maximale de 5 Mo.',
+        'not_provided': 'Non fourni',
+        'review_info': 'Veuillez réviser vos informations avant de soumettre',
+        'subscription_code': 'Code d\'Abonnement'
       },
     }
   }

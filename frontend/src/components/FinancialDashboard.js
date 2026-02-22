@@ -157,8 +157,8 @@ const FinancialDashboard = () => {
             className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:scale-105 transition-all text-left"
           >
             <div className="text-4xl mb-3">💸</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Manage Expenses</h3>
-            <p className="text-sm text-gray-600">Track and categorize expenses</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('manage_expenses', 'Manage Expenses')}</h3>
+            <p className="text-sm text-gray-600">{t('track_categorize_expenses', 'Track and categorize expenses')}</p>
           </button>
 
           <button
@@ -166,8 +166,8 @@ const FinancialDashboard = () => {
             className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:scale-105 transition-all text-left"
           >
             <div className="text-4xl mb-3">💰</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Manage Revenue</h3>
-            <p className="text-sm text-gray-600">Track income and payments</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('manage_revenue', 'Manage Revenue')}</h3>
+            <p className="text-sm text-gray-600">{t('track_income_payments', 'Track income and payments')}</p>
           </button>
 
           <button
@@ -175,8 +175,8 @@ const FinancialDashboard = () => {
             className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:scale-105 transition-all text-left"
           >
             <div className="text-4xl mb-3">👥</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Resident Accounts</h3>
-            <p className="text-sm text-gray-600">View balances and payments</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('resident_accounts', 'Resident Accounts')}</h3>
+            <p className="text-sm text-gray-600">{t('view_balances_payments', 'View balances and payments')}</p>
           </button>
 
           <button
@@ -184,8 +184,8 @@ const FinancialDashboard = () => {
             className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:scale-105 transition-all text-left"
           >
             <div className="text-4xl mb-3">📊</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">Financial Reports</h3>
-            <p className="text-sm text-gray-600">Generate detailed reports</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('financial_reports', 'Financial Reports')}</h3>
+            <p className="text-sm text-gray-600">{t('generate_detailed_reports', 'Generate detailed reports')}</p>
           </button>
         </div>
 

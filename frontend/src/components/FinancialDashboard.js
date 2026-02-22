@@ -69,22 +69,22 @@ const FinancialDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6">
+    <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-4xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                💰 Financial Management
+                💰 {t('financial_management', 'Financial Management')}
               </h1>
-              <p className="text-gray-600 font-medium">Comprehensive financial tracking and reporting</p>
+              <p className="text-gray-600 font-medium">{t('comprehensive_financial_tracking', 'Comprehensive financial tracking and reporting')}</p>
             </div>
 
             {/* Date Range Selector */}
             <div className="flex gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('start_date', 'Start Date')}</label>
                 <input
                   type="date"
                   value={dateRange.start}
@@ -93,7 +93,7 @@ const FinancialDashboard = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t('end_date', 'End Date')}</label>
                 <input
                   type="date"
                   value={dateRange.end}

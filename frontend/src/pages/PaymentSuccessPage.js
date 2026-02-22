@@ -128,7 +128,7 @@ const PaymentSuccessPage = () => {
   };
 
   return (
-    <Layout>
+    <>
       <div className="min-h-96 flex items-center justify-center">
         <div className="max-w-md w-full mx-auto">
           <div className="bg-white shadow-lg rounded-lg p-6">

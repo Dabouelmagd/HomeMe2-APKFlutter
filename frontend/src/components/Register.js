@@ -219,7 +219,7 @@ const Register = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-group">
               <label htmlFor="compound_id" className="form-label">
-                Compound ID (Optional)
+                {t('compound_id')} ({t('optional')})
               </label>
               <input
                 type="text"
@@ -228,7 +228,7 @@ const Register = () => {
                 value={formData.compound_id}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="Enter compound ID (optional)"
+                placeholder={t('enter_compound_id', 'Enter compound ID (optional)')}
               />
             </div>
 

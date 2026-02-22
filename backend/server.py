@@ -2062,6 +2062,41 @@ async def register(user_data: UserCreate):
             {"$set": {"family_id": family.id}}
         )
     
+    # Send welcome email (async, don't wait for result)
+    try:
+        compound_name = None
+        if compound_id and compound_id != "default-compound":
+            compound = await db.compounds.find_one({"id": compound_id})
+            if compound:
+                compound_name = compound.get("name")
+        
+        asyncio.create_task(
+            email_service.send_welcome_email(
+                to_email=user_data.email,
+                full_name=user_data.full_name,
+                username=user_data.username,
+                compound_name=compound_name
+            )
+        )
+        
+        # Notify admins of new resident
+        if user_data.role == UserRole.RESIDENT:
+            admins = await db.users.find({"role": "admin", "compound_id": compound_id}).to_list(length=10)
+            for admin in admins:
+                if admin.get("email"):
+                    asyncio.create_task(
+                        email_service.send_new_resident_notification(
+                            admin_email=admin["email"],
+                            admin_name=admin.get("full_name", "Admin"),
+                            new_resident_name=user_data.full_name,
+                            unit_number=user_data.unit_number,
+                            compound_name=compound_name or "Default Compound"
+                        )
+                    )
+    except Exception as e:
+        # Log email error but don't fail registration
+        logging.error(f"Failed to send welcome email: {str(e)}")
+    
     return {
         "message": "User registered successfully",
         "user_id": user.id,

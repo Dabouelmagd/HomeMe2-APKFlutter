@@ -202,7 +202,7 @@ const Register = () => {
 
             <div className="form-group">
               <label htmlFor="phone" className="form-label">
-                Phone Number
+                {t('phone')}
               </label>
               <input
                 type="tel"

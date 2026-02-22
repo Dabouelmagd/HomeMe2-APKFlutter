@@ -266,12 +266,12 @@ const Register = () => {
 
         <div className="text-center mt-6">
           <p className="text-gray-600">
-            Already have an account?{' '}
+            {t('already_have_account', 'Already have an account?')}{' '}
             <Link
               to="/login"
               className="text-blue-600 hover:text-blue-800 font-medium"
             >
-              Sign in here
+              {t('sign_in')}
             </Link>
           </p>
         </div>

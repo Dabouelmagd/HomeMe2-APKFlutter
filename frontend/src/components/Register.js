@@ -256,10 +256,10 @@ const Register = () => {
             {loading ? (
               <>
                 <span className="loading-spinner"></span>
-                Creating account...
+                {t('registering', 'Registering...')}
               </>
             ) : (
-              'Create Account'
+              t('register')
             )}
           </button>
         </form>

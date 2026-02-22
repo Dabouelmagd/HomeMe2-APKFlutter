@@ -3929,6 +3929,7 @@ const resources = {
       'enterprise.analytics': 'التحليلات',
       'enterprise.settings': 'الإعدادات',
       'enterprise_dashboard': 'لوحة تحكم المؤسسة',
+      'enterprise.dashboard_load_failed': 'فشل تحميل لوحة التحكم. يرجى المحاولة مرة أخرى.',
       
       'logins_today': 'تسجيلات الدخول اليوم',
       'logins_this_week': 'تسجيلات الدخول هذا الأسبوع',

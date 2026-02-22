@@ -13512,6 +13512,170 @@ async def advanced_search(
 
 # ==================== END ADVANCED SEARCH ====================
 
+# ==================== EMAIL NOTIFICATIONS ====================
+
+class EmailTestRequest(BaseModel):
+    to_email: str
+    test_type: str = "welcome"  # welcome, payment_reminder, visitor_arrival
+
+class PaymentReminderRequest(BaseModel):
+    resident_id: str
+    amount: float
+    due_date: str
+    description: Optional[str] = None
+
+class VisitorNotificationRequest(BaseModel):
+    resident_id: str
+    visitor_name: str
+
+@api_router.post("/email/test")
+async def test_email(request: EmailTestRequest, current_user: User = Depends(get_current_user)):
+    """Test email sending - Admin only"""
+    if current_user.role not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        if request.test_type == "welcome":
+            result = await email_service.send_welcome_email(
+                to_email=request.to_email,
+                full_name="Test User",
+                username="testuser",
+                compound_name="Test Compound"
+            )
+        elif request.test_type == "payment_reminder":
+            result = await email_service.send_payment_reminder(
+                to_email=request.to_email,
+                full_name="Test User",
+                amount=500.00,
+                due_date="2025-03-01",
+                invoice_description="رسوم الصيانة الشهرية"
+            )
+        elif request.test_type == "visitor_arrival":
+            result = await email_service.send_visitor_arrival(
+                to_email=request.to_email,
+                resident_name="Test User",
+                visitor_name="Ahmed Mohamed",
+                arrival_time=datetime.now().strftime("%Y-%m-%d %H:%M"),
+                unit_number="A101"
+            )
+        else:
+            raise HTTPException(status_code=400, detail="Invalid test type")
+        
+        return {
+            "success": result,
+            "message": "Email sent successfully" if result else "Failed to send email"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Email error: {str(e)}")
+
+@api_router.post("/email/send-payment-reminder")
+async def send_payment_reminder_email(request: PaymentReminderRequest, current_user: User = Depends(get_current_user)):
+    """Send payment reminder to a specific resident - Admin only"""
+    if current_user.role not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Get resident info
+    resident = await db.users.find_one({"id": request.resident_id})
+    if not resident:
+        raise HTTPException(status_code=404, detail="Resident not found")
+    
+    if not resident.get("email"):
+        raise HTTPException(status_code=400, detail="Resident has no email address")
+    
+    result = await email_service.send_payment_reminder(
+        to_email=resident["email"],
+        full_name=resident.get("full_name", "Resident"),
+        amount=request.amount,
+        due_date=request.due_date,
+        invoice_description=request.description
+    )
+    
+    return {
+        "success": result,
+        "message": f"Payment reminder sent to {resident['email']}" if result else "Failed to send email"
+    }
+
+@api_router.post("/email/send-visitor-notification/{guest_id}")
+async def send_visitor_notification(guest_id: str, current_user: User = Depends(get_current_user)):
+    """Send visitor arrival notification to resident"""
+    # Get guest info
+    guest = await db.guests.find_one({"id": guest_id})
+    if not guest:
+        raise HTTPException(status_code=404, detail="Guest not found")
+    
+    # Get resident info
+    resident = await db.users.find_one({"id": guest.get("resident_id")})
+    if not resident or not resident.get("email"):
+        raise HTTPException(status_code=400, detail="Resident not found or has no email")
+    
+    result = await email_service.send_visitor_arrival(
+        to_email=resident["email"],
+        resident_name=resident.get("full_name", "Resident"),
+        visitor_name=guest.get("name", "Visitor"),
+        arrival_time=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        unit_number=resident.get("unit_number")
+    )
+    
+    return {
+        "success": result,
+        "message": "Visitor notification sent" if result else "Failed to send notification"
+    }
+
+@api_router.post("/email/send-daily-report")
+async def send_daily_report_email(current_user: User = Depends(get_current_user)):
+    """Send daily report to admin - Admin only"""
+    if current_user.role not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    if not current_user.email:
+        raise HTTPException(status_code=400, detail="Admin has no email address")
+    
+    # Get compound info
+    compound_name = "Default Compound"
+    if current_user.compound_id:
+        compound = await db.compounds.find_one({"id": current_user.compound_id})
+        if compound:
+            compound_name = compound.get("name", "Default Compound")
+    
+    # Gather daily stats
+    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    stats = {
+        "new_residents": await db.users.count_documents({
+            "role": "resident",
+            "compound_id": current_user.compound_id,
+            "created_at": {"$gte": today_start}
+        }),
+        "visitors_today": await db.guests.count_documents({
+            "created_at": {"$gte": today_start}
+        }),
+        "maintenance_requests": await db.maintenance_requests.count_documents({
+            "created_at": {"$gte": today_start}
+        }) if "maintenance_requests" in await db.list_collection_names() else 0,
+        "payments_received": 0,
+        "pending_payments": await db.invoices.count_documents({
+            "status": "pending"
+        }) if "invoices" in await db.list_collection_names() else 0,
+        "messages_sent": await db.messages.count_documents({
+            "created_at": {"$gte": today_start}
+        }) if "messages" in await db.list_collection_names() else 0
+    }
+    
+    result = await email_service.send_daily_report(
+        admin_email=current_user.email,
+        admin_name=current_user.full_name,
+        compound_name=compound_name,
+        stats=stats
+    )
+    
+    return {
+        "success": result,
+        "message": "Daily report sent" if result else "Failed to send report",
+        "stats": stats
+    }
+
+# ==================== END EMAIL NOTIFICATIONS ====================
+
 # Include the API router after ALL endpoints are defined
 app.include_router(api_router)
 

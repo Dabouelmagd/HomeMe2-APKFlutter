@@ -14,7 +14,8 @@ import {
 const API = process.env.REACT_APP_BACKEND_URL;
 
 const FinancialDashboard = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState(null);
   const [expenses, setExpenses] = useState([]);

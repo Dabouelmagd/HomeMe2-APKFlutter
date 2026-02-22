@@ -3922,6 +3922,14 @@ const resources = {
       'enterprise.not_provided': 'غير محدد',
       'enterprise.review_info': 'يرجى مراجعة معلوماتك قبل الإرسال',
       'enterprise.subscription_code': 'كود الاشتراك',
+      
+      // Enterprise Dashboard tabs
+      'enterprise.overview': 'نظرة عامة',
+      'enterprise.compounds': 'المجمعات',
+      'enterprise.analytics': 'التحليلات',
+      'enterprise.settings': 'الإعدادات',
+      'enterprise_dashboard': 'لوحة تحكم المؤسسة',
+      
       'logins_today': 'تسجيلات الدخول اليوم',
       'logins_this_week': 'تسجيلات الدخول هذا الأسبوع',
       'overview': 'نظرة عامة',

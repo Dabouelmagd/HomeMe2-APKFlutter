@@ -59,6 +59,9 @@ from activity_logger import ActivityLogger, ErrorLogger
 # Import subscription codes manager
 from subscription_codes import SubscriptionCodeManager
 
+# Import email service
+from email_service import email_service
+
 # Import financial models
 from financial_models import (
     ExpenseCreate, Expense, RevenueCreate, Revenue,

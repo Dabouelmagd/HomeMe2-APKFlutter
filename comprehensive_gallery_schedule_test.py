@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://dashboard-rescue-12.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-visitor-logs.preview.emergentagent.com/api"
 
 class ComprehensiveTestSuite:
     def __init__(self):

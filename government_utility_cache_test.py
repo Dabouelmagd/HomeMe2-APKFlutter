@@ -16,7 +16,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 # Configuration - Using the production URL as specified in the review request
-BASE_URL = "https://dashboard-rescue-12.preview.emergentagent.com/api"
+BASE_URL = "https://homeme-visitor-logs.preview.emergentagent.com/api"
 
 class GovernmentUtilityCacheTestSuite:
     def __init__(self):

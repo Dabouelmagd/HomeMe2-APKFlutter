@@ -211,7 +211,7 @@ const Register = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="Enter phone number"
+                placeholder={t('enter_phone', 'Enter your phone number')}
               />
             </div>
           </div>

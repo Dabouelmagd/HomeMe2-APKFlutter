@@ -123,7 +123,7 @@ const Register = () => {
               onChange={handleChange}
               className="form-input"
               required
-              placeholder="Enter your email"
+              placeholder={t('enter_email', 'Enter your email')}
             />
           </div>
 

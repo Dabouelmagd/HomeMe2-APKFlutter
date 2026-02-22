@@ -113,7 +113,7 @@ const Register = () => {
 
           <div className="form-group">
             <label htmlFor="email" className="form-label">
-              Email
+              {t('email')}
             </label>
             <input
               type="email"

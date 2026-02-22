@@ -147,7 +147,7 @@ const Register = () => {
 
             <div className="form-group">
               <label htmlFor="confirmPassword" className="form-label">
-                Confirm Password
+                {t('confirm_password')}
               </label>
               <input
                 type="password"

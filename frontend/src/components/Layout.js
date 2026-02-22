@@ -82,7 +82,7 @@ const Layout = ({ children, isTrialMode = false }) => {
 
   // Search functionality
   const handleSearch = async (query) => {
-    if (!query.trim()) {
+    if (!query || query.trim().length < 2) {
       setSearchResults([]);
       setShowSearchResults(false);
       return;
@@ -100,9 +100,14 @@ const Layout = ({ children, isTrialMode = false }) => {
         const data = await response.json();
         setSearchResults(data.results || []);
         setShowSearchResults(true);
+      } else {
+        setSearchResults([]);
+        setShowSearchResults(false);
       }
     } catch (error) {
       console.error('Search error:', error);
+      setSearchResults([]);
+      setShowSearchResults(false);
     } finally {
       setIsSearching(false);
     }
@@ -112,16 +117,22 @@ const Layout = ({ children, isTrialMode = false }) => {
     const query = e.target.value;
     setSearchQuery(query);
     
-    // Debounce search
-    const timeoutId = setTimeout(() => {
-      handleSearch(query);
-    }, 300);
-    
     // Clear previous timeout
     if (window.searchTimeout) {
       clearTimeout(window.searchTimeout);
     }
-    window.searchTimeout = timeoutId;
+    
+    // If empty, clear results immediately
+    if (!query || query.trim().length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+    
+    // Debounce search
+    window.searchTimeout = setTimeout(() => {
+      handleSearch(query);
+    }, 300);
   };
 
   const handleSearchResultClick = (result) => {

@@ -60,7 +60,7 @@ const PaymentCancelPage = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

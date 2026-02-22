@@ -144,9 +144,9 @@ const HelpCenter = () => {
         </div>
       </div>
 
-      {/* Video Tutorial Section */}
+      {/* Written Guide Section */}
       <div className="mb-12">
-        <VideoTutorial />
+        <WrittenGuide />
       </div>
 
       {/* Quick Actions */}

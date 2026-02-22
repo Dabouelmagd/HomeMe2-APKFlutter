@@ -194,8 +194,8 @@ const FinancialDashboard = () => {
           {/* Recent Expenses */}
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <span className="mr-2">💸</span>
-              Recent Expenses
+              <span className={isRTL ? 'ml-2' : 'mr-2'}>💸</span>
+              {t('recent_expenses', 'Recent Expenses')}
             </h2>
             <div className="space-y-3">
               {expenses.slice(0, 5).map((expense) => (
@@ -210,7 +210,7 @@ const FinancialDashboard = () => {
                 </div>
               ))}
               {expenses.length === 0 && (
-                <p className="text-center text-gray-500 py-8">No expenses recorded</p>
+                <p className="text-center text-gray-500 py-8">{t('no_expenses_recorded', 'No expenses recorded')}</p>
               )}
             </div>
           </div>
@@ -218,8 +218,8 @@ const FinancialDashboard = () => {
           {/* Recent Revenue */}
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <span className="mr-2">💰</span>
-              Recent Revenue
+              <span className={isRTL ? 'ml-2' : 'mr-2'}>💰</span>
+              {t('recent_revenue', 'Recent Revenue')}
             </h2>
             <div className="space-y-3">
               {revenue.slice(0, 5).map((rev) => (
@@ -234,7 +234,7 @@ const FinancialDashboard = () => {
                 </div>
               ))}
               {revenue.length === 0 && (
-                <p className="text-center text-gray-500 py-8">No revenue recorded</p>
+                <p className="text-center text-gray-500 py-8">{t('no_revenue_recorded', 'No revenue recorded')}</p>
               )}
             </div>
           </div>

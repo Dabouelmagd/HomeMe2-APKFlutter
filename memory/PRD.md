@@ -42,6 +42,14 @@ A comprehensive residential compound management system that supports:
 - User activation/deactivation
 - Profile management
 
+### Email Notifications System (NEW)
+- Welcome email for new registrations
+- Payment reminder notifications
+- Visitor arrival notifications
+- Daily reports for administrators
+- Maintenance request notifications
+- SMTP integration with SiteGround
+
 ### Compound Management
 - Create and manage residential compounds
 - Unit management

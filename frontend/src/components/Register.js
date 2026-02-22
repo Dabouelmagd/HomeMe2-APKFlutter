@@ -140,7 +140,7 @@ const Register = () => {
                 onChange={handleChange}
                 className="form-input"
                 required
-                placeholder="Enter password"
+                placeholder={t('enter_password', 'Enter password')}
                 minLength="6"
               />
             </div>

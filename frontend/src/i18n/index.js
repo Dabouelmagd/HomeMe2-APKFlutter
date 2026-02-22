@@ -3873,6 +3873,28 @@ const resources = {
       'enter_compound_id': 'أدخل معرف المجمع (اختياري)',
       'subscription_code': 'كود الاشتراك',
       
+      // Financial Management translations
+      'financial_management': 'الإدارة المالية',
+      'comprehensive_financial_tracking': 'تتبع وتقارير مالية شاملة',
+      'start_date': 'تاريخ البداية',
+      'end_date': 'تاريخ النهاية',
+      'total_revenue': 'إجمالي الإيرادات',
+      'total_expenses': 'إجمالي المصروفات',
+      'net_profit_loss': 'صافي الربح/الخسارة',
+      'profit_margin': 'هامش الربح',
+      'manage_expenses': 'إدارة المصروفات',
+      'track_categorize_expenses': 'تتبع وتصنيف المصروفات',
+      'manage_revenue': 'إدارة الإيرادات',
+      'track_income_payments': 'تتبع الدخل والمدفوعات',
+      'resident_accounts': 'حسابات السكان',
+      'view_balances_payments': 'عرض الأرصدة والمدفوعات',
+      'financial_reports': 'التقارير المالية',
+      'generate_detailed_reports': 'إنشاء تقارير مفصلة',
+      'recent_expenses': 'المصروفات الأخيرة',
+      'recent_revenue': 'الإيرادات الأخيرة',
+      'no_expenses_recorded': 'لا توجد مصروفات مسجلة',
+      'no_revenue_recorded': 'لا توجد إيرادات مسجلة',
+      
       // Enterprise Registration
       'enterprise.step1_title': 'معلومات الشركة',
       'enterprise.step2_title': 'بيانات الاتصال والتفاصيل',

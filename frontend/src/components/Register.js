@@ -130,7 +130,7 @@ const Register = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-group">
               <label htmlFor="password" className="form-label">
-                Password
+                {t('password')}
               </label>
               <input
                 type="password"

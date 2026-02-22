@@ -166,7 +166,7 @@ const Register = () => {
           {/* Subscription Code Field */}
           <div className="form-group">
             <label htmlFor="subscription_code" className="form-label">
-              {t('subscription_code_optional')}
+              {t('subscription_code')} ({t('optional')})
             </label>
             <input
               type="text"

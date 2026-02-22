@@ -382,7 +382,7 @@ const LocationsPage = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

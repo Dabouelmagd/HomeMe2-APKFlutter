@@ -341,7 +341,7 @@ const MobileAppPage = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

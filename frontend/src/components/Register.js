@@ -234,7 +234,7 @@ const Register = () => {
 
             <div className="form-group">
               <label htmlFor="unit_number" className="form-label">
-                Unit Number
+                {t('unit_number')}
               </label>
               <input
                 type="text"
@@ -243,7 +243,7 @@ const Register = () => {
                 value={formData.unit_number}
                 onChange={handleChange}
                 className="form-input"
-                placeholder="Enter unit number"
+                placeholder={t('enter_unit_number', 'e.g., A101')}
               />
             </div>
           </div>

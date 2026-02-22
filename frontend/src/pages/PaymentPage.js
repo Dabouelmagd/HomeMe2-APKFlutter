@@ -340,7 +340,7 @@ const PaymentPage = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

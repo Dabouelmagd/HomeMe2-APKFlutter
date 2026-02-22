@@ -135,6 +135,12 @@ A comprehensive residential compound management system that supports:
 - POST /api/auth/register - User registration
 - GET /api/auth/me - Get current user
 
+### Email Notifications
+- POST /api/email/test - Test email sending (Admin only)
+- POST /api/email/send-payment-reminder - Send payment reminder
+- POST /api/email/send-visitor-notification/{guest_id} - Send visitor notification
+- POST /api/email/send-daily-report - Send daily report to admin
+
 ### Users
 - GET /api/users - List users
 - POST /api/users - Create user

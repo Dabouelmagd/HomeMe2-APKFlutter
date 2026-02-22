@@ -3861,6 +3861,17 @@ const resources = {
       'new': 'جديد',
       'unit': 'وحدة',
       
+      // Registration page translations
+      'register': 'تسجيل',
+      'registering': 'جاري التسجيل...',
+      'choose_username': 'اختر اسم مستخدم',
+      'enter_full_name': 'أدخل الاسم الكامل',
+      'enter_email': 'أدخل البريد الإلكتروني',
+      'enter_phone': 'أدخل رقم الهاتف',
+      'enter_password': 'أدخل كلمة المرور',
+      'enter_unit_number': 'مثال: A101',
+      'enter_compound_id': 'أدخل معرف المجمع (اختياري)',
+      
       // Enterprise Registration
       'enterprise.step1_title': 'معلومات الشركة',
       'enterprise.step2_title': 'بيانات الاتصال والتفاصيل',

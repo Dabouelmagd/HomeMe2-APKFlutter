@@ -144,13 +144,8 @@ const HelpCenter = () => {
         </div>
       </div>
 
-      {/* Written Guide Section */}
-      <div className="mb-12">
-        <WrittenGuide />
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid md:grid-cols-4 gap-6 mb-12">
+      {/* Quick Actions - Before Guide */}
+      <div className="grid md:grid-cols-4 gap-6 mb-8">
         <button 
           onClick={() => {
             const guideSection = document.querySelector('[class*="bg-gradient-to-br from-purple-600"]');
@@ -183,10 +178,8 @@ const HelpCenter = () => {
         
         <button 
           onClick={() => {
-            const helpTopics = document.querySelector('[class*="Help Topics"], h2');
             const articlesSection = document.getElementById('help-articles');
             if (articlesSection) articlesSection.scrollIntoView({ behavior: 'smooth' });
-            else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
           }}
           className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-lg hover:border-orange-300 transition-all cursor-pointer"
         >
@@ -194,6 +187,11 @@ const HelpCenter = () => {
           <h3 className="font-semibold text-gray-900 mb-2">{t('documentation', 'الوثائق')}</h3>
           <p className="text-sm text-gray-600">{t('browse_full_docs', 'تصفح المقالات أدناه')}</p>
         </button>
+      </div>
+
+      {/* Written Guide Section */}
+      <div className="mb-12">
+        <WrittenGuide />
       </div>
 
       {/* Help Articles by Category */}

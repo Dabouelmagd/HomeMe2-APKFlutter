@@ -135,8 +135,12 @@ A comprehensive residential compound management system that supports:
 - POST /api/admin/subscription-codes/{code}/renew - Renew code
 
 ## Test Credentials
-- Super Admin: dalia / Admin2024!
-- Admin: admin / admin123
+| Role | Username | Password | Status |
+|------|----------|----------|--------|
+| Admin | dalia | Admin2024! | ✅ Working |
+| Admin | admin | admin123 | ✅ Working |
+| Security | security | security123 | ✅ Working |
+| Resident | resident1 | resident123 | ✅ Working |
 
 ## Deployment Information
 - Preview URL: https://homeme-visitor-logs.preview.emergentagent.com

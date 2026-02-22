@@ -3871,6 +3871,7 @@ const resources = {
       'enter_password': 'أدخل كلمة المرور',
       'enter_unit_number': 'مثال: A101',
       'enter_compound_id': 'أدخل معرف المجمع (اختياري)',
+      'subscription_code': 'كود الاشتراك',
       
       // Enterprise Registration
       'enterprise.step1_title': 'معلومات الشركة',

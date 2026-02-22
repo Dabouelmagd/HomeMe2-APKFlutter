@@ -185,7 +185,7 @@ const Register = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="form-group">
               <label htmlFor="role" className="form-label">
-                Role
+                {t('role')}
               </label>
               <select
                 id="role"
@@ -195,8 +195,8 @@ const Register = () => {
                 className="form-input"
                 required
               >
-                <option value="resident">Resident</option>
-                <option value="admin">Admin</option>
+                <option value="resident">{t('resident')}</option>
+                <option value="admin">{t('admin')}</option>
               </select>
             </div>
 

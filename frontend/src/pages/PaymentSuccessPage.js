@@ -207,7 +207,7 @@ const PaymentSuccessPage = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

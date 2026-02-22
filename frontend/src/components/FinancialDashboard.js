@@ -113,7 +113,7 @@ const FinancialDashboard = () => {
                   <ArrowTrendingUpIcon className="w-12 h-12 text-white/90" />
                   <span className="text-3xl">💵</span>
                 </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">Total Revenue</h3>
+                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('total_revenue', 'Total Revenue')}</h3>
                 <p className="text-3xl font-black">{formatCurrency(summary.total_revenue)}</p>
               </div>
 
@@ -123,7 +123,7 @@ const FinancialDashboard = () => {
                   <ArrowTrendingDownIcon className="w-12 h-12 text-white/90" />
                   <span className="text-3xl">💸</span>
                 </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">Total Expenses</h3>
+                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('total_expenses', 'Total Expenses')}</h3>
                 <p className="text-3xl font-black">{formatCurrency(summary.total_expenses)}</p>
               </div>
 
@@ -133,7 +133,7 @@ const FinancialDashboard = () => {
                   <BanknotesIcon className="w-12 h-12 text-white/90" />
                   <span className="text-3xl">{summary.net_profit >= 0 ? '📈' : '📉'}</span>
                 </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">Net Profit/Loss</h3>
+                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('net_profit_loss', 'Net Profit/Loss')}</h3>
                 <p className="text-3xl font-black">{formatCurrency(summary.net_profit)}</p>
               </div>
 
@@ -143,7 +143,7 @@ const FinancialDashboard = () => {
                   <ChartBarIcon className="w-12 h-12 text-white/90" />
                   <span className="text-3xl">📊</span>
                 </div>
-                <h3 className="text-white/80 text-sm font-semibold mb-1">Profit Margin</h3>
+                <h3 className="text-white/80 text-sm font-semibold mb-1">{t('profit_margin', 'Profit Margin')}</h3>
                 <p className="text-3xl font-black">{summary.profit_margin}%</p>
               </div>
             </div>

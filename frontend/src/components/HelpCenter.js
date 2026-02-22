@@ -151,33 +151,53 @@ const HelpCenter = () => {
 
       {/* Quick Actions */}
       <div className="grid md:grid-cols-4 gap-6 mb-12">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
+        <button 
+          onClick={() => {
+            const guideSection = document.querySelector('[class*="bg-gradient-to-br from-purple-600"]');
+            if (guideSection) guideSection.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-lg hover:border-blue-300 transition-all cursor-pointer"
+        >
           <VideoCameraIcon className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-2">{t('video_tutorials')}</h3>
-          <p className="text-sm text-gray-600">{t('watch_video_guides')}</p>
-        </div>
+          <h3 className="font-semibold text-gray-900 mb-2">{t('video_tutorials', 'دروس الفيديو')}</h3>
+          <p className="text-sm text-gray-600">{t('watch_video_guides', 'شاهد الدليل المكتوب أدناه')}</p>
+        </button>
         
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
+        <button 
+          onClick={() => window.location.href = '/app/messages'}
+          className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-lg hover:border-green-300 transition-all cursor-pointer"
+        >
           <ChatBubbleLeftRightIcon className="h-8 w-8 text-green-600 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-2">{t('live_chat')}</h3>
-          <p className="text-sm text-gray-600">{t('chat_with_support')}</p>
-        </div>
+          <h3 className="font-semibold text-gray-900 mb-2">{t('live_chat', 'الدردشة المباشرة')}</h3>
+          <p className="text-sm text-gray-600">{t('chat_with_support', 'تحدث مع إدارة المجمع')}</p>
+        </button>
         
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
+        <a 
+          href="tel:+201000000000"
+          className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-lg hover:border-purple-300 transition-all cursor-pointer block"
+        >
           <PhoneIcon className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-2">{t('phone_support')}</h3>
-          <p className="text-sm text-gray-600">{t('call_support_team')}</p>
-        </div>
+          <h3 className="font-semibold text-gray-900 mb-2">{t('phone_support', 'الدعم الهاتفي')}</h3>
+          <p className="text-sm text-gray-600">{t('call_support_team', 'اتصل: 01000000000')}</p>
+        </a>
         
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
+        <button 
+          onClick={() => {
+            const helpTopics = document.querySelector('[class*="Help Topics"], h2');
+            const articlesSection = document.getElementById('help-articles');
+            if (articlesSection) articlesSection.scrollIntoView({ behavior: 'smooth' });
+            else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+          }}
+          className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-center hover:shadow-lg hover:border-orange-300 transition-all cursor-pointer"
+        >
           <BookOpenIcon className="h-8 w-8 text-orange-600 mx-auto mb-3" />
-          <h3 className="font-semibold text-gray-900 mb-2">{t('documentation')}</h3>
-          <p className="text-sm text-gray-600">{t('browse_full_docs')}</p>
-        </div>
+          <h3 className="font-semibold text-gray-900 mb-2">{t('documentation', 'الوثائق')}</h3>
+          <p className="text-sm text-gray-600">{t('browse_full_docs', 'تصفح المقالات أدناه')}</p>
+        </button>
       </div>
 
       {/* Help Articles by Category */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div id="help-articles" className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">{t('help_topics')}</h2>
         </div>

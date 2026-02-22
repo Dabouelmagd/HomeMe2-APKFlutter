@@ -73,7 +73,7 @@ const Register = () => {
             alt="HomeMe Logo"
             className="h-48 w-auto mx-auto mb-6"
           />
-          <p>Join your compound community</p>
+          <p>{t('join_community')}</p>
         </div>
 
         <form onSubmit={handleSubmit}>

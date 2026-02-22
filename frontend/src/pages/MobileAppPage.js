@@ -91,7 +91,7 @@ const MobileAppPage = () => {
   ];
 
   return (
-    <Layout>
+    <>
       <div className="max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white">

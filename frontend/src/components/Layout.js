@@ -198,15 +198,24 @@ const Layout = ({ children, isTrialMode = false }) => {
 
   // Toggle section expand/collapse
   const toggleSection = (sectionIndex) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sectionIndex]: !prev[sectionIndex]
-    }));
+    setExpandedSections(prev => {
+      const currentState = prev[sectionIndex];
+      // If currentState is undefined (first click), set to false (collapse)
+      // Otherwise, toggle the current state
+      const newState = currentState === undefined ? false : !currentState;
+      console.log(`Toggle section ${sectionIndex}: ${currentState} -> ${newState}`);
+      return {
+        ...prev,
+        [sectionIndex]: newState
+      };
+    });
   };
 
   // Check if section is expanded (default is expanded/true)
   const isSectionExpanded = (sectionIndex) => {
-    return expandedSections[sectionIndex] !== false;
+    const state = expandedSections[sectionIndex];
+    // Default is expanded (true) if undefined
+    return state === undefined ? true : state;
   };
 
   // Organized navigation with sections

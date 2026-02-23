@@ -93,7 +93,7 @@ db = None
 # JWT Configuration
 JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
 JWT_ALGORITHM = 'HS256'
-JWT_EXPIRATION_HOURS = 24 * 7  # 7 days
+JWT_EXPIRATION_HOURS = 24  # 24 hours (reduced from 7 days for better security)
 
 # Backend URL Configuration
 BACKEND_URL = os.environ.get('BACKEND_URL', 'http://localhost:8000')
@@ -7078,13 +7078,14 @@ async def root():
 
 # Router will be included after all endpoints are defined
 
-# CORS middleware
+# CORS middleware - Restricted origins for security
+ALLOWED_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://keen-brahmagupta-2.preview.emergentagent.com,https://homemeapp.net,http://localhost:3000').split(',')
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],
 )
 
 # ============ USER SETTINGS ENDPOINTS ============

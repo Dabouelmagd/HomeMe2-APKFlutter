@@ -643,6 +643,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('feature_usage')}>
                 <SimpleChart 
                   data={analytics.charts?.feature_usage || []}
+                  type="bar"
                   color="#8B5CF6"
                 />
               </ChartContainer>
@@ -650,6 +651,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('notification_engagement')}>
                 <SimpleChart 
                   data={analytics.charts?.notification_engagement || []}
+                  type="line"
                   color="#06B6D4"
                 />
               </ChartContainer>

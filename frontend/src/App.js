@@ -509,7 +509,7 @@ function App() {
                 } />
                 
                 <Route path="subscription-codes" element={
-                  <SubscriptionCodesManagement />
+                  <SubscriptionCodesUnified />
                 } />
                 
                 <Route path="activate-subscription" element={

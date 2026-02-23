@@ -5,8 +5,10 @@ import { toast } from 'react-hot-toast';
 import {
   ShieldCheckIcon,
   TrashIcon,
-  CheckIcon,
-  FingerPrintIcon
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+  DevicePhoneMobileIcon,
+  ComputerDesktopIcon
 } from '@heroicons/react/24/outline';
 import {
   isWebAuthnSupported,
@@ -90,77 +92,78 @@ const BiometricSettings = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center py-20">
+        <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-          <FingerPrintIcon className="h-6 w-6 text-green-600" />
-          {t('biometric_settings', 'إعدادات البصمة')}
-        </h3>
-
-        {/* Biometric Availability Status */}
-        <div className={`mb-6 p-4 rounded-lg ${biometricAvailable ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800'}`}>
-          <div className="flex items-center gap-3">
+      {/* Status Card */}
+      <div className={`rounded-2xl p-6 ${biometricAvailable ? 'bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800' : 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800'}`}>
+        <div className="flex items-start gap-4">
+          <div className={`p-3 rounded-xl ${biometricAvailable ? 'bg-emerald-500' : 'bg-amber-500'}`}>
             {biometricAvailable ? (
-              <>
-                <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
-                  <CheckIcon className="h-6 w-6 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="font-medium text-green-800 dark:text-green-300">{t('biometric_supported', 'البصمة مدعومة')}</p>
-                  <p className="text-sm text-green-600 dark:text-green-400">{t('device_supports_biometric', 'جهازك يدعم تسجيل الدخول بالبصمة')}</p>
-                </div>
-              </>
+              <CheckCircleIcon className="w-6 h-6 text-white" />
             ) : (
-              <>
-                <div className="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-800 flex items-center justify-center">
-                  <ShieldCheckIcon className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
-                </div>
-                <div>
-                  <p className="font-medium text-yellow-800 dark:text-yellow-300">{t('biometric_not_supported', 'البصمة غير مدعومة')}</p>
-                  <p className="text-sm text-yellow-600 dark:text-yellow-400">{t('device_not_support_biometric', 'جهازك لا يدعم تسجيل الدخول بالبصمة')}</p>
-                </div>
-              </>
+              <ExclamationTriangleIcon className="w-6 h-6 text-white" />
             )}
           </div>
+          <div className="flex-1">
+            <h3 className={`font-bold ${biometricAvailable ? 'text-emerald-800 dark:text-emerald-300' : 'text-amber-800 dark:text-amber-300'}`}>
+              {biometricAvailable 
+                ? t('biometric_supported', 'جهازك يدعم البصمة') 
+                : t('biometric_not_supported', 'البصمة غير مدعومة')}
+            </h3>
+            <p className={`text-sm mt-1 ${biometricAvailable ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+              {biometricAvailable 
+                ? t('biometric_supported_desc', 'يمكنك تفعيل تسجيل الدخول بالبصمة أو بصمة الوجه')
+                : t('biometric_not_supported_desc', 'جهازك أو متصفحك لا يدعم هذه الميزة')}
+            </p>
+          </div>
         </div>
+      </div>
 
-        {biometricAvailable && (
-          <>
-            {/* Current Status */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      {biometricAvailable && (
+        <>
+          {/* Current Status */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="p-6">
+              <h3 className="font-bold text-gray-900 dark:text-white mb-4">
+                {t('biometric_status', 'حالة البصمة')}
+              </h3>
+              
+              <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                 <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${hasBiometric ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                  <div className={`w-3 h-3 rounded-full ${hasBiometric ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></div>
                   <span className="font-medium text-gray-700 dark:text-gray-300">
                     {hasBiometric 
-                      ? t('biometric_enabled', 'الدخول بالبصمة مفعّل') 
-                      : t('biometric_disabled', 'الدخول بالبصمة غير مفعّل')}
+                      ? t('biometric_active', 'البصمة مفعّلة')
+                      : t('biometric_inactive', 'البصمة غير مفعّلة')}
                   </span>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${hasBiometric ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200' : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'}`}>
-                  {hasBiometric ? t('active', 'نشط') : t('inactive', 'غير نشط')}
+                <span className={`px-3 py-1.5 rounded-full text-xs font-bold ${
+                  hasBiometric 
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400' 
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-300'
+                }`}>
+                  {hasBiometric ? t('enabled', 'مفعّل') : t('disabled', 'معطّل')}
                 </span>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-4">
+            {/* Action Button */}
+            <div className="px-6 pb-6">
               {!hasBiometric ? (
                 <button
                   onClick={handleRegisterBiometric}
                   disabled={registering}
-                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30"
                 >
                   {registering ? (
                     <>
-                      <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span>{t('registering', 'جاري التسجيل...')}</span>
                     </>
                   ) : (
@@ -168,7 +171,7 @@ const BiometricSettings = () => {
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
                       </svg>
-                      <span>{t('register_biometric', 'تسجيل البصمة / بصمة الوجه')}</span>
+                      <span>{t('enable_biometric', 'تفعيل البصمة')}</span>
                     </>
                   )}
                 </button>
@@ -176,48 +179,66 @@ const BiometricSettings = () => {
                 <button
                   onClick={handleRemoveBiometric}
                   disabled={removing}
-                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {removing ? (
                     <>
-                      <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       <span>{t('removing', 'جاري الإزالة...')}</span>
                     </>
                   ) : (
                     <>
-                      <TrashIcon className="w-6 h-6" />
+                      <TrashIcon className="w-5 h-5" />
                       <span>{t('remove_biometric', 'إزالة البصمة')}</span>
                     </>
                   )}
                 </button>
               )}
             </div>
+          </div>
 
-            {/* Information */}
-            <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">{t('how_biometric_works', 'كيف تعمل البصمة؟')}</h4>
-              <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-2">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-500 mt-1">•</span>
-                  {t('biometric_info_1', 'البصمة تُخزن بأمان على جهازك فقط')}
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-500 mt-1">•</span>
-                  {t('biometric_info_2', 'يمكنك تسجيل الدخول بسرعة دون إدخال كلمة المرور')}
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-500 mt-1">•</span>
-                  {t('biometric_info_3', 'تعمل مع بصمة الإصبع وبصمة الوجه (Face ID)')}
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-500 mt-1">•</span>
-                  {t('biometric_info_4', 'يمكنك إزالة البصمة في أي وقت')}
-                </li>
-              </ul>
+          {/* Supported Devices */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+            <h3 className="font-bold text-gray-900 dark:text-white mb-4">
+              {t('supported_devices', 'الأجهزة المدعومة')}
+            </h3>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                <DevicePhoneMobileIcon className="w-8 h-8 text-emerald-500" />
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white text-sm">{t('mobile', 'الجوال')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Face ID / Touch ID</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                <ComputerDesktopIcon className="w-8 h-8 text-emerald-500" />
+                <div>
+                  <p className="font-medium text-gray-900 dark:text-white text-sm">{t('computer', 'الكمبيوتر')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Windows Hello</p>
+                </div>
+              </div>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+
+          {/* Info */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-5">
+            <div className="flex gap-3">
+              <ShieldCheckIcon className="w-6 h-6 text-blue-500 flex-shrink-0" />
+              <div>
+                <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-2">
+                  {t('security_info', 'معلومات الأمان')}
+                </h4>
+                <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1.5">
+                  <li>• {t('biometric_info_1', 'البصمة مخزنة بأمان على جهازك فقط')}</li>
+                  <li>• {t('biometric_info_2', 'لا يتم إرسال بيانات بصمتك إلى أي خادم')}</li>
+                  <li>• {t('biometric_info_3', 'يمكنك إزالة البصمة في أي وقت')}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

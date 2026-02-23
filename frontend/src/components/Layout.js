@@ -54,12 +54,35 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [isSearching, setIsSearching] = useState(false);
   // State for collapsible menu sections - all expanded by default
   const [expandedSections, setExpandedSections] = useState({});
+  // State for scroll to top button
+  const [showScrollTop, setShowScrollTop] = useState(false);
   // const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
+
+  // Handle scroll to show/hide scroll-to-top button
+  useEffect(() => {
+    const mainContent = document.querySelector('.page-scroll');
+    if (!mainContent) return;
+
+    const handleScroll = () => {
+      setShowScrollTop(mainContent.scrollTop > 300);
+    };
+
+    mainContent.addEventListener('scroll', handleScroll);
+    return () => mainContent.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    const mainContent = document.querySelector('.page-scroll');
+    if (mainContent) {
+      mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   // Keyboard shortcuts for advanced search - DISABLED TEMPORARILY
   // useEffect(() => {

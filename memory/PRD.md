@@ -160,6 +160,19 @@ A comprehensive residential compound management system that supports:
     - Default facilities: Swimming Pool, Gym, Tennis Court, Party Hall, BBQ Area
     - API: `/api/facilities`, `/api/facility-bookings`
 
+14. ✅ **Facility Booking Frontend Page (Feb 23, 2025):**
+    - Created `FacilityBooking.js` page with full UI
+    - Features:
+      - Browse facilities with icons and prices
+      - Interactive weekly calendar for date selection
+      - Time slot selection with availability display
+      - Booking form with guest count and purpose
+      - My Bookings tab with booking history
+      - Cancel booking functionality
+    - Full RTL Arabic support
+    - Added to sidebar navigation under "Services & Maintenance"
+    - 50+ new i18n translation keys (AR + EN)
+
 ### Previous Session Fixes
 1. Fixed Arabic translation for registration page
 2. Added missing i18n keys for registration form fields

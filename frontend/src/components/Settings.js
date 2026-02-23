@@ -1188,6 +1188,7 @@ const Settings = () => {
                 {activeTab === 'notifications' && t('notification_settings_description', 'إدارة إعدادات الإشعارات')}
                 {activeTab === 'profile' && t('profile_settings_description', 'تحديث معلومات الملف الشخصي')}
                 {activeTab === 'privacy' && t('privacy_settings_description', 'التحكم في إعدادات الخصوصية')}
+                {activeTab === 'biometric' && t('biometric_settings_description', 'تفعيل الدخول بالبصمة أو بصمة الوجه')}
                 {activeTab === 'language' && t('language_settings_description', 'اختيار لغة التطبيق')}
               </p>
             </div>

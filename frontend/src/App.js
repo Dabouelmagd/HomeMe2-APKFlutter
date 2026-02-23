@@ -74,7 +74,7 @@ import ContactUs from './components/ContactUs';
 import Newsletter from './components/Newsletter';
 import HelpCenter from './components/HelpCenter';
 import MobileOptimized from './components/MobileOptimized';
-import SubscriptionCodesManagement from './components/SubscriptionCodesManagement';
+// SubscriptionCodesManagement replaced by SubscriptionCodesUnified
 import SubscriptionActivation from './components/SubscriptionActivation';
 import { Toaster } from './components/ui/sonner';
 

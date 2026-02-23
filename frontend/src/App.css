@@ -609,3 +609,53 @@
 .sidebar-scroll:hover::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Page Content Scroll Styles */
+.page-scroll {
+  scroll-behavior: smooth;
+}
+
+.page-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.page-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.page-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+.page-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #2563eb, #7c3aed);
+}
+
+/* Firefox */
+.page-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3b82f6 #f1f1f1;
+}
+
+/* Scroll to top button styles */
+.scroll-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 50;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.scroll-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+[dir="rtl"] .scroll-to-top {
+  right: auto;
+  left: 20px;
+}

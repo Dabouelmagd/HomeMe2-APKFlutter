@@ -189,15 +189,16 @@ A comprehensive residential compound management system that supports:
 - None currently
 
 ### P1 (High Priority)
+- Final pre-deployment verification of all features
 - Deploy to production domain (homemeapp.net)
 - Comprehensive end-to-end testing
 - Security audit and hardening
 
 ### P2 (Medium Priority)
-- Mobile app development
+- Mobile app development (React Native - user requested)
 - Push notifications
-- Email notifications
 - Report generation and export
+- Refactor duplicate SubscriptionCodes components
 
 ### P3 (Low Priority)
 - Advanced analytics dashboard

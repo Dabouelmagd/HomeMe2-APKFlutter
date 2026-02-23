@@ -534,7 +534,7 @@ const Layout = ({ children, isTrialMode = false }) => {
   };
 
   return (
-    <div className={`flex h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`}>
+    <div className={`flex h-screen bg-gray-50 dark:bg-gray-900 ${isRTL ? 'rtl' : 'ltr'}`}>
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -545,17 +545,17 @@ const Layout = ({ children, isTrialMode = false }) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col
+        fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col
         lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}
       `}>
-        <div className="flex items-center justify-between h-24 px-6 border-b border-gray-200 flex-shrink-0">
+        <div className="flex items-center justify-between h-24 px-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
           {/* Close button for mobile - positioned on the left */}
           <button
             className="lg:hidden"
             onClick={() => setSidebarOpen(false)}
           >
-            <XMarkIcon className="h-6 w-6 text-gray-500" />
+            <XMarkIcon className="h-6 w-6 text-gray-500 dark:text-gray-400" />
           </button>
           
           {/* Logo centered */}

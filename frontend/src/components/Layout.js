@@ -507,7 +507,17 @@ const Layout = ({ children, isTrialMode = false }) => {
     }
   ];
 
-  const isActive = (href) => location.pathname === href || location.pathname.startsWith(href + '/');
+  // Improved isActive function to correctly match current route
+  const isActive = (href) => {
+    const currentPath = location.pathname;
+    const fullHref = `/app/${href}`;
+    
+    // Exact match or starts with (for nested routes)
+    return currentPath === fullHref || 
+           currentPath.startsWith(fullHref + '/') ||
+           currentPath === href ||
+           currentPath.startsWith(href + '/');
+  };
 
   return (
     <div className={`flex h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`}>

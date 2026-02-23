@@ -97,7 +97,12 @@ A comprehensive residential compound management system that supports:
    - Updated `PushNotifications.js` component to use dynamic VAPID keys from server
    - Added Arabic translations for push notification UI
    - **Auto-subscription enabled**: Users are automatically subscribed to push notifications on login
-   - Created `autoPushService.js` for automatic subscription management
+5. ✅ **Merged SubscriptionCodes Components:**
+   - Created unified `SubscriptionCodesUnified.js` component
+   - Combined features from both `SubscriptionCodes.js` and `SubscriptionCodesManagement.js`
+   - Features: Create single/bulk codes, filters, search, statistics, renew, activate/deactivate
+   - Deleted old redundant files
+   - Full Arabic RTL support
 
 ### Previous Session Fixes
 1. Fixed Arabic translation for registration page

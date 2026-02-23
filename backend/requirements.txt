@@ -127,3 +127,4 @@ zipp==3.23.0
 # Subscription codes dependencies already covered by existing packages
 paypalrestsdk==1.13.3
 pywebpush==2.3.0
+reportlab==4.4.10

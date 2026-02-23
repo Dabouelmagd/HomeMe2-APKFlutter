@@ -128,15 +128,16 @@
             
             console.log('HomeMe: Service Worker registered');
             
-            // Force update check
+            // Force update check - Auto reload disabled for stability
             registration.addEventListener('updatefound', () => {
               console.log('HomeMe: New service worker version detected');
               const newWorker = registration.installing;
               
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('HomeMe: New version available, reloading...');
-                  window.location.reload(true);
+                  console.log('HomeMe: New version available. Refresh manually to update.');
+                  // Auto reload disabled to prevent navigation issues
+                  // window.location.reload(true);
                 }
               });
             });

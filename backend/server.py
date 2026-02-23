@@ -14103,11 +14103,11 @@ async def generate_maintenance_report(
 @api_router.get("/facilities")
 async def get_facilities(
     compound_id: str = None,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Get all facilities for a compound"""
     if not compound_id:
-        compound_id = current_user.get("compound_id")
+        compound_id = current_user.compound_id
     
     facility_service = FacilityBookingService(db)
     facilities = await facility_service.get_facilities(compound_id)
@@ -14116,7 +14116,7 @@ async def get_facilities(
 @api_router.get("/facilities/{facility_id}")
 async def get_facility(
     facility_id: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Get a single facility by ID"""
     facility_service = FacilityBookingService(db)
@@ -14130,13 +14130,13 @@ async def get_facility(
 @api_router.post("/facilities")
 async def create_facility(
     facility_data: dict,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Create a new facility (Admin only)"""
-    if current_user.get("role") not in ["admin", "super_admin"]:
+    if current_user.role not in ["admin", "super_admin"] and not current_user.is_super_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    compound_id = current_user.get("compound_id")
+    compound_id = current_user.compound_id
     facility_service = FacilityBookingService(db)
     
     try:
@@ -14149,10 +14149,10 @@ async def create_facility(
 async def update_facility(
     facility_id: str,
     update_data: dict,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Update a facility (Admin only)"""
-    if current_user.get("role") not in ["admin", "super_admin"]:
+    if current_user.role not in ["admin", "super_admin"] and not current_user.is_super_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     
     facility_service = FacilityBookingService(db)
@@ -14162,10 +14162,10 @@ async def update_facility(
 @api_router.delete("/facilities/{facility_id}")
 async def delete_facility(
     facility_id: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Delete a facility (Admin only)"""
-    if current_user.get("role") not in ["admin", "super_admin"]:
+    if current_user.role not in ["admin", "super_admin"] and not current_user.is_super_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     
     facility_service = FacilityBookingService(db)
@@ -14179,7 +14179,7 @@ async def delete_facility(
 async def get_facility_availability(
     facility_id: str,
     date: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Get availability for a facility on a specific date"""
     facility_service = FacilityBookingService(db)
@@ -14193,16 +14193,16 @@ async def get_facility_availability(
 @api_router.post("/facility-bookings")
 async def create_facility_booking(
     booking_data: dict,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Create a new facility booking"""
     facility_service = FacilityBookingService(db)
     
     try:
         booking = await facility_service.create_booking(
-            user_id=str(current_user.get("_id", current_user.get("id"))),
-            user_name=current_user.get("full_name", current_user.get("username")),
-            compound_id=current_user.get("compound_id"),
+            user_id=str(current_user.id),
+            user_name=current_user.full_name or current_user.username,
+            compound_id=current_user.compound_id,
             booking_data=booking_data
         )
         return {"status": "success", "booking": booking}
@@ -14216,17 +14216,17 @@ async def get_facility_bookings(
     status: str = None,
     user_only: bool = False,
     limit: int = 50,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Get facility bookings with filters"""
     facility_service = FacilityBookingService(db)
     
     user_id = None
-    if user_only or current_user.get("role") == "resident":
-        user_id = str(current_user.get("_id", current_user.get("id")))
+    if user_only or current_user.role == "resident":
+        user_id = str(current_user.id)
     
     bookings = await facility_service.get_bookings(
-        compound_id=current_user.get("compound_id"),
+        compound_id=current_user.compound_id,
         user_id=user_id,
         facility_id=facility_id,
         date=date,
@@ -14239,7 +14239,7 @@ async def get_facility_bookings(
 @api_router.get("/facility-bookings/{booking_id}")
 async def get_facility_booking(
     booking_id: str,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Get a single booking by ID"""
     facility_service = FacilityBookingService(db)
@@ -14249,8 +14249,8 @@ async def get_facility_booking(
         raise HTTPException(status_code=404, detail="Booking not found")
     
     # Check access
-    user_id = str(current_user.get("_id", current_user.get("id")))
-    if current_user.get("role") == "resident" and booking["user_id"] != user_id:
+    user_id = str(current_user.id)
+    if current_user.role == "resident" and booking["user_id"] != user_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     return booking
@@ -14260,10 +14260,10 @@ async def update_booking_status(
     booking_id: str,
     status: str,
     admin_notes: str = None,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Update booking status (Admin only)"""
-    if current_user.get("role") not in ["admin", "super_admin"]:
+    if current_user.role not in ["admin", "super_admin"] and not current_user.is_super_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     
     facility_service = FacilityBookingService(db)
@@ -14275,13 +14275,13 @@ async def update_booking_status(
 async def cancel_facility_booking(
     booking_id: str,
     reason: str = None,
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Cancel a booking"""
     facility_service = FacilityBookingService(db)
     
     try:
-        user_id = str(current_user.get("_id", current_user.get("id")))
+        user_id = str(current_user.id)
         booking = await facility_service.cancel_booking(booking_id, user_id, reason)
         return {"status": "success", "booking": booking}
     except ValueError as e:
@@ -14289,13 +14289,13 @@ async def cancel_facility_booking(
 
 @api_router.post("/facilities/seed-defaults")
 async def seed_default_facilities(
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     """Seed default facilities for a compound (Admin only)"""
-    if current_user.get("role") not in ["admin", "super_admin"]:
+    if current_user.role not in ["admin", "super_admin"] and not current_user.is_super_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    compound_id = current_user.get("compound_id")
+    compound_id = current_user.compound_id
     facility_service = FacilityBookingService(db)
     
     # Check if facilities already exist

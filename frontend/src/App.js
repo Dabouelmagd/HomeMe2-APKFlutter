@@ -607,6 +607,7 @@ function App() {
             </TransliterationProvider>
           </NotificationProvider>
         </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </div>
   );

@@ -5382,6 +5382,17 @@ const resources = {
       'primary_admin': 'المدير الرئيسي',
       'click_to_upload_logo': 'اضغط لتحميل الشعار',
       
+      // Form Validation Messages - رسائل التحقق من الإدخال
+      'compound_name_required': 'اسم المجمع مطلوب',
+      'compound_name_too_short': 'اسم المجمع قصير جداً (الحد الأدنى حرفان)',
+      'compound_name_too_long': 'اسم المجمع طويل جداً (الحد الأقصى 100 حرف)',
+      'address_required': 'العنوان مطلوب',
+      'address_too_short': 'العنوان قصير جداً (الحد الأدنى 5 أحرف)',
+      'address_too_long': 'العنوان طويل جداً (الحد الأقصى 200 حرف)',
+      'description_too_long': 'الوصف طويل جداً (الحد الأقصى 500 حرف)',
+      'compound_settings_updated': 'تم تحديث إعدادات المجمع بنجاح',
+      'failed_update_compound_settings': 'فشل في تحديث إعدادات المجمع',
+      
       // Analytics & Statistics
       'collection_rate': 'معدل التحصيل',
       'maintenance_requests_trend': 'اتجاه طلبات الصيانة',

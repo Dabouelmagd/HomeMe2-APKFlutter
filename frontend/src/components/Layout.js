@@ -43,6 +43,7 @@ import {
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
+import ThemeToggle from './ThemeToggle';
 import BackButton from './BackButton';
 // import AdvancedSearchModal from './AdvancedSearchModal';
 

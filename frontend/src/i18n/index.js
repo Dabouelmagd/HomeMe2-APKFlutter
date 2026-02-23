@@ -2638,6 +2638,8 @@ const resources = {
       'no_transactions_found': 'لم يتم العثور على معاملات',
       'show_all': 'إظهار الكل',
       'hide': 'إخفاء',
+      'secure_payment_processing': 'معالجة دفع آمنة',
+      'payment_security_notice': 'جميع المدفوعات تتم بشكل آمن عبر Stripe. معلومات الدفع الخاصة بك مشفرة ولا يتم تخزينها على خوادمنا.',
       'processing': 'جاري المعالجة...',
       'signing_in': 'جاري تسجيل الدخول...',
       'creating_account': 'جاري إنشاء الحساب...',

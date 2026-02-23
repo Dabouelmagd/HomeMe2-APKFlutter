@@ -491,11 +491,11 @@ const Layout = ({ children, isTrialMode = false }) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col
         lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}
       `}>
-        <div className="flex items-center justify-between h-24 px-6 border-b border-gray-200">
+        <div className="flex items-center justify-between h-24 px-6 border-b border-gray-200 flex-shrink-0">
           {/* Close button for mobile - positioned on the left */}
           <button
             className="lg:hidden"
@@ -519,7 +519,8 @@ const Layout = ({ children, isTrialMode = false }) => {
           <div className="w-6 lg:hidden"></div>
         </div>
 
-        <nav className="mt-6 px-3 pb-8 overflow-y-auto">
+        {/* Scrollable Navigation Area */}
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
           <div className="space-y-4">
             {navigationSections.map((section, sectionIndex) => {
               const visibleItems = section.items.filter(item => item.show);

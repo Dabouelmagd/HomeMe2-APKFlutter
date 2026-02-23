@@ -208,9 +208,17 @@ const TrialDashboard = ({ exitTrial }) => {
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const [isTrial, setIsTrial] = useState(false);
   const [currency, setCurrency] = useState('USD'); // USD or EGP
   const [isYearly, setIsYearly] = useState(false);
+
+  // Redirect logged-in users to dashboard
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/app/dashboard', { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const startTrial = () => {
     setIsTrial(true);

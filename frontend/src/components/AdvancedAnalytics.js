@@ -593,6 +593,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('monthly_revenue')}>
                 <SimpleChart 
                   data={analytics.charts?.monthly_revenue || []}
+                  type="area"
                   color="#10B981"
                 />
               </ChartContainer>
@@ -600,6 +601,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('payment_methods')}>
                 <SimpleChart 
                   data={analytics.charts?.payment_methods || []}
+                  type="pie"
                   color="#3B82F6"
                 />
               </ChartContainer>

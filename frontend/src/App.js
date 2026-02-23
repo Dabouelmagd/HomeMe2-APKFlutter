@@ -377,6 +377,7 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <ScrollToTop />
+        <ThemeProvider>
         <AuthProvider>
           <NotificationProvider>
             <TransliterationProvider>

@@ -49,6 +49,21 @@ const resources = {
       'payment_successful': 'Payment successful!',
       'payment_status_check_failed': 'Failed to check payment status',
       
+      // Push Notifications
+      'push_notifications': 'Push Notifications',
+      'push_notifications_desc': 'Receive instant notifications for invoices, reminders, and visitors',
+      'push_not_supported': 'Your browser does not support push notifications',
+      'push_permission_denied': 'Notification permission denied. Please enable it in browser settings.',
+      'push_active': 'Push notifications are active',
+      'send_test_notification': 'Send Test Notification',
+      'test_sent': 'Test notification sent ✓',
+      'test_failed': 'Failed to send ✗',
+      'sending': 'Sending...',
+      'notification_types': 'Notification types:',
+      'invoice_notifications': 'New invoices',
+      'payment_reminders': 'Payment reminders',
+      'visitor_notifications': 'Visitor arrivals',
+      
       // Homepage translations
       'login': 'Login',
       'register_now': 'Register Now',

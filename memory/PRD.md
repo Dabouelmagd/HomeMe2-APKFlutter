@@ -219,6 +219,8 @@ A comprehensive residential compound management system that supports:
     - Added "Remember Me" checkbox to save username
     - Biometric login button appears when user has registered biometric
     - Added Arabic translations for all biometric features
+    - Added BiometricSettings component to Settings page
+    - Settings tab with green color for biometric section
 
 ### Previous Session Fixes
 1. Fixed Arabic translation for registration page

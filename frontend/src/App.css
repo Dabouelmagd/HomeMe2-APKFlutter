@@ -659,3 +659,197 @@
   right: auto;
   left: 20px;
 }
+
+
+/* =============================================
+   Page Transition & Element Animations
+   ============================================= */
+
+/* Page Transition Animation */
+@keyframes pageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageSlideInRTL {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Fade In Up Animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Scale In Animation */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide In From Left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide In From Right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Page Content Animation */
+.page-scroll > div,
+.page-scroll > main > div {
+  animation: pageSlideIn 0.4s ease-out;
+}
+
+/* Animate Cards */
+.stat-card,
+.dashboard-card,
+.card {
+  animation: fadeInUp 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+/* Staggered Animation for Multiple Cards */
+.stat-card:nth-child(1),
+.dashboard-card:nth-child(1) { animation-delay: 0.1s; }
+.stat-card:nth-child(2),
+.dashboard-card:nth-child(2) { animation-delay: 0.2s; }
+.stat-card:nth-child(3),
+.dashboard-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4),
+.dashboard-card:nth-child(4) { animation-delay: 0.4s; }
+.stat-card:nth-child(5),
+.dashboard-card:nth-child(5) { animation-delay: 0.5s; }
+.stat-card:nth-child(6),
+.dashboard-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Animate Tables */
+table {
+  animation: fadeIn 0.4s ease-out;
+}
+
+table tbody tr {
+  animation: fadeInUp 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+table tbody tr:nth-child(1) { animation-delay: 0.05s; }
+table tbody tr:nth-child(2) { animation-delay: 0.1s; }
+table tbody tr:nth-child(3) { animation-delay: 0.15s; }
+table tbody tr:nth-child(4) { animation-delay: 0.2s; }
+table tbody tr:nth-child(5) { animation-delay: 0.25s; }
+
+/* Animate Forms */
+.form-group {
+  animation: fadeInUp 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.15s; }
+.form-group:nth-child(3) { animation-delay: 0.2s; }
+.form-group:nth-child(4) { animation-delay: 0.25s; }
+
+/* Animate Headers */
+.dashboard-header,
+.page-header {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Animate Modal/Dialog */
+.modal-content,
+[role="dialog"] {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Animate Sidebar Items on Hover */
+nav a {
+  transition: all 0.2s ease;
+}
+
+/* Animate Buttons */
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Smooth Hover Effects */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* RTL Animation Support */
+[dir="rtl"] .page-scroll > div,
+[dir="rtl"] .page-scroll > main > div {
+  animation: pageSlideInRTL 0.4s ease-out;
+}
+
+/* Reduce Motion for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

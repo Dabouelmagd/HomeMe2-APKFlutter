@@ -408,6 +408,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('resident_growth_trend')}>
                 <SimpleChart 
                   data={analytics.charts?.resident_growth || []}
+                  type="area"
                   color="#3B82F6"
                 />
               </ChartContainer>
@@ -415,6 +416,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('maintenance_requests_trend')}>
                 <SimpleChart 
                   data={analytics.charts?.maintenance_trend || []}
+                  type="bar"
                   color="#F59E0B"
                 />
               </ChartContainer>
@@ -424,6 +426,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('revenue_trend')}>
                 <SimpleChart 
                   data={analytics.charts?.revenue_trend || []}
+                  type="area"
                   color="#10B981"
                 />
               </ChartContainer>
@@ -431,6 +434,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('user_activity_trend')}>
                 <SimpleChart 
                   data={analytics.charts?.activity_trend || []}
+                  type="line"
                   color="#8B5CF6"
                 />
               </ChartContainer>

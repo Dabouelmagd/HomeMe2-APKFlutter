@@ -173,6 +173,16 @@ A comprehensive residential compound management system that supports:
     - Added to sidebar navigation under "Services & Maintenance"
     - 50+ new i18n translation keys (AR + EN)
 
+15. ✅ **Sidebar Active Menu Item Highlighting (Feb 23, 2025):**
+    - Fixed `isActive` function in `Layout.js` to correctly compare paths
+    - Active menu items now have blue gradient background
+    - Works with nested routes and various URL structures
+
+16. ✅ **Page Persistence on Browser Refresh (Feb 23, 2025):**
+    - Modified `ProtectedRoute` component to save original destination URL
+    - Updated `Login.js` to redirect back to original page after authentication
+    - Users no longer lose their location when refreshing the browser
+
 ### Previous Session Fixes
 1. Fixed Arabic translation for registration page
 2. Added missing i18n keys for registration form fields

@@ -213,7 +213,6 @@ A comprehensive residential compound management system that supports:
 - Mobile app development (React Native - user requested)
 - Push notifications
 - Report generation and export
-- Refactor duplicate SubscriptionCodes components
 
 ### P3 (Low Priority)
 - Advanced analytics dashboard

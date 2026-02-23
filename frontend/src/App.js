@@ -19,6 +19,19 @@ function ScrollToTop() {
   return null;
 }
 
+// Force re-render on navigation (fixes back button issue)
+function RouteChangeHandler({ children }) {
+  const location = useLocation();
+  const [key, setKey] = useState(0);
+  
+  useEffect(() => {
+    // Force re-render when location changes (including back/forward navigation)
+    setKey(prev => prev + 1);
+  }, [location.pathname, location.search]);
+  
+  return <React.Fragment key={key}>{children}</React.Fragment>;
+}
+
 // Components
 import Login from './components/Login';
 import Register from './components/Register';

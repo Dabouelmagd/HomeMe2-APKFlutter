@@ -206,6 +206,20 @@ A comprehensive residential compound management system that supports:
     - Smooth transition animations between themes
     - Full RTL support for dark mode
 
+20. ✅ **Biometric Authentication & Remember Me (Feb 23, 2025):**
+    - Created `webauthn.js` service for WebAuthn/Biometric support
+    - Created `webauthn_service.py` backend for credential management
+    - Added WebAuthn API endpoints:
+      - `POST /api/webauthn/register/options` - Get registration options
+      - `POST /api/webauthn/register/verify` - Verify registration
+      - `POST /api/webauthn/login/options` - Get login options
+      - `POST /api/webauthn/login/verify` - Verify biometric login
+      - `GET /api/webauthn/check/{username}` - Check if user has biometric
+      - `DELETE /api/webauthn/remove` - Remove biometric
+    - Added "Remember Me" checkbox to save username
+    - Biometric login button appears when user has registered biometric
+    - Added Arabic translations for all biometric features
+
 ### Previous Session Fixes
 1. Fixed Arabic translation for registration page
 2. Added missing i18n keys for registration form fields

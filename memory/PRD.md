@@ -198,6 +198,7 @@ A comprehensive residential compound management system that supports:
 ### P1 (High Priority)
 - Final pre-deployment verification of all features
 - Deploy to production domain (homemeapp.net)
+- Test push notifications in production environment
 - Comprehensive end-to-end testing
 - Security audit and hardening
 

@@ -71,6 +71,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import PayPalSuccessPage from './pages/PayPalSuccessPage';
 import FacilityBooking from './pages/FacilityBooking';
 import { TransliterationProvider } from './components/TransliterationToggle';
+import { ThemeProvider } from './components/ThemeProvider';
 import MaintenanceSystem from './components/MaintenanceSystem';
 import EnterpriseRegistration from './components/EnterpriseRegistration';
 import EnterpriseDashboard from './components/EnterpriseDashboard';

@@ -1132,6 +1132,7 @@ const Settings = () => {
                       {tab.id === 'notifications' && t('manage_notifications_desc', 'إدارة الإشعارات')}
                       {tab.id === 'profile' && t('update_profile_desc', 'تحديث الملف الشخصي')}
                       {tab.id === 'privacy' && t('control_privacy_desc', 'التحكم في الخصوصية')}
+                      {tab.id === 'biometric' && t('biometric_settings_desc', 'تفعيل الدخول بالبصمة')}
                       {tab.id === 'language' && t('choose_language_desc', 'اختيار اللغة')}
                     </div>
                     

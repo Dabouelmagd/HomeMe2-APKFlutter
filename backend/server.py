@@ -13935,6 +13935,75 @@ async def broadcast_push_notification(
 
 # ==================== END PUSH NOTIFICATIONS ====================
 
+# ==================== PAYMENT REMINDERS ====================
+
+@api_router.get("/reminders/settings/{compound_id}")
+async def get_reminder_settings(compound_id: str, current_user: dict = Depends(get_current_user)):
+    """Get reminder settings for a compound"""
+    reminder_service = PaymentReminderService(db)
+    return await reminder_service.get_reminder_settings(compound_id)
+
+@api_router.put("/reminders/settings/{compound_id}")
+async def update_reminder_settings(
+    compound_id: str, 
+    settings: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update reminder settings for a compound (Admin only)"""
+    if current_user.get("role") not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    reminder_service = PaymentReminderService(db)
+    return await reminder_service.update_reminder_settings(compound_id, settings)
+
+@api_router.post("/reminders/send/{bill_id}")
+async def send_manual_reminder(
+    bill_id: str,
+    custom_message: str = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Send a manual reminder for a specific bill (Admin only)"""
+    if current_user.get("role") not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    reminder_service = PaymentReminderService(db)
+    try:
+        result = await reminder_service.send_custom_reminder(bill_id, custom_message)
+        return {"status": "success", **result}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/reminders/run-check")
+async def run_reminder_check(current_user: dict = Depends(get_current_user)):
+    """Manually trigger reminder check (Admin only)"""
+    if current_user.get("role") not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    reminder_service = PaymentReminderService(db)
+    results = await reminder_service.check_and_send_reminders()
+    return {"status": "success", "reminders_sent": results}
+
+@api_router.get("/reminders/logs")
+async def get_reminder_logs(
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get reminder logs (Admin only)"""
+    if current_user.get("role") not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    cursor = db.reminder_logs.find().sort("sent_at", -1).limit(limit)
+    logs = []
+    async for log in cursor:
+        log["_id"] = str(log["_id"])
+        logs.append(log)
+    
+    return {"logs": logs}
+
+# ==================== END PAYMENT REMINDERS ====================
+
 # Include the API router after ALL endpoints are defined
 app.include_router(api_router)
 

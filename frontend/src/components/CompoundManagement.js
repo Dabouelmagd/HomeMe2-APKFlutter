@@ -2019,33 +2019,33 @@ const CompoundManagement = () => {
         <div className="space-y-6">
           {/* Basic Information */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">المعلومات الأساسية</h3>
+            <h3 className="text-lg font-semibold text-center text-gray-900 text-center mb-6">{t('basic_information')}</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Compound Name *
+                  {t('compound_name_label')} *
                 </label>
                 <input
                   type="text"
                   value={editableCompound.name}
                   onChange={(e) => setEditableCompound(prev => ({ ...prev, name: e.target.value }))}
                   className="form-input w-full"
-                  placeholder="Enter compound name"
+                  placeholder={t('enter_compound_name')}
                   required
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Address *
+                  {t('address_label')} *
                 </label>
                 <input
                   type="text"
                   value={editableCompound.address}
                   onChange={(e) => setEditableCompound(prev => ({ ...prev, address: e.target.value }))}
                   className="form-input w-full"
-                  placeholder="Enter compound address"
+                  placeholder={t('enter_compound_address')}
                   required
                 />
               </div>
@@ -2054,20 +2054,20 @@ const CompoundManagement = () => {
             <div className="mt-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
+                  {t('description_label')}
                 </label>
                 <textarea
                   value={editableCompound.description || ''}
                   onChange={(e) => setEditableCompound(prev => ({ ...prev, description: e.target.value }))}
                   className="form-input w-full"
                   rows="3"
-                  placeholder="Enter compound description (optional)"
+                  placeholder={t('enter_compound_description')}
                 />
               </div>
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <div className="flex justify-end space-x-4">
+              <div className="flex justify-end space-x-4 rtl:space-x-reverse">
                 <button 
                   onClick={handleCancelCompoundSettings}
                   className="btn btn-secondary"
@@ -2078,7 +2078,7 @@ const CompoundManagement = () => {
                   onClick={handleSaveCompoundSettings}
                   className="btn btn-primary"
                 >
-                  حفظ التغييرات
+                  {t('save_changes')}
                 </button>
               </div>
             </div>
@@ -2092,7 +2092,7 @@ const CompoundManagement = () => {
               {/* Current Logo Display */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Logo
+                  {t('current_logo')}
                 </label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                   {logoPreview ? (
@@ -2102,14 +2102,14 @@ const CompoundManagement = () => {
                         alt={t('compound_logo')}
                         className="mx-auto h-32 w-32 object-contain rounded-lg border border-gray-200"
                       />
-                      <p className="text-sm text-gray-600">شعار المجمع الحالي</p>
+                      <p className="text-sm text-gray-600">{t('current_compound_logo')}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
                       <PhotoIcon className="mx-auto h-16 w-16 text-gray-400" />
                       <div>
-                        <p className="text-sm font-medium text-gray-900">No logo uploaded</p>
-                        <p className="text-sm text-gray-500">Upload a logo to brand your compound</p>
+                        <p className="text-sm font-medium text-gray-900">{t('no_logo_uploaded')}</p>
+                        <p className="text-sm text-gray-500">{t('upload_logo_to_brand')}</p>
                       </div>
                     </div>
                   )}
@@ -2119,7 +2119,7 @@ const CompoundManagement = () => {
               {/* Logo Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Upload New Logo
+                  {t('upload_new_logo')}
                 </label>
                 <div className="space-y-4">
                   <input
@@ -2132,7 +2132,7 @@ const CompoundManagement = () => {
                   {logoFile && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <div className="flex items-center">
-                        <PhotoIcon className="h-5 w-5 text-blue-400 mr-2" />
+                        <PhotoIcon className="h-5 w-5 text-blue-400 mr-2 rtl:ml-2 rtl:mr-0" />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-blue-800">
                             {logoFile.name}
@@ -2145,11 +2145,11 @@ const CompoundManagement = () => {
                     </div>
                   )}
 
-                  <div className="flex space-x-3">
+                  <div className="flex space-x-3 rtl:space-x-reverse">
                     <button
                       onClick={handleUploadLogo}
                       disabled={!logoFile}
-                      className={`btn flex items-center space-x-2 flex-1 ${
+                      className={`btn flex items-center space-x-2 rtl:space-x-reverse flex-1 ${
                         logoFile 
                           ? 'btn-primary' 
                           : 'btn-secondary opacity-50 cursor-not-allowed'
@@ -2173,9 +2173,9 @@ const CompoundManagement = () => {
                   </div>
 
                   <div className="text-xs text-gray-500">
-                    <p>• Recommended size: 200x200px or larger</p>
-                    <p>• Supported formats: JPG, PNG, GIF</p>
-                    <p>• Maximum file size: 5MB</p>
+                    <p>• {t('recommended_size')}</p>
+                    <p>• {t('supported_formats')}</p>
+                    <p>• {t('maximum_file_size')}</p>
                   </div>
                 </div>
               </div>

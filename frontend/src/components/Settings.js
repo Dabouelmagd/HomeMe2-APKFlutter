@@ -1201,7 +1201,7 @@ const Settings = () => {
               {activeTab === 'registration_links' && <RegistrationLinksSettings />}
               {activeTab === 'user_management' && <UserManagementSettings />}
               {activeTab === 'add_admin' && <AddAdminSettings />}
-              {activeTab === 'notifications' && <NotificationSettings />}
+              {activeTab === 'notifications' && <PushNotifications />}
               {activeTab === 'profile' && <ProfileSettings />}
               {activeTab === 'privacy' && <PrivacySettings />}
               {activeTab === 'biometric' && <BiometricSettings />}

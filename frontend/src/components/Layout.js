@@ -510,13 +510,26 @@ const Layout = ({ children, isTrialMode = false }) => {
   // Improved isActive function to correctly match current route
   const isActive = (href) => {
     const currentPath = location.pathname;
-    const fullHref = `/app/${href}`;
+    // Build the full path for comparison
+    const fullHref = href.startsWith('/') ? href : `/app/${href}`;
     
-    // Exact match or starts with (for nested routes)
-    return currentPath === fullHref || 
-           currentPath.startsWith(fullHref + '/') ||
-           currentPath === href ||
-           currentPath.startsWith(href + '/');
+    // For exact matches like /app/dashboard === /app/dashboard
+    if (currentPath === fullHref) {
+      return true;
+    }
+    
+    // For nested routes like /app/dashboard/details starts with /app/dashboard/
+    if (currentPath.startsWith(fullHref + '/')) {
+      return true;
+    }
+    
+    // Check if the current path ends with the href (fallback)
+    // This handles cases where the path might be structured differently
+    if (currentPath.endsWith('/' + href) || currentPath === '/' + href) {
+      return true;
+    }
+    
+    return false;
   };
 
   return (

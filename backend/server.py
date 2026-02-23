@@ -112,6 +112,32 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI(title="HomeMe API", description="Compound Management System")
 api_router = APIRouter(prefix="/api")
 
+# Add rate limiter to app
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Password strength validation function
+def validate_password_strength(password: str) -> tuple[bool, str]:
+    """
+    Validate password strength:
+    - At least 8 characters
+    - At least one uppercase letter
+    - At least one lowercase letter
+    - At least one number
+    - At least one special character
+    """
+    if len(password) < 8:
+        return False, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"
+    if not re.search(r'[A-Z]', password):
+        return False, "كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل"
+    if not re.search(r'[a-z]', password):
+        return False, "كلمة المرور يجب أن تحتوي على حرف صغير واحد على الأقل"
+    if not re.search(r'\d', password):
+        return False, "كلمة المرور يجب أن تحتوي على رقم واحد على الأقل"
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        return False, "كلمة المرور يجب أن تحتوي على رمز خاص واحد على الأقل (!@#$%^&*)"
+    return True, ""
+
 # Create uploads directory
 UPLOAD_DIR = Path("/app/uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)

@@ -2700,7 +2700,29 @@ const resources = {
         'file_too_large': 'File is too large. Maximum size is 5MB.',
         'not_provided': 'Not provided',
         'review_info': 'Please review your information before submitting',
-        'subscription_code': 'Subscription Code'
+        'subscription_code': 'Subscription Code',
+        
+        // Biometric Authentication
+        'remember_me': 'Remember me',
+        'login_with_biometric': 'Login with Fingerprint/Face ID',
+        'biometric_login_success': 'Biometric login successful',
+        'biometric_login_failed': 'Biometric login failed',
+        'biometric_error': 'Biometric authentication error',
+        'enter_username_first': 'Enter username first',
+        'verifying': 'Verifying...',
+        'or': 'or',
+        'biometric_hint': 'You can enable biometric login from settings after signing in',
+        'enable_biometric': 'Enable Biometric Login',
+        'biometric_settings': 'Biometric Settings',
+        'biometric_enabled': 'Biometric login is enabled',
+        'biometric_disabled': 'Biometric login is disabled',
+        'register_biometric': 'Register Fingerprint/Face ID',
+        'remove_biometric': 'Remove Biometric',
+        'biometric_registered': 'Biometric registered successfully',
+        'biometric_removed': 'Biometric removed successfully',
+        'biometric_not_supported': 'Biometric authentication is not supported on this device',
+        'saved_login': 'Saved Login',
+        'quick_login': 'Quick Login'
       },
     }
   },

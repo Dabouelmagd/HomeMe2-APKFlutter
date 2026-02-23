@@ -94,52 +94,61 @@ const PushNotifications = () => {
     return outputArray;
   };
 
+  const arrayBufferToBase64url = (buffer) => {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  };
+
   const subscribeToPush = async () => {
-    if (!isSupported) {
-      alert('Push notifications are not supported in this browser');
+    if (!isSupported || !vapidPublicKey) {
+      alert(t('push_not_supported', 'Push notifications are not supported'));
       return;
     }
 
     setLoading(true);
     try {
-      // Request notification permission
       const permission = await Notification.requestPermission();
       
       if (permission !== 'granted') {
-        alert('Push notifications permission was denied');
+        alert(t('push_permission_denied', 'Push notifications permission was denied'));
+        setLoading(false);
         return;
       }
 
-      // Get service worker registration
       const registration = await navigator.serviceWorker.ready;
       
-      // Subscribe to push notifications
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
       });
 
-      // Send subscription to backend
       const subscriptionData = {
         endpoint: subscription.endpoint,
         keys: {
-          p256dh: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('p256dh')))),
-          auth: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('auth'))))
-        }
+          p256dh: arrayBufferToBase64url(subscription.getKey('p256dh')),
+          auth: arrayBufferToBase64url(subscription.getKey('auth'))
+        },
+        user_agent: navigator.userAgent
       };
 
-      await axios.post(`${API}/push/subscribe`, subscriptionData);
+      const token = localStorage.getItem('token');
+      await axios.post(`${API}/push/subscribe`, subscriptionData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       
       setIsSubscribed(true);
       
-      // Test notification
       setTimeout(() => {
         sendTestNotification();
       }, 1000);
       
     } catch (error) {
       console.error('Failed to subscribe to push notifications:', error);
-      alert('Failed to subscribe to push notifications');
+      alert(t('push_subscription_failed', 'Failed to subscribe to push notifications'));
     } finally {
       setLoading(false);
     }

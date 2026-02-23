@@ -3923,6 +3923,28 @@ const resources = {
       'enterprise.review_info': 'يرجى مراجعة معلوماتك قبل الإرسال',
       'enterprise.subscription_code': 'كود الاشتراك',
       
+      // Payment page translations
+      'payment_center': 'مركز المدفوعات',
+      'manage_payments_description': 'إدارة مدفوعاتك وعرض سجل المعاملات',
+      'make_payment': 'إجراء دفع',
+      'select_payment_type': 'اختر نوع الدفع',
+      'choose_payment_option': 'اختر خيار الدفع',
+      'proceed_to_payment': 'المتابعة للدفع',
+      'processing': 'جاري المعالجة...',
+      'secure_payments_stripe': 'مدفوعات آمنة مدعومة بـ Stripe',
+      'transaction_history': 'سجل المعاملات',
+      'show_all': 'إظهار الكل',
+      'hide': 'إخفاء',
+      'no_transactions_found': 'لا توجد معاملات',
+      'secure_payment_processing': 'معالجة دفع آمنة',
+      'payment_security_notice': 'جميع المدفوعات تتم بشكل آمن عبر Stripe. معلومات الدفع الخاصة بك مشفرة ولا يتم تخزينها على خوادمنا.',
+      'payment_monthly': 'الرسوم الشهرية',
+      'payment_quarterly': 'الرسوم الربع سنوية',
+      'payment_yearly': 'الرسوم السنوية',
+      'status_completed': 'مكتمل',
+      'status_pending': 'معلق',
+      'status_failed': 'فشل',
+      
       // Enterprise Dashboard tabs
       'enterprise.overview': 'نظرة عامة',
       'enterprise.compounds': 'المجمعات',

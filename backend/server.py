@@ -2187,6 +2187,7 @@ async def create_admin_user():
     }
 
 @api_router.post("/auth/login")
+@limiter.limit("5/minute")  # Rate limit: 5 login attempts per minute
 async def login(user_data: UserLogin, request: Request):
     user = await db.users.find_one({"username": user_data.username})
     if not user or not verify_password(user_data.password, user["password_hash"]):

@@ -164,24 +164,34 @@ const PushNotifications = () => {
       
       if (subscription) {
         await subscription.unsubscribe();
-        await axios.delete(`${API}/push/unsubscribe?endpoint=${encodeURIComponent(subscription.endpoint)}`);
+        const token = localStorage.getItem('token');
+        await axios.delete(`${API}/push/unsubscribe?endpoint=${encodeURIComponent(subscription.endpoint)}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
       }
       
       setIsSubscribed(false);
     } catch (error) {
       console.error('Failed to unsubscribe from push notifications:', error);
-      alert('Failed to unsubscribe from push notifications');
+      alert(t('push_unsubscribe_failed', 'Failed to unsubscribe from push notifications'));
     } finally {
       setLoading(false);
     }
   };
 
   const sendTestNotification = async () => {
+    setTestStatus('sending');
     try {
-      await axios.post(`${API}/push/test`);
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API}/push/test`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTestStatus(response.data.success ? 'success' : 'error');
     } catch (error) {
       console.error('Failed to send test notification:', error);
+      setTestStatus('error');
     }
+    setTimeout(() => setTestStatus(null), 3000);
   };
 
   const updatePreferences = async (key, value) => {

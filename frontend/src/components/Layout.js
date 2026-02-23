@@ -535,7 +535,12 @@ const Layout = ({ children, isTrialMode = false }) => {
                 <div key={section.title} className="transition-all duration-200">
                   {/* Section Header - Clickable */}
                   <button
-                    onClick={() => toggleSection(sectionIndex)}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      toggleSection(sectionIndex);
+                    }}
                     className={`w-full px-3 py-2.5 rounded-lg border ${sectionColors[sectionIndex % sectionColors.length]} mb-2 transition-all duration-200 cursor-pointer`}
                   >
                     <div className="flex items-center justify-between">

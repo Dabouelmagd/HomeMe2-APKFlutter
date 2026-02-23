@@ -8,7 +8,7 @@ from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Optional
 from bson import ObjectId
 from email_service import EmailService
-from push_service import PushNotificationService
+from push_notification_service import PushNotificationService
 from dotenv import load_dotenv
 
 load_dotenv()

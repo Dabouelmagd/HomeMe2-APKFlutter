@@ -1018,6 +1018,15 @@ const Settings = () => {
       accent: 'bg-violet-500'
     },
     {
+      id: 'biometric',
+      name: t('biometric_settings', 'إعدادات البصمة'),
+      icon: FingerPrintIcon,
+      component: BiometricSettings,
+      color: 'from-green-600 to-emerald-600',
+      bgColor: 'from-green-50 to-emerald-50',
+      accent: 'bg-green-500'
+    },
+    {
       id: 'language',
       name: t('settings_language', 'اللغة'),
       icon: LanguageIcon,

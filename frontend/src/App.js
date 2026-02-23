@@ -519,6 +519,10 @@ function App() {
                   <VotingSystem />
                 } />
                 
+                <Route path="facility-booking" element={
+                  <FacilityBooking />
+                } />
+                
                 <Route path="smart-home" element={
                   <SmartHomeIntegration />
                 } />

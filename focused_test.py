@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://payment-i18n.preview.emergentagent.com/api"
+BASE_URL = "https://push-notify-app-2.preview.emergentagent.com/api"
 
 class FocusedTestSuite:
     def __init__(self):

@@ -36,7 +36,7 @@ from typing import Dict, List, Optional
 from motor.motor_asyncio import AsyncIOMotorClient
 
 # Configuration - Using the production URL from frontend/.env
-BASE_URL = "https://payment-i18n.preview.emergentagent.com/api"
+BASE_URL = "https://push-notify-app-2.preview.emergentagent.com/api"
 
 class LoginInvestigationSuite:
     def __init__(self):

@@ -19,7 +19,7 @@ from typing import Dict, List, Optional
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://payment-i18n.preview.emergentagent.com/api"
+BASE_URL = "https://push-notify-app-2.preview.emergentagent.com/api"
 
 class HomePhase2TestSuite:
     def __init__(self):

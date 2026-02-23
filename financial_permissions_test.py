@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 # Configuration - Using the production URL as specified in the review request
-BASE_URL = "https://homeme-visitor-logs.preview.emergentagent.com/api"
+BASE_URL = "https://payment-i18n.preview.emergentagent.com/api"
 
 class FinancialPermissionsTestSuite:
     def __init__(self):

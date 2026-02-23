@@ -171,7 +171,7 @@ A comprehensive residential compound management system that supports:
 | Resident | resident1 | resident123 | ✅ Working |
 
 ## Deployment Information
-- Preview URL: https://homeme-visitor-logs.preview.emergentagent.com
+- Preview URL: https://payment-i18n.preview.emergentagent.com
 - Target Domain: homemeapp.net (user's custom domain)
 
 ## Backlog

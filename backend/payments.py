@@ -22,14 +22,56 @@ load_dotenv()
 
 router = APIRouter(prefix="/api/payments", tags=["payments"])
 
-# Payment packages configuration
+# Payment packages configuration - EGP for Egypt
 PAYMENT_PACKAGES = {
-    "monthly_fee": {"amount": 250.0, "currency": "USD", "name": "Monthly Fee"},
-    "maintenance_basic": {"amount": 50.0, "currency": "USD", "name": "Basic Maintenance"},
-    "maintenance_premium": {"amount": 150.0, "currency": "USD", "name": "Premium Maintenance"},
-    "guest_parking": {"amount": 25.0, "currency": "USD", "name": "Guest Parking Fee"},
-    "facility_booking": {"amount": 100.0, "currency": "USD", "name": "Facility Booking"},
-    "late_fee": {"amount": 75.0, "currency": "USD", "name": "Late Payment Fee"},
+    "monthly_fee": {
+        "amount": 250.0, 
+        "currency": "EGP", 
+        "name": "Monthly Fee",
+        "name_ar": "الرسوم الشهرية"
+    },
+    "maintenance_basic": {
+        "amount": 50.0, 
+        "currency": "EGP", 
+        "name": "Basic Maintenance",
+        "name_ar": "صيانة أساسية"
+    },
+    "maintenance_premium": {
+        "amount": 150.0, 
+        "currency": "EGP", 
+        "name": "Premium Maintenance",
+        "name_ar": "صيانة مميزة"
+    },
+    "guest_parking": {
+        "amount": 25.0, 
+        "currency": "EGP", 
+        "name": "Guest Parking Fee",
+        "name_ar": "رسوم موقف الضيوف"
+    },
+    "facility_booking": {
+        "amount": 100.0, 
+        "currency": "EGP", 
+        "name": "Facility Booking",
+        "name_ar": "حجز المرافق"
+    },
+    "late_fee": {
+        "amount": 75.0, 
+        "currency": "EGP", 
+        "name": "Late Payment Fee",
+        "name_ar": "رسوم التأخير"
+    },
+    "subscription_monthly": {
+        "amount": 199.0,
+        "currency": "EGP",
+        "name": "Monthly Subscription",
+        "name_ar": "اشتراك شهري"
+    },
+    "subscription_annual": {
+        "amount": 1999.0,
+        "currency": "EGP",
+        "name": "Annual Subscription",
+        "name_ar": "اشتراك سنوي"
+    }
 }
 
 class PaymentRequest(BaseModel):

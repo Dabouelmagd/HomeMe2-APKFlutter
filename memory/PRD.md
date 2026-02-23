@@ -175,13 +175,27 @@ A comprehensive residential compound management system that supports:
 
 15. ✅ **Sidebar Active Menu Item Highlighting (Feb 23, 2025):**
     - Fixed `isActive` function in `Layout.js` to correctly compare paths
-    - Active menu items now have blue gradient background
+    - Active menu items now have orange gradient background
     - Works with nested routes and various URL structures
 
 16. ✅ **Page Persistence on Browser Refresh (Feb 23, 2025):**
     - Modified `ProtectedRoute` component to save original destination URL
     - Updated `Login.js` to redirect back to original page after authentication
     - Users no longer lose their location when refreshing the browser
+
+17. ✅ **Page Animations (Feb 23, 2025):**
+    - Added smooth page transition animations (slide-in effect)
+    - Added staggered fade-in animations for cards and elements
+    - Added table row animations
+    - Added RTL support for animations
+    - Added accessibility support (prefers-reduced-motion)
+
+18. ✅ **Security Audit & Fixes (Feb 23, 2025):**
+    - **CORS Restriction:** Changed from `*` to specific allowed origins
+    - **Rate Limiting:** Added slowapi for login (5/min) and registration (3/min)
+    - **JWT Expiration:** Reduced from 7 days to 24 hours
+    - **Password Strength:** Added validation (8+ chars, uppercase, lowercase, number, special char)
+    - **HTTP Methods/Headers:** Restricted to specific allowed methods and headers
 
 ### Previous Session Fixes
 1. Fixed Arabic translation for registration page

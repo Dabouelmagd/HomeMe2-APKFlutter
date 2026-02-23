@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher';
 import ResidentDashboard from './ResidentDashboard';
 import Layout from './Layout';
+import { useAuth } from '../App';
 
 // مكون Dashboard التجريبي
 const TrialDashboard = ({ exitTrial }) => {

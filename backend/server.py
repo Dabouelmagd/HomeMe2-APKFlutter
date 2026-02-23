@@ -65,6 +65,9 @@ from email_service import email_service
 # Import push notification service
 from push_notification_service import PushNotificationService, get_vapid_public_key
 
+# Import reminder service
+from reminder_service import PaymentReminderService, run_reminder_scheduler
+
 # Import financial models
 from financial_models import (
     ExpenseCreate, Expense, RevenueCreate, Revenue,

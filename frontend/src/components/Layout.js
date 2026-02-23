@@ -441,7 +441,7 @@ const Layout = ({ children, isTrialMode = false }) => {
           name: t('advanced_analytics'),
           href: 'analytics',
           icon: ChartBarIcon,
-          show: user?.role === 'admin'
+          show: user?.role === 'admin' || user?.is_super_admin
         },
         {
           name: t('enterprise.dashboard'),

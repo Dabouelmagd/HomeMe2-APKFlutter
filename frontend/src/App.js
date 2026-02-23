@@ -165,6 +165,15 @@ const AuthProvider = ({ children }) => {
       setUser(userData);
       initializeSocket(userData.id);
       
+      // Auto-subscribe to push notifications after login
+      setTimeout(() => {
+        autoSubscribeToPush().then(success => {
+          if (success) {
+            console.log('Push notifications enabled automatically');
+          }
+        });
+      }, 1500);
+      
       return { success: true };
     } catch (error) {
       return { 

@@ -159,92 +159,366 @@ const FinancialDashboard = () => {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <button
-            onClick={() => window.location.href = '/app/financial/expenses'}
-            className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:scale-105 transition-all text-left"
+            onClick={() => setActiveTab('expenses')}
+            className={`bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border ${activeTab === 'expenses' ? 'border-red-400 ring-2 ring-red-200' : 'border-white/20'} hover:shadow-2xl transform hover:scale-105 transition-all text-${isRTL ? 'right' : 'left'}`}
           >
             <div className="text-4xl mb-3">💸</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('manage_expenses', 'Manage Expenses')}</h3>
-            <p className="text-sm text-gray-600">{t('track_categorize_expenses', 'Track and categorize expenses')}</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('manage_expenses', 'إدارة المصروفات')}</h3>
+            <p className="text-sm text-gray-600">{t('track_categorize_expenses', 'تتبع وتصنيف المصروفات')}</p>
           </button>
 
           <button
-            onClick={() => window.location.href = '/app/financial/revenue'}
-            className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:scale-105 transition-all text-left"
+            onClick={() => setActiveTab('revenue')}
+            className={`bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border ${activeTab === 'revenue' ? 'border-green-400 ring-2 ring-green-200' : 'border-white/20'} hover:shadow-2xl transform hover:scale-105 transition-all text-${isRTL ? 'right' : 'left'}`}
           >
             <div className="text-4xl mb-3">💰</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('manage_revenue', 'Manage Revenue')}</h3>
-            <p className="text-sm text-gray-600">{t('track_income_payments', 'Track income and payments')}</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('manage_revenue', 'إدارة الإيرادات')}</h3>
+            <p className="text-sm text-gray-600">{t('track_income_payments', 'تتبع الدخل والمدفوعات')}</p>
           </button>
 
           <button
-            onClick={() => window.location.href = '/app/financial/residents'}
-            className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:scale-105 transition-all text-left"
+            onClick={() => setActiveTab('residents')}
+            className={`bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border ${activeTab === 'residents' ? 'border-blue-400 ring-2 ring-blue-200' : 'border-white/20'} hover:shadow-2xl transform hover:scale-105 transition-all text-${isRTL ? 'right' : 'left'}`}
           >
             <div className="text-4xl mb-3">👥</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('resident_accounts', 'Resident Accounts')}</h3>
-            <p className="text-sm text-gray-600">{t('view_balances_payments', 'View balances and payments')}</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('resident_accounts', 'حسابات السكان')}</h3>
+            <p className="text-sm text-gray-600">{t('view_balances_payments', 'عرض الأرصدة والمدفوعات')}</p>
           </button>
 
           <button
-            onClick={() => window.location.href = '/app/financial/reports'}
-            className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/20 hover:shadow-2xl transform hover:scale-105 transition-all text-left"
+            onClick={() => setActiveTab('reports')}
+            className={`bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-xl border ${activeTab === 'reports' ? 'border-purple-400 ring-2 ring-purple-200' : 'border-white/20'} hover:shadow-2xl transform hover:scale-105 transition-all text-${isRTL ? 'right' : 'left'}`}
           >
             <div className="text-4xl mb-3">📊</div>
-            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('financial_reports', 'Financial Reports')}</h3>
-            <p className="text-sm text-gray-600">{t('generate_detailed_reports', 'Generate detailed reports')}</p>
+            <h3 className="text-lg font-bold text-gray-900 mb-1">{t('financial_reports', 'التقارير المالية')}</h3>
+            <p className="text-sm text-gray-600">{t('generate_detailed_reports', 'إنشاء تقارير مفصلة')}</p>
           </button>
         </div>
 
-        {/* Recent Transactions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Recent Expenses */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <span className={isRTL ? 'ml-2' : 'mr-2'}>💸</span>
-              {t('recent_expenses', 'Recent Expenses')}
-            </h2>
+        {/* Tab Content */}
+        {activeTab === 'expenses' && (
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                💸 {t('manage_expenses', 'إدارة المصروفات')}
+              </h2>
+              <button
+                onClick={() => setShowAddModal('expense')}
+                className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+              >
+                <PlusIcon className="w-5 h-5" />
+                {t('add_expense', 'إضافة مصروف')}
+              </button>
+            </div>
             <div className="space-y-3">
-              {expenses.slice(0, 5).map((expense) => (
+              {expenses.length > 0 ? expenses.map((expense) => (
                 <div key={expense.id} className="bg-red-50 border border-red-200 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-semibold text-gray-900">{expense.description}</p>
-                      <p className="text-sm text-gray-600">{expense.category} • {new Date(expense.date).toLocaleDateString()}</p>
+                      <p className="text-sm text-gray-600">{expense.category} • {new Date(expense.date).toLocaleDateString('ar-EG')}</p>
                     </div>
                     <p className="text-xl font-bold text-red-600">-{formatCurrency(expense.amount)}</p>
                   </div>
                 </div>
-              ))}
-              {expenses.length === 0 && (
-                <p className="text-center text-gray-500 py-8">{t('no_expenses_recorded', 'No expenses recorded')}</p>
+              )) : (
+                <div className="text-center py-12 text-gray-500">
+                  <div className="text-5xl mb-4">📭</div>
+                  <p>{t('no_expenses_recorded', 'لا توجد مصروفات مسجلة')}</p>
+                  <button
+                    onClick={() => setShowAddModal('expense')}
+                    className="mt-4 text-red-600 hover:text-red-700 font-medium"
+                  >
+                    {t('add_first_expense', 'أضف أول مصروف')}
+                  </button>
+                </div>
               )}
             </div>
           </div>
+        )}
 
-          {/* Recent Revenue */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-              <span className={isRTL ? 'ml-2' : 'mr-2'}>💰</span>
-              {t('recent_revenue', 'Recent Revenue')}
-            </h2>
+        {activeTab === 'revenue' && (
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                💰 {t('manage_revenue', 'إدارة الإيرادات')}
+              </h2>
+              <button
+                onClick={() => setShowAddModal('revenue')}
+                className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+              >
+                <PlusIcon className="w-5 h-5" />
+                {t('add_revenue', 'إضافة إيراد')}
+              </button>
+            </div>
             <div className="space-y-3">
-              {revenue.slice(0, 5).map((rev) => (
+              {revenue.length > 0 ? revenue.map((rev) => (
                 <div key={rev.id} className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-semibold text-gray-900">{rev.description}</p>
-                      <p className="text-sm text-gray-600">{rev.source} • {new Date(rev.date).toLocaleDateString()}</p>
+                      <p className="text-sm text-gray-600">{rev.source} • {new Date(rev.date).toLocaleDateString('ar-EG')}</p>
                     </div>
                     <p className="text-xl font-bold text-green-600">+{formatCurrency(rev.amount)}</p>
                   </div>
                 </div>
-              ))}
-              {revenue.length === 0 && (
-                <p className="text-center text-gray-500 py-8">{t('no_revenue_recorded', 'No revenue recorded')}</p>
+              )) : (
+                <div className="text-center py-12 text-gray-500">
+                  <div className="text-5xl mb-4">📭</div>
+                  <p>{t('no_revenue_recorded', 'لا توجد إيرادات مسجلة')}</p>
+                  <button
+                    onClick={() => setShowAddModal('revenue')}
+                    className="mt-4 text-green-600 hover:text-green-700 font-medium"
+                  >
+                    {t('add_first_revenue', 'أضف أول إيراد')}
+                  </button>
+                </div>
               )}
             </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'residents' && (
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2 mb-6">
+              👥 {t('resident_accounts', 'حسابات السكان')}
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="text-right p-3 font-semibold">{t('resident_name', 'اسم الساكن')}</th>
+                    <th className="text-right p-3 font-semibold">{t('unit', 'الوحدة')}</th>
+                    <th className="text-right p-3 font-semibold">{t('balance', 'الرصيد')}</th>
+                    <th className="text-right p-3 font-semibold">{t('status', 'الحالة')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {residents.length > 0 ? residents.map((resident) => (
+                    <tr key={resident.id} className="border-b hover:bg-gray-50">
+                      <td className="p-3">{resident.full_name}</td>
+                      <td className="p-3">{resident.unit_number}</td>
+                      <td className={`p-3 font-bold ${resident.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatCurrency(Math.abs(resident.balance || 0))}
+                        {resident.balance < 0 && ' (مستحق)'}
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded-full text-xs ${resident.balance >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {resident.balance >= 0 ? t('paid', 'مسدد') : t('pending', 'معلق')}
+                        </span>
+                      </td>
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan="4" className="text-center py-12 text-gray-500">
+                        <div className="text-5xl mb-4">👥</div>
+                        <p>{t('no_residents_found', 'لا يوجد سكان')}</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'reports' && (
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2 mb-6">
+              📊 {t('financial_reports', 'التقارير المالية')}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+                <h3 className="text-lg font-bold mb-4">{t('monthly_summary', 'ملخص الشهر')}</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>{t('total_revenue', 'إجمالي الإيرادات')}</span>
+                    <span className="font-bold">{formatCurrency(summary?.total_revenue || 0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t('total_expenses', 'إجمالي المصروفات')}</span>
+                    <span className="font-bold">{formatCurrency(summary?.total_expenses || 0)}</span>
+                  </div>
+                  <hr className="border-white/30" />
+                  <div className="flex justify-between text-lg">
+                    <span>{t('net_profit', 'صافي الربح')}</span>
+                    <span className="font-bold">{formatCurrency(summary?.net_profit || 0)}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+                <h3 className="text-lg font-bold mb-4">{t('quick_stats', 'إحصائيات سريعة')}</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>{t('transactions_count', 'عدد المعاملات')}</span>
+                    <span className="font-bold">{(expenses.length || 0) + (revenue.length || 0)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t('expense_count', 'عدد المصروفات')}</span>
+                    <span className="font-bold">{expenses.length || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t('revenue_count', 'عدد الإيرادات')}</span>
+                    <span className="font-bold">{revenue.length || 0}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex gap-4">
+              <button className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                {t('download_pdf', 'تحميل PDF')}
+              </button>
+              <button className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors">
+                {t('download_excel', 'تحميل Excel')}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Transactions (shown on overview) */}
+        {activeTab === 'overview' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Recent Expenses */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <span className={isRTL ? 'ml-2' : 'mr-2'}>💸</span>
+                {t('recent_expenses', 'المصروفات الأخيرة')}
+              </h2>
+              <div className="space-y-3">
+                {expenses.slice(0, 5).map((expense) => (
+                  <div key={expense.id} className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-gray-900">{expense.description}</p>
+                        <p className="text-sm text-gray-600">{expense.category} • {new Date(expense.date).toLocaleDateString()}</p>
+                      </div>
+                      <p className="text-xl font-bold text-red-600">-{formatCurrency(expense.amount)}</p>
+                    </div>
+                  </div>
+                ))}
+                {expenses.length === 0 && (
+                  <p className="text-center text-gray-500 py-8">{t('no_expenses_recorded', 'لا توجد مصروفات مسجلة')}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Recent Revenue */}
+            <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
+                <span className={isRTL ? 'ml-2' : 'mr-2'}>💰</span>
+                {t('recent_revenue', 'الإيرادات الأخيرة')}
+              </h2>
+              <div className="space-y-3">
+                {revenue.slice(0, 5).map((rev) => (
+                  <div key={rev.id} className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-gray-900">{rev.description}</p>
+                        <p className="text-sm text-gray-600">{rev.source} • {new Date(rev.date).toLocaleDateString()}</p>
+                      </div>
+                      <p className="text-xl font-bold text-green-600">+{formatCurrency(rev.amount)}</p>
+                    </div>
+                  </div>
+                ))}
+                {revenue.length === 0 && (
+                  <p className="text-center text-gray-500 py-8">{t('no_revenue_recorded', 'لا توجد إيرادات مسجلة')}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add Modal */}
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold">
+                  {showAddModal === 'expense' ? t('add_expense', 'إضافة مصروف') : t('add_revenue', 'إضافة إيراد')}
+                </h3>
+                <button onClick={() => setShowAddModal(null)} className="text-gray-500 hover:text-gray-700">
+                  <XMarkIcon className="w-6 h-6" />
+                </button>
+              </div>
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('description', 'الوصف')}</label>
+                  <input
+                    type="text"
+                    value={newEntry.description}
+                    onChange={(e) => setNewEntry({...newEntry, description: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder={showAddModal === 'expense' ? t('expense_description', 'مثال: فاتورة كهرباء') : t('revenue_description', 'مثال: رسوم صيانة')}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('amount', 'المبلغ')}</label>
+                  <input
+                    type="number"
+                    value={newEntry.amount}
+                    onChange={(e) => setNewEntry({...newEntry, amount: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {showAddModal === 'expense' ? t('category', 'الفئة') : t('source', 'المصدر')}
+                  </label>
+                  <select
+                    value={newEntry.category}
+                    onChange={(e) => setNewEntry({...newEntry, category: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">{t('select', 'اختر...')}</option>
+                    {showAddModal === 'expense' ? (
+                      <>
+                        <option value="utilities">{t('utilities', 'مرافق')}</option>
+                        <option value="maintenance">{t('maintenance', 'صيانة')}</option>
+                        <option value="salaries">{t('salaries', 'رواتب')}</option>
+                        <option value="supplies">{t('supplies', 'مستلزمات')}</option>
+                        <option value="other">{t('other', 'أخرى')}</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="fees">{t('fees', 'رسوم')}</option>
+                        <option value="rentals">{t('rentals', 'إيجارات')}</option>
+                        <option value="services">{t('services', 'خدمات')}</option>
+                        <option value="other">{t('other', 'أخرى')}</option>
+                      </>
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">{t('date', 'التاريخ')}</label>
+                  <input
+                    type="date"
+                    value={newEntry.date}
+                    onChange={(e) => setNewEntry({...newEntry, date: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(null)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    {t('cancel', 'إلغاء')}
+                  </button>
+                  <button
+                    type="submit"
+                    className={`flex-1 px-4 py-2 rounded-lg text-white ${showAddModal === 'expense' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
+                  >
+                    {t('save', 'حفظ')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

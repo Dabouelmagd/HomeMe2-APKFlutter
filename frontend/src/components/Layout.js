@@ -520,7 +520,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         </div>
 
         {/* Scrollable Navigation Area */}
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 sidebar-scroll">
           <div className="space-y-4">
             {navigationSections.map((section, sectionIndex) => {
               const visibleItems = section.items.filter(item => item.show);

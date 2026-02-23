@@ -623,42 +623,43 @@ const Layout = ({ children, isTrialMode = false }) => {
               );
             })}
           </div>
+        </nav>
 
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="px-3 py-2">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                    <span className="text-sm font-medium text-white">
-                      {user?.full_name?.charAt(0) || 'U'}
-                    </span>
-                  </div>
-                </div>
-                <div className={`${isRTL ? 'mr-3' : 'ml-3'}`}>
-                  <p className="text-sm font-medium text-gray-700">
-                    {user?.full_name}
-                  </p>
-                  <p className="text-xs text-gray-500 capitalize">
-                    {t(user?.role)}
-                  </p>
+        {/* Fixed Bottom Section - User Info & Logout */}
+        <div className="flex-shrink-0 border-t border-gray-200 bg-white px-3 py-4">
+          <div className="px-3 py-2">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                  <span className="text-sm font-medium text-white">
+                    {user?.full_name?.charAt(0) || 'U'}
+                  </span>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-2 space-y-1">
-              <LanguageSwitcher className="w-full justify-start" />
-              <TransliterationToggle className="px-2 py-1" />
-              
-              <button
-                onClick={handleLogout}
-                className={`group flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 hover:text-gray-900`}
-              >
-                <ArrowRightOnRectangleIcon className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 text-gray-500 group-hover:text-gray-700`} />
-                {t('sign_out')}
-              </button>
+              <div className={`${isRTL ? 'mr-3' : 'ml-3'}`}>
+                <p className="text-sm font-medium text-gray-700">
+                  {user?.full_name}
+                </p>
+                <p className="text-xs text-gray-500 capitalize">
+                  {t(user?.role)}
+                </p>
+              </div>
             </div>
           </div>
-        </nav>
+
+          <div className="mt-2 space-y-1">
+            <LanguageSwitcher className="w-full justify-start" />
+            <TransliterationToggle className="px-2 py-1" />
+            
+            <button
+              onClick={handleLogout}
+              className={`group flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 hover:text-gray-900`}
+            >
+              <ArrowRightOnRectangleIcon className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 text-gray-500 group-hover:text-gray-700`} />
+              {t('sign_out')}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Main content */}

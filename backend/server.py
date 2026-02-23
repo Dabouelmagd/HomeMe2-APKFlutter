@@ -2266,6 +2266,85 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
         "family_id": getattr(current_user, 'family_id', None)
     }
 
+# WebAuthn/Biometric Authentication Routes
+webauthn_service = WebAuthnService(db)
+
+@api_router.post("/webauthn/register/options")
+async def webauthn_register_options(data: WebAuthnRegisterOptions, request: Request, current_user: User = Depends(get_current_user)):
+    """Get registration options for biometric"""
+    origin = request.headers.get('origin', request.headers.get('referer', 'https://localhost'))
+    options = await webauthn_service.get_register_options(data.user_id, data.username, origin)
+    return options
+
+@api_router.post("/webauthn/register/verify")
+async def webauthn_register_verify(data: WebAuthnRegisterVerify, current_user: User = Depends(get_current_user)):
+    """Verify and store biometric registration"""
+    result = await webauthn_service.verify_registration(
+        data.user_id, data.credential_id, data.client_data_json, data.attestation_object
+    )
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("error", "Registration failed"))
+    return result
+
+@api_router.post("/webauthn/login/options")
+async def webauthn_login_options(data: WebAuthnLoginOptions, request: Request):
+    """Get login options for biometric authentication"""
+    origin = request.headers.get('origin', request.headers.get('referer', 'https://localhost'))
+    options, error = await webauthn_service.get_login_options(data.username, origin)
+    if error:
+        raise HTTPException(status_code=400, detail=error)
+    return options
+
+@api_router.post("/webauthn/login/verify")
+async def webauthn_login_verify(data: WebAuthnLoginVerify, request: Request):
+    """Verify biometric login and return token"""
+    user, error = await webauthn_service.verify_login(
+        data.username, data.credential_id, data.client_data_json,
+        data.authenticator_data, data.signature
+    )
+    
+    if error:
+        raise HTTPException(status_code=401, detail=error)
+    
+    # Generate JWT token
+    token = create_access_token(data={"sub": user["id"]})
+    
+    # Log successful biometric login
+    await ActivityLogger.log_activity(
+        action_type="login",
+        user_id=user["id"],
+        username=user["username"],
+        details="Biometric login successful",
+        ip_address=request.client.host if request.client else None,
+        status="success"
+    )
+    
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "role": user["role"],
+            "compound_id": user.get("compound_id"),
+            "full_name": user.get("full_name", user["username"])
+        }
+    }
+
+@api_router.get("/webauthn/check/{username}")
+async def webauthn_check(username: str):
+    """Check if user has biometric registered"""
+    has_biometric = await webauthn_service.has_biometric(username)
+    return {"has_biometric": has_biometric}
+
+@api_router.delete("/webauthn/remove")
+async def webauthn_remove(current_user: User = Depends(get_current_user)):
+    """Remove biometric credential"""
+    success = await webauthn_service.remove_biometric(current_user.id)
+    if not success:
+        raise HTTPException(status_code=400, detail="Failed to remove biometric")
+    return {"message": "Biometric removed successfully"}
+
 # Compound Management Routes
 @api_router.post("/compounds")
 async def create_compound(compound_data: CompoundCreate, current_user: User = Depends(require_admin)):

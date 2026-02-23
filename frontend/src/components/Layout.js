@@ -310,6 +310,12 @@ const Layout = ({ children, isTrialMode = false }) => {
           href: 'guests',
           icon: UsersIcon,
           show: true
+        },
+        {
+          name: t('facility_booking'),
+          href: 'facility-booking',
+          icon: CalendarDaysIcon,
+          show: true
         }
       ]
     },

@@ -6,25 +6,35 @@ import { useTranslation } from 'react-i18next';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// VAPID public key - in production, this would be from environment variables
-const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa40HI0DLLf3glowH-W2jEJN6kVBvBfLZMFkOBdMD7WJIrZMlGfJQH6g8JqK-4';
-
 const PushNotifications = () => {
   const { user } = useAuth();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [isSupported, setIsSupported] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [preferences, setPreferences] = useState({});
   const [loading, setLoading] = useState(false);
+  const [testStatus, setTestStatus] = useState(null);
+  const [vapidPublicKey, setVapidPublicKey] = useState(null);
 
   useEffect(() => {
     checkPushSupport();
+    loadVapidKey();
     checkSubscriptionStatus();
     loadPreferences();
   }, []);
 
+  const loadVapidKey = async () => {
+    try {
+      const response = await axios.get(`${API}/push/public-key`);
+      setVapidPublicKey(response.data.public_key);
+    } catch (error) {
+      console.error('Failed to load VAPID key:', error);
+    }
+  };
+
   const checkPushSupport = () => {
-    const supported = 'serviceWorker' in navigator && 'PushManager' in window;
+    const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
     setIsSupported(supported);
     
     if (supported) {
@@ -34,15 +44,15 @@ const PushNotifications = () => {
 
   const registerServiceWorker = async () => {
     try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('Service Worker registered:', registration);
+      const registration = await navigator.serviceWorker.register('/push-sw.js');
+      console.log('Push Service Worker registered:', registration);
       
-      // Listen for messages from service worker
       navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'NAVIGATE_TO_CHAT') {
-          // Handle navigation from notification click
-          const chatId = event.data.chatId;
-          window.location.href = `/chat?open=${chatId}`;
+        if (event.data && event.data.type === 'NOTIFICATION_CLICK') {
+          const url = event.data.url;
+          if (url) {
+            window.location.href = url;
+          }
         }
       });
       

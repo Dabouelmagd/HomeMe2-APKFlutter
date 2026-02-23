@@ -414,7 +414,7 @@ function App() {
                 
                 <Route path="subscription-codes" element={
                   <ProtectedRoute adminOnly>
-                    <SubscriptionCodes />
+                    <SubscriptionCodesUnified />
                   </ProtectedRoute>
                 } />
                 

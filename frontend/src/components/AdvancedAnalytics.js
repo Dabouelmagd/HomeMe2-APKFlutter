@@ -164,38 +164,122 @@ const AdvancedAnalytics = () => {
   );
 
   const SimpleChart = ({ data, type = "bar", color = "#3B82F6" }) => {
+    const { i18n } = useTranslation();
+    const isRTL = i18n.language === 'ar';
+    
     if (!data || data.length === 0) {
       return (
         <div className="flex items-center justify-center h-full text-gray-500">
-          <ChartBarIcon className="w-8 h-8 mr-2" />
+          <ChartBarIcon className="w-8 h-8 mr-2 rtl:ml-2 rtl:mr-0" />
           <span>{t('no_data_available')}</span>
         </div>
       );
     }
 
-    const maxValue = Math.max(...data.map(d => d.value));
-    
-    return (
-      <div className="flex items-end justify-between h-full space-x-2">
-        {data.map((item, index) => (
-          <div key={index} className="flex flex-col items-center flex-1">
-            <div 
-              className="w-full rounded-t-md"
-              style={{
-                height: `${(item.value / maxValue) * 100}%`,
-                backgroundColor: color,
-                minHeight: '4px'
-              }}
+    // Convert data format for Recharts
+    const chartData = data.map(d => ({
+      name: d.label,
+      value: d.value
+    }));
+
+    if (type === 'pie') {
+      return (
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={40}
+              outerRadius={80}
+              paddingAngle={3}
+              dataKey="value"
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+            >
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    if (type === 'area') {
+      return (
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={chartData}>
+            <defs>
+              <linearGradient id={`gradient-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={color} stopOpacity={0.3}/>
+                <stop offset="95%" stopColor={color} stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+            <XAxis dataKey="name" tick={{ fill: '#6B7280', fontSize: 12 }} reversed={isRTL} />
+            <YAxis tick={{ fill: '#6B7280', fontSize: 12 }} orientation={isRTL ? 'right' : 'left'} />
+            <Tooltip 
+              contentStyle={{ 
+                borderRadius: '12px', 
+                border: '1px solid #E5E7EB',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }} 
             />
-            <span className="text-xs text-gray-600 mt-2 text-center">
-              {item.label}
-            </span>
-            <span className="text-xs font-medium text-gray-900">
-              {item.value}
-            </span>
-          </div>
-        ))}
-      </div>
+            <Area 
+              type="monotone" 
+              dataKey="value" 
+              stroke={color} 
+              fillOpacity={1} 
+              fill={`url(#gradient-${color.replace('#', '')})`} 
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    if (type === 'line') {
+      return (
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+            <XAxis dataKey="name" tick={{ fill: '#6B7280', fontSize: 12 }} reversed={isRTL} />
+            <YAxis tick={{ fill: '#6B7280', fontSize: 12 }} orientation={isRTL ? 'right' : 'left'} />
+            <Tooltip 
+              contentStyle={{ 
+                borderRadius: '12px', 
+                border: '1px solid #E5E7EB'
+              }} 
+            />
+            <Line 
+              type="monotone" 
+              dataKey="value" 
+              stroke={color} 
+              strokeWidth={3}
+              dot={{ fill: color, r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    }
+
+    // Default: Bar chart
+    return (
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+          <XAxis dataKey="name" tick={{ fill: '#6B7280', fontSize: 12 }} reversed={isRTL} />
+          <YAxis tick={{ fill: '#6B7280', fontSize: 12 }} orientation={isRTL ? 'right' : 'left'} />
+          <Tooltip 
+            contentStyle={{ 
+              borderRadius: '12px', 
+              border: '1px solid #E5E7EB'
+            }} 
+          />
+          <Bar dataKey="value" fill={color} radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
     );
   };
 

@@ -2650,6 +2650,21 @@ const resources = {
       'payment_successful': 'تم الدفع بنجاح!',
       'payment_status_check_failed': 'فشل في التحقق من حالة الدفع',
       
+      // Push Notifications
+      'push_notifications': 'الإشعارات الفورية',
+      'push_notifications_desc': 'استلم إشعارات فورية للفواتير والتذكيرات والزوار',
+      'push_not_supported': 'المتصفح لا يدعم الإشعارات الفورية',
+      'push_permission_denied': 'تم رفض إذن الإشعارات. يرجى تفعيلها من إعدادات المتصفح.',
+      'push_active': 'الإشعارات الفورية مفعّلة',
+      'send_test_notification': 'إرسال إشعار تجريبي',
+      'test_sent': 'تم إرسال الإشعار التجريبي ✓',
+      'test_failed': 'فشل الإرسال ✗',
+      'sending': 'جاري الإرسال...',
+      'notification_types': 'أنواع الإشعارات:',
+      'invoice_notifications': 'فواتير جديدة',
+      'payment_reminders': 'تذكيرات الدفع',
+      'visitor_notifications': 'وصول الزوار',
+      
       // Homepage translations
       'login': 'تسجيل الدخول',
       'register_now': 'سجل الآن',

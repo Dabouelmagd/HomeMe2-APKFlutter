@@ -71,6 +71,9 @@ from reminder_service import PaymentReminderService, run_reminder_scheduler
 # Import PDF report service
 from pdf_report_service import PDFReportService
 
+# Import facility booking service
+from facility_booking_service import FacilityBookingService, DEFAULT_FACILITIES
+
 # Import financial models
 from financial_models import (
     ExpenseCreate, Expense, RevenueCreate, Revenue,

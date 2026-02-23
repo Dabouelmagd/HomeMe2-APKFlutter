@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import { toast } from 'sonner';
@@ -14,6 +14,10 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get the original page the user was trying to access
+  const from = location.state?.from || '/app/dashboard';
 
   const handleChange = (e) => {
     setFormData({
@@ -30,7 +34,8 @@ const Login = () => {
       const result = await login(formData);
       if (result.success) {
         toast.success(t('welcome_back'));
-        navigate('/app/dashboard');
+        // Navigate to the original requested page or dashboard
+        navigate(from, { replace: true });
       } else {
         toast.error(result.error);
       }

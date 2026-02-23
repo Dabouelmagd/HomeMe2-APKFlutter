@@ -511,35 +511,59 @@ const Layout = ({ children, isTrialMode = false }) => {
         </div>
 
         <nav className="mt-6 px-3 pb-8 overflow-y-auto">
-          <div className="space-y-6">
+          <div className="space-y-4">
             {navigationSections.map((section, sectionIndex) => {
               const visibleItems = section.items.filter(item => item.show);
               if (visibleItems.length === 0) return null;
               
+              const isExpanded = isSectionExpanded(sectionIndex);
+              
               // Define section colors
               const sectionColors = [
-                'bg-blue-50 border-blue-200 text-blue-700',
-                'bg-green-50 border-green-200 text-green-700',
-                'bg-purple-50 border-purple-200 text-purple-700',
-                'bg-orange-50 border-orange-200 text-orange-700',
-                'bg-pink-50 border-pink-200 text-pink-700',
-                'bg-indigo-50 border-indigo-200 text-indigo-700',
-                'bg-red-50 border-red-200 text-red-700',
-                'bg-emerald-50 border-emerald-200 text-emerald-700'
+                'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100',
+                'bg-green-50 border-green-200 text-green-700 hover:bg-green-100',
+                'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100',
+                'bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100',
+                'bg-pink-50 border-pink-200 text-pink-700 hover:bg-pink-100',
+                'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100',
+                'bg-red-50 border-red-200 text-red-700 hover:bg-red-100',
+                'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100',
+                'bg-cyan-50 border-cyan-200 text-cyan-700 hover:bg-cyan-100'
               ];
               
               return (
-                <div key={section.title}>
-                  <div className={`px-3 py-2 rounded-lg border ${sectionColors[sectionIndex]} mb-3`}>
-                    <h3 className="text-xs font-semibold uppercase tracking-wider flex items-center">
-                      <div className="w-2 h-2 rounded-full bg-current mr-2"></div>
-                      {section.title}
-                      <span className="ml-auto text-xs font-normal bg-white bg-opacity-50 px-2 py-1 rounded-full">
-                        {visibleItems.length}
-                      </span>
-                    </h3>
-                  </div>
-                  <div className="space-y-1">
+                <div key={section.title} className="transition-all duration-200">
+                  {/* Section Header - Clickable */}
+                  <button
+                    onClick={() => toggleSection(sectionIndex)}
+                    className={`w-full px-3 py-2.5 rounded-lg border ${sectionColors[sectionIndex % sectionColors.length]} mb-2 transition-all duration-200 cursor-pointer`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 rounded-full bg-current ml-2 mr-2"></div>
+                        <h3 className="text-xs font-semibold uppercase tracking-wider">
+                          {section.title}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-normal bg-white bg-opacity-60 px-2 py-0.5 rounded-full">
+                          {visibleItems.length}
+                        </span>
+                        {isExpanded ? (
+                          <ChevronUpIcon className="h-4 w-4 transition-transform duration-200" />
+                        ) : (
+                          <ChevronDownIcon className="h-4 w-4 transition-transform duration-200" />
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                  
+                  {/* Section Items - Collapsible */}
+                  <div 
+                    className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${
+                      isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+                    }`}
+                  >
                     {visibleItems.map((item) => (
                       <Link
                         key={item.name}

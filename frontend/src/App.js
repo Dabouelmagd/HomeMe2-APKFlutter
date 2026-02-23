@@ -591,7 +591,8 @@ function App() {
                   <EnterpriseDashboard />
                 } />
               </Route>
-            </Routes>
+              </Routes>
+            </RouteChangeHandler>
             <Toaster />
             <PWAInstallPrompt />
             </TransliterationProvider>

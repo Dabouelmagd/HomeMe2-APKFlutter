@@ -4,6 +4,10 @@ import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
+  LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
+import {
   ChartBarIcon,
   UsersIcon,
   CurrencyDollarIcon,
@@ -20,6 +24,9 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { formatDate } from '../utils/dateUtils';
+
+// Chart Colors
+const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4'];
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;

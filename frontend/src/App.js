@@ -124,6 +124,9 @@ const AuthProvider = ({ children }) => {
           
           // Initialize WebSocket connection
           initializeSocket(userData.id);
+          
+          // Initialize push notifications for already logged-in users
+          initializePushNotifications();
         })
         .catch(error => {
           console.log('Token verification failed:', error);

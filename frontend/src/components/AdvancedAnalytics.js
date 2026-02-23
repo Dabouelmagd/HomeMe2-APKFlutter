@@ -543,6 +543,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('requests_by_category')}>
                 <SimpleChart 
                   data={analytics.charts?.maintenance_by_category || []}
+                  type="pie"
                   color="#F59E0B"
                 />
               </ChartContainer>
@@ -550,6 +551,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('requests_by_priority')}>
                 <SimpleChart 
                   data={analytics.charts?.maintenance_by_priority || []}
+                  type="bar"
                   color="#EF4444"
                 />
               </ChartContainer>

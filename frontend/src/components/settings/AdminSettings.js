@@ -2,7 +2,15 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { UserIcon, KeyIcon, ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { 
+  HomeModernIcon, 
+  KeyIcon, 
+  UserGroupIcon, 
+  UserPlusIcon,
+  PlusIcon,
+  ClipboardDocumentIcon,
+  CheckIcon
+} from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -11,37 +19,59 @@ const API = `${BACKEND_URL}/api`;
 export const ResidencesSettings = () => {
   const { t } = useTranslation();
 
+  const residences = [
+    { unit: 'A-101', resident: 'محمد أحمد', phone: '+966 50 123 4567', status: 'active', since: '2024-01-15' },
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-            <UserIcon className="h-8 w-8 text-green-600" />
-            {t('residences_list', 'قائمة الإقامات')}
-          </h2>
-          <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-sm font-semibold px-4 py-2 rounded-full">
-            {t('total', 'الإجمالي')}: 1
-          </span>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-bold text-gray-900 dark:text-white">{t('all_residences', 'جميع الإقامات')}</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('manage_units', 'إدارة الوحدات السكنية')}</p>
         </div>
+        <span className="px-4 py-2 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded-full text-sm font-bold">
+          {residences.length} {t('units', 'وحدة')}
+        </span>
+      </div>
 
-        <div className="space-y-4">
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6">
+      {/* Residences List */}
+      <div className="space-y-3">
+        {residences.map((residence, index) => (
+          <div 
+            key={index}
+            className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5"
+          >
             <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{t('unit', 'وحدة')} A-101</h3>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">{t('resident', 'ساكن')}: محمد أحمد</p>
-                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">{t('phone', 'الهاتف')}: +966 50 123 4567</p>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-teal-50 dark:bg-teal-900/20 rounded-xl flex items-center justify-center">
+                  <HomeModernIcon className="w-6 h-6 text-teal-500" />
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900 dark:text-white">{residence.unit}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{residence.resident}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{residence.phone}</p>
+                </div>
               </div>
-              <div className="text-right rtl:text-left">
-                <span className="inline-block bg-green-500 text-white text-xs px-3 py-1 rounded-full">
+              <div className="text-end">
+                <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-xs font-bold">
                   {t('active', 'نشط')}
                 </span>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{t('since', 'منذ')}: 2024-01-15</p>
+                <p className="text-xs text-gray-400 mt-2">{t('since', 'منذ')}: {residence.since}</p>
               </div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
+
+      {/* Empty State */}
+      {residences.length === 0 && (
+        <div className="text-center py-12">
+          <HomeModernIcon className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">{t('no_residences', 'لا توجد إقامات')}</p>
+        </div>
+      )}
     </div>
   );
 };
@@ -49,33 +79,49 @@ export const ResidencesSettings = () => {
 // Registration Links Component
 export const RegistrationLinksSettings = () => {
   const { t } = useTranslation();
-  const [links, setLinks] = useState([]);
+  const [links] = useState([]);
+  const [creating, setCreating] = useState(false);
+
+  const handleCreateLink = async () => {
+    setCreating(true);
+    try {
+      // API call would go here
+      toast.success(t('link_created', 'تم إنشاء الرابط'));
+    } catch (error) {
+      toast.error(t('failed_to_create_link', 'فشل إنشاء الرابط'));
+    } finally {
+      setCreating(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-            <KeyIcon className="h-8 w-8 text-purple-600" />
-            {t('registration_links', 'روابط التسجيل')}
-          </h2>
-          <button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
-            {t('create_new_link', 'إنشاء رابط جديد')}
-          </button>
-        </div>
-
-        {links.length === 0 ? (
-          <div className="text-center py-12">
-            <KeyIcon className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-500 dark:text-gray-400 text-lg">{t('no_registration_links', 'لا توجد روابط تسجيل حالياً')}</p>
-            <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">{t('create_link_to_invite', 'قم بإنشاء رابط لدعوة المستخدمين الجدد')}</p>
-          </div>
+      {/* Create New Link */}
+      <button
+        onClick={handleCreateLink}
+        disabled={creating}
+        className="w-full flex items-center justify-center gap-3 p-4 bg-pink-500 hover:bg-pink-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-pink-500/25"
+      >
+        {creating ? (
+          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
         ) : (
-          <div className="space-y-4">
-            {/* Links will be mapped here */}
-          </div>
+          <PlusIcon className="w-5 h-5" />
         )}
-      </div>
+        <span>{t('create_new_link', 'إنشاء رابط جديد')}</span>
+      </button>
+
+      {/* Links List */}
+      {links.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 text-center">
+          <KeyIcon className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400 mb-2">{t('no_links', 'لا توجد روابط تسجيل')}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">{t('create_link_desc', 'أنشئ رابطاً لدعوة سكان جدد')}</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {/* Links would be mapped here */}
+        </div>
+      )}
     </div>
   );
 };
@@ -86,28 +132,28 @@ export const UserManagementSettings = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-            <UserIcon className="h-8 w-8 text-orange-600" />
-            {t('user_management', 'إدارة المستخدمين')}
-          </h2>
-          <button className="bg-gradient-to-r from-orange-600 to-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
-            {t('add_user', 'إضافة مستخدم')}
-          </button>
-        </div>
-
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg p-6 border border-orange-200 dark:border-orange-800">
-          <p className="text-gray-700 dark:text-gray-300">{t('manage_users_description', 'يمكنك هنا إدارة جميع مستخدمي المجمع، بما في ذلك السكان والموظفين والمديرين.')}</p>
-          <div className="mt-4 flex gap-4 flex-wrap">
-            <button className="bg-white dark:bg-gray-700 border border-orange-300 dark:border-orange-600 text-orange-700 dark:text-orange-400 px-4 py-2 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-600">
-              {t('view_all_users', 'عرض جميع المستخدمين')}
-            </button>
-            <button className="bg-white dark:bg-gray-700 border border-orange-300 dark:border-orange-600 text-orange-700 dark:text-orange-400 px-4 py-2 rounded-lg hover:bg-orange-50 dark:hover:bg-gray-600">
-              {t('export_users', 'تصدير المستخدمين')}
-            </button>
+      {/* Actions */}
+      <div className="grid grid-cols-2 gap-4">
+        <button className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 transition-all">
+          <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-xl flex items-center justify-center">
+            <UserGroupIcon className="w-6 h-6 text-orange-500" />
           </div>
-        </div>
+          <span className="font-medium text-gray-900 dark:text-white text-sm">{t('view_all', 'عرض الكل')}</span>
+        </button>
+        <button className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 transition-all">
+          <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-xl flex items-center justify-center">
+            <ClipboardDocumentIcon className="w-6 h-6 text-orange-500" />
+          </div>
+          <span className="font-medium text-gray-900 dark:text-white text-sm">{t('export', 'تصدير')}</span>
+        </button>
+      </div>
+
+      {/* Info */}
+      <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-2xl p-5">
+        <p className="text-orange-800 dark:text-orange-300 font-medium mb-2">{t('user_management_info', 'إدارة المستخدمين')}</p>
+        <p className="text-sm text-orange-700 dark:text-orange-400">
+          {t('user_management_desc', 'يمكنك هنا عرض وإدارة جميع مستخدمي المجمع بما في ذلك السكان والموظفين.')}
+        </p>
       </div>
     </div>
   );
@@ -116,6 +162,7 @@ export const UserManagementSettings = () => {
 // Add Admin Component  
 export const AddAdminSettings = () => {
   const { t } = useTranslation();
+  const [saving, setSaving] = useState(false);
   const [adminData, setAdminData] = useState({
     full_name: '',
     email: '',
@@ -125,86 +172,95 @@ export const AddAdminSettings = () => {
 
   const handleAddAdmin = async (e) => {
     e.preventDefault();
+    setSaving(true);
     try {
       await axios.post(`${API}/users/admin`, adminData);
-      toast.success(t('admin_added_successfully', 'تمت إضافة المدير بنجاح'));
+      toast.success(t('admin_added', 'تمت إضافة المدير'));
       setAdminData({ full_name: '', email: '', phone: '', password: '' });
     } catch (error) {
       toast.error(t('failed_to_add_admin', 'فشل في إضافة المدير'));
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-          <ShieldCheckIcon className="h-8 w-8 text-red-600" />
-          {t('add_admin', 'إضافة مدير')}
-        </h2>
+      <form onSubmit={handleAddAdmin} className="space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+          <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <UserPlusIcon className="w-5 h-5 text-rose-500" />
+            {t('new_admin_info', 'معلومات المدير الجديد')}
+          </h3>
 
-        <form onSubmit={handleAddAdmin} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('full_name', 'الاسم الكامل')}
-              </label>
-              <input
-                type="text"
-                value={adminData.full_name}
-                onChange={(e) => setAdminData({ ...adminData, full_name: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('email', 'البريد الإلكتروني')}
-              </label>
-              <input
-                type="email"
-                value={adminData.email}
-                onChange={(e) => setAdminData({ ...adminData, email: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('phone', 'رقم الهاتف')}
-              </label>
-              <input
-                type="tel"
-                value={adminData.phone}
-                onChange={(e) => setAdminData({ ...adminData, phone: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {t('password', 'كلمة المرور')}
-              </label>
-              <input
-                type="password"
-                value={adminData.password}
-                onChange={(e) => setAdminData({ ...adminData, password: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                required
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('full_name', 'الاسم الكامل')}
+            </label>
+            <input
+              type="text"
+              value={adminData.full_name}
+              onChange={(e) => setAdminData({ ...adminData, full_name: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              required
+            />
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white px-6 py-4 rounded-lg font-semibold hover:shadow-lg transition-all"
-          >
-            {t('add_admin', 'إضافة مدير')}
-          </button>
-        </form>
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('email', 'البريد الإلكتروني')}
+            </label>
+            <input
+              type="email"
+              value={adminData.email}
+              onChange={(e) => setAdminData({ ...adminData, email: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              dir="ltr"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('phone', 'رقم الهاتف')}
+            </label>
+            <input
+              type="tel"
+              value={adminData.phone}
+              onChange={(e) => setAdminData({ ...adminData, phone: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              dir="ltr"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {t('password', 'كلمة المرور')}
+            </label>
+            <input
+              type="password"
+              value={adminData.password}
+              onChange={(e) => setAdminData({ ...adminData, password: e.target.value })}
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent"
+              required
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-rose-500/25"
+        >
+          {saving ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          ) : (
+            <CheckIcon className="w-5 h-5" />
+          )}
+          <span>{saving ? t('adding', 'جاري الإضافة...') : t('add_admin', 'إضافة المدير')}</span>
+        </button>
+      </form>
     </div>
   );
 };

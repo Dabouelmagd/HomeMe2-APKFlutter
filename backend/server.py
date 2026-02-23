@@ -62,6 +62,9 @@ from subscription_codes import SubscriptionCodeManager
 # Import email service
 from email_service import email_service
 
+# Import push notification service
+from push_notification_service import PushNotificationService, get_vapid_public_key
+
 # Import financial models
 from financial_models import (
     ExpenseCreate, Expense, RevenueCreate, Revenue,

@@ -103,6 +103,15 @@ A comprehensive residential compound management system that supports:
    - Features: Create single/bulk codes, filters, search, statistics, renew, activate/deactivate
    - Deleted old redundant files
    - Full Arabic RTL support
+6. ✅ **Compound Settings Page Arabic Translation (Feb 23, 2025):**
+   - Translated Basic Information section: اسم المجمع، العنوان، الوصف
+   - Translated Logo Management section: شعار المجمع، الشعار الحالي، تحميل شعار جديد
+   - Added RTL support for form layout with `rtl:space-x-reverse`
+   - Added 15+ new i18n keys for both English and Arabic:
+     - `basic_information`, `compound_name_label`, `address_label`, `description_label`
+     - `save_changes`, `current_logo`, `current_compound_logo`, `upload_new_logo`
+     - `no_logo_uploaded`, `upload_logo_to_brand`
+     - `recommended_size`, `supported_formats`, `maximum_file_size`
 
 ### Previous Session Fixes
 1. Fixed Arabic translation for registration page

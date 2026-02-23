@@ -6,6 +6,7 @@ import io from 'socket.io-client';
 import './App.css';
 import './styles/mobile.css';
 import './i18n'; // Initialize i18n
+import { autoSubscribeToPush, initializePushNotifications } from './services/autoPushService';
 
 // Scroll to top component
 function ScrollToTop() {

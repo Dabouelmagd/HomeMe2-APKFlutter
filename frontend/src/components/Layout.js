@@ -824,8 +824,8 @@ const Layout = ({ children, isTrialMode = false }) => {
           </div>
         </div>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
+        {/* Page content - Scrollable */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden page-scroll">
           {/* Back Button */}
           <div className="max-w-7xl mx-auto px-4 py-4">
             <BackButton />

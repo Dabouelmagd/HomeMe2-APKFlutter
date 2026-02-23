@@ -856,6 +856,9 @@ const Layout = ({ children, isTrialMode = false }) => {
                 </div>
               </div>
 
+              {/* Theme Toggle */}
+              <ThemeToggle />
+
               {/* Language Switcher */}
               <div className="flex items-center">
                 <LanguageSwitcher />
@@ -864,7 +867,7 @@ const Layout = ({ children, isTrialMode = false }) => {
               {/* Notifications Bell */}
               <Link
                 to="/app/notifications"
-                className="p-2 text-gray-500 hover:text-gray-700 relative transition-all hover:bg-gray-100 rounded-lg"
+                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 relative transition-all hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                 title={t('notifications', 'الإشعارات')}
               >
                 <BellIcon className="h-6 w-6" />

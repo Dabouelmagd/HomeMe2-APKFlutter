@@ -8,7 +8,9 @@ import {
   ArrowTrendingUpIcon,
   ArrowTrendingDownIcon,
   DocumentTextIcon,
-  UsersIcon
+  UsersIcon,
+  PlusIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -20,6 +22,10 @@ const FinancialDashboard = () => {
   const [summary, setSummary] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [revenue, setRevenue] = useState([]);
+  const [activeTab, setActiveTab] = useState('overview'); // overview, expenses, revenue, residents, reports
+  const [showAddModal, setShowAddModal] = useState(null); // 'expense' or 'revenue'
+  const [newEntry, setNewEntry] = useState({ description: '', amount: '', category: '', date: new Date().toISOString().split('T')[0] });
+  const [residents, setResidents] = useState([]);
   const [dateRange, setDateRange] = useState({
     start: new Date(new Date().setDate(1)).toISOString().split('T')[0], // First day of month
     end: new Date().toISOString().split('T')[0] // Today

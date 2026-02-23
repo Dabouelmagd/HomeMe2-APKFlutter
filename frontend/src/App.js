@@ -47,7 +47,7 @@ import Layout from './components/Layout';
 import ResidentsList from './components/ResidentsList';
 import UserManagement from './components/UserManagement';
 import MonitoringDashboard from './components/MonitoringDashboard';
-import SubscriptionCodes from './components/SubscriptionCodes';
+import SubscriptionCodesUnified from './components/SubscriptionCodesUnified';
 import CompoundsManagement from './components/CompoundsManagement';
 import MobileAppPage from './pages/MobileAppPage';
 import PaymentPage from './pages/PaymentPage';

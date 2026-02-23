@@ -20,7 +20,7 @@ from typing import Dict, List, Optional
 from PIL import Image
 
 # Configuration
-BASE_URL = "https://keen-brahmagupta-2.preview.emergentagent.com/api"
+BASE_URL = "https://profile-nav-debug.preview.emergentagent.com/api"
 
 class HomePhase3TestSuite:
     def __init__(self):

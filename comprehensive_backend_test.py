@@ -38,7 +38,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
 # Configuration - Using the production URL from frontend/.env
-BASE_URL = "https://keen-brahmagupta-2.preview.emergentagent.com/api"
+BASE_URL = "https://profile-nav-debug.preview.emergentagent.com/api"
 
 class ComprehensiveBackendTestSuite:
     def __init__(self):

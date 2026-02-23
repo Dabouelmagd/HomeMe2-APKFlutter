@@ -7199,7 +7199,7 @@ async def root():
 # Router will be included after all endpoints are defined
 
 # CORS middleware - Restricted origins for security
-ALLOWED_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://keen-brahmagupta-2.preview.emergentagent.com,https://homemeapp.net,http://localhost:3000').split(',')
+ALLOWED_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://profile-nav-debug.preview.emergentagent.com,https://homemeapp.net,http://localhost:3000').split(',')
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,

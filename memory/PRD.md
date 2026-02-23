@@ -312,7 +312,7 @@ A comprehensive residential compound management system that supports:
 | Resident | resident1 | resident123 | ✅ Working |
 
 ## Deployment Information
-- Preview URL: https://keen-brahmagupta-2.preview.emergentagent.com
+- Preview URL: https://profile-nav-debug.preview.emergentagent.com
 - Target Domain: homemeapp.net (user's custom domain)
 
 ## Backlog

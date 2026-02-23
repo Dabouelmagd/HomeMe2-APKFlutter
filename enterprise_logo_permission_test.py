@@ -24,7 +24,7 @@ from PIL import Image
 from pathlib import Path
 
 # Configuration
-BASE_URL = "https://keen-brahmagupta-2.preview.emergentagent.com/api"
+BASE_URL = "https://profile-nav-debug.preview.emergentagent.com/api"
 
 class EnterpriseLogoPermissionTestSuite:
     def __init__(self):

@@ -1200,7 +1200,11 @@ const Settings = () => {
               {activeTab === 'registration_links' && <RegistrationLinksSettings />}
               {activeTab === 'user_management' && <UserManagementSettings />}
               {activeTab === 'add_admin' && <AddAdminSettings />}
-              {ActiveComponent && <ActiveComponent />}
+              {activeTab === 'notifications' && <NotificationSettings />}
+              {activeTab === 'profile' && <ProfileSettings />}
+              {activeTab === 'privacy' && <PrivacySettings />}
+              {activeTab === 'biometric' && <BiometricSettings />}
+              {activeTab === 'language' && <LanguageSettings />}
             </div>
           </div>
 

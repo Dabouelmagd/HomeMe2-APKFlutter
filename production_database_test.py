@@ -32,7 +32,7 @@ from dotenv import load_dotenv
 load_dotenv('/app/backend/.env')
 
 # Configuration - Using the production URL from frontend/.env
-BASE_URL = "https://push-notify-app-2.preview.emergentagent.com/api"
+BASE_URL = "https://keen-brahmagupta-2.preview.emergentagent.com/api"
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 DB_NAME = os.environ.get('DB_NAME', 'homeme_prod')
 

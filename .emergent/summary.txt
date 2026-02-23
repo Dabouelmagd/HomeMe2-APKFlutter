@@ -1,160 +1,176 @@
 <analysis>**original_problem_statement:**
-The user's initial request was to fix a critical frontend compilation error. During the sessions, the scope expanded significantly to include:
-1.  **Critical Bug Fixes:**
-    *   Resolve intermittent login failures for  and  roles.
-    *   Fix a duplicated sidebar menu.
-    *   Fix non-functional navigation buttons.
-    *   Fix an issue where pages fail to render when using the browser's back button.
-2.  **Internationalization (i18n):**
-    *   Translate multiple pages into Arabic: Registration, Financial Management, Enterprise Dashboard, and Payments Center.
-3.  **Feature Implementation & Enhancements:**
-    *   Implement a comprehensive email notification system.
-    *   Implement a Web Push Notification system for payment reminders and other events, with automatic opt-in for users.
-    *   Revamp the Help Center into a detailed, interactive written guide.
-    *   Update the support contact method to a WhatsApp link.
-    *   Add collapsible (expand/collapse) sections to the sidebar menu.
-    *   Add custom scrollbars to both the sidebar menu and the main page content area.
-    *   Add a Scroll to Top button for the main page.
-4.  **Refactoring:**
-    *   Merge two duplicated  components into a single, unified component.
-5.  **Verification:**
-    *   Confirm that multiple users with different roles (, , ) can log in concurrently.
-6.  **Future Requests:**
-    *   The user has expressed a desire for a mobile application built with React Native.
+The user's initial problem statement from the previous fork focused on bug fixes, internationalization (i18n), and UI enhancements. In this session, the user's requests expanded to include:
+
+1.  **Internationalization (i18n):**
+    *   Translate the Compound Settings page into Arabic.
+2.  **Feature Implementation & Enhancements:**
+    *   Enhance the Advanced Analytics dashboard with interactive charts.
+    *   Verify and enhance existing payment gateway integrations (Stripe, PayPal).
+    *   Implement a backend service for automated invoice reminders.
+    *   Implement a backend service for generating and exporting PDF reports.
+    *   Implement a complete Facility Booking system (backend and frontend).
+    *   Add input validation with Arabic error messages to the Compound Settings page.
+3.  **Bug Fixes:**
+    *   Fix an issue where the active menu item in the sidebar is not highlighted.
+    *   Fix an issue where the application does not stay on the current page after a browser refresh.
 
 **User's preferred language**:
 The user's primary language is **Arabic (عربي)**. The next agent MUST respond in Arabic only.
 
 **what currently exists?**
-The application is a stable full-stack solution with a React frontend and a FastAPI backend. All critical bugs, including authentication and browser navigation issues, have been resolved. The application now features two notification systems: an email service for critical alerts and a complete Web Push Notification system for real-time user engagement. The internationalization effort is extensive, with most major pages now fully translated into Arabic. Significant UI/UX improvements have been made, including a fully refactored, collapsible, and scrollable sidebar menu, and a scrollable main content area with a scroll to top button. The codebase has been improved by merging duplicated components.
+The application is a feature-rich, stable full-stack solution. Key systems implemented in this session include a completely revamped, interactive Advanced Analytics dashboard with multiple chart types, and a full-featured Facility Booking system with both a backend API and a functional frontend page. The backend has been extended with new services for automated invoice reminders and PDF report generation. The Compound Settings page now includes input validation with toast notifications. Payment integrations (Stripe, PayPal) were discovered to be pre-existing and were enhanced to support local currency (EGP). The codebase has been translated further into Arabic.
 
 **Last working item**:
-*   **Last item agent was working:** Implementing a scrollable main content area with a Scroll to Top button. The agent applied the necessary styles to  and , created a  component, and added it to the layout.
-*   **Status:** USER VERIFICATION PENDING
-*   **Agent Testing Done:** Y
-*   **Which testing method agent to use?** screenshot tool. The agent should log in, navigate to a page with long content (like the dashboard), scroll down to confirm the scroll to top button appears, and then click it to verify it scrolls the page back to the top.
-*   **User Testing Done:** N
+- **Last item agent was working:** Fixing a UI bug where the currently active navigation link in the sidebar menu is not highlighted. The agent was investigating  and correctly identified that the  function was failing due to an incorrect path comparison logic.
+- **Status:** IN PROGRESS
+- **Agent Testing Done:** N
+- **Which testing method agent to use?** screenshot tool. After implementing the fix, the agent should log in, navigate to several different pages (e.g., Dashboard, Facility Booking), and capture a screenshot of the sidebar each time to confirm that the corresponding menu item is highlighted.
+- **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-There are no pending issues. All reported bugs have been resolved.
+- **Issue 1: Active menu item is not highlighted (P0)**
+    - **Description:** The sidebar menu does not visually indicate which page is currently active. This hurts user navigation and orientation.
+    - **Attempted fixes:** The agent has identified the root cause in the  function within , where  (e.g., ) is being incorrectly compared to a relative  (e.g., ).
+    - **Next debug checklist:** Modify the  function in  to correctly compare the browser's current path with the menu item's link. A possible fix is to use  or construct the full path for comparison.
+    - **Why fix this issue and what will be achieved with the fix?** Fixing this will improve user experience by providing clear visual feedback on their location within the application.
+    - **Status:** IN PROGRESS
+    - **Is recurring issue?** N
+    - **Should Test frontend/backend/both after fix?** Frontend.
+    - **Blocked on other issue:** None.
+- **Issue 2: App does not persist page on refresh (P1)**
+    - **Description:** The user reported that when they refresh the browser on any page, the application does not reload the same page but likely redirects to the dashboard.
+    - **Attempted fixes:** None. This issue has not been investigated yet.
+    - **Next debug checklist:**
+        1. Reproduce the issue: Navigate to a sub-page (e.g., ) and refresh the browser.
+        2. Inspect the routing logic in . Check for any effects or redirects that might be firing on initial load and sending the user to a default route.
+        3. Examine the  and its interaction with .
+    - **Why fix this issue and what will be achieved with the fix?** This is a standard and expected web application behavior. Fixing it will prevent user frustration and data loss on accidental refreshes.
+    - **Status:** NOT STARTED
+    - **Is recurring issue?** N
+    - **Should Test frontend/backend/both after fix?** Frontend.
+    - **Blocked on other issue:** None.
 
 **In progress Task List**:
-*   **Task 1: Verify Main Content Scroll and Scroll to Top Button (P0)**
-    *   **Where to resume:** The feature is implemented. The next step is to get user confirmation.
-    *   **What will be achieved with this?** Confirms that the final UI enhancement from the last session works as expected, improving page navigation.
-    *   **Status:** USER VERIFICATION PENDING
-    *   **Should Test frontend/backend/both after fix?** Frontend.
-    *   **Blocked on something:** None.
+There are no in-progress tasks, only the issues listed above.
 
 **Upcoming and Future Tasks**
-*   **Upcoming Tasks:**
-    *   **(P0) Final Pre-Deployment Verification:** Proactively suggest a full regression test of all major features (Login for all roles, Email & Push notifications, All translated pages, Help Center, Sidebar/Page controls) to ensure application stability before deployment.
-    *   **(P1) Guide User on Deployment:** Proactively guide the user through deploying the application to their custom domain (), leveraging the platform's Deploy feature.
-*   **Future Tasks:**
-    *   **(P2) Mobile Application Development:** The user has requested a mobile app. Plan and discuss the implementation of a React Native application.
+- There are no specific upcoming or future tasks requested by the user beyond fixing the two pending issues. The next agent should prioritize resolving the issues and then ask the user for the next steps.
 
 **Completed work in this session**
+- **User Verification:**
+  - Confirmed the Scroll to Top button feature is working as expected.
 - **Internationalization (i18n):**
-  - Completed the Arabic translation for the Payments Center by adding the final keys to .
-- **Push Notifications Feature:**
-  - Integrated  on the backend and created  to handle notification logic.
-  - Added API endpoints for subscribing users and sending notifications (, , etc.) in .
-  - Implemented a frontend service worker () to receive push events.
-  - Created a custom hook () for subscription management.
-  - Implemented automatic user subscription to notifications upon login in .
-- **Refactoring:**
-  - Merged  and  into a single unified component ().
-  - Deleted the two redundant component files.
-- **Bug Fixes:**
-  - **Browser Back Button:** Fixed a critical bug where pages would not render when using the browser's back button by implementing a  wrapper in .
-- **UI/UX Enhancements:**
-  - **Collapsible Sidebar:** Modified  to make menu sections collapsible with state management and toggle arrows.
-  - **Sidebar Scroll:** Reworked  and  to add a custom scrollbar to the sidebar menu, keeping the header and user profile section fixed.
-  - **Main Content Scroll:** Added a scrollbar to the main content area and implemented a Scroll to Top button in .
+  - Translated the entire Compound Settings page () into Arabic, including labels, placeholders, and buttons.
+- **Feature: Advanced Analytics Dashboard:**
+  - Installed  library.
+  - Revamped  with interactive charts (Area, Bar, Pie, Line) and a tabbed interface.
+  - Granted  role access to the analytics page.
+- **Feature: Payment Gateways:**
+  - Investigated and confirmed that Stripe and PayPal integrations were already implemented in .
+  - Enhanced the Stripe integration to support EGP (Egyptian Pound) currency.
+- **Feature: Automated Invoice Reminders:**
+  - Created  to handle the logic for sending invoice reminders via email and push notifications.
+  - Added the  endpoint to .
+- **Feature: PDF Report Exporter:**
+  - Installed .
+  - Created  to generate PDF reports for various data types.
+  - Added the  endpoint to .
+- **Feature: Facility Booking System:**
+  - Created a full backend service in  with models and logic for facility/booking CRUD operations.
+  - Added a complete set of RESTful APIs for facility booking to .
+  - Created a seeding function to populate default facilities.
+  - Created a new frontend page at  to display and interact with the booking system.
+  - Added the Facility Booking link to the main sidebar navigation.
+- **Enhancement: Input Validation:**
+  - Added client-side validation to the Compound Settings page using  for toast notifications with Arabic error messages.
+- **Bug Fix:**
+  - Resolved a backend  where Pydantic user models were being accessed as dictionaries. The fix involved using attribute access () instead of key access ().
 
 **Earlier issues found/mentioned but not fixed**
 - None.
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence in previous fork:** Critical authentication failures for non-Super Admin roles.
-- **Recurrence count:** 2+
-- **Status:** RESOLVED. The issue did not recur in this session.
+- None. The previous authentication issue did not recur.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Backend:** FastAPI,  for VAPID-based push notifications, .
-- **Frontend:** React.js, Service Workers for background push events, React Hooks for state management and custom logic,  navigation handling, advanced CSS for custom scrollbars and complex flexbox layouts.
+- **Backend:** FastAPI,  for PDF generation, Background task scheduling (implied for reminders).
+- **Frontend:** React.js,  for interactive data visualization,  for toast notifications,  for navigation, i18n for internationalization.
 
 **key DB schema**
-- **push_subscriptions:** A new collection was implicitly created to store user push notification subscriptions.
-  - 
+- **facilities:** 
+- **bookings:** 
 
 **changes in tech stack**
-- **Backend:**
-  - : Added to enable web push notifications.
+- **Backend:** Added  for PDF generation.
+- **Frontend:** Added  for data visualization.
 
 **All files of reference**
--   : Modified to integrate the new push notification service endpoints.
--   : **New file** containing all VAPID and web push sending logic.
--   : Updated with VAPID private and public keys.
--   : **New file** for the client-side service worker to handle incoming pushes.
--   : Modified to implement the automatic push subscription logic and the browser back-button fix.
--   : **Heavily modified** to implement the collapsible sidebar, scrollable sidebar, scrollable page content, and the scroll to top button.
--   : **New file** abstracting the logic for subscribing to push notifications.
--   : The new unified component resulting from the merge/refactor.
--   : Modified to add custom scrollbar styles.
-
-**Areas that need refactoring**:
-- The  created in  is a custom wrapper to fix the back button issue. While functional, a future task could be to investigate if a more native  v6 solution exists to achieve the same result without a wrapper.
+- : Target file for fixing the active menu item bug.
+- : Contains main routing logic, relevant for the page refresh bug.
+- : New backend service for facility booking.
+- : New frontend page for facility booking.
+- : Heavily modified file with new interactive charts.
+- : New service for generating PDFs.
+- : New service for sending reminders.
+- : Component where validation was added.
+- : Contains all new Arabic translations.
 
 **key api endpoints**
--   **Push Notifications:**
-    -   : Provides the public VAPID key to the frontend.
-    -   : Saves a user's push subscription object to the database.
-    -   : Checks if a user is already subscribed.
-    -   : Triggers a test push notification.
+- **Reminders:** 
+- **PDF Export:** 
+- **Facilities:**
+    - 
+    - 
+- **Bookings:**
+    - 
+    - 
+    - 
+    - 
+    - 
 
 **Critical Info for New Agent**
--   **Communicate in Arabic:** This is a strict requirement.
--   **Push Notifications are Live:** A full push notification system is implemented and enabled by default for users on login. The VAPID keys are in .
--   **UI is Highly Customized:** The sidebar and main layout () have been significantly altered to support collapsible sections and custom scrollbars. Be cautious when editing this file.
--   **Back Button Fix:** A custom component () in  was created to solve a router issue. Understand its purpose before modifying routing logic.
+- **Communicate in Arabic:** This is a strict requirement. All user-facing communication must be in Arabic.
+- **Prioritize Bug Fixes:** The user's last message contained two explicit requests/bug reports. These should be addressed first, starting with the  one.
+- **Pre-existing Integrations:** Be aware that Stripe and PayPal payment integrations are already fully implemented. Do not attempt to re-integrate them.
+- **Pydantic Models vs Dicts:** The backend uses Pydantic models. When accessing data from authenticated user objects or database queries, use attribute access (e.g., ) not dictionary-style access ().
 
 **documents and test reports created in this job**
--    was updated multiple times to reflect completed tasks.
+-  was updated multiple times to reflect completed tasks and new backlogs.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **سكرول للصفحة (Scroll for the page):** Request to add scroll to main content. (COMPLETED)
-2.  **ارغب في سكرول للمينيو (I want a scroll for the menu):** Request to add a scrollbar to the sidebar. (COMPLETED)
-3.  **المينيو والصفحات اضافة سهم للنزول والطلوع... (Add an up and down arrow for each menu item):** Request for a collapsible sidebar. (COMPLETED)
-4.  **عند الرجوع الي الصفحة السابقة... الصفحة لا تظهر (When going back to the previous page... the page doesn't show):** Bug report for the browser's back button. (COMPLETED)
-5.  **دمج ملفات SubscriptionCodes (Merge SubscriptionCodes files):** Request to refactor the two subscription code components. (COMPLETED)
-6.  **فعل الاشعارات تلقيائيا والمستخدم ممكن يلغيها (Enable notifications automatically and the user can cancel them):** Requirement for the push notification feature. (COMPLETED)
-7.  **نعم، أريد إضافة Push Notifications (Yes, I want to add Push Notifications):** User approval to begin implementation of the push notification feature. (Task started and completed)
-8.  **كمل (Continue):** User's initial approval to continue work from the last session (translating the payments page). (Task started and completed)
+1. **User Message:** عند عمل رفرش لاي صفحة يفتح البرنامج علي نفس الصفحة المتوقفة عليها المينيو : عند تحديد اي بند منه يحدد ببار بلون مختلف ويظل عليه لحين الدوس اي اي امر اخر في المنيو (When I refresh any page, the app should stay on the same page. The menu: when an item is selected, it should be highlighted and stay highlighted.) - **Status: IN PROGRESS**
+2. **User Message:** Approves building the facility booking frontend. - **Status: COMPLETED**
+3. **User Message:** Approves implementing PayPal, PDF reports, and facility booking system. - **Status: COMPLETED**
+4. **User Message:** Approves implementing analytics, payment gateways, and invoice reminders. - **Status: COMPLETED**
+5. **User Message:** لا، قمت بتجربتها وهي تعمل بشكل جيد (No, I tried it and it works well.) - Confirmed the Scroll to top button works. - **Status: COMPLETED**
+6. **User Message:** ترجمة (Translate) with a screenshot of the Compound Settings page. - **Status: COMPLETED**
 
 **Project Health Check:**
-*   **Broken:** None. The application is fully functional and stable.
-*   **Mocked:** None.
+- **Broken:** The sidebar active link styling and page refresh behavior are broken.
+- **Mocked:** None.
 
 **3rd Party Integrations**
--   **SMTP Email:** Integration with a custom SMTP server for sending email notifications.
--   **Web Push Notifications:** New integration using the  library to send VAPID-secured push messages to subscribed web clients.
+- **SMTP Email:** Custom SMTP server for notifications.
+- **Web Push Notifications:**  library.
+- **Stripe:** Pre-existing integration for payments.
+- **PayPal:** Pre-existing integration for payments.
+- **Recharts:** New frontend library for charts.
+- **fpdf2:** New backend library for PDF generation.
 
 **Testing status**
--   **Testing agent used after significant changes:** NO. Agent self-tested all features using  for the backend and extensive use of the  tool for the frontend.
--   **Troubleshoot agent used after agent stuck in loop:** NO.
--   **Test files created:** None.
--   **Known regressions:** None.
+- **Testing agent used after significant changes:** NO
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:** None.
+- **Known regressions:** The page refresh issue might be a regression. The active link highlighting is a bug in existing functionality.
 
 **Credentials to test flow:**
-All roles are confirmed working:
 *   **Super Admin:** Username: , Password: 
 *   **Admin:** Username: , Password: 
-*   **Security:** Username: , Password: 
 *   **Resident:** Username: , Password: 
 
 **What agent forgot to execute**
-- The agent successfully addressed all user requests and even a backlog item from a previous session. Nothing was forgotten.</analysis>
+- The agent was in the process of fixing the active menu link when the session ended.
+- The agent has not yet started investigating the second issue reported by the user regarding page state on refresh.</analysis>

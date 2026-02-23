@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { formatDate as formatDateUtil } from '../utils/dateUtils';
 
 const PaymentPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const [packages, setPackages] = useState({});
   const [selectedPackage, setSelectedPackage] = useState('');
   const [loading, setLoading] = useState(false);

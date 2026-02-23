@@ -636,15 +636,15 @@ const Layout = ({ children, isTrialMode = false }) => {
                           className={`
                             group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200
                             ${isActive(item.href)
-                              ? `bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md ${isRTL ? 'border-l-4 border-blue-300' : 'border-r-4 border-blue-300'}`
-                              : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-100 hover:to-blue-100 hover:text-gray-900 hover:shadow-sm'
+                              ? `bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md ${isRTL ? 'border-l-4 border-orange-300' : 'border-r-4 border-orange-300'}`
+                              : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-100 hover:to-orange-100 hover:text-gray-900 hover:shadow-sm'
                             }
                           `}
                           onClick={() => setSidebarOpen(false)}
                         >
                           <item.icon
                             className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 transition-colors duration-200 ${
-                              isActive(item.href) ? 'text-white' : 'text-gray-500 group-hover:text-blue-600'
+                              isActive(item.href) ? 'text-white' : 'text-gray-500 group-hover:text-orange-600'
                             }`}
                           />
                           <span className="flex-1">{item.name}</span>

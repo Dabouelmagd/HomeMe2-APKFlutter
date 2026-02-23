@@ -559,53 +559,51 @@ const Layout = ({ children, isTrialMode = false }) => {
                   </button>
                   
                   {/* Section Items - Collapsible */}
-                  <div 
-                    className={`space-y-1 overflow-hidden transition-all duration-300 ease-in-out ${
-                      isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
-                    }`}
-                  >
-                    {visibleItems.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className={`
-                          group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm
-                          ${isActive(item.href)
-                            ? `bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm ${isRTL ? 'border-l-3 border-blue-500' : 'border-r-3 border-blue-500'}`
-                            : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 hover:text-gray-900'
-                          }
-                        `}
-                        onClick={() => setSidebarOpen(false)}
-                      >
-                        <item.icon
-                          className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 transition-colors duration-200 ${
-                            isActive(item.href) ? 'text-blue-600' : 'text-gray-500 group-hover:text-blue-600'
-                          }`}
-                        />
-                        <span className="flex-1">{item.name}</span>
-                        {item.name === t('notifications_nav') && unreadCount > 0 && (
-                          <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
-                            {unreadCount > 99 ? '99+' : unreadCount}
-                          </span>
-                        )}
-                        {item.name === t('help_center') && (
-                          <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium animate-bounce">
-                            {t('new')}
-                          </span>
-                        )}
-                        {item.name === t('message_center') && (
-                          <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium">
-                            3
-                          </span>
-                        )}
-                        {item.name === t('financial_management') && (
-                          <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-medium">
-                            $2.5K
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
+                  {isExpanded && (
+                    <div className="space-y-1 mt-1">
+                      {visibleItems.map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className={`
+                            group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:shadow-sm
+                            ${isActive(item.href)
+                              ? `bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 shadow-sm ${isRTL ? 'border-l-3 border-blue-500' : 'border-r-3 border-blue-500'}`
+                              : 'text-gray-700 hover:bg-gradient-to-r hover:from-gray-50 hover:to-blue-50 hover:text-gray-900'
+                            }
+                          `}
+                          onClick={() => setSidebarOpen(false)}
+                        >
+                          <item.icon
+                            className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 transition-colors duration-200 ${
+                              isActive(item.href) ? 'text-blue-600' : 'text-gray-500 group-hover:text-blue-600'
+                            }`}
+                          />
+                          <span className="flex-1">{item.name}</span>
+                          {item.name === t('notifications_nav') && unreadCount > 0 && (
+                            <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                              {unreadCount > 99 ? '99+' : unreadCount}
+                            </span>
+                          )}
+                          {item.name === t('help_center') && (
+                            <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium animate-bounce">
+                              {t('new')}
+                            </span>
+                          )}
+                          {item.name === t('message_center') && (
+                            <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium">
+                              3
+                            </span>
+                          )}
+                          {item.name === t('financial_management') && (
+                            <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-medium">
+                              $2.5K
+                            </span>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
               );
             })}

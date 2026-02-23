@@ -5350,6 +5350,24 @@ const resources = {
       'create_admin': 'إنشاء مدير',
       'upload_logo': 'تحميل الشعار',
       
+      // Compound Settings Page - إعدادات المجمع
+      'basic_information': 'المعلومات الأساسية',
+      'compound_name_label': 'اسم المجمع',
+      'enter_compound_name': 'أدخل اسم المجمع',
+      'address_label': 'العنوان',
+      'enter_compound_address': 'أدخل عنوان المجمع',
+      'description_label': 'الوصف',
+      'enter_compound_description': 'أدخل وصف المجمع (اختياري)',
+      'save_changes': 'حفظ التغييرات',
+      'current_logo': 'الشعار الحالي',
+      'current_compound_logo': 'شعار المجمع الحالي',
+      'no_logo_uploaded': 'لم يتم تحميل شعار',
+      'upload_logo_to_brand': 'قم بتحميل شعار لتمييز مجمعك',
+      'upload_new_logo': 'تحميل شعار جديد',
+      'recommended_size': 'الحجم الموصى به: 200×200 بكسل أو أكبر',
+      'supported_formats': 'الصيغ المدعومة: JPG, PNG, GIF',
+      'maximum_file_size': 'الحجم الأقصى للملف: 5 ميجابايت',
+      
       // Residence Management
       'no_additional_admins': 'لا توجد مديرين إضافيين',
       'help_manage': 'المساعدة في الإدارة',

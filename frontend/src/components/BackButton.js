@@ -10,12 +10,18 @@ const BackButton = ({ className = '' }) => {
   const isRTL = i18n.language === 'ar';
 
   // Don't show back button on home/dashboard page
-  if (location.pathname === '/app/dashboard' || location.pathname === '/app') {
+  if (location.pathname === '/app/dashboard' || location.pathname === '/app' || location.pathname === '/') {
     return null;
   }
 
   const handleBack = () => {
-    navigate(-1); // Go back to previous page
+    // Check if there's history to go back to
+    if (window.history.length > 2) {
+      navigate(-1); // Go back to previous page
+    } else {
+      // If no history, go to dashboard
+      navigate('/app/dashboard');
+    }
   };
 
   return (
@@ -26,8 +32,8 @@ const BackButton = ({ className = '' }) => {
     >
       {isRTL ? (
         <>
-          <ArrowRightIcon className="w-5 h-5" />
           <span className="font-semibold">{t('go_back', 'رجوع')}</span>
+          <ArrowRightIcon className="w-5 h-5" />
         </>
       ) : (
         <>

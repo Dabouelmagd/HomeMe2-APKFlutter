@@ -2011,7 +2011,13 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
 
 # Authentication Routes
 @api_router.post("/auth/register")
-async def register(user_data: UserCreate):
+@limiter.limit("3/minute")  # Rate limit: 3 registration attempts per minute
+async def register(user_data: UserCreate, request: Request):
+    # Validate password strength
+    is_valid, error_message = validate_password_strength(user_data.password)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=error_message)
+    
     # Check if username or email already exists
     existing_user = await db.users.find_one({
         "$or": [{"username": user_data.username}, {"email": user_data.email}]

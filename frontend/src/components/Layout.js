@@ -52,6 +52,8 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  // State for collapsible menu sections - all expanded by default
+  const [expandedSections, setExpandedSections] = useState({});
   // const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();

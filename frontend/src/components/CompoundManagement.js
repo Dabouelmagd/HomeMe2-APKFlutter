@@ -254,17 +254,50 @@ const CompoundManagement = () => {
   };
 
   const handleSaveCompoundSettings = async () => {
+    // Validate inputs
+    const errors = [];
+    
+    // Check compound name
+    if (!editableCompound.name || editableCompound.name.trim().length === 0) {
+      errors.push(t('compound_name_required'));
+    } else if (editableCompound.name.trim().length < 2) {
+      errors.push(t('compound_name_too_short'));
+    } else if (editableCompound.name.trim().length > 100) {
+      errors.push(t('compound_name_too_long'));
+    }
+    
+    // Check address
+    if (!editableCompound.address || editableCompound.address.trim().length === 0) {
+      errors.push(t('address_required'));
+    } else if (editableCompound.address.trim().length < 5) {
+      errors.push(t('address_too_short'));
+    } else if (editableCompound.address.trim().length > 200) {
+      errors.push(t('address_too_long'));
+    }
+    
+    // Check description length (optional field)
+    if (editableCompound.description && editableCompound.description.length > 500) {
+      errors.push(t('description_too_long'));
+    }
+    
+    // If there are errors, show them and return
+    if (errors.length > 0) {
+      errors.forEach(error => toast.error(error));
+      return;
+    }
+    
     try {
       const response = await axios.put(`${API}/compounds/${user.compound_id}`, {
-        name: editableCompound.name,
-        address: editableCompound.address
+        name: editableCompound.name.trim(),
+        address: editableCompound.address.trim(),
+        description: editableCompound.description?.trim() || ''
       });
       
       setCompound(response.data);
-      toast.success('Compound settings updated successfully!');
+      toast.success(t('compound_settings_updated'));
     } catch (error) {
       console.error('Failed to update compound settings:', error);
-      toast.error('Failed to update compound settings');
+      toast.error(t('failed_update_compound_settings'));
     }
   };
 

@@ -493,6 +493,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('residents_by_unit_type')}>
                 <SimpleChart 
                   data={analytics.charts?.residents_by_unit_type || []}
+                  type="pie"
                   color="#3B82F6"
                 />
               </ChartContainer>
@@ -500,6 +501,7 @@ const AdvancedAnalytics = () => {
               <ChartContainer title={t('family_size_distribution')}>
                 <SimpleChart 
                   data={analytics.charts?.family_size_distribution || []}
+                  type="bar"
                   color="#10B981"
                 />
               </ChartContainer>

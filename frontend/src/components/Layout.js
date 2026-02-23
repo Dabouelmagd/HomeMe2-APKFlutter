@@ -196,6 +196,19 @@ const Layout = ({ children, isTrialMode = false }) => {
     navigate('/login');
   };
 
+  // Toggle section expand/collapse
+  const toggleSection = (sectionIndex) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionIndex]: !prev[sectionIndex]
+    }));
+  };
+
+  // Check if section is expanded (default is expanded/true)
+  const isSectionExpanded = (sectionIndex) => {
+    return expandedSections[sectionIndex] !== false;
+  };
+
   // Organized navigation with sections
   const navigationSections = [
     {

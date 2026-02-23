@@ -2599,6 +2599,18 @@ const resources = {
       
       // Additional Analytics Terms
       'resident_growth_trend': 'Resident Growth Trend',
+      
+      // Form Validation Messages
+      'compound_name_required': 'Compound name is required',
+      'compound_name_too_short': 'Compound name is too short (minimum 2 characters)',
+      'compound_name_too_long': 'Compound name is too long (maximum 100 characters)',
+      'address_required': 'Address is required',
+      'address_too_short': 'Address is too short (minimum 5 characters)',
+      'address_too_long': 'Address is too long (maximum 200 characters)',
+      'description_too_long': 'Description is too long (maximum 500 characters)',
+      'compound_settings_updated': 'Compound settings updated successfully',
+      'failed_update_compound_settings': 'Failed to update compound settings',
+      
       'legal': {
         'title': 'Legal',
         'contact': {

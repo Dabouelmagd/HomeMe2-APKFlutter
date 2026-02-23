@@ -4013,6 +4013,28 @@ const resources = {
       'enter_compound_id': 'أدخل معرف المجمع (اختياري)',
       'subscription_code': 'كود الاشتراك',
       
+      // Biometric Authentication - Arabic
+      'remember_me': 'تذكرني',
+      'login_with_biometric': 'تسجيل الدخول بالبصمة',
+      'biometric_login_success': 'تم تسجيل الدخول بالبصمة بنجاح',
+      'biometric_login_failed': 'فشل تسجيل الدخول بالبصمة',
+      'biometric_error': 'حدث خطأ في البصمة',
+      'enter_username_first': 'أدخل اسم المستخدم أولاً',
+      'verifying': 'جاري التحقق...',
+      'or': 'أو',
+      'biometric_hint': 'يمكنك تفعيل الدخول بالبصمة من الإعدادات بعد تسجيل الدخول',
+      'enable_biometric': 'تفعيل الدخول بالبصمة',
+      'biometric_settings': 'إعدادات البصمة',
+      'biometric_enabled': 'الدخول بالبصمة مفعّل',
+      'biometric_disabled': 'الدخول بالبصمة غير مفعّل',
+      'register_biometric': 'تسجيل البصمة / بصمة الوجه',
+      'remove_biometric': 'إزالة البصمة',
+      'biometric_registered': 'تم تسجيل البصمة بنجاح',
+      'biometric_removed': 'تم إزالة البصمة بنجاح',
+      'biometric_not_supported': 'البصمة غير مدعومة على هذا الجهاز',
+      'saved_login': 'تسجيل دخول محفوظ',
+      'quick_login': 'دخول سريع',
+      
       // Financial Management translations
       'financial_management': 'الإدارة المالية',
       'comprehensive_financial_tracking': 'تتبع وتقارير مالية شاملة',

@@ -69,6 +69,7 @@ import PaymentCancelPage from './pages/PaymentCancelPage';
 import LocationsPage from './pages/LocationsPage';
 import CheckoutPage from './pages/CheckoutPage';
 import PayPalSuccessPage from './pages/PayPalSuccessPage';
+import FacilityBooking from './pages/FacilityBooking';
 import { TransliterationProvider } from './components/TransliterationToggle';
 import MaintenanceSystem from './components/MaintenanceSystem';
 import EnterpriseRegistration from './components/EnterpriseRegistration';

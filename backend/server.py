@@ -14007,6 +14007,94 @@ async def get_reminder_logs(
 
 # ==================== END PAYMENT REMINDERS ====================
 
+# ==================== PDF REPORTS ====================
+
+@api_router.get("/reports/financial")
+async def generate_financial_report(
+    compound_id: str,
+    start_date: str,
+    end_date: str,
+    language: str = "en",
+    current_user: dict = Depends(get_current_user)
+):
+    """Generate financial report PDF (Admin only)"""
+    from fastapi.responses import Response
+    
+    if current_user.get("role") not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+    except:
+        start = datetime.now(timezone.utc) - timedelta(days=30)
+        end = datetime.now(timezone.utc)
+    
+    pdf_service = PDFReportService(db)
+    pdf_content = await pdf_service.generate_financial_report(compound_id, start, end, language)
+    
+    filename = f"financial_report_{start_date[:10]}_{end_date[:10]}.pdf"
+    return Response(
+        content=pdf_content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+@api_router.get("/reports/residents")
+async def generate_residents_report(
+    compound_id: str,
+    language: str = "en",
+    current_user: dict = Depends(get_current_user)
+):
+    """Generate residents report PDF (Admin only)"""
+    from fastapi.responses import Response
+    
+    if current_user.get("role") not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    pdf_service = PDFReportService(db)
+    pdf_content = await pdf_service.generate_residents_report(compound_id, language)
+    
+    filename = f"residents_report_{datetime.now().strftime('%Y%m%d')}.pdf"
+    return Response(
+        content=pdf_content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+@api_router.get("/reports/maintenance")
+async def generate_maintenance_report(
+    compound_id: str,
+    start_date: str,
+    end_date: str,
+    language: str = "en",
+    current_user: dict = Depends(get_current_user)
+):
+    """Generate maintenance report PDF (Admin only)"""
+    from fastapi.responses import Response
+    
+    if current_user.get("role") not in ["admin", "super_admin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    try:
+        start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+    except:
+        start = datetime.now(timezone.utc) - timedelta(days=30)
+        end = datetime.now(timezone.utc)
+    
+    pdf_service = PDFReportService(db)
+    pdf_content = await pdf_service.generate_maintenance_report(compound_id, start, end, language)
+    
+    filename = f"maintenance_report_{start_date[:10]}_{end_date[:10]}.pdf"
+    return Response(
+        content=pdf_content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+# ==================== END PDF REPORTS ====================
+
 # Include the API router after ALL endpoints are defined
 app.include_router(api_router)
 

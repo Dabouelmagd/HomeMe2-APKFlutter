@@ -2543,6 +2543,24 @@ const resources = {
       'create_admin': 'Create Admin',
       'upload_logo': 'Upload Logo',
       
+      // Compound Settings Page
+      'basic_information': 'Basic Information',
+      'compound_name_label': 'Compound Name',
+      'enter_compound_name': 'Enter compound name',
+      'address_label': 'Address',
+      'enter_compound_address': 'Enter compound address',
+      'description_label': 'Description',
+      'enter_compound_description': 'Enter compound description (optional)',
+      'save_changes': 'Save Changes',
+      'current_logo': 'Current Logo',
+      'current_compound_logo': 'Current compound logo',
+      'no_logo_uploaded': 'No logo uploaded',
+      'upload_logo_to_brand': 'Upload a logo to brand your compound',
+      'upload_new_logo': 'Upload New Logo',
+      'recommended_size': 'Recommended size: 200x200px or larger',
+      'supported_formats': 'Supported formats: JPG, PNG, GIF',
+      'maximum_file_size': 'Maximum file size: 5MB',
+      
       // Residence Management
       'no_additional_admins': 'No Additional Admins',
       'help_manage': 'Help Manage',

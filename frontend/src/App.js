@@ -378,23 +378,24 @@ function App() {
             <TransliterationProvider>
               <LanguageInitializer />
               <PageTitleUpdater />
-              <Routes>
-              <Route path="/login" element={<Login />} />
-        <Route path="/terms-privacy" element={<TermsPrivacy />} />
-        <Route path="/legal" element={<TermsPrivacy />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/debug-login" element={<DebugLogin />} />
-              <Route path="/account-type-selection" element={<PublicAccountTypeSelection />} />
-              <Route path="/public-account-type-selection" element={<Navigate to="/" replace />} />
-              
-              {/* Homepage - no authentication required */}
-              <Route path="/" element={<HomePage />} />
-              
-              <Route path="/app" element={
-                <ProtectedRoute>
-                  <Layout />
-                </ProtectedRoute>
-              }>
+              <RouteChangeHandler>
+                <Routes>
+                <Route path="/login" element={<Login />} />
+          <Route path="/terms-privacy" element={<TermsPrivacy />} />
+          <Route path="/legal" element={<TermsPrivacy />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/debug-login" element={<DebugLogin />} />
+                <Route path="/account-type-selection" element={<PublicAccountTypeSelection />} />
+                <Route path="/public-account-type-selection" element={<Navigate to="/" replace />} />
+                
+                {/* Homepage - no authentication required */}
+                <Route path="/" element={<HomePage />} />
+                
+                <Route path="/app" element={
+                  <ProtectedRoute>
+                    <Layout />
+                  </ProtectedRoute>
+                }>
                 <Route index element={<Navigate to="/app/dashboard" replace />} />
                 
                 <Route path="dashboard" element={

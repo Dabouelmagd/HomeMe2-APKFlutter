@@ -96,6 +96,8 @@ A comprehensive residential compound management system that supports:
    - Created frontend Service Worker (`public/push-sw.js`) for handling push events
    - Updated `PushNotifications.js` component to use dynamic VAPID keys from server
    - Added Arabic translations for push notification UI
+   - **Auto-subscription enabled**: Users are automatically subscribed to push notifications on login
+   - Created `autoPushService.js` for automatic subscription management
 
 ### Previous Session Fixes
 1. Fixed Arabic translation for registration page

@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, validator
 from typing import List, Optional, Dict, Any
 import qrcode
 import io
@@ -24,6 +24,7 @@ import aiofiles
 import asyncio
 import wave
 import struct
+import re
 # import numpy as np  # Removed to reduce deployment size
 from io import BytesIO
 from PIL import Image
@@ -32,6 +33,12 @@ import httpx
 import shutil
 from passlib.context import CryptContext
 from dotenv import load_dotenv
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
+# Rate limiter for API security
+limiter = Limiter(key_func=get_remote_address)
 
 # Import our new models and utilities
 from maintenance_models import *

@@ -40,7 +40,8 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   CalendarDaysIcon,
-  StarIcon
+  StarIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
@@ -405,6 +406,12 @@ const Layout = ({ children, isTrialMode = false }) => {
           name: t('events_announcements'),
           href: 'events',
           icon: SpeakerWaveIcon,
+          show: true
+        },
+        {
+          name: t('complaints_suggestions', 'الشكاوى والاقتراحات'),
+          href: 'complaints',
+          icon: ExclamationTriangleIcon,
           show: true
         }
       ]

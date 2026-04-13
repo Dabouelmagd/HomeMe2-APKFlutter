@@ -14882,6 +14882,32 @@ async def submit_rating(
         }
         await db.ratings.insert_one(rating_doc)
         
+        # Smart alert: instant notification for negative ratings (1-2 stars)
+        if data.rating <= 2:
+            target_label = "صيانة" if data.target_type == "maintenance" else "خدمة"
+            await notify_compound_admins(
+                compound_id=current_user.compound_id,
+                title="تنبيه: تقييم سلبي!",
+                content=f"تقييم {data.rating}/5 من {current_user.full_name} على {target_label}: {data.comment or 'بدون تعليق'}",
+                action_type="negative_rating",
+                exclude_user_id=current_user.id
+            )
+        
+        # Smart alert: check if overall average dropped below 3
+        all_ratings = await db.ratings.find(
+            {"compound_id": current_user.compound_id}, {"_id": 0, "rating": 1}
+        ).to_list(500)
+        if all_ratings:
+            avg = sum(r["rating"] for r in all_ratings) / len(all_ratings)
+            if avg < 3.0:
+                await notify_compound_admins(
+                    compound_id=current_user.compound_id,
+                    title="تحذير: انخفاض مستوى الرضا!",
+                    content=f"متوسط التقييم العام انخفض إلى {round(avg, 1)} من 5 - يرجى مراجعة جودة الخدمات",
+                    action_type="low_satisfaction",
+                    exclude_user_id=None
+                )
+        
         return {"message": "تم إرسال التقييم بنجاح", "rating_id": rating_doc["id"]}
     except HTTPException:
         raise

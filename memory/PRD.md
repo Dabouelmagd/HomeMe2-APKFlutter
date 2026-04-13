@@ -1,36 +1,38 @@
-# HomeMe PRD - Compound Management System
+# HomeMe PRD
 
 ## Architecture
-- **Frontend**: React + Tailwind CSS + Recharts + i18next + Cairo Font
-- **Backend**: FastAPI + MongoDB + WebAuthn + ReportLab + Openpyxl
-- **Auth**: JWT with 6 roles | **Payments**: Stripe + PayPal ready
+- **Frontend**: React + Tailwind + Recharts + i18next + Cairo Font
+- **Backend**: FastAPI + MongoDB + WebAuthn + Stripe + ReportLab + Openpyxl
+- **server.py**: 16,321 → 3,838 lines (-76.5%) | 37 route modules
 
-## Backend Architecture (Final - Apr 13, 2026)
-**server.py: 16,321 → 3,838 lines (-76.5%)**
-**37 route modules in /app/backend/routes/ (~10,479 lines)**
+## New Features (Apr 13, 2026)
+### Stripe Subscription Payments
+- `/api/payments/subscribe` - Creates Stripe checkout for plan+duration
+- `/api/payments/plans` - Returns all plans with prices (EGP/USD)
+- `/api/payments/subscription-status/{session_id}` - Check payment status
+- Webhook auto-activates subscription on successful payment
+- Supports all 7 plans × 6 durations
 
-### All Route Modules
-finance, subscriptions, chat, search, scheduled_msgs, services, family, admin_registration, admin_users, security, push_email, smart_devices, companies, exports, documents, polls, newsletters, guests, announcements, ratings, contracts, facilities, superadmin, maintenance, complaints, monitoring, notifications, compounds, utility, compound_services, dashboard, user_profile, trial, analytics, individual, super_accounts, payments
+### Subscription Analytics (Super Admin)
+- `/api/super-admin/subscription-analytics` - Full analytics
+- Active subscriptions count, plan distribution chart
+- Monthly revenue estimate, expiring-soon alerts
+- New tab in Super Admin Panel with visual stats
 
-### Shared Infrastructure
-- auth_deps.py, database.py, helpers.py, shared_models.py
+### Pricing (EGP monthly)
+| Plan | Price | Residents |
+|------|-------|-----------|
+| Starter | 0 | 5 max |
+| Basic | 500 | Unlimited |
+| Pro | 1,200 | Unlimited |
+| Premium | 2,200 | Unlimited |
+| Company Startup | 3,500 | 3 compounds |
+| Company Business | 7,500 | 1-5 compounds |
+| Company Enterprise | 20,000 | Unlimited |
 
-### E2E Registration Flow - TESTED ✅
-Super Admin → Company Admin → Create Compound → Subscription Code → Register Resident → Verify Subscription
-
-### Subscription System
-- 6 durations: trial, 3m, 6m, 9m, 1year, lifetime
-- 7 plans: starter/basic/pro/premium + company tiers
-- EGP/USD pricing with annual = 10 months discount
-
-## Remaining in server.py (~3,838 lines)
-- Core models & enums
-- Auth (register, login, WebAuthn)
-- Families, Messages, Database queries
-- Admin initialization services
-- WebSocket endpoints
-- Startup/shutdown handlers
+### Smart Devices: Marked as "قريباً" (Coming Soon)
 
 ## Backlog
-- P1: Stripe/PayPal payment integration
-- P2: Continue final server.py cleanup
+- P2: Continue server.py cleanup (3,838 lines remaining)
+- P2: 14-day free trial for paid plans
+- P3: PayPal integration

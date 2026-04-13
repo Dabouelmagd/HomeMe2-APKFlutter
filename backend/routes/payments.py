@@ -11,6 +11,7 @@ from database import get_db
 from auth_deps import get_current_user, require_admin, require_super_admin, hash_password, verify_password, create_access_token, validate_password_strength
 from helpers import serialize_datetime
 from shared_models import *
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
 router = APIRouter(prefix="/api")
 
@@ -38,7 +39,7 @@ async def upload_company_logo(
         if file_extension not in ['.jpg', '.jpeg', '.png', '.gif']:
             raise HTTPException(status_code=400, detail="Invalid file extension")
             
-        unique_filename = f"{current_user.id}_{uuid.uuid4().hex[:8]}{file_extension}"
+        unique_filename = f"{current_user['id']}_{uuid.uuid4().hex[:8]}{file_extension}"
         file_path = uploads_dir / unique_filename
         
         # Save file
@@ -108,10 +109,10 @@ async def create_payment_session(
         
         # For admins, allow payment of any bill in their compound
         # For residents, only allow payment of their own bills
-        if current_user.role != UserRole.ADMIN:
-            if bill.get("family_id") != current_user.family_id:
+        if current_user.get('role','') != 'admin':
+            if bill.get("family_id") != current_user.get('family_id',''):
                 raise HTTPException(status_code=403, detail="Cannot pay this bill")
-        elif bill.get("compound_id") != current_user.compound_id:
+        elif bill.get("compound_id") != current_user.get('compound_id',''):
             raise HTTPException(status_code=403, detail="Bill not in your compound")
         
         # Get frontend origin from request headers (for success/cancel URLs)
@@ -133,7 +134,7 @@ async def create_payment_session(
             cancel_url=cancel_url,
             metadata={
                 "utility_bill_id": request.utility_bill_id,
-                "user_id": current_user.id,
+                "user_id": current_user['id'],
                 "payment_type": "utility_bill"
             }
         )
@@ -146,7 +147,7 @@ async def create_payment_session(
             currency=request.currency,
             utility_bill_id=request.utility_bill_id,
             session_id=session.session_id,
-            user_id=current_user.id,
+            user_id=current_user['id'],
             metadata={
                 "utility_bill_id": request.utility_bill_id,
                 "bill_type": bill.get("utility_type", "unknown"),
@@ -188,7 +189,7 @@ async def get_payment_status(
             raise HTTPException(status_code=404, detail="Payment transaction not found")
         
         # Verify user has access to this payment
-        if transaction["user_id"] != current_user.id and current_user.role != UserRole.ADMIN:
+        if transaction["user_id"] != current_user['id'] and current_user.get('role','') != 'admin':
             raise HTTPException(status_code=403, detail="Access denied")
         
         # Initialize Stripe checkout
@@ -284,20 +285,199 @@ async def stripe_webhook(request: Request):
                 
                 logging.info(f"Payment completed for session {session_id}")
         
+                # Check if this is a subscription payment
+                if transaction.get("payment_type") == "subscription":
+                    user_id = transaction.get("user_id")
+                    plan = transaction.get("metadata", {}).get("plan", "basic")
+                    duration = transaction.get("metadata", {}).get("duration", "1_month")
+                    
+                    duration_days = {"1_month": 30, "3_months": 90, "6_months": 180, "9_months": 270, "1_year": 365, "lifetime": 36500}.get(duration, 30)
+                    
+                    sub_end = datetime.now(timezone.utc) + timedelta(days=duration_days)
+                    await db.users.update_one(
+                        {"id": user_id},
+                        {"$set": {
+                            "subscription_active": True,
+                            "subscription_type": duration,
+                            "subscription_plan": plan,
+                            "subscription_start": datetime.now(timezone.utc).isoformat(),
+                            "subscription_end": sub_end.isoformat(),
+                            "subscription_payment_method": "stripe",
+                            "subscription_session_id": session_id
+                        }}
+                    )
+                    logging.info(f"Subscription activated for user {user_id}: {plan}/{duration}")
+        
         return {"status": "success"}
         
     except Exception as e:
         logging.error(f"Error handling Stripe webhook: {e}")
         raise HTTPException(status_code=400, detail="Webhook error")
 
-# Import payment router
-try:
-    from payments import router as payments_router
-except ImportError:
-    payments_router = None
 
-try:
-    from notifications_push import router as push_notifications_router
-except ImportError:
-    push_notifications_router = None
+# ==================== SUBSCRIPTION PAYMENT ENDPOINTS ====================
 
+class SubscriptionPaymentRequest(BaseModel):
+    plan: str  # starter, basic, pro, premium, company_startup, company_business, company_enterprise
+    duration: str = "1_month"  # 1_month, 3_months, 6_months, 9_months, 1_year, lifetime
+    currency: str = "egp"
+
+
+PLAN_PRICES_EGP = {
+    "starter": 0,
+    "basic": 500,
+    "pro": 1200,
+    "premium": 2200,
+    "company_startup": 3500,
+    "company_business": 7500,
+    "company_enterprise": 20000,
+}
+
+DURATION_MULTIPLIERS = {
+    "1_month": 1,
+    "3_months": 3,
+    "6_months": 6,
+    "9_months": 9,
+    "1_year": 10,  # 10 months (2 free)
+    "lifetime": 120,  # 10 years equivalent
+}
+
+
+@router.post("/payments/subscribe")
+async def create_subscription_payment(
+    data: SubscriptionPaymentRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create Stripe checkout for subscription payment"""
+    try:
+        db = get_db()
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(status_code=500, detail="Stripe not configured")
+
+        monthly_price = PLAN_PRICES_EGP.get(data.plan, 0)
+        if monthly_price == 0 and data.plan == "starter":
+            raise HTTPException(status_code=400, detail="الخطة المجانية لا تحتاج دفع")
+
+        multiplier = DURATION_MULTIPLIERS.get(data.duration, 1)
+        total_egp = monthly_price * multiplier
+
+        if data.currency == "usd":
+            total = round(total_egp * 0.02, 2)
+            currency = "usd"
+        else:
+            total = total_egp
+            currency = "egp"
+
+        plan_names = {
+            "basic": "أساسي", "pro": "احترافي", "premium": "متقدم",
+            "company_startup": "شركة ناشئة", "company_business": "شركة متوسطة", "company_enterprise": "شركة كبرى"
+        }
+        duration_names = {
+            "1_month": "شهر", "3_months": "3 شهور", "6_months": "6 شهور",
+            "9_months": "9 شهور", "1_year": "سنة", "lifetime": "مدى الحياة"
+        }
+
+        frontend_url = os.environ.get('REACT_APP_BACKEND_URL', os.environ.get('FRONTEND_URL', 'http://localhost:3000'))
+        webhook_url = f"{frontend_url}/api/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+
+        success_url = f"{frontend_url}/app/dashboard?payment=success&session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{frontend_url}/app/dashboard?payment=cancelled"
+
+        checkout_request = CheckoutSessionRequest(
+            amount=float(total),
+            currency=currency,
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "payment_type": "subscription",
+                "plan": data.plan,
+                "duration": data.duration,
+                "user_id": current_user['id']
+            }
+        )
+
+        session = await stripe_checkout.create_checkout_session(checkout_request)
+
+        # Save transaction
+        transaction = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user['id'],
+            "session_id": session.session_id,
+            "payment_type": "subscription",
+            "amount": total,
+            "currency": currency,
+            "plan": data.plan,
+            "duration": data.duration,
+            "payment_status": "pending",
+            "metadata": {"plan": data.plan, "duration": data.duration},
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.payment_transactions.insert_one(transaction)
+
+        return {
+            "checkout_url": session.url,
+            "session_id": session.session_id,
+            "amount": total,
+            "currency": currency,
+            "plan": plan_names.get(data.plan, data.plan),
+            "duration": duration_names.get(data.duration, data.duration)
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating subscription payment: {e}")
+        raise HTTPException(status_code=500, detail="فشل في إنشاء جلسة الدفع")
+
+
+@router.get("/payments/subscription-status/{session_id}")
+async def get_subscription_payment_status(session_id: str, current_user: dict = Depends(get_current_user)):
+    """Check subscription payment status"""
+    try:
+        db = get_db()
+        transaction = await db.payment_transactions.find_one(
+            {"session_id": session_id, "payment_type": "subscription"},
+            {"_id": 0}
+        )
+        if not transaction:
+            raise HTTPException(status_code=404, detail="Transaction not found")
+        
+        return {
+            "status": transaction.get("payment_status", "pending"),
+            "plan": transaction.get("plan"),
+            "duration": transaction.get("duration"),
+            "amount": transaction.get("amount"),
+            "currency": transaction.get("currency")
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error checking subscription status: {e}")
+        raise HTTPException(status_code=500, detail="Failed to check status")
+
+
+@router.get("/payments/plans")
+async def get_subscription_plans():
+    """Get available subscription plans with prices"""
+    return {
+        "residential": [
+            {"id": "starter", "name": "مجاني", "name_en": "Starter", "monthly_egp": 0, "monthly_usd": 0, "residents": "حتى 5 سكان"},
+            {"id": "basic", "name": "أساسي", "name_en": "Basic", "monthly_egp": 500, "monthly_usd": 10, "residents": "غير محدود"},
+            {"id": "pro", "name": "احترافي", "name_en": "Pro", "monthly_egp": 1200, "monthly_usd": 24, "residents": "غير محدود"},
+            {"id": "premium", "name": "متقدم", "name_en": "Premium", "monthly_egp": 2200, "monthly_usd": 44, "residents": "غير محدود"},
+        ],
+        "company": [
+            {"id": "company_startup", "name": "شركة ناشئة", "name_en": "Startup", "monthly_egp": 3500, "monthly_usd": 70, "compounds": "حتى 3"},
+            {"id": "company_business", "name": "شركة متوسطة", "name_en": "Business", "monthly_egp": 7500, "monthly_usd": 150, "compounds": "1-5"},
+            {"id": "company_enterprise", "name": "شركة كبرى", "name_en": "Enterprise", "monthly_egp": 20000, "monthly_usd": 400, "compounds": "غير محدود"},
+        ],
+        "durations": [
+            {"id": "1_month", "name": "شهر", "multiplier": 1},
+            {"id": "3_months", "name": "3 شهور", "multiplier": 3},
+            {"id": "6_months", "name": "6 شهور", "multiplier": 6},
+            {"id": "9_months", "name": "9 شهور", "multiplier": 9},
+            {"id": "1_year", "name": "سنة (شهرين مجاناً)", "multiplier": 10},
+            {"id": "lifetime", "name": "مدى الحياة", "multiplier": 120},
+        ]
+    }

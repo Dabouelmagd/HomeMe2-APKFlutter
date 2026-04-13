@@ -143,3 +143,70 @@ async def admin_update_user_role(user_id: str, role: str, current_user: dict = D
     except Exception as e:
         logging.error(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Failed")
+
+
+
+@router.get("/super-admin/subscription-analytics")
+async def subscription_analytics(current_user: dict = Depends(require_super_admin)):
+    db = get_db()
+    try:
+        users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(2000)
+        
+        active_subs = [u for u in users if u.get("subscription_active")]
+        by_plan = {}
+        by_type = {}
+        revenue_estimate = 0
+        expiring_soon = []
+        
+        plan_prices = {"basic": 500, "pro": 1200, "premium": 2200, "company_startup": 3500, "company_business": 7500, "company_enterprise": 20000}
+        
+        from datetime import datetime, timedelta, timezone
+        now = datetime.now(timezone.utc)
+        
+        for u in active_subs:
+            plan = u.get("subscription_plan", u.get("subscription_type", "trial"))
+            by_plan[plan] = by_plan.get(plan, 0) + 1
+            
+            stype = u.get("subscription_type", "unknown")
+            by_type[stype] = by_type.get(stype, 0) + 1
+            
+            revenue_estimate += plan_prices.get(plan, 0)
+            
+            end_str = u.get("subscription_end", "")
+            if end_str:
+                try:
+                    end = datetime.fromisoformat(str(end_str).replace("Z", "+00:00"))
+                    if end.tzinfo is None:
+                        end = end.replace(tzinfo=timezone.utc)
+                    days_left = (end - now).days
+                    if 0 < days_left <= 30:
+                        expiring_soon.append({
+                            "user_id": u.get("id"), "full_name": u.get("full_name", ""),
+                            "username": u.get("username", ""), "plan": plan,
+                            "days_left": days_left, "end_date": str(end_str)[:10]
+                        })
+                except Exception:
+                    pass
+        
+        expiring_soon.sort(key=lambda x: x.get("days_left", 999))
+        
+        # Recent payments
+        transactions = await db.payment_transactions.find(
+            {"payment_type": "subscription", "payment_status": "paid"},
+            {"_id": 0}
+        ).sort("created_at", -1).limit(20).to_list(20)
+        
+        return serialize_datetime({
+            "total_users": len(users),
+            "active_subscriptions": len(active_subs),
+            "free_users": len([u for u in users if not u.get("subscription_active")]),
+            "by_plan": by_plan,
+            "by_type": by_type,
+            "monthly_revenue_estimate": revenue_estimate,
+            "expiring_soon": expiring_soon[:20],
+            "recent_payments": transactions,
+            "trial_users": len([u for u in users if u.get("subscription_type") == "trial"])
+        })
+    except Exception as e:
+        logging.error(f"Subscription analytics error: {e}")
+        raise HTTPException(status_code=500, detail="Failed")

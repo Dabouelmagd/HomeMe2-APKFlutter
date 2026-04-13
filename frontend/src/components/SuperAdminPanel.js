@@ -49,6 +49,8 @@ const SuperAdminPanel = () => {
   const [showCreateCode, setShowCreateCode] = useState(false);
   const [newCode, setNewCode] = useState({ code_type: '3_months', plan: 'pro', max_uses: 1, custom_code: '', notes: '' });
   const [bulkCount, setBulkCount] = useState(10);
+  // Subscription analytics
+  const [subAnalytics, setSubAnalytics] = useState(null);
 
   useEffect(() => { fetchDashboard(); }, []);
 
@@ -122,6 +124,14 @@ const SuperAdminPanel = () => {
 
   useEffect(() => { if (activeTab === 'codes') fetchCodes(); }, [activeTab]);
 
+  const fetchSubAnalytics = async () => {
+    try {
+      const res = await axios.get(`${API}/super-admin/subscription-analytics`, getToken());
+      setSubAnalytics(res.data);
+    } catch { /* ignore */ }
+  };
+  useEffect(() => { if (activeTab === 'analytics') fetchSubAnalytics(); }, [activeTab]);
+
   if (loading) {
     return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div></div>;
   }
@@ -182,6 +192,7 @@ const SuperAdminPanel = () => {
             { id: 'overview', label: 'المجتمعات' },
             { id: 'users', label: 'المستخدمين' },
             { id: 'codes', label: 'أكواد الاشتراك' },
+            { id: 'analytics', label: 'تحليلات الاشتراكات' },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`px-5 py-2.5 rounded-lg text-sm font-medium ${activeTab === tab.id ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
@@ -400,6 +411,92 @@ const SuperAdminPanel = () => {
             </div>
           </div>
         )}
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && subAnalytics && (
+          <div data-testid="analytics-tab">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {[
+                { label: 'إجمالي المستخدمين', value: subAnalytics.total_users, color: 'text-blue-400' },
+                { label: 'اشتراكات نشطة', value: subAnalytics.active_subscriptions, color: 'text-green-400' },
+                { label: 'بدون اشتراك', value: subAnalytics.free_users, color: 'text-gray-400' },
+                { label: 'تجريبي', value: subAnalytics.trial_users, color: 'text-amber-400' },
+              ].map((s, i) => (
+                <div key={i} className="bg-gray-800 rounded-xl p-5 border border-gray-700 text-center">
+                  <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
+                  <p className="text-xs text-gray-400 mt-1">{s.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Revenue */}
+              <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
+                <h3 className="font-bold text-lg text-white mb-3">الإيرادات الشهرية المتوقعة</h3>
+                <p className="text-4xl font-black text-green-400">{(subAnalytics.monthly_revenue_estimate || 0).toLocaleString()} <span className="text-sm text-gray-400">ج.م</span></p>
+                <p className="text-xs text-gray-500 mt-1">بناءً على الاشتراكات النشطة</p>
+              </div>
+
+              {/* By Plan */}
+              <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
+                <h3 className="font-bold text-lg text-white mb-3">توزيع الخطط</h3>
+                <div className="space-y-2">
+                  {Object.entries(subAnalytics.by_plan || {}).map(([plan, count]) => {
+                    const planLabels = { trial: 'تجريبي', basic: 'أساسي', pro: 'احترافي', premium: 'متقدم', company_startup: 'شركة ناشئة', company_business: 'شركة متوسطة', company_enterprise: 'شركة كبرى' };
+                    const colors = { trial: 'bg-gray-500', basic: 'bg-sky-500', pro: 'bg-blue-500', premium: 'bg-violet-500', company_startup: 'bg-amber-500', company_business: 'bg-orange-500', company_enterprise: 'bg-red-500' };
+                    const total = subAnalytics.active_subscriptions || 1;
+                    const pct = Math.round((count / total) * 100);
+                    return (
+                      <div key={plan} className="flex items-center gap-3">
+                        <span className="text-xs text-gray-300 w-24">{planLabels[plan] || plan}</span>
+                        <div className="flex-1 bg-gray-700 rounded-full h-3 overflow-hidden">
+                          <div className={`h-full rounded-full ${colors[plan] || 'bg-blue-500'}`} style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="text-xs text-gray-400 w-12 text-left">{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Expiring Soon */}
+            {subAnalytics.expiring_soon?.length > 0 && (
+              <div className="bg-gray-800 rounded-xl border border-amber-500/30 p-5">
+                <h3 className="font-bold text-lg text-amber-400 mb-3">اشتراكات تنتهي قريباً (30 يوم)</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-gray-400 border-b border-gray-700">
+                        <th className="text-right py-2 px-3">المستخدم</th>
+                        <th className="text-right py-2 px-3">الخطة</th>
+                        <th className="text-center py-2 px-3">أيام متبقية</th>
+                        <th className="text-center py-2 px-3">تاريخ الانتهاء</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subAnalytics.expiring_soon.map((u, i) => (
+                        <tr key={i} className="border-b border-gray-700/50">
+                          <td className="py-2 px-3 text-white">{u.full_name || u.username}</td>
+                          <td className="py-2 px-3 text-gray-300">{u.plan}</td>
+                          <td className="py-2 px-3 text-center">
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${u.days_left <= 7 ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
+                              {u.days_left} يوم
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 text-center text-gray-400">{u.end_date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {activeTab === 'analytics' && !subAnalytics && (
+          <div className="text-center py-10 text-gray-500">جاري التحميل...</div>
+        )}
+
       </div>
     </div>
   );

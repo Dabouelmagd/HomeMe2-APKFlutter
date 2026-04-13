@@ -62,6 +62,34 @@ const HomePage = () => {
     setCodeLoading(false);
   };
 
+  const handleSubscribe = async (plan) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/register');
+      return;
+    }
+    if (plan === 'starter') {
+      navigate('/register');
+      return;
+    }
+    try {
+      const duration = isYearly ? '1_year' : '1_month';
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/payments/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ plan, duration, currency })
+      });
+      const data = await res.json();
+      if (data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        alert(data.detail || 'حدث خطأ');
+      }
+    } catch {
+      navigate('/register');
+    }
+  };
+
   const systems = [
     { icon: UserGroupIcon, title: 'إدارة المقيمين', desc: 'ملف شامل لكل مقيم مع العائلة والوحدة وتصدير PDF', color: 'from-blue-500 to-blue-600' },
     { icon: CurrencyDollarIcon, title: 'النظام المالي', desc: 'ميزانية عمومية، 4 طرق توزيع مصروفات، رسوم بيانية، تصدير Excel', color: 'from-emerald-500 to-green-600' },
@@ -468,7 +496,7 @@ const HomePage = () => {
                     </li>
                   ))}
                 </ul>
-                <button onClick={() => navigate('/register')} className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>{plan.cta}</button>
+                <button onClick={() => handleSubscribe(plan.nameEn.toLowerCase())} className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>{plan.cta}</button>
               </div>
             ))}
           </div>
@@ -594,7 +622,7 @@ const HomePage = () => {
                       </li>
                     ))}
                   </ul>
-                  <button onClick={() => navigate('/register')} className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>{plan.cta}</button>
+                  <button onClick={() => handleSubscribe(`company_${plan.nameEn.toLowerCase()}`)} className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>{plan.cta}</button>
                 </div>
               ))}
             </div>

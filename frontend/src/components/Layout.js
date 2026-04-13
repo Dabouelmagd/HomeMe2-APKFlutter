@@ -61,12 +61,32 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [expandedSections, setExpandedSections] = useState({});
   // State for scroll to top button
   const [showScrollTop, setShowScrollTop] = useState(false);
+  // Compound logo
+  const [compoundLogo, setCompoundLogo] = useState(null);
   // const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
+
+  // Fetch compound logo
+  useEffect(() => {
+    const fetchCompoundLogo = async () => {
+      if (!user?.compound_id) return;
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/compounds/${user.compound_id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.logo_url) setCompoundLogo(data.logo_url);
+        }
+      } catch (e) { /* silently fail */ }
+    };
+    fetchCompoundLogo();
+  }, [user?.compound_id]);
 
   // Handle scroll to show/hide scroll-to-top button
   useEffect(() => {
@@ -373,28 +393,39 @@ const Layout = ({ children, isTrialMode = false }) => {
         lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}
       `}>
-        <div className="flex items-center justify-between h-24 px-6 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
-          {/* Close button for mobile - positioned on the left */}
-          <button
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <XMarkIcon className="h-6 w-6 text-gray-500 dark:text-gray-400" />
-          </button>
-          
-          {/* Logo centered */}
-          <div className="flex-1 flex justify-center">
-            <div className="flex-shrink-0">
+        <div className="flex flex-col items-center justify-center px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+          {/* Close button for mobile */}
+          <div className="w-full flex justify-between items-center mb-2 lg:hidden">
+            <button onClick={() => setSidebarOpen(false)}>
+              <XMarkIcon className="h-6 w-6 text-gray-500 dark:text-gray-400" />
+            </button>
+            <div className="w-6"></div>
+          </div>
+
+          {/* Compound Logo - shown if available */}
+          {compoundLogo && (
+            <div className="mb-2">
               <img 
-                src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
-                alt="HomeMe Logo"
-                className="h-32 w-auto object-contain"
+                src={compoundLogo}
+                alt="Compound Logo"
+                className="h-14 w-14 rounded-xl object-cover border-2 border-gray-100 dark:border-gray-600 shadow-sm"
+                data-testid="compound-logo-sidebar"
               />
             </div>
-          </div>
+          )}
+          {user?.compound_name && (
+            <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1 text-center">{user.compound_name}</p>
+          )}
           
-          {/* Empty space for balance */}
-          <div className="w-6 lg:hidden"></div>
+          {/* HomeMe Logo */}
+          <div className="flex-shrink-0">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
+              alt="HomeMe Logo"
+              className="h-14 w-auto object-contain"
+              data-testid="sidebar-homeme-logo"
+            />
+          </div>
         </div>
 
         {/* Scrollable Navigation Area */}

@@ -118,12 +118,12 @@ const HomePage = () => {
             <img
               src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
               alt="HomeMe"
-              className="h-16 w-auto rounded-2xl shadow-md"
+              className="h-20 w-auto rounded-2xl shadow-lg"
               data-testid="homepage-logo"
             />
             <div>
-              <span className="text-2xl font-bold text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
-              <span className="text-xs text-gray-500">إدارة المجتمعات السكنية</span>
+              <span className="text-3xl font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
+              <span className="text-xs text-gray-500 font-medium">إدارة المجتمعات السكنية</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -154,7 +154,7 @@ const HomePage = () => {
             <img
               src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
               alt="HomeMe"
-              className="h-24 w-auto rounded-3xl shadow-2xl mx-auto mb-8 ring-4 ring-white/20"
+              className="h-32 w-auto rounded-3xl shadow-2xl mx-auto mb-8 ring-4 ring-white/20"
               data-testid="hero-logo"
             />
             <div className="inline-block px-5 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-blue-200 mb-6 border border-white/10">

@@ -1181,6 +1181,43 @@ def is_quiet_hours(preferences: Dict[str, Any]) -> bool:
         # Crosses midnight (e.g., 22:00 to 08:00)
         return now >= start_time or now <= end_time
 
+
+async def notify_compound_admins(compound_id: str, title: str, content: str, action_type: str, exclude_user_id: str = None):
+    """Send in-app notification to all admins in a compound for important actions"""
+    try:
+        admin_query = {"compound_id": compound_id, "role": "admin"}
+        if exclude_user_id:
+            admin_query["id"] = {"$ne": exclude_user_id}
+        admins = await db.users.find(admin_query, {"id": 1}).to_list(50)
+        admin_ids = [a["id"] for a in admins]
+        if not admin_ids:
+            return
+        notification_doc = {
+            "id": str(uuid.uuid4()),
+            "compound_id": compound_id,
+            "sender_id": "system",
+            "title": title,
+            "content": content,
+            "type": action_type,
+            "recipient_ids": admin_ids,
+            "is_read": False,
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.notifications.insert_one(notification_doc)
+        # Broadcast via websocket
+        ws_message = json.dumps({
+            "type": "notification",
+            "title": title,
+            "content": content,
+            "action_type": action_type,
+            "id": notification_doc["id"]
+        })
+        for admin_id in admin_ids:
+            await manager.send_personal_message(ws_message, admin_id)
+    except Exception as e:
+        logging.error(f"Error notifying admins: {e}")
+
+
 async def send_push_notification(user_id: str, title: str, body: str, data: Dict[str, Any] = None):
     """Send push notification to a user"""
     try:
@@ -2738,9 +2775,9 @@ async def get_my_notifications(current_user: User = Depends(get_current_user)):
             {"recipient_ids": {"$size": 0}},  # Broadcast notifications
             {"recipient_ids": current_user.id}  # Direct notifications
         ]
-    }).to_list(None)
+    }, {"_id": 0}).sort("created_at", -1).limit(100).to_list(None)
     
-    return notifications
+    return serialize_datetime(notifications)
 
 @api_router.put("/notifications/{notification_id}/read")
 async def mark_notification_read(
@@ -3663,6 +3700,36 @@ async def get_admin_dashboard(current_user: User = Depends(require_admin)):
         {"$limit": 5}
     ]).to_list(None)
     
+    # Additional stats for enhanced dashboard
+    total_services = await db.service_providers.count_documents({
+        "compound_id": current_user.compound_id,
+        "is_active": True
+    })
+    
+    open_maintenance = await db.maintenance_requests.count_documents({
+        "compound_id": current_user.compound_id,
+        "status": {"$in": ["pending", "in_progress"]}
+    })
+    
+    active_bookings = await db.service_bookings.count_documents({
+        "compound_id": current_user.compound_id,
+        "status": {"$in": ["pending", "confirmed", "in_progress"]}
+    })
+    
+    total_family_members = await db.family_members.count_documents({
+        "compound_id": current_user.compound_id
+    })
+    
+    # Recent notifications
+    recent_notifications = await db.notifications.find({
+        "compound_id": current_user.compound_id
+    }, {"_id": 0}).sort("created_at", -1).limit(5).to_list(None)
+    
+    # Recent activity log
+    recent_activities = await db.activity_logs.find({
+        "compound_id": current_user.compound_id
+    }, {"_id": 0}).sort("timestamp", -1).limit(10).to_list(None)
+    
     # Serialize compound data to avoid ObjectId issues
     compound_data = None
     if compound:
@@ -3700,10 +3767,16 @@ async def get_admin_dashboard(current_user: User = Depends(require_admin)):
             "total_residents": total_residents,
             "total_families": total_families,
             "pending_payments": pending_payments,
-            "open_messages": open_messages
+            "open_messages": open_messages,
+            "total_services": total_services,
+            "open_maintenance": open_maintenance,
+            "active_bookings": active_bookings,
+            "total_family_members": total_family_members
         },
         "recent_messages": serialized_messages,
-        "recent_payments": serialized_payments
+        "recent_payments": serialized_payments,
+        "recent_notifications": serialize_datetime(recent_notifications),
+        "recent_activities": serialize_datetime(recent_activities)
     }
 
 @api_router.get("/dashboard/resident")
@@ -5386,6 +5459,15 @@ async def create_service_booking(
             booking_data.provider_id
         )
         
+        # Notify admins about new service booking
+        await notify_compound_admins(
+            compound_id=current_user.compound_id,
+            title="حجز خدمة جديد",
+            content=f"حجز خدمة جديد من {current_user.full_name} - {provider.get('name', 'مزود خدمة')}",
+            action_type="new_booking",
+            exclude_user_id=None
+        )
+        
         return {"message": "Service booking created successfully", "booking": serialize_datetime(booking.dict())}
         
     except HTTPException:
@@ -5835,6 +5917,15 @@ async def add_family_member_to_unit(
             "details": f"{current_user.full_name} ({current_user.role}) added family member {full_name} to unit {target_resident['unit_number']}",
             "timestamp": datetime.now(timezone.utc)
         })
+        
+        # Notify admins about new family member
+        await notify_compound_admins(
+            compound_id=current_user.compound_id,
+            title="فرد عائلة جديد",
+            content=f"تمت إضافة {full_name} إلى وحدة {target_resident['unit_number']} بواسطة {current_user.full_name}",
+            action_type="new_family_member",
+            exclude_user_id=current_user.id
+        )
         
         return {
             "message": f"Family member {full_name} added successfully to unit {target_resident['unit_number']}",
@@ -6552,6 +6643,15 @@ async def create_residence_directly(
         await db.users.update_one(
             {"id": new_user.id},
             {"$set": {"family_id": new_family.id}}
+        )
+        
+        # Notify admins about new residence
+        await notify_compound_admins(
+            compound_id=compound_id,
+            title="وحدة سكنية جديدة",
+            content=f"تم إنشاء وحدة سكنية جديدة: {unit_number} - {full_name}",
+            action_type="new_residence",
+            exclude_user_id=current_user.id
         )
         
         return {
@@ -8178,6 +8278,16 @@ async def create_maintenance_request(
         }
         
         await db.maintenance_requests.insert_one(maintenance_request)
+        
+        # Notify admins about new maintenance request
+        priority_labels = {"urgent": "عاجل", "high": "مرتفع", "normal": "عادي", "low": "منخفض"}
+        await notify_compound_admins(
+            compound_id=current_user.compound_id,
+            title="طلب صيانة جديد",
+            content=f"طلب صيانة من {current_user.full_name}: {title} (أولوية: {priority_labels.get(priority, priority)})",
+            action_type="new_maintenance",
+            exclude_user_id=None
+        )
         
         return {"message": "Maintenance request created successfully", "request_id": maintenance_request["id"]}
         

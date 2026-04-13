@@ -251,7 +251,28 @@ const HomePage = () => {
       compounds: 'حتى 3 مجتمعات',
       monthly: 3500,
       color: 'border-amber-400',
-      features: ['إدارة حتى 3 مجتمعات سكنية', 'لوحة تحكم موحدة', 'عدد غير محدود من السكان', 'كل مميزات الاحترافي لكل مجتمع', 'تقارير موحدة', 'فريق إدارة واحد', 'دعم فني بالبريد'],
+      features: [
+        'إدارة حتى 3 مجتمعات سكنية',
+        'لوحة تحكم موحدة',
+        'عدد غير محدود من السكان',
+        'كل مميزات الاحترافي لكل مجتمع',
+        'النظام المالي الكامل',
+        'توزيع المصروفات (4 طرق)',
+        'تصدير Excel و PDF',
+        'إدارة العقود والمزودين',
+        'تقييمات الرضا',
+        'حجز المرافق',
+        'الشكاوى والاقتراحات',
+        'إدارة الزوار + QR Code',
+        'تقارير يومية تلقائية بالبريد',
+        'استطلاعات الرأي',
+        'إعلانات وأحداث',
+        'نشرات إخبارية',
+        'تحليلات متقدمة + رسوم بيانية',
+        'تقارير موحدة لكل المجتمعات',
+        'فريق إدارة واحد',
+        'دعم فني بالبريد'
+      ],
       cta: 'اشترك الآن',
       ctaStyle: 'bg-amber-500 text-white hover:bg-amber-600'
     },
@@ -262,7 +283,32 @@ const HomePage = () => {
       monthly: 7500,
       color: 'border-orange-500 ring-2 ring-orange-500/20',
       badge: 'الأفضل للشركات',
-      features: ['إدارة حتى 5 مجتمعات', 'لوحة تحكم مركزية متقدمة', 'عدد غير محدود من السكان', 'كل مميزات المتقدم لكل مجتمع', 'تحليلات مقارنة بين المجتمعات', 'إدارة فرق متعددة', 'نظام صلاحيات متقدم', 'تقارير أداء الشركة', 'دعم فني أولوية + واتساب'],
+      features: [
+        'إدارة حتى 5 مجتمعات',
+        'لوحة تحكم مركزية متقدمة',
+        'عدد غير محدود من السكان',
+        'كل مميزات المتقدم لكل مجتمع',
+        'النظام المالي الكامل',
+        'توزيع المصروفات (4 طرق)',
+        'تصدير Excel و PDF',
+        'إدارة العقود والمزودين',
+        'تقييمات الرضا',
+        'حجز المرافق',
+        'الشكاوى والاقتراحات',
+        'إدارة الزوار + QR Code',
+        'تقارير يومية تلقائية بالبريد',
+        'استطلاعات الرأي',
+        'إعلانات وأحداث',
+        'نشرات إخبارية',
+        'تحليلات متقدمة + رسوم بيانية',
+        'الأجهزة الذكية والأتمتة (قريباً)',
+        'API مخصص للتكامل',
+        'تحليلات مقارنة بين المجتمعات',
+        'إدارة فرق متعددة',
+        'نظام صلاحيات متقدم',
+        'تقارير أداء الشركة',
+        'دعم فني أولوية + واتساب'
+      ],
       cta: 'اشترك الآن',
       ctaStyle: 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:shadow-xl hover:scale-[1.02]'
     },
@@ -273,10 +319,71 @@ const HomePage = () => {
       monthly: 20000,
       isCustom: false,
       color: 'border-red-500',
-      features: ['عدد غير محدود من المجتمعات', 'عدد غير محدود من السكان', 'كل مميزات المنصة بدون استثناء', 'تكامل API كامل مع أنظمتكم', 'استضافة خاصة (اختياري)', 'تخصيص العلامة التجارية', 'مدير حساب مخصص', 'تدريب شامل للفريق', 'SLA مضمون 99.9%', 'دعم فني 24/7 هاتف + واتساب'],
+      features: [
+        'عدد غير محدود من المجتمعات',
+        'عدد غير محدود من السكان',
+        'كل مميزات المنصة بدون استثناء',
+        'النظام المالي الكامل',
+        'توزيع المصروفات (4 طرق)',
+        'تصدير Excel و PDF',
+        'إدارة العقود والمزودين',
+        'تقييمات الرضا',
+        'حجز المرافق',
+        'الشكاوى والاقتراحات',
+        'إدارة الزوار + QR Code',
+        'تقارير يومية تلقائية بالبريد',
+        'استطلاعات الرأي',
+        'إعلانات وأحداث',
+        'نشرات إخبارية',
+        'تحليلات متقدمة + رسوم بيانية',
+        'الأجهزة الذكية والأتمتة (قريباً)',
+        'تكامل API كامل مع أنظمتكم',
+        'تحليلات مقارنة بين المجتمعات',
+        'إدارة فرق متعددة',
+        'نظام صلاحيات متقدم',
+        'تقارير أداء الشركة',
+        'استضافة خاصة (اختياري)',
+        'تخصيص العلامة التجارية',
+        'مدير حساب مخصص',
+        'تدريب شامل للفريق',
+        'SLA مضمون 99.9%',
+        'دعم فني 24/7 هاتف + واتساب'
+      ],
       cta: 'اشترك الآن',
       ctaStyle: 'bg-red-600 text-white hover:bg-red-700'
     },
+  ];
+
+  const companyComparisonFeatures = [
+    { name: 'عدد المجتمعات', startup: 'حتى 3', business: 'حتى 5', enterprise: 'غير محدود' },
+    { name: 'عدد السكان', startup: true, business: true, enterprise: true },
+    { name: 'لوحة تحكم مركزية', startup: true, business: true, enterprise: true },
+    { name: 'النظام المالي الكامل', startup: true, business: true, enterprise: true },
+    { name: 'توزيع المصروفات (4 طرق)', startup: true, business: true, enterprise: true },
+    { name: 'تصدير Excel و PDF', startup: true, business: true, enterprise: true },
+    { name: 'إدارة العقود والمزودين', startup: true, business: true, enterprise: true },
+    { name: 'تقييمات الرضا', startup: true, business: true, enterprise: true },
+    { name: 'حجز المرافق', startup: true, business: true, enterprise: true },
+    { name: 'الشكاوى والاقتراحات', startup: true, business: true, enterprise: true },
+    { name: 'إدارة الزوار + QR Code', startup: true, business: true, enterprise: true },
+    { name: 'تقارير يومية تلقائية بالبريد', startup: true, business: true, enterprise: true },
+    { name: 'استطلاعات الرأي', startup: true, business: true, enterprise: true },
+    { name: 'إعلانات وأحداث', startup: true, business: true, enterprise: true },
+    { name: 'نشرات إخبارية', startup: true, business: true, enterprise: true },
+    { name: 'تحليلات متقدمة + رسوم بيانية', startup: true, business: true, enterprise: true },
+    { name: 'تقارير موحدة لكل المجتمعات', startup: true, business: true, enterprise: true },
+    { name: 'الأجهزة الذكية والأتمتة (قريباً)', startup: false, business: true, enterprise: true },
+    { name: 'API مخصص للتكامل', startup: false, business: true, enterprise: true },
+    { name: 'تحليلات مقارنة بين المجتمعات', startup: false, business: true, enterprise: true },
+    { name: 'إدارة فرق متعددة', startup: false, business: true, enterprise: true },
+    { name: 'نظام صلاحيات متقدم', startup: false, business: true, enterprise: true },
+    { name: 'تقارير أداء الشركة', startup: false, business: true, enterprise: true },
+    { name: 'استضافة خاصة (اختياري)', startup: false, business: false, enterprise: true },
+    { name: 'تخصيص العلامة التجارية', startup: false, business: false, enterprise: true },
+    { name: 'مدير حساب مخصص', startup: false, business: false, enterprise: true },
+    { name: 'تدريب شامل للفريق', startup: false, business: false, enterprise: true },
+    { name: 'SLA مضمون 99.9%', startup: false, business: false, enterprise: true },
+    { name: 'دعم فني 24/7 هاتف + واتساب', startup: false, business: false, enterprise: true },
   ];
 
   const comparisonFeatures = [
@@ -689,6 +796,48 @@ const HomePage = () => {
                   <button onClick={() => handleSubscribe(`company_${plan.nameEn.toLowerCase()}`)} className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>{plan.cta}</button>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Company Comparison Table */}
+          <div className="mb-16">
+            <h3 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'Cairo', sans-serif" }}>مقارنة تفصيلية بين خطط الشركات</h3>
+            <div className="overflow-x-auto rounded-2xl border border-white/10">
+              <table className="w-full text-sm" data-testid="company-comparison-table">
+                <thead>
+                  <tr className="bg-white/10">
+                    <th className="text-right py-3 px-4 font-bold text-gray-300">الميزة</th>
+                    <th className="text-center py-3 px-3 font-bold text-amber-400">شركة ناشئة</th>
+                    <th className="text-center py-3 px-3 font-bold text-orange-400">شركة متوسطة</th>
+                    <th className="text-center py-3 px-3 font-bold text-red-400">شركة كبرى</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {companyComparisonFeatures.map((feat, i) => (
+                    <tr key={i} className={i % 2 === 0 ? 'bg-white/[0.02]' : ''}>
+                      <td className="py-2.5 px-4 text-gray-300 text-xs">{feat.name}</td>
+                      {['startup', 'business', 'enterprise'].map(tier => (
+                        <td key={tier} className="text-center py-2.5 px-3">
+                          {typeof feat[tier] === 'string' ? (
+                            <span className="text-xs font-bold text-amber-300">{feat[tier]}</span>
+                          ) : feat[tier] ? (
+                            <CheckCircleIcon className="h-4 w-4 text-green-400 mx-auto" />
+                          ) : (
+                            <span className="text-gray-600 text-xs">—</span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                  {/* Price row */}
+                  <tr className="bg-white/5 border-t border-white/10">
+                    <td className="py-3 px-4 font-bold text-white text-xs">السعر {isYearly ? 'السنوي' : 'الشهري'}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-amber-300">{isYearly ? yearlyOf(3500) : priceOf(3500)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-orange-300">{isYearly ? yearlyOf(7500) : priceOf(7500)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-red-300">{isYearly ? yearlyOf(20000) : priceOf(20000)} {sym}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 

@@ -187,7 +187,7 @@ const CompoundManagement = () => {
     } catch (error) {
       console.error('Failed to fetch users:', error);
       if (error.response?.status !== 429) {
-        toast.error('Failed to load users');
+        toast.error(t('failed_load_users', 'فشل في تحميل المستخدمين'));
       }
     } finally {
       fetchAllUsers._isLoading = false;
@@ -236,7 +236,7 @@ const CompoundManagement = () => {
       await fetchAllUsers();
     } catch (error) {
       console.error('Failed to update user status:', error);
-      toast.error('Failed to update user status');
+      toast.error(t('failed_update_status', 'فشل في تحديث حالة المستخدم'));
     }
   };
 
@@ -244,11 +244,11 @@ const CompoundManagement = () => {
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
         await axios.delete(`${API}/admin/users/${userId}`);
-        toast.success('User deleted successfully');
+        toast.success(t('user_deleted', 'تم حذف المستخدم بنجاح'));
         await fetchAllUsers();
       } catch (error) {
         console.error('Failed to delete user:', error);
-        toast.error('Failed to delete user');
+        toast.error(t('user_delete_failed', 'فشل في حذف المستخدم'));
       }
     }
   };
@@ -354,7 +354,7 @@ const CompoundManagement = () => {
       setLogoFile(null);
     } catch (error) {
       console.error('Failed to upload logo:', error);
-      toast.error('Failed to upload logo');
+      toast.error(t('failed_upload_logo', 'فشل في رفع الشعار'));
     }
   };
 
@@ -413,7 +413,7 @@ const CompoundManagement = () => {
       } else if (error.response?.status === 429) {
         console.log('Rate limited - compound data will retry later');
       } else {
-        toast.error('Failed to load compound data');
+        toast.error(t('failed_load_compound', 'فشل في تحميل بيانات المجمع'));
       }
     } finally {
       fetchCompound._isLoading = false;
@@ -428,7 +428,7 @@ const CompoundManagement = () => {
       setShowCompoundSelection(true);
     } catch (error) {
       console.error('Failed to load available compounds:', error);
-      toast.error('Failed to load available compounds');
+      toast.error(t('failed_load_compounds', 'فشل في تحميل المجمعات المتاحة'));
     }
   };
 
@@ -456,11 +456,11 @@ const CompoundManagement = () => {
           await fetchRegistrationLinks();
         }
         
-        toast.success('Compound selected successfully!');
+        toast.success(t('compound_selected', 'تم اختيار المجمع بنجاح!'));
       }
     } catch (error) {
       console.error('Failed to update compound selection:', error);
-      toast.error('Failed to update compound selection');
+      toast.error(t('failed_select_compound', 'فشل في تحديث اختيار المجمع'));
     }
   };
 
@@ -505,11 +505,11 @@ const CompoundManagement = () => {
     e.preventDefault();
     try {
       const response = await axios.post(`${API}/admin/registration-links`, residenceForm);
-      toast.success('Registration link created successfully!');
+      toast.success(t('link_created', 'تم إنشاء رابط التسجيل بنجاح!'));
       
       // Copy link to clipboard
       navigator.clipboard.writeText(response.data.registration_url);
-      toast.success('Registration URL copied to clipboard!');
+      toast.success(t('url_copied', 'تم نسخ رابط التسجيل!'));
       
       setShowAddResidence(false);
       resetResidenceForm();
@@ -524,18 +524,18 @@ const CompoundManagement = () => {
     if (window.confirm('Are you sure you want to delete this registration link?')) {
       try {
         await axios.delete(`${API}/admin/registration-links/${linkId}`);
-        toast.success('Registration link deleted successfully');
+        toast.success(t('link_deleted', 'تم حذف رابط التسجيل بنجاح'));
         await fetchRegistrationLinks();
       } catch (error) {
         console.error('Failed to delete registration link:', error);
-        toast.error('Failed to delete registration link');
+        toast.error(t('failed_delete_link', 'فشل في حذف رابط التسجيل'));
       }
     }
   };
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    toast.success('Copied to clipboard!');
+    toast.success(t('copied_clipboard', 'تم النسخ!'));
   };
 
   const resetResidenceForm = () => {
@@ -859,7 +859,7 @@ const CompoundManagement = () => {
       // Note: Unit number and email updates would need additional backend endpoints
       // For now, we'll focus on the fields that can be updated
 
-      toast.success('Unit updated successfully!');
+      toast.success(t('unit_updated', 'تم تحديث الوحدة بنجاح!'));
       setShowEditUnit(false);
       setEditingUnit(null);
       await fetchResidences();
@@ -894,7 +894,7 @@ const CompoundManagement = () => {
         },
       });
 
-      toast.success('Family member updated successfully!');
+      toast.success(t('member_updated', 'تم تحديث فرد العائلة بنجاح!'));
       setShowEditMember(false);
       setEditingMember(null);
       
@@ -913,7 +913,7 @@ const CompoundManagement = () => {
 
   const addFamilyMember = () => {
     if (!newFamilyMember.full_name || !newFamilyMember.relationship) {
-      toast.error('Please fill in required fields (Name and Relationship)');
+      toast.error(t('fill_required_fields', 'يرجى ملء الحقول المطلوبة (الاسم والعلاقة)'));
       return;
     }
 
@@ -964,7 +964,7 @@ const CompoundManagement = () => {
         },
       });
 
-      toast.success('Residence and family head created successfully!');
+      toast.success(t('residence_created', 'تم إنشاء الوحدة ورب العائلة بنجاح!'));
       
       if (residenceResponse.data.temporary_password) {
         toast.success(`Family Head Login - Username: ${residenceResponse.data.username}, Password: ${residenceResponse.data.temporary_password}`, { duration: 15000 });
@@ -1048,7 +1048,7 @@ const CompoundManagement = () => {
         },
       });
 
-      toast.success('New residence created successfully!');
+      toast.success(t('new_residence_created', 'تم إنشاء وحدة سكنية جديدة بنجاح!'));
       
       if (response.data.temporary_password) {
         toast.success(`Temporary password: ${response.data.temporary_password}`, { duration: 10000 });
@@ -1094,7 +1094,7 @@ const CompoundManagement = () => {
 
       toast.success(t('logo_uploaded_successfully', 'Logo uploaded successfully!'));
     } catch (error) {
-      toast.error('Failed to upload logo');
+      toast.error(t('failed_upload_logo', 'فشل في رفع الشعار'));
     } finally {
       setUploading(false);
     }

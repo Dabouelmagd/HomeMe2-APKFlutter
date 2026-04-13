@@ -86,7 +86,7 @@ const AdvancedAnalytics = () => {
       
       setAnalytics(response.data || {});
     } catch (error) {
-      toast.error('Failed to load analytics data');
+      toast.error(t('failed_load_analytics', 'فشل في تحميل بيانات التحليلات'));
       console.error('Analytics fetch error:', error);
     } finally {
       setLoading(false);
@@ -97,7 +97,7 @@ const AdvancedAnalytics = () => {
     setRefreshing(true);
     await fetchAnalytics();
     setRefreshing(false);
-    toast.success('Analytics data refreshed');
+    toast.success(t('analytics_refreshed', 'تم تحديث بيانات التحليلات'));
   };
 
   const exportData = async (format = 'csv') => {
@@ -120,7 +120,7 @@ const AdvancedAnalytics = () => {
       
       toast.success(`Analytics exported as ${format.toUpperCase()}`);
     } catch (error) {
-      toast.error('Failed to export analytics data');
+      toast.error(t('failed_export_analytics', 'فشل في تصدير البيانات'));
     }
   };
 

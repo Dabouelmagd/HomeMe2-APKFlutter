@@ -26,7 +26,7 @@ const CompoundsManagement = () => {
       setCompounds(response.data);
     } catch (error) {
       console.error('Error fetching compounds:', error);
-      toast.error('Failed to load compounds');
+      toast.error(t('failed_load_compounds', 'فشل في تحميل المجمعات'));
     } finally {
       setLoading(false);
     }
@@ -43,7 +43,7 @@ const CompoundsManagement = () => {
 
   const handleSendCode = async () => {
     if (!selectedCompound || !selectedCode) {
-      toast.error('Please select a compound and code');
+      toast.error(t('select_compound_and_code', 'يرجى اختيار المجمع والرمز'));
       return;
     }
 
@@ -57,7 +57,7 @@ const CompoundsManagement = () => {
       setSelectedCompound(null);
       setSelectedCode('');
     } catch (error) {
-      toast.error('Failed to send code');
+      toast.error(t('failed_send_code', 'فشل في إرسال الرمز'));
     }
   };
 

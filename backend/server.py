@@ -1959,7 +1959,7 @@ async def get_user_trial_status(user_id: str, compound_id: str) -> Dict[str, Any
 
 async def get_compound_chat_ids(compound_id: str) -> List[str]:
     """Get all chat IDs for a compound"""
-    chats = await db.chats.find({"compound_id": compound_id}).to_list(None)
+    chats = await db.chats.find({"compound_id": compound_id}).limit(500).to_list(None)
     return [chat["id"] for chat in chats]
 
 async def calculate_storage_usage(compound_id: str) -> int:
@@ -2689,11 +2689,9 @@ async def create_message(
 @api_router.get("/messages")
 async def get_messages(current_user: User = Depends(get_current_user)):
     if current_user.role == UserRole.ADMIN:
-        # Admins see all messages in their compound
-        messages = await db.messages.find({"compound_id": current_user.compound_id}).to_list(None)
+        messages = await db.messages.find({"compound_id": current_user.compound_id}).sort("created_at", -1).limit(200).to_list(None)
     else:
-        # Residents see only their messages
-        messages = await db.messages.find({"sender_id": current_user.id}).to_list(None)
+        messages = await db.messages.find({"sender_id": current_user.id}).sort("created_at", -1).limit(200).to_list(None)
     
     return messages
 
@@ -3779,7 +3777,7 @@ async def get_user_chats(current_user: User = Depends(get_current_user)):
         "compound_id": current_user.compound_id,
         "participants": current_user.id,
         "is_active": True
-    }).sort("last_message_at", -1).to_list(None)
+    }).sort("last_message_at", -1).limit(100).to_list(None)
     
     # Get participant details for each chat
     for chat in chats:

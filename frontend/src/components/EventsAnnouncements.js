@@ -117,7 +117,7 @@ const EventsAnnouncements = () => {
       setAnnouncements(announcementsRes.data.announcements || []);
       setStats(statsRes.data.stats || {});
     } catch (error) {
-      toast.error('Failed to load data');
+      toast.error(t('failed_load_data', 'فشل في تحميل البيانات'));
       console.error('Data fetch error:', error);
     } finally {
       setLoading(false);
@@ -177,7 +177,7 @@ const EventsAnnouncements = () => {
       await axios.post(`${API}/${itemType}s/${itemId}/like`);
       fetchData();
     } catch (error) {
-      toast.error('Failed to like item');
+      toast.error(t('failed_like', 'فشل في الإعجاب'));
     }
   };
 
@@ -186,7 +186,7 @@ const EventsAnnouncements = () => {
       await axios.post(`${API}/${itemType}s/${itemId}/bookmark`);
       fetchData();
     } catch (error) {
-      toast.error('Failed to bookmark item');
+      toast.error(t('failed_bookmark', 'فشل في الحفظ'));
     }
   };
 

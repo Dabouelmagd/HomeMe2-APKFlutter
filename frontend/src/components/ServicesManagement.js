@@ -613,7 +613,7 @@ const ServicesManagement = () => {
         setServices(servicesWithAvailability);
         
         if (servicesWithAvailability.length > 0) {
-          toast.success(`Loaded ${servicesWithAvailability.length} services successfully!`);
+          toast.success(t('services_loaded_success', `تم تحميل ${servicesWithAvailability.length} خدمة بنجاح!`));
         }
       } else {
         console.log('No services array in response');
@@ -622,7 +622,7 @@ const ServicesManagement = () => {
     } catch (error) {
       console.error('Failed to load services:', error);
       console.error('Error response:', error.response?.data);
-      toast.error(`Failed to load services: ${error.response?.data?.detail || error.message}`);
+      toast.error(t('failed_to_load_services', 'فشل في تحميل الخدمات'));
       setServices([]);
     } finally {
       setLoading(false);
@@ -643,10 +643,10 @@ const ServicesManagement = () => {
       // Fetch fresh services
       await fetchServices();
       
-      toast.success('Services refreshed successfully!');
+      toast.success(t('services_refreshed', 'تم تحديث الخدمات بنجاح!'));
     } catch (error) {
       console.error('Failed to refresh services:', error);
-      toast.error('Failed to refresh services');
+      toast.error(t('failed_refresh_services', 'فشل في تحديث الخدمات'));
     }
   };
 
@@ -674,7 +674,7 @@ const ServicesManagement = () => {
       
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Failed to add services');
+      toast.error(t('failed_add_services', 'فشل في إضافة الخدمات'));
     }
   };
 
@@ -814,12 +814,12 @@ const ServicesManagement = () => {
     e.preventDefault();
     try {
       await axios.post(`${API}/compounds/${user.compound_id}/services`, serviceForm);
-      toast.success('Service created successfully!');
+      toast.success(t('service_created_success', 'تم إنشاء الخدمة بنجاح!'));
       setShowAddService(false);
       resetForm();
       fetchServices();
     } catch (error) {
-      toast.error('Failed to create service');
+      toast.error(t('failed_create_service', 'فشل في إنشاء الخدمة'));
     }
   };
 
@@ -827,11 +827,11 @@ const ServicesManagement = () => {
     e.preventDefault();
     try {
       await axios.put(`${API}/compounds/${user.compound_id}/services/${editingService.id}`, serviceForm);
-      toast.success('Service updated successfully!');
+      toast.success(t('service_updated_success', 'تم تحديث الخدمة بنجاح!'));
       resetForm();
       fetchServices();
     } catch (error) {
-      toast.error('Failed to update service');
+      toast.error(t('failed_update_service', 'فشل في تحديث الخدمة'));
     }
   };
 
@@ -839,10 +839,10 @@ const ServicesManagement = () => {
     if (window.confirm('Are you sure you want to delete this service?')) {
       try {
         await axios.delete(`${API}/compounds/${user.compound_id}/services/${serviceId}`);
-        toast.success('Service deleted successfully!');
+        toast.success(t('service_deleted_success', 'تم حذف الخدمة بنجاح!'));
         fetchServices();
       } catch (error) {
-        toast.error('Failed to delete service');
+        toast.error(t('failed_delete_service', 'فشل في حذف الخدمة'));
       }
     }
   };
@@ -883,7 +883,7 @@ const ServicesManagement = () => {
         console.error('Error response:', error.response.data);
         toast.error(error.response.data.detail || 'Failed to initialize default services');
       } else {
-        toast.error('Failed to initialize default services');
+        toast.error(t('failed_init_services', 'فشل في تهيئة الخدمات الافتراضية'));
       }
     }
   };

@@ -106,7 +106,7 @@ const AddFamilyMemberToUnit = () => {
       setFilteredResidents(flatResidences);
     } catch (error) {
       console.error('Error fetching residents:', error);
-      toast.error('Failed to load residents');
+      toast.error(t('failed_load_residents', 'فشل في تحميل السكان'));
     } finally {
       setLoading(false);
     }
@@ -116,7 +116,7 @@ const AddFamilyMemberToUnit = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
+        toast.error(t('select_image_file', 'يرجى اختيار ملف صورة'));
         return;
       }
       
@@ -161,7 +161,7 @@ const AddFamilyMemberToUnit = () => {
     if (!selectedUnit) return;
 
     if (!memberForm.full_name || !memberForm.relationship) {
-      toast.error('Please fill in required fields (Name and Relationship)');
+      toast.error(t('fill_required_fields', 'يرجى ملء الحقول المطلوبة (الاسم والعلاقة)'));
       return;
     }
 
@@ -195,7 +195,7 @@ const AddFamilyMemberToUnit = () => {
       setSelectedUnit(null);
     } catch (error) {
       console.error('Error adding family member:', error);
-      toast.error(error.response?.data?.detail || 'Failed to add family member');
+      toast.error(error.response?.data?.detail || t('failed_add_family_member', 'فشل في إضافة فرد العائلة'));
     } finally {
       setSubmitting(false);
     }

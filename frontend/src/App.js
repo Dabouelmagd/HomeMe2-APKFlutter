@@ -53,6 +53,7 @@ import ComplaintsSystem from './components/ComplaintsSystem';
 import SuperAdminPanel from './components/SuperAdminPanel';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
+import SubscriptionManagement from './components/SubscriptionManagement';
 import NotificationCenter from './components/NotificationCenter';
 import Chat from './components/Chat';
 import Settings from './components/Settings';
@@ -575,6 +576,10 @@ function App() {
                 
                 <Route path="activate-subscription" element={
                   <SubscriptionActivation />
+                } />
+                
+                <Route path="my-subscription" element={
+                  <SubscriptionManagement />
                 } />
                 
                 <Route path="terms-privacy" element={

@@ -2362,6 +2362,8 @@ from routes.auth import router as auth_router
 from routes.families_msgs import router as families_msgs_router
 from routes.db_admin import router as db_admin_router
 from routes.gallery_init import router as gallery_init_router
+from routes.paypal import router as paypal_router
+from routes.coupons import router as coupons_router
 
 app.include_router(monitoring_router)
 app.include_router(finance_router)
@@ -2404,6 +2406,8 @@ app.include_router(auth_router)
 app.include_router(families_msgs_router)
 app.include_router(db_admin_router)
 app.include_router(gallery_init_router)
+app.include_router(paypal_router)
+app.include_router(coupons_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

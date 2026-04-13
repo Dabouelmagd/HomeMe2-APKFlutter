@@ -77,6 +77,8 @@ packaging==25.0
 pandas==2.3.2
 passlib==1.7.4
 pathspec==0.12.1
+paypal-checkout-serversdk==1.0.3
+paypalhttp==1.0.1
 paypalrestsdk==1.13.3
 pillow==11.3.0
 platformdirs==4.4.0

@@ -2,17 +2,31 @@
 
 ## Architecture
 - **Frontend**: React + Tailwind + Recharts + i18next + Cairo
-- **Backend**: FastAPI + MongoDB + Stripe + WebAuthn
-- **server.py**: 16,321 → 2,495 lines (-84.7%) | 42 route modules
+- **Backend**: FastAPI + MongoDB + Stripe + PayPal + WebAuthn
+- **server.py**: 16,321 → 2,495 lines (-84.7%) | 44 route modules
 
-## Latest Changes (Apr 13, 2026)
-- 14-day free trial for all new accounts
-- Stripe subscription checkout working
-- Subscription expiry notifications (7-day + same-day)
-- Super Admin subscription analytics dashboard
-- server.py final cleanup: 2,495 lines remaining
+## Latest Features (Apr 13, 2026)
+### Payment Integration
+- Stripe checkout for subscriptions (working)
+- PayPal orders/capture (code ready, sandbox creds need verification)
+- Payment methods API: Stripe, PayPal, InstaPay, Vodafone Cash, Bank Transfer
+- InstaPay: 00201006008552 | Vodafone: 00201012625529
 
-## Subscription Pricing (EGP)
+### Subscription Management Page (Admin)
+- Current plan status with days remaining
+- Activate subscription code
+- Upgrade/renew with plan + duration selection
+- Pay via Stripe, PayPal, or manual transfer (InstaPay/Vodafone)
+
+### Coupon System
+- Super Admin creates percentage or fixed-amount coupons
+- Apply at checkout to get discount
+- Track usage, set max uses, plan restrictions, expiry
+
+### 14-Day Free Trial
+- All new accounts get 14-day trial automatically
+
+## Pricing (EGP)
 | Plan | Monthly | Annual (10mo) |
 |------|---------|---------------|
 | Starter | Free | Free |
@@ -23,11 +37,7 @@
 | Co. Business | 7,500 | 75,000 |
 | Co. Enterprise | 20,000 | 200,000 |
 
-## Remaining in server.py (2,495 lines)
-- Core models, enums, WebSocket handlers
-- Push notification routes, gallery/init services (duplicated in routes)
-- Startup/shutdown handlers
-
 ## Backlog
-- P2: PayPal integration
-- P3: Final server.py dedup (remove remaining duplicates)
+- P2: PayPal sandbox credentials verification
+- P2: Bank transfer API (pending bank setup)
+- P3: Coupon UI in Super Admin panel

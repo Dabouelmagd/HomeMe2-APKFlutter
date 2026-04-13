@@ -284,6 +284,14 @@ export default function SubscriptionManagement() {
                       <button onClick={() => handleDownloadPDF(inv.id)} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold hover:bg-blue-200" data-testid={`download-${inv.id}`}>
                         PDF ⬇
                       </button>
+                      <button onClick={async () => {
+                        try {
+                          await axios.post(`${API}/notifications/send-invoice-email`, {}, getToken());
+                          toast.success('تم إرسال الفاتورة بالبريد');
+                        } catch { toast.error('فشل في الإرسال'); }
+                      }} className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-xs font-bold hover:bg-green-200">
+                        بريد ✉
+                      </button>
                     </div>
                   </div>
                 ))}

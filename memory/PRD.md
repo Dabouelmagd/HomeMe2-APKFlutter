@@ -74,4 +74,12 @@
 
 ## Backlog
 - P2: Bank transfer API (pending bank setup)
-- P3: Google AdSense client ID integration (when ready)
+
+## Completed (Latest Session - Apr 13, 2026)
+- Google AdSense spaces with proper `ins` elements (3 slots on HomePage)
+- Upload images/videos for ads (up to 50MB) from Super Admin panel
+- Email notification system (invoice emails + subscription reminders) from info@datalifeai.com
+- Invoice PDF auto-generation
+- Payment History page in Subscription Management
+- Internal Ads system (CRUD + compound targeting)
+- Referral program (5 friends = 1 month free)

@@ -1,12 +1,14 @@
 """
 Internal Ads Management System - Super Admin controlled
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
 from datetime import datetime, timezone
 from typing import Optional
 from pydantic import BaseModel
 import uuid
 import logging
+import os
+import base64
 
 from database import get_db
 from auth_deps import get_current_user, require_super_admin
@@ -125,3 +127,44 @@ async def track_ad_click(ad_id: str, current_user: dict = Depends(get_current_us
     db = get_db()
     await db.internal_ads.update_one({"id": ad_id}, {"$inc": {"clicks": 1}})
     return {"ok": True}
+
+
+UPLOAD_DIR = "/app/backend/uploads/ads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+@router.post("/ads/upload-media")
+async def upload_ad_media(file: UploadFile = File(...), current_user: dict = Depends(require_super_admin)):
+    """Upload image or video for an ad"""
+    allowed_image = [".jpg", ".jpeg", ".png", ".gif", ".webp"]
+    allowed_video = [".mp4", ".webm", ".mov"]
+    allowed = allowed_image + allowed_video
+
+    ext = os.path.splitext(file.filename or "")[1].lower()
+    if ext not in allowed:
+        raise HTTPException(status_code=400, detail=f"نوع ملف غير مدعوم. المسموح: {', '.join(allowed)}")
+
+    content = await file.read()
+    max_size = 50 * 1024 * 1024  # 50MB
+    if len(content) > max_size:
+        raise HTTPException(status_code=400, detail="حجم الملف كبير جداً (الحد الأقصى 50 ميجا)")
+
+    filename = f"{uuid.uuid4().hex[:12]}{ext}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    with open(filepath, "wb") as f:
+        f.write(content)
+
+    media_type = "video" if ext in allowed_video else "image"
+    media_url = f"/api/ads/media/{filename}"
+
+    return {"url": media_url, "filename": filename, "type": media_type, "size": len(content)}
+
+
+@router.get("/ads/media/{filename}")
+async def serve_ad_media(filename: str):
+    """Serve uploaded ad media"""
+    from fastapi.responses import FileResponse
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    if not os.path.exists(filepath):
+        raise HTTPException(status_code=404, detail="ملف غير موجود")
+    return FileResponse(filepath)

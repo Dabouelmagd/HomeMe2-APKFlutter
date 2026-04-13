@@ -608,7 +608,22 @@ const SuperAdminPanel = () => {
                     <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="عنوان الإعلان" />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">رابط الصورة</label>
+                    <label className="block text-xs text-gray-400 mb-1">رفع صورة أو فيديو</label>
+                    <input type="file" accept="image/*,video/mp4,video/webm" onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      try {
+                        const res = await axios.post(`${API}/ads/upload-media`, formData, { ...getToken(), headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
+                        setNewAd({...newAd, image_url: res.data.url});
+                        toast.success(`تم رفع ${res.data.type === 'video' ? 'الفيديو' : 'الصورة'}`);
+                      } catch (err) { toast.error(err.response?.data?.detail || 'فشل في الرفع'); }
+                    }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:text-xs file:cursor-pointer" />
+                    {newAd.image_url && <p className="text-xs text-green-400 mt-1">تم الرفع: {newAd.image_url}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">أو رابط صورة خارجي</label>
                     <input type="text" value={newAd.image_url} onChange={e => setNewAd({...newAd, image_url: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
                   </div>
                   <div>
@@ -627,10 +642,6 @@ const SuperAdminPanel = () => {
                       <option value="inline">داخل المحتوى</option>
                       <option value="dashboard">لوحة التحكم</option>
                     </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">المجتمعات المستهدفة</label>
-                    <input type="text" placeholder="فارغ = جميع المجتمعات" className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" onChange={e => setNewAd({...newAd, target_compounds: e.target.value ? e.target.value.split(',').map(s => s.trim()) : []})} />
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -732,6 +743,24 @@ const SuperAdminPanel = () => {
         {/* Analytics Tab */}
         {activeTab === 'analytics' && subAnalytics && (
           <div data-testid="analytics-tab">
+            {/* Email Notifications */}
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-white">إشعارات البريد الإلكتروني</h3>
+                  <p className="text-xs text-gray-400 mt-1">إرسال تذكيرات تجديد الاشتراك من info@datalifeai.com</p>
+                </div>
+                <button onClick={async () => {
+                  try {
+                    const res = await axios.post(`${API}/notifications/send-reminders`, {}, getToken());
+                    toast.success(res.data.message);
+                  } catch { toast.error('فشل في الإرسال'); }
+                }} className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500" data-testid="send-reminders-btn">
+                  إرسال التذكيرات الآن
+                </button>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {[
                 { label: 'إجمالي المستخدمين', value: subAnalytics.total_users, color: 'text-blue-400' },

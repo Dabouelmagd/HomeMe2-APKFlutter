@@ -276,6 +276,15 @@ async def generate_manual_invoice(current_user: dict = Depends(get_current_user)
     }
 
     invoice = await create_invoice_record(db, transaction, user)
+
+    # Auto-send invoice email if user has email
+    if user.get("email"):
+        try:
+            from routes.email_notifications import send_invoice_email
+            await send_invoice_email(user["email"], invoice)
+        except Exception as e:
+            logging.error(f"Failed to auto-send invoice email: {e}")
+
     return {"message": "تم إنشاء الفاتورة", "invoice": invoice}
 
 

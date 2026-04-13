@@ -2366,6 +2366,7 @@ from routes.paypal import router as paypal_router
 from routes.coupons import router as coupons_router
 from routes.ads import router as ads_router
 from routes.referrals import router as referrals_router
+from routes.invoices import router as invoices_router
 
 app.include_router(monitoring_router)
 app.include_router(finance_router)
@@ -2412,6 +2413,7 @@ app.include_router(paypal_router)
 app.include_router(coupons_router)
 app.include_router(ads_router)
 app.include_router(referrals_router)
+app.include_router(invoices_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

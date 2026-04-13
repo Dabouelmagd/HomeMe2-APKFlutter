@@ -73,6 +73,5 @@
 | Co. Enterprise | 20,000 | 200,000 |
 
 ## Backlog
-- P1: Automatic Invoice PDF generation
-- P1: Payment History page for Admins
 - P2: Bank transfer API (pending bank setup)
+- P3: Google AdSense client ID integration (when ready)

@@ -20,6 +20,9 @@ export default function SubscriptionManagement() {
   const [selectedPlan, setSelectedPlan] = useState('');
   const [selectedDuration, setSelectedDuration] = useState('1_month');
   const [payLoading, setPayLoading] = useState('');
+  const [invoices, setInvoices] = useState([]);
+  const [invoiceStats, setInvoiceStats] = useState({});
+  const [showHistory, setShowHistory] = useState(false);
 
   const fetchSub = useCallback(async () => {
     try {
@@ -35,7 +38,36 @@ export default function SubscriptionManagement() {
     } catch { /* */ }
   }, []);
 
-  useEffect(() => { fetchSub(); fetchMethods(); }, [fetchSub, fetchMethods]);
+  useEffect(() => { fetchSub(); fetchMethods(); fetchInvoices(); }, [fetchSub, fetchMethods]);
+
+  const fetchInvoices = async () => {
+    try {
+      const res = await axios.get(`${API}/invoices`, getToken());
+      setInvoices(res.data.invoices || []);
+      setInvoiceStats(res.data.stats || {});
+    } catch { /* */ }
+  };
+
+  const handleDownloadPDF = async (invoiceId) => {
+    try {
+      const res = await axios.get(`${API}/invoices/${invoiceId}/pdf`, { ...getToken(), responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `invoice-${invoiceId}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success('تم تحميل الفاتورة');
+    } catch { toast.error('فشل في تحميل الفاتورة'); }
+  };
+
+  const handleGenerateInvoice = async () => {
+    try {
+      const res = await axios.post(`${API}/invoices/generate`, {}, getToken());
+      toast.success(res.data.message);
+      fetchInvoices();
+    } catch (err) { toast.error(err.response?.data?.detail || 'فشل'); }
+  };
 
   const handleActivateCode = async () => {
     if (!code.trim()) return;
@@ -203,6 +235,66 @@ export default function SubscriptionManagement() {
                 ))}
               </div>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Payment History & Invoices */}
+      <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden" data-testid="payment-history">
+        <button onClick={() => setShowHistory(!showHistory)} className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">🧾</span>
+            <div className="text-right">
+              <h2 className="font-bold text-gray-900">سجل المدفوعات والفواتير</h2>
+              <p className="text-xs text-gray-500">{invoiceStats.total_invoices || 0} فاتورة | إجمالي: {(invoiceStats.total_paid || 0).toLocaleString()} ج.م</p>
+            </div>
+          </div>
+          <span className={`transition-transform ${showHistory ? 'rotate-180' : ''}`}>▼</span>
+        </button>
+
+        {showHistory && (
+          <div className="border-t border-gray-100 p-5">
+            <div className="flex gap-2 mb-4">
+              <button onClick={handleGenerateInvoice} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700" data-testid="generate-invoice-btn">
+                إنشاء فاتورة
+              </button>
+              <button onClick={fetchInvoices} className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200">
+                تحديث
+              </button>
+            </div>
+
+            {invoices.length > 0 ? (
+              <div className="space-y-2">
+                {invoices.map(inv => (
+                  <div key={inv.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors" data-testid={`invoice-${inv.id}`}>
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">📄</span>
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">{inv.invoice_number}</p>
+                        <p className="text-xs text-gray-500">{inv.date} | {planLabels[inv.plan] || inv.plan} - {durationLabels[inv.duration] || inv.duration}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-left">
+                        <p className="text-sm font-bold text-gray-900">{(inv.total || 0).toLocaleString()} {inv.currency}</p>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${inv.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                          {inv.status === 'paid' ? 'مدفوع' : 'معلق'}
+                        </span>
+                      </div>
+                      <button onClick={() => handleDownloadPDF(inv.id)} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold hover:bg-blue-200" data-testid={`download-${inv.id}`}>
+                        PDF ⬇
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-400">
+                <p className="text-3xl mb-2">🧾</p>
+                <p className="text-sm">لا توجد فواتير بعد</p>
+                <p className="text-xs mt-1">سيتم إنشاء الفواتير تلقائياً عند كل عملية دفع</p>
+              </div>
+            )}
           </div>
         )}
       </div>

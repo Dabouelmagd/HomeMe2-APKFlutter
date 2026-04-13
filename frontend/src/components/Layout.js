@@ -419,7 +419,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                       e.stopPropagation();
                       toggleSection(sectionIndex);
                     }}
-                    className={`w-full px-3 py-2 rounded-lg border ${sectionColor} mb-1 transition-all duration-200 cursor-pointer bg-white`}
+                    className={`w-full px-3 py-1.5 rounded-lg border ${sectionColor} mb-0.5 transition-all duration-200 cursor-pointer bg-white`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
@@ -449,7 +449,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                           key={item.name}
                           to={item.href}
                           className={`
-                            group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                            group flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200
                             ${isActive(item.href)
                               ? `bg-gradient-to-r ${theme.active} text-white shadow-sm`
                               : `text-gray-700 ${theme.hover} hover:text-gray-900`
@@ -458,8 +458,8 @@ const Layout = ({ children, isTrialMode = false }) => {
                           onClick={() => setSidebarOpen(false)}
                         >
                           <item.icon
-                            className={`${isRTL ? 'ml-2.5' : 'mr-2.5'} h-4.5 w-4.5 transition-colors duration-200 ${
-                              isActive(item.href) ? 'text-white' : `text-gray-400 group-hover:${theme.text}`
+                            className={`${isRTL ? 'ml-2.5' : 'mr-2.5'} h-5 w-5 flex-shrink-0 transition-colors duration-200 ${
+                              isActive(item.href) ? 'text-white' : 'text-gray-400'
                             }`}
                           />
                           <span className="flex-1">{item.name}</span>

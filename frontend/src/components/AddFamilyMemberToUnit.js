@@ -88,8 +88,22 @@ const AddFamilyMemberToUnit = () => {
       const response = await axios.get(`${API}/compounds/${user.compound_id}/residences`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      setResidents(response.data.residences || []);
-      setFilteredResidents(response.data.residences || []);
+      // Flatten the nested family_head data into top-level fields
+      const rawResidences = response.data.residences || [];
+      const flatResidences = rawResidences.map(r => ({
+        id: r.family_head?.id || '',
+        full_name: r.family_head?.full_name || '',
+        email: r.family_head?.email || '',
+        phone: r.family_head?.phone || '',
+        username: r.family_head?.username || '',
+        profile_picture_url: r.family_head?.profile_picture_url || null,
+        unit_number: r.unit_number || '',
+        family_id: r.family_id || '',
+        family_members: r.family_members || [],
+        member_count: r.member_count || 0,
+      }));
+      setResidents(flatResidences);
+      setFilteredResidents(flatResidences);
     } catch (error) {
       console.error('Error fetching residents:', error);
       toast.error('Failed to load residents');

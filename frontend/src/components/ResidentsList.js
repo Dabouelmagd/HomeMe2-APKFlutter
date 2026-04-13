@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { 
   UserGroupIcon, 
@@ -21,6 +22,7 @@ const API = `${BACKEND_URL}/api`;
 const ResidentsList = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
   
   const [residents, setResidents] = useState([
@@ -128,7 +130,7 @@ const ResidentsList = () => {
               </div>
               
               <button
-                onClick={() => window.location.href = '/app/add-family-member'}
+                onClick={() => navigate('/app/add-family-member')}
                 className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl flex items-center space-x-3 rtl:space-x-reverse transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <UserPlusIcon className="h-6 w-6 group-hover:rotate-12 transition-transform" />

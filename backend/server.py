@@ -113,6 +113,15 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI(title="HomeMe API", description="Compound Management System")
 api_router = APIRouter(prefix="/api")
 
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Add rate limiter to app
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -2907,32 +2916,58 @@ async def get_all_compounds(current_user: User = Depends(get_current_user)):
     if current_user.username not in ["johndoe", "admin", "superadmin"]:
         raise HTTPException(status_code=403, detail="Super admin access required")
     
-    compounds = await db.compounds.find({}).to_list(None)
+    compounds = await db.compounds.find({}).to_list(100)
+    
+    # Batch get counts using aggregation to avoid N+1 queries
+    compound_ids = [c.get("id") for c in compounds]
+    
+    user_counts = {}
+    admin_counts = {}
+    resident_counts = {}
+    family_counts = {}
+    
+    if compound_ids:
+        # Get user counts by compound and role in batch
+        user_agg = await db.users.aggregate([
+            {"$match": {"compound_id": {"$in": compound_ids}}},
+            {"$group": {
+                "_id": {"compound_id": "$compound_id", "role": "$role"},
+                "count": {"$sum": 1}
+            }}
+        ]).to_list(None)
+        
+        for item in user_agg:
+            cid = item["_id"]["compound_id"]
+            role = item["_id"]["role"]
+            count = item["count"]
+            user_counts[cid] = user_counts.get(cid, 0) + count
+            if role == "admin":
+                admin_counts[cid] = count
+            elif role == "resident":
+                resident_counts[cid] = count
+        
+        # Get family counts by compound in batch
+        family_agg = await db.families.aggregate([
+            {"$match": {"compound_id": {"$in": compound_ids}}},
+            {"$group": {"_id": "$compound_id", "count": {"$sum": 1}}}
+        ]).to_list(None)
+        
+        for item in family_agg:
+            family_counts[item["_id"]] = item["count"]
     
     compound_data = []
     for compound in compounds:
-        # Count users in compound
-        user_count = await db.users.count_documents({"compound_id": compound.get("id")})
-        admin_count = await db.users.count_documents({
-            "compound_id": compound.get("id"),
-            "role": "admin"
-        })
-        resident_count = await db.users.count_documents({
-            "compound_id": compound.get("id"),
-            "role": "resident"
-        })
-        family_count = await db.families.count_documents({"compound_id": compound.get("id")})
-        
+        cid = compound.get("id")
         compound_info = {
-            "id": compound.get("id"),
+            "id": cid,
             "name": compound.get("name"),
             "address": compound.get("address"),
             "admin_id": compound.get("admin_id"),
             "additional_admins": compound.get("additional_admins", []),
-            "user_count": user_count,
-            "admin_count": admin_count,
-            "resident_count": resident_count,
-            "family_count": family_count,
+            "user_count": user_counts.get(cid, 0),
+            "admin_count": admin_counts.get(cid, 0),
+            "resident_count": resident_counts.get(cid, 0),
+            "family_count": family_counts.get(cid, 0),
             "created_at": compound.get("created_at").isoformat() if compound.get("created_at") else None
         }
         compound_data.append(compound_info)
@@ -3080,7 +3115,7 @@ async def search_database(
                 {"email": {"$regex": query, "$options": "i"}},
                 {"full_name": {"$regex": query, "$options": "i"}}
             ]
-        }, {"password_hash": 0}).to_list(None)
+        }, {"password_hash": 0}).to_list(100)
         
         return {"results": users}
     
@@ -3090,7 +3125,7 @@ async def search_database(
                 {"name": {"$regex": query, "$options": "i"}},
                 {"address": {"$regex": query, "$options": "i"}}
             ]
-        }).to_list(None)
+        }).to_list(100)
         
         return {"results": compounds}
     

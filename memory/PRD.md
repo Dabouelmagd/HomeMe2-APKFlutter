@@ -5,23 +5,32 @@
 - **Backend**: FastAPI + MongoDB + WebAuthn + ReportLab + Openpyxl
 - **Auth**: JWT with 6 roles | **Payments**: Stripe + PayPal ready
 
-## Backend Architecture (Refactored Apr 13, 2026)
-**server.py: 16,321 → 5,773 lines (-65%)**
-**27 route modules in /app/backend/routes/ (8,303 lines total)**
+## Backend Architecture (Final - Apr 13, 2026)
+**server.py: 16,321 → 3,838 lines (-76.5%)**
+**37 route modules in /app/backend/routes/ (~10,479 lines)**
 
-### Route Modules
-finance, subscriptions, chat, search, scheduled_msgs, services, family, admin_registration, admin_users, security, push_email, smart_devices, companies, exports, documents, polls, newsletters, guests, announcements, ratings, contracts, facilities, superadmin, maintenance, complaints, monitoring, notifications
+### All Route Modules
+finance, subscriptions, chat, search, scheduled_msgs, services, family, admin_registration, admin_users, security, push_email, smart_devices, companies, exports, documents, polls, newsletters, guests, announcements, ratings, contracts, facilities, superadmin, maintenance, complaints, monitoring, notifications, compounds, utility, compound_services, dashboard, user_profile, trial, analytics, individual, super_accounts, payments
 
 ### Shared Infrastructure
-- auth_deps.py, database.py, helpers.py, shared_models.py (74 Pydantic models)
+- auth_deps.py, database.py, helpers.py, shared_models.py
 
-### Subscription System (NEW)
+### E2E Registration Flow - TESTED ✅
+Super Admin → Company Admin → Create Compound → Subscription Code → Register Resident → Verify Subscription
+
+### Subscription System
 - 6 durations: trial, 3m, 6m, 9m, 1year, lifetime
 - 7 plans: starter/basic/pro/premium + company tiers
-- Bulk creation, custom codes, Super Admin management
-- Pricing: EGP/USD with annual = 10 months discount
+- EGP/USD pricing with annual = 10 months discount
+
+## Remaining in server.py (~3,838 lines)
+- Core models & enums
+- Auth (register, login, WebAuthn)
+- Families, Messages, Database queries
+- Admin initialization services
+- WebSocket endpoints
+- Startup/shutdown handlers
 
 ## Backlog
-- P1: Stripe/PayPal payment integration (needs API keys)
-- P1: E2E Registration Flow Test
-- P2: Continue server.py refactoring (Compounds, Utility, Payments ~5.7k left)
+- P1: Stripe/PayPal payment integration
+- P2: Continue final server.py cleanup

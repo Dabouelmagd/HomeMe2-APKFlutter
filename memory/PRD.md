@@ -1,40 +1,39 @@
 # HomeMe - Compound Management System PRD
 
 ## Original Problem Statement
-A compound management system (HomeMe / هوم-مي) for managing residential compounds, including residents, family members, services, maintenance, billing, and communications.
+A compound management system (HomeMe / هوم-مي) for managing residential compounds.
 
 ## Core Architecture
 - **Backend**: FastAPI + MongoDB (Motor async driver)
 - **Frontend**: React + Tailwind CSS + Shadcn UI
-- **Auth**: JWT-based with WebAuthn biometric support
-- **Integrations**: Stripe, PayPal, Recharts, fpdf2, slowapi
+- **Auth**: JWT-based with WebAuthn biometric
+- **Integrations**: Stripe, PayPal, Recharts, fpdf2, slowapi, reportlab
 
 ## What's Been Implemented
 
 ### Session 1-2 (Previous)
 - Full compound management system, WebAuthn, PWA, Multi-language
-- Settings page fix, refactor, redesign, PWA auto-reload fix
+- Settings page fix, refactor, redesign
 
 ### Session 3 (Apr 13, 2026)
-- **Fixed "Add Resident" bug** + **Fixed WebAuthn db init bug**
-- **CORS middleware** + **Query optimization** (N+1 fix, bounded queries)
-- **Arabic translation completeness**: 35+ missing keys, 50+ toast messages translated
-- **Admin Notification System**: Auto-notify admins on: new family member, maintenance request, service booking, new residence
-- **Live Dashboard**: Replaced mock data with real-time API data (GET /api/dashboard/admin) - shows residents, families, services, maintenance, bookings, payments, family members + recent activities + notifications
-- **Dashboard redesign**: Stats grid, live indicators, quick actions (6 buttons), two-column activities/notifications
-- **Deployment health check**: All 3 critical blockers resolved
-- **Cleanup**: Removed backup files from components + i18n
+- Fixed "Add Resident" bug + WebAuthn db init bug
+- CORS middleware + Query optimization (N+1 fix, bounded queries)
+- Arabic translation: 35+ missing keys, 50+ toast messages translated
+- Admin Notification System: auto-notify on new family member, maintenance, booking, residence
+- Live Dashboard: real-time stats from API, activities, notifications, 6 quick actions
+- **Resident Profile Page**: Full detail page with 7 tabs (overview, family, maintenance, bookings, financial, visitors, activities)
+- **PDF Export**: Generate professional PDF report for any resident with all sections
+- **Print Support**: Print-friendly layout for resident profiles
+- **Sort functionality**: Toggle between newest/oldest for all data sections
+- Deployment health check: all blockers resolved
 
 ## Key Files
+- `/app/frontend/src/components/ResidentProfile.js` - Resident detail page
 - `/app/frontend/src/components/AdminDashboard.js` - Live dashboard
 - `/app/frontend/src/i18n/index.js` - Translations (EN/AR/FR)
-- `/app/frontend/src/components/AddFamilyMemberToUnit.js` - Add family member
-- `/app/frontend/src/components/settings/*` - Modular settings
-- `/app/frontend/src/services/webauthn.js` - WebAuthn client
-- `/app/backend/server.py` - Main backend (notify_compound_admins, dashboard/admin endpoint)
+- `/app/backend/server.py` - Main backend
 
 ## Prioritized Backlog
-
 ### P3
-- Arabic PDF reports for compound monthly statistics
-- Further translation audit for edge cases
+- Email daily summary report for admins
+- Arabic PDF reports for compound-wide monthly statistics

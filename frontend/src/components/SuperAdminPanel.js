@@ -56,6 +56,13 @@ const SuperAdminPanel = () => {
   const [couponStats, setCouponStats] = useState({});
   const [showCreateCoupon, setShowCreateCoupon] = useState(false);
   const [newCoupon, setNewCoupon] = useState({ code: '', discount_type: 'percentage', discount_value: 20, max_uses: 100, notes: '' });
+  // Ads
+  const [ads, setAds] = useState([]);
+  const [adStats, setAdStats] = useState({});
+  const [showCreateAd, setShowCreateAd] = useState(false);
+  const [newAd, setNewAd] = useState({ title: '', image_url: '', link_url: '', description: '', position: 'banner', target_compounds: [] });
+  // Referrals
+  const [refStats, setRefStats] = useState(null);
 
   useEffect(() => { fetchDashboard(); }, []);
 
@@ -162,6 +169,34 @@ const SuperAdminPanel = () => {
   };
   useEffect(() => { if (activeTab === 'coupons') fetchCoupons(); }, [activeTab]);
 
+  // Ads
+  const fetchAds = async () => {
+    try { const res = await axios.get(`${API}/ads`, getToken()); setAds(res.data.ads || []); setAdStats(res.data.stats || {}); } catch { /* */ }
+  };
+  const handleCreateAd = async () => {
+    try {
+      await axios.post(`${API}/ads`, newAd, getToken());
+      toast.success('تم إنشاء الإعلان');
+      setShowCreateAd(false);
+      setNewAd({ title: '', image_url: '', link_url: '', description: '', position: 'banner', target_compounds: [] });
+      fetchAds();
+    } catch (err) { toast.error(err.response?.data?.detail || 'فشل'); }
+  };
+  const handleToggleAd = async (id) => {
+    try { await axios.put(`${API}/ads/${id}/toggle`, {}, getToken()); toast.success('تم التحديث'); fetchAds(); } catch { toast.error('فشل'); }
+  };
+  const handleDeleteAd = async (id) => {
+    if (!window.confirm('حذف الإعلان؟')) return;
+    try { await axios.delete(`${API}/ads/${id}`, getToken()); toast.success('تم الحذف'); fetchAds(); } catch { toast.error('فشل'); }
+  };
+  useEffect(() => { if (activeTab === 'ads') fetchAds(); }, [activeTab]);
+
+  // Referrals
+  const fetchRefStats = async () => {
+    try { const res = await axios.get(`${API}/referral/stats`, getToken()); setRefStats(res.data); } catch { /* */ }
+  };
+  useEffect(() => { if (activeTab === 'referrals') fetchRefStats(); }, [activeTab]);
+
   if (loading) {
     return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div></div>;
   }
@@ -223,6 +258,8 @@ const SuperAdminPanel = () => {
             { id: 'users', label: 'المستخدمين' },
             { id: 'codes', label: 'أكواد الاشتراك' },
             { id: 'coupons', label: 'كوبونات الخصم' },
+            { id: 'ads', label: 'الإعلانات' },
+            { id: 'referrals', label: 'الإحالات' },
             { id: 'analytics', label: 'تحليلات الاشتراكات' },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
@@ -538,6 +575,157 @@ const SuperAdminPanel = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+        )}
+
+        {/* Ads Tab */}
+        {activeTab === 'ads' && (
+          <div data-testid="ads-tab">
+            <div className="grid grid-cols-4 gap-4 mb-6">
+              {[
+                { label: 'إجمالي الإعلانات', value: adStats.total || 0, color: 'text-blue-400' },
+                { label: 'نشطة', value: adStats.active || 0, color: 'text-green-400' },
+                { label: 'إجمالي النقرات', value: adStats.total_clicks || 0, color: 'text-amber-400' },
+                { label: 'إجمالي المشاهدات', value: adStats.total_views || 0, color: 'text-purple-400' },
+              ].map((s, i) => (
+                <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
+                  <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                  <p className="text-xs text-gray-400">{s.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={() => setShowCreateAd(!showCreateAd)} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 mb-6" data-testid="create-ad-btn">
+              + إنشاء إعلان جديد
+            </button>
+
+            {showCreateAd && (
+              <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
+                <h3 className="text-lg font-bold mb-4">إنشاء إعلان داخلي</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">عنوان الإعلان</label>
+                    <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="عنوان الإعلان" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">رابط الصورة</label>
+                    <input type="text" value={newAd.image_url} onChange={e => setNewAd({...newAd, image_url: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">رابط الإعلان</label>
+                    <input type="text" value={newAd.link_url} onChange={e => setNewAd({...newAd, link_url: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">الوصف</label>
+                    <input type="text" value={newAd.description} onChange={e => setNewAd({...newAd, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="وصف مختصر..." />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">الموقع</label>
+                    <select value={newAd.position} onChange={e => setNewAd({...newAd, position: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                      <option value="banner">بانر أعلى</option>
+                      <option value="sidebar">شريط جانبي</option>
+                      <option value="inline">داخل المحتوى</option>
+                      <option value="dashboard">لوحة التحكم</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">المجتمعات المستهدفة</label>
+                    <input type="text" placeholder="فارغ = جميع المجتمعات" className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" onChange={e => setNewAd({...newAd, target_compounds: e.target.value ? e.target.value.split(',').map(s => s.trim()) : []})} />
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={handleCreateAd} disabled={!newAd.title.trim()} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 disabled:opacity-50">إنشاء الإعلان</button>
+                  <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">إلغاء</button>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-900/50">
+                  <tr>
+                    <th className="px-4 py-3 text-right text-gray-400">العنوان</th>
+                    <th className="px-4 py-3 text-right text-gray-400">الموقع</th>
+                    <th className="px-4 py-3 text-center text-gray-400">النقرات</th>
+                    <th className="px-4 py-3 text-center text-gray-400">الحالة</th>
+                    <th className="px-4 py-3 text-center text-gray-400">إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {ads.map(a => {
+                    const posLabels = { banner: 'بانر', sidebar: 'جانبي', inline: 'داخلي', dashboard: 'لوحة التحكم' };
+                    return (
+                      <tr key={a.id} className="hover:bg-gray-750">
+                        <td className="px-4 py-3">
+                          <div className="font-bold text-white">{a.title}</div>
+                          <div className="text-xs text-gray-500">{a.description || '-'}</div>
+                        </td>
+                        <td className="px-4 py-3 text-gray-300 text-xs">{posLabels[a.position] || a.position}</td>
+                        <td className="px-4 py-3 text-center text-gray-300">{a.clicks || 0}</td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                            {a.is_active ? 'نشط' : 'معطل'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex gap-1 justify-center">
+                            <button onClick={() => handleToggleAd(a.id)} className={`px-2 py-1 text-xs rounded ${a.is_active ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'}`}>
+                              {a.is_active ? 'تعطيل' : 'تفعيل'}
+                            </button>
+                            <button onClick={() => handleDeleteAd(a.id)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">حذف</button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {ads.length === 0 && (
+                    <tr><td colSpan="5" className="px-4 py-8 text-center text-gray-500">لا توجد إعلانات بعد</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Referrals Tab */}
+        {activeTab === 'referrals' && (
+          <div data-testid="referrals-tab">
+            {refStats ? (
+              <>
+                <div className="grid grid-cols-3 gap-4 mb-6">
+                  {[
+                    { label: 'أكواد الإحالة', value: refStats.total_referral_codes, color: 'text-blue-400' },
+                    { label: 'إجمالي الإحالات', value: refStats.total_referrals, color: 'text-green-400' },
+                    { label: 'كوبونات مكتسبة', value: refStats.total_coupons_earned, color: 'text-amber-400' },
+                  ].map((s, i) => (
+                    <div key={i} className="bg-gray-800 rounded-xl p-5 border border-gray-700 text-center">
+                      <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
+                      <p className="text-xs text-gray-400 mt-1">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
+                  <h3 className="font-bold text-lg mb-4">أفضل المُحيلين</h3>
+                  {refStats.top_referrers?.length > 0 ? (
+                    <div className="space-y-2">
+                      {refStats.top_referrers.map((r, i) => (
+                        <div key={i} className="flex items-center gap-3 bg-gray-900 rounded-lg p-3">
+                          <span className="text-xs font-bold text-gray-500 w-6">{i + 1}</span>
+                          <span className="font-mono text-green-400 text-sm">{r.code}</span>
+                          <div className="flex-1" />
+                          <span className="text-lg font-bold text-white">{r.total}</span>
+                          <span className="text-xs text-gray-400">إحالة</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-gray-500 py-4">لا توجد إحالات بعد</p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-10 text-gray-500">جاري التحميل...</div>
+            )}
           </div>
         )}
 

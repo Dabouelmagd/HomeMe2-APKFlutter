@@ -3,12 +3,13 @@
 ## Architecture
 - **Frontend**: React + Tailwind + Recharts + i18next + Cairo
 - **Backend**: FastAPI + MongoDB + Stripe + PayPal + WebAuthn
-- **server.py**: 16,321 → 2,495 lines (-84.7%) | 44 route modules
+- **server.py**: 16,321 -> 2,495 lines (-84.7%) | 46 route modules
 
 ## Latest Features (Apr 13, 2026)
+
 ### Payment Integration
 - Stripe checkout for subscriptions (working)
-- PayPal orders/capture (code ready, sandbox creds need verification)
+- PayPal orders/capture (sandbox creds)
 - Payment methods API: Stripe, PayPal, InstaPay, Vodafone Cash, Bank Transfer
 - InstaPay: 00201006008552 | Vodafone: 00201012625529
 
@@ -26,6 +27,40 @@
 ### 14-Day Free Trial
 - All new accounts get 14-day trial automatically
 
+### Internal Ads System (NEW)
+- Super Admin creates/manages ads for display inside the app
+- Position options: banner, sidebar, inline, dashboard
+- Target specific compounds or all
+- Click tracking and view stats
+- CRUD from Super Admin panel -> Ads tab
+
+### Google AdSense Spaces (NEW)
+- 3 ad placeholder slots on public HomePage
+- After Hero section (728x90 Leaderboard)
+- Before Pricing section
+- Before CTA section
+- Ready for Google AdSense code insertion
+
+### Referral Program (NEW)
+- Each user gets a unique referral code (REF-XXXXXX)
+- Track invited users count
+- Auto-generate 1-month free coupon when 5 friends sign up
+- Progress bar in admin dashboard
+- Copy code functionality
+- Super Admin referral stats dashboard
+
+### Updated Subscription Plans
+- Residential: Starter(free), Basic(500), Pro(1200), Premium(2200) EGP/month
+- Company: Startup(3500), Business(7500), Enterprise(20000) EGP/month
+- All plans now show FULL feature lists (no excluded items)
+- Premium button changed from "Contact Us" to "Subscribe Now"
+- Full comparison tables for both residential and company plans
+
+### Updated Operating Guide
+- HomePage guide: 15 compact grid cards (was 10 accordion items)
+- In-app guide: 23 sections covering all features
+- New sections: Complaints, Contracts, Ratings, Facilities, Polls, Announcements, Newsletters, Analytics, Export, Subscriptions
+
 ## Pricing (EGP)
 | Plan | Monthly | Annual (10mo) |
 |------|---------|---------------|
@@ -38,6 +73,6 @@
 | Co. Enterprise | 20,000 | 200,000 |
 
 ## Backlog
-- P2: PayPal sandbox credentials verification
+- P1: Automatic Invoice PDF generation
+- P1: Payment History page for Admins
 - P2: Bank transfer API (pending bank setup)
-- P3: Coupon UI in Super Admin panel

@@ -502,6 +502,16 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Google Ad Space 1 - After Hero */}
+      <div className="bg-gray-100 py-3 text-center" data-testid="ad-space-1">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="bg-white border border-dashed border-gray-300 rounded-lg py-6 px-4 flex items-center justify-center min-h-[90px]">
+            <p className="text-xs text-gray-400">مساحة إعلانية - Google AdSense (728x90 Leaderboard)</p>
+            {/* Replace with: <ins class="adsbygoogle" data-ad-client="ca-pub-XXXXX" data-ad-slot="XXXXX" data-ad-format="horizontal"></ins> */}
+          </div>
+        </div>
+      </div>
+
       {/* Registration Types */}
       <section className="py-16 bg-gray-50/80" id="register-types" data-testid="registration-section">
         <div className="max-w-7xl mx-auto px-4">
@@ -618,6 +628,15 @@ const HomePage = () => {
           )}
         </div>
       </section>
+
+      {/* Google Ad Space 2 - Before Pricing */}
+      <div className="bg-slate-900 py-3 text-center">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="border border-dashed border-white/10 rounded-lg py-5 px-4 flex items-center justify-center min-h-[90px]">
+            <p className="text-xs text-gray-500">مساحة إعلانية - Google AdSense (728x90)</p>
+          </div>
+        </div>
+      </div>
 
       {/* Subscription Plans - Residential */}
       <section className="py-20 bg-slate-950 text-white" id="pricing" data-testid="pricing-section">
@@ -912,6 +931,54 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      {/* Referral Program */}
+      <section className="py-16 bg-gradient-to-br from-emerald-50 to-teal-50" data-testid="referral-section">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold mb-6">
+            <UserGroupIcon className="h-4 w-4" />
+            برنامج الإحالة
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: "'Cairo', sans-serif" }}>ادعُ 5 أصدقاء واحصل على شهر مجاني!</h2>
+          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">شارك رابط الإحالة مع أصدقائك. عند تسجيل 5 أشخاص، ستحصل تلقائياً على كوبون اشتراك مجاني لمدة شهر كامل</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
+            <div className="bg-white rounded-xl p-5 border border-emerald-200 shadow-sm">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <UserGroupIcon className="h-6 w-6 text-emerald-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-1">1. شارك الرابط</h3>
+              <p className="text-xs text-gray-500">أرسل رابط الإحالة لأصدقائك</p>
+            </div>
+            <div className="bg-white rounded-xl p-5 border border-emerald-200 shadow-sm">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <CheckCircleIcon className="h-6 w-6 text-emerald-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-1">2. يسجّلون حساب</h3>
+              <p className="text-xs text-gray-500">5 أصدقاء يسجلون ويجربون المنصة</p>
+            </div>
+            <div className="bg-white rounded-xl p-5 border border-emerald-200 shadow-sm">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <SparklesIcon className="h-6 w-6 text-emerald-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 mb-1">3. شهر مجاني!</h3>
+              <p className="text-xs text-gray-500">كوبون اشتراك شهر كامل هدية لك</p>
+            </div>
+          </div>
+          <Link to="/register" className="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all">
+            سجّل الآن وابدأ بالدعوة
+            <ArrowRightIcon className="h-4 w-4 rotate-180" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Google Ad Space 3 - Before CTA */}
+      <div className="bg-gray-50 py-3 text-center">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="bg-white border border-dashed border-gray-300 rounded-lg py-5 px-4 flex items-center justify-center min-h-[90px]">
+            <p className="text-xs text-gray-400">مساحة إعلانية - Google AdSense (728x90)</p>
+          </div>
+        </div>
+      </div>
 
       {/* CTA */}
       <section className="py-16 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white" data-testid="cta-section">

@@ -33,9 +33,13 @@ const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [internalAds, setInternalAds] = useState([]);
+  const [referralData, setReferralData] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
+    fetchInternalAds();
+    fetchReferralCode();
   }, []);
 
   const fetchDashboardData = async () => {
@@ -49,6 +53,36 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
       setRefreshing(false);
+    }
+  };
+
+  const fetchInternalAds = async () => {
+    try {
+      const res = await axios.get(`${API}/ads/active?position=dashboard&compound_id=${user?.compound_id || ''}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      setInternalAds(res.data.ads || []);
+    } catch { /* */ }
+  };
+
+  const fetchReferralCode = async () => {
+    try {
+      const res = await axios.get(`${API}/referral/my-code`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      setReferralData(res.data);
+    } catch { /* */ }
+  };
+
+  const handleAdClick = async (ad) => {
+    try { await axios.post(`${API}/ads/${ad.id}/click`, {}, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }); } catch { /* */ }
+    if (ad.link_url) window.open(ad.link_url, '_blank');
+  };
+
+  const copyReferralCode = () => {
+    if (referralData?.code) {
+      navigator.clipboard.writeText(referralData.code);
+      toast.success('تم نسخ كود الإحالة');
     }
   };
 
@@ -391,6 +425,51 @@ const AdminDashboard = () => {
             </div>
           </div>
         </div>
+
+        {/* Internal Ads Banner */}
+        {internalAds.length > 0 && (
+          <div className="mt-6 space-y-3" data-testid="internal-ads">
+            {internalAds.slice(0, 2).map(ad => (
+              <div key={ad.id} onClick={() => handleAdClick(ad)} className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-4 cursor-pointer hover:shadow-lg transition-all">
+                <div className="flex items-center gap-4">
+                  {ad.image_url && <img src={ad.image_url} alt="" className="h-12 w-12 rounded-lg object-cover" />}
+                  <div className="flex-1 text-white">
+                    <h3 className="font-bold text-sm">{ad.title}</h3>
+                    {ad.description && <p className="text-xs text-blue-100 mt-0.5">{ad.description}</p>}
+                  </div>
+                  <span className="text-[9px] text-blue-200 bg-blue-500/30 px-2 py-0.5 rounded-full">إعلان</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Referral Program */}
+        {referralData && (
+          <div className="mt-6 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200 p-6" data-testid="referral-section">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-bold text-gray-900">{t('referral_program', 'برنامج الإحالة')}</h3>
+                <p className="text-xs text-gray-500 mt-1">ادعُ 5 أصدقاء واحصل على شهر مجاني</p>
+              </div>
+              <div className="text-left">
+                <p className="text-2xl font-black text-emerald-600">{referralData.total_invited}/5</p>
+                <p className="text-[10px] text-gray-400">إحالات</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 bg-white rounded-lg border border-emerald-200 p-2">
+              <span className="flex-1 font-mono text-sm text-emerald-700 px-2">{referralData.code}</span>
+              <button onClick={copyReferralCode} className="px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700">نسخ الكود</button>
+            </div>
+            <div className="mt-3 w-full bg-emerald-100 rounded-full h-2">
+              <div className="bg-emerald-500 h-2 rounded-full transition-all" style={{ width: `${Math.min(100, (referralData.total_invited / 5) * 100)}%` }} />
+            </div>
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              {referralData.remaining_for_coupon > 0 ? `باقي ${referralData.remaining_for_coupon} إحالات للحصول على شهر مجاني` : 'مبروك! حصلت على شهر مجاني!'}
+              {referralData.coupons_earned > 0 && ` (حصلت على ${referralData.coupons_earned} كوبون حتى الآن)`}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

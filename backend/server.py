@@ -13510,8 +13510,11 @@ class ObligationCreate(BaseModel):
     total_amount: float
     month: int  # 1-12
     year: int
-    category: str = "maintenance"  # maintenance, utilities, security, cleaning, other
-    distribute_equally: bool = True
+    category: str = "maintenance"
+    distribution_method: str = "equal"  # equal, per_sqm, percentage, custom
+    unit_area_field: str = ""  # field name for sqm if per_sqm
+    custom_amounts: Optional[Dict[str, float]] = None  # {family_id: amount} for custom
+    percentage_rates: Optional[Dict[str, float]] = None  # {family_id: percentage} for percentage
 
 @api_router.post("/financial/obligations")
 async def create_obligation(
@@ -13528,7 +13531,82 @@ async def create_obligation(
             raise HTTPException(status_code=400, detail="No units found in compound")
         
         unit_count = len(families)
-        per_unit = round(data.total_amount / unit_count, 2)
+        
+        # Build family head lookup
+        family_heads = {}
+        for family in families:
+            head = await db.users.find_one(
+                {"id": {"$in": family.get("members", [])}, "is_family_head": True},
+                {"_id": 0, "id": 1, "full_name": 1, "unit_number": 1, "unit_area": 1}
+            )
+            if not head:
+                head = await db.users.find_one(
+                    {"id": {"$in": family.get("members", [])}},
+                    {"_id": 0, "id": 1, "full_name": 1, "unit_number": 1, "unit_area": 1}
+                )
+            if head:
+                family_heads[family["id"]] = head
+        
+        # Calculate per-unit amounts based on distribution method
+        unit_amounts = {}
+        method_label = "بالتساوي"
+        
+        if data.distribution_method == "equal":
+            per_unit = round(data.total_amount / unit_count, 2)
+            for fid in family_heads:
+                unit_amounts[fid] = per_unit
+            method_label = "بالتساوي"
+            
+        elif data.distribution_method == "per_sqm":
+            # Distribute based on unit area (square meters)
+            total_area = 0
+            for fid, head in family_heads.items():
+                area = float(head.get("unit_area", 100))  # default 100 sqm
+                total_area += area
+            
+            if total_area > 0:
+                for fid, head in family_heads.items():
+                    area = float(head.get("unit_area", 100))
+                    unit_amounts[fid] = round((area / total_area) * data.total_amount, 2)
+            else:
+                per_unit = round(data.total_amount / unit_count, 2)
+                for fid in family_heads:
+                    unit_amounts[fid] = per_unit
+            method_label = "حسب المساحة"
+            
+        elif data.distribution_method == "percentage":
+            # Distribute by percentage
+            if data.percentage_rates:
+                for fid, pct in data.percentage_rates.items():
+                    if fid in family_heads:
+                        unit_amounts[fid] = round(data.total_amount * (pct / 100), 2)
+            # Any family not in percentage_rates gets equal share of remainder
+            assigned = sum(unit_amounts.values())
+            remaining_families = [fid for fid in family_heads if fid not in unit_amounts]
+            if remaining_families and assigned < data.total_amount:
+                remainder_each = round((data.total_amount - assigned) / len(remaining_families), 2)
+                for fid in remaining_families:
+                    unit_amounts[fid] = remainder_each
+            method_label = "نسبة مئوية"
+            
+        elif data.distribution_method == "custom":
+            # Custom amount per unit
+            if data.custom_amounts:
+                for fid, amt in data.custom_amounts.items():
+                    if fid in family_heads:
+                        unit_amounts[fid] = float(amt)
+            # Fill missing with equal share of remainder
+            assigned = sum(unit_amounts.values())
+            remaining_families = [fid for fid in family_heads if fid not in unit_amounts]
+            if remaining_families:
+                remainder_each = round(max(0, data.total_amount - assigned) / len(remaining_families), 2)
+                for fid in remaining_families:
+                    unit_amounts[fid] = remainder_each
+            method_label = "مبلغ مخصص"
+        else:
+            per_unit = round(data.total_amount / unit_count, 2)
+            for fid in family_heads:
+                unit_amounts[fid] = per_unit
         
         # Create the main obligation record
         obligation_id = str(uuid.uuid4())
@@ -13538,7 +13616,8 @@ async def create_obligation(
             "title": data.title,
             "description": data.description,
             "total_amount": data.total_amount,
-            "per_unit_amount": per_unit,
+            "distribution_method": data.distribution_method,
+            "distribution_label": method_label,
             "unit_count": unit_count,
             "month": data.month,
             "year": data.year,
@@ -13551,17 +13630,13 @@ async def create_obligation(
         # Create per-unit charges
         charges_created = 0
         for family in families:
-            # Get family head
-            head = await db.users.find_one(
-                {"id": {"$in": family.get("members", [])}, "is_family_head": True},
-                {"_id": 0, "id": 1, "full_name": 1, "unit_number": 1}
-            )
+            fid = family["id"]
+            head = family_heads.get(fid)
             if not head:
-                head = await db.users.find_one(
-                    {"id": {"$in": family.get("members", [])}},
-                    {"_id": 0, "id": 1, "full_name": 1, "unit_number": 1}
-                )
-            if not head:
+                continue
+            
+            amount = unit_amounts.get(fid, 0)
+            if amount <= 0:
                 continue
             
             charge = {
@@ -13571,10 +13646,10 @@ async def create_obligation(
                 "resident_id": head["id"],
                 "resident_name": head.get("full_name", ""),
                 "unit_number": head.get("unit_number", ""),
-                "family_id": family["id"],
+                "family_id": fid,
                 "title": data.title,
                 "category": data.category,
-                "amount": per_unit,
+                "amount": amount,
                 "month": data.month,
                 "year": data.year,
                 "status": "pending",
@@ -13600,10 +13675,11 @@ async def create_obligation(
         })
         
         return {
-            "message": f"تم إنشاء الالتزام وتوزيعه على {charges_created} وحدة",
+            "message": f"تم إنشاء الالتزام وتوزيعه على {charges_created} وحدة ({method_label})",
             "obligation_id": obligation_id,
-            "per_unit_amount": per_unit,
-            "units_charged": charges_created
+            "distribution_method": data.distribution_method,
+            "units_charged": charges_created,
+            "unit_amounts": {family_heads[fid].get("unit_number", fid): amt for fid, amt in unit_amounts.items() if fid in family_heads}
         }
     except HTTPException:
         raise
@@ -14261,16 +14337,34 @@ async def send_daily_report_email(current_user: User = Depends(get_current_user)
             "created_at": {"$gte": today_start}
         }),
         "maintenance_requests": await db.maintenance_requests.count_documents({
+            "compound_id": current_user.compound_id,
             "created_at": {"$gte": today_start}
-        }) if "maintenance_requests" in await db.list_collection_names() else 0,
+        }),
+        "open_maintenance": await db.maintenance_requests.count_documents({
+            "compound_id": current_user.compound_id,
+            "status": {"$in": ["pending", "in_progress"]}
+        }),
         "payments_received": 0,
         "pending_payments": await db.invoices.count_documents({
             "status": "pending"
         }) if "invoices" in await db.list_collection_names() else 0,
         "messages_sent": await db.messages.count_documents({
+            "compound_id": current_user.compound_id,
             "created_at": {"$gte": today_start}
-        }) if "messages" in await db.list_collection_names() else 0
+        }),
+        "unpaid_obligations": await db.unit_charges.count_documents({
+            "compound_id": current_user.compound_id,
+            "status": "pending"
+        }),
+        "total_unpaid_amount": 0
     }
+    
+    # Calculate total unpaid amount
+    unpaid_charges = await db.unit_charges.find(
+        {"compound_id": current_user.compound_id, "status": "pending"},
+        {"_id": 0, "amount": 1}
+    ).to_list(500)
+    stats["total_unpaid_amount"] = sum(c.get("amount", 0) for c in unpaid_charges)
     
     result = await email_service.send_daily_report(
         admin_email=current_user.email,

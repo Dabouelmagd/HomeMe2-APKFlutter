@@ -19,7 +19,8 @@ import {
   ArrowPathIcon,
   UserPlusIcon,
   CreditCardIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  EnvelopeIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -241,14 +242,33 @@ const AdminDashboard = () => {
                 {new Date().toLocaleTimeString()}
               </p>
             </div>
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
-              data-testid="refresh-dashboard"
-            >
-              <ArrowPathIcon className={`h-6 w-6 ${refreshing ? 'animate-spin' : ''}`} />
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  try {
+                    await axios.post(`${API}/email/send-daily-report`, {}, {
+                      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    toast.success(t('daily_report_sent', 'تم إرسال التقرير اليومي'));
+                  } catch (err) {
+                    toast.error(t('daily_report_failed', 'فشل إرسال التقرير - تأكد من إعداد البريد الإلكتروني'));
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-50 hover:bg-green-100 text-green-700 transition-colors text-sm font-medium"
+                data-testid="send-daily-report"
+              >
+                <EnvelopeIcon className="h-5 w-5" />
+                {t('send_daily_report', 'إرسال تقرير يومي')}
+              </button>
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
+                data-testid="refresh-dashboard"
+              >
+                <ArrowPathIcon className={`h-6 w-6 ${refreshing ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
           </div>
         </div>
 

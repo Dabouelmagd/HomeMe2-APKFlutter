@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="12" skipped="0" tests="13" time="65.674" timestamp="2026-04-13T07:55:46.870857+00:00" hostname="agent-env-d970c3c7-c0dc-4ecb-b74d-c9aec2b4fae3"><testcase classname="backend.tests.test_distribution_methods" name="test_01_equal_distribution" time="0.556"><failure message="AssertionError: Failed to create equal distribution obligation: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:70: in test_01_equal_distribution
+    assert response.status_code == 200, f"Failed to create equal distribution obligation: {response.text}"
+E   AssertionError: Failed to create equal distribution obligation: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_02_per_sqm_distribution" time="0.447"><failure message="AssertionError: Failed to create per_sqm distribution obligation: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:108: in test_02_per_sqm_distribution
+    assert response.status_code == 200, f"Failed to create per_sqm distribution obligation: {response.text}"
+E   AssertionError: Failed to create per_sqm distribution obligation: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_03_percentage_distribution" time="0.420"><failure message="AssertionError: Failed to create percentage distribution obligation: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:141: in test_03_percentage_distribution
+    assert response.status_code == 200, f"Failed to create percentage distribution obligation: {response.text}"
+E   AssertionError: Failed to create percentage distribution obligation: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_04_custom_distribution" time="0.416"><failure message="AssertionError: Failed to create custom distribution obligation: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:170: in test_04_custom_distribution
+    assert response.status_code == 200, f"Failed to create custom distribution obligation: {response.text}"
+E   AssertionError: Failed to create custom distribution obligation: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_05_get_obligations_shows_distribution_method" time="0.421"><failure message="AssertionError: Failed to get obligations: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:187: in test_05_get_obligations_shows_distribution_method
+    assert response.status_code == 200, f"Failed to get obligations: {response.text}"
+E   AssertionError: Failed to get obligations: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_06_balance_sheet_returns_monthly_breakdown" time="0.408"><failure message="AssertionError: Failed to get balance sheet: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:211: in test_06_balance_sheet_returns_monthly_breakdown
+    assert response.status_code == 200, f"Failed to get balance sheet: {response.text}"
+E   AssertionError: Failed to get balance sheet: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_07_balance_sheet_returns_expenses_by_category" time="0.407"><failure message="AssertionError: Failed to get balance sheet: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:232: in test_07_balance_sheet_returns_expenses_by_category
+    assert response.status_code == 200, f"Failed to get balance sheet: {response.text}"
+E   AssertionError: Failed to get balance sheet: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_08_balance_sheet_returns_revenue_by_source" time="0.400"><failure message="AssertionError: Failed to get balance sheet: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:247: in test_08_balance_sheet_returns_revenue_by_source
+    assert response.status_code == 200, f"Failed to get balance sheet: {response.text}"
+E   AssertionError: Failed to get balance sheet: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_09_balance_sheet_returns_collection_rate" time="0.404"><failure message="AssertionError: Failed to get balance sheet: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:262: in test_09_balance_sheet_returns_collection_rate
+    assert response.status_code == 200, f"Failed to get balance sheet: {response.text}"
+E   AssertionError: Failed to get balance sheet: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_10_balance_sheet_complete_structure" time="0.408"><failure message="AssertionError: Failed to get balance sheet: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:281: in test_10_balance_sheet_complete_structure
+    assert response.status_code == 200, f"Failed to get balance sheet: {response.text}"
+E   AssertionError: Failed to get balance sheet: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_11_send_daily_report_returns_stats" time="60.560"><failure message="AssertionError: Failed to send daily report: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:319: in test_11_send_daily_report_returns_stats
+    assert response.status_code == 200, f"Failed to send daily report: {response.text}"
+E   AssertionError: Failed to send daily report: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_distribution_methods" name="test_12_daily_report_requires_auth" time="0.173" /><testcase classname="backend.tests.test_distribution_methods" name="test_13_obligations_have_distribution_label" time="0.410"><failure message="AssertionError: Failed to get obligations: {&quot;detail&quot;:&quot;Invalid token&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code">backend/tests/test_distribution_methods.py:370: in test_13_obligations_have_distribution_label
+    assert response.status_code == 200, f"Failed to get obligations: {response.text}"
+E   AssertionError: Failed to get obligations: {"detail":"Invalid token"}
+E   assert 401 == 200
+E    +  where 401 = &lt;Response [401]&gt;.status_code</failure></testcase></testsuite></testsuites>

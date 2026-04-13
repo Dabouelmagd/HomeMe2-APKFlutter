@@ -17,6 +17,7 @@ import {
   HomeIcon,
   CreditCardIcon
 } from '@heroicons/react/24/outline';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -41,7 +42,8 @@ const CompoundFinance = () => {
 
   const [obligationForm, setObligationForm] = useState({
     title: '', description: '', total_amount: '', category: 'maintenance',
-    month: new Date().getMonth() + 1, year: new Date().getFullYear()
+    month: new Date().getMonth() + 1, year: new Date().getFullYear(),
+    distribution_method: 'equal'
   });
 
   const fetchAll = useCallback(async () => {
@@ -92,12 +94,11 @@ const CompoundFinance = () => {
     try {
       const res = await axios.post(`${API}/financial/obligations`, {
         ...obligationForm,
-        total_amount: parseFloat(obligationForm.total_amount),
-        distribute_equally: true
+        total_amount: parseFloat(obligationForm.total_amount)
       }, getToken());
       toast.success(res.data.message);
       setShowAddObligation(false);
-      setObligationForm({ title: '', description: '', total_amount: '', category: 'maintenance', month: filterMonth, year: filterYear });
+      setObligationForm({ title: '', description: '', total_amount: '', category: 'maintenance', month: filterMonth, year: filterYear, distribution_method: 'equal' });
       fetchAll();
     } catch (err) {
       toast.error(t('failed_add_obligation', 'فشل في إنشاء الالتزام'));
@@ -224,19 +225,59 @@ const CompoundFinance = () => {
             <div className="p-6 space-y-6">
               <h3 className="text-lg font-bold text-gray-900">{t('balance_sheet', 'الميزانية العمومية')} - {filterYear}</h3>
               
+              {/* Monthly Bar Chart */}
+              {Object.keys(bs.monthly_breakdown || {}).length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-700 mb-3">{t('monthly_chart', 'الرسم البياني الشهري')}</h4>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={Object.entries(bs.monthly_breakdown || {}).map(([month, val]) => ({
+                      name: month.slice(5),
+                      [t('expenses', 'المصروفات')]: val.expenses || 0,
+                      [t('revenue', 'الإيرادات')]: val.revenue || 0
+                    }))}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis tick={{ fontSize: 12 }} />
+                      <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                      <Legend />
+                      <Bar dataKey={t('expenses', 'المصروفات')} fill="#ef4444" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey={t('revenue', 'الإيرادات')} fill="#22c55e" radius={[6, 6, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Expenses by Category */}
+                {/* Expenses Pie Chart + List */}
                 <div>
                   <h4 className="font-semibold text-gray-700 mb-3">{t('expenses_by_category', 'المصروفات حسب التصنيف')}</h4>
                   {Object.keys(bs.expenses_by_category || {}).length > 0 ? (
-                    <div className="space-y-2">
-                      {Object.entries(bs.expenses_by_category || {}).map(([cat, amt]) => (
-                        <div key={cat} className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
-                          <span className="text-sm font-medium text-gray-700">{catLabels[cat] || cat}</span>
-                          <span className="text-sm font-bold text-red-600">{Number(amt).toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <PieChart>
+                          <Pie
+                            data={Object.entries(bs.expenses_by_category || {}).map(([cat, amt]) => ({
+                              name: catLabels[cat] || cat, value: Number(amt)
+                            }))}
+                            cx="50%" cy="50%" outerRadius={75} innerRadius={40}
+                            dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          >
+                            {Object.keys(bs.expenses_by_category || {}).map((_, i) => (
+                              <Cell key={i} fill={['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#6366f1'][i % 6]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="space-y-2 mt-2">
+                        {Object.entries(bs.expenses_by_category || {}).map(([cat, amt]) => (
+                          <div key={cat} className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                            <span className="text-sm font-medium text-gray-700">{catLabels[cat] || cat}</span>
+                            <span className="text-sm font-bold text-red-600">{Number(amt).toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
                   ) : <p className="text-gray-400 text-sm text-center py-4">{t('no_expenses', 'لا توجد مصروفات')}</p>}
                 </div>
 
@@ -244,22 +285,40 @@ const CompoundFinance = () => {
                 <div>
                   <h4 className="font-semibold text-gray-700 mb-3">{t('revenue_by_source', 'الإيرادات حسب المصدر')}</h4>
                   {Object.keys(bs.revenue_by_source || {}).length > 0 ? (
-                    <div className="space-y-2">
-                      {Object.entries(bs.revenue_by_source || {}).map(([src, amt]) => (
-                        <div key={src} className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                          <span className="text-sm font-medium text-gray-700">{catLabels[src] || src}</span>
-                          <span className="text-sm font-bold text-green-600">{Number(amt).toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
+                    <>
+                      <ResponsiveContainer width="100%" height={200}>
+                        <PieChart>
+                          <Pie
+                            data={Object.entries(bs.revenue_by_source || {}).map(([src, amt]) => ({
+                              name: catLabels[src] || src, value: Number(amt)
+                            }))}
+                            cx="50%" cy="50%" outerRadius={75} innerRadius={40}
+                            dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          >
+                            {Object.keys(bs.revenue_by_source || {}).map((_, i) => (
+                              <Cell key={i} fill={['#22c55e', '#14b8a6', '#0ea5e9', '#8b5cf6', '#f59e0b'][i % 5]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="space-y-2 mt-2">
+                        {Object.entries(bs.revenue_by_source || {}).map(([src, amt]) => (
+                          <div key={src} className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                            <span className="text-sm font-medium text-gray-700">{catLabels[src] || src}</span>
+                            <span className="text-sm font-bold text-green-600">{Number(amt).toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
                   ) : <p className="text-gray-400 text-sm text-center py-4">{t('no_revenue', 'لا توجد إيرادات')}</p>}
                 </div>
               </div>
 
-              {/* Obligations Summary */}
+              {/* Collection Rate Gauge + Obligations Summary */}
               <div className="border-t pt-6">
                 <h4 className="font-semibold text-gray-700 mb-3">{t('obligations_summary', 'ملخص الالتزامات')}</h4>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-4 gap-4">
                   <div className="p-4 bg-blue-50 rounded-xl text-center">
                     <p className="text-xl font-bold text-blue-700">{(obl.total_charged || 0).toLocaleString()}</p>
                     <p className="text-xs text-blue-600">{t('total_charged', 'إجمالي المطلوب')}</p>
@@ -271,6 +330,12 @@ const CompoundFinance = () => {
                   <div className="p-4 bg-red-50 rounded-xl text-center">
                     <p className="text-xl font-bold text-red-700">{(obl.total_outstanding || 0).toLocaleString()}</p>
                     <p className="text-xs text-red-600">{t('outstanding', 'المتبقي')}</p>
+                  </div>
+                  <div className="p-4 rounded-xl text-center relative overflow-hidden" style={{ background: `conic-gradient(#22c55e ${(obl.collection_rate || 0) * 3.6}deg, #fee2e2 0deg)` }}>
+                    <div className="bg-white rounded-full w-16 h-16 flex items-center justify-center mx-auto">
+                      <p className="text-lg font-bold text-gray-800">{obl.collection_rate || 0}%</p>
+                    </div>
+                    <p className="text-xs text-gray-600 mt-1">{t('collection_rate', 'نسبة التحصيل')}</p>
                   </div>
                 </div>
               </div>
@@ -293,6 +358,7 @@ const CompoundFinance = () => {
                       <div>
                         <p className="font-semibold text-gray-900">{ob.title}</p>
                         <p className="text-sm text-gray-500">{ob.description} | {catLabels[ob.category] || ob.category}</p>
+                        <span className="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">{ob.distribution_label || t('equal_distribution', 'بالتساوي')}</span>
                       </div>
                       <div className="text-right">
                         <p className="text-lg font-bold text-blue-600">{ob.total_amount?.toLocaleString()}</p>
@@ -477,7 +543,36 @@ const CompoundFinance = () => {
                     </select>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 bg-blue-50 p-2 rounded-lg">{t('distribute_note', 'سيتم توزيع المبلغ بالتساوي على جميع الوحدات')}</p>
+                <div>
+                  <label className="block text-sm font-medium mb-1">{t('distribution_method', 'طريقة التوزيع')}</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { id: 'equal', label: t('equal_distribution', 'بالتساوي'), icon: '⚖️' },
+                      { id: 'per_sqm', label: t('per_sqm', 'حسب المساحة'), icon: '📐' },
+                      { id: 'percentage', label: t('percentage', 'نسبة مئوية'), icon: '📊' },
+                      { id: 'custom', label: t('custom_amount', 'مبلغ مخصص'), icon: '✏️' },
+                    ].map(opt => (
+                      <button type="button" key={opt.id}
+                        onClick={() => setObligationForm(p => ({ ...p, distribution_method: opt.id }))}
+                        className={`p-2.5 rounded-lg border-2 text-sm font-medium text-center transition-all ${
+                          obligationForm.distribution_method === opt.id 
+                            ? 'border-blue-500 bg-blue-50 text-blue-700' 
+                            : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                        }`}
+                        data-testid={`dist-${opt.id}`}
+                      >
+                        <span className="block text-lg mb-0.5">{opt.icon}</span>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 bg-blue-50 p-2 rounded-lg">
+                  {obligationForm.distribution_method === 'equal' && t('distribute_equal_note', 'سيتم توزيع المبلغ بالتساوي على جميع الوحدات')}
+                  {obligationForm.distribution_method === 'per_sqm' && t('distribute_sqm_note', 'سيتم توزيع المبلغ حسب مساحة كل وحدة (متر مربع)')}
+                  {obligationForm.distribution_method === 'percentage' && t('distribute_pct_note', 'سيتم توزيع المبلغ بنسب مئوية محددة لكل وحدة')}
+                  {obligationForm.distribution_method === 'custom' && t('distribute_custom_note', 'سيتم تحديد مبلغ مخصص لكل وحدة')}
+                </p>
                 <div className="flex gap-3">
                   <button type="submit" disabled={submitting} className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium disabled:opacity-50">{submitting ? '...' : t('create_and_distribute', 'إنشاء وتوزيع')}</button>
                   <button type="button" onClick={() => setShowAddObligation(false)} className="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-medium">{t('cancel', 'إلغاء')}</button>

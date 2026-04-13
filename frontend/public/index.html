@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#2563eb" />
     <meta name="description" content="HomeMe - Complete residential compound management solution" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     
     <!-- Google Fonts - Luxury Arabic Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -153,6 +156,18 @@
       
       // Execute on page load  
       document.addEventListener('DOMContentLoaded', async () => {
+        // Force clear all old service workers and caches to fix blank page
+        try {
+          if ('serviceWorker' in navigator) {
+            const regs = await navigator.serviceWorker.getRegistrations();
+            for (const reg of regs) { await reg.unregister(); }
+          }
+          if ('caches' in window) {
+            const names = await caches.keys();
+            for (const n of names) { await caches.delete(n); }
+          }
+        } catch(e) { console.log('Cache cleanup:', e); }
+        
         await lightCacheRefresh();
         await registerServiceWorker();
       });

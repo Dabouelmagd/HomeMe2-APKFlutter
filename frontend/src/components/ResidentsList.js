@@ -281,19 +281,23 @@ const ResidentsList = () => {
 
                   {/* Actions */}
                   <div className="grid grid-cols-3 gap-2 pt-4 border-t border-gray-200">
-                    <button className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-blue-50 transition-colors group">
-                      <PencilIcon className="h-5 w-5 text-gray-600 group-hover:text-blue-600" />
-                      <span className="text-xs font-medium text-gray-600 group-hover:text-blue-600">{t('edit', 'Edit')}</span>
+                    <button 
+                      onClick={() => navigate(`/app/residents/${resident.id}`)}
+                      className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-blue-50 transition-colors group"
+                      data-testid={`view-profile-${resident.id}`}
+                    >
+                      <EyeIcon className="h-5 w-5 text-gray-600 group-hover:text-blue-600" />
+                      <span className="text-xs font-medium text-gray-600 group-hover:text-blue-600">{t('view_profile', 'عرض الملف')}</span>
+                    </button>
+                    
+                    <button className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-green-50 transition-colors group">
+                      <PencilIcon className="h-5 w-5 text-gray-600 group-hover:text-green-600" />
+                      <span className="text-xs font-medium text-gray-600 group-hover:text-green-600">{t('edit', 'تعديل')}</span>
                     </button>
                     
                     <button className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-red-50 transition-colors group">
                       <TrashIcon className="h-5 w-5 text-gray-600 group-hover:text-red-600" />
-                      <span className="text-xs font-medium text-gray-600 group-hover:text-red-600">{t('delete', 'Delete')}</span>
-                    </button>
-                    
-                    <button className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-purple-50 transition-colors group">
-                      <EyeIcon className="h-5 w-5 text-gray-600 group-hover:text-purple-600" />
-                      <span className="text-xs font-medium text-gray-600 group-hover:text-purple-600">{t('view_family', 'View Family')}</span>
+                      <span className="text-xs font-medium text-gray-600 group-hover:text-red-600">{t('delete', 'حذف')}</span>
                     </button>
                   </div>
                 </div>

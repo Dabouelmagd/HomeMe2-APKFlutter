@@ -14276,6 +14276,366 @@ async def get_reminder_logs(
 
 # ==================== PDF REPORTS ====================
 
+# ==================== RESIDENT PROFILE DETAIL ====================
+
+@api_router.get("/residents/{resident_id}/profile")
+async def get_resident_profile(
+    resident_id: str,
+    sort_order: str = "desc",
+    current_user: User = Depends(get_current_user)
+):
+    """Get complete resident profile with all related data"""
+    try:
+        # Get resident
+        resident = await db.users.find_one({"id": resident_id, "compound_id": current_user.compound_id}, {"_id": 0, "password_hash": 0})
+        if not resident:
+            raise HTTPException(status_code=404, detail="Resident not found")
+        
+        # Get family
+        family = None
+        family_members_list = []
+        if resident.get("family_id"):
+            family = await db.families.find_one({"id": resident["family_id"]}, {"_id": 0})
+            if family:
+                members = await db.users.find(
+                    {"id": {"$in": family.get("members", [])}},
+                    {"_id": 0, "password_hash": 0}
+                ).to_list(50)
+                family_members_list = serialize_datetime(members)
+        
+        # Get family members from family_members collection
+        extra_members = await db.family_members.find(
+            {"$or": [
+                {"primary_resident_id": resident_id},
+                {"unit_id": resident_id}
+            ]},
+            {"_id": 0}
+        ).to_list(50)
+        
+        # Maintenance requests
+        sort_dir = -1 if sort_order == "desc" else 1
+        maintenance = await db.maintenance_requests.find(
+            {"$or": [
+                {"requester_id": resident_id},
+                {"unit_number": resident.get("unit_number")}
+            ]},
+            {"_id": 0}
+        ).sort("created_at", sort_dir).to_list(100)
+        
+        # Service bookings
+        bookings = await db.service_bookings.find(
+            {"resident_id": resident_id},
+            {"_id": 0}
+        ).sort("created_at", sort_dir).to_list(100)
+        
+        # Invoices and payments
+        invoices = []
+        if resident.get("family_id"):
+            invoices = await db.invoices.find(
+                {"$or": [
+                    {"family_id": resident.get("family_id")},
+                    {"resident_id": resident_id}
+                ]},
+                {"_id": 0}
+            ).sort("created_at", sort_dir).to_list(100)
+        
+        # Visitors
+        visitors = await db.visit_requests.find(
+            {"$or": [
+                {"host_unit": resident.get("unit_number")},
+                {"unit_number": resident.get("unit_number")},
+                {"requester_id": resident_id}
+            ]},
+            {"_id": 0}
+        ).sort("created_at", sort_dir).to_list(100)
+        
+        # Gate access history
+        gate_access = await db.gate_access.find(
+            {"$or": [
+                {"unit_id": resident_id},
+                {"compound_id": current_user.compound_id, "unit_number": resident.get("unit_number")}
+            ]},
+            {"_id": 0}
+        ).sort("accessed_at", sort_dir).to_list(50)
+        
+        # Activity log for this unit
+        activities = await db.activity_logs.find(
+            {"$or": [
+                {"user_id": resident_id},
+                {"target_user_id": resident_id}
+            ]},
+            {"_id": 0}
+        ).sort("timestamp", sort_dir).to_list(50)
+        
+        # Notifications for this resident
+        notifications = await db.notifications.find(
+            {"$or": [
+                {"recipient_ids": resident_id},
+                {"sender_id": resident_id}
+            ]},
+            {"_id": 0}
+        ).sort("created_at", sort_dir).to_list(50)
+        
+        return serialize_datetime({
+            "resident": resident,
+            "family": family,
+            "family_members": family_members_list,
+            "extra_family_members": serialize_datetime(extra_members),
+            "maintenance_requests": maintenance,
+            "service_bookings": bookings,
+            "invoices": invoices,
+            "visitors": visitors,
+            "gate_access": serialize_datetime(gate_access),
+            "activities": activities,
+            "notifications": notifications,
+            "summary": {
+                "total_family_members": len(family_members_list) + len(extra_members),
+                "total_maintenance": len(maintenance),
+                "open_maintenance": len([m for m in maintenance if m.get("status") in ["pending", "in_progress"]]),
+                "total_bookings": len(bookings),
+                "total_invoices": len(invoices),
+                "pending_invoices": len([i for i in invoices if i.get("status") == "pending"]),
+                "total_visitors": len(visitors),
+                "total_activities": len(activities)
+            }
+        })
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error getting resident profile: {e}")
+        raise HTTPException(status_code=500, detail="Failed to load resident profile")
+
+@api_router.get("/residents/{resident_id}/export-pdf")
+async def export_resident_pdf(
+    resident_id: str,
+    current_user: User = Depends(require_admin)
+):
+    """Export resident profile as PDF"""
+    from fastapi.responses import Response
+    from reportlab.lib import colors
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.enums import TA_CENTER
+    
+    try:
+        # Get all resident data
+        resident = await db.users.find_one({"id": resident_id, "compound_id": current_user.compound_id}, {"_id": 0, "password_hash": 0})
+        if not resident:
+            raise HTTPException(status_code=404, detail="Resident not found")
+        
+        compound = await db.compounds.find_one({"id": current_user.compound_id}, {"_id": 0})
+        
+        # Family members
+        family_members = []
+        if resident.get("family_id"):
+            family = await db.families.find_one({"id": resident["family_id"]}, {"_id": 0})
+            if family:
+                members = await db.users.find({"id": {"$in": family.get("members", [])}}, {"_id": 0, "password_hash": 0}).to_list(50)
+                family_members = members
+        
+        extra_members = await db.family_members.find(
+            {"$or": [{"primary_resident_id": resident_id}, {"unit_id": resident_id}]}, {"_id": 0}
+        ).to_list(50)
+        
+        # Maintenance
+        maintenance = await db.maintenance_requests.find(
+            {"$or": [{"requester_id": resident_id}, {"unit_number": resident.get("unit_number")}]}, {"_id": 0}
+        ).sort("created_at", -1).to_list(50)
+        
+        # Bookings
+        bookings = await db.service_bookings.find({"resident_id": resident_id}, {"_id": 0}).sort("created_at", -1).to_list(50)
+        
+        # Invoices
+        invoices = []
+        if resident.get("family_id"):
+            invoices = await db.invoices.find(
+                {"$or": [{"family_id": resident.get("family_id")}, {"resident_id": resident_id}]}, {"_id": 0}
+            ).sort("created_at", -1).to_list(50)
+        
+        # Visitors
+        visitors = await db.visit_requests.find(
+            {"$or": [{"host_unit": resident.get("unit_number")}, {"unit_number": resident.get("unit_number")}]}, {"_id": 0}
+        ).sort("created_at", -1).to_list(50)
+        
+        # Generate PDF
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
+        
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle('Title_AR', fontName='Helvetica-Bold', fontSize=16, alignment=TA_CENTER, spaceAfter=12)
+        section_style = ParagraphStyle('Section_AR', fontName='Helvetica-Bold', fontSize=13, textColor=colors.HexColor('#1e3a5f'), spaceAfter=8, spaceBefore=16)
+        normal_style = ParagraphStyle('Normal_AR', fontName='Helvetica', fontSize=10, spaceAfter=4)
+        
+        elements = []
+        
+        # Header
+        compound_name = compound.get("name", "HomeMe") if compound else "HomeMe"
+        elements.append(Paragraph(f"<b>{compound_name}</b>", title_style))
+        elements.append(Paragraph(f"Resident Profile Report / تقرير ملف المقيم", ParagraphStyle('Sub', fontName='Helvetica', fontSize=11, alignment=TA_CENTER, spaceAfter=6)))
+        elements.append(Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", ParagraphStyle('Date', fontName='Helvetica', fontSize=9, alignment=TA_CENTER, textColor=colors.grey, spaceAfter=20)))
+        elements.append(Spacer(1, 10))
+        
+        # Personal Info
+        elements.append(Paragraph("Personal Information / المعلومات الشخصية", section_style))
+        info_data = [
+            ["Field", "Value"],
+            ["Name / الاسم", resident.get("full_name", "N/A")],
+            ["Username / اسم المستخدم", resident.get("username", "N/A")],
+            ["Email / البريد", resident.get("email", "N/A")],
+            ["Phone / الهاتف", resident.get("phone", "N/A")],
+            ["Unit / الوحدة", resident.get("unit_number", "N/A")],
+            ["Role / الدور", resident.get("role", "N/A")],
+        ]
+        t = Table(info_data, colWidths=[200, 300])
+        t.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a5f')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f0f4f8')]),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('PADDING', (0, 0), (-1, -1), 6),
+        ]))
+        elements.append(t)
+        elements.append(Spacer(1, 15))
+        
+        # Family Members
+        all_members = family_members + extra_members
+        if all_members:
+            elements.append(Paragraph(f"Family Members / أفراد العائلة ({len(all_members)})", section_style))
+            fm_data = [["Name / الاسم", "Relationship / القرابة", "Phone / الهاتف", "Email / البريد"]]
+            for m in all_members:
+                fm_data.append([
+                    m.get("full_name", "N/A"),
+                    m.get("relationship", m.get("role", "N/A")),
+                    m.get("phone", "N/A"),
+                    m.get("email", "N/A")
+                ])
+            ft = Table(fm_data, colWidths=[140, 120, 120, 140])
+            ft.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2563eb')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#eff6ff')]),
+                ('PADDING', (0, 0), (-1, -1), 5),
+            ]))
+            elements.append(ft)
+            elements.append(Spacer(1, 15))
+        
+        # Maintenance
+        if maintenance:
+            elements.append(Paragraph(f"Maintenance Requests / طلبات الصيانة ({len(maintenance)})", section_style))
+            mt_data = [["Title / العنوان", "Category / التصنيف", "Priority / الأولوية", "Status / الحالة", "Date / التاريخ"]]
+            for m in maintenance[:20]:
+                created = m.get("created_at", "")
+                if hasattr(created, 'strftime'):
+                    created = created.strftime('%Y-%m-%d')
+                elif isinstance(created, str):
+                    created = created[:10]
+                mt_data.append([
+                    str(m.get("title", "N/A"))[:30],
+                    m.get("category", "N/A"),
+                    m.get("priority", "N/A"),
+                    m.get("status", "N/A"),
+                    str(created)
+                ])
+            mt = Table(mt_data, colWidths=[130, 90, 80, 80, 90])
+            mt.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#d97706')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#fffbeb')]),
+                ('PADDING', (0, 0), (-1, -1), 5),
+            ]))
+            elements.append(mt)
+            elements.append(Spacer(1, 15))
+        
+        # Invoices
+        if invoices:
+            elements.append(Paragraph(f"Financial / المالية ({len(invoices)})", section_style))
+            inv_data = [["Description / الوصف", "Amount / المبلغ", "Status / الحالة", "Due Date / تاريخ الاستحقاق"]]
+            for inv in invoices[:20]:
+                due = inv.get("due_date", inv.get("created_at", ""))
+                if hasattr(due, 'strftime'):
+                    due = due.strftime('%Y-%m-%d')
+                elif isinstance(due, str):
+                    due = due[:10]
+                inv_data.append([
+                    str(inv.get("description", "N/A"))[:35],
+                    str(inv.get("amount", "0")),
+                    inv.get("status", "N/A"),
+                    str(due)
+                ])
+            it = Table(inv_data, colWidths=[180, 90, 90, 120])
+            it.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#059669')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#ecfdf5')]),
+                ('PADDING', (0, 0), (-1, -1), 5),
+            ]))
+            elements.append(it)
+            elements.append(Spacer(1, 15))
+        
+        # Visitors
+        if visitors:
+            elements.append(Paragraph(f"Visitors / الزوار ({len(visitors)})", section_style))
+            vis_data = [["Visitor / الزائر", "Purpose / الغرض", "Date / التاريخ", "Status / الحالة"]]
+            for v in visitors[:20]:
+                vdate = v.get("visit_date", v.get("created_at", ""))
+                if hasattr(vdate, 'strftime'):
+                    vdate = vdate.strftime('%Y-%m-%d')
+                elif isinstance(vdate, str):
+                    vdate = vdate[:10]
+                vis_data.append([
+                    v.get("visitor_name", "N/A"),
+                    v.get("purpose", v.get("visit_purpose", "N/A")),
+                    str(vdate),
+                    v.get("status", "N/A")
+                ])
+            vt = Table(vis_data, colWidths=[140, 130, 110, 100])
+            vt.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#7c3aed')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, -1), 8),
+                ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f5f3ff')]),
+                ('PADDING', (0, 0), (-1, -1), 5),
+            ]))
+            elements.append(vt)
+        
+        # Footer
+        elements.append(Spacer(1, 30))
+        elements.append(Paragraph(f"HomeMe - {compound_name} | Generated {datetime.now().strftime('%Y-%m-%d %H:%M')}", 
+            ParagraphStyle('Footer', fontName='Helvetica', fontSize=8, alignment=TA_CENTER, textColor=colors.grey)))
+        
+        doc.build(elements)
+        pdf_content = buffer.getvalue()
+        buffer.close()
+        
+        filename = f"resident_{resident.get('full_name', 'report').replace(' ', '_')}_{datetime.now().strftime('%Y%m%d')}.pdf"
+        return Response(
+            content=pdf_content,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error generating resident PDF: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate PDF report")
+
+
+
 @api_router.get("/reports/financial")
 async def generate_financial_report(
     compound_id: str,

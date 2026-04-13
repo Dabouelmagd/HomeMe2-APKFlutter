@@ -58,6 +58,7 @@ import Pricing from './components/Pricing';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
 import ResidentsList from './components/ResidentsList';
+import ResidentProfile from './components/ResidentProfile';
 import UserManagement from './components/UserManagement';
 import MonitoringDashboard from './components/MonitoringDashboard';
 import SubscriptionCodesUnified from './components/SubscriptionCodesUnified';
@@ -416,6 +417,12 @@ function App() {
                 <Route path="residents" element={
                   <ProtectedRoute adminOnly>
                     <ResidentsList />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="residents/:residentId" element={
+                  <ProtectedRoute adminOnly>
+                    <ResidentProfile />
                   </ProtectedRoute>
                 } />
                 

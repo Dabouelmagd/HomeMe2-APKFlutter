@@ -13334,6 +13334,8 @@ async def create_expense(
             status="success"
         )
         
+        # Remove MongoDB _id before returning
+        expense.pop("_id", None)
         return {"success": True, "expense": expense}
     except Exception as e:
         logging.error(f"Error creating expense: {e}")
@@ -13498,6 +13500,339 @@ async def get_financial_summary(
     except Exception as e:
         logging.error(f"Error generating financial summary: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate summary")
+
+
+# ==================== UNIT OBLIGATIONS SYSTEM ====================
+
+class ObligationCreate(BaseModel):
+    title: str
+    description: str = ""
+    total_amount: float
+    month: int  # 1-12
+    year: int
+    category: str = "maintenance"  # maintenance, utilities, security, cleaning, other
+    distribute_equally: bool = True
+
+@api_router.post("/financial/obligations")
+async def create_obligation(
+    data: ObligationCreate,
+    current_user: User = Depends(require_admin)
+):
+    """Create expense obligation and distribute to all units"""
+    try:
+        compound_id = current_user.compound_id
+        
+        # Get all resident families/units
+        families = await db.families.find({"compound_id": compound_id}, {"_id": 0}).to_list(100)
+        if not families:
+            raise HTTPException(status_code=400, detail="No units found in compound")
+        
+        unit_count = len(families)
+        per_unit = round(data.total_amount / unit_count, 2)
+        
+        # Create the main obligation record
+        obligation_id = str(uuid.uuid4())
+        obligation = {
+            "id": obligation_id,
+            "compound_id": compound_id,
+            "title": data.title,
+            "description": data.description,
+            "total_amount": data.total_amount,
+            "per_unit_amount": per_unit,
+            "unit_count": unit_count,
+            "month": data.month,
+            "year": data.year,
+            "category": data.category,
+            "created_by": current_user.id,
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.obligations.insert_one(obligation)
+        
+        # Create per-unit charges
+        charges_created = 0
+        for family in families:
+            # Get family head
+            head = await db.users.find_one(
+                {"id": {"$in": family.get("members", [])}, "is_family_head": True},
+                {"_id": 0, "id": 1, "full_name": 1, "unit_number": 1}
+            )
+            if not head:
+                head = await db.users.find_one(
+                    {"id": {"$in": family.get("members", [])}},
+                    {"_id": 0, "id": 1, "full_name": 1, "unit_number": 1}
+                )
+            if not head:
+                continue
+            
+            charge = {
+                "id": str(uuid.uuid4()),
+                "obligation_id": obligation_id,
+                "compound_id": compound_id,
+                "resident_id": head["id"],
+                "resident_name": head.get("full_name", ""),
+                "unit_number": head.get("unit_number", ""),
+                "family_id": family["id"],
+                "title": data.title,
+                "category": data.category,
+                "amount": per_unit,
+                "month": data.month,
+                "year": data.year,
+                "status": "pending",
+                "paid_at": None,
+                "created_at": datetime.now(timezone.utc)
+            }
+            await db.unit_charges.insert_one(charge)
+            charges_created += 1
+        
+        # Also record as compound expense
+        await db.expenses.insert_one({
+            "id": str(uuid.uuid4()),
+            "category": data.category,
+            "amount": data.total_amount,
+            "description": data.title + " - " + data.description,
+            "date": datetime.now(timezone.utc).isoformat(),
+            "payment_method": "other",
+            "compound_id": compound_id,
+            "obligation_id": obligation_id,
+            "created_by": current_user.username,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "status": "completed"
+        })
+        
+        return {
+            "message": f"تم إنشاء الالتزام وتوزيعه على {charges_created} وحدة",
+            "obligation_id": obligation_id,
+            "per_unit_amount": per_unit,
+            "units_charged": charges_created
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating obligation: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create obligation")
+
+@api_router.get("/financial/obligations")
+async def get_obligations(
+    month: Optional[int] = None,
+    year: Optional[int] = None,
+    current_user: User = Depends(require_admin)
+):
+    """Get all obligations for the compound"""
+    try:
+        query = {"compound_id": current_user.compound_id}
+        if month:
+            query["month"] = month
+        if year:
+            query["year"] = year
+        obligations = await db.obligations.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+        return {"obligations": serialize_datetime(obligations)}
+    except Exception as e:
+        logging.error(f"Error fetching obligations: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch obligations")
+
+@api_router.get("/financial/unit-charges")
+async def get_unit_charges(
+    obligation_id: Optional[str] = None,
+    month: Optional[int] = None,
+    year: Optional[int] = None,
+    status: Optional[str] = None,
+    current_user: User = Depends(require_admin)
+):
+    """Get all unit charges with payment status (green=paid, red=unpaid)"""
+    try:
+        query = {"compound_id": current_user.compound_id}
+        if obligation_id:
+            query["obligation_id"] = obligation_id
+        if month:
+            query["month"] = month
+        if year:
+            query["year"] = year
+        if status:
+            query["status"] = status
+        
+        charges = await db.unit_charges.find(query, {"_id": 0}).sort("unit_number", 1).to_list(500)
+        
+        total = len(charges)
+        paid = len([c for c in charges if c.get("status") == "paid"])
+        unpaid = len([c for c in charges if c.get("status") != "paid"])
+        total_amount = sum(c.get("amount", 0) for c in charges)
+        paid_amount = sum(c.get("amount", 0) for c in charges if c.get("status") == "paid")
+        
+        return {
+            "charges": serialize_datetime(charges),
+            "summary": {
+                "total": total,
+                "paid": paid,
+                "unpaid": unpaid,
+                "total_amount": total_amount,
+                "paid_amount": paid_amount,
+                "unpaid_amount": total_amount - paid_amount
+            }
+        }
+    except Exception as e:
+        logging.error(f"Error fetching unit charges: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch unit charges")
+
+@api_router.put("/financial/unit-charges/{charge_id}/pay")
+async def mark_charge_paid(
+    charge_id: str,
+    current_user: User = Depends(require_admin)
+):
+    """Mark a unit charge as paid"""
+    try:
+        charge = await db.unit_charges.find_one({"id": charge_id, "compound_id": current_user.compound_id})
+        if not charge:
+            raise HTTPException(status_code=404, detail="Charge not found")
+        
+        now = datetime.now(timezone.utc)
+        await db.unit_charges.update_one(
+            {"id": charge_id},
+            {"$set": {"status": "paid", "paid_at": now, "paid_by": current_user.id}}
+        )
+        
+        # Record as revenue
+        await db.revenue.insert_one({
+            "id": str(uuid.uuid4()),
+            "source": "maintenance_fees",
+            "amount": charge["amount"],
+            "description": f"سداد {charge.get('title', '')} - وحدة {charge.get('unit_number', '')}",
+            "date": now.isoformat(),
+            "payment_method": "other",
+            "resident_id": charge.get("resident_id"),
+            "compound_id": current_user.compound_id,
+            "charge_id": charge_id,
+            "created_by": current_user.username,
+            "created_at": now.isoformat(),
+            "status": "completed"
+        })
+        
+        return {"message": "تم تسجيل السداد بنجاح", "charge_id": charge_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error marking charge paid: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update charge")
+
+@api_router.post("/financial/unit-charges/notify-unpaid")
+async def notify_unpaid_units(
+    obligation_id: str = "",
+    month: Optional[int] = None,
+    year: Optional[int] = None,
+    current_user: User = Depends(require_admin)
+):
+    """Send notifications to units that haven't paid"""
+    try:
+        query = {"compound_id": current_user.compound_id, "status": "pending"}
+        if obligation_id:
+            query["obligation_id"] = obligation_id
+        if month:
+            query["month"] = month
+        if year:
+            query["year"] = year
+        
+        unpaid = await db.unit_charges.find(query, {"_id": 0}).to_list(500)
+        
+        notified = 0
+        for charge in unpaid:
+            resident_id = charge.get("resident_id")
+            if not resident_id:
+                continue
+            
+            notification = {
+                "id": str(uuid.uuid4()),
+                "compound_id": current_user.compound_id,
+                "sender_id": "system",
+                "title": "تذكير بسداد التزام",
+                "content": f"يرجى سداد التزام '{charge.get('title', '')}' بمبلغ {charge.get('amount', 0)} - شهر {charge.get('month')}/{charge.get('year')}",
+                "type": "payment_reminder",
+                "recipient_ids": [resident_id],
+                "is_read": False,
+                "created_at": datetime.now(timezone.utc)
+            }
+            await db.notifications.insert_one(notification)
+            notified += 1
+        
+        return {"message": f"تم إرسال {notified} إشعار للوحدات المتأخرة", "notified_count": notified}
+    except Exception as e:
+        logging.error(f"Error notifying unpaid: {e}")
+        raise HTTPException(status_code=500, detail="Failed to send notifications")
+
+@api_router.get("/financial/balance-sheet")
+async def get_balance_sheet(
+    year: Optional[int] = None,
+    current_user: User = Depends(require_admin)
+):
+    """Get compound balance sheet - all income, expenses, and obligations"""
+    try:
+        compound_id = current_user.compound_id
+        current_year = year or datetime.now().year
+        
+        # Total expenses
+        expenses = await db.expenses.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+        total_expenses = sum(float(e.get("amount", 0)) for e in expenses)
+        
+        # Expenses by category
+        exp_by_cat = {}
+        for e in expenses:
+            cat = e.get("category", "other")
+            exp_by_cat[cat] = exp_by_cat.get(cat, 0) + float(e.get("amount", 0))
+        
+        # Total revenue
+        revenues = await db.revenue.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+        total_revenue = sum(float(r.get("amount", 0)) for r in revenues)
+        
+        # Revenue by source
+        rev_by_src = {}
+        for r in revenues:
+            src = r.get("source", "other")
+            rev_by_src[src] = rev_by_src.get(src, 0) + float(r.get("amount", 0))
+        
+        # Unit charges summary
+        all_charges = await db.unit_charges.find({"compound_id": compound_id}, {"_id": 0}).to_list(1000)
+        total_charged = sum(float(c.get("amount", 0)) for c in all_charges)
+        total_collected = sum(float(c.get("amount", 0)) for c in all_charges if c.get("status") == "paid")
+        total_outstanding = total_charged - total_collected
+        
+        # Monthly breakdown
+        monthly = {}
+        for e in expenses:
+            date_str = e.get("date", e.get("created_at", ""))
+            if date_str:
+                m = date_str[:7]  # YYYY-MM
+                if m not in monthly:
+                    monthly[m] = {"expenses": 0, "revenue": 0}
+                monthly[m]["expenses"] += float(e.get("amount", 0))
+        
+        for r in revenues:
+            date_str = r.get("date", r.get("created_at", ""))
+            if date_str:
+                m = date_str[:7]
+                if m not in monthly:
+                    monthly[m] = {"expenses": 0, "revenue": 0}
+                monthly[m]["revenue"] += float(r.get("amount", 0))
+        
+        return {
+            "compound_id": compound_id,
+            "year": current_year,
+            "total_expenses": round(total_expenses, 2),
+            "total_revenue": round(total_revenue, 2),
+            "net_balance": round(total_revenue - total_expenses, 2),
+            "expenses_by_category": exp_by_cat,
+            "revenue_by_source": rev_by_src,
+            "obligations": {
+                "total_charged": round(total_charged, 2),
+                "total_collected": round(total_collected, 2),
+                "total_outstanding": round(total_outstanding, 2),
+                "collection_rate": round((total_collected / total_charged * 100) if total_charged > 0 else 0, 1)
+            },
+            "monthly_breakdown": dict(sorted(monthly.items())),
+            "recent_expenses": serialize_datetime(expenses[:10]),
+            "recent_revenue": serialize_datetime(revenues[:10])
+        }
+    except Exception as e:
+        logging.error(f"Error getting balance sheet: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate balance sheet")
+
 
 @api_router.get("/financial/residents/{resident_id}/account")
 async def get_resident_account(

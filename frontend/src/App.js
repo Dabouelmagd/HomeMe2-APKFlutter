@@ -46,6 +46,7 @@ import UtilityBills from './components/UtilityBills';
 import FamilyManagement from './components/FamilyManagement';
 import AddFamilyMemberToUnit from './components/AddFamilyMemberToUnit';
 import FinancialManagement from './components/FinancialManagement';
+import CompoundFinance from './components/CompoundFinance';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
 import NotificationCenter from './components/NotificationCenter';
@@ -471,7 +472,9 @@ function App() {
                 } />
                 
                 <Route path="finances" element={
-                  <FinancialRoute />
+                  <ProtectedRoute adminOnly>
+                    <CompoundFinance />
+                  </ProtectedRoute>
                 } />
                 
                 <Route path="financial-old" element={

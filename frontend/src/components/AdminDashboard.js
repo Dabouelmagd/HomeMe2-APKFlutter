@@ -213,9 +213,9 @@ const AdminDashboard = () => {
     const diffDays = Math.floor(diffMs / 86400000);
     
     if (diffMins < 1) return t('just_now', 'الآن');
-    if (diffMins < 60) return t('minutes_ago', `منذ ${diffMins} دقيقة`);
-    if (diffHours < 24) return t('hours_ago', `منذ ${diffHours} ساعة`);
-    return t('days_ago', `منذ ${diffDays} يوم`);
+    if (diffMins < 60) return `${t('ago', 'منذ')} ${diffMins} ${t('minutes', 'دقيقة')}`;
+    if (diffHours < 24) return `${t('ago', 'منذ')} ${diffHours} ${t('hours', 'ساعة')}`;
+    return `${t('ago', 'منذ')} ${diffDays} ${t('days', 'يوم')}`;
   };
 
   return (

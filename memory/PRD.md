@@ -9,41 +9,32 @@ A compound management system (HomeMe / هوم-مي) for managing residential com
 - **Auth**: JWT-based with WebAuthn biometric support
 - **Integrations**: Stripe, PayPal, Recharts, fpdf2, slowapi
 
-## User Personas
-- **Super Admin** (dalia): Full system access
-- **Admin**: Compound-level management
-- **Resident**: Personal dashboard, family management, service booking
-
 ## What's Been Implemented
 
 ### Session 1-2 (Previous)
-- Full compound management system
-- WebAuthn biometric login, PWA, Multi-language
+- Full compound management system, WebAuthn, PWA, Multi-language
 - Settings page fix, refactor, redesign, PWA auto-reload fix
 
 ### Session 3 (Apr 13, 2026)
-- **Fixed "Add Resident" bug**: Data structure mismatch fix in `AddFamilyMemberToUnit.js`
-- **Fixed WebAuthn db initialization bug**: `webauthn_service.db` reassigned in startup event
-- **CORS middleware**: Added CORSMiddleware to FastAPI
-- **Query optimization**: N+1 fix in `/database/compounds`, bounded queries for messages/chats/search
-- **Arabic translation completeness**: Added 35+ missing Arabic keys, translated 50+ hardcoded English toast messages in ServicesManagement, CompoundManagement, AddFamilyMemberToUnit, EventsAnnouncements, AdvancedAnalytics
+- **Fixed "Add Resident" bug** + **Fixed WebAuthn db init bug**
+- **CORS middleware** + **Query optimization** (N+1 fix, bounded queries)
+- **Arabic translation completeness**: 35+ missing keys, 50+ toast messages translated
+- **Admin Notification System**: Auto-notify admins on: new family member, maintenance request, service booking, new residence
+- **Live Dashboard**: Replaced mock data with real-time API data (GET /api/dashboard/admin) - shows residents, families, services, maintenance, bookings, payments, family members + recent activities + notifications
+- **Dashboard redesign**: Stats grid, live indicators, quick actions (6 buttons), two-column activities/notifications
 - **Deployment health check**: All 3 critical blockers resolved
-- **Cleanup**: Removed 8 backup files (components + i18n)
+- **Cleanup**: Removed backup files from components + i18n
 
 ## Key Files
-- `/app/frontend/src/i18n/index.js` - All translations (EN/AR/FR)
+- `/app/frontend/src/components/AdminDashboard.js` - Live dashboard
+- `/app/frontend/src/i18n/index.js` - Translations (EN/AR/FR)
 - `/app/frontend/src/components/AddFamilyMemberToUnit.js` - Add family member
-- `/app/frontend/src/components/ResidentsList.js` - Residents list
 - `/app/frontend/src/components/settings/*` - Modular settings
 - `/app/frontend/src/services/webauthn.js` - WebAuthn client
-- `/app/backend/webauthn_service.py` - WebAuthn server
-- `/app/backend/server.py` - Main backend
+- `/app/backend/server.py` - Main backend (notify_compound_admins, dashboard/admin endpoint)
 
 ## Prioritized Backlog
 
-### P2
-- Real-time notifications for admin actions (new resident, maintenance, etc.)
-
 ### P3
-- Interactive dashboard with live stats (new residents, open maintenance, pending payments)
+- Arabic PDF reports for compound monthly statistics
 - Further translation audit for edge cases

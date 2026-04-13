@@ -9,7 +9,19 @@ class SubscriptionDuration(str, Enum):
     TWO_MONTHS = "2_months" 
     THREE_MONTHS = "3_months"
     SIX_MONTHS = "6_months"
+    NINE_MONTHS = "9_months"
     ONE_YEAR = "1_year"
+    LIFETIME = "lifetime"
+
+
+class SubscriptionPlan(str, Enum):
+    STARTER = "starter"
+    BASIC = "basic"
+    PRO = "pro"
+    PREMIUM = "premium"
+    COMPANY_STARTUP = "company_startup"
+    COMPANY_BUSINESS = "company_business"
+    COMPANY_ENTERPRISE = "company_enterprise"
 
 class CodeStatus(str, Enum):
     ACTIVE = "active"

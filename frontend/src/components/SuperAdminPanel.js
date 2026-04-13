@@ -43,6 +43,12 @@ const SuperAdminPanel = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [roleFilter, setRoleFilter] = useState('');
   const [compoundFilter, setCompoundFilter] = useState('');
+  // Subscription codes state
+  const [codes, setCodes] = useState([]);
+  const [codeStats, setCodeStats] = useState({});
+  const [showCreateCode, setShowCreateCode] = useState(false);
+  const [newCode, setNewCode] = useState({ code_type: '3_months', plan: 'pro', max_uses: 1, custom_code: '', notes: '' });
+  const [bulkCount, setBulkCount] = useState(10);
 
   useEffect(() => { fetchDashboard(); }, []);
 
@@ -70,6 +76,51 @@ const SuperAdminPanel = () => {
       toast.error('فشل في تغيير الدور');
     }
   };
+
+  const fetchCodes = async () => {
+    try {
+      const res = await axios.get(`${API}/subscription-codes`, getToken());
+      setCodes(res.data.codes || []);
+      setCodeStats(res.data.stats || {});
+    } catch { /* ignore */ }
+  };
+
+  const handleCreateCode = async (isBulk = false) => {
+    try {
+      if (isBulk) {
+        const res = await axios.post(`${API}/subscription-codes/bulk-create`, { ...newCode, count: bulkCount, max_uses_per_code: newCode.max_uses }, getToken());
+        toast.success(res.data.message);
+      } else {
+        const payload = { ...newCode };
+        if (!payload.custom_code) delete payload.custom_code;
+        const res = await axios.post(`${API}/subscription-codes/create`, payload, getToken());
+        toast.success(`${res.data.message}: ${res.data.code?.code}`);
+      }
+      setShowCreateCode(false);
+      fetchCodes();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'فشل في إنشاء الكود');
+    }
+  };
+
+  const handleToggleCode = async (code) => {
+    try {
+      await axios.put(`${API}/subscription-codes/${code}/toggle`, {}, getToken());
+      toast.success('تم تحديث حالة الكود');
+      fetchCodes();
+    } catch { toast.error('فشل'); }
+  };
+
+  const handleDeleteCode = async (code) => {
+    if (!window.confirm('حذف هذا الكود نهائياً؟')) return;
+    try {
+      await axios.delete(`${API}/subscription-codes/${code}`, getToken());
+      toast.success('تم الحذف');
+      fetchCodes();
+    } catch { toast.error('فشل'); }
+  };
+
+  useEffect(() => { if (activeTab === 'codes') fetchCodes(); }, [activeTab]);
 
   if (loading) {
     return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div></div>;
@@ -130,6 +181,7 @@ const SuperAdminPanel = () => {
           {[
             { id: 'overview', label: 'المجتمعات' },
             { id: 'users', label: 'المستخدمين' },
+            { id: 'codes', label: 'أكواد الاشتراك' },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`px-5 py-2.5 rounded-lg text-sm font-medium ${activeTab === tab.id ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
@@ -213,6 +265,136 @@ const SuperAdminPanel = () => {
                       </td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Codes Tab */}
+        {activeTab === 'codes' && (
+          <div data-testid="codes-tab">
+            {/* Code Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+              {[
+                { label: 'إجمالي الأكواد', value: codeStats.total || 0, color: 'text-blue-400' },
+                { label: 'نشطة', value: codeStats.active || 0, color: 'text-green-400' },
+                { label: 'مستخدمة', value: codeStats.used || 0, color: 'text-amber-400' },
+                { label: 'معطلة', value: codeStats.disabled || 0, color: 'text-red-400' },
+                { label: 'إجمالي التفعيلات', value: codeStats.total_activations || 0, color: 'text-purple-400' },
+              ].map((s, i) => (
+                <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
+                  <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                  <p className="text-xs text-gray-400">{s.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 mb-6">
+              <button onClick={() => setShowCreateCode(!showCreateCode)} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500" data-testid="create-code-btn">
+                + إنشاء كود جديد
+              </button>
+              <button onClick={fetchCodes} className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600">تحديث</button>
+            </div>
+
+            {/* Create Code Form */}
+            {showCreateCode && (
+              <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6" data-testid="create-code-form">
+                <h3 className="text-lg font-bold mb-4">إنشاء كود اشتراك</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">الفترة</label>
+                    <select value={newCode.code_type} onChange={e => setNewCode({...newCode, code_type: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                      <option value="trial">تجريبي (شهر)</option>
+                      <option value="3_months">3 شهور</option>
+                      <option value="6_months">6 شهور</option>
+                      <option value="9_months">9 شهور</option>
+                      <option value="12_months">سنة</option>
+                      <option value="lifetime">مدى الحياة</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">الخطة</label>
+                    <select value={newCode.plan} onChange={e => setNewCode({...newCode, plan: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                      <option value="starter">مجاني</option>
+                      <option value="basic">أساسي</option>
+                      <option value="pro">احترافي</option>
+                      <option value="premium">متقدم</option>
+                      <option value="company_startup">شركة ناشئة</option>
+                      <option value="company_business">شركة متوسطة</option>
+                      <option value="company_enterprise">شركة كبرى</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">عدد الاستخدامات</label>
+                    <input type="number" min="1" max="1000" value={newCode.max_uses} onChange={e => setNewCode({...newCode, max_uses: parseInt(e.target.value) || 1})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">كود مخصص (اختياري)</label>
+                    <input type="text" placeholder="مثل: VIP-2026" value={newCode.custom_code} onChange={e => setNewCode({...newCode, custom_code: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">ملاحظات</label>
+                    <input type="text" placeholder="ملاحظات..." value={newCode.notes} onChange={e => setNewCode({...newCode, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">عدد الأكواد (جملة)</label>
+                    <input type="number" min="1" max="500" value={bulkCount} onChange={e => setBulkCount(parseInt(e.target.value) || 1)} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={() => handleCreateCode(false)} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">إنشاء كود واحد</button>
+                  <button onClick={() => handleCreateCode(true)} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">إنشاء {bulkCount} كود</button>
+                  <button onClick={() => setShowCreateCode(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600">إلغاء</button>
+                </div>
+              </div>
+            )}
+
+            {/* Codes Table */}
+            <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-900/50">
+                  <tr>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">الكود</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">الفترة</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">الخطة</th>
+                    <th className="px-4 py-3 text-center text-gray-400 font-medium">الاستخدام</th>
+                    <th className="px-4 py-3 text-center text-gray-400 font-medium">الحالة</th>
+                    <th className="px-4 py-3 text-center text-gray-400 font-medium">إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {codes.map(c => {
+                    const typeLabels = { trial: 'تجريبي', '3_months': '3 شهور', '6_months': '6 شهور', '9_months': '9 شهور', '12_months': 'سنة', '1_year': 'سنة', lifetime: 'مدى الحياة', duration: c.duration_months ? `${c.duration_months} شهر` : 'مخصص' };
+                    const planLabels = { starter: 'مجاني', basic: 'أساسي', pro: 'احترافي', premium: 'متقدم', company_startup: 'شركة ناشئة', company_business: 'شركة متوسطة', company_enterprise: 'شركة كبرى' };
+                    const isUsedUp = (c.times_used || 0) >= (c.max_uses || 1);
+                    return (
+                      <tr key={c.code} className="hover:bg-gray-750">
+                        <td className="px-4 py-3 font-mono font-bold text-green-400">{c.code}</td>
+                        <td className="px-4 py-3 text-gray-300">{typeLabels[c.type] || c.type}</td>
+                        <td className="px-4 py-3"><span className="px-2 py-0.5 rounded-full text-xs bg-blue-500/20 text-blue-300">{planLabels[c.plan] || c.plan || '-'}</span></td>
+                        <td className="px-4 py-3 text-center"><span className={isUsedUp ? 'text-red-400' : 'text-gray-300'}>{c.times_used || 0}/{c.max_uses || 1}</span></td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.is_active && !isUsedUp ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                            {c.is_active && !isUsedUp ? 'نشط' : isUsedUp ? 'مستخدم' : 'معطل'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <div className="flex gap-1 justify-center">
+                            <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success('تم النسخ'); }} className="px-2 py-1 text-xs bg-gray-700 rounded hover:bg-gray-600" title="نسخ">نسخ</button>
+                            <button onClick={() => handleToggleCode(c.code)} className={`px-2 py-1 text-xs rounded ${c.is_active ? 'bg-amber-600/20 text-amber-400 hover:bg-amber-600/30' : 'bg-green-600/20 text-green-400 hover:bg-green-600/30'}`}>
+                              {c.is_active ? 'تعطيل' : 'تفعيل'}
+                            </button>
+                            <button onClick={() => handleDeleteCode(c.code)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded hover:bg-red-600/30">حذف</button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {codes.length === 0 && (
+                    <tr><td colSpan="6" className="px-4 py-8 text-center text-gray-500">لا توجد أكواد بعد</td></tr>
+                  )}
                 </tbody>
               </table>
             </div>

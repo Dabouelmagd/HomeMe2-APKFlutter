@@ -1,33 +1,51 @@
 # HomeMe PRD - Compound Management System
 
-## Original Problem Statement
-Multi-role Compound Management application with Arabic-first UI, featuring financial management, maintenance, contracts, satisfaction ratings, complaints, facilities booking, and role-based access control.
-
 ## Architecture
 - **Frontend**: React + Tailwind CSS + Recharts + i18next (Arabic) + Cairo Font
 - **Backend**: FastAPI + MongoDB + WebAuthn + ReportLab + Openpyxl
-- **Auth**: JWT-based with 6 roles (super_admin, company_admin, admin, manager, security, resident)
+- **Auth**: JWT-based with 6 roles
+- **Payments**: Stripe + PayPal (infrastructure ready)
 
-## Modular Backend (17 route modules, 4,248 lines extracted)
-server.py: 16,321 → 11,251 lines (-31%)
+## Backend Modular Architecture
+**server.py: 16,321 → 9,798 lines (-40%, -6,523 lines)**
 
-## Landing Page Features (Apr 13, 2026)
-- Cairo Arabic font throughout
-- Bigger logo in header and hero
-- Super Admin quick-access key icon
-- 3 registration types with feature lists
-- 15+ systems grid
-- Comprehensive operating guide (10 expandable sections)
-- Subscription plans comparison (Free/Pro/Enterprise) with pricing
-- Payment methods (Credit Card, PayPal, Apple Pay, Bank Transfer)
-- 6 roles section with proper icons (no emojis)
-- CTA section and footer with navigation
+### 18 Route Modules (routes/)
+| Module | Description |
+|--------|-------------|
+| finance.py | Balance sheet, obligations, charges, expenses |
+| subscriptions.py | Subscription codes CRUD, activate, verify, bulk create |
+| smart_devices.py | IoT devices, automations |
+| companies.py | Company registration, dashboard |
+| exports.py | Excel/PDF export, resident profile |
+| documents.py | Document management |
+| polls.py | Polls & voting |
+| newsletters.py | Newsletter CRUD |
+| guests.py | Visit requests, QR codes |
+| announcements.py | Announcements & events |
+| ratings.py | Satisfaction ratings |
+| contracts.py | Contract management |
+| facilities.py | Facility booking |
+| superadmin.py | Super admin panel |
+| maintenance.py | Maintenance requests |
+| complaints.py | Complaints & suggestions |
+| monitoring.py | Health checks, stats |
+| notifications.py | User notifications |
 
-## 15+ Systems Built
-1-15: All operational (see previous entries)
+### Subscription System
+- 6 durations: trial, 3m, 6m, 9m, 1year, lifetime
+- 7 plans: starter, basic, pro, premium, company_startup/business/enterprise
+- Bulk code creation (up to 500)
+- Custom codes support
+- Auto-activation on user registration
+- Super Admin management panel with stats
+
+### Pricing (EGP/USD)
+- Residential: Free (5 users), Basic 500 EGP (1-50), Pro 1200 (51-100), Premium 2200 (101+)
+- Companies: Startup 3500 (3 compounds), Business 7500 (4-10), Enterprise (custom)
+- Annual = 10 months (2 months free)
 
 ## Backlog
-- P1: Continue server.py refactoring (Chat, Auth, Users)
-- P1: E2E Registration Flow Test
+- P1: Continue server.py refactoring (Messaging/Chat, Auth)
+- P1: Stripe/PayPal actual payment integration
+- P2: E2E Registration Flow Test
 - P2: Clean up duplicate user routes
-- P2: Performance optimization

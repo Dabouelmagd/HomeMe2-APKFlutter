@@ -22,14 +22,45 @@ const HomePage = () => {
   const { user, loading } = useAuth();
   const isRTL = i18n.language === 'ar';
   const [openGuide, setOpenGuide] = useState(null);
-  const [billingPeriod, setBillingPeriod] = useState('monthly'); // monthly or yearly
-  const [currency, setCurrency] = useState('egp'); // egp or usd
+  const [billingPeriod, setBillingPeriod] = useState('monthly');
+  const [currency, setCurrency] = useState('egp');
+  const [subCode, setSubCode] = useState('');
+  const [codeStatus, setCodeStatus] = useState(null); // {type:'success'|'error', msg:'...'}
+  const [codeLoading, setCodeLoading] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
       navigate('/app/dashboard', { replace: true });
     }
   }, [user, loading, navigate]);
+
+  const handleCodeActivate = async () => {
+    if (!subCode.trim()) return;
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setCodeStatus({ type: 'error', msg: 'يجب تسجيل الدخول أولاً لتفعيل الكود' });
+      return;
+    }
+    setCodeLoading(true);
+    setCodeStatus(null);
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/subscription-codes/activate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ code: subCode.trim() })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCodeStatus({ type: 'success', msg: data.message || 'تم تفعيل الاشتراك بنجاح!' });
+        setSubCode('');
+      } else {
+        setCodeStatus({ type: 'error', msg: data.detail || 'كود غير صالح' });
+      }
+    } catch {
+      setCodeStatus({ type: 'error', msg: 'حدث خطأ، حاول مرة أخرى' });
+    }
+    setCodeLoading(false);
+  };
 
   const systems = [
     { icon: UserGroupIcon, title: 'إدارة المقيمين', desc: 'ملف شامل لكل مقيم مع العائلة والوحدة وتصدير PDF', color: 'from-blue-500 to-blue-600' },
@@ -509,11 +540,16 @@ const HomePage = () => {
               ))}
             </div>
             <div className="flex gap-3">
-              <input type="text" placeholder="أدخل كود الاشتراك هنا..." className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30" data-testid="subscription-code-input" />
-              <button className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-500 transition-all whitespace-nowrap" data-testid="activate-code-btn">
-                تفعيل الكود
+              <input type="text" placeholder="أدخل كود الاشتراك هنا..." value={subCode} onChange={e => setSubCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleCodeActivate()} className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30" data-testid="subscription-code-input" />
+              <button onClick={handleCodeActivate} disabled={codeLoading || !subCode.trim()} className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-500 transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed" data-testid="activate-code-btn">
+                {codeLoading ? '...' : 'تفعيل الكود'}
               </button>
             </div>
+            {codeStatus && (
+              <div className={`mt-3 text-sm font-medium text-center py-2 px-4 rounded-lg ${codeStatus.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`} data-testid="code-status-message">
+                {codeStatus.msg}
+              </div>
+            )}
           </div>
 
           {/* Company Plans */}

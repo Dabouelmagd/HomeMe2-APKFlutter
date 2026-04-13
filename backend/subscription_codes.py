@@ -1,15 +1,21 @@
 from datetime import datetime, timezone, timedelta
-from motor.motor_asyncio import AsyncIOMotorClient
-import os
 import secrets
 import string
 
-# Database connection
-MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-DB_NAME = os.environ.get('DB_NAME', 'homeme_db')
 
-client = AsyncIOMotorClient(MONGO_URL)
-db = client[DB_NAME]
+def _get_db():
+    """Get db from shared database module"""
+    from database import get_db
+    db = get_db()
+    if db is not None:
+        return db
+    # Fallback for startup - use direct connection
+    from motor.motor_asyncio import AsyncIOMotorClient
+    from dotenv import load_dotenv
+    import os
+    load_dotenv()
+    client = AsyncIOMotorClient(os.environ['MONGO_URL'])
+    return client[os.environ['DB_NAME']]
 
 
 class SubscriptionCodeManager:
@@ -52,10 +58,10 @@ class SubscriptionCodeManager:
             code = SubscriptionCodeManager.generate_code()
             
             # Check if code already exists (very unlikely but check anyway)
-            existing = await db.subscription_codes.find_one({"code": code})
+            existing = await _get_db().subscription_codes.find_one({"code": code})
             while existing:
                 code = SubscriptionCodeManager.generate_code()
-                existing = await db.subscription_codes.find_one({"code": code})
+                existing = await _get_db().subscription_codes.find_one({"code": code})
             
             # Calculate duration in days based on type
             duration_days = 0
@@ -67,8 +73,10 @@ class SubscriptionCodeManager:
                 duration_days = 180
             elif code_type == "9_months":
                 duration_days = 270
-            elif code_type == "12_months":
+            elif code_type == "12_months" or code_type == "1_year":
                 duration_days = 365
+            elif code_type == "lifetime":
+                duration_days = 36500  # ~100 years
             elif duration_months:
                 duration_days = duration_months * 30
             
@@ -89,7 +97,7 @@ class SubscriptionCodeManager:
                 "notes": notes
             }
             
-            result = await db.subscription_codes.insert_one(code_doc)
+            result = await _get_db().subscription_codes.insert_one(code_doc)
             code_doc['_id'] = str(result.inserted_id)
             
             return code_doc
@@ -107,7 +115,7 @@ class SubscriptionCodeManager:
         """
         try:
             # Find the code
-            code_doc = await db.subscription_codes.find_one({"code": code.upper().strip()})
+            code_doc = await _get_db().subscription_codes.find_one({"code": code.upper().strip()})
             
             if not code_doc:
                 return {"valid": False, "error": "code_not_found"}
@@ -164,7 +172,7 @@ class SubscriptionCodeManager:
                 }
             
             # Get code details
-            code_doc = await db.subscription_codes.find_one({"code": code.upper().strip()})
+            code_doc = await _get_db().subscription_codes.find_one({"code": code.upper().strip()})
             
             # Calculate subscription end date
             duration_days = verification.get("duration_days", 0)
@@ -179,13 +187,13 @@ class SubscriptionCodeManager:
                 "subscription_code_used": code.upper().strip()
             }
             
-            await db.users.update_one(
+            await _get_db().users.update_one(
                 {"id": user_id},
                 {"$set": user_update}
             )
             
             # Mark code as used
-            await db.subscription_codes.update_one(
+            await _get_db().subscription_codes.update_one(
                 {"code": code.upper().strip()},
                 {
                     "$inc": {"times_used": 1},
@@ -215,7 +223,7 @@ class SubscriptionCodeManager:
         """Get all subscription codes"""
         try:
             query = {} if include_inactive else {"is_active": True}
-            codes = await db.subscription_codes.find(query).sort("created_at", -1).to_list(length=None)
+            codes = await _get_db().subscription_codes.find(query).sort("created_at", -1).to_list(length=None)
             
             # Convert ObjectId to string
             for code in codes:
@@ -231,7 +239,7 @@ class SubscriptionCodeManager:
     async def deactivate_code(code: str):
         """Deactivate a subscription code"""
         try:
-            result = await db.subscription_codes.update_one(
+            result = await _get_db().subscription_codes.update_one(
                 {"code": code.upper().strip()},
                 {"$set": {"is_active": False}}
             )
@@ -244,7 +252,7 @@ class SubscriptionCodeManager:
     async def delete_code(code: str):
         """Delete a subscription code"""
         try:
-            result = await db.subscription_codes.delete_one({"code": code.upper().strip()})
+            result = await _get_db().subscription_codes.delete_one({"code": code.upper().strip()})
             return result.deleted_count > 0
         except Exception as e:
             print(f"Error deleting code: {e}")

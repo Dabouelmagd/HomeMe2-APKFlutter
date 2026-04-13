@@ -179,8 +179,12 @@ security = HTTPBearer()
 
 # Pydantic Models
 class UserRole(str):
-    ADMIN = "admin"
-    RESIDENT = "resident"
+    SUPER_ADMIN = "super_admin"  # App owner - sees everything
+    COMPANY_ADMIN = "company_admin"  # Company with multiple compounds
+    ADMIN = "admin"  # Compound admin
+    MANAGER = "manager"  # Staff/Manager - follows up residents, complaints, maintenance
+    SECURITY = "security"  # Gate access, visitors, delivery
+    RESIDENT = "resident"  # Regular resident
 
 class PaymentStatus(str):
     PENDING = "pending"
@@ -1887,8 +1891,23 @@ async def get_current_user_optional(credentials: Optional[HTTPAuthorizationCrede
         return None
 
 async def require_admin(current_user: User = Depends(get_current_user)):
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role not in [UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.COMPANY_ADMIN]:
         raise HTTPException(status_code=403, detail="Admin access required")
+    return current_user
+
+async def require_super_admin(current_user: User = Depends(get_current_user)):
+    if current_user.role != UserRole.SUPER_ADMIN:
+        raise HTTPException(status_code=403, detail="Super Admin access required")
+    return current_user
+
+async def require_staff_or_admin(current_user: User = Depends(get_current_user)):
+    if current_user.role not in [UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.COMPANY_ADMIN, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="Staff or Admin access required")
+    return current_user
+
+async def require_security_or_admin(current_user: User = Depends(get_current_user)):
+    if current_user.role not in [UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SECURITY, UserRole.MANAGER]:
+        raise HTTPException(status_code=403, detail="Security or Admin access required")
     return current_user
 
 def is_trial_feature_allowed(user_trial: Dict[str, Any], feature: str, current_usage: int) -> bool:
@@ -15280,6 +15299,145 @@ async def respond_to_complaint(
 
 # ==================== END COMPLAINTS ====================
 
+# ==================== SUPER ADMIN PANEL ====================
+
+@api_router.get("/super-admin/dashboard")
+async def super_admin_dashboard(current_user: User = Depends(require_super_admin)):
+    """Super Admin dashboard - sees everything across all compounds"""
+    try:
+        compounds = await db.compounds.find({}, {"_id": 0}).to_list(100)
+        total_users = await db.users.count_documents({})
+        total_compounds = len(compounds)
+        total_residents = await db.users.count_documents({"role": "resident"})
+        total_admins = await db.users.count_documents({"role": {"$in": ["admin", "company_admin"]}})
+        total_revenue = 0
+        total_expenses = 0
+        
+        revenues = await db.revenue.find({}, {"_id": 0, "amount": 1}).to_list(1000)
+        total_revenue = sum(float(r.get("amount", 0)) for r in revenues)
+        expenses = await db.expenses.find({}, {"_id": 0, "amount": 1}).to_list(1000)
+        total_expenses = sum(float(e.get("amount", 0)) for e in expenses)
+        
+        # Per-compound stats
+        compound_stats = []
+        for c in compounds:
+            cid = c.get("id")
+            users = await db.users.count_documents({"compound_id": cid})
+            families = await db.families.count_documents({"compound_id": cid})
+            compound_stats.append({
+                "id": cid,
+                "name": c.get("name", ""),
+                "users": users,
+                "families": families,
+                "created_at": c.get("created_at")
+            })
+        
+        # Recent registrations
+        recent_users = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(10).to_list(10)
+        
+        return serialize_datetime({
+            "stats": {
+                "total_compounds": total_compounds,
+                "total_users": total_users,
+                "total_residents": total_residents,
+                "total_admins": total_admins,
+                "total_revenue": round(total_revenue, 2),
+                "total_expenses": round(total_expenses, 2),
+                "net_balance": round(total_revenue - total_expenses, 2)
+            },
+            "compounds": compound_stats,
+            "recent_users": recent_users
+        })
+    except Exception as e:
+        logging.error(f"Super admin dashboard error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to load dashboard")
+
+@api_router.get("/super-admin/compounds")
+async def super_admin_get_compounds(current_user: User = Depends(require_super_admin)):
+    """Get all compounds with detailed stats"""
+    try:
+        compounds = await db.compounds.find({}, {"_id": 0}).to_list(100)
+        result = []
+        for c in compounds:
+            cid = c.get("id")
+            users = await db.users.count_documents({"compound_id": cid})
+            families = await db.families.count_documents({"compound_id": cid})
+            complaints = await db.complaints.count_documents({"compound_id": cid, "status": "open"})
+            result.append({
+                **c,
+                "user_count": users,
+                "family_count": families,
+                "open_complaints": complaints
+            })
+        return {"compounds": serialize_datetime(result)}
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed")
+
+@api_router.get("/super-admin/users")
+async def super_admin_get_users(
+    role: Optional[str] = None,
+    compound_id: Optional[str] = None,
+    current_user: User = Depends(require_super_admin)
+):
+    """Get all users across all compounds"""
+    try:
+        query = {}
+        if role:
+            query["role"] = role
+        if compound_id:
+            query["compound_id"] = compound_id
+        users = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(200).to_list(200)
+        return {"users": serialize_datetime(users), "total": len(users)}
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed")
+
+@api_router.put("/super-admin/users/{user_id}/role")
+async def super_admin_update_role(user_id: str, role: str, current_user: User = Depends(require_super_admin)):
+    """Change any user's role"""
+    try:
+        valid_roles = ["super_admin", "company_admin", "admin", "manager", "security", "resident"]
+        if role not in valid_roles:
+            raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {valid_roles}")
+        result = await db.users.update_one({"id": user_id}, {"$set": {"role": role}})
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {"message": f"تم تغيير الدور إلى {role}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed")
+
+# ==================== COMPOUND ADMIN ROLE MANAGEMENT ====================
+
+@api_router.put("/admin/users/{user_id}/role")
+async def admin_update_user_role(user_id: str, role: str, current_user: User = Depends(require_admin)):
+    """Compound admin assigns roles within their compound"""
+    try:
+        allowed_roles = ["manager", "security", "resident"]
+        if role not in allowed_roles:
+            raise HTTPException(status_code=400, detail=f"يمكنك تعيين الأدوار التالية فقط: {allowed_roles}")
+        
+        target = await db.users.find_one({"id": user_id, "compound_id": current_user.compound_id})
+        if not target:
+            raise HTTPException(status_code=404, detail="User not found in your compound")
+        
+        await db.users.update_one({"id": user_id}, {"$set": {"role": role}})
+        
+        role_labels = {"manager": "إداري", "security": "أمن", "resident": "مقيم"}
+        return {"message": f"تم تعيين {target.get('full_name', '')} كـ {role_labels.get(role, role)}"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed")
+
+# ==================== END SUPER ADMIN ====================
+
+
+
 
 
 
@@ -16135,6 +16293,26 @@ async def startup_db_client():
     
     # Create text indexes for search functionality
     await create_text_index()
+    
+    # Seed super admin if not exists
+    existing_super = await db.users.find_one({"role": "super_admin"})
+    if not existing_super:
+        super_admin = {
+            "id": str(uuid.uuid4()),
+            "username": "superadmin",
+            "email": "superadmin@homeme.app",
+            "password_hash": hash_password("SuperAdmin2024!"),
+            "role": "super_admin",
+            "full_name": "Super Admin",
+            "compound_id": "",
+            "phone": "",
+            "unit_number": "",
+            "is_active": True,
+            "is_family_head": False,
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.users.insert_one(super_admin)
+        logging.info("Super Admin account created (superadmin / SuperAdmin2024!)")
     
     logging.info("Database connection and indexes initialized")
 

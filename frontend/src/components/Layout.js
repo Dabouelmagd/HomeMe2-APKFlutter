@@ -41,7 +41,8 @@ import {
   ChevronUpIcon,
   CalendarDaysIcon,
   StarIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ShieldCheckIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
@@ -883,6 +884,18 @@ const Layout = ({ children, isTrialMode = false }) => {
               <div className="flex items-center">
                 <LanguageSwitcher />
               </div>
+
+              {/* Super Admin Icon */}
+              {user?.role === 'super_admin' && (
+                <Link
+                  to="/app/super-admin"
+                  className="p-2 text-purple-500 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-200 relative transition-all hover:bg-purple-50 dark:hover:bg-gray-700 rounded-lg"
+                  title={t('super_admin_panel', 'لوحة تحكم المالك')}
+                  data-testid="super-admin-icon"
+                >
+                  <ShieldCheckIcon className="h-6 w-6" />
+                </Link>
+              )}
 
               {/* Notifications Bell */}
               <Link

@@ -50,6 +50,7 @@ import CompoundFinance from './components/CompoundFinance';
 import SatisfactionDashboard from './components/SatisfactionDashboard';
 import ContractsManagement from './components/ContractsManagement';
 import ComplaintsSystem from './components/ComplaintsSystem';
+import SuperAdminPanel from './components/SuperAdminPanel';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
 import NotificationCenter from './components/NotificationCenter';
@@ -495,6 +496,12 @@ function App() {
                 <Route path="complaints" element={
                   <ProtectedRoute>
                     <ComplaintsSystem />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="super-admin" element={
+                  <ProtectedRoute>
+                    <SuperAdminPanel />
                   </ProtectedRoute>
                 } />
                 

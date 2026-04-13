@@ -662,7 +662,7 @@ const ServicesManagement = () => {
       });
       
       if (response.data.success) {
-        toast.success(`${response.data.added_count} services added successfully!`);
+        toast.success(t('services_added_success', 'تم إضافة الخدمات بنجاح!'));
       } else {
         toast.info('Services already exist, refreshing...');
       }
@@ -715,14 +715,14 @@ const ServicesManagement = () => {
         }));
         
         setServices(services);
-        toast.success(`✅ FIXED! Found ${services.length} services with fresh token!`);
+        toast.success(t('services_loaded_fresh', 'تم تحميل الخدمات بنجاح!'));
       } else {
-        toast.error('No services in response');
+        toast.error(t('no_services_response', 'لا توجد خدمات في الاستجابة'));
       }
       
     } catch (error) {
       console.error('API Error:', error);
-      toast.error(`API Error: ${error.response?.status || error.message}`);
+      toast.error(t('api_error', 'خطأ في الاتصال بالخادم'));
     }
   };
 
@@ -767,7 +767,7 @@ const ServicesManagement = () => {
     ];
     
     setServices(testServices);
-    toast.success('3 test services added to display!');
+    toast.success(t('test_services_added', 'تم إضافة خدمات تجريبية!'));
   };
 
   const fetchServiceProviders = async () => {
@@ -870,7 +870,7 @@ const ServicesManagement = () => {
       console.log('Initialize services response:', response.data);
       
       if (response.data.success) {
-        toast.success(`${response.data.added_count} default services added successfully!`);
+        toast.success(t('default_services_added', 'تم إضافة الخدمات الافتراضية بنجاح!'));
         await fetchServices();
       } else {
         toast.info(`${response.data.message || 'Services already exist'} - Found ${services.length} services in your compound.`);

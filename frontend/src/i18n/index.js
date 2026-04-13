@@ -5672,6 +5672,12 @@ const resources = {
       'visitor_badge': 'بطاقة الزائر',
       'visitor_checked_in': 'تم تسجيل دخول الزائر',
       'visitor_checked_out': 'تم تسجيل خروج الزائر',
+
+      // Events & Analytics missing keys
+      'no_items_found': 'لا توجد عناصر',
+      'no_items_found_description': 'لا توجد أحداث أو إعلانات حالياً',
+      'engagement': 'المشاركة',
+      'financial': 'المالية',
     }
   },
   fr: {

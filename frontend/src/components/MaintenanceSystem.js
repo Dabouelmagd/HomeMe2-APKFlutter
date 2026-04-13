@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import RatingModal from './RatingModal';
 import {
   WrenchScrewdriverIcon,
   ClipboardDocumentListIcon,
@@ -29,6 +30,7 @@ const MaintenanceSystem = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [stats, setStats] = useState({});
+  const [ratingTarget, setRatingTarget] = useState(null);
 
   // Form state for new request
   const [newRequest, setNewRequest] = useState({
@@ -365,6 +367,15 @@ const MaintenanceSystem = () => {
                     >
                       {t('view_details')}
                     </button>
+                    {request.status === 'completed' && (
+                      <button
+                        onClick={() => setRatingTarget(request)}
+                        className="mt-2 mr-3 text-amber-600 hover:text-amber-800 text-sm font-medium"
+                        data-testid={`rate-request-${request.id}`}
+                      >
+                        {t('rate_service', 'قيّم الخدمة')} ⭐
+                      </button>
+                    )}
                   </div>
                 </div>
                 
@@ -571,6 +582,15 @@ const MaintenanceSystem = () => {
           </div>
         </div>
       )}
+      
+      {/* Rating Modal */}
+      <RatingModal
+        isOpen={!!ratingTarget}
+        onClose={() => setRatingTarget(null)}
+        targetType="maintenance"
+        targetId={ratingTarget?.id}
+        targetTitle={ratingTarget?.title}
+      />
     </div>
   );
 };

@@ -14381,6 +14381,124 @@ async def send_daily_report_email(current_user: User = Depends(get_current_user)
 
 # ==================== END EMAIL NOTIFICATIONS ====================
 
+# ==================== AUTOMATED DAILY REPORT CRON ====================
+
+async def send_daily_reports_for_all_compounds():
+    """Send daily reports to all admins in all compounds separately"""
+    try:
+        compounds = await db.compounds.find({}, {"_id": 0, "id": 1, "name": 1}).to_list(100)
+        total_sent = 0
+        
+        for compound in compounds:
+            compound_id = compound["id"]
+            compound_name = compound.get("name", "المجمع")
+            
+            # Get all admins for this compound
+            admins = await db.users.find(
+                {"compound_id": compound_id, "role": {"$in": ["admin", "super_admin"]}, "email": {"$exists": True, "$ne": ""}},
+                {"_id": 0, "id": 1, "full_name": 1, "email": 1}
+            ).to_list(50)
+            
+            if not admins:
+                continue
+            
+            # Gather compound-specific stats
+            today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+            
+            stats = {
+                "new_residents": await db.users.count_documents({
+                    "role": "resident", "compound_id": compound_id,
+                    "created_at": {"$gte": today_start}
+                }),
+                "visitors_today": await db.guests.count_documents({
+                    "compound_id": compound_id, "created_at": {"$gte": today_start}
+                }),
+                "maintenance_requests": await db.maintenance_requests.count_documents({
+                    "compound_id": compound_id, "created_at": {"$gte": today_start}
+                }),
+                "open_maintenance": await db.maintenance_requests.count_documents({
+                    "compound_id": compound_id, "status": {"$in": ["pending", "in_progress"]}
+                }),
+                "payments_received": 0,
+                "pending_payments": await db.invoices.count_documents({
+                    "compound_id": compound_id, "status": "pending"
+                }),
+                "messages_sent": await db.messages.count_documents({
+                    "compound_id": compound_id, "created_at": {"$gte": today_start}
+                }),
+                "unpaid_obligations": await db.unit_charges.count_documents({
+                    "compound_id": compound_id, "status": "pending"
+                }),
+                "total_unpaid_amount": 0
+            }
+            
+            unpaid = await db.unit_charges.find(
+                {"compound_id": compound_id, "status": "pending"}, {"_id": 0, "amount": 1}
+            ).to_list(500)
+            stats["total_unpaid_amount"] = sum(c.get("amount", 0) for c in unpaid)
+            
+            # Send to each admin
+            for admin in admins:
+                try:
+                    result = await email_service.send_daily_report(
+                        admin_email=admin["email"],
+                        admin_name=admin.get("full_name", "المدير"),
+                        compound_name=compound_name,
+                        stats=stats
+                    )
+                    if result:
+                        total_sent += 1
+                except Exception as e:
+                    logging.error(f"Failed to send report to {admin['email']}: {e}")
+        
+        logging.info(f"Daily reports sent: {total_sent} emails across {len(compounds)} compounds")
+        return total_sent
+    except Exception as e:
+        logging.error(f"Error in daily report cron: {e}")
+        return 0
+
+# Background scheduler
+_daily_report_task = None
+
+async def daily_report_scheduler():
+    """Run daily report at 7:00 AM every day"""
+    import asyncio
+    while True:
+        now = datetime.now()
+        # Calculate next 7:00 AM
+        next_run = now.replace(hour=7, minute=0, second=0, microsecond=0)
+        if now >= next_run:
+            next_run += timedelta(days=1)
+        
+        wait_seconds = (next_run - now).total_seconds()
+        logging.info(f"Next daily report scheduled at {next_run} (in {wait_seconds/3600:.1f} hours)")
+        await asyncio.sleep(wait_seconds)
+        
+        # Send reports
+        count = await send_daily_reports_for_all_compounds()
+        logging.info(f"Daily report cron completed: {count} emails sent")
+
+@app.on_event("startup")
+async def start_daily_report_scheduler():
+    """Start the daily report background task"""
+    global _daily_report_task
+    import asyncio
+    _daily_report_task = asyncio.create_task(daily_report_scheduler())
+    logging.info("Daily report scheduler started (7:00 AM daily)")
+
+@api_router.post("/email/trigger-daily-reports")
+async def trigger_daily_reports(current_user: User = Depends(require_admin)):
+    """Manually trigger daily reports for all compounds (admin only)"""
+    count = await send_daily_reports_for_all_compounds()
+    return {
+        "message": f"تم إرسال {count} تقرير يومي لجميع المجمعات",
+        "emails_sent": count
+    }
+
+# ==================== END AUTOMATED DAILY REPORT ====================
+
+
+
 
 # ==================== PUSH NOTIFICATIONS ENDPOINTS ====================
 
@@ -14704,6 +14822,182 @@ async def get_reminder_logs(
 # ==================== END PAYMENT REMINDERS ====================
 
 # ==================== PDF REPORTS ====================
+
+
+# ==================== EXCEL EXPORT ====================
+
+@api_router.get("/financial/export-excel")
+async def export_financial_excel(
+    year: Optional[int] = None,
+    month: Optional[int] = None,
+    current_user: User = Depends(require_admin)
+):
+    """Export financial data as Excel file"""
+    from fastapi.responses import Response
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+    
+    try:
+        compound_id = current_user.compound_id
+        current_year = year or datetime.now().year
+        
+        wb = openpyxl.Workbook()
+        
+        # Styles
+        header_font = Font(bold=True, color="FFFFFF", size=11)
+        header_fill = PatternFill(start_color="1e3a5f", end_color="1e3a5f", fill_type="solid")
+        green_fill = PatternFill(start_color="dcfce7", end_color="dcfce7", fill_type="solid")
+        red_fill = PatternFill(start_color="fee2e2", end_color="fee2e2", fill_type="solid")
+        thin_border = Border(
+            left=Side(style='thin'), right=Side(style='thin'),
+            top=Side(style='thin'), bottom=Side(style='thin')
+        )
+        
+        def style_header(ws, row, cols):
+            for col in range(1, cols + 1):
+                cell = ws.cell(row=row, column=col)
+                cell.font = header_font
+                cell.fill = header_fill
+                cell.alignment = Alignment(horizontal='center')
+                cell.border = thin_border
+        
+        # Sheet 1: Balance Sheet Summary
+        ws1 = wb.active
+        ws1.title = "Balance Sheet"
+        ws1.sheet_properties.sheetView = openpyxl.worksheet.views.SheetView(rightToLeft=True)
+        
+        expenses = await db.expenses.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+        revenues = await db.revenue.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+        total_exp = sum(float(e.get("amount", 0)) for e in expenses)
+        total_rev = sum(float(r.get("amount", 0)) for r in revenues)
+        
+        ws1.append(["الميزانية العمومية / Balance Sheet", "", "", ""])
+        ws1.merge_cells('A1:D1')
+        ws1.cell(1, 1).font = Font(bold=True, size=14)
+        ws1.append([])
+        ws1.append(["البند", "المبلغ"])
+        style_header(ws1, 3, 2)
+        ws1.append(["إجمالي الإيرادات", total_rev])
+        ws1.append(["إجمالي المصروفات", total_exp])
+        ws1.append(["صافي الرصيد", total_rev - total_exp])
+        ws1.cell(6, 2).font = Font(bold=True, color="FF0000" if total_rev - total_exp < 0 else "008000")
+        
+        ws1.append([])
+        ws1.append(["المصروفات حسب التصنيف", "المبلغ"])
+        style_header(ws1, 8, 2)
+        exp_by_cat = {}
+        for e in expenses:
+            cat = e.get("category", "other")
+            exp_by_cat[cat] = exp_by_cat.get(cat, 0) + float(e.get("amount", 0))
+        for cat, amt in exp_by_cat.items():
+            ws1.append([cat, amt])
+        
+        ws1.column_dimensions['A'].width = 30
+        ws1.column_dimensions['B'].width = 20
+        
+        # Sheet 2: Expenses Detail
+        ws2 = wb.create_sheet("Expenses")
+        ws2.sheet_properties.sheetView = openpyxl.worksheet.views.SheetView(rightToLeft=True)
+        ws2.append(["الوصف", "التصنيف", "المبلغ", "التاريخ", "الحالة"])
+        style_header(ws2, 1, 5)
+        for e in expenses:
+            ws2.append([
+                e.get("description", ""),
+                e.get("category", ""),
+                float(e.get("amount", 0)),
+                str(e.get("date", ""))[:10],
+                e.get("status", "")
+            ])
+        for col in ['A', 'B', 'C', 'D', 'E']:
+            ws2.column_dimensions[col].width = 22
+        
+        # Sheet 3: Unit Charges
+        ws3 = wb.create_sheet("Unit Charges")
+        ws3.sheet_properties.sheetView = openpyxl.worksheet.views.SheetView(rightToLeft=True)
+        
+        query = {"compound_id": compound_id}
+        if month:
+            query["month"] = month
+        if year:
+            query["year"] = year
+        charges = await db.unit_charges.find(query, {"_id": 0}).sort("unit_number", 1).to_list(500)
+        
+        ws3.append(["الوحدة", "المقيم", "الالتزام", "المبلغ", "الحالة", "تاريخ السداد", "الشهر", "السنة"])
+        style_header(ws3, 1, 8)
+        for c in charges:
+            row_num = ws3.max_row + 1
+            paid_at = ""
+            if c.get("paid_at"):
+                pa = c["paid_at"]
+                paid_at = pa.strftime('%Y-%m-%d') if hasattr(pa, 'strftime') else str(pa)[:10]
+            ws3.append([
+                c.get("unit_number", ""),
+                c.get("resident_name", ""),
+                c.get("title", ""),
+                float(c.get("amount", 0)),
+                "سدد" if c.get("status") == "paid" else "لم يسدد",
+                paid_at,
+                c.get("month", ""),
+                c.get("year", "")
+            ])
+            # Color rows
+            fill = green_fill if c.get("status") == "paid" else red_fill
+            for col in range(1, 9):
+                ws3.cell(row=row_num, column=col).fill = fill
+        
+        for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+            ws3.column_dimensions[col].width = 18
+        
+        # Sheet 4: Obligations
+        ws4 = wb.create_sheet("Obligations")
+        ws4.sheet_properties.sheetView = openpyxl.worksheet.views.SheetView(rightToLeft=True)
+        obs = await db.obligations.find({"compound_id": compound_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+        ws4.append(["العنوان", "التصنيف", "المبلغ الإجمالي", "طريقة التوزيع", "عدد الوحدات", "الشهر", "السنة"])
+        style_header(ws4, 1, 7)
+        for ob in obs:
+            ws4.append([
+                ob.get("title", ""),
+                ob.get("category", ""),
+                float(ob.get("total_amount", 0)),
+                ob.get("distribution_label", "بالتساوي"),
+                ob.get("unit_count", 0),
+                ob.get("month", ""),
+                ob.get("year", "")
+            ])
+        for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G']:
+            ws4.column_dimensions[col].width = 20
+        
+        # Sheet 5: Revenue
+        ws5 = wb.create_sheet("Revenue")
+        ws5.sheet_properties.sheetView = openpyxl.worksheet.views.SheetView(rightToLeft=True)
+        ws5.append(["الوصف", "المصدر", "المبلغ", "التاريخ", "الحالة"])
+        style_header(ws5, 1, 5)
+        for r in revenues:
+            ws5.append([
+                r.get("description", ""),
+                r.get("source", ""),
+                float(r.get("amount", 0)),
+                str(r.get("date", ""))[:10],
+                r.get("status", "")
+            ])
+        for col in ['A', 'B', 'C', 'D', 'E']:
+            ws5.column_dimensions[col].width = 22
+        
+        buffer = io.BytesIO()
+        wb.save(buffer)
+        excel_content = buffer.getvalue()
+        buffer.close()
+        
+        filename = f"financial_report_{current_year}.xlsx"
+        return Response(
+            content=excel_content,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+    except Exception as e:
+        logging.error(f"Error exporting Excel: {e}")
+        raise HTTPException(status_code=500, detail="Failed to export Excel")
+
 
 # ==================== RESIDENT PROFILE DETAIL ====================
 

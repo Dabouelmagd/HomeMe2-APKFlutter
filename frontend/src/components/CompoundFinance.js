@@ -15,7 +15,8 @@ import {
   DocumentTextIcon,
   ChartBarIcon,
   HomeIcon,
-  CreditCardIcon
+  CreditCardIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
@@ -146,6 +147,7 @@ const CompoundFinance = () => {
   const obl = bs.obligations || {};
   const tabs = [
     { id: 'balance', label: t('balance_sheet', 'الميزانية العمومية'), icon: ChartBarIcon },
+    { id: 'comparison', label: t('monthly_comparison', 'المقارنة الشهرية'), icon: ArrowTrendingUpIcon },
     { id: 'obligations', label: t('obligations', 'الالتزامات'), icon: DocumentTextIcon },
     { id: 'units', label: t('unit_payments', 'سداد الوحدات'), icon: HomeIcon },
     { id: 'expenses', label: t('expenses', 'المصروفات'), icon: ArrowTrendingDownIcon },
@@ -161,6 +163,30 @@ const CompoundFinance = () => {
             <p className="text-sm text-gray-500">{t('compound_budget_desc', 'إدارة ميزانية المجمع والالتزامات والمصروفات')}</p>
           </div>
           <div className="flex gap-2">
+            <button
+              onClick={async () => {
+                try {
+                  const res = await axios.get(`${API}/financial/export-excel?year=${filterYear}&month=${filterMonth}`, {
+                    ...getToken(), responseType: 'blob'
+                  });
+                  const url = window.URL.createObjectURL(new Blob([res.data]));
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', `financial_report_${filterYear}.xlsx`);
+                  document.body.appendChild(link);
+                  link.click();
+                  link.remove();
+                  toast.success(t('excel_exported', 'تم تصدير ملف Excel بنجاح'));
+                } catch (err) {
+                  toast.error(t('failed_export_excel', 'فشل في تصدير Excel'));
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+              data-testid="export-excel-btn"
+            >
+              <ArrowDownTrayIcon className="h-4 w-4" />
+              {t('export_excel', 'تصدير Excel')}
+            </button>
             <select value={filterMonth} onChange={e => setFilterMonth(+e.target.value)} className="border rounded-lg px-3 py-2 text-sm" data-testid="filter-month">
               {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
             </select>
@@ -339,6 +365,135 @@ const CompoundFinance = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+
+          {/* Monthly Comparison */}
+          {activeTab === 'comparison' && (
+            <div className="p-6 space-y-6">
+              <h3 className="text-lg font-bold text-gray-900">{t('monthly_comparison', 'المقارنة الشهرية')} - {filterYear}</h3>
+              
+              {/* Monthly Collection Rate Chart */}
+              {(() => {
+                const monthlyData = Object.entries(bs.monthly_breakdown || {}).map(([month, val]) => {
+                  const charged = val.expenses || 0;
+                  const collected = val.revenue || 0;
+                  const rate = charged > 0 ? Math.round((collected / charged) * 100) : 0;
+                  return {
+                    name: months[parseInt(month.slice(5)) - 1] || month.slice(5),
+                    [t('collection_rate', 'نسبة التحصيل')]: rate,
+                    [t('expenses', 'المصروفات')]: charged,
+                    [t('revenue', 'الإيرادات')]: collected,
+                    rate
+                  };
+                });
+                
+                const lowMonths = monthlyData.filter(d => d.rate > 0 && d.rate < 70);
+                
+                return (
+                  <>
+                    {/* Alert for low collection */}
+                    {lowMonths.length > 0 && (
+                      <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 flex items-start gap-3" data-testid="low-collection-alert">
+                        <XCircleIcon className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-bold text-red-700">{t('collection_alert', 'تنبيه: انخفاض معدل التحصيل!')}</p>
+                          <p className="text-sm text-red-600 mt-1">
+                            {lowMonths.map(m => `${m.name} (${m.rate}%)`).join(' | ')}
+                          </p>
+                          <p className="text-xs text-red-500 mt-1">{t('collection_alert_note', 'معدل التحصيل أقل من 70% في الأشهر المذكورة')}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Collection Rate Line/Bar Chart */}
+                    {monthlyData.length > 0 ? (
+                      <div>
+                        <h4 className="font-semibold text-gray-700 mb-3">{t('collection_rate_by_month', 'معدل التحصيل شهرياً')}</h4>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={monthlyData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                            <YAxis tick={{ fontSize: 11 }} domain={[0, 100]} unit="%" />
+                            <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                            <Legend />
+                            <Bar dataKey={t('collection_rate', 'نسبة التحصيل')} radius={[6, 6, 0, 0]}>
+                              {monthlyData.map((entry, i) => (
+                                <Cell key={i} fill={entry.rate >= 70 ? '#22c55e' : entry.rate >= 50 ? '#f59e0b' : '#ef4444'} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                        <div className="flex gap-4 justify-center mt-2 text-xs">
+                          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span> 70%+ {t('good', 'جيد')}</span>
+                          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> 50-70% {t('warning', 'تحذير')}</span>
+                          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span> &lt;50% {t('critical', 'حرج')}</span>
+                        </div>
+                      </div>
+                    ) : <p className="text-gray-400 text-center py-8">{t('no_monthly_data', 'لا توجد بيانات شهرية للمقارنة')}</p>}
+                    
+                    {/* Monthly Revenue vs Expenses comparison */}
+                    {monthlyData.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-gray-700 mb-3">{t('revenue_vs_expenses', 'الإيرادات مقابل المصروفات')}</h4>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={monthlyData}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                            <YAxis tick={{ fontSize: 11 }} />
+                            <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                            <Legend />
+                            <Bar dataKey={t('expenses', 'المصروفات')} fill="#ef4444" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey={t('revenue', 'الإيرادات')} fill="#22c55e" radius={[6, 6, 0, 0]} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                    
+                    {/* Monthly breakdown table */}
+                    {monthlyData.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold text-gray-700 mb-3">{t('monthly_details', 'تفاصيل شهرية')}</h4>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="bg-gray-50">
+                                <th className="p-3 text-right font-medium">{t('month', 'الشهر')}</th>
+                                <th className="p-3 text-right font-medium">{t('expenses', 'المصروفات')}</th>
+                                <th className="p-3 text-right font-medium">{t('revenue', 'الإيرادات')}</th>
+                                <th className="p-3 text-right font-medium">{t('collection_rate', 'نسبة التحصيل')}</th>
+                                <th className="p-3 text-right font-medium">{t('status', 'الحالة')}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {monthlyData.map((m, i) => (
+                                <tr key={i} className="border-t border-gray-100">
+                                  <td className="p-3 font-medium">{m.name}</td>
+                                  <td className="p-3 text-red-600 font-medium">{m[t('expenses', 'المصروفات')]?.toLocaleString()}</td>
+                                  <td className="p-3 text-green-600 font-medium">{m[t('revenue', 'الإيرادات')]?.toLocaleString()}</td>
+                                  <td className="p-3">
+                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                      m.rate >= 70 ? 'bg-green-100 text-green-700' : m.rate >= 50 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
+                                    }`}>{m.rate}%</span>
+                                  </td>
+                                  <td className="p-3">
+                                    {m.rate >= 70 ? (
+                                      <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                                    ) : (
+                                      <XCircleIcon className="h-5 w-5 text-red-500" />
+                                    )}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           )}
 

@@ -10,55 +10,52 @@ Multi-role Compound Management application with Arabic-first UI, featuring finan
 - **Background Tasks**: Daily report scheduler, contract expiry checker
 
 ## Modular Backend Architecture (Refactored Apr 13, 2026)
-### Extracted Route Modules (11 files, 2,191 lines)
-- `routes/finance.py` - Expenses, Revenue, Obligations, Balance Sheet, Unit Charges (501 lines)
-- `routes/exports.py` - Excel/PDF exports, Resident profile (402 lines)
-- `routes/guests.py` - Visit requests, Guest management, QR codes (209 lines)
-- `routes/ratings.py` - Satisfaction ratings with smart alerts (165 lines)
-- `routes/contracts.py` - Contract management with expiry tracking (161 lines)
-- `routes/facilities.py` - Facility booking system (157 lines)
-- `routes/superadmin.py` - Super Admin panel & role management (145 lines)
-- `routes/maintenance.py` - Maintenance requests (142 lines)
-- `routes/complaints.py` - Complaints & Suggestions (138 lines)
-- `routes/monitoring.py` - System health & monitoring (99 lines)
-- `routes/notifications.py` - User notifications CRUD (71 lines)
+**server.py: 16,321 → 11,251 lines (-31%, -5,070 lines)**
+
+### 17 Extracted Route Modules (4,248 lines total)
+| Module | Lines | Routes |
+|--------|-------|--------|
+| finance.py | 501 | Balance sheet, obligations, charges, expenses, revenue |
+| smart_devices.py | 512 | IoT devices, automations, NL commands |
+| companies.py | 496 | Company registration, dashboard, compounds |
+| exports.py | 402 | Excel/PDF export, resident profile |
+| documents.py | 305 | Document management, folders |
+| polls.py | 292 | Polls, voting, results |
+| newsletters.py | 261 | Newsletter CRUD |
+| guests.py | 209 | Visit requests, QR codes, check-in/out |
+| announcements.py | 191 | Announcements & events |
+| ratings.py | 165 | Satisfaction ratings, smart alerts |
+| contracts.py | 161 | Contract management, expiry tracking |
+| facilities.py | 157 | Facility booking |
+| superadmin.py | 145 | Super admin panel, role management |
+| maintenance.py | 142 | Maintenance requests |
+| complaints.py | 138 | Complaints & suggestions |
+| monitoring.py | 99 | Health checks, system stats |
+| notifications.py | 71 | User notification CRUD |
 
 ### Shared Modules
-- `auth_deps.py` - Auth dependencies (UserDict, get_current_user, require_admin, etc.)
+- `auth_deps.py` - Auth dependencies (UserDict, get_current_user, require_admin)
 - `database.py` - Shared DB connection module
-- `helpers.py` - Shared utilities (serialize_datetime, notify_compound_admins)
+- `helpers.py` - Utilities (serialize_datetime, notify_compound_admins)
 
-### Still in server.py (~13,138 lines)
-- Auth/Registration, WebAuthn
-- Compounds, Families, Users CRUD
-- Messaging/Chat system (WebSockets)
+### Still in server.py (~11,251 lines)
+- Auth/Registration, WebAuthn, Login
+- Compounds CRUD, Families, Users
+- Messaging/Chat (WebSockets) - largest remaining section
 - Dashboard routes
 - Service providers/bookings
-- Documents, Polls, Smart Devices, Newsletters
-- Company/Enterprise, Individual accounts
-- Subscription codes
+- Individual accounts, Account selection
+- Subscription codes & management
 - Email/Push notifications, Daily reports
 - Payment services (Stripe, PayPal)
+- Security endpoints
+- User profile/password/privacy (with duplicates)
 
 ## 15 Systems Built
-1. Bug Fixes (Add Resident, WebAuthn, CORS)
-2. Admin Notification System
-3. Live Dashboard + Quick Actions
-4. Resident Profile (7 tabs + PDF + Print)
-5. Arabic Translation (complete)
-6. Financial Management (Balance Sheet, Charts, 4 distribution methods, Excel)
-7. Daily Report Cron (7AM per compound)
-8. Monthly Comparison + <70% Alert
-9. Ratings & Satisfaction (smart alerts)
-10. Contracts Management (expiry tracking 30/7/0 days)
-11. Facility Booking Enhanced (admin management)
-12. Complaints & Suggestions System
-13. Roles & Permissions (6 roles)
-14. Registration Flow Redesign (3 account types)
-15. Sidebar Redesign (role-based colors, 8 sections)
+1-15: (See previous PRD entries - all operational)
 
 ## Backlog
-- P1: Continue server.py refactoring (Auth, Messaging, Users, Dashboard, etc.)
-- P1: E2E Registration Flow Test (Super Admin → Company → Compound → Invite → Resident)
-- P2: Performance optimization for large compounds
-- P2: Offline PWA capabilities
+- P1: Continue server.py refactoring (Messaging/Chat ~2000 lines, Auth, Users, Subscriptions)
+- P1: E2E Registration Flow Test
+- P2: Clean up duplicate user profile/password routes (4 copies exist)
+- P2: Performance optimization

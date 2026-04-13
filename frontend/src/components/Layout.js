@@ -261,37 +261,37 @@ const Layout = ({ children, isTrialMode = false }) => {
           name: t('compound_management'),
           href: 'compound',
           icon: BuildingOfficeIcon,
-          show: user?.role === 'admin'
+          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
         },
         {
           name: t('residents_list'),
           href: 'residents',
           icon: UserGroupIcon,
-          show: user?.role === 'admin'
+          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
         },
         {
           name: t('user_management'),
           href: 'users',
           icon: UsersIcon,
-          show: user?.role === 'admin'
+          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
         },
         {
           name: t('monitoring_dashboard'),
           href: 'monitoring',
           icon: ChartPieIcon,
-          show: user?.role === 'admin'
+          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
         },
         {
           name: t('compounds_management', 'Compounds Management'),
           href: 'compounds-management',
           icon: HomeIcon,
-          show: user?.role === 'admin' && user?.compound_id === 'super_admin'
+          show: user?.role === 'super_admin' || user?.role === 'company_admin'
         },
         {
           name: t('subscription_codes'),
           href: 'subscription-codes',
           icon: TicketIcon,
-          show: user?.role === 'admin' && user?.compound_id === 'super_admin'
+          show: user?.role === 'super_admin' || user?.role === 'company_admin'
         }
       ]
     },
@@ -314,7 +314,7 @@ const Layout = ({ children, isTrialMode = false }) => {
           name: t('guest_management'),
           href: 'guests',
           icon: UsersIcon,
-          show: true
+          show: ['admin','company_admin','super_admin','manager','security'].includes(user?.role)
         },
         {
           name: t('facility_booking'),
@@ -372,13 +372,13 @@ const Layout = ({ children, isTrialMode = false }) => {
           name: t('satisfaction_ratings', 'تقييمات الرضا'),
           href: 'satisfaction',
           icon: StarIcon,
-          show: user?.role === 'admin'
+          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
         },
         {
           name: t('contracts_management', 'إدارة العقود'),
           href: 'contracts',
           icon: DocumentTextIcon,
-          show: user?.role === 'admin'
+          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
         }
       ]
     },
@@ -470,19 +470,19 @@ const Layout = ({ children, isTrialMode = false }) => {
           name: t('advanced_analytics'),
           href: 'analytics',
           icon: ChartBarIcon,
-          show: user?.role === 'admin' || user?.is_super_admin
+          show: ['admin','company_admin','super_admin','manager'].includes(user?.role) || user?.is_super_admin
         },
         {
           name: t('enterprise.dashboard'),
           href: 'enterprise-dashboard',
           icon: BuildingOffice2Icon,
-          show: user?.role === 'admin'
+          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
         },
         {
           name: t('subscription_codes_management'),
           href: 'subscription-codes',
           icon: KeyIcon,
-          show: user?.role === 'admin'
+          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
         }
       ]
     },

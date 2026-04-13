@@ -165,18 +165,24 @@ const UserManagement = () => {
 
   const getRoleColor = (role) => {
     switch (role) {
+      case 'super_admin': return 'bg-purple-100 text-purple-800';
+      case 'company_admin': return 'bg-indigo-100 text-indigo-800';
       case 'admin': return 'bg-red-100 text-red-800';
+      case 'manager': return 'bg-emerald-100 text-emerald-800';
+      case 'security': return 'bg-amber-100 text-amber-800';
       case 'resident': return 'bg-blue-100 text-blue-800';
-      case 'staff': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getRoleName = (role) => {
     switch (role) {
-      case 'admin': return t('admin');
-      case 'resident': return t('resident');
-      case 'staff': return t('staff');
+      case 'super_admin': return t('super_admin', 'مالك التطبيق');
+      case 'company_admin': return t('company_admin', 'إدارة شركة');
+      case 'admin': return t('admin', 'مدير مجتمع');
+      case 'manager': return t('manager', 'إداري');
+      case 'security': return t('security_role', 'أمن');
+      case 'resident': return t('resident', 'مقيم');
       default: return role;
     }
   };
@@ -237,6 +243,8 @@ const UserManagement = () => {
           >
             <option value="">{t('all_roles')}</option>
             <option value="admin">{t('admin')}</option>
+            <option value="manager">{t('manager', 'إداري')}</option>
+            <option value="security">{t('security_role', 'أمن')}</option>
             <option value="resident">{t('resident')}</option>
             <option value="staff">{t('staff')}</option>
           </select>
@@ -330,6 +338,9 @@ const UserManagement = () => {
                       {t('created_date')}
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('change_role', 'تغيير الدور')}
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       {t('actions')}
                     </th>
                   </tr>
@@ -396,6 +407,29 @@ const UserManagement = () => {
                           <CalendarIcon className="h-4 w-4 text-gray-400 ml-2" />
                           {new Date(userItem.created_at || Date.now()).toLocaleDateString('ar')}
                         </div>
+                      </td>
+                      
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <select
+                          value={userItem.role}
+                          onChange={async (e) => {
+                            try {
+                              await axios.put(`${API}/admin/users/${userItem.id}/role?role=${e.target.value}`, {}, {
+                                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                              });
+                              toast.success(t('role_updated', 'تم تغيير الدور بنجاح'));
+                              fetchUsers();
+                            } catch (err) {
+                              toast.error(err.response?.data?.detail || t('role_update_failed', 'فشل في تغيير الدور'));
+                            }
+                          }}
+                          className="text-xs border border-gray-200 rounded-lg px-2 py-1 bg-white"
+                          data-testid={`role-change-${userItem.id}`}
+                        >
+                          <option value="resident">{t('resident', 'مقيم')}</option>
+                          <option value="manager">{t('manager', 'إداري')}</option>
+                          <option value="security">{t('security', 'أمن')}</option>
+                        </select>
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -519,8 +553,9 @@ const UserManagement = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="resident">{t('resident')}</option>
+                  <option value="manager">{t('manager', 'إداري')}</option>
+                  <option value="security">{t('security_role', 'أمن')}</option>
                   <option value="admin">{t('admin')}</option>
-                  <option value="staff">{t('staff')}</option>
                 </select>
               </div>
               

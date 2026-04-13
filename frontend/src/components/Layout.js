@@ -371,6 +371,12 @@ const Layout = ({ children, isTrialMode = false }) => {
           href: 'satisfaction',
           icon: StarIcon,
           show: user?.role === 'admin'
+        },
+        {
+          name: t('contracts_management', 'إدارة العقود'),
+          href: 'contracts',
+          icon: DocumentTextIcon,
+          show: user?.role === 'admin'
         }
       ]
     },

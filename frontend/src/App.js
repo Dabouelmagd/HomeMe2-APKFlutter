@@ -48,6 +48,7 @@ import AddFamilyMemberToUnit from './components/AddFamilyMemberToUnit';
 import FinancialManagement from './components/FinancialManagement';
 import CompoundFinance from './components/CompoundFinance';
 import SatisfactionDashboard from './components/SatisfactionDashboard';
+import ContractsManagement from './components/ContractsManagement';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
 import NotificationCenter from './components/NotificationCenter';
@@ -481,6 +482,12 @@ function App() {
                 <Route path="satisfaction" element={
                   <ProtectedRoute adminOnly>
                     <SatisfactionDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="contracts" element={
+                  <ProtectedRoute adminOnly>
+                    <ContractsManagement />
                   </ProtectedRoute>
                 } />
                 

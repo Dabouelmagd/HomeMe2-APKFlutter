@@ -47,6 +47,7 @@ import FamilyManagement from './components/FamilyManagement';
 import AddFamilyMemberToUnit from './components/AddFamilyMemberToUnit';
 import FinancialManagement from './components/FinancialManagement';
 import CompoundFinance from './components/CompoundFinance';
+import SatisfactionDashboard from './components/SatisfactionDashboard';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
 import NotificationCenter from './components/NotificationCenter';
@@ -474,6 +475,12 @@ function App() {
                 <Route path="finances" element={
                   <ProtectedRoute adminOnly>
                     <CompoundFinance />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="satisfaction" element={
+                  <ProtectedRoute adminOnly>
+                    <SatisfactionDashboard />
                   </ProtectedRoute>
                 } />
                 

@@ -14824,6 +14824,169 @@ async def get_reminder_logs(
 # ==================== PDF REPORTS ====================
 
 
+
+# ==================== RATINGS & SATISFACTION SYSTEM ====================
+
+class RatingCreate(BaseModel):
+    target_type: str  # "maintenance" or "service"
+    target_id: str  # maintenance_request_id or service_booking_id
+    rating: int  # 1-5 stars
+    comment: str = ""
+
+@api_router.post("/ratings")
+async def submit_rating(
+    data: RatingCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Submit a rating for maintenance or service"""
+    try:
+        if data.rating < 1 or data.rating > 5:
+            raise HTTPException(status_code=400, detail="Rating must be 1-5")
+        
+        # Verify target exists
+        if data.target_type == "maintenance":
+            target = await db.maintenance_requests.find_one({"id": data.target_id}, {"_id": 0})
+            if not target:
+                raise HTTPException(status_code=404, detail="Maintenance request not found")
+        elif data.target_type == "service":
+            target = await db.service_bookings.find_one({"id": data.target_id}, {"_id": 0})
+            if not target:
+                raise HTTPException(status_code=404, detail="Service booking not found")
+        else:
+            raise HTTPException(status_code=400, detail="Invalid target_type")
+        
+        # Check if already rated
+        existing = await db.ratings.find_one({
+            "target_type": data.target_type,
+            "target_id": data.target_id,
+            "user_id": current_user.id
+        })
+        if existing:
+            # Update existing rating
+            await db.ratings.update_one(
+                {"id": existing["id"]},
+                {"$set": {"rating": data.rating, "comment": data.comment, "updated_at": datetime.now(timezone.utc)}}
+            )
+            return {"message": "تم تحديث التقييم بنجاح", "rating_id": existing["id"]}
+        
+        rating_doc = {
+            "id": str(uuid.uuid4()),
+            "compound_id": current_user.compound_id,
+            "user_id": current_user.id,
+            "user_name": current_user.full_name,
+            "target_type": data.target_type,
+            "target_id": data.target_id,
+            "rating": data.rating,
+            "comment": data.comment,
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.ratings.insert_one(rating_doc)
+        
+        return {"message": "تم إرسال التقييم بنجاح", "rating_id": rating_doc["id"]}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error submitting rating: {e}")
+        raise HTTPException(status_code=500, detail="Failed to submit rating")
+
+@api_router.get("/ratings/target/{target_type}/{target_id}")
+async def get_target_ratings(
+    target_type: str,
+    target_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get ratings for a specific target"""
+    try:
+        ratings = await db.ratings.find(
+            {"target_type": target_type, "target_id": target_id},
+            {"_id": 0}
+        ).sort("created_at", -1).to_list(50)
+        avg = sum(r["rating"] for r in ratings) / len(ratings) if ratings else 0
+        return {
+            "ratings": serialize_datetime(ratings),
+            "average": round(avg, 1),
+            "count": len(ratings)
+        }
+    except Exception as e:
+        logging.error(f"Error fetching ratings: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch ratings")
+
+@api_router.get("/ratings/stats")
+async def get_rating_stats(current_user: User = Depends(require_admin)):
+    """Get compound-wide rating statistics for admin dashboard"""
+    try:
+        compound_id = current_user.compound_id
+        
+        all_ratings = await db.ratings.find({"compound_id": compound_id}, {"_id": 0}).to_list(1000)
+        
+        if not all_ratings:
+            return {
+                "overall_average": 0,
+                "total_ratings": 0,
+                "maintenance_avg": 0,
+                "service_avg": 0,
+                "rating_distribution": {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+                "monthly_trend": [],
+                "recent_ratings": [],
+                "best_rated": [],
+                "worst_rated": []
+            }
+        
+        # Overall stats
+        total = len(all_ratings)
+        overall_avg = round(sum(r["rating"] for r in all_ratings) / total, 1)
+        
+        # By type
+        maint_ratings = [r for r in all_ratings if r["target_type"] == "maintenance"]
+        service_ratings = [r for r in all_ratings if r["target_type"] == "service"]
+        maint_avg = round(sum(r["rating"] for r in maint_ratings) / len(maint_ratings), 1) if maint_ratings else 0
+        service_avg = round(sum(r["rating"] for r in service_ratings) / len(service_ratings), 1) if service_ratings else 0
+        
+        # Distribution
+        dist = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+        for r in all_ratings:
+            dist[r["rating"]] = dist.get(r["rating"], 0) + 1
+        
+        # Monthly trend
+        monthly = {}
+        for r in all_ratings:
+            created = r.get("created_at")
+            if created:
+                if hasattr(created, 'strftime'):
+                    m = created.strftime('%Y-%m')
+                else:
+                    m = str(created)[:7]
+                if m not in monthly:
+                    monthly[m] = {"total": 0, "sum": 0}
+                monthly[m]["total"] += 1
+                monthly[m]["sum"] += r["rating"]
+        
+        monthly_trend = [
+            {"month": m, "average": round(v["sum"] / v["total"], 1), "count": v["total"]}
+            for m, v in sorted(monthly.items())
+        ]
+        
+        # Recent ratings
+        recent = sorted(all_ratings, key=lambda x: x.get("created_at", ""), reverse=True)[:10]
+        
+        return serialize_datetime({
+            "overall_average": overall_avg,
+            "total_ratings": total,
+            "maintenance_avg": maint_avg,
+            "maintenance_count": len(maint_ratings),
+            "service_avg": service_avg,
+            "service_count": len(service_ratings),
+            "rating_distribution": dist,
+            "monthly_trend": monthly_trend,
+            "recent_ratings": recent
+        })
+    except Exception as e:
+        logging.error(f"Error getting rating stats: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get rating stats")
+
+# ==================== END RATINGS SYSTEM ====================
+
+
 # ==================== EXCEL EXPORT ====================
 
 @api_router.get("/financial/export-excel")

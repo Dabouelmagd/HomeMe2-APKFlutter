@@ -39,7 +39,8 @@ import {
   KeyIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  CalendarDaysIcon
+  CalendarDaysIcon,
+  StarIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
@@ -364,6 +365,12 @@ const Layout = ({ children, isTrialMode = false }) => {
           href: 'pricing',
           icon: CurrencyDollarIcon,
           show: true
+        },
+        {
+          name: t('satisfaction_ratings', 'تقييمات الرضا'),
+          href: 'satisfaction',
+          icon: StarIcon,
+          show: user?.role === 'admin'
         }
       ]
     },

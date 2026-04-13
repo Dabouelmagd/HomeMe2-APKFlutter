@@ -365,9 +365,71 @@ async def get_reminder_logs(
 
 
 
-# ==================== EXTRACTED ROUTE MODULES ====================
-# These routes have been extracted into /app/backend/routes/ for maintainability
+# ==================== SUBSCRIPTION EXPIRY NOTIFICATIONS ====================
 
-# ==================== END EXTRACTED ROUTES ====================
+async def check_expiring_subscriptions():
+    """Check for subscriptions expiring in 7 days and send notifications"""
+    db = get_db()
+    try:
+        from datetime import datetime, timedelta, timezone
+        now = datetime.now(timezone.utc)
+        warn_date = (now + timedelta(days=7)).isoformat()[:10]
+        today = now.isoformat()[:10]
+        
+        users = await db.users.find(
+            {"subscription_active": True, "subscription_end": {"$exists": True}},
+            {"_id": 0, "password_hash": 0}
+        ).to_list(2000)
+        
+        notified = 0
+        for user in users:
+            end_str = str(user.get("subscription_end", ""))[:10]
+            if not end_str:
+                continue
+            
+            if end_str == warn_date:
+                # 7 days warning
+                notification = {
+                    "id": str(__import__('uuid').uuid4()),
+                    "compound_id": user.get("compound_id", ""),
+                    "sender_id": "system",
+                    "title": "اشتراكك ينتهي خلال 7 أيام",
+                    "content": f"اشتراكك في خطة {user.get('subscription_plan', user.get('subscription_type', 'basic'))} ينتهي في {end_str}. جدّد الآن لتستمر في الاستفادة من كل المميزات.",
+                    "type": "subscription_expiry",
+                    "recipient_ids": [user["id"]],
+                    "is_read": False,
+                    "created_at": now
+                }
+                await db.notifications.insert_one(notification)
+                notified += 1
+                
+            elif end_str == today:
+                # Expiring today
+                notification = {
+                    "id": str(__import__('uuid').uuid4()),
+                    "compound_id": user.get("compound_id", ""),
+                    "sender_id": "system",
+                    "title": "اشتراكك ينتهي اليوم!",
+                    "content": "اشتراكك ينتهي اليوم. جدّد الآن لتجنب فقدان الوصول للخدمات.",
+                    "type": "subscription_expired",
+                    "recipient_ids": [user["id"]],
+                    "is_read": False,
+                    "created_at": now
+                }
+                await db.notifications.insert_one(notification)
+                notified += 1
+                
+                # Deactivate subscription
+                await db.users.update_one(
+                    {"id": user["id"]},
+                    {"$set": {"subscription_active": False}}
+                )
+        
+        logging.info(f"Subscription expiry check: {notified} notifications sent")
+        return notified
+    except Exception as e:
+        logging.error(f"Error checking subscription expiry: {e}")
+        return 0
+
 
 # Include the API router after ALL endpoints are defined

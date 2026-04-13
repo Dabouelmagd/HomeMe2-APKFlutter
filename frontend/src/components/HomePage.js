@@ -312,9 +312,10 @@ const HomePage = () => {
             <p className="text-lg text-blue-100/80 mb-10 max-w-2xl mx-auto leading-relaxed">
               15+ نظام متكامل لإدارة المقيمين والمالية والصيانة والعقود والمرافق والشكاوى - كل ما تحتاجه في منصة واحدة
             </p>
+            <p className="text-sm text-cyan-300 font-medium mb-6 -mt-6">تجربة مجانية 14 يوم لجميع الخطط - بدون بطاقة ائتمان</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register" className="px-8 py-4 bg-white text-blue-950 rounded-2xl font-bold text-lg hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2" data-testid="hero-cta-register">
-                ابدأ الآن مجاناً
+                ابدأ تجربتك المجانية
                 <ArrowRightIcon className="h-5 w-5 rotate-180" />
               </Link>
               <a href="#guide" className="px-8 py-4 border-2 border-white/30 text-white rounded-2xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2" data-testid="hero-cta-guide">
@@ -686,7 +687,7 @@ const HomePage = () => {
       <section className="py-16 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white" data-testid="cta-section">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "'Cairo', sans-serif" }}>جاهز لإدارة مجتمعك السكني؟</h2>
-          <p className="text-blue-100 mb-8 text-lg">انضم الآن وابدأ في استخدام منصة HomeMe - تجربة مجانية بدون بطاقة ائتمان</p>
+          <p className="text-blue-100 mb-8 text-lg">انضم الآن وابدأ تجربة مجانية 14 يوم - بدون بطاقة ائتمان</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/register" className="px-10 py-4 bg-white text-blue-700 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all" data-testid="cta-register">
               إنشاء حساب مجاني

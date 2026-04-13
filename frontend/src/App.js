@@ -321,7 +321,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  if (adminOnly && user.role !== 'admin') {
+  if (adminOnly && !['admin', 'super_admin', 'company_admin', 'manager'].includes(user.role)) {
     return <Navigate to="/app/dashboard" replace />;
   }
 
@@ -655,7 +655,9 @@ function App() {
 const DashboardRouter = () => {
   const { user } = useAuth();
   
-  if (user?.role === 'admin') {
+  if (user?.role === 'super_admin' || user?.role === 'company_admin') {
+    return <AdminDashboard />;
+  } else if (user?.role === 'admin' || user?.role === 'manager') {
     return <AdminDashboard />;
   } else if (user?.role === 'security') {
     return <SecurityDashboard />;

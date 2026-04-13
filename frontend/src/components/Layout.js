@@ -246,285 +246,88 @@ const Layout = ({ children, isTrialMode = false }) => {
     return state === undefined ? true : state;
   };
 
-  // Organized navigation with sections
+  const isAdminRole = ['admin','company_admin','super_admin'].includes(user?.role);
+  const isStaffRole = ['admin','company_admin','super_admin','manager'].includes(user?.role);
+  const isSecurityRole = ['admin','company_admin','super_admin','manager','security'].includes(user?.role);
+
+  // Role-based theme
+  const roleTheme = {
+    super_admin: { active: 'from-purple-600 to-purple-700', hover: 'hover:bg-purple-50', text: 'text-purple-600', dot: 'bg-purple-500' },
+    company_admin: { active: 'from-indigo-600 to-indigo-700', hover: 'hover:bg-indigo-50', text: 'text-indigo-600', dot: 'bg-indigo-500' },
+    admin: { active: 'from-blue-600 to-blue-700', hover: 'hover:bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500' },
+    manager: { active: 'from-emerald-600 to-emerald-700', hover: 'hover:bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500' },
+    security: { active: 'from-amber-600 to-amber-700', hover: 'hover:bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500' },
+    resident: { active: 'from-teal-600 to-teal-700', hover: 'hover:bg-teal-50', text: 'text-teal-600', dot: 'bg-teal-500' },
+  };
+  const theme = roleTheme[user?.role] || roleTheme.resident;
+
+  // Organized navigation by role
   const navigationSections = [
     {
       title: t('main_sections'),
       items: [
-        {
-          name: t('dashboard'),
-          href: 'dashboard',
-          icon: HomeIcon,
-          show: true
-        },
-        {
-          name: t('compound_management'),
-          href: 'compound',
-          icon: BuildingOfficeIcon,
-          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
-        },
-        {
-          name: t('residents_list'),
-          href: 'residents',
-          icon: UserGroupIcon,
-          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
-        },
-        {
-          name: t('user_management'),
-          href: 'users',
-          icon: UsersIcon,
-          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
-        },
-        {
-          name: t('monitoring_dashboard'),
-          href: 'monitoring',
-          icon: ChartPieIcon,
-          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
-        },
-        {
-          name: t('compounds_management', 'Compounds Management'),
-          href: 'compounds-management',
-          icon: HomeIcon,
-          show: user?.role === 'super_admin' || user?.role === 'company_admin'
-        },
-        {
-          name: t('subscription_codes'),
-          href: 'subscription-codes',
-          icon: TicketIcon,
-          show: user?.role === 'super_admin' || user?.role === 'company_admin'
-        }
+        { name: t('dashboard'), href: 'dashboard', icon: HomeIcon, show: true },
+        { name: t('compound_management'), href: 'compound', icon: BuildingOfficeIcon, show: isAdminRole },
+        { name: t('residents_list'), href: 'residents', icon: UserGroupIcon, show: isStaffRole },
+        { name: t('user_management'), href: 'users', icon: UsersIcon, show: isAdminRole },
+        { name: t('monitoring_dashboard'), href: 'monitoring', icon: ChartPieIcon, show: isStaffRole },
+        { name: t('compounds_management', 'Compounds Management'), href: 'compounds-management', icon: HomeIcon, show: user?.role === 'super_admin' || user?.role === 'company_admin' },
       ]
     },
     {
       title: t('services_maintenance'),
       items: [
-        {
-          name: t('services_management'),
-          href: 'services',
-          icon: WrenchScrewdriverIcon,
-          show: true
-        },
-        {
-          name: t('maintenance_system'),
-          href: 'maintenance',
-          icon: CogIcon,
-          show: true
-        },
-        {
-          name: t('guest_management'),
-          href: 'guests',
-          icon: UsersIcon,
-          show: ['admin','company_admin','super_admin','manager','security'].includes(user?.role)
-        },
-        {
-          name: t('facility_booking'),
-          href: 'facility-booking',
-          icon: CalendarDaysIcon,
-          show: true
-        }
-      ]
-    },
-    {
-      title: t('family_management_section'),
-      items: [
-        {
-          name: t('family_management'),
-          href: 'family',
-          icon: UsersIcon,
-          show: true
-        },
-        {
-          name: t('add_family_member'),
-          href: 'add-family-member',
-          icon: UserPlusIcon,
-          show: true
-        }
+        { name: t('services_management'), href: 'services', icon: WrenchScrewdriverIcon, show: true },
+        { name: t('maintenance_system'), href: 'maintenance', icon: CogIcon, show: true },
+        { name: t('facility_booking'), href: 'facility-booking', icon: CalendarDaysIcon, show: true },
+        { name: t('guest_management'), href: 'guests', icon: UsersIcon, show: isSecurityRole },
       ]
     },
     {
       title: t('financial_services'),
       items: [
-        {
-          name: t('financial_management'),
-          href: 'finances',
-          icon: CurrencyDollarIcon,
-          show: true
-        },
-        {
-          name: t('payment_center'),
-          href: 'payments',
-          icon: CreditCardIcon,
-          show: true
-        },
-        {
-          name: t('government_utility_gateway'),
-          href: 'utilities',
-          icon: BoltIcon,
-          show: true
-        },
-        {
-          name: t('pricing_plans'),
-          href: 'pricing',
-          icon: CurrencyDollarIcon,
-          show: true
-        },
-        {
-          name: t('satisfaction_ratings', 'تقييمات الرضا'),
-          href: 'satisfaction',
-          icon: StarIcon,
-          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
-        },
-        {
-          name: t('contracts_management', 'إدارة العقود'),
-          href: 'contracts',
-          icon: DocumentTextIcon,
-          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
-        }
+        { name: t('financial_management'), href: 'finances', icon: CurrencyDollarIcon, show: isStaffRole },
+        { name: t('payment_center'), href: 'payments', icon: CreditCardIcon, show: true },
+        { name: t('contracts_management', 'العقود'), href: 'contracts', icon: DocumentTextIcon, show: isStaffRole },
+        { name: t('satisfaction_ratings', 'التقييمات'), href: 'satisfaction', icon: StarIcon, show: isStaffRole },
       ]
     },
     {
       title: t('communication'),
       items: [
-        {
-          name: t('message_center'),
-          href: 'messages',
-          icon: ChatBubbleLeftEllipsisIcon,
-          show: true
-        },
-        {
-          name: t('chat.chats'),
-          href: 'chat',
-          icon: ChatBubbleLeftEllipsisIcon,
-          show: true
-        },
-        {
-          name: t('notifications_nav'),
-          href: 'notifications',
-          icon: BellIcon,
-          show: true
-        },
-        {
-          name: t('events_announcements'),
-          href: 'events',
-          icon: SpeakerWaveIcon,
-          show: true
-        },
-        {
-          name: t('complaints_suggestions', 'الشكاوى والاقتراحات'),
-          href: 'complaints',
-          icon: ExclamationTriangleIcon,
-          show: true
-        }
+        { name: t('message_center'), href: 'messages', icon: ChatBubbleLeftEllipsisIcon, show: true },
+        { name: t('notifications_nav'), href: 'notifications', icon: BellIcon, show: true },
+        { name: t('events_announcements'), href: 'events', icon: SpeakerWaveIcon, show: true },
+        { name: t('complaints_suggestions', 'الشكاوى والاقتراحات'), href: 'complaints', icon: ExclamationTriangleIcon, show: true },
+      ]
+    },
+    {
+      title: t('family_management_section'),
+      items: [
+        { name: t('family_management'), href: 'family', icon: UsersIcon, show: true },
+        { name: t('add_family_member'), href: 'add-family-member', icon: UserPlusIcon, show: true },
       ]
     },
     {
       title: t('tools_resources'),
       items: [
-        {
-          name: t('gallery.title'),
-          href: 'gallery',
-          icon: PhotoIcon,
-          show: true
-        },
-        {
-          name: t('document_management'),
-          href: 'documents',
-          icon: DocumentTextIcon,
-          show: true
-        },
-        {
-          name: t('voting_system'),
-          href: 'voting',
-          icon: HandRaisedIcon,
-          show: true
-        },
-        {
-          name: t('smart_home'),
-          href: 'smart-home',
-          icon: HomeModernIcon,
-          show: true
-        },
-        {
-          name: t('schedule.title'),
-          href: 'schedule',
-          icon: ClockIcon,
-          show: true
-        }
-      ]
-    },
-    {
-      title: t('subscription_management'),
-      items: [
-        {
-          name: t('activate_subscription_code'),
-          href: 'activate-subscription',
-          icon: KeyIcon,
-          show: user?.role !== 'admin'
-        }
+        { name: t('gallery.title'), href: 'gallery', icon: PhotoIcon, show: true },
+        { name: t('document_management'), href: 'documents', icon: DocumentTextIcon, show: true },
+        { name: t('voting_system'), href: 'voting', icon: HandRaisedIcon, show: true },
       ]
     },
     {
       title: t('admin_tools'),
       items: [
-        {
-          name: t('advanced_analytics'),
-          href: 'analytics',
-          icon: ChartBarIcon,
-          show: ['admin','company_admin','super_admin','manager'].includes(user?.role) || user?.is_super_admin
-        },
-        {
-          name: t('enterprise.dashboard'),
-          href: 'enterprise-dashboard',
-          icon: BuildingOffice2Icon,
-          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
-        },
-        {
-          name: t('subscription_codes_management'),
-          href: 'subscription-codes',
-          icon: KeyIcon,
-          show: ['admin','company_admin','super_admin','manager'].includes(user?.role)
-        }
+        { name: t('advanced_analytics'), href: 'analytics', icon: ChartBarIcon, show: isStaffRole },
+        { name: t('subscription_codes_management'), href: 'subscription-codes', icon: KeyIcon, show: isAdminRole },
       ]
     },
     {
       title: t('support_info'),
       items: [
-        {
-          name: t('help_center'),
-          href: 'help',
-          icon: QuestionMarkCircleIcon,
-          show: true
-        },
-        {
-          name: t('mobile_app'),
-          href: 'mobile-app',
-          icon: PhoneIcon,
-          show: true
-        },
-        {
-          name: t('settings_nav'),
-          href: 'settings',
-          icon: Cog6ToothIcon,
-          show: true
-        },
-        {
-          name: t('legal.title'),
-          href: 'terms-privacy',
-          icon: DocumentTextIcon,
-          show: true
-        },
-        {
-          name: t('legal_contact_title'),
-          href: 'contact',
-          icon: EnvelopeIcon,
-          show: true
-        },
-        {
-          name: t('community_newsletter'),
-          href: 'newsletter',
-          icon: NewspaperIcon,
-          show: true
-        }
+        { name: t('settings_nav'), href: 'settings', icon: Cog6ToothIcon, show: true },
+        { name: t('help_center'), href: 'help', icon: QuestionMarkCircleIcon, show: true },
       ]
     }
   ];
@@ -596,25 +399,15 @@ const Layout = ({ children, isTrialMode = false }) => {
 
         {/* Scrollable Navigation Area */}
         <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 sidebar-scroll">
-          <div className="space-y-4">
+          <div className="space-y-2">
             {navigationSections.map((section, sectionIndex) => {
               const visibleItems = section.items.filter(item => item.show);
               if (visibleItems.length === 0) return null;
               
               const isExpanded = isSectionExpanded(sectionIndex);
               
-              // Define section colors
-              const sectionColors = [
-                'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100',
-                'bg-green-50 border-green-200 text-green-700 hover:bg-green-100',
-                'bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100',
-                'bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100',
-                'bg-pink-50 border-pink-200 text-pink-700 hover:bg-pink-100',
-                'bg-indigo-50 border-indigo-200 text-indigo-700 hover:bg-indigo-100',
-                'bg-red-50 border-red-200 text-red-700 hover:bg-red-100',
-                'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100',
-                'bg-cyan-50 border-cyan-200 text-cyan-700 hover:bg-cyan-100'
-              ];
+              // Section colors based on role theme
+              const sectionColor = `${theme.hover} border-gray-200 ${theme.text}`;
               
               return (
                 <div key={section.title} className="transition-all duration-200">
@@ -626,11 +419,11 @@ const Layout = ({ children, isTrialMode = false }) => {
                       e.stopPropagation();
                       toggleSection(sectionIndex);
                     }}
-                    className={`w-full px-3 py-2.5 rounded-lg border ${sectionColors[sectionIndex % sectionColors.length]} mb-2 transition-all duration-200 cursor-pointer`}
+                    className={`w-full px-3 py-2 rounded-lg border ${sectionColor} mb-1 transition-all duration-200 cursor-pointer bg-white`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <div className="w-2 h-2 rounded-full bg-current ml-2 mr-2"></div>
+                        <div className={`w-1.5 h-1.5 rounded-full ${theme.dot} ml-2 mr-2`}></div>
                         <h3 className="text-xs font-semibold uppercase tracking-wider">
                           {section.title}
                         </h3>
@@ -650,23 +443,23 @@ const Layout = ({ children, isTrialMode = false }) => {
                   
                   {/* Section Items - Collapsible */}
                   {isExpanded && (
-                    <div className="space-y-1 mt-1">
+                    <div className="space-y-0.5 mt-0.5">
                       {visibleItems.map((item) => (
                         <Link
                           key={item.name}
                           to={item.href}
                           className={`
-                            group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200
+                            group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
                             ${isActive(item.href)
-                              ? `bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md ${isRTL ? 'border-l-4 border-orange-300' : 'border-r-4 border-orange-300'}`
-                              : 'text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-gray-100 hover:to-orange-100 dark:hover:from-gray-700 dark:hover:to-orange-900 hover:text-gray-900 dark:hover:text-white hover:shadow-sm'
+                              ? `bg-gradient-to-r ${theme.active} text-white shadow-sm`
+                              : `text-gray-700 ${theme.hover} hover:text-gray-900`
                             }
                           `}
                           onClick={() => setSidebarOpen(false)}
                         >
                           <item.icon
-                            className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 transition-colors duration-200 ${
-                              isActive(item.href) ? 'text-white' : 'text-gray-500 dark:text-gray-400 group-hover:text-orange-600'
+                            className={`${isRTL ? 'ml-2.5' : 'mr-2.5'} h-4.5 w-4.5 transition-colors duration-200 ${
+                              isActive(item.href) ? 'text-white' : `text-gray-400 group-hover:${theme.text}`
                             }`}
                           />
                           <span className="flex-1">{item.name}</span>
@@ -705,7 +498,7 @@ const Layout = ({ children, isTrialMode = false }) => {
           <div className="px-3 py-2">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className={`h-8 w-8 rounded-full bg-gradient-to-r ${theme.active} flex items-center justify-center`}>
                   <span className="text-sm font-medium text-white">
                     {user?.full_name?.charAt(0) || 'U'}
                   </span>

@@ -63,50 +63,116 @@ const HomePage = () => {
     { id: 'smart', icon: LightBulbIcon, title: 'الأجهزة الذكية والأتمتة', content: 'تحكم بالأجهزة الذكية في المجتمع (إضاءة، تكييف، كاميرات، أقفال). أوامر طبيعية بالعربية مدعومة بالذكاء الاصطناعي. قواعد أتمتة (مثل: أطفئ الإضاءة الساعة 11 مساءً).' },
   ];
 
-  const plans = [
+  const residentialPlans = [
     {
       name: 'مجاني',
-      nameEn: 'Free',
+      nameEn: 'Starter',
+      residents: 'حتى 5 سكان',
       price: '0',
-      period: 'شهرياً',
-      color: 'border-gray-200',
+      color: 'border-gray-300',
       badge: '',
-      features: ['حتى 20 وحدة سكنية', 'إدارة المقيمين الأساسية', 'طلبات الصيانة', 'إشعارات محدودة', 'تقرير شهري واحد'],
-      excluded: ['النظام المالي المتقدم', 'تصدير Excel/PDF', 'إدارة العقود', 'الأجهزة الذكية', 'دعم فني مخصص'],
+      features: ['إدارة المقيمين الأساسية', 'طلبات الصيانة', 'إشعارات محدودة', 'تقرير شهري واحد', 'بوابة المقيم'],
+      excluded: ['النظام المالي', 'تصدير Excel/PDF', 'إدارة العقود', 'حجز المرافق', 'الأجهزة الذكية', 'دعم فني'],
       cta: 'ابدأ مجاناً',
-      ctaStyle: 'bg-gray-900 text-white hover:bg-gray-800'
+      ctaStyle: 'bg-gray-800 text-white hover:bg-gray-700'
+    },
+    {
+      name: 'أساسي',
+      nameEn: 'Basic',
+      residents: '1 - 50 ساكن',
+      price: '99',
+      color: 'border-sky-400',
+      badge: '',
+      features: ['كل مميزات المجاني', 'النظام المالي الكامل', 'توزيع المصروفات (4 طرق)', 'تصدير Excel و PDF', 'إدارة العقود', 'تقييمات الرضا', 'حجز المرافق', 'إشعارات البريد', 'دعم فني بالبريد'],
+      excluded: ['التقارير اليومية التلقائية', 'الأجهزة الذكية', 'API للتكامل'],
+      cta: 'اشترك الآن',
+      ctaStyle: 'bg-sky-500 text-white hover:bg-sky-600'
     },
     {
       name: 'احترافي',
       nameEn: 'Pro',
-      price: '199',
-      period: 'شهرياً',
-      color: 'border-blue-500 ring-2 ring-blue-100',
+      residents: '51 - 100 ساكن',
+      price: '249',
+      color: 'border-blue-500 ring-2 ring-blue-500/20',
       badge: 'الأكثر طلباً',
-      features: ['حتى 100 وحدة سكنية', 'كل مميزات المجاني', 'النظام المالي الكامل', 'تصدير Excel و PDF', 'إدارة العقود والمزودين', 'تقييمات الرضا والشكاوى', 'حجز المرافق', 'تقارير يومية بالبريد', 'دعم فني بالبريد'],
-      excluded: ['الأجهزة الذكية', 'API مخصص'],
+      features: ['كل مميزات الأساسي', 'الشكاوى والاقتراحات', 'تقارير يومية تلقائية بالبريد', 'إدارة الزوار + QR Code', 'استطلاعات الرأي', 'إعلانات وأحداث', 'نشرات إخبارية', 'تحليلات متقدمة + رسوم بيانية', 'دعم فني أولوية'],
+      excluded: ['الأجهزة الذكية', 'API للتكامل'],
       cta: 'اشترك الآن',
-      ctaStyle: 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-xl'
+      ctaStyle: 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-xl hover:scale-[1.02]'
     },
     {
-      name: 'المؤسسي',
-      nameEn: 'Enterprise',
-      price: '499',
-      period: 'شهرياً',
-      color: 'border-purple-500',
+      name: 'متقدم',
+      nameEn: 'Premium',
+      residents: '101+ ساكن',
+      price: '449',
+      color: 'border-violet-500',
       badge: '',
-      features: ['عدد غير محدود من الوحدات', 'كل مميزات الاحترافي', 'إدارة عدة مجتمعات', 'الأجهزة الذكية والأتمتة', 'تحليلات متقدمة', 'API مخصص للتكامل', 'دعم فني مخصص 24/7', 'تدريب الفريق', 'تقارير مخصصة'],
+      features: ['كل مميزات الاحترافي', 'عدد غير محدود من السكان', 'الأجهزة الذكية والأتمتة', 'أوامر ذكاء اصطناعي', 'API مخصص للتكامل', 'تقارير مخصصة', 'دعم فني مخصص 24/7', 'تدريب الفريق', 'مدير حساب مخصص'],
       excluded: [],
       cta: 'تواصل معنا',
-      ctaStyle: 'bg-purple-600 text-white hover:bg-purple-700'
+      ctaStyle: 'bg-violet-600 text-white hover:bg-violet-700'
     },
+  ];
+
+  const companyPlans = [
+    {
+      name: 'شركة ناشئة',
+      nameEn: 'Startup',
+      compounds: 'حتى 3 مجتمعات',
+      price: '699',
+      color: 'border-amber-400',
+      features: ['إدارة حتى 3 مجتمعات سكنية', 'لوحة تحكم موحدة', 'حتى 150 ساكن إجمالي', 'كل مميزات الاحترافي لكل مجتمع', 'تقارير موحدة', 'فريق إدارة واحد', 'دعم فني بالبريد'],
+      cta: 'اشترك الآن',
+      ctaStyle: 'bg-amber-500 text-white hover:bg-amber-600'
+    },
+    {
+      name: 'شركة متوسطة',
+      nameEn: 'Business',
+      compounds: '4 - 10 مجتمعات',
+      price: '1,499',
+      color: 'border-orange-500 ring-2 ring-orange-500/20',
+      badge: 'الأفضل للشركات',
+      features: ['إدارة حتى 10 مجتمعات', 'لوحة تحكم مركزية متقدمة', 'حتى 500 ساكن إجمالي', 'كل مميزات المتقدم لكل مجتمع', 'تحليلات مقارنة بين المجتمعات', 'إدارة فرق متعددة', 'نظام صلاحيات متقدم', 'تقارير أداء الشركة', 'دعم فني أولوية + واتساب'],
+      cta: 'اشترك الآن',
+      ctaStyle: 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:shadow-xl hover:scale-[1.02]'
+    },
+    {
+      name: 'شركة كبرى',
+      nameEn: 'Enterprise',
+      compounds: 'غير محدود',
+      price: 'مخصص',
+      color: 'border-red-500',
+      features: ['عدد غير محدود من المجتمعات', 'عدد غير محدود من السكان', 'كل مميزات المنصة', 'تكامل API كامل مع أنظمتكم', 'استضافة خاصة (اختياري)', 'تخصيص العلامة التجارية', 'مدير حساب مخصص', 'تدريب شامل للفريق', 'SLA مضمون 99.9%', 'دعم فني 24/7 هاتف + واتساب'],
+      cta: 'طلب عرض سعر',
+      ctaStyle: 'bg-red-600 text-white hover:bg-red-700'
+    },
+  ];
+
+  const comparisonFeatures = [
+    { name: 'إدارة المقيمين', starter: true, basic: true, pro: true, premium: true },
+    { name: 'طلبات الصيانة', starter: true, basic: true, pro: true, premium: true },
+    { name: 'النظام المالي الكامل', starter: false, basic: true, pro: true, premium: true },
+    { name: 'توزيع المصروفات (4 طرق)', starter: false, basic: true, pro: true, premium: true },
+    { name: 'تصدير Excel و PDF', starter: false, basic: true, pro: true, premium: true },
+    { name: 'إدارة العقود والمزودين', starter: false, basic: true, pro: true, premium: true },
+    { name: 'تقييمات الرضا', starter: false, basic: true, pro: true, premium: true },
+    { name: 'حجز المرافق', starter: false, basic: true, pro: true, premium: true },
+    { name: 'الشكاوى والاقتراحات', starter: false, basic: false, pro: true, premium: true },
+    { name: 'إدارة الزوار + QR Code', starter: false, basic: false, pro: true, premium: true },
+    { name: 'تقارير يومية تلقائية', starter: false, basic: false, pro: true, premium: true },
+    { name: 'استطلاعات الرأي', starter: false, basic: false, pro: true, premium: true },
+    { name: 'تحليلات متقدمة', starter: false, basic: false, pro: true, premium: true },
+    { name: 'الأجهزة الذكية والأتمتة', starter: false, basic: false, pro: false, premium: true },
+    { name: 'API للتكامل الخارجي', starter: false, basic: false, pro: false, premium: true },
+    { name: 'دعم فني مخصص 24/7', starter: false, basic: false, pro: false, premium: true },
   ];
 
   const paymentMethods = [
     { icon: CreditCardIcon, name: 'بطاقات الائتمان', desc: 'Visa, Mastercard, Mada' },
-    { icon: GlobeAltIcon, name: 'PayPal', desc: 'دفع آمن عبر PayPal' },
-    { icon: DevicePhoneMobileIcon, name: 'Apple Pay', desc: 'دفع سريع بلمسة' },
+    { icon: GlobeAltIcon, name: 'PayPal', desc: 'دفع آمن عالمي' },
+    { icon: DevicePhoneMobileIcon, name: 'المحافظ الرقمية', desc: 'Apple Pay, STC Pay' },
     { icon: CurrencyDollarIcon, name: 'تحويل بنكي', desc: 'تحويل مباشر للحساب' },
+    { icon: PhoneIcon, name: 'انستاباي', desc: 'تحويل فوري بالموبايل' },
   ];
 
   return (
@@ -289,63 +355,133 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Subscription Plans */}
+      {/* Subscription Plans - Residential */}
       <section className="py-20 bg-slate-950 text-white" id="pricing" data-testid="pricing-section">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>خطط الاشتراك</h2>
-            <p className="text-gray-400 max-w-xl mx-auto">اختر الخطة المناسبة لحجم مجتمعك واحتياجاتك. يمكنك الترقية في أي وقت.</p>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>خطط اشتراك المجتمعات السكنية</h2>
+            <p className="text-gray-400 max-w-xl mx-auto">اختر الخطة حسب عدد السكان. ابدأ مجاناً وقم بالترقية في أي وقت.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            {plans.map((plan, i) => (
-              <div key={i} className={`relative rounded-2xl border-2 bg-white/5 backdrop-blur-sm p-7 transition-all hover:-translate-y-1 hover:shadow-2xl ${plan.color}`} data-testid={`plan-${plan.nameEn.toLowerCase()}`}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">
+            {residentialPlans.map((plan, i) => (
+              <div key={i} className={`relative rounded-2xl border-2 bg-white/5 backdrop-blur-sm p-6 transition-all hover:-translate-y-1 hover:shadow-2xl ${plan.color}`} data-testid={`plan-${plan.nameEn.toLowerCase()}`}>
                 {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
-                    {plan.badge}
-                  </div>
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-500 text-white text-xs font-bold rounded-full whitespace-nowrap">{plan.badge}</div>
                 )}
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
-                  <p className="text-xs text-gray-400 mb-4">{plan.nameEn}</p>
+                <div className="text-center mb-5">
+                  <h3 className="text-lg font-bold mb-0.5">{plan.name}</h3>
+                  <p className="text-[10px] text-gray-400 mb-1">{plan.nameEn}</p>
+                  <p className="text-xs text-blue-300 font-medium mb-3">{plan.residents}</p>
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl font-black">{plan.price}</span>
-                    <span className="text-sm text-gray-400">ر.س / {plan.period}</span>
+                    <span className="text-3xl font-black">{plan.price}</span>
+                    {plan.price !== 'مخصص' && <span className="text-xs text-gray-400">ر.س / شهرياً</span>}
                   </div>
                 </div>
-                <ul className="space-y-2.5 mb-6">
+                <ul className="space-y-2 mb-5 text-sm">
                   {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-center gap-2 text-sm">
-                      <CheckCircleIcon className="h-4 w-4 text-green-400 flex-shrink-0" />
-                      <span className="text-gray-200">{f}</span>
+                    <li key={j} className="flex items-start gap-2">
+                      <CheckCircleIcon className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-200 text-xs">{f}</span>
                     </li>
                   ))}
                   {plan.excluded.map((f, j) => (
-                    <li key={`ex-${j}`} className="flex items-center gap-2 text-sm opacity-40">
-                      <span className="h-4 w-4 flex-shrink-0 flex items-center justify-center text-xs">✕</span>
-                      <span className="text-gray-400 line-through">{f}</span>
+                    <li key={`x-${j}`} className="flex items-start gap-2 opacity-30">
+                      <span className="h-4 w-4 flex-shrink-0 flex items-center justify-center text-[10px] mt-0.5">✕</span>
+                      <span className="text-gray-400 line-through text-xs">{f}</span>
                     </li>
                   ))}
                 </ul>
-                <button onClick={() => navigate('/register')} className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>
-                  {plan.cta}
-                </button>
+                <button onClick={() => navigate('/register')} className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>{plan.cta}</button>
               </div>
             ))}
           </div>
 
+          {/* Feature Comparison Table */}
+          <div className="mb-20">
+            <h3 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'Cairo', sans-serif" }}>مقارنة تفصيلية بين الخطط</h3>
+            <div className="overflow-x-auto rounded-2xl border border-white/10">
+              <table className="w-full text-sm" data-testid="comparison-table">
+                <thead>
+                  <tr className="bg-white/10">
+                    <th className="text-right py-3 px-4 font-bold text-gray-300">الميزة</th>
+                    <th className="text-center py-3 px-3 font-bold text-gray-400">مجاني</th>
+                    <th className="text-center py-3 px-3 font-bold text-sky-400">أساسي</th>
+                    <th className="text-center py-3 px-3 font-bold text-blue-400">احترافي</th>
+                    <th className="text-center py-3 px-3 font-bold text-violet-400">متقدم</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonFeatures.map((feat, i) => (
+                    <tr key={i} className={i % 2 === 0 ? 'bg-white/[0.02]' : ''}>
+                      <td className="py-2.5 px-4 text-gray-300 text-xs">{feat.name}</td>
+                      {['starter', 'basic', 'pro', 'premium'].map(tier => (
+                        <td key={tier} className="text-center py-2.5 px-3">
+                          {feat[tier] ? (
+                            <CheckCircleIcon className="h-4 w-4 text-green-400 mx-auto" />
+                          ) : (
+                            <span className="text-gray-600 text-xs">—</span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Company Plans */}
+          <div className="mb-16">
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/10 text-amber-400 rounded-full text-sm font-medium mb-4 border border-amber-500/20">
+                <BuildingOffice2Icon className="h-4 w-4" />
+                لشركات الإدارة
+              </div>
+              <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>خطط شركات إدارة المجتمعات</h3>
+              <p className="text-gray-400 text-sm max-w-lg mx-auto">حلول مخصصة للشركات التي تدير أكثر من مجتمع سكني مع لوحة تحكم مركزية</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {companyPlans.map((plan, i) => (
+                <div key={i} className={`relative rounded-2xl border-2 bg-white/5 backdrop-blur-sm p-7 transition-all hover:-translate-y-1 hover:shadow-2xl ${plan.color}`} data-testid={`company-plan-${plan.nameEn.toLowerCase()}`}>
+                  {plan.badge && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-orange-500 text-white text-xs font-bold rounded-full whitespace-nowrap">{plan.badge}</div>
+                  )}
+                  <div className="text-center mb-5">
+                    <h3 className="text-xl font-bold mb-0.5">{plan.name}</h3>
+                    <p className="text-[10px] text-gray-400 mb-1">{plan.nameEn}</p>
+                    <p className="text-xs text-amber-300 font-medium mb-3">{plan.compounds}</p>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-3xl font-black">{plan.price}</span>
+                      {plan.price !== 'مخصص' && <span className="text-xs text-gray-400">ر.س / شهرياً</span>}
+                    </div>
+                  </div>
+                  <ul className="space-y-2 mb-6">
+                    {plan.features.map((f, j) => (
+                      <li key={j} className="flex items-start gap-2 text-sm">
+                        <CheckCircleIcon className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-200 text-xs">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button onClick={() => navigate('/register')} className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>{plan.cta}</button>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Payment Methods */}
           <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-300 mb-6">طرق الدفع المتاحة</h3>
-            <div className="flex flex-wrap justify-center gap-4">
+            <h3 className="text-lg font-bold text-gray-300 mb-6" style={{ fontFamily: "'Cairo', sans-serif" }}>طرق الدفع المتاحة</h3>
+            <div className="flex flex-wrap justify-center gap-3">
               {paymentMethods.map((method, i) => {
                 const Icon = method.icon;
                 return (
-                  <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-5 py-3 hover:border-white/20 transition-all" data-testid={`payment-method-${i}`}>
+                  <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-5 py-3 hover:border-white/25 transition-all" data-testid={`payment-method-${i}`}>
                     <Icon className="h-5 w-5 text-blue-400" />
                     <div className="text-right">
                       <p className="text-sm font-medium text-white">{method.name}</p>
-                      <p className="text-xs text-gray-400">{method.desc}</p>
+                      <p className="text-[10px] text-gray-400">{method.desc}</p>
                     </div>
                   </div>
                 );
@@ -353,7 +489,7 @@ const HomePage = () => {
             </div>
             <p className="text-xs text-gray-500 mt-6">
               <LockClosedIcon className="h-3.5 w-3.5 inline-block -mt-0.5 ml-1" />
-              جميع المدفوعات مشفرة ومؤمنة عبر Stripe و PayPal
+              جميع المدفوعات مشفرة ومؤمنة - ادفع بالطريقة التي تناسبك
             </p>
           </div>
         </div>

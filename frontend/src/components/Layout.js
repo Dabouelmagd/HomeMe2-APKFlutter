@@ -404,27 +404,23 @@ const Layout = ({ children, isTrialMode = false }) => {
 
           {/* Compound Logo - shown if available */}
           {compoundLogo && (
-            <div className="mb-2">
+            <div className="mb-1">
               <img 
                 src={compoundLogo}
                 alt="Compound Logo"
-                className="h-14 w-14 rounded-xl object-cover border-2 border-gray-100 dark:border-gray-600 shadow-sm"
+                className="h-16 w-16 rounded-2xl object-cover border-2 border-gray-100 dark:border-gray-600 shadow-md"
                 data-testid="compound-logo-sidebar"
               />
             </div>
           )}
           {user?.compound_name && (
-            <p className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-1 text-center">{user.compound_name}</p>
+            <p className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-0.5 text-center">{user.compound_name}</p>
           )}
           
-          {/* HomeMe Logo */}
-          <div className="flex-shrink-0">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
-              alt="HomeMe Logo"
-              className="h-14 w-auto object-contain"
-              data-testid="sidebar-homeme-logo"
-            />
+          {/* HomeMe Brand */}
+          <div className="flex items-center gap-1.5 opacity-60">
+            <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Powered by</span>
+            <span className="text-[11px] font-bold text-blue-500">HomeMe</span>
           </div>
         </div>
 

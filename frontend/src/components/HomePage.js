@@ -112,16 +112,21 @@ const HomePage = () => {
   ];
 
   const guideItems = [
-    { id: 'overview', icon: HomeModernIcon, title: 'نظرة عامة على المنصة', content: 'HomeMe هي منصة متكاملة لإدارة المجتمعات السكنية تضم 15+ نظام. تدعم إدارة المقيمين، النظام المالي، الصيانة، العقود، المرافق، الشكاوى، والتقارير. المنصة تدعم اللغة العربية بالكامل مع واجهة RTL احترافية.' },
-    { id: 'registration', icon: UserIcon, title: 'التسجيل وإنشاء الحساب', content: 'يتوفر 3 أنواع حسابات: مدير مجتمع سكني (ينشئ المجتمع ويدير كل شيء)، شركة إدارة (تدير عدة مجتمعات)، مقيم (ينضم عبر رمز دعوة). بعد التسجيل، يحصل المدير على لوحة تحكم كاملة لإعداد المجتمع.' },
-    { id: 'financial', icon: CurrencyDollarIcon, title: 'النظام المالي والمحاسبي', content: 'يشمل: ميزانية عمومية شاملة، 4 طرق لتوزيع المصروفات (بالتساوي، حسب المساحة، نسبة مئوية، مبلغ مخصص)، متابعة سداد الوحدات بالألوان (أخضر=سدد، أحمر=لم يسدد)، رسوم بيانية تفاعلية Recharts، تصدير Excel بـ 5 أوراق عمل.' },
-    { id: 'maintenance', icon: WrenchScrewdriverIcon, title: 'إدارة الصيانة والخدمات', content: 'يمكن للمقيم تقديم طلب صيانة مع صور وتحديد الأولوية والموقع. المدير يتابع الطلبات ويغير حالتها (معلق، قيد التنفيذ، مكتمل). يتم إشعار المدراء فوراً عند أي طلب جديد. بعد الإنجاز يمكن تقييم الخدمة بـ 5 نجوم.' },
-    { id: 'visitors', icon: QrCodeIcon, title: 'إدارة الزوار والبوابات', content: 'نظام متكامل لطلبات الزيارة مع QR Code ذكي. يقدم المقيم طلب زيارة ← يوافق المدير ← يُنشأ QR Code ← يمسحه الأمن عند الدخول والخروج. يتضمن سجل كامل لحركة الزوار والإحصائيات اليومية.' },
-    { id: 'contracts', icon: DocumentTextIcon, title: 'إدارة العقود والمزودين', content: 'تسجيل عقود المزودين (صيانة، نظافة، أمن، مرافق) مع تتبع تاريخ الانتهاء. تنبيهات تلقائية قبل 30 يوم، 7 أيام، ويوم الانتهاء. يمكن تجديد أو إنهاء العقود مع أرشيف كامل.' },
-    { id: 'communication', icon: ChatBubbleLeftEllipsisIcon, title: 'التواصل والإعلانات', content: 'نظام رسائل متكامل مع WebSocket للتواصل الفوري. إعلانات عامة وطوارئ، أحداث مجتمعية، استطلاعات رأي، نشرات إخبارية. دعم المرفقات والصور والرسائل الصوتية.' },
-    { id: 'reports', icon: PresentationChartBarIcon, title: 'التقارير والتحليلات', content: 'لوحة تحكم حية بإحصائيات فورية. تقرير يومي تلقائي يرسل بالبريد الساعة 7 صباحاً. تقارير PDF عربية احترافية. تصدير Excel شامل. مقارنة شهرية للأداء مع تنبيه عند انخفاض < 70%.' },
-    { id: 'roles', icon: ShieldCheckIcon, title: 'الأدوار والصلاحيات', content: '6 أدوار: مالك التطبيق (Super Admin) - تحكم كامل | شركة إدارة - عدة مجتمعات | مدير مجتمع - إدارة كاملة | إداري - متابعة يومية | أمن - البوابات والزوار | مقيم - خدمات وصيانة. كل دور بصلاحيات وقائمة جانبية مخصصة.' },
-    { id: 'smart', icon: LightBulbIcon, title: 'الأجهزة الذكية والأتمتة (قريباً)', content: 'قريباً - تحكم بالأجهزة الذكية في المجتمع (إضاءة، تكييف، كاميرات، أقفال). أوامر طبيعية بالعربية مدعومة بالذكاء الاصطناعي. قواعد أتمتة (مثل: أطفئ الإضاءة الساعة 11 مساءً). هذه الميزة قيد التطوير وستتوفر قريباً.' },
+    { id: 'overview', icon: HomeModernIcon, title: 'نظرة عامة على المنصة', content: 'منصة متكاملة لإدارة المجتمعات السكنية تضم 20+ نظام. تدعم العربية بالكامل مع واجهة RTL احترافية.' },
+    { id: 'registration', icon: UserIcon, title: 'التسجيل وإنشاء الحساب', content: '3 أنواع حسابات: مدير مجتمع، شركة إدارة، مقيم. تجربة مجانية 14 يوم بدون بطاقة ائتمان.' },
+    { id: 'financial', icon: CurrencyDollarIcon, title: 'النظام المالي والمحاسبي', content: 'ميزانية شاملة، 4 طرق لتوزيع المصروفات، متابعة السداد بالألوان، رسوم بيانية، تصدير Excel بـ 5 أوراق.' },
+    { id: 'maintenance', icon: WrenchScrewdriverIcon, title: 'إدارة الصيانة والخدمات', content: 'تقديم طلبات مع صور وأولوية. إشعارات فورية للمدراء. تقييم 5 نجوم بعد الإنجاز.' },
+    { id: 'visitors', icon: QrCodeIcon, title: 'إدارة الزوار + QR Code', content: 'طلب زيارة ← موافقة ← QR Code ← مسح عند الدخول/الخروج. سجل كامل للزوار.' },
+    { id: 'contracts', icon: DocumentTextIcon, title: 'إدارة العقود والمزودين', content: 'تسجيل عقود المزودين مع تنبيهات انتهاء تلقائية (30 يوم، 7 أيام). تجديد وأرشيف كامل.' },
+    { id: 'communication', icon: ChatBubbleLeftEllipsisIcon, title: 'التواصل والإعلانات', content: 'رسائل فورية WebSocket، إعلانات عامة وطوارئ، أحداث، نشرات إخبارية، مرفقات وصوتيات.' },
+    { id: 'complaints', icon: ExclamationTriangleIcon, title: 'الشكاوى والاقتراحات', content: 'تقديم شكوى بتصنيف وصور. متابعة الحالة بالإشعارات. اقتراحات لتحسين المجتمع.' },
+    { id: 'ratings', icon: StarIcon, title: 'تقييمات الرضا', content: 'تقييم الخدمات 1-5 نجوم. إحصائيات رضا شاملة ومتوسط تقييم لكل خدمة.' },
+    { id: 'facilities', icon: CalendarDaysIcon, title: 'حجز المرافق', content: 'حجز الصالة، الملعب، المسبح. تقويم متاح، إلغاء قبل 24 ساعة.' },
+    { id: 'polls', icon: ClipboardDocumentCheckIcon, title: 'استطلاعات الرأي', content: 'استطلاعات مجتمعية وتصويت على قرارات. نتائج فورية بعد الإغلاق.' },
+    { id: 'reports', icon: PresentationChartBarIcon, title: 'التقارير والتحليلات', content: 'تقارير يومية تلقائية بالبريد. تصدير PDF وExcel. مقارنة أداء المجتمعات.' },
+    { id: 'subscription', icon: CreditCardIcon, title: 'الاشتراكات وطرق الدفع', content: '4 خطط سكنية + 3 للشركات. Stripe، PayPal، انستاباي، فودافون كاش. أكواد وكوبونات خصم.' },
+    { id: 'roles', icon: ShieldCheckIcon, title: '6 أدوار وصلاحيات', content: 'مالك التطبيق، شركة إدارة، مدير مجتمع، إداري، أمن، مقيم - كل بصلاحيات مخصصة.' },
+    { id: 'smart', icon: LightBulbIcon, title: 'الأجهزة الذكية (قريباً)', content: 'تحكم ذكي بالإضاءة، التكييف، الكاميرات، الأقفال. أوامر عربية بالذكاء الاصطناعي.' },
   ];
 
   const fx = currency === 'egp' ? 1 : 0.02; // 1 EGP ≈ 0.02 USD
@@ -557,47 +562,60 @@ const HomePage = () => {
       </section>
 
       {/* Comprehensive Guide */}
-      <section className="py-20 bg-gradient-to-b from-slate-50 to-white" id="guide" data-testid="guide-section">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="text-center mb-14">
+      <section className="py-16 bg-gradient-to-b from-slate-50 to-white" id="guide" data-testid="guide-section">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium mb-4">
               <BookOpenIcon className="h-4 w-4" />
               دليل شامل
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>دليل التشغيل الشامل</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">تعرّف على كل مكونات المنصة بالتفصيل وكيفية الاستفادة القصوى من كل نظام</p>
+            <p className="text-gray-500 max-w-2xl mx-auto">تعرّف على كل مكونات المنصة - اضغط على أي بطاقة لعرض التفاصيل</p>
           </div>
-          <div className="space-y-3">
-            {guideItems.map((item, idx) => {
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {guideItems.map((item) => {
               const Icon = item.icon;
               const isOpen = openGuide === item.id;
               return (
-                <div key={item.id} className={`rounded-2xl border transition-all ${isOpen ? 'border-blue-200 bg-blue-50/30 shadow-md' : 'border-gray-200 bg-white hover:border-gray-300'}`}>
-                  <button
-                    onClick={() => setOpenGuide(isOpen ? null : item.id)}
-                    className="w-full flex items-center gap-4 p-5 text-right"
-                    data-testid={`guide-item-${item.id}`}
-                  >
-                    <div className={`flex-shrink-0 p-2.5 rounded-xl ${isOpen ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'} transition-colors`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="flex-1 text-right">
-                      <span className="text-xs text-gray-400 font-medium">{idx + 1} / {guideItems.length}</span>
-                      <h3 className="font-bold text-gray-900">{item.title}</h3>
-                    </div>
-                    {isOpen ? <ChevronUpIcon className="h-5 w-5 text-blue-500 flex-shrink-0" /> : <ChevronDownIcon className="h-5 w-5 text-gray-400 flex-shrink-0" />}
-                  </button>
-                  {isOpen && (
-                    <div className="px-5 pb-5 pt-0">
-                      <div className="bg-white rounded-xl p-5 border border-blue-100">
-                        <p className="text-gray-700 leading-relaxed text-sm">{item.content}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <button
+                  key={item.id}
+                  onClick={() => setOpenGuide(isOpen ? null : item.id)}
+                  className={`rounded-xl p-4 text-center border transition-all hover:shadow-md ${isOpen ? 'border-blue-400 bg-blue-50 shadow-md ring-1 ring-blue-200' : 'border-gray-200 bg-white hover:border-blue-200'}`}
+                  data-testid={`guide-item-${item.id}`}
+                >
+                  <div className={`mx-auto w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${isOpen ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className={`font-bold text-xs leading-tight ${isOpen ? 'text-blue-700' : 'text-gray-800'}`}>{item.title}</h3>
+                </button>
               );
             })}
           </div>
+          {openGuide && (
+            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-5 animate-in fade-in">
+              <div className="flex items-start gap-3">
+                {(() => {
+                  const selected = guideItems.find(g => g.id === openGuide);
+                  if (!selected) return null;
+                  const SelIcon = selected.icon;
+                  return (
+                    <>
+                      <div className="bg-blue-600 text-white p-2.5 rounded-lg flex-shrink-0">
+                        <SelIcon className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-blue-900 mb-1">{selected.title}</h3>
+                        <p className="text-gray-700 text-sm leading-relaxed">{selected.content}</p>
+                      </div>
+                      <button onClick={() => setOpenGuide(null)} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
+                        <ChevronUpIcon className="h-5 w-5" />
+                      </button>
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

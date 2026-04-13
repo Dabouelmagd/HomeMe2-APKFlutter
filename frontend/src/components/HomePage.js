@@ -22,6 +22,8 @@ const HomePage = () => {
   const { user, loading } = useAuth();
   const isRTL = i18n.language === 'ar';
   const [openGuide, setOpenGuide] = useState(null);
+  const [billingPeriod, setBillingPeriod] = useState('monthly'); // monthly or yearly
+  const [currency, setCurrency] = useState('egp'); // egp or usd
 
   useEffect(() => {
     if (!loading && user) {
@@ -63,12 +65,25 @@ const HomePage = () => {
     { id: 'smart', icon: LightBulbIcon, title: 'الأجهزة الذكية والأتمتة', content: 'تحكم بالأجهزة الذكية في المجتمع (إضاءة، تكييف، كاميرات، أقفال). أوامر طبيعية بالعربية مدعومة بالذكاء الاصطناعي. قواعد أتمتة (مثل: أطفئ الإضاءة الساعة 11 مساءً).' },
   ];
 
+  const fx = currency === 'egp' ? 1 : 0.02; // 1 EGP ≈ 0.02 USD
+  const sym = currency === 'egp' ? 'ج.م' : '$';
+  const priceOf = (egp) => {
+    const val = currency === 'egp' ? egp : Math.round(egp * 0.02);
+    return val.toLocaleString();
+  };
+  const yearlyOf = (monthly) => {
+    const total = monthly * 10; // 10 months = yearly (2 months free)
+    const val = currency === 'egp' ? total : Math.round(total * 0.02);
+    return val.toLocaleString();
+  };
+  const isYearly = billingPeriod === 'yearly';
+
   const residentialPlans = [
     {
       name: 'مجاني',
       nameEn: 'Starter',
       residents: 'حتى 5 سكان',
-      price: '0',
+      monthly: 0,
       color: 'border-gray-300',
       badge: '',
       features: ['إدارة المقيمين الأساسية', 'طلبات الصيانة', 'إشعارات محدودة', 'تقرير شهري واحد', 'بوابة المقيم'],
@@ -80,7 +95,7 @@ const HomePage = () => {
       name: 'أساسي',
       nameEn: 'Basic',
       residents: '1 - 50 ساكن',
-      price: '99',
+      monthly: 500,
       color: 'border-sky-400',
       badge: '',
       features: ['كل مميزات المجاني', 'النظام المالي الكامل', 'توزيع المصروفات (4 طرق)', 'تصدير Excel و PDF', 'إدارة العقود', 'تقييمات الرضا', 'حجز المرافق', 'إشعارات البريد', 'دعم فني بالبريد'],
@@ -92,7 +107,7 @@ const HomePage = () => {
       name: 'احترافي',
       nameEn: 'Pro',
       residents: '51 - 100 ساكن',
-      price: '249',
+      monthly: 1200,
       color: 'border-blue-500 ring-2 ring-blue-500/20',
       badge: 'الأكثر طلباً',
       features: ['كل مميزات الأساسي', 'الشكاوى والاقتراحات', 'تقارير يومية تلقائية بالبريد', 'إدارة الزوار + QR Code', 'استطلاعات الرأي', 'إعلانات وأحداث', 'نشرات إخبارية', 'تحليلات متقدمة + رسوم بيانية', 'دعم فني أولوية'],
@@ -104,7 +119,7 @@ const HomePage = () => {
       name: 'متقدم',
       nameEn: 'Premium',
       residents: '101+ ساكن',
-      price: '449',
+      monthly: 2200,
       color: 'border-violet-500',
       badge: '',
       features: ['كل مميزات الاحترافي', 'عدد غير محدود من السكان', 'الأجهزة الذكية والأتمتة', 'أوامر ذكاء اصطناعي', 'API مخصص للتكامل', 'تقارير مخصصة', 'دعم فني مخصص 24/7', 'تدريب الفريق', 'مدير حساب مخصص'],
@@ -119,7 +134,7 @@ const HomePage = () => {
       name: 'شركة ناشئة',
       nameEn: 'Startup',
       compounds: 'حتى 3 مجتمعات',
-      price: '699',
+      monthly: 3500,
       color: 'border-amber-400',
       features: ['إدارة حتى 3 مجتمعات سكنية', 'لوحة تحكم موحدة', 'حتى 150 ساكن إجمالي', 'كل مميزات الاحترافي لكل مجتمع', 'تقارير موحدة', 'فريق إدارة واحد', 'دعم فني بالبريد'],
       cta: 'اشترك الآن',
@@ -129,7 +144,7 @@ const HomePage = () => {
       name: 'شركة متوسطة',
       nameEn: 'Business',
       compounds: '4 - 10 مجتمعات',
-      price: '1,499',
+      monthly: 7500,
       color: 'border-orange-500 ring-2 ring-orange-500/20',
       badge: 'الأفضل للشركات',
       features: ['إدارة حتى 10 مجتمعات', 'لوحة تحكم مركزية متقدمة', 'حتى 500 ساكن إجمالي', 'كل مميزات المتقدم لكل مجتمع', 'تحليلات مقارنة بين المجتمعات', 'إدارة فرق متعددة', 'نظام صلاحيات متقدم', 'تقارير أداء الشركة', 'دعم فني أولوية + واتساب'],
@@ -140,7 +155,8 @@ const HomePage = () => {
       name: 'شركة كبرى',
       nameEn: 'Enterprise',
       compounds: 'غير محدود',
-      price: 'مخصص',
+      monthly: 0,
+      isCustom: true,
       color: 'border-red-500',
       features: ['عدد غير محدود من المجتمعات', 'عدد غير محدود من السكان', 'كل مميزات المنصة', 'تكامل API كامل مع أنظمتكم', 'استضافة خاصة (اختياري)', 'تخصيص العلامة التجارية', 'مدير حساب مخصص', 'تدريب شامل للفريق', 'SLA مضمون 99.9%', 'دعم فني 24/7 هاتف + واتساب'],
       cta: 'طلب عرض سعر',
@@ -358,12 +374,30 @@ const HomePage = () => {
       {/* Subscription Plans - Residential */}
       <section className="py-20 bg-slate-950 text-white" id="pricing" data-testid="pricing-section">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>خطط اشتراك المجتمعات السكنية</h2>
-            <p className="text-gray-400 max-w-xl mx-auto">اختر الخطة حسب عدد السكان. ابدأ مجاناً وقم بالترقية في أي وقت.</p>
+            <p className="text-gray-400 max-w-xl mx-auto mb-8">اختر الخطة حسب عدد السكان. ابدأ مجاناً وقم بالترقية في أي وقت.</p>
+
+            {/* Toggles Row */}
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-2">
+              {/* Billing Period Toggle */}
+              <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
+                <button onClick={() => setBillingPeriod('monthly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${billingPeriod === 'monthly' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-monthly">شهري</button>
+                <button onClick={() => setBillingPeriod('yearly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all relative ${billingPeriod === 'yearly' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-yearly">
+                  سنوي
+                  <span className="absolute -top-2.5 -left-2 px-1.5 py-0.5 bg-green-500 text-[9px] font-bold rounded-full text-white">شهرين مجاناً</span>
+                </button>
+              </div>
+              {/* Currency Toggle */}
+              <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
+                <button onClick={() => setCurrency('egp')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'egp' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-egp">ج.م EGP</button>
+                <button onClick={() => setCurrency('usd')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'usd' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-usd">$ USD</button>
+              </div>
+            </div>
+            {isYearly && <p className="text-xs text-green-400 mb-2">الاشتراك السنوي = 10 شهور فقط (وفّر شهرين)</p>}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
             {residentialPlans.map((plan, i) => (
               <div key={i} className={`relative rounded-2xl border-2 bg-white/5 backdrop-blur-sm p-6 transition-all hover:-translate-y-1 hover:shadow-2xl ${plan.color}`} data-testid={`plan-${plan.nameEn.toLowerCase()}`}>
                 {plan.badge && (
@@ -373,10 +407,21 @@ const HomePage = () => {
                   <h3 className="text-lg font-bold mb-0.5">{plan.name}</h3>
                   <p className="text-[10px] text-gray-400 mb-1">{plan.nameEn}</p>
                   <p className="text-xs text-blue-300 font-medium mb-3">{plan.residents}</p>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-3xl font-black">{plan.price}</span>
-                    {plan.price !== 'مخصص' && <span className="text-xs text-gray-400">ر.س / شهرياً</span>}
-                  </div>
+                  {plan.monthly === 0 ? (
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-3xl font-black">مجاناً</span>
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="text-3xl font-black">{isYearly ? yearlyOf(plan.monthly) : priceOf(plan.monthly)}</span>
+                        <span className="text-xs text-gray-400">{sym} / {isYearly ? 'سنوياً' : 'شهرياً'}</span>
+                      </div>
+                      {isYearly && plan.monthly > 0 && (
+                        <p className="text-[10px] text-gray-500 mt-1 line-through">{priceOf(plan.monthly * 12)} {sym} / سنوياً بدون خصم</p>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <ul className="space-y-2 mb-5 text-sm">
                   {plan.features.map((f, j) => (
@@ -398,7 +443,7 @@ const HomePage = () => {
           </div>
 
           {/* Feature Comparison Table */}
-          <div className="mb-20">
+          <div className="mb-16">
             <h3 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'Cairo', sans-serif" }}>مقارنة تفصيلية بين الخطط</h3>
             <div className="overflow-x-auto rounded-2xl border border-white/10">
               <table className="w-full text-sm" data-testid="comparison-table">
@@ -426,8 +471,48 @@ const HomePage = () => {
                       ))}
                     </tr>
                   ))}
+                  {/* Price row */}
+                  <tr className="bg-white/5 border-t border-white/10">
+                    <td className="py-3 px-4 font-bold text-white text-xs">السعر {isYearly ? 'السنوي' : 'الشهري'}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-gray-300">مجاناً</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-sky-300">{isYearly ? yearlyOf(500) : priceOf(500)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-blue-300">{isYearly ? yearlyOf(1200) : priceOf(1200)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-violet-300">{isYearly ? yearlyOf(2200) : priceOf(2200)} {sym}</td>
+                  </tr>
                 </tbody>
               </table>
+            </div>
+          </div>
+
+          {/* Subscription Codes */}
+          <div className="mb-20 max-w-3xl mx-auto" data-testid="subscription-codes-section">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500/10 text-green-400 rounded-full text-sm font-medium mb-3 border border-green-500/20">
+                <KeyIcon className="h-4 w-4" />
+                أكواد الاشتراك
+              </div>
+              <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>لديك كود اشتراك؟</h3>
+              <p className="text-gray-400 text-sm">يمكنك تفعيل اشتراكك بكود مسبق الدفع لمدة 3 أو 6 أو 9 شهور أو سنة أو مدى الحياة</p>
+            </div>
+            <div className="grid grid-cols-5 gap-3 mb-6">
+              {[
+                { label: '3 شهور', icon: '3m', color: 'border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10' },
+                { label: '6 شهور', icon: '6m', color: 'border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10' },
+                { label: '9 شهور', icon: '9m', color: 'border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/10' },
+                { label: 'سنة', icon: '1Y', color: 'border-green-500/30 bg-green-500/5 hover:bg-green-500/10' },
+                { label: 'مدى الحياة', icon: '∞', color: 'border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10' },
+              ].map((d, i) => (
+                <div key={i} className={`rounded-xl border text-center py-3 px-2 transition-all ${d.color}`}>
+                  <p className="text-lg font-black text-white mb-0.5">{d.icon}</p>
+                  <p className="text-[10px] text-gray-300">{d.label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <input type="text" placeholder="أدخل كود الاشتراك هنا..." className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30" data-testid="subscription-code-input" />
+              <button className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-500 transition-all whitespace-nowrap" data-testid="activate-code-btn">
+                تفعيل الكود
+              </button>
             </div>
           </div>
 
@@ -451,10 +536,19 @@ const HomePage = () => {
                     <h3 className="text-xl font-bold mb-0.5">{plan.name}</h3>
                     <p className="text-[10px] text-gray-400 mb-1">{plan.nameEn}</p>
                     <p className="text-xs text-amber-300 font-medium mb-3">{plan.compounds}</p>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-3xl font-black">{plan.price}</span>
-                      {plan.price !== 'مخصص' && <span className="text-xs text-gray-400">ر.س / شهرياً</span>}
-                    </div>
+                    {plan.isCustom ? (
+                      <span className="text-2xl font-black">سعر مخصص</span>
+                    ) : (
+                      <div>
+                        <div className="flex items-baseline justify-center gap-1">
+                          <span className="text-3xl font-black">{isYearly ? yearlyOf(plan.monthly) : priceOf(plan.monthly)}</span>
+                          <span className="text-xs text-gray-400">{sym} / {isYearly ? 'سنوياً' : 'شهرياً'}</span>
+                        </div>
+                        {isYearly && (
+                          <p className="text-[10px] text-gray-500 mt-1 line-through">{priceOf(plan.monthly * 12)} {sym} / سنوياً بدون خصم</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <ul className="space-y-2 mb-6">
                     {plan.features.map((f, j) => (

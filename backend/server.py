@@ -14476,9 +14476,12 @@ app.include_router(api_router)
 @app.on_event("startup")
 async def startup_db_client():
     """Initialize database connection and indexes"""
-    global client, db
+    global client, db, webauthn_service
     client = AsyncIOMotorClient(os.environ['MONGO_URL'])
     db = client[os.environ['DB_NAME']]
+    
+    # Reinitialize WebAuthn service with the actual db connection
+    webauthn_service.db = db
     
     # Create text indexes for search functionality
     await create_text_index()

@@ -486,27 +486,27 @@ const HomePage = () => {
             />
             <div className="inline-block px-5 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-blue-200 mb-6 border border-white/10">
               <SparklesIcon className="h-4 w-4 inline-block -mt-0.5 ml-1" />
-              منصة إدارة المجتمعات السكنية المتكاملة
+              {t('hp_subtitle')}
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>
-              أدر مجتمعك السكني
+              {t('hp_hero_title_1')}
               <br />
               <span className="bg-gradient-to-r from-blue-400 via-cyan-300 to-teal-300 bg-clip-text text-transparent">
-                بذكاء واحترافية
+                {t('hp_hero_title_2')}
               </span>
             </h1>
             <p className="text-lg text-blue-100/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-              15+ نظام متكامل لإدارة المقيمين والمالية والصيانة والعقود والمرافق والشكاوى - كل ما تحتاجه في منصة واحدة
+              {t('hp_hero_desc')}
             </p>
-            <p className="text-sm text-cyan-300 font-medium mb-6 -mt-6">تجربة مجانية 14 يوم لجميع الخطط - بدون بطاقة ائتمان</p>
+            <p className="text-sm text-cyan-300 font-medium mb-6 -mt-6">{t('hp_free_trial_note')}</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register" className="px-8 py-4 bg-white text-blue-950 rounded-2xl font-bold text-lg hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2" data-testid="hero-cta-register">
-                ابدأ تجربتك المجانية
+                {t('hp_start_trial')}
                 <ArrowRightIcon className="h-5 w-5 rotate-180" />
               </Link>
               <a href="#guide" className="px-8 py-4 border-2 border-white/30 text-white rounded-2xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2" data-testid="hero-cta-guide">
                 <BookOpenIcon className="h-5 w-5" />
-                دليل التشغيل
+                {t('hp_guide_btn')}
               </a>
             </div>
           </div>
@@ -531,8 +531,8 @@ const HomePage = () => {
       <section className="py-16 bg-gray-50/80" id="register-types" data-testid="registration-section">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>اختر نوع التسجيل</h2>
-            <p className="text-gray-500">حدد نوع حسابك للبدء في استخدام المنصة</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_choose_registration')}</h2>
+            <p className="text-gray-500">{t('hp_choose_registration_desc')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {accountTypes.map(type => {
@@ -566,7 +566,7 @@ const HomePage = () => {
       <section className="py-16" id="systems" data-testid="systems-section">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>15+ نظام متكامل</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_15_systems')}</h2>
             <p className="text-gray-500">كل ما تحتاجه لإدارة مجتمعك السكني باحترافية</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -594,8 +594,8 @@ const HomePage = () => {
               <BookOpenIcon className="h-4 w-4" />
               دليل شامل
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>دليل التشغيل الشامل</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">تعرّف على كل مكونات المنصة - اضغط على أي بطاقة لعرض التفاصيل</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_guide_title')}</h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">{t('hp_guide_desc')}</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {guideItems.map((item) => {
@@ -662,17 +662,17 @@ const HomePage = () => {
       <section className="py-20 bg-slate-950 text-white" id="pricing" data-testid="pricing-section">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>خطط اشتراك المجتمعات السكنية</h2>
-            <p className="text-gray-400 max-w-xl mx-auto mb-8">اختر الخطة حسب عدد السكان. ابدأ مجاناً وقم بالترقية في أي وقت.</p>
+            <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_residential_plans')}</h2>
+            <p className="text-gray-400 max-w-xl mx-auto mb-8">{t('hp_residential_plans_desc')}</p>
 
             {/* Toggles Row */}
             <div className="flex flex-wrap items-center justify-center gap-4 mb-2">
               {/* Billing Period Toggle */}
               <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
-                <button onClick={() => setBillingPeriod('monthly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${billingPeriod === 'monthly' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-monthly">شهري</button>
+                <button onClick={() => setBillingPeriod('monthly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${billingPeriod === 'monthly' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-monthly">{t('hp_monthly')}</button>
                 <button onClick={() => setBillingPeriod('yearly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all relative ${billingPeriod === 'yearly' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-yearly">
                   سنوي
-                  <span className="absolute -top-2.5 -left-2 px-1.5 py-0.5 bg-green-500 text-[9px] font-bold rounded-full text-white">شهرين مجاناً</span>
+                  <span className="absolute -top-2.5 -left-2 px-1.5 py-0.5 bg-green-500 text-[9px] font-bold rounded-full text-white">{t('hp_2months_free')}</span>
                 </button>
               </div>
               {/* Currency Toggle */}
@@ -681,7 +681,7 @@ const HomePage = () => {
                 <button onClick={() => setCurrency('usd')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'usd' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-usd">$ USD</button>
               </div>
             </div>
-            {isYearly && <p className="text-xs text-green-400 mb-2">الاشتراك السنوي = 10 شهور فقط (وفّر شهرين)</p>}
+            {isYearly && <p className="text-xs text-green-400 mb-2">{t('hp_yearly_note')}</p>}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
@@ -731,12 +731,12 @@ const HomePage = () => {
 
           {/* Feature Comparison Table */}
           <div className="mb-16">
-            <h3 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'Cairo', sans-serif" }}>مقارنة تفصيلية بين الخطط</h3>
+            <h3 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_comparison_title')}</h3>
             <div className="overflow-x-auto rounded-2xl border border-white/10">
               <table className="w-full text-sm" data-testid="comparison-table">
                 <thead>
                   <tr className="bg-white/10">
-                    <th className="text-right py-3 px-4 font-bold text-gray-300">الميزة</th>
+                    <th className="text-right py-3 px-4 font-bold text-gray-300">{t('hp_feature')}</th>
                     <th className="text-center py-3 px-3 font-bold text-gray-400">مجاني</th>
                     <th className="text-center py-3 px-3 font-bold text-sky-400">أساسي</th>
                     <th className="text-center py-3 px-3 font-bold text-blue-400">احترافي</th>
@@ -778,8 +778,8 @@ const HomePage = () => {
                 <KeyIcon className="h-4 w-4" />
                 أكواد الاشتراك
               </div>
-              <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>لديك كود اشتراك؟</h3>
-              <p className="text-gray-400 text-sm">يمكنك تفعيل اشتراكك بكود مسبق الدفع لمدة 3 أو 6 أو 9 شهور أو سنة أو مدى الحياة</p>
+              <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_have_code')}</h3>
+              <p className="text-gray-400 text-sm">{t('hp_code_desc')}</p>
             </div>
             <div className="grid grid-cols-5 gap-3 mb-6">
               {[
@@ -796,7 +796,7 @@ const HomePage = () => {
               ))}
             </div>
             <div className="flex gap-3">
-              <input type="text" placeholder="أدخل كود الاشتراك هنا..." value={subCode} onChange={e => setSubCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleCodeActivate()} className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30" data-testid="subscription-code-input" />
+              <input type="text" placeholder={t("hp_enter_code")} value={subCode} onChange={e => setSubCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleCodeActivate()} className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30" data-testid="subscription-code-input" />
               <button onClick={handleCodeActivate} disabled={codeLoading || !subCode.trim()} className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-500 transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed" data-testid="activate-code-btn">
                 {codeLoading ? '...' : 'تفعيل الكود'}
               </button>
@@ -815,8 +815,8 @@ const HomePage = () => {
                 <BuildingOffice2Icon className="h-4 w-4" />
                 لشركات الإدارة
               </div>
-              <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>خطط شركات إدارة المجتمعات</h3>
-              <p className="text-gray-400 text-sm max-w-lg mx-auto">حلول مخصصة للشركات التي تدير أكثر من مجتمع سكني مع لوحة تحكم مركزية</p>
+              <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_company_plans_title')}</h3>
+              <p className="text-gray-400 text-sm max-w-lg mx-auto">{t('hp_company_plans_desc')}</p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {companyPlans.map((plan, i) => (
@@ -858,12 +858,12 @@ const HomePage = () => {
 
           {/* Company Comparison Table */}
           <div className="mb-16">
-            <h3 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'Cairo', sans-serif" }}>مقارنة تفصيلية بين خطط الشركات</h3>
+            <h3 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_company_comparison')}</h3>
             <div className="overflow-x-auto rounded-2xl border border-white/10">
               <table className="w-full text-sm" data-testid="company-comparison-table">
                 <thead>
                   <tr className="bg-white/10">
-                    <th className="text-right py-3 px-4 font-bold text-gray-300">الميزة</th>
+                    <th className="text-right py-3 px-4 font-bold text-gray-300">{t('hp_feature')}</th>
                     <th className="text-center py-3 px-3 font-bold text-amber-400">شركة ناشئة</th>
                     <th className="text-center py-3 px-3 font-bold text-orange-400">شركة متوسطة</th>
                     <th className="text-center py-3 px-3 font-bold text-red-400">شركة كبرى</th>
@@ -900,7 +900,7 @@ const HomePage = () => {
 
           {/* Payment Methods */}
           <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-300 mb-6" style={{ fontFamily: "'Cairo', sans-serif" }}>طرق الدفع المتاحة</h3>
+            <h3 className="text-lg font-bold text-gray-300 mb-6" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_payment_methods')}</h3>
             <div className="flex flex-wrap justify-center gap-3">
               {paymentMethods.map((method, i) => {
                 const Icon = method.icon;
@@ -917,7 +917,7 @@ const HomePage = () => {
             </div>
             <p className="text-xs text-gray-500 mt-6">
               <LockClosedIcon className="h-3.5 w-3.5 inline-block -mt-0.5 ml-1" />
-              جميع المدفوعات مشفرة ومؤمنة - ادفع بالطريقة التي تناسبك
+              {t('hp_payments_secure')}
             </p>
           </div>
         </div>
@@ -927,8 +927,8 @@ const HomePage = () => {
       <section className="py-16 bg-gradient-to-b from-gray-50 to-white" data-testid="roles-section">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>6 أدوار مختلفة</h2>
-            <p className="text-gray-500">كل دور بصلاحيات مخصصة حسب المسؤولية</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_6_roles')}</h2>
+            <p className="text-gray-500">{t('hp_roles_desc')}</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
@@ -959,29 +959,29 @@ const HomePage = () => {
             <UserGroupIcon className="h-4 w-4" />
             برنامج الإحالة
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: "'Cairo', sans-serif" }}>ادعُ 5 أصدقاء واحصل على شهر مجاني!</h2>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">شارك رابط الإحالة مع أصدقائك. عند تسجيل 5 أشخاص، ستحصل تلقائياً على كوبون اشتراك مجاني لمدة شهر كامل</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_referral_title')}</h2>
+          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">{t('hp_referral_desc')}</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
             <div className="bg-white rounded-xl p-5 border border-emerald-200 shadow-sm">
               <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <UserGroupIcon className="h-6 w-6 text-emerald-600" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-1">1. شارك الرابط</h3>
-              <p className="text-xs text-gray-500">أرسل رابط الإحالة لأصدقائك</p>
+              <h3 className="font-bold text-gray-900 mb-1">{t('hp_share_link')}</h3>
+              <p className="text-xs text-gray-500">{t('hp_share_link_desc')}</p>
             </div>
             <div className="bg-white rounded-xl p-5 border border-emerald-200 shadow-sm">
               <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <CheckCircleIcon className="h-6 w-6 text-emerald-600" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-1">2. يسجّلون حساب</h3>
-              <p className="text-xs text-gray-500">5 أصدقاء يسجلون ويجربون المنصة</p>
+              <h3 className="font-bold text-gray-900 mb-1">{t('hp_they_register')}</h3>
+              <p className="text-xs text-gray-500">{t('hp_they_register_desc')}</p>
             </div>
             <div className="bg-white rounded-xl p-5 border border-emerald-200 shadow-sm">
               <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
                 <SparklesIcon className="h-6 w-6 text-emerald-600" />
               </div>
-              <h3 className="font-bold text-gray-900 mb-1">3. شهر مجاني!</h3>
-              <p className="text-xs text-gray-500">كوبون اشتراك شهر كامل هدية لك</p>
+              <h3 className="font-bold text-gray-900 mb-1">{t('hp_free_month')}</h3>
+              <p className="text-xs text-gray-500">{t('hp_free_month_desc')}</p>
             </div>
           </div>
           <Link to="/register" className="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all">
@@ -1008,8 +1008,8 @@ const HomePage = () => {
       {/* CTA */}
       <section className="py-16 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white" data-testid="cta-section">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "'Cairo', sans-serif" }}>جاهز لإدارة مجتمعك السكني؟</h2>
-          <p className="text-blue-100 mb-8 text-lg">انضم الآن وابدأ تجربة مجانية 14 يوم - بدون بطاقة ائتمان</p>
+          <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_ready_title')}</h2>
+          <p className="text-blue-100 mb-8 text-lg">{t('hp_ready_desc')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/register" className="px-10 py-4 bg-white text-blue-700 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all" data-testid="cta-register">
               إنشاء حساب مجاني

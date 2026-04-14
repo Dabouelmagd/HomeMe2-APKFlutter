@@ -79,6 +79,12 @@
 - 3 ad slots on HomePage (after hero, before pricing, before CTA)
 - Status: Configured, pending Google approval for domain
 
+## Translations
+- 170+ translation keys added for HomePage
+- Full Arabic (RTL), English (LTR), and French (LTR) support
+- All plan names, features, systems, guide items, comparison tables fully translated
+- i18next configured with `load: 'languageOnly'` + `supportedLngs: ['en', 'ar', 'fr']`
+
 ## Backlog
 - P2: Bank transfer API (pending bank setup)
 

@@ -68,7 +68,7 @@ export default function SubscriptionManagement() {
       const res = await axios.post(`${API}/invoices/generate`, {}, getToken());
       toast.success(res.data.message);
       fetchInvoices();
-    } catch (err) { toast.error(err.response?.data?.detail || 'فشل'); }
+    } catch (err) { toast.error(err.response?.data?.detail || t('sm_error','فشل')); }
   };
 
   const handleActivateCode = async () => {
@@ -90,7 +90,7 @@ export default function SubscriptionManagement() {
       const res = await axios.post(`${API}/payments/subscribe`, { plan, duration: selectedDuration, currency: 'egp' }, getToken());
       if (res.data.checkout_url) window.location.href = res.data.checkout_url;
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'فشل');
+      toast.error(err.response?.data?.detail || t('sm_error','فشل'));
     }
     setPayLoading('');
   };
@@ -101,7 +101,7 @@ export default function SubscriptionManagement() {
       const res = await axios.post(`${API}/payments/paypal/create-order`, { plan, duration: selectedDuration, currency: 'usd' }, getToken());
       if (res.data.approve_url) window.location.href = res.data.approve_url;
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'فشل');
+      toast.error(err.response?.data?.detail || t('sm_error','فشل'));
     }
     setPayLoading('');
   };
@@ -130,7 +130,7 @@ export default function SubscriptionManagement() {
                 {planLabels[plan] || plan}
               </span>
               <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${isActive ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-                {isActive ? t('sub_active', 'نشط') : t('sub_expired', 'منتهي')}
+                {isActive ? t('sub_active', 'نشط') : t('sub_expired', t('sm_expired','منتهي'))}
               </span>
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function SubscriptionManagement() {
                 <p className="text-sm text-gray-500">{t('sub_expires_on', 'ينتهي في')}</p>
                 <p className="font-bold text-gray-900">{new Date(sub.subscription_end).toLocaleDateString('ar-EG')}</p>
                 <p className={`text-xs font-medium ${daysRemaining <= 7 ? 'text-red-600' : daysRemaining <= 30 ? 'text-amber-600' : 'text-green-600'}`}>
-                  {daysRemaining > 0 ? `${daysRemaining} يوم متبقي` : 'منتهي'}
+                  {daysRemaining > 0 ? `${daysRemaining} ${t('sm_days_left','يوم متبقي')}` : 'منتهي'}
                 </p>
               </>
             )}
@@ -194,8 +194,8 @@ export default function SubscriptionManagement() {
                 className={`rounded-xl border-2 p-4 cursor-pointer transition-all ${selectedPlan === p.id ? 'border-blue-500 bg-blue-50' : isCurrent ? 'border-green-300 bg-green-50 opacity-70' : 'border-gray-200 hover:border-gray-300'}`}
                 data-testid={`plan-card-${p.id}`}>
                 <h3 className="font-bold text-gray-900">{p.name}</h3>
-                <p className="text-2xl font-black text-blue-600 mt-1">{total.toLocaleString()} <span className="text-sm text-gray-400">ج.م</span></p>
-                <p className="text-xs text-gray-400">{p.price.toLocaleString()} ج.م × {mult} شهر</p>
+                <p className="text-2xl font-black text-blue-600 mt-1">{total.toLocaleString()} <span className="text-sm text-gray-400">{t('sm_egp','ج.م')}</span></p>
+                <p className="text-xs text-gray-400">{p.price.toLocaleString()} {t('sm_egp','ج.م')} × {mult} {t('sm_month','شهر')}</p>
                 {isCurrent && <span className="text-xs text-green-600 font-bold">{t('sub_current_plan', 'الخطة الحالية')}</span>}
               </div>
             );
@@ -248,7 +248,7 @@ export default function SubscriptionManagement() {
             <span className="text-xl">🧾</span>
             <div className="text-right">
               <h2 className="font-bold text-gray-900">{t('sub_payment_history', 'سجل المدفوعات والفواتير')}</h2>
-              <p className="text-xs text-gray-500">{invoiceStats.total_invoices || 0} فاتورة | إجمالي: {(invoiceStats.total_paid || 0).toLocaleString()} ج.م</p>
+              <p className="text-xs text-gray-500">{invoiceStats.total_invoices || 0} {t('sm_invoice','فاتورة')} | {t('sm_total','إجمالي')}: {(invoiceStats.total_paid || 0).toLocaleString()} {t('sm_egp','ج.م')}</p>
             </div>
           </div>
           <span className={`transition-transform ${showHistory ? 'rotate-180' : ''}`}>▼</span>
@@ -258,10 +258,10 @@ export default function SubscriptionManagement() {
           <div className="border-t border-gray-100 p-5">
             <div className="flex gap-2 mb-4">
               <button onClick={handleGenerateInvoice} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700" data-testid="generate-invoice-btn">
-                إنشاء فاتورة
+                {t('sm_gen_invoice','إنشاء فاتورة')}
               </button>
               <button onClick={fetchInvoices} className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm hover:bg-gray-200">
-                تحديث
+                {t('sm_refresh','تحديث')}
               </button>
             </div>
 
@@ -292,7 +292,7 @@ export default function SubscriptionManagement() {
                           toast.success(t('sub_invoice_emailed', 'تم إرسال الفاتورة بالبريد'));
                         } catch { toast.error(t('sub_email_failed', 'فشل في الإرسال')); }
                       }} className="px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-xs font-bold hover:bg-green-200">
-                        بريد ✉
+                        {t('sm_email','بريد')} ✉
                       </button>
                     </div>
                   </div>

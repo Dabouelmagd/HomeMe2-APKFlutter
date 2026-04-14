@@ -73,7 +73,7 @@ export const usePushNotifications = () => {
   // Subscribe to push notifications
   const subscribe = useCallback(async () => {
     if (!isSupported) {
-      setError('المتصفح لا يدعم الإشعارات الفورية');
+      setError('Browser does not support push notifications');
       return false;
     }
 
@@ -86,7 +86,7 @@ export const usePushNotifications = () => {
       setPermission(permissionResult);
       
       if (permissionResult !== 'granted') {
-        setError('تم رفض إذن الإشعارات');
+        setError('Notification permission denied');
         setIsLoading(false);
         return false;
       }
@@ -107,7 +107,7 @@ export const usePushNotifications = () => {
       const { public_key } = await keyResponse.json();
 
       if (!public_key) {
-        throw new Error('لم يتم الحصول على مفتاح التشفير');
+        throw new Error('Failed to get encryption key');
       }
 
       // Subscribe to push manager
@@ -136,7 +136,7 @@ export const usePushNotifications = () => {
       });
 
       if (!response.ok) {
-        throw new Error('فشل تسجيل الاشتراك');
+        throw new Error('Subscription failed');
       }
 
       setIsSubscribed(true);
@@ -144,7 +144,7 @@ export const usePushNotifications = () => {
 
     } catch (err) {
       console.error('Subscription error:', err);
-      setError(err.message || 'حدث خطأ أثناء تفعيل الإشعارات');
+      setError(err.message || 'Error activating notifications');
       return false;
     } finally {
       setIsLoading(false);
@@ -179,7 +179,7 @@ export const usePushNotifications = () => {
 
     } catch (err) {
       console.error('Unsubscription error:', err);
-      setError(err.message || 'حدث خطأ أثناء إلغاء الاشتراك');
+      setError(err.message || 'Error unsubscribing');
       return false;
     } finally {
       setIsLoading(false);

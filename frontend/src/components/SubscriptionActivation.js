@@ -133,10 +133,10 @@ const SubscriptionActivation = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      active: { label: 'نشط', color: 'bg-green-100 text-green-800', icon: CheckCircleIcon },
-      used: { label: 'مستخدم', color: 'bg-blue-100 text-blue-800', icon: CheckCircleIcon },
-      expired: { label: 'منتهي الصلاحية', color: 'bg-red-100 text-red-800', icon: XCircleIcon },
-      disabled: { label: 'معطل', color: 'bg-gray-100 text-gray-800', icon: XCircleIcon }
+      active: { label: t('sa_active', 'نشط'), color: 'bg-green-100 text-green-800', icon: CheckCircleIcon },
+      used: { label: t('sa_used', 'مستخدم'), color: 'bg-blue-100 text-blue-800', icon: CheckCircleIcon },
+      expired: { label: t('sa_expired', 'منتهي الصلاحية'), color: 'bg-red-100 text-red-800', icon: XCircleIcon },
+      disabled: { label: t('sa_disabled', 'معطل'), color: 'bg-gray-100 text-gray-800', icon: XCircleIcon }
     };
     
     const config = statusConfig[status] || statusConfig.active;
@@ -167,30 +167,30 @@ const SubscriptionActivation = () => {
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-600">نوع الاشتراك</p>
+                    <p className="text-gray-600">{t('sa_sub_type', 'نوع الاشتراك')}</p>
                     <p className="font-semibold text-green-800">
                       {durations[userSubscription.duration]}
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-gray-600">تاريخ التفعيل</p>
+                    <p className="text-gray-600">{t('sa_activation_date', 'تاريخ التفعيل')}</p>
                     <p className="font-semibold text-green-800">
                       {formatDate(userSubscription.activated_at)}
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-gray-600">تاريخ الانتهاء</p>
+                    <p className="text-gray-600">{t('sa_expiry_date', 'تاريخ الانتهاء')}</p>
                     <p className="font-semibold text-green-800">
                       {formatDate(userSubscription.expires_at)}
                     </p>
                   </div>
                   
                   <div>
-                    <p className="text-gray-600">الأيام المتبقية</p>
+                    <p className="text-gray-600">{t('sa_remaining_days', 'الأيام المتبقية')}</p>
                     <p className="font-semibold text-green-800">
-                      {calculateRemainingDays(userSubscription.expires_at)} يوم
+                      {calculateRemainingDays(userSubscription.expires_at)} {t('sa_day', 'يوم')}
                     </p>
                   </div>
                 </div>
@@ -199,12 +199,12 @@ const SubscriptionActivation = () => {
               <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
                 <div className="flex items-center">
                   <CheckCircleIcon className="w-5 h-5 text-green-500 mr-2" />
-                  <span>الاشتراك نشط</span>
+                  <span>{t('sa_sub_active', 'الاشتراك نشط')}</span>
                 </div>
                 
                 <div className="flex items-center">
                   <CalendarDaysIcon className="w-5 h-5 text-blue-500 mr-2" />
-                  <span>تجديد تلقائي: {userSubscription.auto_renewal ? 'مفعل' : 'غير مفعل'}</span>
+                  <span>{t('sa_auto_renew', 'تجديد تلقائي')}: {userSubscription.auto_renewal ? t('sa_enabled', 'مفعل') : t('sa_not_enabled', 'غير مفعل')}</span>
                 </div>
               </div>
             </div>
@@ -220,7 +220,7 @@ const SubscriptionActivation = () => {
               <h1 className="text-2xl font-bold">{t('sa_activate_code_title', 'تفعيل كود الاشتراك')}</h1>
             </div>
             <p className="text-blue-100 text-center mt-2">
-              أدخل كود الاشتراك الخاص بك لتفعيل HomeMe
+              {t('sa_enter_code_desc', 'أدخل كود الاشتراك الخاص بك لتفعيل HomeMe')}
             </p>
           </div>
 
@@ -229,7 +229,7 @@ const SubscriptionActivation = () => {
             <form onSubmit={handleActivateCode} className="space-y-6">
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-3">
-                  كود الاشتراك
+                  {t('sa_sub_code', 'كود الاشتراك')}
                 </label>
                 <input
                   type="text"
@@ -242,32 +242,32 @@ const SubscriptionActivation = () => {
                 />
                 
                 <p className="text-sm text-gray-500 text-center mt-2">
-                  أدخل الكود كما هو مكتوب (مع الشرطات)
+                  {t('sa_code_hint', 'أدخل الكود كما هو مكتوب (مع الشرطات)')}
                 </p>
               </div>
 
               {/* Code Information */}
               {codeInfo && (
                 <div className="bg-blue-50 rounded-lg p-6 border-l-4 border-blue-400">
-                  <h3 className="text-lg font-semibold text-blue-900 mb-4">معلومات الكود</h3>
+                  <h3 className="text-lg font-semibold text-blue-900 mb-4">{t('sa_code_info', 'معلومات الكود')}</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-blue-600">مدة الاشتراك</p>
+                      <p className="text-blue-600">{t('sa_duration', 'مدة الاشتراك')}</p>
                       <p className="font-semibold text-blue-900">
                         {durations[codeInfo.duration]}
                       </p>
                     </div>
                     
                     <div>
-                      <p className="text-blue-600">حالة الكود</p>
+                      <p className="text-blue-600">{t('sa_code_status', 'حالة الكود')}</p>
                       <div className="mt-1">
                         {getStatusBadge(codeInfo.status)}
                       </div>
                     </div>
                     
                     <div>
-                      <p className="text-blue-600">الاستخدامات</p>
+                      <p className="text-blue-600">{t('sa_usages', 'الاستخدامات')}</p>
                       <p className="font-semibold text-blue-900">
                         {codeInfo.current_uses}/{codeInfo.max_uses}
                       </p>
@@ -275,7 +275,7 @@ const SubscriptionActivation = () => {
                     
                     {codeInfo.expires_at && (
                       <div>
-                        <p className="text-blue-600">ينتهي في</p>
+                        <p className="text-blue-600">{t('sa_expires_at', 'ينتهي في')}</p>
                         <p className="font-semibold text-blue-900">
                           {formatDate(codeInfo.expires_at)}
                         </p>
@@ -284,7 +284,7 @@ const SubscriptionActivation = () => {
                     
                     {codeInfo.compound_name && (
                       <div className="md:col-span-2">
-                        <p className="text-blue-600">المجمع السكني</p>
+                        <p className="text-blue-600">{t('sa_compound', 'المجمع السكني')}</p>
                         <p className="font-semibold text-blue-900">
                           {codeInfo.compound_name}
                         </p>
@@ -316,7 +316,7 @@ const SubscriptionActivation = () => {
                   
                   {messageType === 'success' && (
                     <p className="text-sm mt-2">
-                      جاري إعادة التوجيه إلى لوحة التحكم...
+                      {t('sa_redirecting', 'جاري إعادة التوجيه إلى لوحة التحكم...')}
                     </p>
                   )}
                 </div>
@@ -335,12 +335,12 @@ const SubscriptionActivation = () => {
                 {loading ? (
                   <div className="flex items-center justify-center">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
-                    جاري التفعيل...
+                    {t('sa_activating', 'جاري التفعيل...')}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center">
                     <KeyIcon className="w-6 h-6 mr-3" />
-                    تفعيل الاشتراك
+                    {t('sa_activate', 'تفعيل الاشتراك')}
                   </div>
                 )}
               </button>
@@ -351,25 +351,25 @@ const SubscriptionActivation = () => {
         {/* Help Section */}
         <div className="mt-8 text-center">
           <div className="bg-white rounded-lg p-6 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">تحتاج مساعدة؟</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">{t('sa_need_help', 'تحتاج مساعدة؟')}</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
               <div>
-                <h4 className="font-semibold text-gray-900">شكل الكود</h4>
+                <h4 className="font-semibold text-gray-900">{t('sa_code_format', 'شكل الكود')}</h4>
                 <p>HM1M-2024-ABC5XY2Z</p>
-                <p className="text-xs">يبدأ بـ HM ويحتوي على شرطات</p>
+                <p className="text-xs">{t('sa_code_format_hint', 'يبدأ بـ HM ويحتوي على شرطات')}</p>
               </div>
               
               <div>
-                <h4 className="font-semibold text-gray-900">مدد الاشتراك</h4>
-                <p>من شهر واحد إلى سنة كاملة</p>
-                <p className="text-xs">حسب نوع الكود المشتري</p>
+                <h4 className="font-semibold text-gray-900">{t('sa_durations', 'مدد الاشتراك')}</h4>
+                <p>{t('sa_duration_range', 'من شهر واحد إلى سنة كاملة')}</p>
+                <p className="text-xs">{t('sa_duration_hint', 'حسب نوع الكود المشتري')}</p>
               </div>
               
               <div>
-                <h4 className="font-semibold text-gray-900">مشاكل الكود؟</h4>
-                <p>تأكد من صحة الكتابة</p>
-                <p className="text-xs">أو تواصل مع الدعم الفني</p>
+                <h4 className="font-semibold text-gray-900">{t('sa_code_issues', 'مشاكل الكود؟')}</h4>
+                <p>{t('sa_check_spelling', 'تأكد من صحة الكتابة')}</p>
+                <p className="text-xs">{t('sa_contact_support', 'أو تواصل مع الدعم الفني')}</p>
               </div>
             </div>
           </div>

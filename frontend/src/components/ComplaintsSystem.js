@@ -18,22 +18,22 @@ import {
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
-const typeConfig = {
-  complaint: { label: 'شكوى', icon: ExclamationTriangleIcon, color: 'text-red-600 bg-red-100' },
-  suggestion: { label: 'اقتراح', icon: LightBulbIcon, color: 'text-amber-600 bg-amber-100' },
-  inquiry: { label: 'استفسار', icon: QuestionMarkCircleIcon, color: 'text-blue-600 bg-blue-100' }
-};
-
-const statusConfig = {
-  open: { label: 'مفتوحة', color: 'bg-red-100 text-red-700', icon: XCircleIcon },
-  in_progress: { label: 'قيد المراجعة', color: 'bg-amber-100 text-amber-700', icon: ClockIcon },
-  resolved: { label: 'تم الحل', color: 'bg-green-100 text-green-700', icon: CheckCircleIcon },
-  closed: { label: 'مغلقة', color: 'bg-gray-100 text-gray-600', icon: CheckCircleIcon }
-};
-
 const ComplaintsSystem = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+
+  const typeConfig = {
+    complaint: { label: t('cs_complaint', 'شكوى'), icon: ExclamationTriangleIcon, color: 'text-red-600 bg-red-100' },
+    suggestion: { label: t('cs_suggestion', 'اقتراح'), icon: LightBulbIcon, color: 'text-amber-600 bg-amber-100' },
+    inquiry: { label: t('cs_inquiry', 'استفسار'), icon: QuestionMarkCircleIcon, color: 'text-blue-600 bg-blue-100' }
+  };
+
+  const statusConfig = {
+    open: { label: t('cs_open', 'مفتوحة'), color: 'bg-red-100 text-red-700', icon: XCircleIcon },
+    in_progress: { label: t('cs_in_progress', 'قيد المراجعة'), color: 'bg-amber-100 text-amber-700', icon: ClockIcon },
+    resolved: { label: t('cs_resolved', 'تم الحل'), color: 'bg-green-100 text-green-700', icon: CheckCircleIcon },
+    closed: { label: t('cs_closed', 'مغلقة'), color: 'bg-gray-100 text-gray-600', icon: CheckCircleIcon }
+  };
   const isAdmin = user?.role === 'admin' || user?.role === 'super_admin';
   const [complaints, setComplaints] = useState([]);
   const [summary, setSummary] = useState({});

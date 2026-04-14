@@ -121,13 +121,13 @@ const SuperAdminPanel = () => {
   const handleToggleCode = async (code) => {
     try {
       await axios.put(`${API}/subscription-codes/${code}/toggle`, {}, getToken());
-      toast.success('تم تحديث حالة الكود');
+      toast.success(t('sp_code_updated', 'تم تحديث حالة الكود'));
       fetchCodes();
     } catch { toast.error(t('sa_failed', 'فشل')); }
   };
 
   const handleDeleteCode = async (code) => {
-    if (!window.confirm('حذف هذا الكود نهائياً؟')) return;
+    if (!window.confirm(t('sp_confirm_delete', 'حذف هذا الكود نهائياً؟'))) return;
     try {
       await axios.delete(`${API}/subscription-codes/${code}`, getToken());
       toast.success(t('sa_deleted', 'تم الحذف'));
@@ -285,13 +285,13 @@ const SuperAdminPanel = () => {
                   </div>
                   <div className="bg-gray-900 rounded-lg p-2 text-center">
                     <p className="text-lg font-bold text-emerald-400">{c.families}</p>
-                    <p className="text-xs text-gray-500">عائلة</p>
+                    <p className="text-xs text-gray-500">{t("sp_family", "عائلة")}</p>
                   </div>
                 </div>
               </div>
             ))}
             {compounds.length === 0 && (
-              <div className="col-span-3 text-center py-12 text-gray-500">لا توجد مجتمعات سكنية</div>
+              <div className="col-span-3 text-center py-12 text-gray-500">{t("sp_no_compounds", "لا توجد مجتمعات سكنية")}</div>
             )}
           </div>
         )}
@@ -308,16 +308,16 @@ const SuperAdminPanel = () => {
                 <option value="">{t('sa_all_compounds', 'كل المجتمعات')}</option>
                 {compounds.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
-              <span className="text-sm text-gray-400 self-center">{filteredUsers.length} مستخدم</span>
+              <span className="text-sm text-gray-400 self-center">{filteredUsers.length} {t('sp_user', 'مستخدم')}</span>
             </div>
             
             <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-gray-900">
                   <tr>
-                    <th className="px-4 py-3 text-right text-gray-400 font-medium">الاسم</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sp_name', 'الاسم')}</th>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_user', 'المستخدم')}</th>
-                    <th className="px-4 py-3 text-right text-gray-400 font-medium">البريد</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sp_email', 'البريد')}</th>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_role', 'الدور')}</th>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_change_role', 'تغيير الدور')}</th>
                   </tr>
@@ -375,57 +375,57 @@ const SuperAdminPanel = () => {
               <button onClick={() => setShowCreateCode(!showCreateCode)} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500" data-testid="create-code-btn">
                 + إنشاء كود جديد
               </button>
-              <button onClick={fetchCodes} className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600">تحديث</button>
+              <button onClick={fetchCodes} className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600">{t('sp_refresh', 'تحديث')}</button>
             </div>
 
             {/* Create Code Form */}
             {showCreateCode && (
               <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6" data-testid="create-code-form">
-                <h3 className="text-lg font-bold mb-4">إنشاء كود اشتراك</h3>
+                <h3 className="text-lg font-bold mb-4">{t('sp_create_sub_code', 'إنشاء كود اشتراك')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">الفترة</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sp_period', 'الفترة')}</label>
                     <select value={newCode.code_type} onChange={e => setNewCode({...newCode, code_type: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
-                      <option value="trial">تجريبي (شهر)</option>
-                      <option value="3_months">3 شهور</option>
-                      <option value="6_months">6 شهور</option>
-                      <option value="9_months">9 شهور</option>
-                      <option value="12_months">سنة</option>
-                      <option value="lifetime">مدى الحياة</option>
+                      <option value="trial">{t('sp_trial', 'تجريبي (شهر)')}</option>
+                      <option value="3_months">{t('sp_3m', '3 شهور')}</option>
+                      <option value="6_months">{t('sp_6m', '6 شهور')}</option>
+                      <option value="9_months">{t('sp_9m', '9 شهور')}</option>
+                      <option value="12_months">{t('sp_year', 'سنة')}</option>
+                      <option value="lifetime">{t('sp_lifetime', 'مدى الحياة')}</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_plan', 'الخطة')}</label>
                     <select value={newCode.plan} onChange={e => setNewCode({...newCode, plan: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
-                      <option value="starter">مجاني</option>
-                      <option value="basic">أساسي</option>
-                      <option value="pro">احترافي</option>
-                      <option value="premium">متقدم</option>
-                      <option value="company_startup">شركة ناشئة</option>
-                      <option value="company_business">شركة متوسطة</option>
-                      <option value="company_enterprise">شركة كبرى</option>
+                      <option value="starter">{t('sp_free', 'مجاني')}</option>
+                      <option value="basic">{t('sp_basic', 'أساسي')}</option>
+                      <option value="pro">{t('sp_pro', 'احترافي')}</option>
+                      <option value="premium">{t('sp_premium', 'متقدم')}</option>
+                      <option value="company_startup">{t('sp_co_startup', 'شركة ناشئة')}</option>
+                      <option value="company_business">{t('sp_co_business', 'شركة متوسطة')}</option>
+                      <option value="company_enterprise">{t('sp_co_enterprise', 'شركة كبرى')}</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">عدد الاستخدامات</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sp_max_uses', 'عدد الاستخدامات')}</label>
                     <input type="number" min="1" max="1000" value={newCode.max_uses} onChange={e => setNewCode({...newCode, max_uses: parseInt(e.target.value) || 1})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_custom_code', 'كود مخصص (اختياري)')}</label>
-                    <input type="text" placeholder="مثل: VIP-2026" value={newCode.custom_code} onChange={e => setNewCode({...newCode, custom_code: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                    <input type="text" placeholder={t("sp_code_example", "مثل: VIP-2026")} value={newCode.custom_code} onChange={e => setNewCode({...newCode, custom_code: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_notes', 'ملاحظات')}</label>
-                    <input type="text" placeholder="ملاحظات..." value={newCode.notes} onChange={e => setNewCode({...newCode, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                    <input type="text" placeholder={t("sp_notes", "ملاحظات...")} value={newCode.notes} onChange={e => setNewCode({...newCode, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">عدد الأكواد (جملة)</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sp_bulk_count', 'عدد الأكواد (جملة)')}</label>
                     <input type="number" min="1" max="500" value={bulkCount} onChange={e => setBulkCount(parseInt(e.target.value) || 1)} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={() => handleCreateCode(false)} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">إنشاء كود واحد</button>
-                  <button onClick={() => handleCreateCode(true)} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">إنشاء {bulkCount} كود</button>
+                  <button onClick={() => handleCreateCode(false)} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">{t('sp_create_one', 'إنشاء كود واحد')}</button>
+                  <button onClick={() => handleCreateCode(true)} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">{t('sp_create_bulk', 'إنشاء')} {bulkCount} {t('sp_code_word', 'كود')}</button>
                   <button onClick={() => setShowCreateCode(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600">{t('sa_cancel', 'إلغاء')}</button>
                 </div>
               </div>
@@ -437,17 +437,17 @@ const SuperAdminPanel = () => {
                 <thead className="bg-gray-900/50">
                   <tr>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_code', 'الكود')}</th>
-                    <th className="px-4 py-3 text-right text-gray-400 font-medium">الفترة</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sp_period', 'الفترة')}</th>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_plan', 'الخطة')}</th>
-                    <th className="px-4 py-3 text-center text-gray-400 font-medium">الاستخدام</th>
+                    <th className="px-4 py-3 text-center text-gray-400 font-medium">{t('sp_usage', 'الاستخدام')}</th>
                     <th className="px-4 py-3 text-center text-gray-400 font-medium">{t('sa_status', 'الحالة')}</th>
                     <th className="px-4 py-3 text-center text-gray-400 font-medium">{t('sa_actions', 'إجراءات')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
                   {codes.map(c => {
-                    const typeLabels = { trial: 'تجريبي', '3_months': '3 شهور', '6_months': '6 شهور', '9_months': '9 شهور', '12_months': 'سنة', '1_year': 'سنة', lifetime: 'مدى الحياة', duration: c.duration_months ? `${c.duration_months} شهر` : 'مخصص' };
-                    const planLabels = { starter: 'مجاني', basic: 'أساسي', pro: 'احترافي', premium: 'متقدم', company_startup: 'شركة ناشئة', company_business: 'شركة متوسطة', company_enterprise: 'شركة كبرى' };
+                    const typeLabels = { trial: t('sp_trial','تجريبي'), '3_months': t('sp_3m','3 شهور'), '6_months': t('sp_6m','6 شهور'), '9_months': t('sp_9m','9 شهور'), '12_months': t('sp_year','سنة'), '1_year': t('sp_year','سنة'), lifetime: t('sp_lifetime','مدى الحياة'), duration: c.duration_months ? `${c.duration_months} ${t('sp_month','شهر')}` : t('sp_custom','مخصص') };
+                    const planLabels = { starter: t('sp_free','مجاني'), basic: t('sp_basic','أساسي'), pro: t('sp_pro','احترافي'), premium: t('sp_premium','متقدم'), company_startup: t('sp_co_startup','شركة ناشئة'), company_business: t('sp_co_business','شركة متوسطة'), company_enterprise: t('sp_co_enterprise','شركة كبرى') };
                     const isUsedUp = (c.times_used || 0) >= (c.max_uses || 1);
                     return (
                       <tr key={c.code} className="hover:bg-gray-750">
@@ -457,14 +457,14 @@ const SuperAdminPanel = () => {
                         <td className="px-4 py-3 text-center"><span className={isUsedUp ? 'text-red-400' : 'text-gray-300'}>{c.times_used || 0}/{c.max_uses || 1}</span></td>
                         <td className="px-4 py-3 text-center">
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.is_active && !isUsedUp ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                            {c.is_active && !isUsedUp ? 'نشط' : isUsedUp ? 'مستخدم' : 'معطل'}
+                            {c.is_active && !isUsedUp ? t('sp_active','نشط') : isUsedUp ? t('sp_used','مستخدم') : t('sp_disabled','معطل')}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className="flex gap-1 justify-center">
-                            <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success('تم النسخ'); }} className="px-2 py-1 text-xs bg-gray-700 rounded hover:bg-gray-600" title="نسخ">نسخ</button>
+                            <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success(t('sp_copied','تم النسخ')); }} className="px-2 py-1 text-xs bg-gray-700 rounded hover:bg-gray-600" title={t('sp_copy','نسخ')}>{t('sp_copy','نسخ')}</button>
                             <button onClick={() => handleToggleCode(c.code)} className={`px-2 py-1 text-xs rounded ${c.is_active ? 'bg-amber-600/20 text-amber-400 hover:bg-amber-600/30' : 'bg-green-600/20 text-green-400 hover:bg-green-600/30'}`}>
-                              {c.is_active ? 'تعطيل' : 'تفعيل'}
+                              {c.is_active ? t('sp_deactivate','تعطيل') : t('sp_activate','تفعيل')}
                             </button>
                             <button onClick={() => handleDeleteCode(c.code)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded hover:bg-red-600/30">{t('sa_delete', 'حذف')}</button>
                           </div>
@@ -506,17 +506,17 @@ const SuperAdminPanel = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_coupon_code', 'كود الكوبون')}</label>
-                    <input type="text" value={newCoupon.code} onChange={e => setNewCoupon({...newCoupon, code: e.target.value})} placeholder="مثل: WELCOME20" className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                    <input type="text" value={newCoupon.code} onChange={e => setNewCoupon({...newCoupon, code: e.target.value})} placeholder={t("sp_coupon_example", "مثل: WELCOME20")} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_discount_type', 'نوع الخصم')}</label>
                     <select value={newCoupon.discount_type} onChange={e => setNewCoupon({...newCoupon, discount_type: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
-                      <option value="percentage">نسبة مئوية %</option>
-                      <option value="fixed">مبلغ ثابت (ج.م)</option>
+                      <option value="percentage">{t('sp_percentage', 'نسبة مئوية')} %</option>
+                      <option value="fixed">{t('sp_fixed', 'مبلغ ثابت')} ({t('sp_egp', 'ج.م')})</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">قيمة الخصم {newCoupon.discount_type === 'percentage' ? '%' : 'ج.م'}</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sp_discount_value', 'قيمة الخصم')} {newCoupon.discount_type === 'percentage' ? '%' : t('sp_egp', 'ج.م')}</label>
                     <input type="number" min="1" value={newCoupon.discount_value} onChange={e => setNewCoupon({...newCoupon, discount_value: parseFloat(e.target.value) || 0})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
@@ -525,7 +525,7 @@ const SuperAdminPanel = () => {
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_notes', 'ملاحظات')}</label>
-                    <input type="text" value={newCoupon.notes} onChange={e => setNewCoupon({...newCoupon, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="ملاحظات..." />
+                    <input type="text" value={newCoupon.notes} onChange={e => setNewCoupon({...newCoupon, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t("sp_notes", "ملاحظات...")} />
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -539,9 +539,9 @@ const SuperAdminPanel = () => {
               <table className="w-full text-sm">
                 <thead className="bg-gray-900/50">
                   <tr>
-                    <th className="px-4 py-3 text-right text-gray-400">الكوبون</th>
-                    <th className="px-4 py-3 text-right text-gray-400">الخصم</th>
-                    <th className="px-4 py-3 text-center text-gray-400">الاستخدام</th>
+                    <th className="px-4 py-3 text-right text-gray-400">{t('sp_coupon', 'الكوبون')}</th>
+                    <th className="px-4 py-3 text-right text-gray-400">{t('sp_discount', 'الخصم')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sp_usage', 'الاستخدام')}</th>
                     <th className="px-4 py-3 text-center text-gray-400">{t('sa_status', 'الحالة')}</th>
                     <th className="px-4 py-3 text-center text-gray-400">{t('sa_actions', 'إجراءات')}</th>
                   </tr>
@@ -551,19 +551,19 @@ const SuperAdminPanel = () => {
                     <tr key={c.id} className="hover:bg-gray-750">
                       <td className="px-4 py-3 font-mono font-bold text-amber-400">{c.code}</td>
                       <td className="px-4 py-3 text-gray-300">
-                        {c.discount_type === 'percentage' ? `${c.discount_value}%` : `${c.discount_value} ج.م`}
+                        {c.discount_type === 'percentage' ? `${c.discount_value}%` : `${c.discount_value} ${t('sp_egp', 'ج.م')}`}
                       </td>
                       <td className="px-4 py-3 text-center text-gray-300">{c.times_used || 0}/{c.max_uses}</td>
                       <td className="px-4 py-3 text-center">
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${c.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                          {c.is_active ? 'نشط' : 'معطل'}
+                          {c.is_active ? t('sp_active','نشط') : t('sp_disabled','معطل')}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
                         <div className="flex gap-1 justify-center">
-                          <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success('تم النسخ'); }} className="px-2 py-1 text-xs bg-gray-700 rounded hover:bg-gray-600">نسخ</button>
+                          <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success(t('sp_copied','تم النسخ')); }} className="px-2 py-1 text-xs bg-gray-700 rounded hover:bg-gray-600">{t('sp_copy','نسخ')}</button>
                           <button onClick={() => handleToggleCoupon(c.id)} className={`px-2 py-1 text-xs rounded ${c.is_active ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'}`}>
-                            {c.is_active ? 'تعطيل' : 'تفعيل'}
+                            {c.is_active ? t('sp_deactivate','تعطيل') : t('sp_activate','تفعيل')}
                           </button>
                           <button onClick={() => handleDeleteCoupon(c.id)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">{t('sa_delete', 'حذف')}</button>
                         </div>
@@ -606,7 +606,7 @@ const SuperAdminPanel = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_title', 'عنوان الإعلان')}</label>
-                    <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="عنوان الإعلان" />
+                    <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t("sp_ad_title", "عنوان الإعلان")} />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_media', 'رفع صورة أو فيديو')}</label>
@@ -618,10 +618,10 @@ const SuperAdminPanel = () => {
                       try {
                         const res = await axios.post(`${API}/ads/upload-media`, formData, { ...getToken(), headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
                         setNewAd({...newAd, image_url: res.data.url});
-                        toast.success(`تم رفع ${res.data.type === 'video' ? 'الفيديو' : 'الصورة'}`);
+                        toast.success(t('sp_uploaded', 'تم الرفع'));
                       } catch (err) { toast.error(err.response?.data?.detail || t('sa_upload_failed', 'فشل في الرفع')); }
                     }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:text-xs file:cursor-pointer" />
-                    {newAd.image_url && <p className="text-xs text-green-400 mt-1">تم الرفع: {newAd.image_url}</p>}
+                    {newAd.image_url && <p className="text-xs text-green-400 mt-1">{t('sp_uploaded', 'تم الرفع')}: {newAd.image_url}</p>}
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_ext_image', 'أو رابط صورة خارجي')}</label>
@@ -633,7 +633,7 @@ const SuperAdminPanel = () => {
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_description', 'الوصف')}</label>
-                    <input type="text" value={newAd.description} onChange={e => setNewAd({...newAd, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="وصف مختصر..." />
+                    <input type="text" value={newAd.description} onChange={e => setNewAd({...newAd, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t("sp_desc", "وصف مختصر...")} />
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_position', 'الموقع')}</label>
@@ -665,7 +665,7 @@ const SuperAdminPanel = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-700">
                   {ads.map(a => {
-                    const posLabels = { banner: 'بانر', sidebar: 'جانبي', inline: 'داخلي', dashboard: 'لوحة التحكم' };
+                    const posLabels = { banner: t('sp_pos_banner','بانر'), sidebar: t('sp_pos_sidebar','جانبي'), inline: t('sp_pos_inline','داخلي'), dashboard: t('sp_pos_dashboard','لوحة التحكم') };
                     return (
                       <tr key={a.id} className="hover:bg-gray-750">
                         <td className="px-4 py-3">
@@ -676,13 +676,13 @@ const SuperAdminPanel = () => {
                         <td className="px-4 py-3 text-center text-gray-300">{a.clicks || 0}</td>
                         <td className="px-4 py-3 text-center">
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                            {a.is_active ? 'نشط' : 'معطل'}
+                            {a.is_active ? t('sp_active','نشط') : t('sp_disabled','معطل')}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className="flex gap-1 justify-center">
                             <button onClick={() => handleToggleAd(a.id)} className={`px-2 py-1 text-xs rounded ${a.is_active ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'}`}>
-                              {a.is_active ? 'تعطيل' : 'تفعيل'}
+                              {a.is_active ? t('sp_deactivate','تعطيل') : t('sp_activate','تفعيل')}
                             </button>
                             <button onClick={() => handleDeleteAd(a.id)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">{t('sa_delete', 'حذف')}</button>
                           </div>
@@ -755,7 +755,7 @@ const SuperAdminPanel = () => {
                   try {
                     const res = await axios.post(`${API}/notifications/send-reminders`, {}, getToken());
                     toast.success(res.data.message);
-                  } catch { toast.error('فشل في الإرسال'); }
+                  } catch { toast.error(t('sp_send_failed', 'فشل في الإرسال')); }
                 }} className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500" data-testid="send-reminders-btn">
                   إرسال التذكيرات الآن
                 </button>
@@ -779,17 +779,17 @@ const SuperAdminPanel = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Revenue */}
               <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
-                <h3 className="font-bold text-lg text-white mb-3">الإيرادات الشهرية المتوقعة</h3>
-                <p className="text-4xl font-black text-green-400">{(subAnalytics.monthly_revenue_estimate || 0).toLocaleString()} <span className="text-sm text-gray-400">ج.م</span></p>
-                <p className="text-xs text-gray-500 mt-1">بناءً على الاشتراكات النشطة</p>
+                <h3 className="font-bold text-lg text-white mb-3">{t('sp_monthly_revenue', 'الإيرادات الشهرية المتوقعة')}</h3>
+                <p className="text-4xl font-black text-green-400">{(subAnalytics.monthly_revenue_estimate || 0).toLocaleString()} <span className="text-sm text-gray-400">{t('sp_egp', 'ج.م')}</span></p>
+                <p className="text-xs text-gray-500 mt-1">{t('sp_based_on_active', 'بناءً على الاشتراكات النشطة')}</p>
               </div>
 
               {/* By Plan */}
               <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
-                <h3 className="font-bold text-lg text-white mb-3">توزيع الخطط</h3>
+                <h3 className="font-bold text-lg text-white mb-3">{t('sp_plan_distribution', 'توزيع الخطط')}</h3>
                 <div className="space-y-2">
                   {Object.entries(subAnalytics.by_plan || {}).map(([plan, count]) => {
-                    const planLabels = { trial: 'تجريبي', basic: 'أساسي', pro: 'احترافي', premium: 'متقدم', company_startup: 'شركة ناشئة', company_business: 'شركة متوسطة', company_enterprise: 'شركة كبرى' };
+                    const planLabels = { trial: t('sp_trial','تجريبي'), basic: t('sp_basic','أساسي'), pro: t('sp_pro','احترافي'), premium: t('sp_premium','متقدم'), company_startup: t('sp_co_startup','شركة ناشئة'), company_business: t('sp_co_business','شركة متوسطة'), company_enterprise: t('sp_co_enterprise','شركة كبرى') };
                     const colors = { trial: 'bg-gray-500', basic: 'bg-sky-500', pro: 'bg-blue-500', premium: 'bg-violet-500', company_startup: 'bg-amber-500', company_business: 'bg-orange-500', company_enterprise: 'bg-red-500' };
                     const total = subAnalytics.active_subscriptions || 1;
                     const pct = Math.round((count / total) * 100);
@@ -810,15 +810,15 @@ const SuperAdminPanel = () => {
             {/* Expiring Soon */}
             {subAnalytics.expiring_soon?.length > 0 && (
               <div className="bg-gray-800 rounded-xl border border-amber-500/30 p-5">
-                <h3 className="font-bold text-lg text-amber-400 mb-3">اشتراكات تنتهي قريباً (30 يوم)</h3>
+                <h3 className="font-bold text-lg text-amber-400 mb-3">{t('sp_expiring_soon', 'اشتراكات تنتهي قريباً (30 يوم)')}</h3>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-gray-400 border-b border-gray-700">
                         <th className="text-right py-2 px-3">{t('sa_user', 'المستخدم')}</th>
                         <th className="text-right py-2 px-3">{t('sa_plan', 'الخطة')}</th>
-                        <th className="text-center py-2 px-3">أيام متبقية</th>
-                        <th className="text-center py-2 px-3">تاريخ الانتهاء</th>
+                        <th className="text-center py-2 px-3">{t('sp_days_left', 'أيام متبقية')}</th>
+                        <th className="text-center py-2 px-3">{t('sp_expiry_date', 'تاريخ الانتهاء')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -828,7 +828,7 @@ const SuperAdminPanel = () => {
                           <td className="py-2 px-3 text-gray-300">{u.plan}</td>
                           <td className="py-2 px-3 text-center">
                             <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${u.days_left <= 7 ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400'}`}>
-                              {u.days_left} يوم
+                              {u.days_left} {t('sp_day', 'يوم')}
                             </span>
                           </td>
                           <td className="py-2 px-3 text-center text-gray-400">{u.end_date}</td>

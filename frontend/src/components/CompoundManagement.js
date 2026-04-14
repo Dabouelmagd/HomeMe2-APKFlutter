@@ -1762,8 +1762,8 @@ const CompoundManagement = () => {
           <div className="bg-gradient-to-br from-white via-purple-50 to-indigo-50 rounded-2xl shadow-lg border border-purple-100 p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">👤 إدارة المستخدمين</h3>
-                <p className="text-gray-600">عرض وإدارة جميع المستخدمين في مجمعك</p>
+                <h3 className="text-lg font-semibold text-center text-gray-900 text-center">{t('cm_user_mgmt', 'إدارة المستخدمين')}</h3>
+                <p className="text-gray-600">{t('cm_user_mgmt_desc', 'عرض وإدارة جميع المستخدمين في مجمعك')}</p>
               </div>
               <div className="text-sm text-gray-600">
                 Total Users: <span className="font-semibold text-center">{allUsers.length}</span>
@@ -2454,7 +2454,7 @@ const CompoundManagement = () => {
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
                     <h3 className="text-lg leading-6 font-medium text-gray-900 text-center mb-4" id="new-residence-modal-title">
-                      إضافة إقامة جديدة
+                      {t('cm_add_residence', 'إضافة إقامة جديدة')}
                     </h3>
                     
                     <div className="space-y-4">
@@ -2884,7 +2884,7 @@ const CompoundManagement = () => {
                           <div>
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <PhoneIcon className="h-4 w-4 text-green-500" />
-                              <span>رقم الهاتف</span>
+                              <span>{t('cm_phone', 'رقم الهاتف')}</span>
                             </label>
                             <input
                               type="tel"
@@ -2898,7 +2898,7 @@ const CompoundManagement = () => {
                           <div>
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <CalendarIcon className="h-4 w-4 text-green-500" />
-                              <span>تاريخ الميلاد</span>
+                              <span>{t('cm_dob', 'تاريخ الميلاد')}</span>
                             </label>
                             <DateInput
                               value={comprehensiveFamilyForm.head_date_of_birth}
@@ -2910,21 +2910,21 @@ const CompoundManagement = () => {
                           <div>
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <DocumentDuplicateIcon className="h-4 w-4 text-green-500" />
-                              <span>رقم الهوية</span>
+                              <span>{t('cm_id', 'رقم الهوية')}</span>
                             </label>
                             <input
                               type="text"
                               value={comprehensiveFamilyForm.head_id_number}
                               onChange={(e) => setComprehensiveFamilyForm(prev => ({ ...prev, head_id_number: e.target.value }))}
                               className="block w-full rounded-xl border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-4 py-3"
-                              placeholder="أدخل رقم الهوية/جواز السفر"
+                              placeholder={t("cm_id_placeholder", "أدخل رقم الهوية/جواز السفر")}
                             />
                           </div>
 
                           <div className="md:col-span-2">
                             <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 mb-3">
                               <CameraIcon className="h-4 w-4 text-green-500" />
-                              <span>الصورة الشخصية</span>
+                              <span>{t('cm_photo', 'الصورة الشخصية')}</span>
                             </label>
                             <div className="flex items-center space-x-4">
                               <input
@@ -3144,8 +3144,8 @@ const CompoundManagement = () => {
 
                       {/* Unit Info */}
                       <div className="bg-white border border-gray-200 rounded-lg p-4">
-                        <h5 className="font-medium text-gray-900 mb-3">معلومات الوحدة</h5>
-                        <p className="text-sm text-gray-600">رقم الوحدة: <span className="font-medium">{comprehensiveFamilyForm.unit_number}</span></p>
+                        <h5 className="font-medium text-gray-900 mb-3">{t('cm_unit_info', 'معلومات الوحدة')}</h5>
+                        <p className="text-sm text-gray-600">{t('cm_unit_number', 'رقم الوحدة')}: <span className="font-medium">{comprehensiveFamilyForm.unit_number}</span></p>
                       </div>
 
                       {/* Family Head Info */}
@@ -3375,7 +3375,7 @@ const CompoundManagement = () => {
                       type="submit"
                       className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                     >
-                      حفظ التغييرات
+                      {t('cm_save', 'حفظ التغييرات')}
                     </button>
                     <button
                       type="button"
@@ -3541,7 +3541,7 @@ const CompoundManagement = () => {
                       type="submit"
                       className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                     >
-                      حفظ التغييرات
+                      {t('cm_save', 'حفظ التغييرات')}
                     </button>
                     <button
                       type="button"

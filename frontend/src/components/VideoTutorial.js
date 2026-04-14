@@ -219,13 +219,13 @@ const VideoTutorial = () => {
   const showVisualAudioFeedback = (type) => {
     // Enhanced visual feedback system with clear icons and animations
     const feedbackData = {
-      play: { color: 'bg-green-500', icon: '▶️', text: 'تشغيل' },
-      pause: { color: 'bg-orange-500', icon: '⏸️', text: 'إيقاف' },
-      complete: { color: 'bg-blue-500', icon: '✅', text: 'مكتمل' },
-      next: { color: 'bg-purple-500', icon: '➡️', text: 'التالي' },
-      prev: { color: 'bg-indigo-500', icon: '⬅️', text: 'السابق' },
-      skip: { color: 'bg-yellow-500', icon: '⏭️', text: 'تخطي' },
-      click: { color: 'bg-gray-500', icon: '👆', text: 'نقر' }
+      play: { color: 'bg-green-500', icon: '▶️', text: t('vt_play', 'تشغيل') },
+      pause: { color: 'bg-orange-500', icon: '⏸️', text: t('vt_pause', 'إيقاف') },
+      complete: { color: 'bg-blue-500', icon: '✅', text: t('vt_done', 'مكتمل') },
+      next: { color: 'bg-purple-500', icon: '➡️', text: t('vt_next_fb', 'التالي') },
+      prev: { color: 'bg-indigo-500', icon: '⬅️', text: t('vt_prev_fb', 'السابق') },
+      skip: { color: 'bg-yellow-500', icon: '⏭️', text: t('vt_skip_fb', 'تخطي') },
+      click: { color: 'bg-gray-500', icon: '👆', text: t('vt_click_fb', 'نقر') }
     };
     
     const data = feedbackData[type] || feedbackData.play;
@@ -518,7 +518,7 @@ const VideoTutorial = () => {
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-300 flex items-center space-x-2 shadow-lg animate-pulse"
             >
               <SpeakerWaveIcon className="h-6 w-6" />
-              <span className="text-base">🔊 تفعيل الصوت الواضح</span>
+              <span className="text-base">{t('vt_enable_sound', 'تفعيل الصوت الواضح')}</span>
             </button>
           </div>
         </div>
@@ -549,33 +549,33 @@ const VideoTutorial = () => {
 
         <div className="mt-8 text-center">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl mb-6">
-            <p className="text-gray-800 font-bold text-lg mb-3">📋 إنفوجراف بسيط للاستخدام</p>
+            <p className="text-gray-800 font-bold text-lg mb-3">{t('vt_infographic', 'إنفوجراف بسيط للاستخدام')}</p>
             <div className="flex justify-center items-center space-x-6">
               <div className="text-center">
                 <div className="text-2xl mb-1">🎯</div>
-                <span className="text-sm text-gray-600">واضح ومباشر</span>
+                <span className="text-sm text-gray-600">{t('vt_clear', 'واضح ومباشر')}</span>
               </div>
               <div className="text-center">
                 <div className="text-2xl mb-1">⚡</div>
-                <span className="text-sm text-gray-600">سريع التعلم</span>
+                <span className="text-sm text-gray-600">{t('vt_fast_learn', 'سريع التعلم')}</span>
               </div>
               <div className="text-center">
                 <div className="text-2xl mb-1">📱</div>
-                <span className="text-sm text-gray-600">بصري تفاعلي</span>
+                <span className="text-sm text-gray-600">{t('vt_visual', 'بصري تفاعلي')}</span>
               </div>
             </div>
           </div>
           
           <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <p className="text-gray-700 font-semibold mb-3">مسار التعلم البسيط:</p>
+            <p className="text-gray-700 font-semibold mb-3">{t('vt_learning_path', 'مسار التعلم البسيط')}:</p>
             <div className="flex justify-center items-center space-x-4 text-sm">
-              <span className="bg-blue-100 text-blue-800 px-3 py-2 rounded-full">🔑 ادخل</span>
+              <span className="bg-blue-100 text-blue-800 px-3 py-2 rounded-full">{t('wg_flow_login', 'ادخل')}</span>
               <span className="text-gray-400">→</span>
-              <span className="bg-green-100 text-green-800 px-3 py-2 rounded-full">📊 شاهد</span>
+              <span className="bg-green-100 text-green-800 px-3 py-2 rounded-full">{t('wg_flow_view', 'شاهد')}</span>
               <span className="text-gray-400">→</span>
-              <span className="bg-purple-100 text-purple-800 px-3 py-2 rounded-full">🏠 أدر</span>
+              <span className="bg-purple-100 text-purple-800 px-3 py-2 rounded-full">{t('wg_flow_manage', 'أدر')}</span>
               <span className="text-gray-400">→</span>
-              <span className="bg-orange-100 text-orange-800 px-3 py-2 rounded-full">💬 تواصل</span>
+              <span className="bg-orange-100 text-orange-800 px-3 py-2 rounded-full">{t('wg_flow_communicate', 'تواصل')}</span>
             </div>
           </div>
         </div>
@@ -652,10 +652,10 @@ const VideoTutorial = () => {
                     
                     <div className="flex items-center justify-center space-x-4 mb-4">
                       <div className="bg-white/20 px-4 py-2 rounded-xl">
-                        <span className="text-lg font-bold">الخطوة {safeCurrentStep + 1} من {infographicSteps.length}</span>
+                        <span className="text-lg font-bold">{t('vt_step', 'الخطوة')} {safeCurrentStep + 1} {t('vt_of', 'من')} {infographicSteps.length}</span>
                       </div>
                       <div className="bg-white/20 px-4 py-2 rounded-xl animate-pulse">
-                        <span className="text-sm">{Math.round(videoProgress)}% مكتمل</span>
+                        <span className="text-sm">{Math.round(videoProgress)}% {t('vt_done', 'مكتمل')}</span>
                       </div>
                     </div>
                     
@@ -688,7 +688,7 @@ const VideoTutorial = () => {
                     <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
                       {currentInfo.title}
                     </h2>
-                    <p className="text-xl text-blue-200 mb-6 font-semibold">اضغط للبدء - تعلم بطريقة تفاعلية ممتعة</p>
+                    <p className="text-xl text-blue-200 mb-6 font-semibold">{t('vt_press_start', 'اضغط للبدء - تعلم بطريقة تفاعلية ممتعة')}</p>
                     <p className="text-lg text-purple-200 mb-8">{currentInfo.simple}</p>
                     
                     {/* Enhanced preview thumbnails */}
@@ -702,13 +702,13 @@ const VideoTutorial = () => {
                     
                     <div className="mt-8 flex justify-center space-x-4">
                       <div className="bg-white/10 px-4 py-2 rounded-full border border-white/20">
-                        <span className="text-sm">⚡ سريع وسهل</span>
+                        <span className="text-sm">{t('vt_fast_easy', 'سريع وسهل')}</span>
                       </div>
                       <div className="bg-white/10 px-4 py-2 rounded-full border border-white/20">
-                        <span className="text-sm">🎯 خطوة بخطوة</span>
+                        <span className="text-sm">{t('vt_step_by_step', 'خطوة بخطوة')}</span>
                       </div>
                       <div className="bg-white/10 px-4 py-2 rounded-full border border-white/20">
-                        <span className="text-sm">🌟 تفاعلي</span>
+                        <span className="text-sm">{t('vt_interactive', 'تفاعلي')}</span>
                       </div>
                     </div>
                   </div>
@@ -752,7 +752,7 @@ const VideoTutorial = () => {
                             ? 'bg-red-600 hover:bg-red-700 text-white animate-pulse' 
                             : 'bg-green-600 hover:bg-green-700 text-white'
                         }`}
-                        title={isMuted ? 'إلغاء الكتم (M)' : 'كتم الصوت (M)'}
+                        title={isMuted ? t('vt_unmute','إلغاء الكتم') : t('vt_mute','كتم الصوت')}
                       >
                         {isMuted ? (
                           <>
@@ -782,7 +782,7 @@ const VideoTutorial = () => {
                               setTimeout(() => playAudioFeedback('click'), 100);
                             }}
                             className="w-20 h-2 bg-white bg-opacity-30 rounded-lg appearance-none slider"
-                            title={`مستوى الصوت: ${volume}%`}
+                            title={`${t('vt_volume','مستوى الصوت')}: ${volume}%`}
                           />
                           <span className="text-xs font-bold text-white bg-white/20 px-2 py-1 rounded">
                             {volume}%
@@ -797,7 +797,7 @@ const VideoTutorial = () => {
                       </span>
                       <div className="flex items-center space-x-1">
                         <div className={`w-2 h-2 rounded-full ${!isMuted ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`}></div>
-                        <span className="text-xs">{!isMuted ? 'صوت' : 'صامت'}</span>
+                        <span className="text-xs">{!isMuted ? t('vt_sound','صوت') : t('vt_silent','صامت')}</span>
                       </div>
                     </div>
                   </div>
@@ -807,7 +807,7 @@ const VideoTutorial = () => {
                     <button
                       onClick={restartCurrent}
                       className="px-2 py-1 bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors"
-                      title="إعادة تشغيل (R)"
+                      title={t('vt_restart','إعادة تشغيل')}
                     >
                       <span className="text-xs">🔄</span>
                     </button>
@@ -816,7 +816,7 @@ const VideoTutorial = () => {
                       onClick={skipToNext}
                       disabled={currentStep === infographicSteps.length - 1}
                       className="px-2 py-1 bg-yellow-600 hover:bg-yellow-700 rounded-lg transition-colors disabled:opacity-50"
-                      title="تخطي (S)"
+                      title={t('vt_skip_key','تخطي')}
                     >
                       <span className="text-xs">⏭️</span>
                     </button>
@@ -825,7 +825,7 @@ const VideoTutorial = () => {
                     <button
                       onClick={toggleFullscreen}
                       className="p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-colors"
-                      title={isFullscreen ? 'تصغير الشاشة (F)' : 'ملء الشاشة (F)'}
+                      title={isFullscreen ? t('vt_exit_fs','تصغير الشاشة') : t('vt_fs','ملء الشاشة')}
                     >
                       {isFullscreen ? (
                         <ArrowsPointingInIcon className="h-4 w-4" />
@@ -843,17 +843,17 @@ const VideoTutorial = () => {
                       className={`px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
                         autoPlay ? 'bg-green-600 text-white' : 'bg-white bg-opacity-20 text-white'
                       }`}
-                      title={autoPlay ? 'إيقاف التشغيل التلقائي' : 'تفعيل التشغيل التلقائي'}
+                      title={autoPlay ? t('vt_disable_auto','إيقاف التشغيل التلقائي') : t('vt_enable_auto','تفعيل التشغيل التلقائي')}
                     >
                       {autoPlay ? '🟢' : '🔴'}
                     </button>
                     
                     {/* Speed Indicator */}
                     <div className="bg-white bg-opacity-20 px-2 py-1 rounded-lg">
-                      <span className="text-xs font-medium">⚡ سريع</span>
+                      <span className="text-xs font-medium">{t('vt_fast','سريع')}</span>
                     </div>
                     
-                    <span className="text-blue-200 font-semibold text-xs">30 ثانية</span>
+                    <span className="text-blue-200 font-semibold text-xs">30 {t('vt_seconds','ثانية')}</span>
                   </div>
                 </div>
               </div>
@@ -901,56 +901,56 @@ const VideoTutorial = () => {
 
               {/* Simple Usage Flow */}
               <div className="mt-8 bg-gray-50 rounded-2xl p-6">
-                <h4 className="text-xl font-bold text-center mb-6 text-gray-800">كيفية الاستخدام</h4>
+                <h4 className="text-xl font-bold text-center mb-6 text-gray-800">{t('vt_how_to_use', 'كيفية الاستخدام')}</h4>
                 <div className="flex items-center justify-center space-x-4 mb-6">
                   <div className="text-center">
                     <div className="text-3xl mb-2">🔑</div>
-                    <p className="text-sm font-semibold">ادخل</p>
+                    <p className="text-sm font-semibold">{t('wg_flow_login', 'ادخل')}</p>
                   </div>
                   <div className="text-2xl text-gray-400">→</div>
                   <div className="text-center">
                     <div className="text-3xl mb-2">📊</div>
-                    <p className="text-sm font-semibold">شاهد</p>
+                    <p className="text-sm font-semibold">{t('wg_flow_view', 'شاهد')}</p>
                   </div>
                   <div className="text-2xl text-gray-400">→</div>
                   <div className="text-center">
                     <div className="text-3xl mb-2">🏠</div>
-                    <p className="text-sm font-semibold">أدر</p>
+                    <p className="text-sm font-semibold">{t('wg_flow_manage', 'أدر')}</p>
                   </div>
                   <div className="text-2xl text-gray-400">→</div>
                   <div className="text-center">
                     <div className="text-3xl mb-2">💬</div>
-                    <p className="text-sm font-semibold">تواصل</p>
+                    <p className="text-sm font-semibold">{t('wg_flow_communicate', 'تواصل')}</p>
                   </div>
                 </div>
 
                 {/* Keyboard Controls Guide */}
                 <div className="bg-blue-50 rounded-lg p-4 border-2 border-blue-200">
-                  <h5 className="font-bold text-sm mb-3 text-blue-800">⌨️ مفاتيح التحكم السريع:</h5>
+                  <h5 className="font-bold text-sm mb-3 text-blue-800">{t('vt_keyboard', 'مفاتيح التحكم السريع')}:</h5>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div className="flex items-center space-x-2">
-                      <kbd className="bg-white px-2 py-1 rounded border">مسافة</kbd>
-                      <span>تشغيل/إيقاف</span>
+                      <kbd className="bg-white px-2 py-1 rounded border">{t('vt_space','مسافة')}</kbd>
+                      <span>{t('vt_play_pause','تشغيل/إيقاف')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <kbd className="bg-white px-2 py-1 rounded border">S</kbd>
-                      <span>تخطي الخطوة</span>
+                      <span>{t('vt_skip_step','تخطي الخطوة')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <kbd className="bg-white px-2 py-1 rounded border">↑↓</kbd>
-                      <span>الخطوة السابقة/التالية</span>
+                      <span>{t('vt_prev_next','الخطوة السابقة/التالية')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <kbd className="bg-white px-2 py-1 rounded border">R</kbd>
-                      <span>إعادة تشغيل</span>
+                      <span>{t('vt_restart_label','إعادة تشغيل')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <kbd className="bg-white px-2 py-1 rounded border">M</kbd>
-                      <span>كتم الصوت</span>
+                      <span>{t('vt_mute_label','كتم الصوت')}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <kbd className="bg-white px-2 py-1 rounded border">F</kbd>
-                      <span>ملء الشاشة</span>
+                      <span>{t('vt_fs_label','ملء الشاشة')}</span>
                     </div>
                   </div>
                 </div>
@@ -965,7 +965,7 @@ const VideoTutorial = () => {
                 className="flex items-center space-x-2 px-6 py-3 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
                 <ChevronLeftIcon className="h-5 w-5" />
-                <span>السابق</span>
+                <span>{t('vt_prev','السابق')}</span>
               </button>
 
               <div className="text-center">
@@ -980,7 +980,7 @@ const VideoTutorial = () => {
                   ))}
                 </div>
                 <p className="text-sm text-gray-600">
-                  {safeCurrentStep + 1} من {infographicSteps.length}
+                  {safeCurrentStep + 1} {t('vt_of','من')} {infographicSteps.length}
                 </p>
               </div>
 
@@ -989,7 +989,7 @@ const VideoTutorial = () => {
                 disabled={safeCurrentStep === infographicSteps.length - 1}
                 className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
-                <span>{safeCurrentStep === infographicSteps.length - 1 ? 'انتهاء' : 'التالي'}</span>
+                <span>{safeCurrentStep === infographicSteps.length - 1 ? t('vt_finish','انتهاء') : t('vt_next_btn','التالي')}</span>
                 <ChevronRightIcon className="h-5 w-5" />
               </button>
             </div>

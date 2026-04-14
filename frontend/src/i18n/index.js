@@ -2990,7 +2990,10 @@ const resources = {
       'hp_all_rights': 'All rights reserved',
       'role_super_desc': 'Full control', 'role_company_desc': 'Multiple compounds',
       'role_admin_desc': 'Full management', 'role_manager_desc': 'Daily operations',
-      'role_security_desc': 'Gates & visitors', 'role_resident_desc': 'Services & maintenance'
+      'role_security_desc': 'Gates & visitors', 'role_resident_desc': 'Services & maintenance',
+      'pm_cards': 'Credit Cards', 'pm_paypal_d': 'Secure global payment',
+      'pm_wallets': 'Digital Wallets', 'pm_bank': 'Bank Transfer', 'pm_bank_d': 'Direct bank transfer',
+      'pm_instapay': 'InstaPay', 'pm_instapay_d': 'Instant mobile transfer'
     }
   },
   ar: {
@@ -8723,7 +8726,10 @@ const resources = {
       'hp_all_rights': 'Tous droits réservés',
       'role_super_desc': 'Contrôle total', 'role_company_desc': 'Plusieurs résidences',
       'role_admin_desc': 'Gestion complète', 'role_manager_desc': 'Opérations quotidiennes',
-      'role_security_desc': 'Portes et visiteurs', 'role_resident_desc': 'Services et maintenance'
+      'role_security_desc': 'Portes et visiteurs', 'role_resident_desc': 'Services et maintenance',
+      'pm_cards': 'Cartes de crédit', 'pm_paypal_d': 'Paiement sécurisé mondial',
+      'pm_wallets': 'Portefeuilles numériques', 'pm_bank': 'Virement bancaire', 'pm_bank_d': 'Virement direct',
+      'pm_instapay': 'InstaPay', 'pm_instapay_d': 'Transfert mobile instantané'
     }
   }
 };

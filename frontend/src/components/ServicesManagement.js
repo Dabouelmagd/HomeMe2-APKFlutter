@@ -61,114 +61,59 @@ const ServicesManagement = () => {
     return nameMap[serviceName] ? t(nameMap[serviceName]) : serviceName;
   };
   
-  // Function to translate service specialties/descriptions with complete Arabic translations
-  const translateSpecialty = (specialty) => {
-    // Complete Arabic translations for specialties
-    const specialtyMap = {
-      'Emergency plumbing, pipe repairs, water heater maintenance': 'سباكة الطوارئ، إصلاح الأنابيب، صيانة سخانات المياه',
-      'Electrical repairs, installations, emergency services': 'الإصلاحات الكهربائية، التركيبات، خدمات الطوارئ',
-      'Air conditioning, heating, ventilation systems': 'تكييف الهواء، التدفئة، أنظمة التهوية',
-      'Minor repairs, installations, home improvements': 'إصلاحات طفيفة، تركيبات، تحسينات المنزل',
-      'Regular cleaning, deep cleaning, move-in/out cleaning': 'تنظيف منتظم، تنظيف عميق، تنظيف الانتقال',
-      'Deep carpet cleaning, stain removal, upholstery cleaning': 'تنظيف السجاد العميق، إزالة البقع، تنظيف المفروشات',
-      'Interior and exterior window cleaning': 'تنظيف النوافذ الداخلية والخارجية',
-      '24/7 security, patrol services, event security': 'أمن على مدار الساعة، خدمات الدورية، أمن الفعاليات',
-      'Keycard systems, door locks, security cameras': 'أنظمة البطاقات المفتاحية، أقفال الأبواب، كاميرات الأمان',
-      'Garden maintenance, lawn care, plant installation': 'صيانة الحدائق، رعاية المروج، زراعة النباتات',
-      'Pool cleaning, chemical balancing, equipment repair': 'تنظيف المسابح، توازن المواد الكيميائية، إصلاح المعدات',
-      'Dog walking, pet sitting, grooming': 'تمشية الكلاب، رعاية الحيوانات الأليفة، التنظيف',
-      'Fitness training, wellness coaching, group classes': 'التدريب البدني، التوجيه الصحي، الفصول الجماعية',
-      'Local delivery, grocery delivery, courier services': 'التوصيل المحلي، توصيل البقالة، خدمات البريد السريع',
-      'Local moving, furniture moving, packing services': 'النقل المحلي، نقل الأثاث، خدمات التعبئة',
-      'Party planning, corporate events, wedding coordination': 'تخطيط الحفلات، الفعاليات المؤسسية، تنسيق الأعراس',
-      'Event catering, meal prep, special dietary needs': 'تموين الفعاليات، إعداد الوجبات، الاحتياجات الغذائية الخاصة'
-    };
-    
-    // If exact match found, return Arabic translation
-    if (specialtyMap[specialty]) {
-      return specialtyMap[specialty];
-    }
-    
-    // If not exact match, try to return direct translation key if available
-    const translationKey = Object.keys(specialtyMap).find(key => specialtyMap[key] && key === specialty);
-    return translationKey ? t(translationKey) : specialty;
+  const lang = i18n.language?.substring(0, 2) || 'ar';
+
+  // Multilingual service data maps
+  const specTranslations = {
+    'Emergency plumbing, pipe repairs, water heater maintenance': { ar: 'سباكة الطوارئ، إصلاح الأنابيب، صيانة سخانات المياه', fr: 'Plomberie d\'urgence, réparation de tuyaux, chauffe-eau' },
+    'Electrical repairs, installations, emergency services': { ar: 'الإصلاحات الكهربائية، التركيبات، خدمات الطوارئ', fr: 'Réparations électriques, installations, urgences' },
+    'Air conditioning, heating, ventilation systems': { ar: 'تكييف الهواء، التدفئة، أنظمة التهوية', fr: 'Climatisation, chauffage, ventilation' },
+    'Minor repairs, installations, home improvements': { ar: 'إصلاحات طفيفة، تركيبات، تحسينات المنزل', fr: 'Petites réparations, installations, améliorations' },
+    'Regular cleaning, deep cleaning, move-in/out cleaning': { ar: 'تنظيف منتظم، تنظيف عميق، تنظيف الانتقال', fr: 'Nettoyage régulier, en profondeur, déménagement' },
+    'Deep carpet cleaning, stain removal, upholstery cleaning': { ar: 'تنظيف السجاد العميق، إزالة البقع، تنظيف المفروشات', fr: 'Nettoyage de tapis, détachage, nettoyage de meubles' },
+    'Interior and exterior window cleaning': { ar: 'تنظيف النوافذ الداخلية والخارجية', fr: 'Nettoyage de vitres intérieur et extérieur' },
+    '24/7 security, patrol services, event security': { ar: 'أمن على مدار الساعة، خدمات الدورية، أمن الفعاليات', fr: 'Sécurité 24/7, patrouilles, sécurité événementielle' },
+    'Keycard systems, door locks, security cameras': { ar: 'أنظمة البطاقات المفتاحية، أقفال الأبواب، كاميرات الأمان', fr: 'Systèmes de badges, serrures, caméras de sécurité' },
+    'Garden maintenance, lawn care, plant installation': { ar: 'صيانة الحدائق، رعاية المروج، زراعة النباتات', fr: 'Entretien de jardins, pelouse, plantation' },
+    'Pool cleaning, chemical balancing, equipment repair': { ar: 'تنظيف المسابح، توازن المواد الكيميائية، إصلاح المعدات', fr: 'Nettoyage de piscine, traitement chimique, réparation' },
+    'Dog walking, pet sitting, grooming': { ar: 'تمشية الكلاب، رعاية الحيوانات الأليفة، التنظيف', fr: 'Promenade de chiens, garde d\'animaux, toilettage' },
+    'Fitness training, wellness coaching, group classes': { ar: 'التدريب البدني، التوجيه الصحي، الفصول الجماعية', fr: 'Entraînement fitness, coaching bien-être, cours collectifs' },
+    'Local delivery, grocery delivery, courier services': { ar: 'التوصيل المحلي، توصيل البقالة، خدمات البريد السريع', fr: 'Livraison locale, courses, services de messagerie' },
+    'Local moving, furniture moving, packing services': { ar: 'النقل المحلي، نقل الأثاث، خدمات التعبئة', fr: 'Déménagement local, meubles, emballage' },
+    'Party planning, corporate events, wedding coordination': { ar: 'تخطيط الحفلات، الفعاليات المؤسسية، تنسيق الأعراس', fr: 'Organisation de fêtes, événements, mariages' },
+    'Event catering, meal prep, special dietary needs': { ar: 'تموين الفعاليات، إعداد الوجبات، الاحتياجات الغذائية الخاصة', fr: 'Traiteur événementiel, préparation de repas' },
   };
-  
-  // Function to provide complete Arabic translations for service descriptions
-  const translateDescription = (description) => {
-    if (!description) return description;
-    
-    // Complete Arabic descriptions for all services
-    const fullDescriptions = {
-      'Professional plumbing services including emergency repairs, pipe installations, and water heater maintenance': 
-        'خدمات سباكة مهنية تشمل إصلاحات الطوارئ وتركيب الأنابيب وصيانة سخانات المياه',
-      'Licensed electricians for all electrical needs including installations, repairs, and emergency services':
-        'كهربائيون مرخصون لجميع الاحتياجات الكهربائية تشمل التركيبات والإصلاحات وخدمات الطوارئ',
-      'Complete HVAC services including AC repair, heating system maintenance, and air quality solutions':
-        'خدمات تكييف وتهوية شاملة تشمل إصلاح المكيفات وصيانة أنظمة التدفئة وحلول جودة الهواء',
-      'Skilled handyman for general repairs, furniture assembly, and minor home improvements':
-        'فني ماهر للإصلاحات العامة وتجميع الأثاث والتحسينات المنزلية الطفيفة',
-      'Professional house cleaning services with flexible scheduling and eco-friendly options':
-        'خدمات تنظيف منازل مهنية مع جدولة مرنة وخيارات صديقة للبيئة',
-      'Professional carpet and upholstery cleaning using advanced equipment and safe cleaning solutions':
-        'تنظيف مهني للسجاد والمفروشات باستخدام معدات متطورة ومحاليل تنظيف آمنة',
-      'Professional window cleaning for crystal clear views, interior and exterior service available':
-        'تنظيف مهني للنوافذ للحصول على رؤية واضحة جداً، متوفر للداخل والخارج',
-      'Professional security services including patrol, monitoring, and special event security':
-        'خدمات أمنية مهنية تشمل الدورية والمراقبة وأمن الفعاليات الخاصة',
-      'Installation and maintenance of access control systems, smart locks, and surveillance equipment':
-        'تركيب وصيانة أنظمة التحكم بالدخول والأقفال الذكية ومعدات المراقبة',
-      'Complete landscaping services including garden design, lawn maintenance, and seasonal plant care':
-        'خدمات تنسيق حدائق شاملة تشمل تصميم الحدائق وصيانة المروج ورعاية النباتات الموسمية',
-      'Professional pool maintenance including cleaning, chemical treatment, and equipment servicing':
-        'صيانة مسابح مهنية تشمل التنظيف والمعالجة الكيميائية وخدمة المعدات',
-      'Trusted pet care services including walking, sitting, feeding, and basic grooming':
-        'خدمات رعاية حيوانات أليفة موثوقة تشمل المشي والجلوس والإطعام والتنظيف الأساسي',
-      'Certified personal trainers for individual sessions, group fitness, and wellness programs':
-        'مدربون شخصيون معتمدون للجلسات الفردية واللياقة الجماعية وبرامج العافية',
-      'Reliable delivery services for packages, groceries, and courier needs within the compound':
-        'خدمات توصيل موثوقة للطرود والبقالة واحتياجات البريد السريع داخل المجمع',
-      'Professional moving services for relocating within or outside the compound, including packing':
-        'خدمات نقل مهنية للانتقال داخل أو خارج المجمع، تشمل التعبئة',
-      'Full-service event planning for parties, corporate events, and special occasions':
-        'تخطيط شامل للفعاليات للحفلات والفعاليات المؤسسية والمناسبات الخاصة',
-      'Professional catering for events of all sizes with customizable menus and dietary accommodations':
-        'تموين مهني للفعاليات من جميع الأحجام مع قوائم قابلة للتخصيص وتلبية الاحتياجات الغذائية'
-    };
-    
-    // If exact match found, return complete Arabic description
-    if (fullDescriptions[description]) {
-      return fullDescriptions[description];
-    }
-    
-    // If no exact match, try partial replacement as fallback
-    let translatedDesc = description;
-    const wordReplacements = {
-      'Professional': 'مهني',
-      'Licensed': 'مرخص',
-      'Complete': 'شامل',
-      'Skilled': 'ماهر',
-      'Trusted': 'موثوق',
-      'Certified': 'معتمد',
-      'Reliable': 'موثوق',
-      'Emergency': 'طوارئ',
-      'Advanced': 'متطور',
-      'Flexible': 'مرن',
-      'Crystal clear': 'واضح جداً',
-      'Eco-friendly': 'صديق للبيئة',
-      'services': 'خدمات',
-      'including': t('sv_includes', 'تشمل'),
-      'and': 'و',
-      'for': 'لـ',
-      'with': 'مع'
-    };
-    
-    Object.entries(wordReplacements).forEach(([english, arabic]) => {
-      translatedDesc = translatedDesc.replace(new RegExp(`\\b${english}\\b`, 'gi'), arabic);
-    });
-    
-    return translatedDesc;
+
+  const descTranslations = {
+    'Professional plumbing services including emergency repairs, pipe installations, and water heater maintenance': { ar: 'خدمات سباكة مهنية تشمل إصلاحات الطوارئ وتركيب الأنابيب وصيانة سخانات المياه', fr: 'Services de plomberie professionnels incluant les urgences et installations' },
+    'Licensed electricians for all electrical needs including installations, repairs, and emergency services': { ar: 'كهربائيون مرخصون لجميع الاحتياجات الكهربائية تشمل التركيبات والإصلاحات وخدمات الطوارئ', fr: 'Électriciens certifiés pour tous les besoins électriques' },
+    'Complete HVAC services including AC repair, heating system maintenance, and air quality solutions': { ar: 'خدمات تكييف وتهوية شاملة تشمل إصلاح المكيفات وصيانة أنظمة التدفئة وحلول جودة الهواء', fr: 'Services CVC complets incluant réparation et maintenance' },
+    'Skilled handyman for general repairs, furniture assembly, and minor home improvements': { ar: 'فني ماهر للإصلاحات العامة وتجميع الأثاث والتحسينات المنزلية الطفيفة', fr: 'Technicien qualifié pour les réparations générales et améliorations' },
+    'Professional house cleaning services with flexible scheduling and eco-friendly options': { ar: 'خدمات تنظيف منازل مهنية مع جدولة مرنة وخيارات صديقة للبيئة', fr: 'Services de nettoyage professionnel avec horaires flexibles' },
+    'Professional carpet and upholstery cleaning using advanced equipment and safe cleaning solutions': { ar: 'تنظيف مهني للسجاد والمفروشات باستخدام معدات متطورة ومحاليل تنظيف آمنة', fr: 'Nettoyage professionnel de tapis et meubles' },
+    'Professional window cleaning for crystal clear views, interior and exterior service available': { ar: 'تنظيف مهني للنوافذ للحصول على رؤية واضحة جداً، متوفر للداخل والخارج', fr: 'Nettoyage de vitres professionnel intérieur et extérieur' },
+    'Professional security services including patrol, monitoring, and special event security': { ar: 'خدمات أمنية مهنية تشمل الدورية والمراقبة وأمن الفعاليات الخاصة', fr: 'Services de sécurité professionnels incluant patrouilles et surveillance' },
+    'Installation and maintenance of access control systems, smart locks, and surveillance equipment': { ar: 'تركيب وصيانة أنظمة التحكم بالدخول والأقفال الذكية ومعدات المراقبة', fr: 'Installation et maintenance de contrôle d\'accès et surveillance' },
+    'Complete landscaping services including garden design, lawn maintenance, and seasonal plant care': { ar: 'خدمات تنسيق حدائق شاملة تشمل تصميم الحدائق وصيانة المروج ورعاية النباتات الموسمية', fr: 'Services d\'aménagement paysager complets' },
+    'Professional pool maintenance including cleaning, chemical treatment, and equipment servicing': { ar: 'صيانة مسابح مهنية تشمل التنظيف والمعالجة الكيميائية وخدمة المعدات', fr: 'Entretien professionnel de piscine' },
+    'Trusted pet care services including walking, sitting, feeding, and basic grooming': { ar: 'خدمات رعاية حيوانات أليفة موثوقة تشمل المشي والجلوس والإطعام والتنظيف الأساسي', fr: 'Services de garde d\'animaux de confiance' },
+    'Certified personal trainers for individual sessions, group fitness, and wellness programs': { ar: 'مدربون شخصيون معتمدون للجلسات الفردية واللياقة الجماعية وبرامج العافية', fr: 'Coachs personnels certifiés pour sessions individuelles et collectives' },
+    'Reliable delivery services for packages, groceries, and courier needs within the compound': { ar: 'خدمات توصيل موثوقة للطرود والبقالة واحتياجات البريد السريع داخل المجمع', fr: 'Services de livraison fiables dans la résidence' },
+    'Professional moving services for relocating within or outside the compound, including packing': { ar: 'خدمات نقل مهنية للانتقال داخل أو خارج المجمع، تشمل التعبئة', fr: 'Services de déménagement professionnels incluant l\'emballage' },
+    'Full-service event planning for parties, corporate events, and special occasions': { ar: 'تخطيط شامل للفعاليات للحفلات والفعاليات المؤسسية والمناسبات الخاصة', fr: 'Planification complète d\'événements' },
+    'Professional catering for events of all sizes with customizable menus and dietary accommodations': { ar: 'تموين مهني للفعاليات من جميع الأحجام مع قوائم قابلة للتخصيص وتلبية الاحتياجات الغذائية', fr: 'Traiteur professionnel pour événements avec menus personnalisables' },
   };
+
+  const badgeTranslations = {
+    'Professional': { ar: 'مهني', fr: 'Professionnel' }, 'Licensed': { ar: 'مرخص', fr: 'Certifié' },
+    'Complete': { ar: 'شامل', fr: 'Complet' }, 'Skilled': { ar: 'ماهر', fr: 'Qualifié' },
+    'Trusted': { ar: 'موثوق', fr: 'De confiance' }, 'Certified': { ar: 'معتمد', fr: 'Certifié' },
+    'Reliable': { ar: 'موثوق', fr: 'Fiable' },
+  };
+
+  const translateSpecialty = (s) => (lang === 'en') ? s : (specTranslations[s]?.[lang] || s);
+  const translateDescription = (d) => !d ? d : (lang === 'en') ? d : (descTranslations[d]?.[lang] || d);
+  const translateBadge = (b) => (lang === 'en') ? b : (badgeTranslations[b]?.[lang] || b);
   
   // Function to generate Arabic names for service providers
   const getArabicServiceProviderName = (providerId) => {

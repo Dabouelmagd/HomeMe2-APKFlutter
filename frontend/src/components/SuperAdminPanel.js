@@ -16,27 +16,28 @@ import {
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
-const roleLabels = {
-  super_admin: 'مالك التطبيق',
-  company_admin: 'إدارة شركة',
-  admin: 'مدير مجتمع',
-  manager: 'إداري',
-  security: 'أمن',
-  resident: 'مقيم'
-};
-
-const roleColors = {
-  super_admin: 'bg-purple-100 text-purple-700',
-  company_admin: 'bg-indigo-100 text-indigo-700',
-  admin: 'bg-blue-100 text-blue-700',
-  manager: 'bg-emerald-100 text-emerald-700',
-  security: 'bg-amber-100 text-amber-700',
-  resident: 'bg-gray-100 text-gray-600'
-};
-
 const SuperAdminPanel = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+
+  const roleLabels = {
+    super_admin: t('role_super_admin', 'مالك التطبيق'),
+    company_admin: t('role_company_admin', 'إدارة شركة'),
+    admin: t('role_admin', 'مدير مجتمع'),
+    manager: t('role_manager', 'إداري'),
+    security: t('role_security', 'أمن'),
+    resident: t('role_resident', 'مقيم')
+  };
+
+  const roleColors = {
+    super_admin: 'bg-purple-100 text-purple-700',
+    company_admin: 'bg-indigo-100 text-indigo-700',
+    admin: 'bg-blue-100 text-blue-700',
+    manager: 'bg-emerald-100 text-emerald-700',
+    security: 'bg-amber-100 text-amber-700',
+    resident: 'bg-gray-100 text-gray-600'
+  };
+
   const [data, setData] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -77,17 +78,17 @@ const SuperAdminPanel = () => {
       setUsers(usersRes.data.users || []);
     } catch (err) {
       console.error(err);
-      toast.error('فشل في تحميل لوحة التحكم');
+      toast.error(t('sa_load_failed', 'فشل في تحميل لوحة التحكم'));
     } finally { setLoading(false); }
   };
 
   const handleChangeRole = async (userId, newRole) => {
     try {
       await axios.put(`${API}/super-admin/users/${userId}/role?role=${newRole}`, {}, getToken());
-      toast.success('تم تغيير الدور بنجاح');
+      toast.success(t('sa_role_changed', 'تم تغيير الدور بنجاح'));
       fetchDashboard();
     } catch (err) {
-      toast.error('فشل في تغيير الدور');
+      toast.error(t('sa_role_change_failed', 'فشل في تغيير الدور'));
     }
   };
 
@@ -122,16 +123,16 @@ const SuperAdminPanel = () => {
       await axios.put(`${API}/subscription-codes/${code}/toggle`, {}, getToken());
       toast.success('تم تحديث حالة الكود');
       fetchCodes();
-    } catch { toast.error('فشل'); }
+    } catch { toast.error(t('sa_failed', 'فشل')); }
   };
 
   const handleDeleteCode = async (code) => {
     if (!window.confirm('حذف هذا الكود نهائياً؟')) return;
     try {
       await axios.delete(`${API}/subscription-codes/${code}`, getToken());
-      toast.success('تم الحذف');
+      toast.success(t('sa_deleted', 'تم الحذف'));
       fetchCodes();
-    } catch { toast.error('فشل'); }
+    } catch { toast.error(t('sa_failed', 'فشل')); }
   };
 
   useEffect(() => { if (activeTab === 'codes') fetchCodes(); }, [activeTab]);
@@ -154,18 +155,18 @@ const SuperAdminPanel = () => {
   const handleCreateCoupon = async () => {
     try {
       await axios.post(`${API}/coupons`, newCoupon, getToken());
-      toast.success('تم إنشاء الكوبون');
+      toast.success(t('sa_coupon_created', 'تم إنشاء الكوبون'));
       setShowCreateCoupon(false);
       setNewCoupon({ code: '', discount_type: 'percentage', discount_value: 20, max_uses: 100, notes: '' });
       fetchCoupons();
-    } catch (err) { toast.error(err.response?.data?.detail || 'فشل'); }
+    } catch (err) { toast.error(err.response?.data?.detail || t('sa_failed', 'فشل')); }
   };
   const handleToggleCoupon = async (id) => {
-    try { await axios.put(`${API}/coupons/${id}/toggle`, {}, getToken()); toast.success('تم التحديث'); fetchCoupons(); } catch { toast.error('فشل'); }
+    try { await axios.put(`${API}/coupons/${id}/toggle`, {}, getToken()); toast.success(t('sa_updated', 'تم التحديث')); fetchCoupons(); } catch { toast.error(t('sa_failed', 'فشل')); }
   };
   const handleDeleteCoupon = async (id) => {
     if (!window.confirm('حذف الكوبون؟')) return;
-    try { await axios.delete(`${API}/coupons/${id}`, getToken()); toast.success('تم الحذف'); fetchCoupons(); } catch { toast.error('فشل'); }
+    try { await axios.delete(`${API}/coupons/${id}`, getToken()); toast.success(t('sa_deleted', 'تم الحذف')); fetchCoupons(); } catch { toast.error(t('sa_failed', 'فشل')); }
   };
   useEffect(() => { if (activeTab === 'coupons') fetchCoupons(); }, [activeTab]);
 
@@ -176,18 +177,18 @@ const SuperAdminPanel = () => {
   const handleCreateAd = async () => {
     try {
       await axios.post(`${API}/ads`, newAd, getToken());
-      toast.success('تم إنشاء الإعلان');
+      toast.success(t('sa_ad_created', 'تم إنشاء الإعلان'));
       setShowCreateAd(false);
       setNewAd({ title: '', image_url: '', link_url: '', description: '', position: 'banner', target_compounds: [] });
       fetchAds();
-    } catch (err) { toast.error(err.response?.data?.detail || 'فشل'); }
+    } catch (err) { toast.error(err.response?.data?.detail || t('sa_failed', 'فشل')); }
   };
   const handleToggleAd = async (id) => {
-    try { await axios.put(`${API}/ads/${id}/toggle`, {}, getToken()); toast.success('تم التحديث'); fetchAds(); } catch { toast.error('فشل'); }
+    try { await axios.put(`${API}/ads/${id}/toggle`, {}, getToken()); toast.success(t('sa_updated', 'تم التحديث')); fetchAds(); } catch { toast.error(t('sa_failed', 'فشل')); }
   };
   const handleDeleteAd = async (id) => {
     if (!window.confirm('حذف الإعلان؟')) return;
-    try { await axios.delete(`${API}/ads/${id}`, getToken()); toast.success('تم الحذف'); fetchAds(); } catch { toast.error('فشل'); }
+    try { await axios.delete(`${API}/ads/${id}`, getToken()); toast.success(t('sa_deleted', 'تم الحذف')); fetchAds(); } catch { toast.error(t('sa_failed', 'فشل')); }
   };
   useEffect(() => { if (activeTab === 'ads') fetchAds(); }, [activeTab]);
 
@@ -232,13 +233,13 @@ const SuperAdminPanel = () => {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-8" data-testid="super-stats">
           {[
-            { label: 'المجتمعات', value: stats.total_compounds, color: 'from-purple-500 to-indigo-600', icon: BuildingOfficeIcon },
-            { label: 'المستخدمين', value: stats.total_users, color: 'from-blue-500 to-cyan-600', icon: UsersIcon },
-            { label: 'المقيمين', value: stats.total_residents, color: 'from-emerald-500 to-green-600', icon: UserGroupIcon },
-            { label: 'المدراء', value: stats.total_admins, color: 'from-amber-500 to-orange-600', icon: ShieldCheckIcon },
-            { label: 'الإيرادات', value: (stats.total_revenue || 0).toLocaleString(), color: 'from-green-500 to-emerald-600', icon: BanknotesIcon },
-            { label: 'المصروفات', value: (stats.total_expenses || 0).toLocaleString(), color: 'from-red-500 to-pink-600', icon: BanknotesIcon },
-            { label: 'صافي', value: (stats.net_balance || 0).toLocaleString(), color: 'from-indigo-500 to-purple-600', icon: GlobeAltIcon },
+            { label: t('sa_compounds', 'المجتمعات'), value: stats.total_compounds, color: 'from-purple-500 to-indigo-600', icon: BuildingOfficeIcon },
+            { label: t('sa_users', 'المستخدمين'), value: stats.total_users, color: 'from-blue-500 to-cyan-600', icon: UsersIcon },
+            { label: t('sa_residents', 'المقيمين'), value: stats.total_residents, color: 'from-emerald-500 to-green-600', icon: UserGroupIcon },
+            { label: t('sa_admins', 'المدراء'), value: stats.total_admins, color: 'from-amber-500 to-orange-600', icon: ShieldCheckIcon },
+            { label: t('sa_revenue', 'الإيرادات'), value: (stats.total_revenue || 0).toLocaleString(), color: 'from-green-500 to-emerald-600', icon: BanknotesIcon },
+            { label: t('sa_expenses', 'المصروفات'), value: (stats.total_expenses || 0).toLocaleString(), color: 'from-red-500 to-pink-600', icon: BanknotesIcon },
+            { label: t('sa_net', 'صافي'), value: (stats.net_balance || 0).toLocaleString(), color: 'from-indigo-500 to-purple-600', icon: GlobeAltIcon },
           ].map((s, i) => {
             const Icon = s.icon;
             return (
@@ -254,13 +255,13 @@ const SuperAdminPanel = () => {
         {/* Tabs */}
         <div className="flex gap-2 mb-6">
           {[
-            { id: 'overview', label: 'المجتمعات' },
-            { id: 'users', label: 'المستخدمين' },
-            { id: 'codes', label: 'أكواد الاشتراك' },
-            { id: 'coupons', label: 'كوبونات الخصم' },
-            { id: 'ads', label: 'الإعلانات' },
-            { id: 'referrals', label: 'الإحالات' },
-            { id: 'analytics', label: 'تحليلات الاشتراكات' },
+            { id: 'overview', label: t('sa_compounds') },
+            { id: 'users', label: t('sa_users') },
+            { id: 'codes', label: t('sa_sub_codes', 'أكواد الاشتراك') },
+            { id: 'coupons', label: t('sa_coupons', 'كوبونات الخصم') },
+            { id: 'ads', label: t('sa_ads', 'الإعلانات') },
+            { id: 'referrals', label: t('sa_referrals', 'الإحالات') },
+            { id: 'analytics', label: t('sa_analytics', 'تحليلات الاشتراكات') },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`px-5 py-2.5 rounded-lg text-sm font-medium ${activeTab === tab.id ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
@@ -280,7 +281,7 @@ const SuperAdminPanel = () => {
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="bg-gray-900 rounded-lg p-2 text-center">
                     <p className="text-lg font-bold text-blue-400">{c.users}</p>
-                    <p className="text-xs text-gray-500">مستخدم</p>
+                    <p className="text-xs text-gray-500">{t('sa_used', 'مستخدم')}</p>
                   </div>
                   <div className="bg-gray-900 rounded-lg p-2 text-center">
                     <p className="text-lg font-bold text-emerald-400">{c.families}</p>
@@ -300,11 +301,11 @@ const SuperAdminPanel = () => {
           <div>
             <div className="flex gap-2 mb-4">
               <select value={roleFilter} onChange={e => setRoleFilter(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white" data-testid="role-filter">
-                <option value="">كل الأدوار</option>
+                <option value="">{t('sa_all_roles', 'كل الأدوار')}</option>
                 {Object.entries(roleLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
               <select value={compoundFilter} onChange={e => setCompoundFilter(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white">
-                <option value="">كل المجتمعات</option>
+                <option value="">{t('sa_all_compounds', 'كل المجتمعات')}</option>
                 {compounds.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
               <span className="text-sm text-gray-400 self-center">{filteredUsers.length} مستخدم</span>
@@ -315,10 +316,10 @@ const SuperAdminPanel = () => {
                 <thead className="bg-gray-900">
                   <tr>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">الاسم</th>
-                    <th className="px-4 py-3 text-right text-gray-400 font-medium">المستخدم</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_user', 'المستخدم')}</th>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">البريد</th>
-                    <th className="px-4 py-3 text-right text-gray-400 font-medium">الدور</th>
-                    <th className="px-4 py-3 text-right text-gray-400 font-medium">تغيير الدور</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_role', 'الدور')}</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_change_role', 'تغيير الدور')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
@@ -356,11 +357,11 @@ const SuperAdminPanel = () => {
             {/* Code Stats */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
               {[
-                { label: 'إجمالي الأكواد', value: codeStats.total || 0, color: 'text-blue-400' },
-                { label: 'نشطة', value: codeStats.active || 0, color: 'text-green-400' },
-                { label: 'مستخدمة', value: codeStats.used || 0, color: 'text-amber-400' },
-                { label: 'معطلة', value: codeStats.disabled || 0, color: 'text-red-400' },
-                { label: 'إجمالي التفعيلات', value: codeStats.total_activations || 0, color: 'text-purple-400' },
+                { label: t('sa_total_codes', 'إجمالي الأكواد'), value: codeStats.total || 0, color: 'text-blue-400' },
+                { label: t('sa_active_count', 'نشطة'), value: codeStats.active || 0, color: 'text-green-400' },
+                { label: t('sa_used_count', 'مستخدمة'), value: codeStats.used || 0, color: 'text-amber-400' },
+                { label: t('sa_disabled_count', 'معطلة'), value: codeStats.disabled || 0, color: 'text-red-400' },
+                { label: t('sa_total_activations', 'إجمالي التفعيلات'), value: codeStats.total_activations || 0, color: 'text-purple-400' },
               ].map((s, i) => (
                 <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
                   <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
@@ -394,7 +395,7 @@ const SuperAdminPanel = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">الخطة</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_plan', 'الخطة')}</label>
                     <select value={newCode.plan} onChange={e => setNewCode({...newCode, plan: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
                       <option value="starter">مجاني</option>
                       <option value="basic">أساسي</option>
@@ -410,11 +411,11 @@ const SuperAdminPanel = () => {
                     <input type="number" min="1" max="1000" value={newCode.max_uses} onChange={e => setNewCode({...newCode, max_uses: parseInt(e.target.value) || 1})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">كود مخصص (اختياري)</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_custom_code', 'كود مخصص (اختياري)')}</label>
                     <input type="text" placeholder="مثل: VIP-2026" value={newCode.custom_code} onChange={e => setNewCode({...newCode, custom_code: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">ملاحظات</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_notes', 'ملاحظات')}</label>
                     <input type="text" placeholder="ملاحظات..." value={newCode.notes} onChange={e => setNewCode({...newCode, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
@@ -425,7 +426,7 @@ const SuperAdminPanel = () => {
                 <div className="flex gap-3">
                   <button onClick={() => handleCreateCode(false)} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">إنشاء كود واحد</button>
                   <button onClick={() => handleCreateCode(true)} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">إنشاء {bulkCount} كود</button>
-                  <button onClick={() => setShowCreateCode(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600">إلغاء</button>
+                  <button onClick={() => setShowCreateCode(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm hover:bg-gray-600">{t('sa_cancel', 'إلغاء')}</button>
                 </div>
               </div>
             )}
@@ -435,12 +436,12 @@ const SuperAdminPanel = () => {
               <table className="w-full text-sm">
                 <thead className="bg-gray-900/50">
                   <tr>
-                    <th className="px-4 py-3 text-right text-gray-400 font-medium">الكود</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_code', 'الكود')}</th>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">الفترة</th>
-                    <th className="px-4 py-3 text-right text-gray-400 font-medium">الخطة</th>
+                    <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_plan', 'الخطة')}</th>
                     <th className="px-4 py-3 text-center text-gray-400 font-medium">الاستخدام</th>
-                    <th className="px-4 py-3 text-center text-gray-400 font-medium">الحالة</th>
-                    <th className="px-4 py-3 text-center text-gray-400 font-medium">إجراءات</th>
+                    <th className="px-4 py-3 text-center text-gray-400 font-medium">{t('sa_status', 'الحالة')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400 font-medium">{t('sa_actions', 'إجراءات')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
@@ -465,14 +466,14 @@ const SuperAdminPanel = () => {
                             <button onClick={() => handleToggleCode(c.code)} className={`px-2 py-1 text-xs rounded ${c.is_active ? 'bg-amber-600/20 text-amber-400 hover:bg-amber-600/30' : 'bg-green-600/20 text-green-400 hover:bg-green-600/30'}`}>
                               {c.is_active ? 'تعطيل' : 'تفعيل'}
                             </button>
-                            <button onClick={() => handleDeleteCode(c.code)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded hover:bg-red-600/30">حذف</button>
+                            <button onClick={() => handleDeleteCode(c.code)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded hover:bg-red-600/30">{t('sa_delete', 'حذف')}</button>
                           </div>
                         </td>
                       </tr>
                     );
                   })}
                   {codes.length === 0 && (
-                    <tr><td colSpan="6" className="px-4 py-8 text-center text-gray-500">لا توجد أكواد بعد</td></tr>
+                    <tr><td colSpan="6" className="px-4 py-8 text-center text-gray-500">{t('sa_no_codes', 'لا توجد أكواد بعد')}</td></tr>
                   )}
                 </tbody>
               </table>
@@ -484,9 +485,9 @@ const SuperAdminPanel = () => {
           <div data-testid="coupons-tab">
             <div className="grid grid-cols-3 gap-4 mb-6">
               {[
-                { label: 'إجمالي الكوبونات', value: couponStats.total || 0, color: 'text-blue-400' },
-                { label: 'نشطة', value: couponStats.active || 0, color: 'text-green-400' },
-                { label: 'إجمالي الاستخدامات', value: couponStats.total_uses || 0, color: 'text-purple-400' },
+                { label: t('sa_total_coupons', 'إجمالي الكوبونات'), value: couponStats.total || 0, color: 'text-blue-400' },
+                { label: t('sa_active_count', 'نشطة'), value: couponStats.active || 0, color: 'text-green-400' },
+                { label: t('sa_total_uses', 'إجمالي الاستخدامات'), value: couponStats.total_uses || 0, color: 'text-purple-400' },
               ].map((s, i) => (
                 <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
                   <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
@@ -501,14 +502,14 @@ const SuperAdminPanel = () => {
 
             {showCreateCoupon && (
               <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
-                <h3 className="text-lg font-bold mb-4">إنشاء كوبون خصم</h3>
+                <h3 className="text-lg font-bold mb-4">{t('sa_create_coupon', 'إنشاء كوبون خصم')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">كود الكوبون</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_coupon_code', 'كود الكوبون')}</label>
                     <input type="text" value={newCoupon.code} onChange={e => setNewCoupon({...newCoupon, code: e.target.value})} placeholder="مثل: WELCOME20" className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">نوع الخصم</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_discount_type', 'نوع الخصم')}</label>
                     <select value={newCoupon.discount_type} onChange={e => setNewCoupon({...newCoupon, discount_type: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
                       <option value="percentage">نسبة مئوية %</option>
                       <option value="fixed">مبلغ ثابت (ج.م)</option>
@@ -519,17 +520,17 @@ const SuperAdminPanel = () => {
                     <input type="number" min="1" value={newCoupon.discount_value} onChange={e => setNewCoupon({...newCoupon, discount_value: parseFloat(e.target.value) || 0})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">الحد الأقصى للاستخدام</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_max_usage', 'الحد الأقصى للاستخدام')}</label>
                     <input type="number" min="1" value={newCoupon.max_uses} onChange={e => setNewCoupon({...newCoupon, max_uses: parseInt(e.target.value) || 1})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">ملاحظات</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_notes', 'ملاحظات')}</label>
                     <input type="text" value={newCoupon.notes} onChange={e => setNewCoupon({...newCoupon, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="ملاحظات..." />
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={handleCreateCoupon} disabled={!newCoupon.code.trim()} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 disabled:opacity-50">إنشاء الكوبون</button>
-                  <button onClick={() => setShowCreateCoupon(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">إلغاء</button>
+                  <button onClick={handleCreateCoupon} disabled={!newCoupon.code.trim()} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 disabled:opacity-50">{t('sa_create_coupon_btn', 'إنشاء الكوبون')}</button>
+                  <button onClick={() => setShowCreateCoupon(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
                 </div>
               </div>
             )}
@@ -541,8 +542,8 @@ const SuperAdminPanel = () => {
                     <th className="px-4 py-3 text-right text-gray-400">الكوبون</th>
                     <th className="px-4 py-3 text-right text-gray-400">الخصم</th>
                     <th className="px-4 py-3 text-center text-gray-400">الاستخدام</th>
-                    <th className="px-4 py-3 text-center text-gray-400">الحالة</th>
-                    <th className="px-4 py-3 text-center text-gray-400">إجراءات</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_status', 'الحالة')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_actions', 'إجراءات')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
@@ -564,13 +565,13 @@ const SuperAdminPanel = () => {
                           <button onClick={() => handleToggleCoupon(c.id)} className={`px-2 py-1 text-xs rounded ${c.is_active ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'}`}>
                             {c.is_active ? 'تعطيل' : 'تفعيل'}
                           </button>
-                          <button onClick={() => handleDeleteCoupon(c.id)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">حذف</button>
+                          <button onClick={() => handleDeleteCoupon(c.id)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">{t('sa_delete', 'حذف')}</button>
                         </div>
                       </td>
                     </tr>
                   ))}
                   {coupons.length === 0 && (
-                    <tr><td colSpan="5" className="px-4 py-8 text-center text-gray-500">لا توجد كوبونات بعد</td></tr>
+                    <tr><td colSpan="5" className="px-4 py-8 text-center text-gray-500">{t('sa_no_coupons', 'لا توجد كوبونات بعد')}</td></tr>
                   )}
                 </tbody>
               </table>
@@ -583,10 +584,10 @@ const SuperAdminPanel = () => {
           <div data-testid="ads-tab">
             <div className="grid grid-cols-4 gap-4 mb-6">
               {[
-                { label: 'إجمالي الإعلانات', value: adStats.total || 0, color: 'text-blue-400' },
-                { label: 'نشطة', value: adStats.active || 0, color: 'text-green-400' },
-                { label: 'إجمالي النقرات', value: adStats.total_clicks || 0, color: 'text-amber-400' },
-                { label: 'إجمالي المشاهدات', value: adStats.total_views || 0, color: 'text-purple-400' },
+                { label: t('sa_total_ads', 'إجمالي الإعلانات'), value: adStats.total || 0, color: 'text-blue-400' },
+                { label: t('sa_active_count', 'نشطة'), value: adStats.active || 0, color: 'text-green-400' },
+                { label: t('sa_total_clicks', 'إجمالي النقرات'), value: adStats.total_clicks || 0, color: 'text-amber-400' },
+                { label: t('sa_total_views', 'إجمالي المشاهدات'), value: adStats.total_views || 0, color: 'text-purple-400' },
               ].map((s, i) => (
                 <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
                   <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
@@ -601,14 +602,14 @@ const SuperAdminPanel = () => {
 
             {showCreateAd && (
               <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
-                <h3 className="text-lg font-bold mb-4">إنشاء إعلان داخلي</h3>
+                <h3 className="text-lg font-bold mb-4">{t('sa_create_ad', 'إنشاء إعلان داخلي')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">عنوان الإعلان</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_title', 'عنوان الإعلان')}</label>
                     <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="عنوان الإعلان" />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">رفع صورة أو فيديو</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_media', 'رفع صورة أو فيديو')}</label>
                     <input type="file" accept="image/*,video/mp4,video/webm" onChange={async (e) => {
                       const file = e.target.files[0];
                       if (!file) return;
@@ -618,35 +619,35 @@ const SuperAdminPanel = () => {
                         const res = await axios.post(`${API}/ads/upload-media`, formData, { ...getToken(), headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
                         setNewAd({...newAd, image_url: res.data.url});
                         toast.success(`تم رفع ${res.data.type === 'video' ? 'الفيديو' : 'الصورة'}`);
-                      } catch (err) { toast.error(err.response?.data?.detail || 'فشل في الرفع'); }
+                      } catch (err) { toast.error(err.response?.data?.detail || t('sa_upload_failed', 'فشل في الرفع')); }
                     }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:text-xs file:cursor-pointer" />
                     {newAd.image_url && <p className="text-xs text-green-400 mt-1">تم الرفع: {newAd.image_url}</p>}
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">أو رابط صورة خارجي</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_ext_image', 'أو رابط صورة خارجي')}</label>
                     <input type="text" value={newAd.image_url} onChange={e => setNewAd({...newAd, image_url: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">رابط الإعلان</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_link', 'رابط الإعلان')}</label>
                     <input type="text" value={newAd.link_url} onChange={e => setNewAd({...newAd, link_url: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">الوصف</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_description', 'الوصف')}</label>
                     <input type="text" value={newAd.description} onChange={e => setNewAd({...newAd, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="وصف مختصر..." />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">الموقع</label>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_position', 'الموقع')}</label>
                     <select value={newAd.position} onChange={e => setNewAd({...newAd, position: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
-                      <option value="banner">بانر أعلى</option>
-                      <option value="sidebar">شريط جانبي</option>
-                      <option value="inline">داخل المحتوى</option>
-                      <option value="dashboard">لوحة التحكم</option>
+                      <option value="banner">{t('sa_pos_banner', 'بانر أعلى')}</option>
+                      <option value="sidebar">{t('sa_pos_sidebar', 'شريط جانبي')}</option>
+                      <option value="inline">{t('sa_pos_inline', 'داخل المحتوى')}</option>
+                      <option value="dashboard">{t('sa_pos_dashboard', 'لوحة التحكم')}</option>
                     </select>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={handleCreateAd} disabled={!newAd.title.trim()} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 disabled:opacity-50">إنشاء الإعلان</button>
-                  <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">إلغاء</button>
+                  <button onClick={handleCreateAd} disabled={!newAd.title.trim()} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 disabled:opacity-50">{t('sa_create_ad_btn', 'إنشاء الإعلان')}</button>
+                  <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
                 </div>
               </div>
             )}
@@ -655,11 +656,11 @@ const SuperAdminPanel = () => {
               <table className="w-full text-sm">
                 <thead className="bg-gray-900/50">
                   <tr>
-                    <th className="px-4 py-3 text-right text-gray-400">العنوان</th>
-                    <th className="px-4 py-3 text-right text-gray-400">الموقع</th>
-                    <th className="px-4 py-3 text-center text-gray-400">النقرات</th>
-                    <th className="px-4 py-3 text-center text-gray-400">الحالة</th>
-                    <th className="px-4 py-3 text-center text-gray-400">إجراءات</th>
+                    <th className="px-4 py-3 text-right text-gray-400">{t('sa_title', 'العنوان')}</th>
+                    <th className="px-4 py-3 text-right text-gray-400">{t('sa_position', 'الموقع')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_clicks', 'النقرات')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_status', 'الحالة')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_actions', 'إجراءات')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
@@ -683,14 +684,14 @@ const SuperAdminPanel = () => {
                             <button onClick={() => handleToggleAd(a.id)} className={`px-2 py-1 text-xs rounded ${a.is_active ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'}`}>
                               {a.is_active ? 'تعطيل' : 'تفعيل'}
                             </button>
-                            <button onClick={() => handleDeleteAd(a.id)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">حذف</button>
+                            <button onClick={() => handleDeleteAd(a.id)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">{t('sa_delete', 'حذف')}</button>
                           </div>
                         </td>
                       </tr>
                     );
                   })}
                   {ads.length === 0 && (
-                    <tr><td colSpan="5" className="px-4 py-8 text-center text-gray-500">لا توجد إعلانات بعد</td></tr>
+                    <tr><td colSpan="5" className="px-4 py-8 text-center text-gray-500">{t('sa_no_ads', 'لا توجد إعلانات بعد')}</td></tr>
                   )}
                 </tbody>
               </table>
@@ -705,9 +706,9 @@ const SuperAdminPanel = () => {
               <>
                 <div className="grid grid-cols-3 gap-4 mb-6">
                   {[
-                    { label: 'أكواد الإحالة', value: refStats.total_referral_codes, color: 'text-blue-400' },
-                    { label: 'إجمالي الإحالات', value: refStats.total_referrals, color: 'text-green-400' },
-                    { label: 'كوبونات مكتسبة', value: refStats.total_coupons_earned, color: 'text-amber-400' },
+                    { label: t('sa_ref_codes', 'أكواد الإحالة'), value: refStats.total_referral_codes, color: 'text-blue-400' },
+                    { label: t('sa_total_referrals', 'إجمالي الإحالات'), value: refStats.total_referrals, color: 'text-green-400' },
+                    { label: t('sa_earned_coupons', 'كوبونات مكتسبة'), value: refStats.total_coupons_earned, color: 'text-amber-400' },
                   ].map((s, i) => (
                     <div key={i} className="bg-gray-800 rounded-xl p-5 border border-gray-700 text-center">
                       <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
@@ -716,7 +717,7 @@ const SuperAdminPanel = () => {
                   ))}
                 </div>
                 <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
-                  <h3 className="font-bold text-lg mb-4">أفضل المُحيلين</h3>
+                  <h3 className="font-bold text-lg mb-4">{t('sa_top_referrers', 'أفضل المُحيلين')}</h3>
                   {refStats.top_referrers?.length > 0 ? (
                     <div className="space-y-2">
                       {refStats.top_referrers.map((r, i) => (
@@ -725,17 +726,17 @@ const SuperAdminPanel = () => {
                           <span className="font-mono text-green-400 text-sm">{r.code}</span>
                           <div className="flex-1" />
                           <span className="text-lg font-bold text-white">{r.total}</span>
-                          <span className="text-xs text-gray-400">إحالة</span>
+                          <span className="text-xs text-gray-400">{t('sa_referral', 'إحالة')}</span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center text-gray-500 py-4">لا توجد إحالات بعد</p>
+                    <p className="text-center text-gray-500 py-4">{t('sa_no_referrals', 'لا توجد إحالات بعد')}</p>
                   )}
                 </div>
               </>
             ) : (
-              <div className="text-center py-10 text-gray-500">جاري التحميل...</div>
+              <div className="text-center py-10 text-gray-500">{t('sa_loading', 'جاري التحميل...')}</div>
             )}
           </div>
         )}
@@ -747,8 +748,8 @@ const SuperAdminPanel = () => {
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-white">إشعارات البريد الإلكتروني</h3>
-                  <p className="text-xs text-gray-400 mt-1">إرسال تذكيرات تجديد الاشتراك من info@datalifeai.com</p>
+                  <h3 className="font-bold text-white">{t('sa_email_notif', 'إشعارات البريد الإلكتروني')}</h3>
+                  <p className="text-xs text-gray-400 mt-1">{t('sa_send_from')} info@datalifeai.com</p>
                 </div>
                 <button onClick={async () => {
                   try {
@@ -763,10 +764,10 @@ const SuperAdminPanel = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               {[
-                { label: 'إجمالي المستخدمين', value: subAnalytics.total_users, color: 'text-blue-400' },
-                { label: 'اشتراكات نشطة', value: subAnalytics.active_subscriptions, color: 'text-green-400' },
-                { label: 'بدون اشتراك', value: subAnalytics.free_users, color: 'text-gray-400' },
-                { label: 'تجريبي', value: subAnalytics.trial_users, color: 'text-amber-400' },
+                { label: t('sa_total_users', 'إجمالي المستخدمين'), value: subAnalytics.total_users, color: 'text-blue-400' },
+                { label: t('sa_active_subs', 'اشتراكات نشطة'), value: subAnalytics.active_subscriptions, color: 'text-green-400' },
+                { label: t('sa_free_users', 'بدون اشتراك'), value: subAnalytics.free_users, color: 'text-gray-400' },
+                { label: t('sa_trial_users', 'تجريبي'), value: subAnalytics.trial_users, color: 'text-amber-400' },
               ].map((s, i) => (
                 <div key={i} className="bg-gray-800 rounded-xl p-5 border border-gray-700 text-center">
                   <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
@@ -814,8 +815,8 @@ const SuperAdminPanel = () => {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="text-gray-400 border-b border-gray-700">
-                        <th className="text-right py-2 px-3">المستخدم</th>
-                        <th className="text-right py-2 px-3">الخطة</th>
+                        <th className="text-right py-2 px-3">{t('sa_user', 'المستخدم')}</th>
+                        <th className="text-right py-2 px-3">{t('sa_plan', 'الخطة')}</th>
                         <th className="text-center py-2 px-3">أيام متبقية</th>
                         <th className="text-center py-2 px-3">تاريخ الانتهاء</th>
                       </tr>
@@ -841,7 +842,7 @@ const SuperAdminPanel = () => {
           </div>
         )}
         {activeTab === 'analytics' && !subAnalytics && (
-          <div className="text-center py-10 text-gray-500">جاري التحميل...</div>
+          <div className="text-center py-10 text-gray-500">{t('sa_loading', 'جاري التحميل...')}</div>
         )}
 
       </div>

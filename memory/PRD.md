@@ -80,10 +80,11 @@
 - Status: Configured, pending Google approval for domain
 
 ## Translations
-- 250+ translation keys for full app localization
+- 350+ translation keys for full app localization
 - HomePage: 100% translated (all sections, plans, features, comparisons)
-- AdminDashboard: Translated (stats, actions, referral, ads)
-- SubscriptionManagement: Translated (plans, durations, payments, invoices)
+- AdminDashboard: 100% translated (stats, ads, referral program)
+- SubscriptionManagement: 100% translated (plans, durations, payments, invoices)
+- SuperAdminPanel: 100% translated (7 tabs, stats, forms, tables, roles, CRUD)
 - Email notifications: Full AR/EN/FR templates (invoices, reminders, welcome)
 - i18next: `load: 'languageOnly'` + `supportedLngs: ['en', 'ar', 'fr']`
 

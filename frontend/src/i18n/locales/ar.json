@@ -2621,5 +2621,12 @@
   "send_daily_report": "إرسال تقرير يومي",
   "total_family_members": "إجمالي أفراد العائلات",
   "open_maintenance_requests": "طلبات صيانة مفتوحة",
-  "family_member_count": "عدد أفراد الأسرة"
+  "family_member_count": "عدد أفراد الأسرة",
+  "as_select_compound": "اختر المجمع السكني",
+  "as_select_desc": "اختر المجمع الذي تريد الدخول إليه",
+  "as_my_compound": "مجمعي السكني",
+  "as_users": "مستخدم",
+  "as_families": "أسرة",
+  "as_remember": "تذكر اختياري (الدخول مباشرة في المرة القادمة)",
+  "as_continue": "متابعة"
 }

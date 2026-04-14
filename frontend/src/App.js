@@ -98,6 +98,7 @@ import HelpCenter from './components/HelpCenter';
 import MobileOptimized from './components/MobileOptimized';
 // SubscriptionCodesManagement replaced by SubscriptionCodesUnified
 import SubscriptionActivation from './components/SubscriptionActivation';
+import AccountSelector from './components/AccountSelector';
 import { Toaster } from './components/ui/sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -228,6 +229,8 @@ const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('selectedCompoundId');
+    localStorage.removeItem('rememberCompound');
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     
@@ -397,6 +400,11 @@ function App() {
           <Route path="/legal" element={<TermsPrivacy />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/debug-login" element={<DebugLogin />} />
+                <Route path="/select-account" element={
+                  <ProtectedRoute>
+                    <AccountSelector />
+                  </ProtectedRoute>
+                } />
                 <Route path="/account-type-selection" element={<PublicAccountTypeSelection />} />
                 <Route path="/public-account-type-selection" element={<Navigate to="/" replace />} />
                 

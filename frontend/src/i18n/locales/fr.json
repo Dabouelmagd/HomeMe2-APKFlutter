@@ -2880,5 +2880,12 @@
   "distribute_sqm_note": "Distribution par surface",
   "distribute_custom_note": "Montant personnalise par unite",
   "create_and_distribute": "Creer et distribuer",
-  "obligation_title_placeholder": "ex: Frais de maintenance Janvier 2026"
+  "obligation_title_placeholder": "ex: Frais de maintenance Janvier 2026",
+  "as_select_compound": "Choisir la residence",
+  "as_select_desc": "Choisissez la residence a laquelle vous souhaitez acceder",
+  "as_my_compound": "Ma residence",
+  "as_users": "utilisateurs",
+  "as_families": "familles",
+  "as_remember": "Se souvenir de mon choix (passer cet ecran la prochaine fois)",
+  "as_continue": "Continuer"
 }

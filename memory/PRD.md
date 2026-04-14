@@ -1,32 +1,25 @@
 # HomeMe PRD
 
 ## Architecture
-- **Frontend**: React + Tailwind + Recharts + i18next + Cairo
-- **Backend**: FastAPI + MongoDB + Stripe + PayPal + WebAuthn
-- **server.py**: 47 route modules
-- **i18n**: `en.json` (2914 keys), `ar.json` (2326 keys), `fr.json` (2717 keys)
+- Frontend: React + Tailwind + Recharts + i18next
+- Backend: FastAPI + MongoDB + Stripe + PayPal
+- i18n: en.json (2921 keys), ar.json (2471 keys), fr.json (2724 keys)
 
-## Completed (Apr 14, 2026)
+## Latest: Account Selector (Apr 14, 2026)
+- New `/select-account` screen after login
+- Shows all user compounds as selectable cards
+- "Remember my choice" checkbox to skip next time
+- Auto-redirect if only 1 compound
+- Clears selection on logout
+- Files: AccountSelector.js, App.js (route + logout), Login.js (redirect)
 
-### Translation Management System
-- Backend API (`routes/translations.py`): 7 endpoints for CRUD, export/import
-- Frontend (`TranslationManager.js`): Stats cards, searchable table, inline editing, export/import
-- Integrated as tab in Super Admin Panel
-
-### Financial Management i18n Fix
-- Added 95+ missing English/French translation keys for CompoundFinance.js
-- All financial labels, months, categories, actions now fully translated
-- Fixed: total_revenue, net_balance, collection_rate, expenses_by_category, obligations_summary, months, etc.
-
-### i18n Localization - COMPLETE
-All components use t() function. i18n split into 3 JSON locale files.
-
-### Previously Completed
+## Completed Features
+- Account Selector, Translation Management (Super Admin)
+- Full i18n (EN/AR/FR) with split JSON files
 - Payment (Stripe + PayPal), Subscriptions, 14-Day Trial
-- Internal Ads, Google AdSense (pub-5928973437129941)
-- Referral Program, PDF Invoices, Email Notifications
-- Written Guide (23 sections), Plan Comparison Tables
+- Internal Ads, Google AdSense, Referral Program
+- PDF Invoices, Email Notifications, Written Guide
 
 ## Backlog
-- P2: Bank transfer API (pending user details)
+- P2: Bank transfer API (pending details)
 - P2: Smart Devices & Automation (deferred)

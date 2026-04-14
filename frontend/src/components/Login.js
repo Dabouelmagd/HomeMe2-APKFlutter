@@ -30,7 +30,7 @@ const Login = () => {
   const location = useLocation();
   
   // Get the original page the user was trying to access
-  const from = location.state?.from || '/app/dashboard';
+  const from = location.state?.from || '/select-account';
 
   // Check for saved credentials and biometric availability on mount
   useEffect(() => {

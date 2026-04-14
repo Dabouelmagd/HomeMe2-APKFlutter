@@ -3098,5 +3098,12 @@
   "distribute_sqm_note": "Amount distributed by unit area",
   "distribute_custom_note": "Set custom amount per unit",
   "create_and_distribute": "Create and Distribute",
-  "obligation_title_placeholder": "e.g. Maintenance fees January 2026"
+  "obligation_title_placeholder": "e.g. Maintenance fees January 2026",
+  "as_select_compound": "Select Compound",
+  "as_select_desc": "Choose the compound you want to access",
+  "as_my_compound": "My Compound",
+  "as_users": "users",
+  "as_families": "families",
+  "as_remember": "Remember my choice (skip this screen next time)",
+  "as_continue": "Continue"
 }

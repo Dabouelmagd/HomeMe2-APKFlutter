@@ -2449,5 +2449,7 @@
   "no_items_found": "لا توجد عناصر",
   "no_items_found_description": "لا توجد أحداث أو إعلانات حالياً",
   "engagement": "المشاركة",
-  "financial": "المالية"
+  "financial": "المالية",
+  "no_requests": "لا توجد طلبات",
+  "no_requests_description": "لا توجد طلبات صيانة حالياً"
 }

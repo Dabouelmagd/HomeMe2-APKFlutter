@@ -4,31 +4,45 @@
 - **Frontend**: React + Tailwind + Recharts + i18next + Cairo
 - **Backend**: FastAPI + MongoDB + Stripe + PayPal + WebAuthn
 - **server.py**: 16,321 -> 2,495 lines (-84.7%) | 46 route modules
+- **i18n**: Split into `en.json` (3003 lines), `ar.json` (2454 lines), `fr.json` (2784 lines) + index.js loader
 
-## Latest Updates (Apr 14, 2026)
+## Completed (Apr 14, 2026)
 
-### i18n / Localization - Phase 2 Complete
-- **WrittenGuide.js**: 100% translated (45 strings wrapped in t() with EN/FR keys)
-- **HelpCenter.js**: 100% translated (33 strings - section titles, articles)
-- **VideoTutorial.js**: Core UI translated (step titles, header, guide button)
-- **SubscriptionActivation.js**: Duration labels and key messages translated
-- **SuperAdminPanel.js**: Previously completed (112 strings translated)
-- **ComplaintsSystem.js**: Type/status labels need t() (deferred - used to cause crash)
-- **SubscriptionManagement.js**: Key toast/label strings remain
-- **PushNotificationSettings.js**: Error messages use English (hook scope limitation)
-- **i18n/index.js**: 9900+ lines with 500+ new translation keys added for EN and FR
-- **French 'remember_me'**: Added missing translation
-- All provider names (UtilityBills), multilingual data structures (ServicesManagement, PublicAccountTypeSelection), and language names intentionally remain as-is
+### i18n Localization - COMPLETE
+All translatable UI strings across components now use `t()` function:
+- **WrittenGuide.js**: 100% (45 strings)
+- **HelpCenter.js**: 100% (33 strings)
+- **VideoTutorial.js**: 100% (48 strings)
+- **ComplaintsSystem.js**: 100% (7 strings - typeConfig/statusConfig moved inside component)
+- **SuperAdminPanel.js**: 100% (69 strings - codes, coupons, ads, analytics)
+- **SubscriptionActivation.js**: 100% (34 strings - durations, labels, help section)
+- **SubscriptionManagement.js**: 100% (10 strings - toasts, labels, invoices)
+- **CompoundManagement.js**: 100% (12 strings - user mgmt, form labels)
+- **PushNotificationSettings.js**: 100% (6 strings - English in hook scope)
+- **HomePage.js, AdminDashboard.js, Layout.js**: 100% (done previously)
+- **SubscriptionManagement, ContractsManagement, FinancialDashboard**: 100% (done previously)
+
+### i18n File Split (P3) - COMPLETE
+- Old: Single `i18n/index.js` with 9900+ lines
+- New: `i18n/index.js` (35 lines) imports from `locales/en.json`, `locales/ar.json`, `locales/fr.json`
+- Fixed: `total_units` key had Arabic value in en.json, added missing `no_requests` keys, `balance_sheet`, `monthly_comparison` keys
+
+### Files intentionally keeping Arabic text
+- ServicesManagement.js: Uses `{ar, en, fr}` multilingual data objects
+- UtilityBills.js: Official company/provider proper names
+- PublicAccountTypeSelection.js: Uses `{ar, en, fr}` multilingual data objects
+- EnterpriseRegistration.js / IndividualRegistration.js: Currency symbols (د.إ, ر.س, ج.م)
+- LanguageSettings.js: Native language display names
 
 ### Previously Completed Features
 - Payment Integration (Stripe + PayPal)
 - Subscription Management with codes and coupons
 - 14-Day Free Trial
 - Internal Ads System (CRUD + targeting)
-- Google AdSense spaces (3 slots on HomePage)
+- Google AdSense (pub-5928973437129941)
 - Referral Program (5 friends = 1 month free)
-- Updated Subscription Plans (7 tiers)
-- Comprehensive Written Guide (23 sections)
+- 7 subscription tiers
+- Written Guide (23 sections)
 - PDF Invoice Generation
 - Automated Email Notifications
 - Full comparison tables for plans
@@ -44,30 +58,6 @@
 | Co. Business | 7,500 | 75,000 |
 | Co. Enterprise | 20,000 | 200,000 |
 
-## Google AdSense
-- Publisher ID: ca-pub-5928973437129941
-- 3 ad slots on HomePage
-- Status: Configured, pending Google domain approval
-
-## Translations Status
-| Component | Arabic | English | French |
-|-----------|--------|---------|--------|
-| HomePage | 100% | 100% | 100% |
-| AdminDashboard | 100% | 100% | 100% |
-| SubscriptionManagement | 95% | 95% | 90% |
-| SuperAdminPanel | 95% | 95% | 85% |
-| ContractsManagement | 100% | 100% | 100% |
-| FinancialDashboard | 100% | 100% | 100% |
-| CompoundFinance | 90% | 90% | 80% |
-| WrittenGuide | 100% | 100% | 100% |
-| HelpCenter | 100% | 100% | 100% |
-| VideoTutorial | 80% | 80% | 70% |
-| SubscriptionActivation | 70% | 60% | 50% |
-| Layout/Navigation | 100% | 100% | 100% |
-| Login/Register | 100% | 100% | 100% |
-
 ## Backlog
-- P1: Complete remaining translations in VideoTutorial, SubscriptionActivation, ComplaintsSystem, CompoundManagement, SuperAdminPanel (remaining toast messages and labels)
-- P2: Bank transfer API (pending bank setup from user)
+- P2: Bank transfer API integration (pending user details)
 - P2: Smart Devices & Automation feature (placeholder exists)
-- P3: Split i18n/index.js into separate locale JSON files for maintainability

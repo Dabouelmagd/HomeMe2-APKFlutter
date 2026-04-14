@@ -2993,7 +2993,17 @@ const resources = {
       'role_security_desc': 'Gates & visitors', 'role_resident_desc': 'Services & maintenance',
       'pm_cards': 'Credit Cards', 'pm_paypal_d': 'Secure global payment',
       'pm_wallets': 'Digital Wallets', 'pm_bank': 'Bank Transfer', 'pm_bank_d': 'Direct bank transfer',
-      'pm_instapay': 'InstaPay', 'pm_instapay_d': 'Instant mobile transfer'
+      'pm_instapay': 'InstaPay', 'pm_instapay_d': 'Instant mobile transfer',
+      'contracts_management': 'Contracts', 'satisfaction_ratings': 'Ratings',
+      'complaints_suggestions': 'Complaints & Suggestions', 'my_subscription': 'My Subscription',
+      // Dashboard cards
+      'open_maintenance': 'Open Maintenance', 'pending_payments': 'Pending Payments',
+      'send_daily_report': 'Send Daily Report', 'daily_report_sent': 'Daily report sent!',
+      'daily_report_failed': 'Failed to send report', 'referral_program': 'Referral Program',
+      'family_members_count': 'Family Members', 'just_now': 'Just now',
+      'minutes': 'minutes', 'hours': 'hours', 'ago': 'ago',
+      'referral_remaining': '{count} referrals left for a free month',
+      'coupons_earned_count': 'Earned {count} coupons so far'
     }
   },
   ar: {
@@ -8729,7 +8739,16 @@ const resources = {
       'role_security_desc': 'Portes et visiteurs', 'role_resident_desc': 'Services et maintenance',
       'pm_cards': 'Cartes de crédit', 'pm_paypal_d': 'Paiement sécurisé mondial',
       'pm_wallets': 'Portefeuilles numériques', 'pm_bank': 'Virement bancaire', 'pm_bank_d': 'Virement direct',
-      'pm_instapay': 'InstaPay', 'pm_instapay_d': 'Transfert mobile instantané'
+      'pm_instapay': 'InstaPay', 'pm_instapay_d': 'Transfert mobile instantané',
+      'contracts_management': 'Contrats', 'satisfaction_ratings': 'Évaluations',
+      'complaints_suggestions': 'Plaintes et suggestions', 'my_subscription': 'Mon abonnement',
+      'open_maintenance': 'Maintenance ouverte', 'pending_payments': 'Paiements en attente',
+      'send_daily_report': 'Envoyer le rapport quotidien', 'daily_report_sent': 'Rapport envoyé!',
+      'daily_report_failed': 'Échec de l\'envoi', 'referral_program': 'Programme de parrainage',
+      'family_members_count': 'Membres de la famille', 'just_now': 'À l\'instant',
+      'minutes': 'minutes', 'hours': 'heures', 'ago': 'il y a',
+      'referral_remaining': '{count} parrainages restants pour un mois gratuit',
+      'coupons_earned_count': '{count} coupons gagnés'
     }
   }
 };

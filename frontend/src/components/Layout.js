@@ -341,7 +341,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('advanced_analytics'), href: 'analytics', icon: ChartBarIcon, show: isStaffRole },
         { name: t('subscription_codes_management'), href: 'subscription-codes', icon: KeyIcon, show: isAdminRole },
-        { name: 'إدارة اشتراكي', href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole || user?.role === 'company_admin' },
+        { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole || user?.role === 'company_admin' },
       ]
     },
     {

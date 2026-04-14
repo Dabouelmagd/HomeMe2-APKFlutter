@@ -157,7 +157,7 @@ const ServicesManagement = () => {
       'Crystal clear': 'واضح جداً',
       'Eco-friendly': 'صديق للبيئة',
       'services': 'خدمات',
-      'including': 'تشمل',
+      'including': t('sv_includes', 'تشمل'),
       'and': 'و',
       'for': 'لـ',
       'with': 'مع'
@@ -191,7 +191,7 @@ const ServicesManagement = () => {
     
     // Use provider ID to consistently get same name
     const index = providerId ? parseInt(providerId.slice(-1), 16) % arabicNames.length : 0;
-    return arabicNames[index] || 'مقدم الخدمة';
+    return arabicNames[index] || t('sv_provider', 'مقدم الخدمة');
   };
 
   // Function to translate working hours
@@ -212,7 +212,7 @@ const ServicesManagement = () => {
     
     // Replace common time patterns
     translatedHours = translatedHours.replace(/Emergency Service/gi, t('emergency_word'));
-    translatedHours = translatedHours.replace(/Service/gi, 'خدمة');
+    translatedHours = translatedHours.replace(/Service/gi, t('sv_service', 'خدمة'));
     translatedHours = translatedHours.replace(/Available/gi, t('available'));
     
     return translatedHours;
@@ -436,8 +436,8 @@ const ServicesManagement = () => {
       workingHours = workingHours
         .replace(/AM/g, 'ص')
         .replace(/PM/g, 'م')
-        .replace(/Emergency service/g, 'خدمة طوارئ')
-        .replace(/Service available/g, 'خدمة متاحة')
+        .replace(/Emergency service/g, t('sv_emergency', 'خدمة طوارئ'))
+        .replace(/Service available/g, t('sv_available', 'خدمة متاحة'))
         .replace(/24\/7/g, '24/7');
     } else if (currentLang === 'fr') {
       workingHours = workingHours
@@ -622,7 +622,7 @@ const ServicesManagement = () => {
     } catch (error) {
       console.error('Failed to load services:', error);
       console.error('Error response:', error.response?.data);
-      toast.error(t('failed_to_load_services', 'فشل في تحميل الخدمات'));
+      toast.error(t('failed_to_load_services', t('sv_load_failed', 'فشل في تحميل الخدمات')));
       setServices([]);
     } finally {
       setLoading(false);
@@ -643,10 +643,10 @@ const ServicesManagement = () => {
       // Fetch fresh services
       await fetchServices();
       
-      toast.success(t('services_refreshed', 'تم تحديث الخدمات بنجاح!'));
+      toast.success(t('services_refreshed', t('sv_all_updated', 'تم تحديث الخدمات بنجاح!')));
     } catch (error) {
       console.error('Failed to refresh services:', error);
-      toast.error(t('failed_refresh_services', 'فشل في تحديث الخدمات'));
+      toast.error(t('failed_refresh_services', t('sv_update_all_failed', 'فشل في تحديث الخدمات')));
     }
   };
 
@@ -662,7 +662,7 @@ const ServicesManagement = () => {
       });
       
       if (response.data.success) {
-        toast.success(t('services_added_success', 'تم إضافة الخدمات بنجاح!'));
+        toast.success(t('services_added_success', t('sv_added', 'تم إضافة الخدمات بنجاح!')));
       } else {
         toast.info('Services already exist, refreshing...');
       }
@@ -674,7 +674,7 @@ const ServicesManagement = () => {
       
     } catch (error) {
       console.error('Error:', error);
-      toast.error(t('failed_add_services', 'فشل في إضافة الخدمات'));
+      toast.error(t('failed_add_services', t('sv_add_failed', 'فشل في إضافة الخدمات')));
     }
   };
 
@@ -715,14 +715,14 @@ const ServicesManagement = () => {
         }));
         
         setServices(services);
-        toast.success(t('services_loaded_fresh', 'تم تحميل الخدمات بنجاح!'));
+        toast.success(t('services_loaded_fresh', t('sv_loaded', 'تم تحميل الخدمات بنجاح!')));
       } else {
-        toast.error(t('no_services_response', 'لا توجد خدمات في الاستجابة'));
+        toast.error(t('no_services_response', t('sv_no_services', 'لا توجد خدمات في الاستجابة')));
       }
       
     } catch (error) {
       console.error('API Error:', error);
-      toast.error(t('api_error', 'خطأ في الاتصال بالخادم'));
+      toast.error(t('api_error', t('sv_server_error', 'خطأ في الاتصال بالخادم')));
     }
   };
 
@@ -767,7 +767,7 @@ const ServicesManagement = () => {
     ];
     
     setServices(testServices);
-    toast.success(t('test_services_added', 'تم إضافة خدمات تجريبية!'));
+    toast.success(t('test_services_added', t('sv_demo_added', 'تم إضافة خدمات تجريبية!')));
   };
 
   const fetchServiceProviders = async () => {
@@ -814,12 +814,12 @@ const ServicesManagement = () => {
     e.preventDefault();
     try {
       await axios.post(`${API}/compounds/${user.compound_id}/services`, serviceForm);
-      toast.success(t('service_created_success', 'تم إنشاء الخدمة بنجاح!'));
+      toast.success(t('service_created_success', t('sv_created', 'تم إنشاء الخدمة بنجاح!')));
       setShowAddService(false);
       resetForm();
       fetchServices();
     } catch (error) {
-      toast.error(t('failed_create_service', 'فشل في إنشاء الخدمة'));
+      toast.error(t('failed_create_service', t('sv_create_failed', 'فشل في إنشاء الخدمة')));
     }
   };
 
@@ -827,11 +827,11 @@ const ServicesManagement = () => {
     e.preventDefault();
     try {
       await axios.put(`${API}/compounds/${user.compound_id}/services/${editingService.id}`, serviceForm);
-      toast.success(t('service_updated_success', 'تم تحديث الخدمة بنجاح!'));
+      toast.success(t('service_updated_success', t('sv_updated', 'تم تحديث الخدمة بنجاح!')));
       resetForm();
       fetchServices();
     } catch (error) {
-      toast.error(t('failed_update_service', 'فشل في تحديث الخدمة'));
+      toast.error(t('failed_update_service', t('sv_update_failed', 'فشل في تحديث الخدمة')));
     }
   };
 
@@ -839,10 +839,10 @@ const ServicesManagement = () => {
     if (window.confirm('Are you sure you want to delete this service?')) {
       try {
         await axios.delete(`${API}/compounds/${user.compound_id}/services/${serviceId}`);
-        toast.success(t('service_deleted_success', 'تم حذف الخدمة بنجاح!'));
+        toast.success(t('service_deleted_success', t('sv_deleted', 'تم حذف الخدمة بنجاح!')));
         fetchServices();
       } catch (error) {
-        toast.error(t('failed_delete_service', 'فشل في حذف الخدمة'));
+        toast.error(t('failed_delete_service', t('sv_delete_failed', 'فشل في حذف الخدمة')));
       }
     }
   };
@@ -870,7 +870,7 @@ const ServicesManagement = () => {
       console.log('Initialize services response:', response.data);
       
       if (response.data.success) {
-        toast.success(t('default_services_added', 'تم إضافة الخدمات الافتراضية بنجاح!'));
+        toast.success(t('default_services_added', t('sv_defaults_added', 'تم إضافة الخدمات الافتراضية بنجاح!')));
         await fetchServices();
       } else {
         toast.info(`${response.data.message || 'Services already exist'} - Found ${services.length} services in your compound.`);
@@ -883,7 +883,7 @@ const ServicesManagement = () => {
         console.error('Error response:', error.response.data);
         toast.error(error.response.data.detail || 'Failed to initialize default services');
       } else {
-        toast.error(t('failed_init_services', 'فشل في تهيئة الخدمات الافتراضية'));
+        toast.error(t('failed_init_services', t('sv_init_failed', 'فشل في تهيئة الخدمات الافتراضية')));
       }
     }
   };

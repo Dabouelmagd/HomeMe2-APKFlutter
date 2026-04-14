@@ -80,12 +80,17 @@
 - Status: Configured, pending Google approval for domain
 
 ## Translations
-- 350+ translation keys for full app localization
-- HomePage: 100% translated (all sections, plans, features, comparisons)
-- AdminDashboard: 100% translated (stats, ads, referral program)
-- SubscriptionManagement: 100% translated (plans, durations, payments, invoices)
-- SuperAdminPanel: 100% translated (7 tabs, stats, forms, tables, roles, CRUD)
-- Email notifications: Full AR/EN/FR templates (invoices, reminders, welcome)
+- 500+ translation keys for full app localization (2450 EN keys total)
+- HomePage: 100% translated
+- AdminDashboard: 100% translated
+- SubscriptionManagement: 100% translated
+- SuperAdminPanel: 100% translated
+- ContractsManagement: 100% translated (40 keys)
+- FinancialDashboard: 100% translated (52 keys)
+- CompoundFinance: ~90% translated (98 keys, some tab labels pending)
+- ServicesManagement: Toast messages translated (21 keys)
+- MaintenanceSystem, GuestManagement, ServiceBooking: Already use t() with fallbacks
+- Email notifications: Full AR/EN/FR templates
 - i18next: `load: 'languageOnly'` + `supportedLngs: ['en', 'ar', 'fr']`
 
 ## Backlog

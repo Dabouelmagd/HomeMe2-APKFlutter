@@ -126,17 +126,17 @@ const CompoundFinance = () => {
   };
 
   const catLabels = {
-    maintenance: t('maintenance', 'صيانة'), utilities: t('utilities', 'مرافق'),
+    maintenance: t('maintenance', t('cf_maintenance', 'صيانة')), utilities: t('utilities', t('cf_facilities', 'مرافق')),
     security: t('security', 'حراسة'), cleaning: t('cleaning', 'نظافة'),
-    salaries: t('salaries', 'رواتب'), other: t('other', 'أخرى'),
+    salaries: t('salaries', t('cf_salaries', 'رواتب')), other: t('other', t('cf_other', 'أخرى')),
     maintenance_fees: t('maintenance_fees', 'رسوم صيانة'), late_fees: t('late_fees', 'غرامات تأخير'),
-    additional_services: t('additional_services', 'خدمات إضافية'), rentals: t('rentals', 'إيجارات'),
+    additional_services: t('additional_services', 'خدمات إضافية'), rentals: t('rentals', t('cf_rent', 'إيجارات')),
   };
 
   const months = [
-    t('january', 'يناير'), t('february', 'فبراير'), t('march', 'مارس'), t('april', 'أبريل'),
-    t('may', 'مايو'), t('june', 'يونيو'), t('july', 'يوليو'), t('august', 'أغسطس'),
-    t('september', 'سبتمبر'), t('october', 'أكتوبر'), t('november', 'نوفمبر'), t('december', 'ديسمبر')
+    t('january', t('m_jan', 'يناير')), t('february', t('m_feb', 'فبراير')), t('march', t('m_mar', 'مارس')), t('april', t('m_apr', 'أبريل')),
+    t('may', t('m_may', 'مايو')), t('june', t('m_jun', 'يونيو')), t('july', t('m_jul', 'يوليو')), t('august', t('m_aug', 'أغسطس')),
+    t('september', t('m_sep', 'سبتمبر')), t('october', t('m_oct', 'أكتوبر')), t('november', t('m_nov', 'نوفمبر')), t('december', t('m_dec', 'ديسمبر'))
   ];
 
   if (loading) {
@@ -148,9 +148,9 @@ const CompoundFinance = () => {
   const tabs = [
     { id: 'balance', label: t('balance_sheet', 'الميزانية العمومية'), icon: ChartBarIcon },
     { id: 'comparison', label: t('monthly_comparison', 'المقارنة الشهرية'), icon: ArrowTrendingUpIcon },
-    { id: 'obligations', label: t('obligations', 'الالتزامات'), icon: DocumentTextIcon },
+    { id: 'obligations', label: t('obligations', t('cf_obligations', 'الالتزامات')), icon: DocumentTextIcon },
     { id: 'units', label: t('unit_payments', 'سداد الوحدات'), icon: HomeIcon },
-    { id: 'expenses', label: t('expenses', 'المصروفات'), icon: ArrowTrendingDownIcon },
+    { id: 'expenses', label: t('expenses', t('cf_expenses', 'المصروفات')), icon: ArrowTrendingDownIcon },
   ];
 
   return (
@@ -159,8 +159,8 @@ const CompoundFinance = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('financial_management', 'الإدارة المالية')}</h1>
-            <p className="text-sm text-gray-500">{t('compound_budget_desc', 'إدارة ميزانية المجمع والالتزامات والمصروفات')}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t('financial_management', t('cf_title', 'الإدارة المالية'))}</h1>
+            <p className="text-sm text-gray-500">{t('compound_budget_desc', t('cf_subtitle', 'إدارة ميزانية المجمع والالتزامات والمصروفات'))}</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -201,14 +201,14 @@ const CompoundFinance = () => {
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 rounded-lg bg-green-100"><ArrowTrendingUpIcon className="h-5 w-5 text-green-600" /></div>
-              <span className="text-sm text-gray-500">{t('total_revenue', 'إجمالي الإيرادات')}</span>
+              <span className="text-sm text-gray-500">{t('total_revenue', t('cf_total_revenue', 'إجمالي الإيرادات'))}</span>
             </div>
             <p className="text-2xl font-bold text-green-600">{(bs.total_revenue || 0).toLocaleString()}</p>
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 rounded-lg bg-red-100"><ArrowTrendingDownIcon className="h-5 w-5 text-red-600" /></div>
-              <span className="text-sm text-gray-500">{t('total_expenses', 'إجمالي المصروفات')}</span>
+              <span className="text-sm text-gray-500">{t('total_expenses', t('cf_total_expenses', 'إجمالي المصروفات'))}</span>
             </div>
             <p className="text-2xl font-bold text-red-600">{(bs.total_expenses || 0).toLocaleString()}</p>
           </div>
@@ -224,7 +224,7 @@ const CompoundFinance = () => {
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 rounded-lg bg-amber-100"><CreditCardIcon className="h-5 w-5 text-amber-600" /></div>
-              <span className="text-sm text-gray-500">{t('collection_rate', 'نسبة التحصيل')}</span>
+              <span className="text-sm text-gray-500">{t('collection_rate', t('cf_collection_rate', 'نسبة التحصيل'))}</span>
             </div>
             <p className="text-2xl font-bold text-amber-600">{obl.collection_rate || 0}%</p>
           </div>
@@ -254,20 +254,20 @@ const CompoundFinance = () => {
               {/* Monthly Bar Chart */}
               {Object.keys(bs.monthly_breakdown || {}).length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-gray-700 mb-3">{t('monthly_chart', 'الرسم البياني الشهري')}</h4>
+                  <h4 className="font-semibold text-gray-700 mb-3">{t('monthly_chart', t('cf_monthly_chart', 'الرسم البياني الشهري'))}</h4>
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={Object.entries(bs.monthly_breakdown || {}).map(([month, val]) => ({
                       name: month.slice(5),
-                      [t('expenses', 'المصروفات')]: val.expenses || 0,
-                      [t('revenue', 'الإيرادات')]: val.revenue || 0
+                      [t('expenses', t('cf_expenses', 'المصروفات'))]: val.expenses || 0,
+                      [t('revenue', t('cf_revenues', 'الإيرادات'))]: val.revenue || 0
                     }))}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                       <YAxis tick={{ fontSize: 12 }} />
                       <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                       <Legend />
-                      <Bar dataKey={t('expenses', 'المصروفات')} fill="#ef4444" radius={[6, 6, 0, 0]} />
-                      <Bar dataKey={t('revenue', 'الإيرادات')} fill="#22c55e" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey={t('expenses', t('cf_expenses', 'المصروفات'))} fill="#ef4444" radius={[6, 6, 0, 0]} />
+                      <Bar dataKey={t('revenue', t('cf_revenues', 'الإيرادات'))} fill="#22c55e" radius={[6, 6, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -309,7 +309,7 @@ const CompoundFinance = () => {
 
                 {/* Revenue by Source */}
                 <div>
-                  <h4 className="font-semibold text-gray-700 mb-3">{t('revenue_by_source', 'الإيرادات حسب المصدر')}</h4>
+                  <h4 className="font-semibold text-gray-700 mb-3">{t('revenue_by_source', t('cf_rev_by_source', 'الإيرادات حسب المصدر'))}</h4>
                   {Object.keys(bs.revenue_by_source || {}).length > 0 ? (
                     <>
                       <ResponsiveContainer width="100%" height={200}>
@@ -347,11 +347,11 @@ const CompoundFinance = () => {
                 <div className="grid grid-cols-4 gap-4">
                   <div className="p-4 bg-blue-50 rounded-xl text-center">
                     <p className="text-xl font-bold text-blue-700">{(obl.total_charged || 0).toLocaleString()}</p>
-                    <p className="text-xs text-blue-600">{t('total_charged', 'إجمالي المطلوب')}</p>
+                    <p className="text-xs text-blue-600">{t('total_charged', t('cf_total_required', 'إجمالي المطلوب'))}</p>
                   </div>
                   <div className="p-4 bg-green-50 rounded-xl text-center">
                     <p className="text-xl font-bold text-green-700">{(obl.total_collected || 0).toLocaleString()}</p>
-                    <p className="text-xs text-green-600">{t('total_collected', 'إجمالي المحصّل')}</p>
+                    <p className="text-xs text-green-600">{t('total_collected', t('cf_total_collected', 'إجمالي المحصّل'))}</p>
                   </div>
                   <div className="p-4 bg-red-50 rounded-xl text-center">
                     <p className="text-xl font-bold text-red-700">{(obl.total_outstanding || 0).toLocaleString()}</p>
@@ -361,7 +361,7 @@ const CompoundFinance = () => {
                     <div className="bg-white rounded-full w-16 h-16 flex items-center justify-center mx-auto">
                       <p className="text-lg font-bold text-gray-800">{obl.collection_rate || 0}%</p>
                     </div>
-                    <p className="text-xs text-gray-600 mt-1">{t('collection_rate', 'نسبة التحصيل')}</p>
+                    <p className="text-xs text-gray-600 mt-1">{t('collection_rate', t('cf_collection_rate', 'نسبة التحصيل'))}</p>
                   </div>
                 </div>
               </div>
@@ -382,9 +382,9 @@ const CompoundFinance = () => {
                   const rate = charged > 0 ? Math.round((collected / charged) * 100) : 0;
                   return {
                     name: months[parseInt(month.slice(5)) - 1] || month.slice(5),
-                    [t('collection_rate', 'نسبة التحصيل')]: rate,
-                    [t('expenses', 'المصروفات')]: charged,
-                    [t('revenue', 'الإيرادات')]: collected,
+                    [t('collection_rate', t('cf_collection_rate', 'نسبة التحصيل'))]: rate,
+                    [t('expenses', t('cf_expenses', 'المصروفات'))]: charged,
+                    [t('revenue', t('cf_revenues', 'الإيرادات'))]: collected,
                     rate
                   };
                 });
@@ -418,7 +418,7 @@ const CompoundFinance = () => {
                             <YAxis tick={{ fontSize: 11 }} domain={[0, 100]} unit="%" />
                             <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                             <Legend />
-                            <Bar dataKey={t('collection_rate', 'نسبة التحصيل')} radius={[6, 6, 0, 0]}>
+                            <Bar dataKey={t('collection_rate', t('cf_collection_rate', 'نسبة التحصيل'))} radius={[6, 6, 0, 0]}>
                               {monthlyData.map((entry, i) => (
                                 <Cell key={i} fill={entry.rate >= 70 ? '#22c55e' : entry.rate >= 50 ? '#f59e0b' : '#ef4444'} />
                               ))}
@@ -436,7 +436,7 @@ const CompoundFinance = () => {
                     {/* Monthly Revenue vs Expenses comparison */}
                     {monthlyData.length > 0 && (
                       <div>
-                        <h4 className="font-semibold text-gray-700 mb-3">{t('revenue_vs_expenses', 'الإيرادات مقابل المصروفات')}</h4>
+                        <h4 className="font-semibold text-gray-700 mb-3">{t('revenue_vs_expenses', t('cf_rev_vs_exp', 'الإيرادات مقابل المصروفات'))}</h4>
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={monthlyData}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -444,8 +444,8 @@ const CompoundFinance = () => {
                             <YAxis tick={{ fontSize: 11 }} />
                             <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
                             <Legend />
-                            <Bar dataKey={t('expenses', 'المصروفات')} fill="#ef4444" radius={[6, 6, 0, 0]} />
-                            <Bar dataKey={t('revenue', 'الإيرادات')} fill="#22c55e" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey={t('expenses', t('cf_expenses', 'المصروفات'))} fill="#ef4444" radius={[6, 6, 0, 0]} />
+                            <Bar dataKey={t('revenue', t('cf_revenues', 'الإيرادات'))} fill="#22c55e" radius={[6, 6, 0, 0]} />
                           </BarChart>
                         </ResponsiveContainer>
                       </div>
@@ -459,19 +459,19 @@ const CompoundFinance = () => {
                           <table className="w-full text-sm">
                             <thead>
                               <tr className="bg-gray-50">
-                                <th className="p-3 text-right font-medium">{t('month', 'الشهر')}</th>
-                                <th className="p-3 text-right font-medium">{t('expenses', 'المصروفات')}</th>
-                                <th className="p-3 text-right font-medium">{t('revenue', 'الإيرادات')}</th>
-                                <th className="p-3 text-right font-medium">{t('collection_rate', 'نسبة التحصيل')}</th>
-                                <th className="p-3 text-right font-medium">{t('status', 'الحالة')}</th>
+                                <th className="p-3 text-right font-medium">{t('month', t('cf_month', 'الشهر'))}</th>
+                                <th className="p-3 text-right font-medium">{t('expenses', t('cf_expenses', 'المصروفات'))}</th>
+                                <th className="p-3 text-right font-medium">{t('revenue', t('cf_revenues', 'الإيرادات'))}</th>
+                                <th className="p-3 text-right font-medium">{t('collection_rate', t('cf_collection_rate', 'نسبة التحصيل'))}</th>
+                                <th className="p-3 text-right font-medium">{t('status', t('cf_status', 'الحالة'))}</th>
                               </tr>
                             </thead>
                             <tbody>
                               {monthlyData.map((m, i) => (
                                 <tr key={i} className="border-t border-gray-100">
                                   <td className="p-3 font-medium">{m.name}</td>
-                                  <td className="p-3 text-red-600 font-medium">{m[t('expenses', 'المصروفات')]?.toLocaleString()}</td>
-                                  <td className="p-3 text-green-600 font-medium">{m[t('revenue', 'الإيرادات')]?.toLocaleString()}</td>
+                                  <td className="p-3 text-red-600 font-medium">{m[t('expenses', t('cf_expenses', 'المصروفات'))]?.toLocaleString()}</td>
+                                  <td className="p-3 text-green-600 font-medium">{m[t('revenue', t('cf_revenues', 'الإيرادات'))]?.toLocaleString()}</td>
                                   <td className="p-3">
                                     <span className={`px-2 py-1 rounded-full text-xs font-bold ${
                                       m.rate >= 70 ? 'bg-green-100 text-green-700' : m.rate >= 50 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
@@ -501,9 +501,9 @@ const CompoundFinance = () => {
           {activeTab === 'obligations' && (
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-gray-900">{t('obligations', 'الالتزامات')} - {months[filterMonth - 1]} {filterYear}</h3>
+                <h3 className="text-lg font-bold text-gray-900">{t('obligations', t('cf_obligations', 'الالتزامات'))} - {months[filterMonth - 1]} {filterYear}</h3>
                 <button onClick={() => setShowAddObligation(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm" data-testid="add-obligation-btn">
-                  <PlusIcon className="h-4 w-4" />{t('add_obligation', 'إضافة التزام')}
+                  <PlusIcon className="h-4 w-4" />{t('add_obligation', t('cf_add_obl', 'إضافة التزام'))}
                 </button>
               </div>
               {obligations.length > 0 ? (
@@ -548,13 +548,13 @@ const CompoundFinance = () => {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-gray-50">
-                        <th className="p-3 text-right font-medium text-gray-600">{t('unit', 'الوحدة')}</th>
+                        <th className="p-3 text-right font-medium text-gray-600">{t('unit', t('cf_unit', 'الوحدة'))}</th>
                         <th className="p-3 text-right font-medium text-gray-600">{t('resident', 'المقيم')}</th>
-                        <th className="p-3 text-right font-medium text-gray-600">{t('obligation', 'الالتزام')}</th>
-                        <th className="p-3 text-right font-medium text-gray-600">{t('amount', 'المبلغ')}</th>
-                        <th className="p-3 text-right font-medium text-gray-600">{t('status', 'الحالة')}</th>
+                        <th className="p-3 text-right font-medium text-gray-600">{t('obligation', t('cf_obligation', 'الالتزام'))}</th>
+                        <th className="p-3 text-right font-medium text-gray-600">{t('amount', t('cf_amount', 'المبلغ'))}</th>
+                        <th className="p-3 text-right font-medium text-gray-600">{t('status', t('cf_status', 'الحالة'))}</th>
                         <th className="p-3 text-right font-medium text-gray-600">{t('paid_date', 'تاريخ السداد')}</th>
-                        <th className="p-3 text-right font-medium text-gray-600">{t('actions', 'الإجراءات')}</th>
+                        <th className="p-3 text-right font-medium text-gray-600">{t('actions', t('cf_actions', 'الإجراءات'))}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -596,9 +596,9 @@ const CompoundFinance = () => {
           {activeTab === 'expenses' && (
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-bold text-gray-900">{t('expenses', 'المصروفات')}</h3>
+                <h3 className="text-lg font-bold text-gray-900">{t('expenses', t('cf_expenses', 'المصروفات'))}</h3>
                 <button onClick={() => setShowAddExpense(true)} className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm" data-testid="add-expense-btn">
-                  <PlusIcon className="h-4 w-4" />{t('add_expense', 'إضافة مصروف')}
+                  <PlusIcon className="h-4 w-4" />{t('add_expense', t('cf_add_expense', 'إضافة مصروف'))}
                 </button>
               </div>
               {(bs.recent_expenses || []).length > 0 ? (
@@ -622,25 +622,25 @@ const CompoundFinance = () => {
         {showAddExpense && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowAddExpense(false)}>
             <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
-              <h3 className="text-lg font-bold mb-4">{t('add_expense', 'إضافة مصروف')}</h3>
+              <h3 className="text-lg font-bold mb-4">{t('add_expense', t('cf_add_expense', 'إضافة مصروف'))}</h3>
               <form onSubmit={handleAddExpense} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('category', 'التصنيف')}</label>
+                  <label className="block text-sm font-medium mb-1">{t('category', t('cf_category', 'التصنيف'))}</label>
                   <select value={expenseForm.category} onChange={e => setExpenseForm(p => ({ ...p, category: e.target.value }))} className="w-full border rounded-lg p-2.5">
-                    <option value="maintenance">{t('maintenance', 'صيانة')}</option>
-                    <option value="utilities">{t('utilities', 'مرافق')}</option>
+                    <option value="maintenance">{t('maintenance', t('cf_maintenance', 'صيانة'))}</option>
+                    <option value="utilities">{t('utilities', t('cf_facilities', 'مرافق'))}</option>
                     <option value="security">{t('security', 'حراسة')}</option>
                     <option value="cleaning">{t('cleaning', 'نظافة')}</option>
-                    <option value="salaries">{t('salaries', 'رواتب')}</option>
-                    <option value="other">{t('other', 'أخرى')}</option>
+                    <option value="salaries">{t('salaries', t('cf_salaries', 'رواتب'))}</option>
+                    <option value="other">{t('other', t('cf_other', 'أخرى'))}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('amount', 'المبلغ')}</label>
+                  <label className="block text-sm font-medium mb-1">{t('amount', t('cf_amount', 'المبلغ'))}</label>
                   <input type="number" value={expenseForm.amount} onChange={e => setExpenseForm(p => ({ ...p, amount: e.target.value }))} className="w-full border rounded-lg p-2.5" required />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('description', 'الوصف')}</label>
+                  <label className="block text-sm font-medium mb-1">{t('description', t('cf_desc', 'الوصف'))}</label>
                   <input type="text" value={expenseForm.description} onChange={e => setExpenseForm(p => ({ ...p, description: e.target.value }))} className="w-full border rounded-lg p-2.5" required />
                 </div>
                 <div>
@@ -648,8 +648,8 @@ const CompoundFinance = () => {
                   <input type="text" value={expenseForm.vendor} onChange={e => setExpenseForm(p => ({ ...p, vendor: e.target.value }))} className="w-full border rounded-lg p-2.5" />
                 </div>
                 <div className="flex gap-3">
-                  <button type="submit" disabled={submitting} className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium disabled:opacity-50">{submitting ? '...' : t('save', 'حفظ')}</button>
-                  <button type="button" onClick={() => setShowAddExpense(false)} className="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-medium">{t('cancel', 'إلغاء')}</button>
+                  <button type="submit" disabled={submitting} className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium disabled:opacity-50">{submitting ? '...' : t('save', t('cf_save', 'حفظ'))}</button>
+                  <button type="button" onClick={() => setShowAddExpense(false)} className="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-medium">{t('cancel', t('cf_cancel', 'إلغاء'))}</button>
                 </div>
               </form>
             </div>
@@ -660,39 +660,39 @@ const CompoundFinance = () => {
         {showAddObligation && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowAddObligation(false)}>
             <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4" onClick={e => e.stopPropagation()}>
-              <h3 className="text-lg font-bold mb-4">{t('add_obligation', 'إضافة التزام جديد')}</h3>
+              <h3 className="text-lg font-bold mb-4">{t('add_obligation', t('cf_add_obligation', 'إضافة التزام جديد'))}</h3>
               <form onSubmit={handleAddObligation} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('title', 'العنوان')}</label>
+                  <label className="block text-sm font-medium mb-1">{t('title', t('cf_label', 'العنوان'))}</label>
                   <input type="text" value={obligationForm.title} onChange={e => setObligationForm(p => ({ ...p, title: e.target.value }))} className="w-full border rounded-lg p-2.5" placeholder={t('obligation_title_placeholder', 'مثال: رسوم صيانة شهر أبريل')} required />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('total_amount', 'المبلغ الإجمالي')}</label>
+                  <label className="block text-sm font-medium mb-1">{t('total_amount', t('cf_total_amount', 'المبلغ الإجمالي'))}</label>
                   <input type="number" value={obligationForm.total_amount} onChange={e => setObligationForm(p => ({ ...p, total_amount: e.target.value }))} className="w-full border rounded-lg p-2.5" required />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('description', 'الوصف')}</label>
+                  <label className="block text-sm font-medium mb-1">{t('description', t('cf_desc', 'الوصف'))}</label>
                   <input type="text" value={obligationForm.description} onChange={e => setObligationForm(p => ({ ...p, description: e.target.value }))} className="w-full border rounded-lg p-2.5" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('category', 'التصنيف')}</label>
+                  <label className="block text-sm font-medium mb-1">{t('category', t('cf_category', 'التصنيف'))}</label>
                   <select value={obligationForm.category} onChange={e => setObligationForm(p => ({ ...p, category: e.target.value }))} className="w-full border rounded-lg p-2.5">
-                    <option value="maintenance">{t('maintenance', 'صيانة')}</option>
-                    <option value="utilities">{t('utilities', 'مرافق')}</option>
+                    <option value="maintenance">{t('maintenance', t('cf_maintenance', 'صيانة'))}</option>
+                    <option value="utilities">{t('utilities', t('cf_facilities', 'مرافق'))}</option>
                     <option value="security">{t('security', 'حراسة')}</option>
                     <option value="cleaning">{t('cleaning', 'نظافة')}</option>
-                    <option value="other">{t('other', 'أخرى')}</option>
+                    <option value="other">{t('other', t('cf_other', 'أخرى'))}</option>
                   </select>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium mb-1">{t('month', 'الشهر')}</label>
+                    <label className="block text-sm font-medium mb-1">{t('month', t('cf_month', 'الشهر'))}</label>
                     <select value={obligationForm.month} onChange={e => setObligationForm(p => ({ ...p, month: +e.target.value }))} className="w-full border rounded-lg p-2.5">
                       {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">{t('year', 'السنة')}</label>
+                    <label className="block text-sm font-medium mb-1">{t('year', t('cf_year', 'السنة'))}</label>
                     <select value={obligationForm.year} onChange={e => setObligationForm(p => ({ ...p, year: +e.target.value }))} className="w-full border rounded-lg p-2.5">
                       {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
                     </select>
@@ -729,8 +729,8 @@ const CompoundFinance = () => {
                   {obligationForm.distribution_method === 'custom' && t('distribute_custom_note', 'سيتم تحديد مبلغ مخصص لكل وحدة')}
                 </p>
                 <div className="flex gap-3">
-                  <button type="submit" disabled={submitting} className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium disabled:opacity-50">{submitting ? '...' : t('create_and_distribute', 'إنشاء وتوزيع')}</button>
-                  <button type="button" onClick={() => setShowAddObligation(false)} className="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-medium">{t('cancel', 'إلغاء')}</button>
+                  <button type="submit" disabled={submitting} className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium disabled:opacity-50">{submitting ? '...' : t('create_and_distribute', t('cf_create_dist', 'إنشاء وتوزيع'))}</button>
+                  <button type="button" onClick={() => setShowAddObligation(false)} className="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-medium">{t('cancel', t('cf_cancel', 'إلغاء'))}</button>
                 </div>
               </form>
             </div>

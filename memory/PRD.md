@@ -72,6 +72,13 @@
 | Co. Business | 7,500 | 75,000 |
 | Co. Enterprise | 20,000 | 200,000 |
 
+## Google AdSense
+- Publisher ID: ca-pub-5928973437129941
+- Customer ID: 2587234002
+- Script added to index.html
+- 3 ad slots on HomePage (after hero, before pricing, before CTA)
+- Status: Configured, pending Google approval for domain
+
 ## Backlog
 - P2: Bank transfer API (pending bank setup)
 

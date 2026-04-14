@@ -34,6 +34,17 @@ const HomePage = () => {
     }
   }, [user, loading, navigate]);
 
+  // Initialize Google AdSense ads
+  useEffect(() => {
+    try {
+      if (window.adsbygoogle) {
+        window.adsbygoogle.push({});
+        window.adsbygoogle.push({});
+        window.adsbygoogle.push({});
+      }
+    } catch (e) { /* AdSense not loaded yet */ }
+  }, []);
+
   const handleCodeActivate = async () => {
     if (!subCode.trim()) return;
     const token = localStorage.getItem('token');
@@ -503,18 +514,15 @@ const HomePage = () => {
       </section>
 
       {/* Google Ad Space 1 - After Hero */}
-      <div className="bg-gray-100 py-3 text-center" data-testid="ad-space-1">
+      <div className="bg-gray-100 py-2 text-center" data-testid="ad-space-1">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-white border border-gray-200 rounded-lg py-2 px-4 flex items-center justify-center min-h-[90px] overflow-hidden">
-            {/* Google AdSense - Replace data-ad-client and data-ad-slot with your values */}
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden" style={{ minHeight: '90px', maxHeight: '100px' }}>
             <ins className="adsbygoogle"
-              style={{ display: 'block', width: '100%', height: '90px' }}
-              data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-              data-ad-slot="XXXXXXXXXX"
-              data-ad-format="horizontal"
+              style={{ display: 'block' }}
+              data-ad-client="ca-pub-5928973437129941"
+              data-ad-format="auto"
               data-full-width-responsive="true"
             />
-            <p className="text-xs text-gray-300 absolute">إعلان</p>
           </div>
         </div>
       </div>
@@ -637,17 +645,15 @@ const HomePage = () => {
       </section>
 
       {/* Google Ad Space 2 - Before Pricing */}
-      <div className="bg-slate-900 py-3 text-center">
+      <div className="bg-slate-900 py-2 text-center">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="border border-white/5 rounded-lg py-2 px-4 flex items-center justify-center min-h-[90px] overflow-hidden relative">
+          <div className="rounded-lg overflow-hidden" style={{ minHeight: '90px', maxHeight: '100px' }}>
             <ins className="adsbygoogle"
-              style={{ display: 'block', width: '100%', height: '90px' }}
-              data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-              data-ad-slot="XXXXXXXXXX"
-              data-ad-format="horizontal"
+              style={{ display: 'block' }}
+              data-ad-client="ca-pub-5928973437129941"
+              data-ad-format="auto"
               data-full-width-responsive="true"
             />
-            <p className="text-xs text-gray-600 absolute">إعلان</p>
           </div>
         </div>
       </div>
@@ -986,17 +992,15 @@ const HomePage = () => {
       </section>
 
       {/* Google Ad Space 3 - Before CTA */}
-      <div className="bg-gray-50 py-3 text-center">
+      <div className="bg-gray-50 py-2 text-center">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-white border border-gray-200 rounded-lg py-2 px-4 flex items-center justify-center min-h-[90px] overflow-hidden relative">
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden" style={{ minHeight: '90px', maxHeight: '100px' }}>
             <ins className="adsbygoogle"
-              style={{ display: 'block', width: '100%', height: '90px' }}
-              data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-              data-ad-slot="XXXXXXXXXX"
-              data-ad-format="horizontal"
+              style={{ display: 'block' }}
+              data-ad-client="ca-pub-5928973437129941"
+              data-ad-format="auto"
               data-full-width-responsive="true"
             />
-            <p className="text-xs text-gray-300 absolute">إعلان</p>
           </div>
         </div>
       </div>

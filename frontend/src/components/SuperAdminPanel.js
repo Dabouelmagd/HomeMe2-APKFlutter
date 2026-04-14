@@ -10,8 +10,10 @@ import {
   GlobeAltIcon,
   ShieldCheckIcon,
   ArrowPathIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  LanguageIcon
 } from '@heroicons/react/24/outline';
+import TranslationManager from './TranslationManager';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -262,6 +264,7 @@ const SuperAdminPanel = () => {
             { id: 'ads', label: t('sa_ads', 'الإعلانات') },
             { id: 'referrals', label: t('sa_referrals', 'الإحالات') },
             { id: 'analytics', label: t('sa_analytics', 'تحليلات الاشتراكات') },
+            { id: 'translations', label: t('sa_translations', 'إدارة الترجمات') },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`px-5 py-2.5 rounded-lg text-sm font-medium ${activeTab === tab.id ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
@@ -843,6 +846,11 @@ const SuperAdminPanel = () => {
         )}
         {activeTab === 'analytics' && !subAnalytics && (
           <div className="text-center py-10 text-gray-500">{t('sa_loading', 'جاري التحميل...')}</div>
+        )}
+
+        {/* Translations Tab */}
+        {activeTab === 'translations' && (
+          <TranslationManager />
         )}
 
       </div>

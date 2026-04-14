@@ -2416,6 +2416,8 @@ app.include_router(ads_router)
 app.include_router(referrals_router)
 app.include_router(invoices_router)
 app.include_router(email_notif_router)
+from routes.translations import router as translations_router
+app.include_router(translations_router, prefix="/api", tags=["translations"])
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

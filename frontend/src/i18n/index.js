@@ -2844,7 +2844,23 @@ const resources = {
       'feat_multi_compound': 'Manage multiple compounds', 'feat_unified_reports': 'Unified reports',
       'feat_contract_mgmt': 'Contract management', 'feat_full_analytics': 'Full analytics',
       'feat_maint_requests': 'Maintenance requests', 'feat_book_facilities': 'Book facilities',
-      'feat_pay_dues': 'Pay dues', 'feat_complaints': 'Complaints & suggestions'
+      'feat_pay_dues': 'Pay dues', 'feat_complaints': 'Complaints & suggestions',
+      // Company plans
+      'cp_startup': 'Startup Company', 'cp_business': 'Medium Company', 'cp_enterprise': 'Enterprise',
+      'cp_up_to_3': 'Up to 3 compounds', 'cp_up_to_5': '1 - 5 compounds',
+      'cp_up_to_3_short': 'Up to 3', 'cp_up_to_5_short': 'Up to 5', 'cf_unlimited_short': 'Unlimited',
+      'cf_manage_3': 'Manage up to 3 compounds', 'cf_unified_dashboard': 'Unified dashboard',
+      'cf_all_pro_each': 'All Pro features per compound', 'cf_unified_reports': 'Unified reports for all compounds',
+      'cf_single_team': 'Single management team', 'cf_manage_5': 'Manage up to 5 compounds',
+      'cf_adv_dashboard': 'Advanced central dashboard', 'cf_all_premium_each': 'All Premium features per compound',
+      'cf_compare_analytics': 'Comparative analytics', 'cf_multi_teams': 'Multi-team management',
+      'cf_adv_permissions': 'Advanced permissions', 'cf_company_reports': 'Company performance reports',
+      'cf_priority_whatsapp': 'Priority + WhatsApp support', 'cf_unlimited_compounds': 'Unlimited compounds',
+      'cf_all_platform': 'All platform features', 'cf_full_api': 'Full API integration',
+      'cf_private_hosting': 'Private hosting (optional)', 'cf_white_label': 'Custom branding',
+      'cf_full_training': 'Full team training', 'cf_sla': 'Guaranteed SLA 99.9%',
+      'cf_24_7_phone': '24/7 phone + WhatsApp support', 'cf_num_compounds': 'Number of compounds',
+      'cf_central_dashboard': 'Central dashboard'
     }
   },
   ar: {
@@ -4276,6 +4292,22 @@ const resources = {
       'feat_pay_dues': 'دفع التزامات', 'feat_complaints': 'شكاوى واقتراحات',
       'pm_cards': 'بطاقات الائتمان', 'pm_paypal_d': 'دفع آمن عالمي', 'pm_wallets': 'المحافظ الرقمية',
       'pm_bank': 'تحويل بنكي', 'pm_bank_d': 'تحويل مباشر للحساب', 'pm_instapay': 'انستاباي', 'pm_instapay_d': 'تحويل فوري بالموبايل',
+      // Company plans
+      'cp_startup': 'شركة ناشئة', 'cp_business': 'شركة متوسطة', 'cp_enterprise': 'شركة كبرى',
+      'cp_up_to_3': 'حتى 3 مجتمعات', 'cp_up_to_5': '1 - 5 مجتمعات',
+      'cp_up_to_3_short': 'حتى 3', 'cp_up_to_5_short': 'حتى 5', 'cf_unlimited_short': 'غير محدود',
+      'cf_manage_3': 'إدارة حتى 3 مجتمعات سكنية', 'cf_unified_dashboard': 'لوحة تحكم موحدة',
+      'cf_all_pro_each': 'كل مميزات الاحترافي لكل مجتمع', 'cf_unified_reports': 'تقارير موحدة لكل المجتمعات',
+      'cf_single_team': 'فريق إدارة واحد', 'cf_manage_5': 'إدارة حتى 5 مجتمعات',
+      'cf_adv_dashboard': 'لوحة تحكم مركزية متقدمة', 'cf_all_premium_each': 'كل مميزات المتقدم لكل مجتمع',
+      'cf_compare_analytics': 'تحليلات مقارنة بين المجتمعات', 'cf_multi_teams': 'إدارة فرق متعددة',
+      'cf_adv_permissions': 'نظام صلاحيات متقدم', 'cf_company_reports': 'تقارير أداء الشركة',
+      'cf_priority_whatsapp': 'دعم فني أولوية + واتساب', 'cf_unlimited_compounds': 'عدد غير محدود من المجتمعات',
+      'cf_all_platform': 'كل مميزات المنصة بدون استثناء', 'cf_full_api': 'تكامل API كامل مع أنظمتكم',
+      'cf_private_hosting': 'استضافة خاصة (اختياري)', 'cf_white_label': 'تخصيص العلامة التجارية',
+      'cf_full_training': 'تدريب شامل للفريق', 'cf_sla': 'SLA مضمون 99.9%',
+      'cf_24_7_phone': 'دعم فني 24/7 هاتف + واتساب', 'cf_num_compounds': 'عدد المجتمعات',
+      'cf_central_dashboard': 'لوحة تحكم مركزية',
       
       // Financial Management translations
       'financial_management': 'الإدارة المالية',
@@ -8394,7 +8426,23 @@ const resources = {
       'feat_multi_compound': 'Gérer plusieurs résidences', 'feat_unified_reports': 'Rapports unifiés',
       'feat_contract_mgmt': 'Gestion des contrats', 'feat_full_analytics': 'Analyses complètes',
       'feat_maint_requests': 'Demandes de maintenance', 'feat_book_facilities': 'Réserver installations',
-      'feat_pay_dues': 'Payer les charges', 'feat_complaints': 'Plaintes & suggestions'
+      'feat_pay_dues': 'Payer les charges', 'feat_complaints': 'Plaintes & suggestions',
+      // Company plans
+      'cp_startup': 'Startup', 'cp_business': 'Business', 'cp_enterprise': 'Entreprise',
+      'cp_up_to_3': 'Jusqu\'à 3 résidences', 'cp_up_to_5': '1 - 5 résidences',
+      'cp_up_to_3_short': 'Jusqu\'à 3', 'cp_up_to_5_short': 'Jusqu\'à 5', 'cf_unlimited_short': 'Illimité',
+      'cf_manage_3': 'Gérer jusqu\'à 3 résidences', 'cf_unified_dashboard': 'Tableau de bord unifié',
+      'cf_all_pro_each': 'Toutes fonctionnalités Pro par résidence', 'cf_unified_reports': 'Rapports unifiés',
+      'cf_single_team': 'Équipe de gestion unique', 'cf_manage_5': 'Gérer jusqu\'à 5 résidences',
+      'cf_adv_dashboard': 'Tableau de bord central avancé', 'cf_all_premium_each': 'Toutes fonctionnalités Premium par résidence',
+      'cf_compare_analytics': 'Analyses comparatives', 'cf_multi_teams': 'Gestion multi-équipes',
+      'cf_adv_permissions': 'Permissions avancées', 'cf_company_reports': 'Rapports de performance',
+      'cf_priority_whatsapp': 'Support prioritaire + WhatsApp', 'cf_unlimited_compounds': 'Résidences illimitées',
+      'cf_all_platform': 'Toutes les fonctionnalités', 'cf_full_api': 'Intégration API complète',
+      'cf_private_hosting': 'Hébergement privé (optionnel)', 'cf_white_label': 'Personnalisation de marque',
+      'cf_full_training': 'Formation complète', 'cf_sla': 'SLA garanti 99.9%',
+      'cf_24_7_phone': 'Support 24/7 téléphone + WhatsApp', 'cf_num_compounds': 'Nombre de résidences',
+      'cf_central_dashboard': 'Tableau de bord central'
     }
   }
 };

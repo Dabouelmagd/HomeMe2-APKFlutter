@@ -69,8 +69,8 @@ const VideoTutorial = () => {
     {
       id: 1,
       icon: '🔑',
-      title: 'تسجيل الدخول',
-      simple: 'ادخل بياناتك',
+      title: t('vt_step1_title', 'تسجيل الدخول'),
+      simple: t('vt_step1_simple', 'ادخل بياناتك'),
       visual: {
         main: '👤',
         arrow: '→',
@@ -80,8 +80,8 @@ const VideoTutorial = () => {
     {
       id: 2,
       icon: '📊',
-      title: 'لوحة التحكم',
-      simple: 'شاهد الإحصائيات',
+      title: t('vt_step2_title', 'لوحة التحكم'),
+      simple: t('vt_step2_simple', 'شاهد الإحصائيات'),
       visual: {
         main: '📈',
         arrow: '→',
@@ -91,8 +91,8 @@ const VideoTutorial = () => {
     {
       id: 3,
       icon: '🏠',
-      title: 'إدارة المجمع',
-      simple: 'أضف المقيمين',
+      title: t('vt_step3_title', 'إدارة المجمع'),
+      simple: t('vt_step3_simple', 'أضف المقيمين'),
       visual: {
         main: '👥',
         arrow: '→',
@@ -102,8 +102,8 @@ const VideoTutorial = () => {
     {
       id: 4,
       icon: '💬',
-      title: 'التواصل',
-      simple: 'أرسل رسائل',
+      title: t('vt_step4_title', 'التواصل'),
+      simple: t('vt_step4_simple', 'أرسل رسائل'),
       visual: {
         main: '📨',
         arrow: '→',
@@ -471,8 +471,8 @@ const VideoTutorial = () => {
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold mb-2">دليل الاستخدام المبسط</h2>
-            <p className="text-purple-100">إنفوجراف تفاعلي يوضح كيفية استخدام التطبيق خطوة بخطوة</p>
+            <h2 className="text-2xl font-bold mb-2">{t('vt_header_title', 'دليل الاستخدام المبسط')}</h2>
+            <p className="text-purple-100">{t('vt_header_desc', 'إنفوجراف تفاعلي يوضح كيفية استخدام التطبيق خطوة بخطوة')}</p>
           </div>
           <div className="flex space-x-3">
             <button
@@ -484,7 +484,7 @@ const VideoTutorial = () => {
               className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 flex items-center space-x-2"
             >
               <PlayCircleIcon className="h-5 w-5" />
-              <span>شاهد الدليل</span>
+              <span>{t('vt_watch_guide', 'شاهد الدليل')}</span>
             </button>
             
             <button

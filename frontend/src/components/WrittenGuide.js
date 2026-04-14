@@ -45,693 +45,102 @@ const WrittenGuide = () => {
   };
 
   const guides = [
-    {
-      id: 'login',
-      title: 'تسجيل الدخول',
-      icon: KeyIcon,
-      color: 'from-amber-500 to-orange-600',
-      description: 'كيفية الدخول إلى حسابك في HomeMe',
-      steps: [
-        {
-          title: 'الخطوة 1: افتح صفحة تسجيل الدخول',
-          content: 'انتقل إلى الرابط homemeapp.net/login من متصفحك.',
-          tip: 'يمكنك حفظ الرابط في المفضلة للوصول السريع'
-        },
-        {
-          title: 'الخطوة 2: أدخل بيانات الدخول',
-          content: 'أدخل اسم المستخدم وكلمة المرور الخاصة بك في الحقول المخصصة.',
-          tip: 'تأكد من صحة كلمة المرور (الحروف الكبيرة والصغيرة مهمة)'
-        },
-        {
-          title: 'الخطوة 3: اختر اللغة',
-          content: 'يمكنك اختيار اللغة المفضلة (العربية/English/Français) من القائمة المنسدلة.',
-          tip: 'ستُحفظ اللغة تلقائياً لزياراتك القادمة'
-        },
-        {
-          title: 'الخطوة 4: اضغط "تسجيل الدخول"',
-          content: 'بعد إدخال البيانات، اضغط على زر تسجيل الدخول للدخول إلى لوحة التحكم.',
-          tip: 'إذا نسيت كلمة المرور، تواصل مع إدارة المجمع'
-        }
-      ]
-    },
-    {
-      id: 'dashboard',
-      title: 'لوحة التحكم',
-      icon: HomeIcon,
-      color: 'from-blue-500 to-indigo-600',
-      description: 'الشاشة الرئيسية لعرض ملخص نشاطك',
-      steps: [
-        {
-          title: 'نظرة عامة على الإحصائيات',
-          content: 'تعرض لوحة التحكم إحصائيات سريعة: عدد أفراد العائلة، المدفوعات المعلقة، الرسائل الجديدة، والإشعارات.',
-          tip: 'البطاقات الملونة تتحدث تلقائياً لعرض أحدث البيانات'
-        },
-        {
-          title: 'الإجراءات السريعة',
-          content: 'من لوحة التحكم يمكنك الوصول السريع لـ: إضافة ضيف، طلب صيانة، دفع فاتورة، إرسال رسالة.',
-          tip: 'اضغط على أي بطاقة للانتقال مباشرة إلى تلك الخدمة'
-        },
-        {
-          title: 'آخر النشاطات',
-          content: 'يعرض القسم السفلي آخر الأحداث: زيارات الضيوف، طلبات الصيانة، والمدفوعات الأخيرة.',
-          tip: 'اضغط على "عرض الكل" لرؤية السجل الكامل'
-        }
-      ]
-    },
-    {
-      id: 'compound',
-      title: 'إدارة المجمع',
-      icon: BuildingOfficeIcon,
-      color: 'from-green-500 to-emerald-600',
-      description: 'للمشرفين: إدارة بيانات المجمع السكني',
-      adminOnly: true,
-      steps: [
-        {
-          title: 'عرض معلومات المجمع',
-          content: 'يعرض اسم المجمع، العنوان، عدد الوحدات، وعدد السكان الحاليين.',
-          tip: 'يمكنك تعديل هذه المعلومات بالضغط على زر "تعديل"'
-        },
-        {
-          title: 'إضافة وحدات سكنية',
-          content: 'اضغط على "إضافة وحدة" وأدخل: رقم الوحدة، المبنى، الطابق، نوع الوحدة (شقة/فيلا).',
-          tip: 'يمكنك استيراد قائمة الوحدات من ملف Excel'
-        },
-        {
-          title: 'إدارة المباني',
-          content: 'أضف مباني جديدة، حدد عدد الطوابق، وخصص الوحدات لكل مبنى.',
-          tip: 'نظم المباني بأسماء واضحة (مبنى أ، مبنى ب) للسهولة'
-        },
-        {
-          title: 'رفع شعار المجمع',
-          content: 'اضغط على "رفع الشعار" واختر صورة بصيغة PNG أو JPG (حد أقصى 5 ميجابايت).',
-          tip: 'استخدم صورة بخلفية شفافة للحصول على مظهر احترافي'
-        }
-      ]
-    },
-    {
-      id: 'residents',
-      title: 'قائمة السكان',
-      icon: UsersIcon,
-      color: 'from-purple-500 to-violet-600',
-      description: 'للمشرفين: عرض وإدارة بيانات جميع السكان',
-      adminOnly: true,
-      steps: [
-        {
-          title: 'عرض قائمة السكان',
-          content: 'تعرض جدول بجميع السكان يشمل: الاسم، الوحدة، رقم الهاتف، البريد الإلكتروني، تاريخ التسجيل.',
-          tip: 'استخدم البحث للعثور على ساكن محدد بسرعة'
-        },
-        {
-          title: 'تصفية وترتيب البيانات',
-          content: 'فلتر السكان حسب: المبنى، حالة الاشتراك، تاريخ التسجيل. رتب تصاعدياً أو تنازلياً.',
-          tip: 'اضغط على عنوان العمود للترتيب السريع'
-        },
-        {
-          title: 'عرض تفاصيل الساكن',
-          content: 'اضغط على اسم الساكن لعرض: بيانات كاملة، أفراد العائلة، سجل المدفوعات، طلبات الصيانة.',
-          tip: 'يمكنك التواصل مباشرة من صفحة التفاصيل'
-        },
-        {
-          title: 'تعديل أو حذف ساكن',
-          content: 'من قائمة الإجراءات: تعديل البيانات، إعادة تعيين كلمة المرور، تعليق الحساب، أو حذفه.',
-          tip: 'حذف الساكن سيزيل جميع بياناته نهائياً - استخدم "تعليق" بدلاً منه'
-        }
-      ]
-    },
-    {
-      id: 'users',
-      title: 'إدارة المستخدمين',
-      icon: UserPlusIcon,
-      color: 'from-teal-500 to-cyan-600',
-      description: 'للمشرفين: إنشاء وإدارة حسابات المستخدمين',
-      adminOnly: true,
-      steps: [
-        {
-          title: 'إنشاء مستخدم جديد',
-          content: 'اضغط "إضافة مستخدم" وأدخل: الاسم، البريد، رقم الهاتف، الوحدة، ونوع الحساب (ساكن/مشرف/أمن).',
-          tip: 'أرسل بيانات الدخول للمستخدم عبر البريد الإلكتروني تلقائياً'
-        },
-        {
-          title: 'تعيين الصلاحيات',
-          content: 'حدد صلاحيات كل مستخدم: ساكن (صلاحيات محدودة)، مشرف (صلاحيات كاملة)، أمن (صلاحيات الزوار فقط).',
-          tip: 'المشرف يمكنه الوصول لجميع البيانات والإعدادات'
-        },
-        {
-          title: 'إدارة أكواد الاشتراك',
-          content: 'أنشئ أكواد اشتراك للسكان الجدد بفترات مختلفة (3/6/9/12 شهر).',
-          tip: 'شارك الكود مع الساكن الجديد للتسجيل الذاتي'
-        }
-      ]
-    },
-    {
-      id: 'services',
-      title: 'إدارة الخدمات',
-      icon: WrenchScrewdriverIcon,
-      color: 'from-orange-500 to-red-600',
-      description: 'طلب ومتابعة خدمات الصيانة والخدمات العامة',
-      steps: [
-        {
-          title: 'طلب خدمة جديدة',
-          content: 'اضغط "طلب خدمة"، اختر نوع الخدمة (صيانة/تنظيف/نقل/أخرى)، صف المشكلة بالتفصيل.',
-          tip: 'أرفق صوراً للمشكلة لتسريع المعالجة'
-        },
-        {
-          title: 'تحديد الأولوية',
-          content: 'حدد مستوى الأولوية: طارئ (خلال ساعات)، عاجل (خلال يوم)، عادي (خلال أسبوع).',
-          tip: 'الحالات الطارئة مثل: تسرب مياه، انقطاع كهرباء، مشاكل أمنية'
-        },
-        {
-          title: 'متابعة الطلب',
-          content: 'تابع حالة الطلب: قيد المراجعة، معتمد، قيد التنفيذ، مكتمل.',
-          tip: 'ستصلك إشعارات عند كل تحديث لحالة الطلب'
-        },
-        {
-          title: 'تقييم الخدمة',
-          content: 'بعد اكتمال الخدمة، قيّم جودة العمل (1-5 نجوم) واكتب ملاحظاتك.',
-          tip: 'تقييمك يساعد في تحسين جودة الخدمات'
-        }
-      ]
-    },
-    {
-      id: 'maintenance',
-      title: 'نظام الصيانة',
-      icon: Cog6ToothIcon,
-      color: 'from-gray-600 to-gray-800',
-      description: 'جدولة ومتابعة أعمال الصيانة',
-      steps: [
-        {
-          title: 'تقديم طلب صيانة',
-          content: 'حدد موقع المشكلة (داخل الوحدة/مناطق مشتركة)، نوع الصيانة (كهرباء/سباكة/تكييف/أخرى).',
-          tip: 'كن دقيقاً في وصف المشكلة لتسريع الإصلاح'
-        },
-        {
-          title: 'جدولة موعد',
-          content: 'اختر الوقت المناسب لزيارة فريق الصيانة من المواعيد المتاحة.',
-          tip: 'تأكد من وجود شخص بالغ في الوحدة وقت الموعد'
-        },
-        {
-          title: 'استلام تقرير العمل',
-          content: 'بعد الانتهاء، ستستلم تقريراً بالعمل المنجز والقطع المستبدلة إن وجدت.',
-          tip: 'احتفظ بالتقارير كمرجع للصيانة المستقبلية'
-        }
-      ]
-    },
-    {
-      id: 'guests',
-      title: 'إدارة الضيوف',
-      icon: UserGroupIcon,
-      color: 'from-pink-500 to-rose-600',
-      description: 'تسجيل وإدارة زيارات الضيوف',
-      steps: [
-        {
-          title: 'إضافة ضيف جديد',
-          content: 'أدخل: اسم الضيف، رقم الهوية (اختياري)، رقم الهاتف، سبب الزيارة، تاريخ ووقت الزيارة المتوقع.',
-          tip: 'يمكنك إضافة عدة ضيوف دفعة واحدة'
-        },
-        {
-          title: 'إنشاء رمز QR',
-          content: 'بعد إضافة الضيف، يُنشأ رمز QR فريد يمكنك مشاركته مع الضيف.',
-          tip: 'شارك الرمز عبر واتساب أو البريد الإلكتروني'
-        },
-        {
-          title: 'متابعة وصول الضيوف',
-          content: 'عند وصول الضيف، يمسح الأمن الرمز ويسجل دخوله، وتصلك إشعار فوري.',
-          tip: 'يمكنك إلغاء الزيارة قبل وصول الضيف'
-        },
-        {
-          title: 'سجل الزيارات',
-          content: 'اطلع على تاريخ جميع الزيارات: التاريخ، الوقت، مدة الزيارة، ملاحظات الأمن.',
-          tip: 'استخدم الفلتر لعرض زيارات فترة معينة'
-        }
-      ]
-    },
-    {
-      id: 'family',
-      title: 'إدارة العائلة',
-      icon: UsersIcon,
-      color: 'from-indigo-500 to-blue-600',
-      description: 'إضافة وإدارة أفراد عائلتك',
-      steps: [
-        {
-          title: 'إضافة فرد جديد',
-          content: 'اضغط "إضافة فرد"، أدخل: الاسم، صلة القرابة، تاريخ الميلاد، رقم الهاتف.',
-          tip: 'يمكن لأفراد العائلة البالغين الحصول على حساب خاص'
-        },
-        {
-          title: 'تعيين صلاحيات',
-          content: 'حدد من يمكنه: استقبال الضيوف، طلب الخدمات، استلام الإشعارات.',
-          tip: 'رب الأسرة لديه جميع الصلاحيات تلقائياً'
-        },
-        {
-          title: 'إدارة بطاقات الدخول',
-          content: 'خصص بطاقات دخول لكل فرد للبوابات والمرافق المشتركة.',
-          tip: 'في حالة فقدان البطاقة، أبلغ الإدارة فوراً'
-        }
-      ]
-    },
-    {
-      id: 'finances',
-      title: 'الإدارة المالية',
-      icon: CurrencyDollarIcon,
-      color: 'from-green-600 to-emerald-700',
-      description: 'عرض ودفع الفواتير والمستحقات',
-      steps: [
-        {
-          title: 'عرض الفواتير',
-          content: 'اطلع على جميع الفواتير: رسوم الصيانة، خدمات إضافية، مخالفات (إن وجدت).',
-          tip: 'الفواتير المتأخرة تظهر باللون الأحمر'
-        },
-        {
-          title: 'دفع فاتورة',
-          content: 'اختر الفاتورة، اضغط "دفع"، اختر طريقة الدفع (بطاقة/تحويل)، أكد الدفع.',
-          tip: 'احتفظ بإيصال الدفع كمرجع'
-        },
-        {
-          title: 'عرض السجل المالي',
-          content: 'اطلع على تاريخ جميع المدفوعات: التاريخ، المبلغ، طريقة الدفع، رقم المرجع.',
-          tip: 'يمكنك تحميل كشف حساب بصيغة PDF'
-        },
-        {
-          title: 'إعداد التذكيرات',
-          content: 'فعّل التذكير التلقائي قبل موعد استحقاق الفاتورة بيوم أو أسبوع.',
-          tip: 'تجنب رسوم التأخير بتفعيل التذكيرات'
-        }
-      ]
-    },
-    {
-      id: 'messages',
-      title: 'مركز الرسائل',
-      icon: ChatBubbleLeftRightIcon,
-      color: 'from-blue-600 to-cyan-600',
-      description: 'التواصل مع الإدارة والجيران',
-      steps: [
-        {
-          title: 'إرسال رسالة للإدارة',
-          content: 'اضغط "رسالة جديدة"، اختر "إدارة المجمع"، اكتب رسالتك، أرفق ملفات إن لزم.',
-          tip: 'الرسائل العاجلة تُعالج خلال 24 ساعة'
-        },
-        {
-          title: 'التواصل مع الجيران',
-          content: 'أرسل رسائل للجيران في نفس المبنى أو المجمع (إذا كانت الميزة مفعلة).',
-          tip: 'حافظ على آداب التواصل واحترم خصوصية الآخرين'
-        },
-        {
-          title: 'الإعلانات العامة',
-          content: 'تابع إعلانات الإدارة: صيانة مجدولة، فعاليات، تحديثات مهمة.',
-          tip: 'الإعلانات المهمة تُرسل كإشعارات أيضاً'
-        }
-      ]
-    },
-    {
-      id: 'notifications',
-      title: 'الإشعارات',
-      icon: BellIcon,
-      color: 'from-yellow-500 to-amber-600',
-      description: 'إدارة إشعاراتك وتنبيهاتك',
-      steps: [
-        {
-          title: 'عرض الإشعارات',
-          content: 'اضغط على أيقونة الجرس لعرض جميع الإشعارات: جديدة ومقروءة.',
-          tip: 'الإشعارات غير المقروءة تظهر بخلفية ملونة'
-        },
-        {
-          title: 'إعدادات الإشعارات',
-          content: 'تحكم في أنواع الإشعارات: فواتير، ضيوف، صيانة، إعلانات.',
-          tip: 'يمكنك تفعيل الإشعارات عبر البريد الإلكتروني أيضاً'
-        },
-        {
-          title: 'تفعيل الإشعارات الفورية',
-          content: 'اسمح للموقع بإرسال إشعارات للحصول على تنبيهات فورية.',
-          tip: 'مهم لتنبيهات الضيوف والحالات الطارئة'
-        }
-      ]
-    },
-    {
-      id: 'settings',
-      title: 'الإعدادات',
-      icon: Cog6ToothIcon,
-      color: 'from-gray-500 to-slate-600',
-      description: 'تخصيص إعدادات حسابك',
-      steps: [
-        {
-          title: 'تعديل الملف الشخصي',
-          content: 'حدّث: الاسم، الصورة الشخصية، رقم الهاتف، البريد الإلكتروني.',
-          tip: 'استخدم صورة واضحة للتعرف السهل'
-        },
-        {
-          title: 'تغيير كلمة المرور',
-          content: 'أدخل كلمة المرور الحالية، ثم الجديدة مرتين للتأكيد.',
-          tip: 'استخدم كلمة مرور قوية (8 أحرف على الأقل، أرقام ورموز)'
-        },
-        {
-          title: 'إعدادات اللغة',
-          content: 'اختر لغة الواجهة: العربية، English، Français.',
-          tip: 'يتغير اتجاه الصفحة تلقائياً حسب اللغة'
-        },
-        {
-          title: 'إعدادات الخصوصية',
-          content: 'تحكم في: من يرى معلوماتك، مشاركة الموقع، تتبع النشاط.',
-          tip: 'راجع إعدادات الخصوصية بانتظام'
-        }
-      ]
-    },
-    {
-      id: 'complaints',
-      title: 'الشكاوى والاقتراحات',
-      icon: ClipboardDocumentListIcon,
-      color: 'from-rose-500 to-pink-600',
-      description: 'تقديم شكوى أو اقتراح لإدارة المجمع',
-      steps: [
-        {
-          title: 'تقديم شكوى',
-          content: 'اضغط "شكوى جديدة"، اختر التصنيف (صيانة/نظافة/أمن/إزعاج/أخرى)، اكتب تفاصيل الشكوى، وأرفق صوراً إن وجدت.',
-          tip: 'كلما كانت التفاصيل أدق، كلما تمت المعالجة أسرع'
-        },
-        {
-          title: 'متابعة حالة الشكوى',
-          content: 'تابع شكواك عبر الحالات: جديدة، قيد المراجعة، قيد المعالجة، تم الحل. ستصلك إشعارات عند كل تحديث.',
-          tip: 'يمكنك إضافة تعليقات إضافية على الشكوى المفتوحة'
-        },
-        {
-          title: 'تقديم اقتراح',
-          content: 'شارك أفكارك لتحسين المجمع: خدمات جديدة، تحسينات في المرافق، فعاليات مجتمعية.',
-          tip: 'الاقتراحات الأكثر تأييداً من السكان تُعطى الأولوية'
-        }
-      ]
-    },
-    {
-      id: 'contracts',
-      title: 'إدارة العقود والمزودين',
-      icon: DocumentTextIcon,
-      color: 'from-slate-600 to-zinc-700',
-      description: 'للمشرفين: إدارة عقود الموردين ومقدمي الخدمات',
-      adminOnly: true,
-      steps: [
-        {
-          title: 'إضافة عقد جديد',
-          content: 'أدخل بيانات العقد: اسم المورد، نوع الخدمة، تاريخ البداية والنهاية، القيمة، وشروط الدفع.',
-          tip: 'ارفع نسخة إلكترونية من العقد للرجوع إليها لاحقاً'
-        },
-        {
-          title: 'متابعة العقود النشطة',
-          content: 'اطلع على جميع العقود الفعالة مع تنبيهات قبل انتهاء العقد بـ 30 يوم.',
-          tip: 'فعّل التذكيرات التلقائية لتجنب انتهاء العقود دون تجديد'
-        },
-        {
-          title: 'تقييم المزودين',
-          content: 'قيّم أداء كل مزود خدمة (جودة العمل، الالتزام بالمواعيد، التكلفة) لمساعدتك في قرارات التجديد.',
-          tip: 'احتفظ بسجل التقييمات للمقارنة عند البحث عن مزودين جدد'
-        }
-      ]
-    },
-    {
-      id: 'ratings',
-      title: 'تقييمات الرضا',
-      icon: ChartBarIcon,
-      color: 'from-yellow-500 to-orange-500',
-      description: 'قياس رضا السكان عن الخدمات والمرافق',
-      steps: [
-        {
-          title: 'تقييم الخدمات',
-          content: 'بعد كل خدمة مكتملة (صيانة، تنظيف، إلخ) يمكنك تقييم الجودة من 1 إلى 5 نجوم مع كتابة ملاحظاتك.',
-          tip: 'تقييمك يساعد الإدارة في اختيار أفضل مزودي الخدمات'
-        },
-        {
-          title: 'لوحة تحليل الرضا (للمشرفين)',
-          content: 'عرض إحصائيات شاملة: متوسط التقييم لكل خدمة، اتجاه الرضا عبر الزمن، أكثر الشكاوى تكراراً.',
-          tip: 'استخدم هذه البيانات في اجتماعات التحسين الشهرية'
-        }
-      ]
-    },
-    {
-      id: 'facilities',
-      title: 'حجز المرافق',
-      icon: CalendarIcon,
-      color: 'from-teal-500 to-emerald-600',
-      description: 'حجز المرافق المشتركة (صالة، ملعب، مسبح)',
-      steps: [
-        {
-          title: 'عرض المرافق المتاحة',
-          content: 'اطلع على قائمة المرافق: الصالة المشتركة، الملعب، المسبح، غرفة الاجتماعات، مع أوقات التشغيل.',
-          tip: 'المرافق المحجوزة تظهر باللون الرمادي في التقويم'
-        },
-        {
-          title: 'إنشاء حجز جديد',
-          content: 'اختر المرفق، حدد التاريخ والوقت (من-إلى)، أضف ملاحظات عن المناسبة إن رغبت.',
-          tip: 'احجز مبكراً خاصة في عطلات نهاية الأسبوع'
-        },
-        {
-          title: 'إلغاء أو تعديل الحجز',
-          content: 'يمكنك إلغاء أو تعديل الحجز قبل الموعد بـ 24 ساعة على الأقل.',
-          tip: 'الإلغاء المتكرر قد يؤثر على أولوية حجوزاتك المستقبلية'
-        }
-      ]
-    },
-    {
-      id: 'polls',
-      title: 'استطلاعات الرأي',
-      icon: ClipboardDocumentListIcon,
-      color: 'from-violet-500 to-purple-600',
-      description: 'المشاركة في استطلاعات الرأي المجتمعية',
-      steps: [
-        {
-          title: 'عرض الاستطلاعات النشطة',
-          content: 'اطلع على الاستطلاعات المتاحة: استطلاعات عامة، تصويت على قرارات، اقتراحات تحسين.',
-          tip: 'صوتك مهم! شارك في كل استطلاع لتحسين مجتمعك'
-        },
-        {
-          title: 'التصويت والمشاركة',
-          content: 'اختر إجابتك من الخيارات المتاحة. بعض الاستطلاعات تسمح باختيار أكثر من إجابة.',
-          tip: 'نتائج التصويت تظهر فور إغلاق الاستطلاع'
-        },
-        {
-          title: 'إنشاء استطلاع (للمشرفين)',
-          content: 'أنشئ استطلاع جديد: العنوان، الأسئلة، الخيارات، تاريخ الانتهاء، وحدد من يمكنه المشاركة.',
-          tip: 'اجعل الأسئلة واضحة ومختصرة لزيادة نسبة المشاركة'
-        }
-      ]
-    },
-    {
-      id: 'announcements',
-      title: 'الإعلانات والأحداث',
-      icon: BellIcon,
-      color: 'from-blue-500 to-sky-600',
-      description: 'متابعة إعلانات المجمع والفعاليات المجتمعية',
-      steps: [
-        {
-          title: 'عرض الإعلانات',
-          content: 'تابع جميع إعلانات الإدارة: صيانة مجدولة، تغييرات في القوانين، تحديثات مهمة.',
-          tip: 'الإعلانات العاجلة تظهر في أعلى القائمة باللون الأحمر'
-        },
-        {
-          title: 'الأحداث والفعاليات',
-          content: 'اطلع على الفعاليات القادمة: حفلات مجتمعية، ورش عمل، أنشطة رياضية. سجل حضورك مسبقاً.',
-          tip: 'فعّل التذكيرات للأحداث التي تهمك'
-        },
-        {
-          title: 'نشر إعلان (للمشرفين)',
-          content: 'أنشئ إعلان جديد: العنوان، المحتوى، تاريخ النشر، مستوى الأهمية (عادي/مهم/طارئ).',
-          tip: 'أضف صوراً للإعلان لزيادة التفاعل'
-        }
-      ]
-    },
-    {
-      id: 'newsletters',
-      title: 'النشرات الإخبارية',
-      icon: EnvelopeIcon,
-      color: 'from-cyan-500 to-blue-600',
-      description: 'إرسال ومتابعة النشرات الإخبارية الدورية',
-      steps: [
-        {
-          title: 'عرض النشرات',
-          content: 'تصفح أرشيف النشرات الإخبارية: أخبار المجمع، تحديثات الخدمات، نصائح مفيدة.',
-          tip: 'النشرات تُرسل تلقائياً لبريدك الإلكتروني أيضاً'
-        },
-        {
-          title: 'إنشاء نشرة (للمشرفين)',
-          content: 'أنشئ نشرة إخبارية بمحرر نصوص متقدم. أضف صوراً، روابط، وجداول. اختر قائمة المستلمين.',
-          tip: 'النشرات الشهرية المنتظمة تبني ثقة السكان'
-        }
-      ]
-    },
-    {
-      id: 'analytics',
-      title: 'التحليلات والتقارير',
-      icon: ChartBarIcon,
-      color: 'from-indigo-600 to-violet-700',
-      description: 'للمشرفين: تقارير متقدمة ورسوم بيانية',
-      adminOnly: true,
-      steps: [
-        {
-          title: 'لوحة التحليلات',
-          content: 'عرض رسوم بيانية تفاعلية: الإيرادات الشهرية، المصروفات، نسبة تحصيل الفواتير، معدل الإشغال.',
-          tip: 'اضغط على أي رسم بياني لعرض التفاصيل'
-        },
-        {
-          title: 'التقارير اليومية التلقائية',
-          content: 'يُرسل النظام تقريراً يومياً للمشرفين بالبريد الإلكتروني يشمل: طلبات جديدة، مدفوعات، شكاوى، حالة المرافق.',
-          tip: 'يمكنك تخصيص محتوى التقرير اليومي من الإعدادات'
-        },
-        {
-          title: 'تصدير التقارير',
-          content: 'صدّر أي تقرير بصيغة Excel أو PDF. اختر الفترة الزمنية ونوع البيانات المطلوبة.',
-          tip: 'استخدم تقارير Excel للتحليل المتقدم في جداول البيانات'
-        },
-        {
-          title: 'تقارير مقارنة المجتمعات (للشركات)',
-          content: 'قارن أداء المجتمعات: الإيرادات، رضا السكان، سرعة الاستجابة، نسبة الإشغال.',
-          tip: 'التقارير المقارنة تساعد في تحديد أفضل الممارسات ونقلها بين المجتمعات'
-        }
-      ]
-    },
-    {
-      id: 'exports',
-      title: 'تصدير Excel و PDF',
-      icon: DocumentTextIcon,
-      color: 'from-green-600 to-teal-600',
-      description: 'تصدير البيانات والتقارير بصيغ مختلفة',
-      steps: [
-        {
-          title: 'تصدير بيانات السكان',
-          content: 'صدّر قائمة السكان الكاملة بصيغة Excel مع كل التفاصيل: الاسم، الوحدة، الهاتف، تاريخ التسجيل.',
-          tip: 'فلتر البيانات أولاً ثم صدّر النتائج المطلوبة فقط'
-        },
-        {
-          title: 'تصدير التقارير المالية',
-          content: 'صدّر كشوف الحساب، تقارير الإيرادات والمصروفات، وفواتير السكان بصيغة PDF.',
-          tip: 'تقارير PDF جاهزة للطباعة والتقديم للإدارة'
-        },
-        {
-          title: 'تصدير سجلات الصيانة',
-          content: 'صدّر جميع طلبات الصيانة مع حالاتها وتقييماتها لفترة زمنية محددة.',
-          tip: 'مفيد لتقييم أداء فرق الصيانة ومزودي الخدمات'
-        }
-      ]
-    },
-    {
-      id: 'subscription',
-      title: 'الاشتراكات والدفع',
-      icon: CreditCardIcon,
-      color: 'from-emerald-500 to-green-600',
-      description: 'إدارة اشتراكك وطرق الدفع',
-      steps: [
-        {
-          title: 'اختيار الخطة المناسبة',
-          content: 'اختر من بين 4 خطط للمجتمعات السكنية (مجاني، أساسي، احترافي، متقدم) أو 3 خطط للشركات (ناشئة، متوسطة، كبرى).',
-          tip: 'ابدأ بخطة مجانية واترقِ حسب احتياجاتك. جميع الخطط تشمل 14 يوم تجربة مجانية'
-        },
-        {
-          title: 'طرق الدفع',
-          content: 'ادفع عبر: بطاقات الائتمان (Stripe)، PayPal، تحويل بنكي، انستاباي، أو محفظة فودافون كاش.',
-          tip: 'الاشتراك السنوي يوفر شهرين مجاناً (تدفع 10 شهور فقط)'
-        },
-        {
-          title: 'تفعيل كود اشتراك',
-          content: 'إذا لديك كود اشتراك مسبق الدفع، أدخله في حقل "كود الاشتراك" لتفعيل خطتك فوراً.',
-          tip: 'الأكواد متاحة بفترات: 3، 6، 9 شهور، سنة، أو مدى الحياة'
-        },
-        {
-          title: 'إدارة الاشتراك',
-          content: 'من صفحة "إدارة الاشتراك": شاهد خطتك الحالية، الأيام المتبقية، تجديد أو ترقية الخطة.',
-          tip: 'ستصلك رسالة تذكير قبل انتهاء الاشتراك بـ 7 أيام'
-        },
-        {
-          title: 'استخدام كوبون خصم',
-          content: 'عند الدفع، أدخل كود الكوبون للحصول على خصم نسبة مئوية أو مبلغ ثابت من سعر الاشتراك.',
-          tip: 'تابع حسابات HomeMe للحصول على أحدث عروض الخصم'
-        }
-      ]
-    }
+    { id: 'login', title: t('wg_login_title', 'تسجيل الدخول'), icon: KeyIcon, color: 'from-amber-500 to-orange-600', description: t('wg_login_desc', 'كيفية الدخول إلى حسابك في HomeMe'), steps: [
+      { title: t('wg_login_s1_title', 'الخطوة 1: افتح صفحة تسجيل الدخول'), content: t('wg_login_s1_content', 'انتقل إلى الرابط homemeapp.net/login من متصفحك.'), tip: t('wg_login_s1_tip', 'يمكنك حفظ الرابط في المفضلة للوصول السريع') },
+      { title: t('wg_login_s2_title', 'الخطوة 2: أدخل بيانات الدخول'), content: t('wg_login_s2_content', 'أدخل اسم المستخدم وكلمة المرور الخاصة بك في الحقول المخصصة.'), tip: t('wg_login_s2_tip', 'تأكد من صحة كلمة المرور (الحروف الكبيرة والصغيرة مهمة)') },
+      { title: t('wg_login_s3_title', 'الخطوة 3: اختر اللغة'), content: t('wg_login_s3_content', 'يمكنك اختيار اللغة المفضلة (العربية/English/Français) من القائمة المنسدلة.'), tip: t('wg_login_s3_tip', 'ستُحفظ اللغة تلقائياً لزياراتك القادمة') },
+      { title: t('wg_login_s4_title', 'الخطوة 4: اضغط "تسجيل الدخول"'), content: t('wg_login_s4_content', 'بعد إدخال البيانات، اضغط على زر تسجيل الدخول للدخول إلى لوحة التحكم.'), tip: t('wg_login_s4_tip', 'إذا نسيت كلمة المرور، تواصل مع إدارة المجمع') }
+    ]},
+    { id: 'dashboard', title: t('wg_dashboard_title', 'لوحة التحكم'), icon: HomeIcon, color: 'from-blue-500 to-indigo-600', description: t('wg_dashboard_desc', 'الشاشة الرئيسية لعرض ملخص نشاطك'), steps: [
+      { title: t('wg_dashboard_s1_title', 'نظرة عامة على الإحصائيات'), content: t('wg_dashboard_s1_content', 'تعرض لوحة التحكم إحصائيات سريعة: عدد أفراد العائلة، المدفوعات المعلقة، الرسائل الجديدة، والإشعارات.'), tip: t('wg_dashboard_s1_tip', 'البطاقات الملونة تتحدث تلقائياً لعرض أحدث البيانات') },
+      { title: t('wg_dashboard_s2_title', 'الإجراءات السريعة'), content: t('wg_dashboard_s2_content', 'من لوحة التحكم يمكنك الوصول السريع لـ: إضافة ضيف، طلب صيانة، دفع فاتورة، إرسال رسالة.'), tip: t('wg_dashboard_s2_tip', 'اضغط على أي بطاقة للانتقال مباشرة إلى تلك الخدمة') },
+      { title: t('wg_dashboard_s3_title', 'آخر النشاطات'), content: t('wg_dashboard_s3_content', 'يعرض القسم السفلي آخر الأحداث: زيارات الضيوف، طلبات الصيانة، والمدفوعات الأخيرة.'), tip: t('wg_dashboard_s3_tip', 'اضغط على "عرض الكل" لرؤية السجل الكامل') }
+    ]},
+    { id: 'compound', title: t('wg_compound_title', 'إدارة المجمع'), icon: BuildingOfficeIcon, color: 'from-green-500 to-emerald-600', description: t('wg_compound_desc', 'للمشرفين: إدارة بيانات المجمع السكني'), adminOnly: true, steps: [
+      { title: t('wg_compound_s1_title', 'عرض معلومات المجمع'), content: t('wg_compound_s1_content', 'يعرض اسم المجمع، العنوان، عدد الوحدات، وعدد السكان الحاليين.'), tip: t('wg_compound_s1_tip', 'يمكنك تعديل هذه المعلومات بالضغط على زر "تعديل"') },
+      { title: t('wg_compound_s2_title', 'إضافة وحدات سكنية'), content: t('wg_compound_s2_content', 'اضغط على "إضافة وحدة" وأدخل: رقم الوحدة، المبنى، الطابق، نوع الوحدة (شقة/فيلا).'), tip: t('wg_compound_s2_tip', 'يمكنك استيراد قائمة الوحدات من ملف Excel') },
+      { title: t('wg_compound_s3_title', 'إدارة المباني'), content: t('wg_compound_s3_content', 'أضف مباني جديدة، حدد عدد الطوابق، وخصص الوحدات لكل مبنى.'), tip: t('wg_compound_s3_tip', 'نظم المباني بأسماء واضحة (مبنى أ، مبنى ب) للسهولة') }
+    ]},
+    { id: 'services', title: t('wg_services_title', 'إدارة الخدمات'), icon: WrenchScrewdriverIcon, color: 'from-orange-500 to-red-600', description: t('wg_services_desc', 'طلب ومتابعة خدمات الصيانة والخدمات العامة'), steps: [
+      { title: t('wg_services_s1_title', 'طلب خدمة جديدة'), content: t('wg_services_s1_content', 'اضغط "طلب خدمة"، اختر نوع الخدمة (صيانة/تنظيف/نقل/أخرى)، صف المشكلة بالتفصيل.'), tip: t('wg_services_s1_tip', 'أرفق صوراً للمشكلة لتسريع المعالجة') },
+      { title: t('wg_services_s2_title', 'تحديد الأولوية'), content: t('wg_services_s2_content', 'حدد مستوى الأولوية: طارئ (خلال ساعات)، عاجل (خلال يوم)، عادي (خلال أسبوع).'), tip: t('wg_services_s2_tip', 'الحالات الطارئة مثل: تسرب مياه، انقطاع كهرباء، مشاكل أمنية') },
+      { title: t('wg_services_s3_title', 'متابعة الطلب'), content: t('wg_services_s3_content', 'تابع حالة الطلب: قيد المراجعة، معتمد، قيد التنفيذ، مكتمل.'), tip: t('wg_services_s3_tip', 'ستصلك إشعارات عند كل تحديث لحالة الطلب') }
+    ]},
+    { id: 'guests', title: t('wg_guests_title', 'إدارة الضيوف'), icon: UserGroupIcon, color: 'from-pink-500 to-rose-600', description: t('wg_guests_desc', 'تسجيل وإدارة زيارات الضيوف'), steps: [
+      { title: t('wg_guests_s1_title', 'إضافة ضيف جديد'), content: t('wg_guests_s1_content', 'أدخل: اسم الضيف، رقم الهوية (اختياري)، رقم الهاتف، سبب الزيارة، تاريخ ووقت الزيارة المتوقع.'), tip: t('wg_guests_s1_tip', 'يمكنك إضافة عدة ضيوف دفعة واحدة') },
+      { title: t('wg_guests_s2_title', 'إنشاء رمز QR'), content: t('wg_guests_s2_content', 'بعد إضافة الضيف، يُنشأ رمز QR فريد يمكنك مشاركته مع الضيف.'), tip: t('wg_guests_s2_tip', 'شارك الرمز عبر واتساب أو البريد الإلكتروني') }
+    ]},
+    { id: 'finances', title: t('wg_finances_title', 'الإدارة المالية'), icon: CurrencyDollarIcon, color: 'from-green-600 to-emerald-700', description: t('wg_finances_desc', 'عرض ودفع الفواتير والمستحقات'), steps: [
+      { title: t('wg_finances_s1_title', 'عرض الفواتير'), content: t('wg_finances_s1_content', 'اطلع على جميع الفواتير: رسوم الصيانة، خدمات إضافية، مخالفات (إن وجدت).'), tip: t('wg_finances_s1_tip', 'الفواتير المتأخرة تظهر باللون الأحمر') },
+      { title: t('wg_finances_s2_title', 'دفع فاتورة'), content: t('wg_finances_s2_content', 'اختر الفاتورة، اضغط "دفع"، اختر طريقة الدفع (بطاقة/تحويل)، أكد الدفع.'), tip: t('wg_finances_s2_tip', 'احتفظ بإيصال الدفع كمرجع') }
+    ]},
+    { id: 'notifications', title: t('wg_notifications_title', 'الإشعارات'), icon: BellIcon, color: 'from-yellow-500 to-amber-600', description: t('wg_notifications_desc', 'إدارة إشعاراتك وتنبيهاتك'), steps: [
+      { title: t('wg_notifications_s1_title', 'عرض الإشعارات'), content: t('wg_notifications_s1_content', 'اضغط على أيقونة الجرس لعرض جميع الإشعارات: جديدة ومقروءة.'), tip: t('wg_notifications_s1_tip', 'الإشعارات غير المقروءة تظهر بخلفية ملونة') },
+      { title: t('wg_notifications_s2_title', 'إعدادات الإشعارات'), content: t('wg_notifications_s2_content', 'تحكم في أنواع الإشعارات: فواتير، ضيوف، صيانة، إعلانات.'), tip: t('wg_notifications_s2_tip', 'يمكنك تفعيل الإشعارات عبر البريد الإلكتروني أيضاً') }
+    ]},
+    { id: 'settings', title: t('wg_settings_title', 'الإعدادات'), icon: Cog6ToothIcon, color: 'from-gray-500 to-slate-600', description: t('wg_settings_desc', 'تخصيص إعدادات حسابك'), steps: [
+      { title: t('wg_settings_s1_title', 'تعديل الملف الشخصي'), content: t('wg_settings_s1_content', 'حدّث: الاسم، الصورة الشخصية، رقم الهاتف، البريد الإلكتروني.'), tip: t('wg_settings_s1_tip', 'استخدم صورة واضحة للتعرف السهل') },
+      { title: t('wg_settings_s2_title', 'تغيير كلمة المرور'), content: t('wg_settings_s2_content', 'أدخل كلمة المرور الحالية، ثم الجديدة مرتين للتأكيد.'), tip: t('wg_settings_s2_tip', 'استخدم كلمة مرور قوية (8 أحرف على الأقل، أرقام ورموز)') }
+    ]},
+    { id: 'subscription', title: t('wg_subscription_title', 'الاشتراكات والدفع'), icon: CreditCardIcon, color: 'from-emerald-500 to-green-600', description: t('wg_subscription_desc', 'إدارة اشتراكك وطرق الدفع'), steps: [
+      { title: t('wg_subscription_s1_title', 'اختيار الخطة المناسبة'), content: t('wg_subscription_s1_content', 'اختر من بين 4 خطط للمجتمعات السكنية أو 3 خطط للشركات.'), tip: t('wg_subscription_s1_tip', 'ابدأ بخطة مجانية واترقِ حسب احتياجاتك. جميع الخطط تشمل 14 يوم تجربة مجانية') },
+      { title: t('wg_subscription_s2_title', 'طرق الدفع'), content: t('wg_subscription_s2_content', 'ادفع عبر: بطاقات الائتمان (Stripe)، PayPal، تحويل بنكي، انستاباي، أو محفظة فودافون كاش.'), tip: t('wg_subscription_s2_tip', 'الاشتراك السنوي يوفر شهرين مجاناً (تدفع 10 شهور فقط)') }
+    ]}
   ];
 
   const selectedGuide = guides.find(g => g.id === activeSection);
 
   return (
     <div className={`bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 rounded-2xl p-6 mb-8 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-      {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-white mb-2">
-          📖 دليل الاستخدام الشامل
-        </h2>
-        <p className="text-blue-100">
-          دليل تفصيلي خطوة بخطوة لجميع ميزات النظام
-        </p>
+        <h2 className="text-2xl font-bold text-white mb-2">{t('wg_main_title', 'دليل الاستخدام الشامل')}</h2>
+        <p className="text-blue-100">{t('wg_main_subtitle', 'دليل تفصيلي خطوة بخطوة لجميع ميزات النظام')}</p>
       </div>
 
-      {/* Navigation Tabs */}
       <div className="flex flex-wrap justify-center gap-2 mb-8">
         {guides.map(guide => (
-          <button
-            key={guide.id}
-            onClick={() => setActiveSection(guide.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              activeSection === guide.id
-                ? 'bg-white text-purple-700 shadow-lg'
-                : 'bg-white/20 text-white hover:bg-white/30'
-            }`}
-          >
+          <button key={guide.id} onClick={() => setActiveSection(guide.id)} data-testid={`guide-tab-${guide.id}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${activeSection === guide.id ? 'bg-white text-purple-700 shadow-lg' : 'bg-white/20 text-white hover:bg-white/30'}`}>
             <guide.icon className="w-4 h-4" />
             <span>{guide.title}</span>
-            {guide.adminOnly && (
-              <ShieldCheckIcon className="w-3 h-3 text-yellow-400" title="للمشرفين فقط" />
-            )}
+            {guide.adminOnly && <ShieldCheckIcon className="w-3 h-3 text-yellow-400" title={t('wg_admin_only', 'للمشرفين فقط')} />}
           </button>
         ))}
       </div>
 
-      {/* Selected Guide Content */}
       {selectedGuide && (
         <div className="bg-white rounded-xl p-6 shadow-xl">
-          {/* Guide Header */}
           <div className={`bg-gradient-to-r ${selectedGuide.color} rounded-lg p-4 mb-6`}>
             <div className="flex items-center gap-4">
-              <div className="bg-white/20 p-3 rounded-lg">
-                <selectedGuide.icon className="w-8 h-8 text-white" />
-              </div>
+              <div className="bg-white/20 p-3 rounded-lg"><selectedGuide.icon className="w-8 h-8 text-white" /></div>
               <div>
                 <h3 className="text-xl font-bold text-white">{selectedGuide.title}</h3>
                 <p className="text-white/80 text-sm">{selectedGuide.description}</p>
                 {selectedGuide.adminOnly && (
                   <span className="inline-flex items-center gap-1 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded mt-2">
-                    <ShieldCheckIcon className="w-3 h-3" />
-                    للمشرفين فقط
+                    <ShieldCheckIcon className="w-3 h-3" />{t('wg_admin_only', 'للمشرفين فقط')}
                   </span>
                 )}
               </div>
             </div>
           </div>
-
-          {/* Steps */}
           <div className="space-y-4">
             {selectedGuide.steps.map((step, index) => (
               <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => toggleStep(selectedGuide.id, index)}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
-                >
+                <button onClick={() => toggleStep(selectedGuide.id, index)} className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
                   <div className="flex items-center gap-3">
-                    <span className={`w-8 h-8 rounded-full bg-gradient-to-r ${selectedGuide.color} text-white flex items-center justify-center text-sm font-bold`}>
-                      {index + 1}
-                    </span>
+                    <span className={`w-8 h-8 rounded-full bg-gradient-to-r ${selectedGuide.color} text-white flex items-center justify-center text-sm font-bold`}>{index + 1}</span>
                     <span className="font-medium text-gray-900">{step.title}</span>
                   </div>
-                  {expandedSteps[`${selectedGuide.id}-${index}`] ? (
-                    <ChevronDownIcon className="w-5 h-5 text-gray-500" />
-                  ) : (
-                    <ChevronRightIcon className="w-5 h-5 text-gray-500" />
-                  )}
+                  {expandedSteps[`${selectedGuide.id}-${index}`] ? <ChevronDownIcon className="w-5 h-5 text-gray-500" /> : <ChevronRightIcon className="w-5 h-5 text-gray-500" />}
                 </button>
-                
                 {expandedSteps[`${selectedGuide.id}-${index}`] && (
                   <div className="p-4 bg-white border-t border-gray-200">
                     <p className="text-gray-700 mb-4">{step.content}</p>
                     {step.tip && (
                       <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
                         <LightBulbIcon className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                        <div>
-                          <span className="font-medium text-amber-800">نصيحة: </span>
-                          <span className="text-amber-700">{step.tip}</span>
-                        </div>
+                        <div><span className="font-medium text-amber-800">{t('wg_tip', 'نصيحة')}: </span><span className="text-amber-700">{step.tip}</span></div>
                       </div>
                     )}
                   </div>
@@ -739,53 +148,33 @@ const WrittenGuide = () => {
               </div>
             ))}
           </div>
-
-          {/* Quick Tips Summary */}
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h4 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
-              <CheckCircleIcon className="w-5 h-5" />
-              ملخص سريع
+              <CheckCircleIcon className="w-5 h-5" />{t('wg_quick_summary', 'ملخص سريع')}
             </h4>
             <ul className="space-y-1 text-sm text-blue-800">
-              <li className="flex items-center gap-2">
-                <ArrowRightIcon className="w-3 h-3" />
-                هذا القسم يحتوي على {selectedGuide.steps.length} خطوات
-              </li>
-              <li className="flex items-center gap-2">
-                <ArrowRightIcon className="w-3 h-3" />
-                اضغط على كل خطوة لعرض التفاصيل والنصائح
-              </li>
-              <li className="flex items-center gap-2">
-                <ArrowRightIcon className="w-3 h-3" />
-                للمساعدة الإضافية، تواصل مع إدارة المجمع
-              </li>
+              <li className="flex items-center gap-2"><ArrowRightIcon className="w-3 h-3" />{t('wg_click_step_details', 'اضغط على كل خطوة لعرض التفاصيل والنصائح')}</li>
+              <li className="flex items-center gap-2"><ArrowRightIcon className="w-3 h-3" />{t('wg_extra_help', 'للمساعدة الإضافية، تواصل مع إدارة المجمع')}</li>
             </ul>
           </div>
         </div>
       )}
 
-      {/* Flowchart Section */}
       <div className="mt-8 bg-white/10 backdrop-blur rounded-xl p-6">
-        <h3 className="text-xl font-bold text-white mb-4 text-center">
-          🗺️ مسار التعلم البسيط
-        </h3>
+        <h3 className="text-xl font-bold text-white mb-4 text-center">{t('wg_learning_path', 'مسار التعلم البسيط')}</h3>
         <div className="flex flex-wrap items-center justify-center gap-2">
           {[
-            { icon: KeyIcon, label: 'ادخل', color: 'bg-amber-500' },
-            { icon: ChartBarIcon, label: 'شاهد', color: 'bg-blue-500' },
-            { icon: BuildingOfficeIcon, label: 'أدر', color: 'bg-green-500' },
-            { icon: ChatBubbleLeftRightIcon, label: 'تواصل', color: 'bg-purple-500' }
+            { icon: KeyIcon, label: t('wg_flow_login', 'ادخل'), color: 'bg-amber-500' },
+            { icon: ChartBarIcon, label: t('wg_flow_view', 'شاهد'), color: 'bg-blue-500' },
+            { icon: BuildingOfficeIcon, label: t('wg_flow_manage', 'أدر'), color: 'bg-green-500' },
+            { icon: ChatBubbleLeftRightIcon, label: t('wg_flow_communicate', 'تواصل'), color: 'bg-purple-500' }
           ].map((item, index) => (
             <React.Fragment key={index}>
               <div className="flex flex-col items-center">
-                <div className={`${item.color} p-3 rounded-full`}>
-                  <item.icon className="w-6 h-6 text-white" />
-                </div>
+                <div className={`${item.color} p-3 rounded-full`}><item.icon className="w-6 h-6 text-white" /></div>
                 <span className="text-white text-sm mt-2">{item.label}</span>
               </div>
-              {index < 3 && (
-                <ArrowRightIcon className="w-6 h-6 text-white/60" />
-              )}
+              {index < 3 && <ArrowRightIcon className="w-6 h-6 text-white/60" />}
             </React.Fragment>
           ))}
         </div>

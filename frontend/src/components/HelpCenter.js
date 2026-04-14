@@ -24,63 +24,63 @@ const HelpCenter = () => {
   const helpSections = [
     {
       id: 'getting-started',
-      title: 'البدء',
+      title: t('hc_getting_started', 'البدء'),
       icon: BookOpenIcon,
       articles: [
-        { title: 'كيفية تسجيل الدخول لأول مرة', link: '#' },
-        { title: 'إعداد الملف الشخصي', link: '#' },
-        { title: 'فهم لوحة التحكم', link: '#' }
+        { title: t('hc_first_login', 'كيفية تسجيل الدخول لأول مرة'), link: '#' },
+        { title: t('hc_setup_profile', 'إعداد الملف الشخصي'), link: '#' },
+        { title: t('hc_understand_dashboard', 'فهم لوحة التحكم'), link: '#' }
       ]
     },
     {
       id: 'compound-management',
-      title: 'إدارة المجمع',
+      title: t('hc_compound_mgmt', 'إدارة المجمع'),
       icon: BookOpenIcon,
       articles: [
-        { title: 'إنشاء مساكن جديدة', link: '#' },
-        { title: 'إدارة المقيمين', link: '#' },
-        { title: 'تحميل شعار المجمع', link: '#' },
-        { title: 'إعداد روابط التسجيل', link: '#' }
+        { title: t('hc_create_residences', 'إنشاء مساكن جديدة'), link: '#' },
+        { title: t('hc_manage_residents', 'إدارة المقيمين'), link: '#' },
+        { title: t('hc_upload_logo', 'تحميل شعار المجمع'), link: '#' },
+        { title: t('hc_setup_reg_links', 'إعداد روابط التسجيل'), link: '#' }
       ]
     },
     {
       id: 'services-maintenance',
-      title: 'الخدمات والصيانة',
+      title: t('hc_services_maintenance', 'الخدمات والصيانة'),
       icon: BookOpenIcon,
       articles: [
-        { title: 'طلب خدمة صيانة', link: '#' },
-        { title: 'إدارة الخدمات المتاحة', link: '#' },
-        { title: 'تتبع حالة الطلبات', link: '#' }
+        { title: t('hc_request_maintenance', 'طلب خدمة صيانة'), link: '#' },
+        { title: t('hc_manage_services', 'إدارة الخدمات المتاحة'), link: '#' },
+        { title: t('hc_track_requests', 'تتبع حالة الطلبات'), link: '#' }
       ]
     },
     {
       id: 'family-management',
-      title: 'إدارة العائلة',
+      title: t('hc_family_mgmt', 'إدارة العائلة'),
       icon: BookOpenIcon,
       articles: [
-        { title: 'إضافة أفراد العائلة', link: '#' },
-        { title: 'تعديل معلومات الأفراد', link: '#' },
-        { title: 'إدارة الضيوف', link: '#' }
+        { title: t('hc_add_family', 'إضافة أفراد العائلة'), link: '#' },
+        { title: t('hc_edit_members', 'تعديل معلومات الأفراد'), link: '#' },
+        { title: t('hc_manage_guests', 'إدارة الضيوف'), link: '#' }
       ]
     },
     {
       id: 'financial-services',
-      title: 'الخدمات المالية',
+      title: t('hc_financial_services', 'الخدمات المالية'),
       icon: BookOpenIcon,
       articles: [
-        { title: 'دفع الفواتير', link: '#' },
-        { title: 'عرض السجل المالي', link: '#' },
-        { title: 'إعداد الدفع التلقائي', link: '#' }
+        { title: t('hc_pay_bills', 'دفع الفواتير'), link: '#' },
+        { title: t('hc_view_financial_record', 'عرض السجل المالي'), link: '#' },
+        { title: t('hc_setup_autopay', 'إعداد الدفع التلقائي'), link: '#' }
       ]
     },
     {
       id: 'communication',
-      title: 'التواصل والإشعارات',
+      title: t('hc_communication', 'التواصل والإشعارات'),
       icon: BookOpenIcon,
       articles: [
-        { title: 'استخدام مركز الرسائل', link: '#' },
-        { title: 'إدارة الإشعارات', link: '#' },
-        { title: 'استخدام الدردشة', link: '#' }
+        { title: t('hc_use_messages', 'استخدام مركز الرسائل'), link: '#' },
+        { title: t('hc_manage_notifications', 'إدارة الإشعارات'), link: '#' },
+        { title: t('hc_use_chat', 'استخدام الدردشة'), link: '#' }
       ]
     }
   ];

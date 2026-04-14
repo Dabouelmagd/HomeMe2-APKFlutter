@@ -22,11 +22,11 @@ const SubscriptionActivation = () => {
   const [messageType, setMessageType] = useState(''); // success, error, info
 
   const durations = {
-    '1_month': 'شهر واحد',
-    '2_months': 'شهرين', 
-    '3_months': 'ثلاثة شهور',
-    '6_months': 'ستة شهور',
-    '1_year': 'سنة كاملة'
+    '1_month': t('sa_1_month', 'شهر واحد'),
+    '2_months': t('sa_2_months', 'شهرين'), 
+    '3_months': t('sa_3_months', 'ثلاثة شهور'),
+    '6_months': t('sa_6_months', 'ستة شهور'),
+    '1_year': t('sa_1_year', 'سنة كاملة')
   };
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const SubscriptionActivation = () => {
         setCodeInfo(response.data);
       } catch (error) {
         if (error.response?.status === 404) {
-          setMessage('الكود غير موجود');
+          setMessage(t('sa_code_not_found', 'الكود غير موجود'));
           setMessageType('error');
         }
       }
@@ -109,7 +109,7 @@ const SubscriptionActivation = () => {
       }
     } catch (error) {
       console.error('Error activating code:', error);
-      setMessage(error.response?.data?.message || 'حدث خطأ في تفعيل الكود');
+      setMessage(error.response?.data?.message || t('sa_activation_error', 'حدث خطأ في تفعيل الكود'));
       setMessageType('error');
     } finally {
       setLoading(false);
@@ -162,7 +162,7 @@ const SubscriptionActivation = () => {
                 <StarIcon className="w-10 h-10 text-green-600" />
               </div>
               
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">اشتراكك النشط</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('sa_active_subscription', 'اشتراكك النشط')}</h2>
               
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-6 mb-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -217,7 +217,7 @@ const SubscriptionActivation = () => {
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
             <div className="flex items-center justify-center text-white">
               <KeyIcon className="w-8 h-8 mr-3" />
-              <h1 className="text-2xl font-bold">تفعيل كود الاشتراك</h1>
+              <h1 className="text-2xl font-bold">{t('sa_activate_code_title', 'تفعيل كود الاشتراك')}</h1>
             </div>
             <p className="text-blue-100 text-center mt-2">
               أدخل كود الاشتراك الخاص بك لتفعيل HomeMe

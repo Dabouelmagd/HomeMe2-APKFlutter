@@ -114,7 +114,7 @@ const SuperAdminPanel = () => {
       setShowCreateCode(false);
       fetchCodes();
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'فشل في إنشاء الكود');
+      toast.error(err.response?.data?.detail || t('sa_code_create_failed', 'فشل في إنشاء الكود'));
     }
   };
 
@@ -165,7 +165,7 @@ const SuperAdminPanel = () => {
     try { await axios.put(`${API}/coupons/${id}/toggle`, {}, getToken()); toast.success(t('sa_updated', 'تم التحديث')); fetchCoupons(); } catch { toast.error(t('sa_failed', 'فشل')); }
   };
   const handleDeleteCoupon = async (id) => {
-    if (!window.confirm('حذف الكوبون؟')) return;
+    if (!window.confirm(t('sa_confirm_delete_coupon', 'حذف الكوبون؟'))) return;
     try { await axios.delete(`${API}/coupons/${id}`, getToken()); toast.success(t('sa_deleted', 'تم الحذف')); fetchCoupons(); } catch { toast.error(t('sa_failed', 'فشل')); }
   };
   useEffect(() => { if (activeTab === 'coupons') fetchCoupons(); }, [activeTab]);
@@ -187,7 +187,7 @@ const SuperAdminPanel = () => {
     try { await axios.put(`${API}/ads/${id}/toggle`, {}, getToken()); toast.success(t('sa_updated', 'تم التحديث')); fetchAds(); } catch { toast.error(t('sa_failed', 'فشل')); }
   };
   const handleDeleteAd = async (id) => {
-    if (!window.confirm('حذف الإعلان؟')) return;
+    if (!window.confirm(t('sa_confirm_delete_ad', 'حذف الإعلان؟'))) return;
     try { await axios.delete(`${API}/ads/${id}`, getToken()); toast.success(t('sa_deleted', 'تم الحذف')); fetchAds(); } catch { toast.error(t('sa_failed', 'فشل')); }
   };
   useEffect(() => { if (activeTab === 'ads') fetchAds(); }, [activeTab]);

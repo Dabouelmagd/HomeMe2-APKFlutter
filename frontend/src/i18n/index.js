@@ -2860,7 +2860,30 @@ const resources = {
       'cf_private_hosting': 'Private hosting (optional)', 'cf_white_label': 'Custom branding',
       'cf_full_training': 'Full team training', 'cf_sla': 'Guaranteed SLA 99.9%',
       'cf_24_7_phone': '24/7 phone + WhatsApp support', 'cf_num_compounds': 'Number of compounds',
-      'cf_central_dashboard': 'Central dashboard'
+      'cf_central_dashboard': 'Central dashboard',
+      // Subscription page
+      'sub_management': 'Subscription Management', 'sub_current_plan': 'Current Plan',
+      'sub_active': 'Active', 'sub_expired': 'Expired', 'sub_expires_on': 'Expires on',
+      'sub_activate_code': 'Activate Subscription Code', 'sub_enter_code': 'Enter code here...',
+      'sub_activate': 'Activate', 'sub_invalid_code': 'Invalid code',
+      'sub_upgrade_renew': 'Upgrade or Renew', 'sub_choose_plan_desc': 'Choose plan and duration then select payment method',
+      'sub_choose_payment': 'Choose payment method:', 'sub_manual_transfer': 'Or manual transfer:',
+      'sub_send_receipt': 'Send transfer receipt to admin to activate',
+      'sub_payment_history': 'Payment History & Invoices', 'sub_generate_invoice': 'Generate Invoice',
+      'sub_refresh': 'Refresh', 'sub_no_invoices': 'No invoices yet',
+      'sub_auto_invoices': 'Invoices are generated automatically with each payment',
+      'sub_paid': 'Paid', 'sub_pending': 'Pending',
+      'sub_email_invoice': 'Email', 'sub_invoice_emailed': 'Invoice sent by email',
+      'sub_email_failed': 'Failed to send', 'sub_invoice_downloaded': 'Invoice downloaded',
+      'sub_download_failed': 'Download failed', 'sub_code_used': 'Subscription code',
+      'pm_credit_card': 'Credit Card', 'pm_paypal_safe': 'Secure payment via PayPal',
+      'plan_trial': 'Trial', 'dur_trial': 'Trial 14 days',
+      'dur_1m': 'Month', 'dur_3m': '3 Months', 'dur_6m': '6 Months', 'dur_9m': '9 Months',
+      'dur_1y': 'Year', 'dur_lifetime': 'Lifetime',
+      // Dashboard extras
+      'ad_label': 'Ad', 'referral_invite_5': 'Invite 5 friends & get a free month',
+      'referrals_count': 'Referrals', 'copy_code': 'Copy Code',
+      'referral_congrats': 'Congrats! You earned a free month!'
     }
   },
   ar: {
@@ -4308,6 +4331,28 @@ const resources = {
       'cf_full_training': 'تدريب شامل للفريق', 'cf_sla': 'SLA مضمون 99.9%',
       'cf_24_7_phone': 'دعم فني 24/7 هاتف + واتساب', 'cf_num_compounds': 'عدد المجتمعات',
       'cf_central_dashboard': 'لوحة تحكم مركزية',
+      // Subscription page
+      'sub_management': 'إدارة الاشتراك', 'sub_current_plan': 'الخطة الحالية',
+      'sub_active': 'نشط', 'sub_expired': 'منتهي', 'sub_expires_on': 'ينتهي في',
+      'sub_activate_code': 'تفعيل كود اشتراك', 'sub_enter_code': 'أدخل الكود هنا...',
+      'sub_activate': 'تفعيل', 'sub_invalid_code': 'كود غير صالح',
+      'sub_upgrade_renew': 'ترقية أو تجديد الاشتراك', 'sub_choose_plan_desc': 'اختر الخطة والمدة ثم اختر طريقة الدفع',
+      'sub_choose_payment': 'اختر طريقة الدفع:', 'sub_manual_transfer': 'أو تحويل يدوي:',
+      'sub_send_receipt': 'أرسل إيصال التحويل للإدارة لتفعيل اشتراكك',
+      'sub_payment_history': 'سجل المدفوعات والفواتير', 'sub_generate_invoice': 'إنشاء فاتورة',
+      'sub_refresh': 'تحديث', 'sub_no_invoices': 'لا توجد فواتير بعد',
+      'sub_auto_invoices': 'سيتم إنشاء الفواتير تلقائياً عند كل عملية دفع',
+      'sub_paid': 'مدفوع', 'sub_pending': 'معلق',
+      'sub_email_invoice': 'بريد ✉', 'sub_invoice_emailed': 'تم إرسال الفاتورة بالبريد',
+      'sub_email_failed': 'فشل في الإرسال', 'sub_invoice_downloaded': 'تم تحميل الفاتورة',
+      'sub_download_failed': 'فشل في تحميل الفاتورة', 'sub_code_used': 'كود الاشتراك',
+      'pm_credit_card': 'بطاقة ائتمان', 'pm_paypal_safe': 'دفع آمن عبر PayPal',
+      'plan_trial': 'تجريبي', 'dur_trial': 'تجريبي 14 يوم',
+      'dur_1m': 'شهر', 'dur_3m': '3 شهور', 'dur_6m': '6 شهور', 'dur_9m': '9 شهور',
+      'dur_1y': 'سنة', 'dur_lifetime': 'مدى الحياة',
+      'ad_label': 'إعلان', 'referral_invite_5': 'ادعُ 5 أصدقاء واحصل على شهر مجاني',
+      'referrals_count': 'إحالات', 'copy_code': 'نسخ الكود',
+      'referral_congrats': 'مبروك! حصلت على شهر مجاني!',
       
       // Financial Management translations
       'financial_management': 'الإدارة المالية',
@@ -8442,7 +8487,29 @@ const resources = {
       'cf_private_hosting': 'Hébergement privé (optionnel)', 'cf_white_label': 'Personnalisation de marque',
       'cf_full_training': 'Formation complète', 'cf_sla': 'SLA garanti 99.9%',
       'cf_24_7_phone': 'Support 24/7 téléphone + WhatsApp', 'cf_num_compounds': 'Nombre de résidences',
-      'cf_central_dashboard': 'Tableau de bord central'
+      'cf_central_dashboard': 'Tableau de bord central',
+      // Subscription page
+      'sub_management': 'Gestion de l\'abonnement', 'sub_current_plan': 'Plan actuel',
+      'sub_active': 'Actif', 'sub_expired': 'Expiré', 'sub_expires_on': 'Expire le',
+      'sub_activate_code': 'Activer un code d\'abonnement', 'sub_enter_code': 'Entrez le code...',
+      'sub_activate': 'Activer', 'sub_invalid_code': 'Code invalide',
+      'sub_upgrade_renew': 'Mettre à niveau ou renouveler', 'sub_choose_plan_desc': 'Choisissez le plan et la durée',
+      'sub_choose_payment': 'Choisir le mode de paiement:', 'sub_manual_transfer': 'Ou virement manuel:',
+      'sub_send_receipt': 'Envoyez le reçu à l\'admin pour activer',
+      'sub_payment_history': 'Historique des paiements', 'sub_generate_invoice': 'Générer une facture',
+      'sub_refresh': 'Actualiser', 'sub_no_invoices': 'Pas encore de factures',
+      'sub_auto_invoices': 'Les factures sont générées automatiquement',
+      'sub_paid': 'Payé', 'sub_pending': 'En attente',
+      'sub_email_invoice': 'Email', 'sub_invoice_emailed': 'Facture envoyée par email',
+      'sub_email_failed': 'Échec de l\'envoi', 'sub_invoice_downloaded': 'Facture téléchargée',
+      'sub_download_failed': 'Échec du téléchargement', 'sub_code_used': 'Code d\'abonnement',
+      'pm_credit_card': 'Carte de crédit', 'pm_paypal_safe': 'Paiement sécurisé via PayPal',
+      'plan_trial': 'Essai', 'dur_trial': 'Essai 14 jours',
+      'dur_1m': 'Mois', 'dur_3m': '3 Mois', 'dur_6m': '6 Mois', 'dur_9m': '9 Mois',
+      'dur_1y': 'Année', 'dur_lifetime': 'À vie',
+      'ad_label': 'Pub', 'referral_invite_5': 'Invitez 5 amis et obtenez un mois gratuit',
+      'referrals_count': 'Parrainages', 'copy_code': 'Copier le code',
+      'referral_congrats': 'Félicitations! Vous avez gagné un mois gratuit!'
     }
   }
 };

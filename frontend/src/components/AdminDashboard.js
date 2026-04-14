@@ -437,7 +437,7 @@ const AdminDashboard = () => {
                     <h3 className="font-bold text-sm">{ad.title}</h3>
                     {ad.description && <p className="text-xs text-blue-100 mt-0.5">{ad.description}</p>}
                   </div>
-                  <span className="text-[9px] text-blue-200 bg-blue-500/30 px-2 py-0.5 rounded-full">إعلان</span>
+                  <span className="text-[9px] text-blue-200 bg-blue-500/30 px-2 py-0.5 rounded-full">{t('ad_label', 'إعلان')}</span>
                 </div>
               </div>
             ))}
@@ -450,23 +450,23 @@ const AdminDashboard = () => {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-bold text-gray-900">{t('referral_program', 'برنامج الإحالة')}</h3>
-                <p className="text-xs text-gray-500 mt-1">ادعُ 5 أصدقاء واحصل على شهر مجاني</p>
+                <p className="text-xs text-gray-500 mt-1">{t('referral_invite_5', 'ادعُ 5 أصدقاء واحصل على شهر مجاني')}</p>
               </div>
               <div className="text-left">
                 <p className="text-2xl font-black text-emerald-600">{referralData.total_invited}/5</p>
-                <p className="text-[10px] text-gray-400">إحالات</p>
+                <p className="text-[10px] text-gray-400">{t('referrals_count', 'إحالات')}</p>
               </div>
             </div>
             <div className="flex items-center gap-2 bg-white rounded-lg border border-emerald-200 p-2">
               <span className="flex-1 font-mono text-sm text-emerald-700 px-2">{referralData.code}</span>
-              <button onClick={copyReferralCode} className="px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700">نسخ الكود</button>
+              <button onClick={copyReferralCode} className="px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700">{t('copy_code', 'نسخ الكود')}</button>
             </div>
             <div className="mt-3 w-full bg-emerald-100 rounded-full h-2">
               <div className="bg-emerald-500 h-2 rounded-full transition-all" style={{ width: `${Math.min(100, (referralData.total_invited / 5) * 100)}%` }} />
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              {referralData.remaining_for_coupon > 0 ? `باقي ${referralData.remaining_for_coupon} إحالات للحصول على شهر مجاني` : 'مبروك! حصلت على شهر مجاني!'}
-              {referralData.coupons_earned > 0 && ` (حصلت على ${referralData.coupons_earned} كوبون حتى الآن)`}
+              {referralData.remaining_for_coupon > 0 ? t('referral_remaining', {count: referralData.remaining_for_coupon, defaultValue: `باقي ${referralData.remaining_for_coupon} إحالات للحصول على شهر مجاني`}) : t('referral_congrats', 'مبروك! حصلت على شهر مجاني!')}
+              {referralData.coupons_earned > 0 && ` (${t('coupons_earned_count', {count: referralData.coupons_earned, defaultValue: `حصلت على ${referralData.coupons_earned} كوبون حتى الآن`})})`}
             </p>
           </div>
         )}

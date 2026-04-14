@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import TrialStatus from './TrialStatus';
@@ -248,9 +249,10 @@ const AdminDashboard = () => {
     const diffDays = Math.floor(diffMs / 86400000);
     
     if (diffMins < 1) return t('just_now', 'الآن');
-    if (diffMins < 60) return `${t('ago', 'منذ')} ${diffMins} ${t('minutes', 'دقيقة')}`;
-    if (diffHours < 24) return `${t('ago', 'منذ')} ${diffHours} ${t('hours', 'ساعة')}`;
-    return `${t('ago', 'منذ')} ${diffDays} ${t('days', 'يوم')}`;
+    const isAr = i18n.language?.startsWith('ar');
+    if (diffMins < 60) return isAr ? `منذ ${diffMins} ${t('minutes', 'دقيقة')}` : `${diffMins} ${t('minutes', 'minutes')} ${t('ago', 'ago')}`;
+    if (diffHours < 24) return isAr ? `منذ ${diffHours} ${t('hours', 'ساعة')}` : `${diffHours} ${t('hours', 'hours')} ${t('ago', 'ago')}`;
+    return isAr ? `منذ ${diffDays} ${t('days', 'يوم')}` : `${diffDays} ${t('days', 'days')} ${t('ago', 'ago')}`;
   };
 
   return (
@@ -465,8 +467,8 @@ const AdminDashboard = () => {
               <div className="bg-emerald-500 h-2 rounded-full transition-all" style={{ width: `${Math.min(100, (referralData.total_invited / 5) * 100)}%` }} />
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              {referralData.remaining_for_coupon > 0 ? t('referral_remaining', {count: referralData.remaining_for_coupon, defaultValue: `باقي ${referralData.remaining_for_coupon} إحالات للحصول على شهر مجاني`}) : t('referral_congrats', 'مبروك! حصلت على شهر مجاني!')}
-              {referralData.coupons_earned > 0 && ` (${t('coupons_earned_count', {count: referralData.coupons_earned, defaultValue: `حصلت على ${referralData.coupons_earned} كوبون حتى الآن`})})`}
+              {referralData.remaining_for_coupon > 0 ? `${referralData.remaining_for_coupon} ${t('referral_remaining_text', 'إحالات للحصول على شهر مجاني')}` : t('referral_congrats', 'مبروك! حصلت على شهر مجاني!')}
+              {referralData.coupons_earned > 0 && ` (${t('earned_text', 'حصلت على')} ${referralData.coupons_earned} ${t('coupons_text', 'كوبون حتى الآن')})`}
             </p>
           </div>
         )}

@@ -3001,9 +3001,11 @@ const resources = {
       'send_daily_report': 'Send Daily Report', 'daily_report_sent': 'Daily report sent!',
       'daily_report_failed': 'Failed to send report', 'referral_program': 'Referral Program',
       'family_members_count': 'Family Members', 'just_now': 'Just now',
-      'minutes': 'minutes', 'hours': 'hours', 'ago': 'ago',
+      'minutes': 'minutes', 'hours': 'hours', 'ago': 'ago', 'days': 'days',
       'referral_remaining': '{count} referrals left for a free month',
-      'coupons_earned_count': 'Earned {count} coupons so far'
+      'coupons_earned_count': 'Earned {count} coupons so far',
+      'referral_remaining_text': 'referrals left for a free month',
+      'earned_text': 'Earned', 'coupons_text': 'coupons so far'
     }
   },
   ar: {
@@ -8746,9 +8748,11 @@ const resources = {
       'send_daily_report': 'Envoyer le rapport quotidien', 'daily_report_sent': 'Rapport envoyé!',
       'daily_report_failed': 'Échec de l\'envoi', 'referral_program': 'Programme de parrainage',
       'family_members_count': 'Membres de la famille', 'just_now': 'À l\'instant',
-      'minutes': 'minutes', 'hours': 'heures', 'ago': 'il y a',
+      'minutes': 'minutes', 'hours': 'heures', 'ago': 'il y a', 'days': 'jours',
       'referral_remaining': '{count} parrainages restants pour un mois gratuit',
-      'coupons_earned_count': '{count} coupons gagnés'
+      'coupons_earned_count': '{count} coupons gagnés',
+      'referral_remaining_text': 'parrainages restants pour un mois gratuit',
+      'earned_text': 'Gagné', 'coupons_text': 'coupons'
     }
   }
 };

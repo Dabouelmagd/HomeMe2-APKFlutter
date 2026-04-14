@@ -2983,7 +2983,14 @@ const resources = {
       'sv_delete_failed': 'Failed to delete', 'sv_load_failed': 'Failed to load',
       'sv_emergency': 'Emergency service', 'sv_available': 'Available',
       'sv_includes': 'Includes', 'sv_provider': 'Provider', 'sv_service': 'Service',
-      'sv_server_error': 'Server connection error'
+      'sv_server_error': 'Server connection error',
+      'hp_login_first': 'Please login first to activate code', 'hp_code_activated': 'Subscription activated!',
+      'hp_invalid_code': 'Invalid code', 'hp_error_retry': 'An error occurred, try again', 'hp_error': 'Error',
+      'hp_custom_price': 'Custom Price', 'hp_egp': 'EGP', 'hp_yearly_no_disc': 'yearly without discount',
+      'hp_all_rights': 'All rights reserved',
+      'role_super_desc': 'Full control', 'role_company_desc': 'Multiple compounds',
+      'role_admin_desc': 'Full management', 'role_manager_desc': 'Daily operations',
+      'role_security_desc': 'Gates & visitors', 'role_resident_desc': 'Services & maintenance'
     }
   },
   ar: {
@@ -8709,7 +8716,14 @@ const resources = {
       'sv_delete_failed': 'Échec de suppression', 'sv_load_failed': 'Échec de chargement',
       'sv_emergency': 'Service d\'urgence', 'sv_available': 'Disponible',
       'sv_includes': 'Comprend', 'sv_provider': 'Fournisseur', 'sv_service': 'Service',
-      'sv_server_error': 'Erreur de connexion au serveur'
+      'sv_server_error': 'Erreur de connexion au serveur',
+      'hp_login_first': 'Veuillez vous connecter d\'abord', 'hp_code_activated': 'Abonnement activé!',
+      'hp_invalid_code': 'Code invalide', 'hp_error_retry': 'Erreur, réessayez', 'hp_error': 'Erreur',
+      'hp_custom_price': 'Prix personnalisé', 'hp_egp': 'EGP', 'hp_yearly_no_disc': 'annuel sans réduction',
+      'hp_all_rights': 'Tous droits réservés',
+      'role_super_desc': 'Contrôle total', 'role_company_desc': 'Plusieurs résidences',
+      'role_admin_desc': 'Gestion complète', 'role_manager_desc': 'Opérations quotidiennes',
+      'role_security_desc': 'Portes et visiteurs', 'role_resident_desc': 'Services et maintenance'
     }
   }
 };

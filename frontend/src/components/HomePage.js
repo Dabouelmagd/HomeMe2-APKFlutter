@@ -49,7 +49,7 @@ const HomePage = () => {
     if (!subCode.trim()) return;
     const token = localStorage.getItem('token');
     if (!token) {
-      setCodeStatus({ type: 'error', msg: 'يجب تسجيل الدخول أولاً لتفعيل الكود' });
+      setCodeStatus({ type: 'error', msg: t('hp_login_first', 'يجب تسجيل الدخول أولاً لتفعيل الكود') });
       return;
     }
     setCodeLoading(true);
@@ -62,13 +62,13 @@ const HomePage = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        setCodeStatus({ type: 'success', msg: data.message || 'تم تفعيل الاشتراك بنجاح!' });
+        setCodeStatus({ type: 'success', msg: data.message || t('hp_code_activated', 'تم تفعيل الاشتراك بنجاح!') });
         setSubCode('');
       } else {
-        setCodeStatus({ type: 'error', msg: data.detail || 'كود غير صالح' });
+        setCodeStatus({ type: 'error', msg: data.detail || t('hp_invalid_code', 'كود غير صالح') });
       }
     } catch {
-      setCodeStatus({ type: 'error', msg: 'حدث خطأ، حاول مرة أخرى' });
+      setCodeStatus({ type: 'error', msg: t('hp_error_retry', 'حدث خطأ، حاول مرة أخرى') });
     }
     setCodeLoading(false);
   };
@@ -94,7 +94,7 @@ const HomePage = () => {
       if (data.checkout_url) {
         window.location.href = data.checkout_url;
       } else {
-        alert(data.detail || 'حدث خطأ');
+        alert(data.detail || t('hp_error', 'حدث خطأ'));
       }
     } catch {
       navigate('/register');
@@ -418,7 +418,7 @@ const HomePage = () => {
             />
             <div>
               <span className="text-3xl font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
-              <span className="text-xs text-gray-500 font-medium">إدارة المجتمعات السكنية</span>
+              <span className="text-xs text-gray-500 font-medium">{t('hp_subtitle')}</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -535,7 +535,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_15_systems')}</h2>
-            <p className="text-gray-500">كل ما تحتاجه لإدارة مجتمعك السكني باحترافية</p>
+            <p className="text-gray-500">{t('hp_systems_desc')}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {systems.map((sys, i) => {
@@ -560,7 +560,7 @@ const HomePage = () => {
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium mb-4">
               <BookOpenIcon className="h-4 w-4" />
-              دليل شامل
+              {t('hp_guide_btn')}
             </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_guide_title')}</h2>
             <p className="text-gray-500 max-w-2xl mx-auto">{t('hp_guide_desc')}</p>
@@ -639,13 +639,13 @@ const HomePage = () => {
               <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
                 <button onClick={() => setBillingPeriod('monthly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${billingPeriod === 'monthly' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-monthly">{t('hp_monthly')}</button>
                 <button onClick={() => setBillingPeriod('yearly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all relative ${billingPeriod === 'yearly' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-yearly">
-                  سنوي
+                  {t('hp_yearly')}
                   <span className="absolute -top-2.5 -left-2 px-1.5 py-0.5 bg-green-500 text-[9px] font-bold rounded-full text-white">{t('hp_2months_free')}</span>
                 </button>
               </div>
               {/* Currency Toggle */}
               <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
-                <button onClick={() => setCurrency('egp')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'egp' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-egp">ج.م EGP</button>
+                <button onClick={() => setCurrency('egp')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'egp' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-egp">{t('hp_egp', 'ج.م EGP')}</button>
                 <button onClick={() => setCurrency('usd')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'usd' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-usd">$ USD</button>
               </div>
             </div>
@@ -664,16 +664,16 @@ const HomePage = () => {
                   <p className="text-xs text-blue-300 font-medium mb-3">{plan.residents}</p>
                   {plan.monthly === 0 ? (
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-3xl font-black">مجاناً</span>
+                      <span className="text-3xl font-black">{t('hp_free')}</span>
                     </div>
                   ) : (
                     <div>
                       <div className="flex items-baseline justify-center gap-1">
                         <span className="text-3xl font-black">{isYearly ? yearlyOf(plan.monthly) : priceOf(plan.monthly)}</span>
-                        <span className="text-xs text-gray-400">{sym} / {isYearly ? 'سنوياً' : 'شهرياً'}</span>
+                        <span className="text-xs text-gray-400">{sym} / {isYearly ? t('hp_per_year') : t('hp_per_month')}</span>
                       </div>
                       {isYearly && plan.monthly > 0 && (
-                        <p className="text-[10px] text-gray-500 mt-1 line-through">{priceOf(plan.monthly * 12)} {sym} / سنوياً بدون خصم</p>
+                        <p className="text-[10px] text-gray-500 mt-1 line-through">{priceOf(plan.monthly * 12)} {sym} / {t('hp_yearly_no_disc', 'سنوياً بدون خصم')}</p>
                       )}
                     </div>
                   )}
@@ -728,8 +728,8 @@ const HomePage = () => {
                   ))}
                   {/* Price row */}
                   <tr className="bg-white/5 border-t border-white/10">
-                    <td className="py-3 px-4 font-bold text-white text-xs">السعر {isYearly ? 'السنوي' : 'الشهري'}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-gray-300">مجاناً</td>
+                    <td className="py-3 px-4 font-bold text-white text-xs">{t('hp_price_label')} {isYearly ? t('hp_yearly_price') : t('hp_monthly_price')}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-gray-300">{t('hp_free')}</td>
                     <td className="text-center py-3 px-3 text-xs font-bold text-sky-300">{isYearly ? yearlyOf(500) : priceOf(500)} {sym}</td>
                     <td className="text-center py-3 px-3 text-xs font-bold text-blue-300">{isYearly ? yearlyOf(1200) : priceOf(1200)} {sym}</td>
                     <td className="text-center py-3 px-3 text-xs font-bold text-violet-300">{isYearly ? yearlyOf(2200) : priceOf(2200)} {sym}</td>
@@ -744,18 +744,18 @@ const HomePage = () => {
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500/10 text-green-400 rounded-full text-sm font-medium mb-3 border border-green-500/20">
                 <KeyIcon className="h-4 w-4" />
-                أكواد الاشتراك
+                {t('hp_sub_codes')}
               </div>
               <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_have_code')}</h3>
               <p className="text-gray-400 text-sm">{t('hp_code_desc')}</p>
             </div>
             <div className="grid grid-cols-5 gap-3 mb-6">
               {[
-                { label: '3 شهور', icon: '3m', color: 'border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10' },
-                { label: '6 شهور', icon: '6m', color: 'border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10' },
-                { label: '9 شهور', icon: '9m', color: 'border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/10' },
-                { label: 'سنة', icon: '1Y', color: 'border-green-500/30 bg-green-500/5 hover:bg-green-500/10' },
-                { label: 'مدى الحياة', icon: '∞', color: 'border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10' },
+                { label: t('dur_3m', '3 شهور'), icon: '3m', color: 'border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10' },
+                { label: t('dur_6m', '6 شهور'), icon: '6m', color: 'border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10' },
+                { label: t('dur_9m', '9 شهور'), icon: '9m', color: 'border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/10' },
+                { label: t('dur_1y', 'سنة'), icon: '1Y', color: 'border-green-500/30 bg-green-500/5 hover:bg-green-500/10' },
+                { label: t('dur_lifetime', 'مدى الحياة'), icon: '∞', color: 'border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10' },
               ].map((d, i) => (
                 <div key={i} className={`rounded-xl border text-center py-3 px-2 transition-all ${d.color}`}>
                   <p className="text-lg font-black text-white mb-0.5">{d.icon}</p>
@@ -766,7 +766,7 @@ const HomePage = () => {
             <div className="flex gap-3">
               <input type="text" placeholder={t("hp_enter_code")} value={subCode} onChange={e => setSubCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleCodeActivate()} className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30" data-testid="subscription-code-input" />
               <button onClick={handleCodeActivate} disabled={codeLoading || !subCode.trim()} className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-500 transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed" data-testid="activate-code-btn">
-                {codeLoading ? '...' : 'تفعيل الكود'}
+                {codeLoading ? '...' : t('hp_activate_code')}
               </button>
             </div>
             {codeStatus && (
@@ -781,7 +781,7 @@ const HomePage = () => {
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/10 text-amber-400 rounded-full text-sm font-medium mb-4 border border-amber-500/20">
                 <BuildingOffice2Icon className="h-4 w-4" />
-                لشركات الإدارة
+                {t('hp_for_companies')}
               </div>
               <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_company_plans_title')}</h3>
               <p className="text-gray-400 text-sm max-w-lg mx-auto">{t('hp_company_plans_desc')}</p>
@@ -797,15 +797,15 @@ const HomePage = () => {
                     <p className="text-[10px] text-gray-400 mb-1">{plan.nameEn}</p>
                     <p className="text-xs text-amber-300 font-medium mb-3">{plan.compounds}</p>
                     {plan.isCustom ? (
-                      <span className="text-2xl font-black">سعر مخصص</span>
+                      <span className="text-2xl font-black">{t('hp_custom_price', 'سعر مخصص')}</span>
                     ) : (
                       <div>
                         <div className="flex items-baseline justify-center gap-1">
                           <span className="text-3xl font-black">{isYearly ? yearlyOf(plan.monthly) : priceOf(plan.monthly)}</span>
-                          <span className="text-xs text-gray-400">{sym} / {isYearly ? 'سنوياً' : 'شهرياً'}</span>
+                          <span className="text-xs text-gray-400">{sym} / {isYearly ? t('hp_per_year') : t('hp_per_month')}</span>
                         </div>
                         {isYearly && (
-                          <p className="text-[10px] text-gray-500 mt-1 line-through">{priceOf(plan.monthly * 12)} {sym} / سنوياً بدون خصم</p>
+                          <p className="text-[10px] text-gray-500 mt-1 line-through">{priceOf(plan.monthly * 12)} {sym} / {t('hp_yearly_no_disc', 'سنوياً بدون خصم')}</p>
                         )}
                       </div>
                     )}
@@ -856,7 +856,7 @@ const HomePage = () => {
                   ))}
                   {/* Price row */}
                   <tr className="bg-white/5 border-t border-white/10">
-                    <td className="py-3 px-4 font-bold text-white text-xs">السعر {isYearly ? 'السنوي' : 'الشهري'}</td>
+                    <td className="py-3 px-4 font-bold text-white text-xs">{t('hp_price_label')} {isYearly ? t('hp_yearly_price') : t('hp_monthly_price')}</td>
                     <td className="text-center py-3 px-3 text-xs font-bold text-amber-300">{isYearly ? yearlyOf(3500) : priceOf(3500)} {sym}</td>
                     <td className="text-center py-3 px-3 text-xs font-bold text-orange-300">{isYearly ? yearlyOf(7500) : priceOf(7500)} {sym}</td>
                     <td className="text-center py-3 px-3 text-xs font-bold text-red-300">{isYearly ? yearlyOf(20000) : priceOf(20000)} {sym}</td>
@@ -900,12 +900,12 @@ const HomePage = () => {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              { icon: KeyIcon, title: 'مالك التطبيق', desc: 'تحكم كامل', color: 'bg-purple-50 text-purple-700 border-purple-200' },
-              { icon: BuildingOffice2Icon, title: 'إدارة شركة', desc: 'عدة مجتمعات', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-              { icon: HomeModernIcon, title: 'مدير مجتمع', desc: 'إدارة كاملة', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-              { icon: ClipboardDocumentCheckIcon, title: 'إداري', desc: 'متابعة يومية', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-              { icon: ShieldCheckIcon, title: 'أمن', desc: 'بوابات وزوار', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-              { icon: UserIcon, title: 'مقيم', desc: 'خدمات وصيانة', color: 'bg-teal-50 text-teal-700 border-teal-200' },
+              { icon: KeyIcon, title: t('role_super_admin', 'مالك التطبيق'), desc: t('role_super_desc', 'تحكم كامل'), color: 'bg-purple-50 text-purple-700 border-purple-200' },
+              { icon: BuildingOffice2Icon, title: t('role_company_admin', 'إدارة شركة'), desc: t('role_company_desc', 'عدة مجتمعات'), color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+              { icon: HomeModernIcon, title: t('role_admin', 'مدير مجتمع'), desc: t('role_admin_desc', 'إدارة كاملة'), color: 'bg-blue-50 text-blue-700 border-blue-200' },
+              { icon: ClipboardDocumentCheckIcon, title: t('role_manager', 'إداري'), desc: t('role_manager_desc', 'متابعة يومية'), color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+              { icon: ShieldCheckIcon, title: t('role_security', 'أمن'), desc: t('role_security_desc', 'بوابات وزوار'), color: 'bg-amber-50 text-amber-700 border-amber-200' },
+              { icon: UserIcon, title: t('role_resident', 'مقيم'), desc: t('role_resident_desc', 'خدمات وصيانة'), color: 'bg-teal-50 text-teal-700 border-teal-200' },
             ].map((role, i) => {
               const Icon = role.icon;
               return (
@@ -925,7 +925,7 @@ const HomePage = () => {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold mb-6">
             <UserGroupIcon className="h-4 w-4" />
-            برنامج الإحالة
+            {t('hp_referral_program')}
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-4" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_referral_title')}</h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">{t('hp_referral_desc')}</p>
@@ -953,7 +953,7 @@ const HomePage = () => {
             </div>
           </div>
           <Link to="/register" className="inline-flex items-center gap-2 px-8 py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all">
-            سجّل الآن وابدأ بالدعوة
+            {t('hp_register_invite')}
             <ArrowRightIcon className="h-4 w-4 rotate-180" />
           </Link>
         </div>
@@ -980,10 +980,10 @@ const HomePage = () => {
           <p className="text-blue-100 mb-8 text-lg">{t('hp_ready_desc')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/register" className="px-10 py-4 bg-white text-blue-700 rounded-2xl font-bold text-lg hover:shadow-2xl transition-all" data-testid="cta-register">
-              إنشاء حساب مجاني
+              {t('hp_create_free')}
             </Link>
             <Link to="/login" className="px-10 py-4 border-2 border-white/40 text-white rounded-2xl font-bold text-lg hover:bg-white/10 transition-all" data-testid="cta-login">
-              تسجيل الدخول
+              {t('sign_in', 'تسجيل الدخول')}
             </Link>
           </div>
         </div>
@@ -1001,12 +1001,12 @@ const HomePage = () => {
               <span className="font-bold text-white">HomeMe</span>
             </div>
             <div className="flex gap-6 text-sm">
-              <a href="#guide" className="hover:text-white transition-colors">دليل التشغيل</a>
-              <a href="#pricing" className="hover:text-white transition-colors">الاشتراكات</a>
-              <a href="#systems" className="hover:text-white transition-colors">الأنظمة</a>
-              <Link to="/login" className="hover:text-white transition-colors">تسجيل الدخول</Link>
+              <a href="#guide" className="hover:text-white transition-colors">{t('hp_guide_btn')}</a>
+              <a href="#pricing" className="hover:text-white transition-colors">{t('hp_sub_codes')}</a>
+              <a href="#systems" className="hover:text-white transition-colors">{t('hp_15_systems')}</a>
+              <Link to="/login" className="hover:text-white transition-colors">{t('sign_in', 'تسجيل الدخول')}</Link>
             </div>
-            <p className="text-xs">&copy; {new Date().getFullYear()} HomeMe - جميع الحقوق محفوظة</p>
+            <p className="text-xs">&copy; {new Date().getFullYear()} HomeMe - {t('hp_all_rights', 'جميع الحقوق محفوظة')}</p>
           </div>
         </div>
       </footer>

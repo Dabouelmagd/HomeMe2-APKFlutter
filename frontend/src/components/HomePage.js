@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import i18n from 'i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useAuth } from '../App';
@@ -141,7 +142,7 @@ const HomePage = () => {
   ];
 
   const fx = currency === 'egp' ? 1 : 0.02; // 1 EGP ≈ 0.02 USD
-  const sym = currency === 'egp' ? 'ج.م' : '$';
+  const sym = currency === 'egp' ? (i18n.language?.startsWith('ar') ? 'ج.م' : 'EGP') : '$';
   const priceOf = (egp) => {
     const val = currency === 'egp' ? egp : Math.round(egp * 0.02);
     return val.toLocaleString();

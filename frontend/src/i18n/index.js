@@ -2786,8 +2786,8 @@ const resources = {
       'hp_create_free': 'Create Free Account',
       'hp_for_companies': 'For Management Companies',
       'hp_best_for_companies': 'Best for Companies',
-      'hp_per_month': '/month',
-      'hp_per_year': '/year',
+      'hp_per_month': 'month',
+      'hp_per_year': 'year',
       'hp_referral_program': 'Referral Program',
       // Systems
       'sys_residents': 'Resident Management', 'sys_residents_d': 'Complete profile for each resident with family, unit & PDF export',
@@ -4378,8 +4378,8 @@ const resources = {
       'hp_create_free': 'إنشاء حساب مجاني',
       'hp_for_companies': 'لشركات الإدارة',
       'hp_best_for_companies': 'الأفضل للشركات',
-      'hp_per_month': '/ شهرياً',
-      'hp_per_year': '/ سنوياً',
+      'hp_per_month': 'شهرياً',
+      'hp_per_year': 'سنوياً',
       'hp_referral_program': 'برنامج الإحالة',
       // Systems
       'sys_residents': 'إدارة المقيمين', 'sys_residents_d': 'ملف شامل لكل مقيم مع العائلة والوحدة وتصدير PDF',
@@ -8521,8 +8521,8 @@ const resources = {
       'hp_create_free': 'Créer un compte gratuit',
       'hp_for_companies': 'Pour les sociétés de gestion',
       'hp_best_for_companies': 'Meilleur pour les entreprises',
-      'hp_per_month': '/mois',
-      'hp_per_year': '/an',
+      'hp_per_month': 'mois',
+      'hp_per_year': 'an',
       'hp_referral_program': 'Programme de parrainage',
       // Systems
       'sys_residents': 'Gestion des résidents', 'sys_residents_d': 'Profil complet pour chaque résident avec famille et unité',

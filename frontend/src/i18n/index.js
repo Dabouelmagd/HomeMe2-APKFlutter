@@ -7724,6 +7724,7 @@ const resources = {
       'next_week': 'Semaine prochaine',
       'this_month': 'Ce mois-ci',
       'in_progress': 'En cours',
+      'remember_me': 'Se souvenir de moi',
       
       // Navigation
       'back_to_menu': 'Retour au menu',

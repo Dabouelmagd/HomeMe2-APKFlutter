@@ -3266,5 +3266,19 @@
   "ad_learn_more": "Learn More",
   "ad_target_compounds": "Target Compounds (leave empty = all compounds)",
   "ad_no_compounds": "No compounds available",
-  "ad_all_compounds": "All Compounds"
+  "ad_all_compounds": "All Compounds",
+  "ad_analytics_tab": "Ad Reports",
+  "ad_perf_by_position": "Performance by Position",
+  "ad_distribution": "Ad Distribution",
+  "ad_top_ctr": "Top CTR",
+  "ad_top_clicks": "Most Clicked",
+  "ad_top_views": "Most Viewed",
+  "ad_all_performance": "All Ads Performance",
+  "ad_views": "Views",
+  "ad_clicks": "Clicks",
+  "ad_avg_ctr": "Avg CTR",
+  "ad_revenue": "Revenue",
+  "ad_gifts": "Gifts",
+  "ad_active": "Active",
+  "ad_total_ads": "Total Ads"
 }

@@ -21,7 +21,9 @@ import {
   EyeIcon,
   ArrowDownTrayIcon,
   FunnelIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  SpeakerWaveIcon,
+  CursorArrowRaysIcon,
 } from '@heroicons/react/24/outline';
 import { formatDate } from '../utils/dateUtils';
 
@@ -60,6 +62,7 @@ const AdvancedAnalytics = () => {
     return data;
   };
   const [analytics, setAnalytics] = useState({});
+  const [adAnalytics, setAdAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState('last_30_days');
   const [refreshing, setRefreshing] = useState(false);
@@ -75,7 +78,18 @@ const AdvancedAnalytics = () => {
 
   useEffect(() => {
     fetchAnalytics();
-  }, [dateRange]);
+    if (activeTab === 'ads') fetchAdAnalytics();
+  }, [dateRange, activeTab]);
+
+  const fetchAdAnalytics = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API}/ads/analytics`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAdAnalytics(res.data);
+    } catch { /* silent */ }
+  };
 
   const fetchAnalytics = async () => {
     try {
@@ -378,7 +392,8 @@ const AdvancedAnalytics = () => {
             { key: 'residents', label: t('residents'), icon: UsersIcon },
             { key: 'maintenance', label: t('maintenance'), icon: WrenchScrewdriverIcon },
             { key: 'financial', label: t('financial'), icon: CurrencyDollarIcon },
-            { key: 'engagement', label: t('engagement'), icon: BellIcon }
+            { key: 'engagement', label: t('engagement'), icon: BellIcon },
+            { key: 'ads', label: t('ad_analytics_tab', 'تقارير الإعلانات'), icon: SpeakerWaveIcon }
           ].map(tab => {
             const Icon = tab.icon;
             return (
@@ -699,6 +714,234 @@ const AdvancedAnalytics = () => {
               ))}
             </ul>
           </div>
+        </div>
+      </div>
+
+      {/* Ads Analytics Tab */}
+      {activeTab === 'ads' && (
+        <AdsAnalyticsTab data={adAnalytics} t={t} />
+      )}
+    </div>
+  );
+};
+
+// Ads Analytics Sub-component
+const AdsAnalyticsTab = ({ data, t }) => {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+
+  if (!data) {
+    return (
+      <div className="flex justify-center py-16">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  const s = data.summary || {};
+  const posLabels = {
+    banner: t('sa_pos_banner', 'بانر'),
+    sidebar: t('sa_pos_sidebar', 'جانبي'),
+    inline: t('sa_pos_inline', 'داخلي'),
+    dashboard: t('sa_pos_dashboard', 'لوحة التحكم'),
+  };
+
+  return (
+    <div className="space-y-6" data-testid="ads-analytics-tab">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+        {[
+          { label: t('ad_total_ads', 'إجمالي الإعلانات'), value: s.total_ads, color: 'text-blue-600', bg: 'bg-blue-50' },
+          { label: t('ad_active', 'نشطة'), value: s.active_ads, color: 'text-green-600', bg: 'bg-green-50' },
+          { label: t('ad_views', 'المشاهدات'), value: (s.total_views || 0).toLocaleString(), color: 'text-purple-600', bg: 'bg-purple-50' },
+          { label: t('ad_clicks', 'النقرات'), value: (s.total_clicks || 0).toLocaleString(), color: 'text-amber-600', bg: 'bg-amber-50' },
+          { label: t('ad_avg_ctr', 'متوسط CTR'), value: `${s.avg_ctr || 0}%`, color: 'text-rose-600', bg: 'bg-rose-50' },
+          { label: t('ad_revenue', 'الإيرادات'), value: `${(s.total_revenue || 0).toLocaleString()} ${t('sm_egp','ج.م')}`, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          { label: t('ad_gifts', 'هدايا'), value: s.gift_ads, color: 'text-pink-600', bg: 'bg-pink-50' },
+        ].map((c, i) => (
+          <div key={i} className={`${c.bg} rounded-xl p-4 text-center`}>
+            <p className={`text-xl font-black ${c.color}`}>{c.value}</p>
+            <p className="text-[10px] text-gray-500 mt-1">{c.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Performance by Position - Bar Chart */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">{t('ad_perf_by_position', 'الأداء حسب الموقع')}</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={(data.position_chart || []).map(p => ({
+                name: posLabels[p.label] || p.label,
+                [t('ad_views','المشاهدات')]: p.views,
+                [t('ad_clicks','النقرات')]: p.clicks,
+              }))}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis dataKey="name" tick={{ fill: '#6B7280', fontSize: 12 }} reversed={isRTL} />
+                <YAxis tick={{ fill: '#6B7280', fontSize: 12 }} orientation={isRTL ? 'right' : 'left'} />
+                <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB' }} />
+                <Legend />
+                <Bar dataKey={t('ad_views','المشاهدات')} fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey={t('ad_clicks','النقرات')} fill="#F59E0B" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Ads by Position - Pie Chart */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">{t('ad_distribution', 'توزيع الإعلانات')}</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={(data.position_chart || []).map(p => ({
+                    name: posLabels[p.label] || p.label,
+                    value: p.count,
+                  }))}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
+                  outerRadius={80}
+                  paddingAngle={3}
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  {(data.position_chart || []).map((_, i) => (
+                    <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Top Performers Tables */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top by CTR */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-5 py-3 border-b border-gray-100 bg-rose-50">
+            <h4 className="font-bold text-gray-900 flex items-center gap-2">
+              <CursorArrowRaysIcon className="w-4 h-4 text-rose-500" />
+              {t('ad_top_ctr', 'أعلى نسبة نقر (CTR)')}
+            </h4>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {(data.top_by_ctr || []).length === 0 ? (
+              <p className="p-4 text-center text-sm text-gray-400">{t('no_data_available', 'لا توجد بيانات')}</p>
+            ) : (
+              (data.top_by_ctr || []).map((a, i) => (
+                <div key={i} className="px-5 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-xs font-bold text-gray-400 w-4">{i + 1}</span>
+                    <span className="text-sm text-gray-800 truncate">{a.title}</span>
+                  </div>
+                  <span className="text-sm font-bold text-rose-600 whitespace-nowrap">{a.ctr}%</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Top by Clicks */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-5 py-3 border-b border-gray-100 bg-amber-50">
+            <h4 className="font-bold text-gray-900 flex items-center gap-2">
+              <CursorArrowRaysIcon className="w-4 h-4 text-amber-500" />
+              {t('ad_top_clicks', 'أكثر نقراً')}
+            </h4>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {(data.top_by_clicks || []).length === 0 ? (
+              <p className="p-4 text-center text-sm text-gray-400">{t('no_data_available', 'لا توجد بيانات')}</p>
+            ) : (
+              (data.top_by_clicks || []).map((a, i) => (
+                <div key={i} className="px-5 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-xs font-bold text-gray-400 w-4">{i + 1}</span>
+                    <span className="text-sm text-gray-800 truncate">{a.title}</span>
+                  </div>
+                  <span className="text-sm font-bold text-amber-600 whitespace-nowrap">{a.clicks}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Top by Views */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-5 py-3 border-b border-gray-100 bg-purple-50">
+            <h4 className="font-bold text-gray-900 flex items-center gap-2">
+              <EyeIcon className="w-4 h-4 text-purple-500" />
+              {t('ad_top_views', 'أكثر مشاهدة')}
+            </h4>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {(data.top_by_views || []).length === 0 ? (
+              <p className="p-4 text-center text-sm text-gray-400">{t('no_data_available', 'لا توجد بيانات')}</p>
+            ) : (
+              (data.top_by_views || []).map((a, i) => (
+                <div key={i} className="px-5 py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-xs font-bold text-gray-400 w-4">{i + 1}</span>
+                    <span className="text-sm text-gray-800 truncate">{a.title}</span>
+                  </div>
+                  <span className="text-sm font-bold text-purple-600 whitespace-nowrap">{(a.views || 0).toLocaleString()}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Full Ads Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h3 className="text-lg font-bold text-gray-900">{t('ad_all_performance', 'أداء جميع الإعلانات')}</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-right text-gray-500 font-medium">{t('sa_title', 'العنوان')}</th>
+                <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('sa_position', 'الموقع')}</th>
+                <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('ad_views', 'المشاهدات')}</th>
+                <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('ad_clicks', 'النقرات')}</th>
+                <th className="px-4 py-3 text-center text-gray-500 font-medium">CTR</th>
+                <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('ad_value_col', 'القيمة')}</th>
+                <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('sa_status', 'الحالة')}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {(data.all_ads || []).map((a) => (
+                <tr key={a.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 font-medium text-gray-900">{a.title}</td>
+                  <td className="px-4 py-3 text-center text-xs text-gray-500">{posLabels[a.position] || a.position}</td>
+                  <td className="px-4 py-3 text-center font-bold text-purple-600">{(a.views || 0).toLocaleString()}</td>
+                  <td className="px-4 py-3 text-center font-bold text-amber-600">{(a.clicks || 0).toLocaleString()}</td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${a.ctr > 5 ? 'bg-green-100 text-green-700' : a.ctr > 1 ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500'}`}>
+                      {a.ctr}%
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-center text-xs">
+                    {a.is_gift ? (
+                      <span className="px-2 py-0.5 bg-pink-100 text-pink-600 rounded-full font-medium">{t('ad_gift', 'هدية')}</span>
+                    ) : (
+                      <span className="text-emerald-600 font-bold">{(a.ad_value || 0).toLocaleString()} {t('sm_egp','ج.م')}</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <span className={`w-2 h-2 rounded-full inline-block ${a.is_active ? 'bg-green-500' : 'bg-red-400'}`}></span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

@@ -167,8 +167,90 @@ async def delete_ad(ad_id: str, current_user: dict = Depends(require_super_admin
 @router.post("/ads/{ad_id}/click")
 async def track_ad_click(ad_id: str, current_user: dict = Depends(get_current_user)):
     db = get_db()
+    now = datetime.now(timezone.utc)
     await db.internal_ads.update_one({"id": ad_id}, {"$inc": {"clicks": 1}})
+    # Log click event for analytics
+    await db.ad_events.insert_one({
+        "ad_id": ad_id,
+        "event": "click",
+        "user_id": current_user.get("id", ""),
+        "compound_id": current_user.get("compound_id", ""),
+        "timestamp": now.isoformat(),
+    })
     return {"ok": True}
+
+
+@router.get("/ads/analytics")
+async def get_ad_analytics(current_user: dict = Depends(require_super_admin)):
+    """Get ad performance analytics for charts"""
+    db = get_db()
+    ads = await db.internal_ads.find({}, {"_id": 0}).sort("created_at", -1).to_list(200)
+
+    # Per-ad stats
+    ad_stats = []
+    for a in ads:
+        clicks = a.get("clicks", 0)
+        views = a.get("views", 0)
+        ctr = round((clicks / views * 100), 2) if views > 0 else 0
+        ad_stats.append({
+            "id": a.get("id", ""),
+            "title": a.get("title", ""),
+            "position": a.get("position", ""),
+            "dimensions": a.get("dimensions", ""),
+            "is_gift": a.get("is_gift", False),
+            "ad_value": a.get("ad_value", 0),
+            "clicks": clicks,
+            "views": views,
+            "ctr": ctr,
+            "is_active": a.get("is_active", False),
+            "created_at": a.get("created_at", ""),
+        })
+
+    # Sort by CTR descending for top performers
+    top_by_ctr = sorted([a for a in ad_stats if a["views"] > 0], key=lambda x: x["ctr"], reverse=True)[:5]
+    top_by_clicks = sorted(ad_stats, key=lambda x: x["clicks"], reverse=True)[:5]
+    top_by_views = sorted(ad_stats, key=lambda x: x["views"], reverse=True)[:5]
+
+    # Aggregate by position
+    position_stats = {}
+    for a in ad_stats:
+        pos = a["position"]
+        if pos not in position_stats:
+            position_stats[pos] = {"clicks": 0, "views": 0, "count": 0, "revenue": 0}
+        position_stats[pos]["clicks"] += a["clicks"]
+        position_stats[pos]["views"] += a["views"]
+        position_stats[pos]["count"] += 1
+        if not a["is_gift"]:
+            position_stats[pos]["revenue"] += a["ad_value"]
+
+    position_chart = [
+        {"label": pos, "clicks": s["clicks"], "views": s["views"], "count": s["count"], "revenue": s["revenue"]}
+        for pos, s in position_stats.items()
+    ]
+
+    # Overall summary
+    total_clicks = sum(a["clicks"] for a in ad_stats)
+    total_views = sum(a["views"] for a in ad_stats)
+    total_revenue = sum(a["ad_value"] for a in ad_stats if not a["is_gift"])
+    gift_count = len([a for a in ad_stats if a["is_gift"]])
+    avg_ctr = round((total_clicks / total_views * 100), 2) if total_views > 0 else 0
+
+    return {
+        "summary": {
+            "total_ads": len(ad_stats),
+            "active_ads": len([a for a in ad_stats if a["is_active"]]),
+            "total_clicks": total_clicks,
+            "total_views": total_views,
+            "avg_ctr": avg_ctr,
+            "total_revenue": total_revenue,
+            "gift_ads": gift_count,
+        },
+        "all_ads": ad_stats,
+        "top_by_ctr": top_by_ctr,
+        "top_by_clicks": top_by_clicks,
+        "top_by_views": top_by_views,
+        "position_chart": position_chart,
+    }
 
 
 UPLOAD_DIR = "/app/backend/uploads/ads"

@@ -3048,5 +3048,19 @@
   "ad_learn_more": "En Savoir Plus",
   "ad_target_compounds": "Complexes Ciblés (vide = tous)",
   "ad_no_compounds": "Aucun complexe disponible",
-  "ad_all_compounds": "Tous les Complexes"
+  "ad_all_compounds": "Tous les Complexes",
+  "ad_analytics_tab": "Rapports Publicitaires",
+  "ad_perf_by_position": "Performance par Position",
+  "ad_distribution": "Distribution des Annonces",
+  "ad_top_ctr": "Meilleur CTR",
+  "ad_top_clicks": "Plus Cliquées",
+  "ad_top_views": "Plus Vues",
+  "ad_all_performance": "Performance de Toutes les Annonces",
+  "ad_views": "Vues",
+  "ad_clicks": "Clics",
+  "ad_avg_ctr": "CTR Moyen",
+  "ad_revenue": "Revenus",
+  "ad_gifts": "Cadeaux",
+  "ad_active": "Actives",
+  "ad_total_ads": "Total des Annonces"
 }

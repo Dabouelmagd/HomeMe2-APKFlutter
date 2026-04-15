@@ -2794,5 +2794,19 @@
   "ad_learn_more": "اعرف أكثر",
   "ad_target_compounds": "الكمبوندات المستهدفة (اتركه فارغ = كل الكمبوندات)",
   "ad_no_compounds": "لا توجد كمبوندات",
-  "ad_all_compounds": "كل الكمبوندات"
+  "ad_all_compounds": "كل الكمبوندات",
+  "ad_analytics_tab": "تقارير الإعلانات",
+  "ad_perf_by_position": "الأداء حسب الموقع",
+  "ad_distribution": "توزيع الإعلانات",
+  "ad_top_ctr": "أعلى نسبة نقر (CTR)",
+  "ad_top_clicks": "أكثر نقراً",
+  "ad_top_views": "أكثر مشاهدة",
+  "ad_all_performance": "أداء جميع الإعلانات",
+  "ad_views": "المشاهدات",
+  "ad_clicks": "النقرات",
+  "ad_avg_ctr": "متوسط CTR",
+  "ad_revenue": "الإيرادات",
+  "ad_gifts": "هدايا",
+  "ad_active": "نشطة",
+  "ad_total_ads": "إجمالي الإعلانات"
 }

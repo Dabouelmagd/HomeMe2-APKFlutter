@@ -5,27 +5,22 @@
 - Backend: FastAPI + MongoDB + Stripe + PayPal
 - i18n: en.json, ar.json, fr.json (split JSON files)
 
-## Latest: Internal Ads Display for Residents (Apr 15, 2026)
-- Created `InternalAdBanner.js` reusable component with 3 variants: full, slim, card
-- Integrated ads in: ResidentDashboard (banner + inline), Layout sidebar, Layout top banner
-- Backend tracks views automatically when ads are fetched
-- Ads filtered by: position, compound targeting, date range, active status
-- Compound targeting: checkboxes in ad creation form to select target compounds
-- Ad positions: banner (top), sidebar (side nav), inline (between content), dashboard (on dashboard)
+## Latest: Ad Analytics Reports (Apr 15, 2026)
+- Added "تقارير الإعلانات" tab to Advanced Analytics page
+- Backend `/api/ads/analytics` returns: summary, top by CTR/clicks/views, position chart, all ads data
+- Charts: Bar chart (views/clicks by position), Pie chart (ad distribution by position)
+- Tables: Top 5 by CTR, Top 5 by clicks, Top 5 by views, Full performance table
+- Click events logged to `ad_events` collection for future time-series analysis
 
 ## Completed Features
-- Internal Ad Display for Residents with compound targeting (DONE - Apr 15, 2026)
+- Ad Analytics Reports in Advanced Analytics (DONE - Apr 15, 2026)
+- Internal Ad Display for Residents with compound targeting (DONE)
 - Enhanced Ads Management with dimensions/value/gift/dates (DONE)
-- Translation fixes: 120+ keys added (DONE)
 - Sidebar Reorganization + Owner Budget + Subscription Reminders (DONE)
 - Company Subscriptions Management Page (DONE)
-- Account Selector post-login (DONE)
-- Translation Management UI for Super Admin (DONE)
-- Full i18n (EN/AR/FR) with split JSON files (DONE)
-- App Owner role with custom dark sidebar (DONE)
-- Owner Dashboard (DONE)
-- Payment (Stripe + PayPal), Subscriptions, 14-Day Trial (DONE)
-- Internal Ads, Google AdSense, Referral Program (DONE)
+- Account Selector post-login, Translation Management (DONE)
+- Full i18n (EN/AR/FR), App Owner role (DONE)
+- Payment (Stripe + PayPal), Subscriptions, Internal Ads, AdSense, Referral (DONE)
 - PDF Invoices, Email Notifications, Written Guide (DONE)
 
 ## Backlog

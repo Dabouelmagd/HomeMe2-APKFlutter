@@ -2648,5 +2648,7 @@
   "as_badge_company": "إدارة الشركة",
   "as_badge_operations": "العمليات",
   "as_badge_services": "الخدمات والعائلة",
-  "as_badge_gates": "البوابات والزوار"
+  "as_badge_gates": "البوابات والزوار",
+  "forgot_password": "نسيت كلمة المرور؟",
+  "forgot_password_msg": "تواصل مع إدارة المجمع لإعادة تعيين كلمة المرور"
 }

@@ -3125,5 +3125,7 @@
   "as_badge_company": "Company Management",
   "as_badge_operations": "Operations",
   "as_badge_services": "Services & Family",
-  "as_badge_gates": "Gates & Visitors"
+  "as_badge_gates": "Gates & Visitors",
+  "forgot_password": "Forgot password?",
+  "forgot_password_msg": "Contact compound management to reset your password"
 }

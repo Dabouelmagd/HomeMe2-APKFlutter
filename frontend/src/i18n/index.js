@@ -10,7 +10,13 @@ const resources = {
   fr: { translation: fr }
 };
 
-const savedLanguage = localStorage.getItem('i18nextLng') || 'ar';
+const savedLanguage = localStorage.getItem('i18nextLng');
+const defaultLng = (savedLanguage && ['ar', 'en', 'fr'].includes(savedLanguage)) ? savedLanguage : 'ar';
+
+// Ensure Arabic is set as default on first visit
+if (!savedLanguage) {
+  localStorage.setItem('i18nextLng', 'ar');
+}
 
 i18n
   .use(initReactI18next)
@@ -25,7 +31,7 @@ i18n
       escapeValue: false
     },
     
-    lng: savedLanguage,
+    lng: defaultLng,
     
     react: {
       useSuspense: false

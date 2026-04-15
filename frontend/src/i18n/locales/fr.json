@@ -2907,5 +2907,7 @@
   "as_badge_company": "Gestion entreprise",
   "as_badge_operations": "Operations",
   "as_badge_services": "Services et famille",
-  "as_badge_gates": "Portes et visiteurs"
+  "as_badge_gates": "Portes et visiteurs",
+  "forgot_password": "Mot de passe oublie?",
+  "forgot_password_msg": "Contactez la gestion pour reinitialiser votre mot de passe"
 }

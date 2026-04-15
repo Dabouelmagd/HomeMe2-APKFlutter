@@ -22,8 +22,13 @@ class AdCreate(BaseModel):
     link_url: str = ""
     description: str = ""
     position: str = "sidebar"  # sidebar, banner, inline, popup
+    dimensions: str = ""  # e.g. "728x90", "300x250"
     target_compounds: list = []  # empty = all compounds
     is_active: bool = True
+    is_gift: bool = False
+    ad_value: float = 0  # monetary value (0 if gift)
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
     priority: int = 0
 
 
@@ -33,8 +38,13 @@ class AdUpdate(BaseModel):
     link_url: Optional[str] = None
     description: Optional[str] = None
     position: Optional[str] = None
+    dimensions: Optional[str] = None
     target_compounds: Optional[list] = None
     is_active: Optional[bool] = None
+    is_gift: Optional[bool] = None
+    ad_value: Optional[float] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
     priority: Optional[int] = None
 
 
@@ -48,8 +58,13 @@ async def create_ad(data: AdCreate, current_user: dict = Depends(require_super_a
         "link_url": data.link_url,
         "description": data.description,
         "position": data.position,
+        "dimensions": data.dimensions,
         "target_compounds": data.target_compounds,
         "is_active": data.is_active,
+        "is_gift": data.is_gift,
+        "ad_value": data.ad_value if not data.is_gift else 0,
+        "start_date": data.start_date,
+        "end_date": data.end_date,
         "priority": data.priority,
         "clicks": 0,
         "views": 0,
@@ -70,7 +85,9 @@ async def get_all_ads(current_user: dict = Depends(require_super_admin)):
         "total": len(ads),
         "active": len([a for a in ads if a.get("is_active")]),
         "total_clicks": sum(a.get("clicks", 0) for a in ads),
-        "total_views": sum(a.get("views", 0) for a in ads)
+        "total_views": sum(a.get("views", 0) for a in ads),
+        "total_revenue": sum(a.get("ad_value", 0) for a in ads if not a.get("is_gift")),
+        "gift_ads": len([a for a in ads if a.get("is_gift")]),
     }
     return {"ads": ads, "stats": stats}
 

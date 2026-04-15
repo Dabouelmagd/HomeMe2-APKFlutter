@@ -101,6 +101,8 @@ import MobileOptimized from './components/MobileOptimized';
 import SubscriptionActivation from './components/SubscriptionActivation';
 import AccountSelector from './components/AccountSelector';
 import CompanySubscriptions from './components/CompanySubscriptions';
+import OwnerBudget from './components/OwnerBudget';
+import SubscriptionReminders from './components/SubscriptionReminders';
 import { Toaster } from './components/ui/sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -520,6 +522,18 @@ function App() {
                 <Route path="company-subscriptions" element={
                   <ProtectedRoute adminOnly>
                     <CompanySubscriptions />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="owner-budget" element={
+                  <ProtectedRoute adminOnly>
+                    <OwnerBudget />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="subscription-reminders" element={
+                  <ProtectedRoute adminOnly>
+                    <SubscriptionReminders />
                   </ProtectedRoute>
                 } />
                 

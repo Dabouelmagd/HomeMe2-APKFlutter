@@ -2421,6 +2421,10 @@ from routes.translations import router as translations_router
 app.include_router(translations_router, prefix="/api", tags=["translations"])
 from routes.owner_subscriptions import router as owner_subs_router
 app.include_router(owner_subs_router, tags=["owner"])
+from routes.owner_budget import router as owner_budget_router
+app.include_router(owner_budget_router, tags=["owner"])
+from routes.owner_reminders import router as owner_reminders_router
+app.include_router(owner_reminders_router, tags=["owner"])
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

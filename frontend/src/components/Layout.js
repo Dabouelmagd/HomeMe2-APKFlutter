@@ -294,6 +294,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('owner_dashboard', 'لوحة التحكم الرئيسية'), href: 'dashboard', icon: HomeIcon, show: true },
         { name: t('sa_compounds', 'المجمعات السكنية'), href: 'super-admin?tab=compounds', icon: BuildingOfficeIcon, show: true },
         { name: t('sa_users', 'المستخدمين'), href: 'super-admin?tab=users', icon: UsersIcon, show: true },
+        { name: t('owner_budget', 'الميزانية العامة'), href: 'owner-budget', icon: CurrencyDollarIcon, show: true },
       ]
     },
     {
@@ -301,14 +302,15 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('sa_subscription_codes', 'أكواد الاشتراك'), href: 'super-admin?tab=codes', icon: KeyIcon, show: true },
         { name: t('sa_discount_coupons', 'كوبونات الخصم'), href: 'super-admin?tab=coupons', icon: TicketIcon, show: true },
-        { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: CurrencyDollarIcon, show: true },
+        { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
         { name: t('sa_analytics', 'تحليلات الاشتراكات'), href: 'super-admin?tab=analytics', icon: ChartBarIcon, show: true },
+        { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: 'subscription-reminders', icon: BellIcon, show: true },
       ]
     },
     {
       title: t('owner_marketing', 'التسويق والإعلانات'),
       items: [
-        { name: t('sa_ads', 'الإعلانات'), href: 'super-admin?tab=ads', icon: SpeakerWaveIcon, show: true },
+        { name: t('sa_ads', 'إدارة الإعلانات'), href: 'super-admin?tab=ads', icon: SpeakerWaveIcon, show: true },
         { name: t('sa_referrals', 'الإحالات'), href: 'super-admin?tab=referrals', icon: UserGroupIcon, show: true },
       ]
     },

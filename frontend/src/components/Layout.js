@@ -270,9 +270,11 @@ const Layout = ({ children, isTrialMode = false }) => {
   const isStaffRole = ['admin','company_admin','super_admin','manager'].includes(user?.role);
   const isSecurityRole = ['admin','company_admin','super_admin','manager','security'].includes(user?.role);
 
+  const isSuperAdmin = user?.role === 'super_admin';
+
   // Role-based theme
   const roleTheme = {
-    super_admin: { active: 'from-purple-600 to-purple-700', hover: 'hover:bg-purple-50', text: 'text-purple-600', dot: 'bg-purple-500' },
+    super_admin: { active: 'from-purple-500 to-pink-500', hover: 'hover:bg-purple-500/10', text: 'text-purple-400', dot: 'bg-purple-500', sidebarBg: 'bg-gray-950', sidebarBorder: 'border-purple-900/50', sidebarText: 'text-gray-300', sidebarHeading: 'text-purple-400' },
     company_admin: { active: 'from-indigo-600 to-indigo-700', hover: 'hover:bg-indigo-50', text: 'text-indigo-600', dot: 'bg-indigo-500' },
     admin: { active: 'from-blue-600 to-blue-700', hover: 'hover:bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500' },
     manager: { active: 'from-emerald-600 to-emerald-700', hover: 'hover:bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500' },
@@ -390,11 +392,12 @@ const Layout = ({ children, isTrialMode = false }) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col
+        fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col
         lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}
+        ${isSuperAdmin ? 'bg-gray-950 border-e border-purple-900/30' : 'bg-white dark:bg-gray-800'}
       `}>
-        <div className="flex flex-col items-center justify-center px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex-shrink-0">
+        <div className={`flex flex-col items-center justify-center px-4 py-3 border-b flex-shrink-0 ${isSuperAdmin ? 'border-purple-900/30' : 'border-gray-200 dark:border-gray-700'}`}>
           {/* Close button for mobile */}
           <div className="w-full flex justify-between items-center mb-2 lg:hidden">
             <button onClick={() => setSidebarOpen(false)}>
@@ -415,13 +418,13 @@ const Layout = ({ children, isTrialMode = false }) => {
             </div>
           )}
           {user?.compound_name && (
-            <p className="text-sm font-bold text-gray-800 dark:text-gray-200 mb-0.5 text-center">{user.compound_name}</p>
+            <p className={`text-sm font-bold mb-0.5 text-center ${isSuperAdmin ? 'text-purple-300' : 'text-gray-800 dark:text-gray-200'}`}>{user.compound_name}</p>
           )}
           
           {/* HomeMe Brand */}
           <div className="flex items-center gap-1.5 opacity-60">
-            <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500">Powered by</span>
-            <span className="text-[11px] font-bold text-blue-500">HomeMe</span>
+            <span className={`text-[10px] font-medium ${isSuperAdmin ? 'text-gray-500' : 'text-gray-400 dark:text-gray-500'}`}>Powered by</span>
+            <span className={`text-[11px] font-bold ${isSuperAdmin ? 'text-purple-400' : 'text-blue-500'}`}>HomeMe</span>
           </div>
         </div>
 
@@ -447,7 +450,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                       e.stopPropagation();
                       toggleSection(sectionIndex);
                     }}
-                    className={`w-full px-3 py-1.5 rounded-lg border ${sectionColor} mb-0.5 transition-all duration-200 cursor-pointer bg-white`}
+                    className={`w-full px-3 py-1.5 rounded-lg border ${isSuperAdmin ? 'border-purple-800/40 bg-purple-900/20 text-purple-300 hover:bg-purple-900/30' : `${sectionColor} bg-white`} mb-0.5 transition-all duration-200 cursor-pointer`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
@@ -457,7 +460,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                         </h3>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-normal bg-white bg-opacity-60 px-2 py-0.5 rounded-full">
+                        <span className={`text-xs font-normal px-2 py-0.5 rounded-full ${isSuperAdmin ? 'bg-purple-800/30 text-purple-300' : 'bg-white bg-opacity-60'}`}>
                           {visibleItems.length}
                         </span>
                         {isExpanded ? (
@@ -480,14 +483,16 @@ const Layout = ({ children, isTrialMode = false }) => {
                             group flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200
                             ${isActive(item.href)
                               ? `bg-gradient-to-r ${theme.active} text-white shadow-sm`
-                              : `text-gray-700 ${theme.hover} hover:text-gray-900`
+                              : isSuperAdmin
+                                ? 'text-gray-300 hover:bg-purple-900/30 hover:text-purple-300'
+                                : `text-gray-700 ${theme.hover} hover:text-gray-900`
                             }
                           `}
                           onClick={() => setSidebarOpen(false)}
                         >
                           <item.icon
                             className={`${isRTL ? 'ml-2.5' : 'mr-2.5'} h-5 w-5 flex-shrink-0 transition-colors duration-200 ${
-                              isActive(item.href) ? 'text-white' : 'text-gray-400'
+                              isActive(item.href) ? 'text-white' : isSuperAdmin ? 'text-purple-500/70' : 'text-gray-400'
                             }`}
                           />
                           <span className="flex-1">{item.name}</span>
@@ -522,7 +527,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         </nav>
 
         {/* Fixed Bottom Section - User Info & Logout */}
-        <div className="flex-shrink-0 border-t border-gray-200 bg-white px-3 py-4">
+        <div className={`flex-shrink-0 border-t px-3 py-4 ${isSuperAdmin ? 'border-purple-900/30 bg-gray-950' : 'border-gray-200 bg-white'}`}>
           <div className="px-3 py-2">
             <div className="flex items-center">
               <div className="flex-shrink-0">
@@ -533,10 +538,10 @@ const Layout = ({ children, isTrialMode = false }) => {
                 </div>
               </div>
               <div className={`${isRTL ? 'mr-3' : 'ml-3'}`}>
-                <p className="text-sm font-medium text-gray-700">
+                <p className={`text-sm font-medium ${isSuperAdmin ? 'text-gray-200' : 'text-gray-700'}`}>
                   {user?.full_name}
                 </p>
-                <p className="text-xs text-gray-500 capitalize">
+                <p className={`text-xs capitalize ${isSuperAdmin ? 'text-purple-400' : 'text-gray-500'}`}>
                   {t(user?.role)}
                 </p>
               </div>
@@ -549,9 +554,9 @@ const Layout = ({ children, isTrialMode = false }) => {
             
             <button
               onClick={handleLogout}
-              className={`group flex items-center w-full px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 hover:text-gray-900`}
+              className={`group flex items-center w-full px-3 py-2 text-sm font-medium rounded-md ${isSuperAdmin ? 'text-gray-400 hover:bg-purple-900/30 hover:text-red-400' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}
             >
-              <ArrowRightOnRectangleIcon className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 text-gray-500 group-hover:text-gray-700`} />
+              <ArrowRightOnRectangleIcon className={`${isRTL ? 'ml-3' : 'mr-3'} h-5 w-5 ${isSuperAdmin ? 'text-gray-500' : 'text-gray-500 group-hover:text-gray-700'}`} />
               {t('sign_out')}
             </button>
           </div>

@@ -5,7 +5,12 @@
 - Backend: FastAPI + MongoDB + Stripe + PayPal
 - i18n: en.json, ar.json, fr.json (split JSON files)
 
-## Latest: Sidebar Reorganization + New Pages (Apr 15, 2026)
+## Latest: Translation Fix + Sidebar Reorganization (Apr 15, 2026)
+- Added 99 missing Arabic translation keys, 94 English, 94 French
+- Fixed sa_compounds, sa_users, sa_ads, sa_referrals, sa_analytics showing as English keys
+- Added all budget/reminders/company-subs page translations
+- Updated OwnerDashboard quick links to include Budget and Reminders
+
 ### Sidebar Structure for App Owner:
 1. **نظرة عامة** (4 items): Dashboard, Compounds, Users, General Budget
 2. **الاشتراكات والمدفوعات** (5 items): Codes, Coupons, Company Subs, Analytics, Reminders
@@ -13,13 +18,14 @@
 4. **إعدادات النظام** (3 items): Translations, Advanced Analytics, Settings
 
 ### New Pages:
-- **الميزانية العامة** (`/app/owner-budget`): Revenue breakdown (regular subs, company subs, ad revenue, other), expenses by category, net profit, gifts (coupons/codes - no monetary value)
-- **تذكيرات الاشتراكات** (`/app/subscription-reminders`): Expiration tracking, urgency levels, send email reminders
-- **Enhanced Ads Model**: Added dimensions, ad_value, is_gift, start_date, end_date fields
+- **الميزانية العامة** (`/app/owner-budget`): Revenue/expenses/gifts overview
+- **تذكيرات الاشتراكات** (`/app/subscription-reminders`): Expiry tracking + email reminders
+- **Enhanced Ads Model**: dimensions, ad_value, is_gift, start_date, end_date
 
 ## Completed Features
-- Sidebar Reorganization + Owner Budget + Subscription Reminders (DONE - Apr 15, 2026)
-- Company Subscriptions Management Page for App Owner (DONE - Apr 15, 2026)
+- Translation fixes for all new pages (DONE - Apr 15, 2026)
+- Sidebar Reorganization + Owner Budget + Subscription Reminders (DONE)
+- Company Subscriptions Management Page for App Owner (DONE)
 - Account Selector post-login (DONE)
 - Translation Management UI for Super Admin (DONE)
 - Full i18n (EN/AR/FR) with split JSON files (DONE)

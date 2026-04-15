@@ -89,11 +89,11 @@ const OwnerDashboard = () => {
   const quickLinks = [
     { name: t('sa_compounds', 'المجمعات'), href: '/app/super-admin?tab=compounds', icon: BuildingOfficeIcon, color: 'bg-blue-600 hover:bg-blue-500' },
     { name: t('sa_users', 'المستخدمين'), href: '/app/super-admin?tab=users', icon: UsersIcon, color: 'bg-emerald-600 hover:bg-emerald-500' },
-    { name: t('sa_subscription_codes', 'أكواد الاشتراك'), href: '/app/super-admin?tab=codes', icon: KeyIcon, color: 'bg-purple-600 hover:bg-purple-500' },
-    { name: t('sa_discount_coupons', 'كوبونات الخصم'), href: '/app/super-admin?tab=coupons', icon: TicketIcon, color: 'bg-pink-600 hover:bg-pink-500' },
+    { name: t('owner_budget', 'الميزانية العامة'), href: '/app/owner-budget', icon: CurrencyDollarIcon, color: 'bg-orange-600 hover:bg-orange-500' },
+    { name: t('owner_company_subs', 'اشتراكات الشركات'), href: '/app/company-subscriptions', icon: KeyIcon, color: 'bg-purple-600 hover:bg-purple-500' },
+    { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: '/app/subscription-reminders', icon: TicketIcon, color: 'bg-pink-600 hover:bg-pink-500' },
     { name: t('sa_ads', 'الإعلانات'), href: '/app/super-admin?tab=ads', icon: SpeakerWaveIcon, color: 'bg-amber-600 hover:bg-amber-500' },
     { name: t('sa_referrals', 'الإحالات'), href: '/app/super-admin?tab=referrals', icon: UserGroupIcon, color: 'bg-teal-600 hover:bg-teal-500' },
-    { name: t('sa_analytics', 'التحليلات'), href: '/app/super-admin?tab=analytics', icon: ChartBarIcon, color: 'bg-indigo-600 hover:bg-indigo-500' },
     { name: t('owner_translations', 'إدارة الترجمات'), href: '/app/super-admin?tab=translations', icon: LanguageIcon, color: 'bg-rose-600 hover:bg-rose-500' },
   ];
 

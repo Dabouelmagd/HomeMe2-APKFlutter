@@ -26,9 +26,22 @@ const Login = () => {
   const [savedUsername, setSavedUsername] = useState('');
   const [showBiometricLogin, setShowBiometricLogin] = useState(false);
   
-  const { login } = useAuth();
+  const { login, user: currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // If already logged in, redirect to account selector or dashboard
+  useEffect(() => {
+    if (currentUser) {
+      const remembered = localStorage.getItem('rememberedAccount');
+      const rememberCompound = localStorage.getItem('rememberCompound') === 'true';
+      if (remembered && rememberCompound) {
+        navigate('/app/dashboard', { replace: true });
+      } else {
+        navigate('/select-account', { replace: true });
+      }
+    }
+  }, [currentUser, navigate]);
   
   // Get the original page the user was trying to access
   const from = location.state?.from || '/select-account';

@@ -5,27 +5,29 @@
 - Backend: FastAPI + MongoDB + Stripe + PayPal
 - i18n: en.json, ar.json, fr.json (split JSON files)
 
-## Latest: Translation Fix + Sidebar Reorganization (Apr 15, 2026)
-- Added 99 missing Arabic translation keys, 94 English, 94 French
-- Fixed sa_compounds, sa_users, sa_ads, sa_referrals, sa_analytics showing as English keys
-- Added all budget/reminders/company-subs page translations
-- Updated OwnerDashboard quick links to include Budget and Reminders
+## Latest: Enhanced Ads Management + Full Translations (Apr 15, 2026)
+- Updated ads UI: dimensions, ad_value, is_gift, start_date, end_date fields in create form
+- Updated ads table: 8 columns (title, position, dimensions, duration, value/gift, clicks, status, actions)
+- Added ads revenue/gift stats cards (6 total)
+- Added 112+ missing translation keys across ar/en/fr
 
-### Sidebar Structure for App Owner:
-1. **نظرة عامة** (4 items): Dashboard, Compounds, Users, General Budget
-2. **الاشتراكات والمدفوعات** (5 items): Codes, Coupons, Company Subs, Analytics, Reminders
-3. **التسويق والإعلانات** (2 items): Ads Management, Referrals
-4. **إعدادات النظام** (3 items): Translations, Advanced Analytics, Settings
+### Sidebar Structure for App Owner (4 sections):
+1. **نظرة عامة** (4): Dashboard, Compounds, Users, General Budget
+2. **الاشتراكات والمدفوعات** (5): Codes, Coupons, Company Subs, Analytics, Reminders
+3. **التسويق والإعلانات** (2): Ads Management, Referrals
+4. **إعدادات النظام** (3): Translations, Advanced Analytics, Settings
 
-### New Pages:
-- **الميزانية العامة** (`/app/owner-budget`): Revenue/expenses/gifts overview
-- **تذكيرات الاشتراكات** (`/app/subscription-reminders`): Expiry tracking + email reminders
-- **Enhanced Ads Model**: dimensions, ad_value, is_gift, start_date, end_date
+### New Pages Built This Session:
+- `/app/owner-budget` - General Budget (revenue/expenses/gifts)
+- `/app/subscription-reminders` - Subscription expiry tracking + email reminders
+- `/app/company-subscriptions` - Company subscription management
+- `ads.txt` - Google AdSense verification file
 
 ## Completed Features
-- Translation fixes for all new pages (DONE - Apr 15, 2026)
+- Enhanced Ads Management with dimensions/value/gift/dates (DONE)
+- Translation fixes: 112+ keys added (DONE)
 - Sidebar Reorganization + Owner Budget + Subscription Reminders (DONE)
-- Company Subscriptions Management Page for App Owner (DONE)
+- Company Subscriptions Management Page (DONE)
 - Account Selector post-login (DONE)
 - Translation Management UI for Super Admin (DONE)
 - Full i18n (EN/AR/FR) with split JSON files (DONE)

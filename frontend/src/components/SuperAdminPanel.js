@@ -66,7 +66,7 @@ const SuperAdminPanel = () => {
   const [ads, setAds] = useState([]);
   const [adStats, setAdStats] = useState({});
   const [showCreateAd, setShowCreateAd] = useState(false);
-  const [newAd, setNewAd] = useState({ title: '', image_url: '', link_url: '', description: '', position: 'banner', target_compounds: [] });
+  const [newAd, setNewAd] = useState({ title: '', image_url: '', link_url: '', description: '', position: 'banner', dimensions: '', ad_value: 0, is_gift: false, start_date: '', end_date: '', target_compounds: [] });
   // Referrals
   const [refStats, setRefStats] = useState(null);
 
@@ -197,7 +197,7 @@ const SuperAdminPanel = () => {
       await axios.post(`${API}/ads`, newAd, getToken());
       toast.success(t('sa_ad_created', 'تم إنشاء الإعلان'));
       setShowCreateAd(false);
-      setNewAd({ title: '', image_url: '', link_url: '', description: '', position: 'banner', target_compounds: [] });
+      setNewAd({ title: '', image_url: '', link_url: '', description: '', position: 'banner', dimensions: '', ad_value: 0, is_gift: false, start_date: '', end_date: '', target_compounds: [] });
       fetchAds();
     } catch (err) { toast.error(err.response?.data?.detail || t('sa_failed', 'فشل')); }
   };
@@ -601,12 +601,14 @@ const SuperAdminPanel = () => {
         {/* Ads Tab */}
         {activeTab === 'ads' && (
           <div data-testid="ads-tab">
-            <div className="grid grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
               {[
                 { label: t('sa_total_ads', 'إجمالي الإعلانات'), value: adStats.total || 0, color: 'text-blue-400' },
                 { label: t('sa_active_count', 'نشطة'), value: adStats.active || 0, color: 'text-green-400' },
                 { label: t('sa_total_clicks', 'إجمالي النقرات'), value: adStats.total_clicks || 0, color: 'text-amber-400' },
                 { label: t('sa_total_views', 'إجمالي المشاهدات'), value: adStats.total_views || 0, color: 'text-purple-400' },
+                { label: t('ad_total_revenue', 'إيرادات الإعلانات'), value: `${(adStats.total_revenue || 0).toLocaleString()} ${t('sm_egp','ج.م')}`, color: 'text-emerald-400' },
+                { label: t('ad_gift_count', 'إعلانات هدية'), value: adStats.gift_ads || 0, color: 'text-pink-400' },
               ].map((s, i) => (
                 <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
                   <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
@@ -664,6 +666,40 @@ const SuperAdminPanel = () => {
                     </select>
                   </div>
                 </div>
+                {/* New Fields Row */}
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('ad_dimensions', 'المقاسات')}</label>
+                    <select value={newAd.dimensions} onChange={e => setNewAd({...newAd, dimensions: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                      <option value="">{t('ad_select_size', 'اختر المقاس')}</option>
+                      <option value="728x90">728x90 (Leaderboard)</option>
+                      <option value="300x250">300x250 (Medium Rectangle)</option>
+                      <option value="336x280">336x280 (Large Rectangle)</option>
+                      <option value="160x600">160x600 (Wide Skyscraper)</option>
+                      <option value="320x50">320x50 (Mobile Banner)</option>
+                      <option value="970x250">970x250 (Billboard)</option>
+                      <option value="custom">{t('ad_custom_size', 'مقاس مخصص')}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('ad_value', 'قيمة الإعلان (ج.م)')}</label>
+                    <input type="number" min="0" value={newAd.ad_value} onChange={e => setNewAd({...newAd, ad_value: parseFloat(e.target.value) || 0})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="0" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('ad_start_date', 'تاريخ البداية')}</label>
+                    <input type="date" value={newAd.start_date} onChange={e => setNewAd({...newAd, start_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('ad_end_date', 'تاريخ النهاية')}</label>
+                    <input type="date" value={newAd.end_date} onChange={e => setNewAd({...newAd, end_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                  </div>
+                  <div className="flex items-end pb-1">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={newAd.is_gift} onChange={e => setNewAd({...newAd, is_gift: e.target.checked, ad_value: e.target.checked ? 0 : newAd.ad_value})} className="w-4 h-4 rounded border-gray-600 bg-gray-900 text-pink-500 focus:ring-pink-500" />
+                      <span className="text-sm text-pink-400 font-medium">{t('ad_is_gift', 'إعلان هدية (مجاني)')}</span>
+                    </label>
+                  </div>
+                </div>
                 <div className="flex gap-3">
                   <button onClick={handleCreateAd} disabled={!newAd.title.trim()} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 disabled:opacity-50">{t('sa_create_ad_btn', 'إنشاء الإعلان')}</button>
                   <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
@@ -677,6 +713,9 @@ const SuperAdminPanel = () => {
                   <tr>
                     <th className="px-4 py-3 text-right text-gray-400">{t('sa_title', 'العنوان')}</th>
                     <th className="px-4 py-3 text-right text-gray-400">{t('sa_position', 'الموقع')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('ad_dimensions', 'المقاسات')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('ad_dates', 'المدة')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('ad_value_col', 'القيمة')}</th>
                     <th className="px-4 py-3 text-center text-gray-400">{t('sa_clicks', 'النقرات')}</th>
                     <th className="px-4 py-3 text-center text-gray-400">{t('sa_status', 'الحالة')}</th>
                     <th className="px-4 py-3 text-center text-gray-400">{t('sa_actions', 'إجراءات')}</th>
@@ -692,6 +731,22 @@ const SuperAdminPanel = () => {
                           <div className="text-xs text-gray-500">{a.description || '-'}</div>
                         </td>
                         <td className="px-4 py-3 text-gray-300 text-xs">{posLabels[a.position] || a.position}</td>
+                        <td className="px-4 py-3 text-center text-gray-300 text-xs">{a.dimensions || '-'}</td>
+                        <td className="px-4 py-3 text-center text-xs">
+                          {a.start_date || a.end_date ? (
+                            <div className="text-gray-300">
+                              {a.start_date && <div>{a.start_date}</div>}
+                              {a.end_date && <div className="text-gray-500">{t('ad_to', 'إلى')} {a.end_date}</div>}
+                            </div>
+                          ) : <span className="text-gray-500">-</span>}
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          {a.is_gift ? (
+                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-pink-500/20 text-pink-400">{t('ad_gift', 'هدية')}</span>
+                          ) : (
+                            <span className="text-emerald-400 font-bold text-xs">{(a.ad_value || 0).toLocaleString()} {t('sm_egp','ج.م')}</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-center text-gray-300">{a.clicks || 0}</td>
                         <td className="px-4 py-3 text-center">
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
@@ -710,7 +765,7 @@ const SuperAdminPanel = () => {
                     );
                   })}
                   {ads.length === 0 && (
-                    <tr><td colSpan="5" className="px-4 py-8 text-center text-gray-500">{t('sa_no_ads', 'لا توجد إعلانات بعد')}</td></tr>
+                    <tr><td colSpan="8" className="px-4 py-8 text-center text-gray-500">{t('sa_no_ads', 'لا توجد إعلانات بعد')}</td></tr>
                   )}
                 </tbody>
               </table>

@@ -3249,5 +3249,18 @@
   "cs_sub_ends": "Ends on",
   "cs_load_failed": "Failed to load data",
   "cs_action_success": "Action completed successfully",
-  "cs_action_failed": "Action failed"
+  "cs_action_failed": "Action failed",
+  "ad_dimensions": "Dimensions",
+  "ad_select_size": "Select Size",
+  "ad_custom_size": "Custom Size",
+  "ad_value": "Ad Value (EGP)",
+  "ad_value_col": "Value",
+  "ad_start_date": "Start Date",
+  "ad_end_date": "End Date",
+  "ad_is_gift": "Gift Ad (Free)",
+  "ad_gift": "Gift",
+  "ad_dates": "Duration",
+  "ad_to": "to",
+  "ad_total_revenue": "Ad Revenue",
+  "ad_gift_count": "Gift Ads"
 }

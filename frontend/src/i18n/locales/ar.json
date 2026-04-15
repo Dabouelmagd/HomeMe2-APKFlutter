@@ -2777,5 +2777,18 @@
   "cs_sub_ends": "ينتهي في",
   "cs_load_failed": "فشل تحميل البيانات",
   "cs_action_success": "تم التنفيذ بنجاح",
-  "cs_action_failed": "فشل في تنفيذ الإجراء"
+  "cs_action_failed": "فشل في تنفيذ الإجراء",
+  "ad_dimensions": "المقاسات",
+  "ad_select_size": "اختر المقاس",
+  "ad_custom_size": "مقاس مخصص",
+  "ad_value": "قيمة الإعلان (ج.م)",
+  "ad_value_col": "القيمة",
+  "ad_start_date": "تاريخ البداية",
+  "ad_end_date": "تاريخ النهاية",
+  "ad_is_gift": "إعلان هدية (مجاني)",
+  "ad_gift": "هدية",
+  "ad_dates": "المدة",
+  "ad_to": "إلى",
+  "ad_total_revenue": "إيرادات الإعلانات",
+  "ad_gift_count": "إعلانات هدية"
 }

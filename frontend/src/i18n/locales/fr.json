@@ -3031,5 +3031,18 @@
   "cs_sub_ends": "Expire le",
   "cs_load_failed": "Échec du chargement des données",
   "cs_action_success": "Action effectuée avec succès",
-  "cs_action_failed": "Échec de l'action"
+  "cs_action_failed": "Échec de l'action",
+  "ad_dimensions": "Dimensions",
+  "ad_select_size": "Choisir la Taille",
+  "ad_custom_size": "Taille Personnalisée",
+  "ad_value": "Valeur de l'Annonce (EGP)",
+  "ad_value_col": "Valeur",
+  "ad_start_date": "Date de Début",
+  "ad_end_date": "Date de Fin",
+  "ad_is_gift": "Annonce Gratuite (Cadeau)",
+  "ad_gift": "Cadeau",
+  "ad_dates": "Durée",
+  "ad_to": "à",
+  "ad_total_revenue": "Revenus Publicitaires",
+  "ad_gift_count": "Annonces Cadeaux"
 }

@@ -2914,5 +2914,16 @@
   "as_desc_app_owner": "Controle total de application et tous les abonnes",
   "as_badge_owner": "Controle total",
   "app_owner_panel": "Panneau proprietaire",
-  "app_owner": "Proprietaire"
+  "app_owner": "Proprietaire",
+  "owner_overview": "Vue generale",
+  "owner_dashboard": "Tableau de bord principal",
+  "owner_all_users": "Tous les utilisateurs",
+  "owner_subscriptions": "Abonnements et paiements",
+  "owner_payments": "Paiements et revenus",
+  "owner_company_subs": "Abonnements societes de gestion",
+  "owner_marketing": "Marketing et publicites",
+  "owner_ads": "Publicites internes",
+  "owner_analytics": "Analyses et rapports",
+  "owner_system": "Parametres systeme",
+  "owner_translations": "Gestion des traductions"
 }

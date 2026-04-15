@@ -42,7 +42,8 @@ import {
   CalendarDaysIcon,
   StarIcon,
   ExclamationTriangleIcon,
-  ShieldCheckIcon
+  ShieldCheckIcon,
+  LanguageIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
@@ -285,8 +286,48 @@ const Layout = ({ children, isTrialMode = false }) => {
   };
   const theme = roleTheme[user?.role] || roleTheme.resident;
 
+  // App Owner gets a completely different navigation
+  const ownerNavigationSections = [
+    {
+      title: t('owner_overview', 'نظرة عامة'),
+      items: [
+        { name: t('owner_dashboard', 'لوحة التحكم الرئيسية'), href: 'dashboard', icon: HomeIcon, show: true },
+        { name: t('compounds_management', 'إدارة المجمعات السكنية'), href: 'compounds-management', icon: BuildingOfficeIcon, show: true },
+        { name: t('owner_all_users', 'جميع المستخدمين'), href: 'users', icon: UsersIcon, show: true },
+      ]
+    },
+    {
+      title: t('owner_subscriptions', 'الاشتراكات والمدفوعات'),
+      items: [
+        { name: t('subscription_codes_management', 'إدارة أكواد الاشتراك'), href: 'subscription-codes', icon: KeyIcon, show: true },
+        { name: t('owner_payments', 'المدفوعات والإيرادات'), href: 'payments', icon: CreditCardIcon, show: true },
+        { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'finances', icon: CurrencyDollarIcon, show: true },
+      ]
+    },
+    {
+      title: t('owner_marketing', 'التسويق والإعلانات'),
+      items: [
+        { name: t('owner_ads', 'الإعلانات الداخلية'), href: 'super-admin', icon: SpeakerWaveIcon, show: true },
+      ]
+    },
+    {
+      title: t('owner_analytics', 'التحليلات والتقارير'),
+      items: [
+        { name: t('advanced_analytics', 'تحليلات متقدمة'), href: 'analytics', icon: ChartBarIcon, show: true },
+        { name: t('monitoring_dashboard', 'لوحة المراقبة'), href: 'monitoring', icon: ChartPieIcon, show: true },
+      ]
+    },
+    {
+      title: t('owner_system', 'إعدادات النظام'),
+      items: [
+        { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin', icon: LanguageIcon, show: true },
+        { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
+      ]
+    },
+  ];
+
   // Organized navigation by role
-  const navigationSections = [
+  const navigationSections = isAppOwner ? ownerNavigationSections : [
     {
       title: t('main_sections'),
       items: [

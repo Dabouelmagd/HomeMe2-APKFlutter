@@ -3132,5 +3132,16 @@
   "as_desc_app_owner": "Full control of the app and all subscribers",
   "as_badge_owner": "Full Control",
   "app_owner_panel": "App Owner Panel",
-  "app_owner": "App Owner"
+  "app_owner": "App Owner",
+  "owner_overview": "Overview",
+  "owner_dashboard": "Main Dashboard",
+  "owner_all_users": "All Users",
+  "owner_subscriptions": "Subscriptions & Payments",
+  "owner_payments": "Payments & Revenue",
+  "owner_company_subs": "Management Company Subscriptions",
+  "owner_marketing": "Marketing & Ads",
+  "owner_ads": "Internal Ads",
+  "owner_analytics": "Analytics & Reports",
+  "owner_system": "System Settings",
+  "owner_translations": "Translation Management"
 }

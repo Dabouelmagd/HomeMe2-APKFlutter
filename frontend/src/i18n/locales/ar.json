@@ -2655,5 +2655,16 @@
   "as_desc_app_owner": "تحكم كامل في التطبيق وجميع المشتركين",
   "as_badge_owner": "تحكم كامل",
   "app_owner_panel": "لوحة تحكم مالك التطبيق",
-  "app_owner": "مالك التطبيق"
+  "app_owner": "مالك التطبيق",
+  "owner_overview": "نظرة عامة",
+  "owner_dashboard": "لوحة التحكم الرئيسية",
+  "owner_all_users": "جميع المستخدمين",
+  "owner_subscriptions": "الاشتراكات والمدفوعات",
+  "owner_payments": "المدفوعات والإيرادات",
+  "owner_company_subs": "اشتراكات شركات الإدارة",
+  "owner_marketing": "التسويق والإعلانات",
+  "owner_ads": "الإعلانات الداخلية",
+  "owner_analytics": "التحليلات والتقارير",
+  "owner_system": "إعدادات النظام",
+  "owner_translations": "إدارة الترجمات"
 }

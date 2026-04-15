@@ -75,11 +75,20 @@ async def get_company_subscriptions(
         # Determine status
         is_active = True
         if sub:
-            end_date = sub.get("current_period_end")
-            if end_date and isinstance(end_date, datetime):
-                is_active = end_date > datetime.now(timezone.utc)
-            elif sub.get("status") == "cancelled":
+            if sub.get("status") == "cancelled":
                 is_active = False
+            else:
+                end_date = sub.get("current_period_end")
+                if end_date:
+                    if isinstance(end_date, str):
+                        try:
+                            end_date = datetime.fromisoformat(end_date.replace("Z", "+00:00"))
+                        except Exception:
+                            end_date = None
+                    if isinstance(end_date, datetime):
+                        if end_date.tzinfo is None:
+                            end_date = end_date.replace(tzinfo=timezone.utc)
+                        is_active = end_date > datetime.now(timezone.utc)
 
         if is_active:
             active_count += 1

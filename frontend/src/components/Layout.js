@@ -301,7 +301,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('sa_subscription_codes', 'أكواد الاشتراك'), href: 'super-admin?tab=codes', icon: KeyIcon, show: true },
         { name: t('sa_discount_coupons', 'كوبونات الخصم'), href: 'super-admin?tab=coupons', icon: TicketIcon, show: true },
-        { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'finances', icon: CurrencyDollarIcon, show: true },
+        { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: CurrencyDollarIcon, show: true },
         { name: t('sa_analytics', 'تحليلات الاشتراكات'), href: 'super-admin?tab=analytics', icon: ChartBarIcon, show: true },
       ]
     },

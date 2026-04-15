@@ -100,6 +100,7 @@ import MobileOptimized from './components/MobileOptimized';
 // SubscriptionCodesManagement replaced by SubscriptionCodesUnified
 import SubscriptionActivation from './components/SubscriptionActivation';
 import AccountSelector from './components/AccountSelector';
+import CompanySubscriptions from './components/CompanySubscriptions';
 import { Toaster } from './components/ui/sonner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -513,6 +514,12 @@ function App() {
                 <Route path="finances" element={
                   <ProtectedRoute adminOnly>
                     <CompoundFinance />
+                  </ProtectedRoute>
+                } />
+                
+                <Route path="company-subscriptions" element={
+                  <ProtectedRoute adminOnly>
+                    <CompanySubscriptions />
                   </ProtectedRoute>
                 } />
                 

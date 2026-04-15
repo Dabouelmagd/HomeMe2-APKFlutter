@@ -3062,5 +3062,21 @@
   "ad_revenue": "Revenus",
   "ad_gifts": "Cadeaux",
   "ad_active": "Actives",
-  "ad_total_ads": "Total des Annonces"
+  "ad_total_ads": "Total des Annonces",
+  "ad_placement_guide": "Guide des Emplacements Publicitaires",
+  "ad_pos_top": "Bannière en Haut de Page",
+  "ad_pos_dash": "Dans le Tableau de Bord",
+  "ad_pos_inline": "Entre le Contenu",
+  "ad_place": "Position",
+  "ad_place_desc": "Description",
+  "ad_sizes": "Tailles Disponibles",
+  "ad_who_sees": "Audience",
+  "ad_max_count": "Max",
+  "ad_desc_banner": "Bannière en haut des pages",
+  "ad_desc_sidebar": "Bas de la navigation latérale",
+  "ad_desc_dashboard": "Dans le tableau de bord principal",
+  "ad_desc_inline": "Entre les sections de contenu",
+  "ad_see_residents": "Résidents uniquement",
+  "ad_see_all": "Tous (sauf Propriétaire)",
+  "ad_see_residents_admins": "Résidents et Admins"
 }

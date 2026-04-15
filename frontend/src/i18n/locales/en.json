@@ -3280,5 +3280,21 @@
   "ad_revenue": "Revenue",
   "ad_gifts": "Gifts",
   "ad_active": "Active",
-  "ad_total_ads": "Total Ads"
+  "ad_total_ads": "Total Ads",
+  "ad_placement_guide": "Ad Placement Guide & Dimensions",
+  "ad_pos_top": "Top Page Banner",
+  "ad_pos_dash": "Inside Dashboard",
+  "ad_pos_inline": "Between Content",
+  "ad_place": "Position",
+  "ad_place_desc": "Description",
+  "ad_sizes": "Available Sizes",
+  "ad_who_sees": "Audience",
+  "ad_max_count": "Max Count",
+  "ad_desc_banner": "Banner at top of content pages",
+  "ad_desc_sidebar": "Bottom of sidebar navigation",
+  "ad_desc_dashboard": "Inside the main dashboard",
+  "ad_desc_inline": "Between dashboard content sections",
+  "ad_see_residents": "Residents only",
+  "ad_see_all": "All (except Owner)",
+  "ad_see_residents_admins": "Residents & Admins"
 }

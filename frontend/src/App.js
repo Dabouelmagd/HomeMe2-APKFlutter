@@ -435,8 +435,8 @@ function App() {
                 <Route path="/account-type-selection" element={<PublicAccountTypeSelection />} />
                 <Route path="/public-account-type-selection" element={<Navigate to="/" replace />} />
                 
-                {/* Root redirects to login */}
-                <Route path="/" element={<Navigate to="/login" replace />} />
+                {/* Root redirects to homepage */}
+                <Route path="/" element={<HomePage />} />
                 
                 <Route path="/app" element={
                   <ProtectedRoute>

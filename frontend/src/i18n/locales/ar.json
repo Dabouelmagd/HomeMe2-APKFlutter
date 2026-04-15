@@ -2808,5 +2808,21 @@
   "ad_revenue": "الإيرادات",
   "ad_gifts": "هدايا",
   "ad_active": "نشطة",
-  "ad_total_ads": "إجمالي الإعلانات"
+  "ad_total_ads": "إجمالي الإعلانات",
+  "ad_placement_guide": "دليل أماكن الإعلانات ومقاساتها",
+  "ad_pos_top": "بانر أعلى الصفحة",
+  "ad_pos_dash": "داخل لوحة التحكم",
+  "ad_pos_inline": "بين المحتوى",
+  "ad_place": "الموقع",
+  "ad_place_desc": "الوصف",
+  "ad_sizes": "المقاسات المتاحة",
+  "ad_who_sees": "من يشاهده",
+  "ad_max_count": "العدد الأقصى",
+  "ad_desc_banner": "بانر أعلى صفحات المحتوى",
+  "ad_desc_sidebar": "أسفل قائمة التنقل الجانبية",
+  "ad_desc_dashboard": "داخل لوحة التحكم الرئيسية",
+  "ad_desc_inline": "بين أقسام المحتوى في الداشبورد",
+  "ad_see_residents": "السكان فقط",
+  "ad_see_all": "الكل (ما عدا المالك)",
+  "ad_see_residents_admins": "السكان والمديرين"
 }

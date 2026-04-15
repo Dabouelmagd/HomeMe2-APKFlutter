@@ -2925,5 +2925,17 @@
   "owner_ads": "Publicites internes",
   "owner_analytics": "Analyses et rapports",
   "owner_system": "Parametres systeme",
-  "owner_translations": "Gestion des traductions"
+  "owner_translations": "Gestion des traductions",
+  "od_welcome": "Bienvenue",
+  "od_subtitle": "Tableau de bord proprietaire - Gestion complete",
+  "od_system_active": "Systeme actif",
+  "od_total_compounds": "Residences",
+  "od_total_users": "Total utilisateurs",
+  "od_total_families": "Total familles",
+  "od_revenue": "Revenus mensuels",
+  "od_compounds_overview": "Residences",
+  "od_view_all": "Voir tout",
+  "od_no_compounds": "Aucune residence encore",
+  "od_created": "Date creation",
+  "od_quick_access": "Acces rapide"
 }

@@ -3143,5 +3143,17 @@
   "owner_ads": "Internal Ads",
   "owner_analytics": "Analytics & Reports",
   "owner_system": "System Settings",
-  "owner_translations": "Translation Management"
+  "owner_translations": "Translation Management",
+  "od_welcome": "Welcome",
+  "od_subtitle": "App Owner Dashboard - Complete management of all compounds and subscribers",
+  "od_system_active": "System Active",
+  "od_total_compounds": "Residential Compounds",
+  "od_total_users": "Total Users",
+  "od_total_families": "Total Families",
+  "od_revenue": "Monthly Revenue",
+  "od_compounds_overview": "Residential Compounds",
+  "od_view_all": "View All",
+  "od_no_compounds": "No residential compounds yet",
+  "od_created": "Created",
+  "od_quick_access": "Quick Access"
 }

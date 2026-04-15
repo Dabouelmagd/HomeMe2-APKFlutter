@@ -2666,5 +2666,17 @@
   "owner_ads": "الإعلانات الداخلية",
   "owner_analytics": "التحليلات والتقارير",
   "owner_system": "إعدادات النظام",
-  "owner_translations": "إدارة الترجمات"
+  "owner_translations": "إدارة الترجمات",
+  "od_welcome": "مرحباً",
+  "od_subtitle": "لوحة تحكم مالك التطبيق - إدارة شاملة لجميع المجمعات والمشتركين",
+  "od_system_active": "النظام نشط",
+  "od_total_compounds": "المجمعات السكنية",
+  "od_total_users": "إجمالي المستخدمين",
+  "od_total_families": "إجمالي الأسر",
+  "od_revenue": "الإيرادات الشهرية",
+  "od_compounds_overview": "المجمعات السكنية",
+  "od_view_all": "عرض الكل",
+  "od_no_compounds": "لا توجد مجمعات سكنية بعد",
+  "od_created": "تاريخ الإنشاء",
+  "od_quick_access": "وصول سريع"
 }

@@ -37,6 +37,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import DebugLogin from './components/DebugLogin';
 import HomePage from './components/HomePage';
+import OwnerDashboard from './components/OwnerDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import ResidentDashboard from './components/ResidentDashboard';
 import SecurityDashboard from './components/SecurityDashboard';
@@ -693,7 +694,9 @@ function App() {
 const DashboardRouter = () => {
   const { user } = useAuth();
   
-  if (user?.role === 'super_admin' || user?.role === 'company_admin') {
+  if (user?.role === 'app_owner') {
+    return <OwnerDashboard />;
+  } else if (user?.role === 'super_admin' || user?.role === 'company_admin') {
     return <AdminDashboard />;
   } else if (user?.role === 'admin' || user?.role === 'manager') {
     return <AdminDashboard />;

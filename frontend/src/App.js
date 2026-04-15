@@ -230,6 +230,8 @@ const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('selectedCompoundId');
+    localStorage.removeItem('selectedRole');
+    localStorage.removeItem('rememberedAccount');
     localStorage.removeItem('rememberCompound');
     delete axios.defaults.headers.common['Authorization'];
     setUser(null);
@@ -381,6 +383,27 @@ const LanguageInitializer = () => {
   return null;
 };
 
+// Compound Selection Redirect
+const CompoundRedirect = () => {
+  const remembered = localStorage.getItem('rememberedAccount');
+  const rememberCompound = localStorage.getItem('rememberCompound') === 'true';
+  
+  if (remembered && rememberCompound) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+  return <Navigate to="/select-account" replace />;
+};
+
+// Require compound selection before accessing dashboard
+const RequireCompound = ({ children }) => {
+  const remembered = localStorage.getItem('rememberedAccount');
+  const selectedCompound = localStorage.getItem('selectedCompoundId');
+  if (!remembered && !selectedCompound) {
+    return <Navigate to="/select-account" replace />;
+  }
+  return children;
+};
+
 // Main App Component  
 function App() {
   return (
@@ -416,10 +439,12 @@ function App() {
                     <Layout />
                   </ProtectedRoute>
                 }>
-                <Route index element={<Navigate to="/app/dashboard" replace />} />
+                <Route index element={<CompoundRedirect />} />
                 
                 <Route path="dashboard" element={
-                  <DashboardRouter />
+                  <RequireCompound>
+                    <DashboardRouter />
+                  </RequireCompound>
                 } />
                 
                 <Route path="compound" element={

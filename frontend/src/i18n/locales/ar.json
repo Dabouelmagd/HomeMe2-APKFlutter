@@ -2790,5 +2790,9 @@
   "ad_dates": "المدة",
   "ad_to": "إلى",
   "ad_total_revenue": "إيرادات الإعلانات",
-  "ad_gift_count": "إعلانات هدية"
+  "ad_gift_count": "إعلانات هدية",
+  "ad_learn_more": "اعرف أكثر",
+  "ad_target_compounds": "الكمبوندات المستهدفة (اتركه فارغ = كل الكمبوندات)",
+  "ad_no_compounds": "لا توجد كمبوندات",
+  "ad_all_compounds": "كل الكمبوندات"
 }

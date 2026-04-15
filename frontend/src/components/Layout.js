@@ -49,6 +49,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
 import ThemeToggle from './ThemeToggle';
 import BackButton from './BackButton';
+import InternalAdBanner from './InternalAdBanner';
 // import AdvancedSearchModal from './AdvancedSearchModal';
 
 const Layout = ({ children, isTrialMode = false }) => {
@@ -572,6 +573,13 @@ const Layout = ({ children, isTrialMode = false }) => {
           </div>
         </nav>
 
+        {/* Sidebar Ad - only for non-owner roles */}
+        {!isAppOwner && (
+          <div className="flex-shrink-0 px-3 pb-2">
+            <InternalAdBanner position="sidebar" maxAds={1} variant="slim" />
+          </div>
+        )}
+
         {/* Fixed Bottom Section - User Info & Logout */}
         <div className={`flex-shrink-0 border-t px-3 py-4 ${isSuperAdmin ? 'border-purple-900/30 bg-gray-950' : 'border-gray-200 bg-white'}`}>
           <div className="px-3 py-2">
@@ -788,6 +796,13 @@ const Layout = ({ children, isTrialMode = false }) => {
 
         {/* Page content - Scrollable */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden page-scroll">
+          {/* Top Banner Ad - only for residents */}
+          {!isAppOwner && !isAdminRole && (
+            <div className="max-w-7xl mx-auto px-4 pt-3">
+              <InternalAdBanner position="banner" maxAds={1} variant="full" />
+            </div>
+          )}
+          
           {/* Back Button */}
           <div className="max-w-7xl mx-auto px-4 py-4">
             <BackButton />

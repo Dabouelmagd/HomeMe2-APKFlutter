@@ -13,6 +13,7 @@ import {
   CheckCircleIcon,
   ClockIcon
 } from '@heroicons/react/24/outline';
+import InternalAdBanner from './InternalAdBanner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -114,6 +115,9 @@ const ResidentDashboard = () => {
         </div>
       )}
 
+      {/* Dashboard Banner Ad */}
+      <InternalAdBanner position="dashboard" maxAds={1} variant="full" className="mb-6" />
+
       {/* Statistics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {stats.map((stat) => (
@@ -134,6 +138,9 @@ const ResidentDashboard = () => {
           </div>
         ))}
       </div>
+
+      {/* Inline Ad between stats and content */}
+      <InternalAdBanner position="inline" maxAds={1} variant="slim" className="mb-6" />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

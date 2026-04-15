@@ -700,8 +700,31 @@ const SuperAdminPanel = () => {
                     </label>
                   </div>
                 </div>
+                {/* Compound Targeting */}
+                <div className="mb-4">
+                  <label className="block text-xs text-gray-400 mb-2">{t('ad_target_compounds', 'الكمبوندات المستهدفة (اتركه فارغ = كل الكمبوندات)')}</label>
+                  <div className="flex flex-wrap gap-2">
+                    {compounds.map(c => (
+                      <label key={c.id} className="flex items-center gap-1.5 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={newAd.target_compounds.includes(c.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setNewAd({...newAd, target_compounds: [...newAd.target_compounds, c.id]});
+                            } else {
+                              setNewAd({...newAd, target_compounds: newAd.target_compounds.filter(id => id !== c.id)});
+                            }
+                          }}
+                          className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500"
+                        />
+                        <span className="text-xs text-gray-300">{c.name}</span>
+                      </label>
+                    ))}
+                    {compounds.length === 0 && <span className="text-xs text-gray-500">{t('ad_no_compounds', 'لا توجد كمبوندات')}</span>}
+                  </div>
+                </div>
                 <div className="flex gap-3">
-                  <button onClick={handleCreateAd} disabled={!newAd.title.trim()} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 disabled:opacity-50">{t('sa_create_ad_btn', 'إنشاء الإعلان')}</button>
                   <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
                 </div>
               </div>

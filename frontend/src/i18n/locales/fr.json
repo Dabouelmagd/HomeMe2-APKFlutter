@@ -3044,5 +3044,9 @@
   "ad_dates": "Durée",
   "ad_to": "à",
   "ad_total_revenue": "Revenus Publicitaires",
-  "ad_gift_count": "Annonces Cadeaux"
+  "ad_gift_count": "Annonces Cadeaux",
+  "ad_learn_more": "En Savoir Plus",
+  "ad_target_compounds": "Complexes Ciblés (vide = tous)",
+  "ad_no_compounds": "Aucun complexe disponible",
+  "ad_all_compounds": "Tous les Complexes"
 }

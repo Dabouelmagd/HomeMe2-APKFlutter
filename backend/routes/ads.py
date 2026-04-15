@@ -99,11 +99,36 @@ async def get_active_ads(position: str = "", compound_id: str = "", current_user
     query = {"is_active": True}
     if position:
         query["position"] = position
+
+    # Check date validity
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
     ads = await db.internal_ads.find(query, {"_id": 0}).sort("priority", -1).to_list(50)
-    # Filter by compound
+
+    # Filter by compound targeting
     if compound_id:
         ads = [a for a in ads if not a.get("target_compounds") or compound_id in a.get("target_compounds", [])]
-    return {"ads": ads}
+
+    # Filter by date range
+    valid_ads = []
+    for a in ads:
+        start = a.get("start_date")
+        end = a.get("end_date")
+        if start and start > now:
+            continue
+        if end and end < now:
+            continue
+        valid_ads.append(a)
+
+    # Track views
+    ad_ids = [a["id"] for a in valid_ads if a.get("id")]
+    if ad_ids:
+        await db.internal_ads.update_many(
+            {"id": {"$in": ad_ids}},
+            {"$inc": {"views": 1}}
+        )
+
+    return {"ads": valid_ads}
 
 
 @router.put("/ads/{ad_id}")

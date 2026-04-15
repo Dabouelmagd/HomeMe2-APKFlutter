@@ -5,27 +5,18 @@
 - Backend: FastAPI + MongoDB + Stripe + PayPal
 - i18n: en.json, ar.json, fr.json (split JSON files)
 
-## Latest: Enhanced Ads Management + Full Translations (Apr 15, 2026)
-- Updated ads UI: dimensions, ad_value, is_gift, start_date, end_date fields in create form
-- Updated ads table: 8 columns (title, position, dimensions, duration, value/gift, clicks, status, actions)
-- Added ads revenue/gift stats cards (6 total)
-- Added 112+ missing translation keys across ar/en/fr
-
-### Sidebar Structure for App Owner (4 sections):
-1. **نظرة عامة** (4): Dashboard, Compounds, Users, General Budget
-2. **الاشتراكات والمدفوعات** (5): Codes, Coupons, Company Subs, Analytics, Reminders
-3. **التسويق والإعلانات** (2): Ads Management, Referrals
-4. **إعدادات النظام** (3): Translations, Advanced Analytics, Settings
-
-### New Pages Built This Session:
-- `/app/owner-budget` - General Budget (revenue/expenses/gifts)
-- `/app/subscription-reminders` - Subscription expiry tracking + email reminders
-- `/app/company-subscriptions` - Company subscription management
-- `ads.txt` - Google AdSense verification file
+## Latest: Internal Ads Display for Residents (Apr 15, 2026)
+- Created `InternalAdBanner.js` reusable component with 3 variants: full, slim, card
+- Integrated ads in: ResidentDashboard (banner + inline), Layout sidebar, Layout top banner
+- Backend tracks views automatically when ads are fetched
+- Ads filtered by: position, compound targeting, date range, active status
+- Compound targeting: checkboxes in ad creation form to select target compounds
+- Ad positions: banner (top), sidebar (side nav), inline (between content), dashboard (on dashboard)
 
 ## Completed Features
+- Internal Ad Display for Residents with compound targeting (DONE - Apr 15, 2026)
 - Enhanced Ads Management with dimensions/value/gift/dates (DONE)
-- Translation fixes: 112+ keys added (DONE)
+- Translation fixes: 120+ keys added (DONE)
 - Sidebar Reorganization + Owner Budget + Subscription Reminders (DONE)
 - Company Subscriptions Management Page (DONE)
 - Account Selector post-login (DONE)

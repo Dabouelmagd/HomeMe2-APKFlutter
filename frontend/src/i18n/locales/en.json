@@ -3262,5 +3262,9 @@
   "ad_dates": "Duration",
   "ad_to": "to",
   "ad_total_revenue": "Ad Revenue",
-  "ad_gift_count": "Gift Ads"
+  "ad_gift_count": "Gift Ads",
+  "ad_learn_more": "Learn More",
+  "ad_target_compounds": "Target Compounds (leave empty = all compounds)",
+  "ad_no_compounds": "No compounds available",
+  "ad_all_compounds": "All Compounds"
 }

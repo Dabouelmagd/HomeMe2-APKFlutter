@@ -179,7 +179,8 @@ security = HTTPBearer()
 
 # Pydantic Models
 class UserRole(str):
-    SUPER_ADMIN = "super_admin"  # App owner - sees everything
+    APP_OWNER = "app_owner"  # App owner - controls everything, all subscribers
+    SUPER_ADMIN = "super_admin"  # Top compound admin - manages compound(s)
     COMPANY_ADMIN = "company_admin"  # Company with multiple compounds
     ADMIN = "admin"  # Compound admin
     MANAGER = "manager"  # Staff/Manager - follows up residents, complaints, maintenance
@@ -2502,6 +2503,26 @@ async def startup_db_client():
         }
         await db.users.insert_one(super_admin)
         logging.info("Super Admin account created (superadmin / SuperAdmin2024!)")
+
+    # Seed app owner if not exists
+    existing_owner = await db.users.find_one({"role": "app_owner"})
+    if not existing_owner:
+        app_owner = {
+            "id": str(uuid.uuid4()),
+            "username": "Owner_homeme",
+            "email": "dalia@datalifeai.com",
+            "password_hash": hash_password("Dalia1234@"),
+            "role": "app_owner",
+            "full_name": "Dalia Abou El Magd",
+            "compound_id": "",
+            "phone": "",
+            "unit_number": "",
+            "is_active": True,
+            "is_family_head": False,
+            "created_at": datetime.now(timezone.utc)
+        }
+        await db.users.insert_one(app_owner)
+        logging.info("App Owner account created (Owner_homeme / Dalia1234@)")
     
     logging.info("Database connection and indexes initialized")
 

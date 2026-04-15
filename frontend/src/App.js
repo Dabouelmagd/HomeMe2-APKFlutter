@@ -327,7 +327,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  if (adminOnly && !['admin', 'super_admin', 'company_admin', 'manager'].includes(user.role)) {
+  if (adminOnly && !['admin', 'super_admin', 'company_admin', 'manager', 'app_owner'].includes(user.role)) {
     return <Navigate to="/app/dashboard" replace />;
   }
 

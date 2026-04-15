@@ -2650,5 +2650,10 @@
   "as_badge_services": "الخدمات والعائلة",
   "as_badge_gates": "البوابات والزوار",
   "forgot_password": "نسيت كلمة المرور؟",
-  "forgot_password_msg": "تواصل مع إدارة المجمع لإعادة تعيين كلمة المرور"
+  "forgot_password_msg": "تواصل مع إدارة المجمع لإعادة تعيين كلمة المرور",
+  "as_role_app_owner": "مالك التطبيق",
+  "as_desc_app_owner": "تحكم كامل في التطبيق وجميع المشتركين",
+  "as_badge_owner": "تحكم كامل",
+  "app_owner_panel": "لوحة تحكم مالك التطبيق",
+  "app_owner": "مالك التطبيق"
 }

@@ -12,11 +12,19 @@ import {
   CheckCircleIcon,
   ArrowRightIcon,
   ArrowLeftIcon,
+  StarIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const ROLE_CONFIG = {
+  app_owner: {
+    icon: StarIcon,
+    gradient: 'from-rose-600 to-purple-700',
+    border: 'border-rose-500',
+    bg: 'bg-rose-600/20',
+    badge: 'bg-rose-500/20 text-rose-300',
+  },
   super_admin: {
     icon: ShieldCheckIcon,
     gradient: 'from-red-600 to-rose-700',
@@ -73,6 +81,7 @@ const AccountSelector = () => {
   const [rememberChoice, setRememberChoice] = useState(false);
 
   const roleLabels = {
+    app_owner: t('as_role_app_owner', 'مالك التطبيق'),
     super_admin: t('as_role_super_admin', 'المدير العام'),
     admin: t('as_role_admin', 'مدير المجمع'),
     company_admin: t('as_role_company_admin', 'مدير الشركة'),
@@ -82,6 +91,7 @@ const AccountSelector = () => {
   };
 
   const roleDescriptions = {
+    app_owner: t('as_desc_app_owner', 'تحكم كامل في التطبيق وجميع المشتركين'),
     super_admin: t('as_desc_super_admin', 'إدارة كاملة للنظام وجميع المجمعات'),
     admin: t('as_desc_admin', 'إدارة المجمع السكني والسكان'),
     company_admin: t('as_desc_company_admin', 'إدارة مجمعات الشركة'),
@@ -109,7 +119,32 @@ const AccountSelector = () => {
       const headers = { Authorization: `Bearer ${token}` };
       const accountsList = [];
 
-      if (user?.role === 'super_admin') {
+      if (user?.role === 'app_owner') {
+        // App owner: show the owner role + all compounds
+        accountsList.push({
+          id: 'app_owner',
+          role: 'app_owner',
+          compound_id: null,
+          compound_name: null,
+          label: roleLabels.app_owner,
+          description: roleDescriptions.app_owner,
+        });
+
+        try {
+          const res = await axios.get(`${API}/super-admin/dashboard`, { headers });
+          for (const c of (res.data.compounds || [])) {
+            accountsList.push({
+              id: `admin_${c.id}`,
+              role: 'admin',
+              compound_id: c.id,
+              compound_name: c.name,
+              label: roleLabels.admin,
+              description: c.name,
+              users: c.users || 0,
+            });
+          }
+        } catch {}
+      } else if (user?.role === 'super_admin') {
         // Super admin: show the super admin role + any compounds they manage
         accountsList.push({
           id: 'super_admin',
@@ -284,6 +319,7 @@ const AccountSelector = () => {
 
                 {/* Role badge */}
                 <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${config.badge}`}>
+                  {acc.role === 'app_owner' && t('as_badge_owner', 'تحكم كامل')}
                   {acc.role === 'super_admin' && t('as_badge_full_access', 'صلاحيات كاملة')}
                   {acc.role === 'admin' && (acc.users != null ? `${acc.users} ${t('as_users', 'مستخدم')}` : t('as_badge_compound_mgmt', 'إدارة المجمع'))}
                   {acc.role === 'company_admin' && t('as_badge_company', 'إدارة الشركة')}

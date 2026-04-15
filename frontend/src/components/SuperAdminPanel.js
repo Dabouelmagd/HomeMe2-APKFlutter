@@ -223,8 +223,8 @@ const SuperAdminPanel = () => {
               <ShieldCheckIcon className="h-8 w-8 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">{t('super_admin_panel', 'لوحة تحكم المالك')}</h1>
-              <p className="text-sm text-gray-400">{t('full_system_control', 'تحكم كامل في النظام')}</p>
+              <h1 className="text-2xl font-bold">{t('app_owner_panel', 'لوحة تحكم مالك التطبيق')}</h1>
+              <p className="text-sm text-gray-400">{t('full_system_control', 'تحكم كامل في التطبيق وجميع المشتركين')}</p>
             </div>
           </div>
           <button onClick={fetchDashboard} className="p-2 rounded-lg bg-gray-800 hover:bg-gray-700">

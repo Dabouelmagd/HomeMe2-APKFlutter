@@ -98,24 +98,30 @@ async def get_current_user_optional(credentials: Optional[HTTPAuthorizationCrede
 
 
 async def require_admin(current_user: dict = Depends(get_current_user)):
-    if current_user.get("role") not in ["admin", "super_admin", "company_admin"]:
+    if current_user.get("role") not in ["admin", "super_admin", "company_admin", "app_owner"]:
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
 
 async def require_super_admin(current_user: dict = Depends(get_current_user)):
-    if current_user.get("role") != "super_admin":
+    if current_user.get("role") not in ["super_admin", "app_owner"]:
         raise HTTPException(status_code=403, detail="Super Admin access required")
     return current_user
 
 
+async def require_app_owner(current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != "app_owner":
+        raise HTTPException(status_code=403, detail="App Owner access required")
+    return current_user
+
+
 async def require_staff_or_admin(current_user: dict = Depends(get_current_user)):
-    if current_user.get("role") not in ["admin", "super_admin", "company_admin", "manager"]:
+    if current_user.get("role") not in ["admin", "super_admin", "company_admin", "manager", "app_owner"]:
         raise HTTPException(status_code=403, detail="Staff or Admin access required")
     return current_user
 
 
 async def require_security_or_admin(current_user: dict = Depends(get_current_user)):
-    if current_user.get("role") not in ["admin", "super_admin", "security", "manager"]:
+    if current_user.get("role") not in ["admin", "super_admin", "security", "manager", "app_owner"]:
         raise HTTPException(status_code=403, detail="Security or Admin access required")
     return current_user

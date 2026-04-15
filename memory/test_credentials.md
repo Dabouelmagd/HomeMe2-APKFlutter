@@ -1,31 +1,29 @@
 # Test Credentials
 
+## App Owner (مالك التطبيق)
+- Username: Owner_homeme
+- Password: Dalia1234@
+- Email: dalia@datalifeai.com
+- Full Name: Dalia Abou El Magd
+- Role: app_owner
+
 ## Super Admin
-- Username: `superadmin`
-- Password: `SuperAdmin2024!`
+- Username: superadmin
+- Password: SuperAdmin2024!
+- Email: superadmin@homeme.app
+- Role: super_admin
 
-## Admin (Compound Admin)
-- Username: `admin`
-- Password: `admin123`
-- Alt: `dalia` / `Admin2024!`
+## Test Admin (if created)
+- Username: admin
+- Password: admin123
+- Role: admin
 
-## Resident
-- Username: `resident1`
-- Password: `resident123`
-- Resident User ID: `d6012878-6794-4d9a-8196-8577da883f5d`
+## Email (SMTP)
+- info@datalifeai.com (configured in backend .env)
 
-## Test Company Admin
-- Username: `companytest5`
-- Password: `Company2024!`
+## Payment Integrations
+- Stripe: Test key in environment
+- PayPal: Client ID starts with: AR3tOJr9moFV4c99gTjx... (sandbox, user-provided)
 
-## Test Resident (created via E2E flow)
-- Username: `resident_noor`
-- Password: `Resident2024!`
-
-## Test Subscription Codes
-- `NOOR-INVITE` - 3 months / basic (20 uses)
-- `WELCOME20` - 20% discount coupon (100 uses)
-
-## PayPal Sandbox
-- Status: Credentials provided but authentication failing (may be expired)
-- Client ID starts with: AR3tOJr9moFV4c99gTjx...
+## Google AdSense
+- Publisher ID: ca-pub-5928973437129941

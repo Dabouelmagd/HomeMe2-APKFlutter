@@ -266,14 +266,16 @@ const Layout = ({ children, isTrialMode = false }) => {
     return state === undefined ? true : state;
   };
 
-  const isAdminRole = ['admin','company_admin','super_admin'].includes(user?.role);
-  const isStaffRole = ['admin','company_admin','super_admin','manager'].includes(user?.role);
-  const isSecurityRole = ['admin','company_admin','super_admin','manager','security'].includes(user?.role);
+  const isAdminRole = ['admin','company_admin','super_admin','app_owner'].includes(user?.role);
+  const isStaffRole = ['admin','company_admin','super_admin','app_owner','manager'].includes(user?.role);
+  const isSecurityRole = ['admin','company_admin','super_admin','app_owner','manager','security'].includes(user?.role);
 
-  const isSuperAdmin = user?.role === 'super_admin';
+  const isAppOwner = user?.role === 'app_owner';
+  const isSuperAdmin = user?.role === 'super_admin' || isAppOwner;
 
   // Role-based theme
   const roleTheme = {
+    app_owner: { active: 'from-rose-600 to-purple-700', hover: 'hover:bg-rose-500/10', text: 'text-rose-400', dot: 'bg-rose-500', sidebarBg: 'bg-gray-950', sidebarBorder: 'border-rose-900/50', sidebarText: 'text-gray-300', sidebarHeading: 'text-rose-400' },
     super_admin: { active: 'from-purple-500 to-pink-500', hover: 'hover:bg-purple-500/10', text: 'text-purple-400', dot: 'bg-purple-500', sidebarBg: 'bg-gray-950', sidebarBorder: 'border-purple-900/50', sidebarText: 'text-gray-300', sidebarHeading: 'text-purple-400' },
     company_admin: { active: 'from-indigo-600 to-indigo-700', hover: 'hover:bg-indigo-50', text: 'text-indigo-600', dot: 'bg-indigo-500' },
     admin: { active: 'from-blue-600 to-blue-700', hover: 'hover:bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500' },
@@ -293,7 +295,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('residents_list'), href: 'residents', icon: UserGroupIcon, show: isStaffRole },
         { name: t('user_management'), href: 'users', icon: UsersIcon, show: isAdminRole },
         { name: t('monitoring_dashboard'), href: 'monitoring', icon: ChartPieIcon, show: isStaffRole },
-        { name: t('compounds_management', 'Compounds Management'), href: 'compounds-management', icon: HomeIcon, show: user?.role === 'super_admin' || user?.role === 'company_admin' },
+        { name: t('compounds_management', 'Compounds Management'), href: 'compounds-management', icon: HomeIcon, show: user?.role === 'app_owner' || user?.role === 'super_admin' || user?.role === 'company_admin' },
       ]
     },
     {
@@ -342,7 +344,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       title: t('admin_tools'),
       items: [
         { name: t('advanced_analytics'), href: 'analytics', icon: ChartBarIcon, show: isStaffRole },
-        { name: t('subscription_codes_management'), href: 'subscription-codes', icon: KeyIcon, show: user?.role === 'super_admin' },
+        { name: t('subscription_codes_management'), href: 'subscription-codes', icon: KeyIcon, show: user?.role === 'app_owner' },
         { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole || user?.role === 'company_admin' },
       ]
     },
@@ -712,11 +714,11 @@ const Layout = ({ children, isTrialMode = false }) => {
               </div>
 
               {/* Super Admin Icon */}
-              {user?.role === 'super_admin' && (
+              {user?.role === 'app_owner' && (
                 <Link
                   to="/app/super-admin"
                   className="p-2 text-purple-500 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-200 relative transition-all hover:bg-purple-50 dark:hover:bg-gray-700 rounded-lg"
-                  title={t('super_admin_panel', 'لوحة تحكم المالك')}
+                  title={t('app_owner_panel', 'لوحة تحكم مالك التطبيق')}
                   data-testid="super-admin-icon"
                 >
                   <ShieldCheckIcon className="h-6 w-6" />

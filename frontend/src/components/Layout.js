@@ -292,35 +292,31 @@ const Layout = ({ children, isTrialMode = false }) => {
       title: t('owner_overview', 'نظرة عامة'),
       items: [
         { name: t('owner_dashboard', 'لوحة التحكم الرئيسية'), href: 'dashboard', icon: HomeIcon, show: true },
-        { name: t('compounds_management', 'إدارة المجمعات السكنية'), href: 'compounds-management', icon: BuildingOfficeIcon, show: true },
-        { name: t('owner_all_users', 'جميع المستخدمين'), href: 'users', icon: UsersIcon, show: true },
+        { name: t('sa_compounds', 'المجمعات السكنية'), href: 'super-admin?tab=compounds', icon: BuildingOfficeIcon, show: true },
+        { name: t('sa_users', 'المستخدمين'), href: 'super-admin?tab=users', icon: UsersIcon, show: true },
       ]
     },
     {
       title: t('owner_subscriptions', 'الاشتراكات والمدفوعات'),
       items: [
-        { name: t('subscription_codes_management', 'إدارة أكواد الاشتراك'), href: 'subscription-codes', icon: KeyIcon, show: true },
-        { name: t('owner_payments', 'المدفوعات والإيرادات'), href: 'payments', icon: CreditCardIcon, show: true },
+        { name: t('sa_subscription_codes', 'أكواد الاشتراك'), href: 'super-admin?tab=codes', icon: KeyIcon, show: true },
+        { name: t('sa_discount_coupons', 'كوبونات الخصم'), href: 'super-admin?tab=coupons', icon: TicketIcon, show: true },
         { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'finances', icon: CurrencyDollarIcon, show: true },
+        { name: t('sa_analytics', 'تحليلات الاشتراكات'), href: 'super-admin?tab=analytics', icon: ChartBarIcon, show: true },
       ]
     },
     {
       title: t('owner_marketing', 'التسويق والإعلانات'),
       items: [
-        { name: t('owner_ads', 'الإعلانات الداخلية'), href: 'super-admin', icon: SpeakerWaveIcon, show: true },
-      ]
-    },
-    {
-      title: t('owner_analytics', 'التحليلات والتقارير'),
-      items: [
-        { name: t('advanced_analytics', 'تحليلات متقدمة'), href: 'analytics', icon: ChartBarIcon, show: true },
-        { name: t('monitoring_dashboard', 'لوحة المراقبة'), href: 'monitoring', icon: ChartPieIcon, show: true },
+        { name: t('sa_ads', 'الإعلانات'), href: 'super-admin?tab=ads', icon: SpeakerWaveIcon, show: true },
+        { name: t('sa_referrals', 'الإحالات'), href: 'super-admin?tab=referrals', icon: UserGroupIcon, show: true },
       ]
     },
     {
       title: t('owner_system', 'إعدادات النظام'),
       items: [
-        { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin', icon: LanguageIcon, show: true },
+        { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
+        { name: t('advanced_analytics', 'تحليلات متقدمة'), href: 'analytics', icon: ChartPieIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
     },
@@ -401,24 +397,29 @@ const Layout = ({ children, isTrialMode = false }) => {
   // Improved isActive function to correctly match current route
   const isActive = (href) => {
     const currentPath = location.pathname;
-    // Build the full path for comparison
-    const fullHref = href.startsWith('/') ? href : `/app/${href}`;
+    const currentSearch = location.search;
     
-    // For exact matches like /app/dashboard === /app/dashboard
-    if (currentPath === fullHref) {
-      return true;
+    // Handle query params (e.g., super-admin?tab=codes)
+    const [hrefPath, hrefQuery] = href.split('?');
+    const fullHref = hrefPath.startsWith('/') ? hrefPath : `/app/${hrefPath}`;
+    
+    // If href has query params, match both path and query
+    if (hrefQuery) {
+      return currentPath === fullHref && currentSearch === `?${hrefQuery}`;
     }
     
-    // For nested routes like /app/dashboard/details starts with /app/dashboard/
-    if (currentPath.startsWith(fullHref + '/')) {
-      return true;
+    // For links without query params, only match if NO query params in URL
+    // (prevents super-admin base from matching when ?tab=codes is active)
+    if (fullHref.includes('super-admin') && currentSearch) {
+      return false;
     }
     
-    // Check if the current path ends with the href (fallback)
-    // This handles cases where the path might be structured differently
-    if (currentPath.endsWith('/' + href) || currentPath === '/' + href) {
-      return true;
-    }
+    // For exact matches
+    if (currentPath === fullHref) return true;
+    // For nested routes
+    if (currentPath.startsWith(fullHref + '/')) return true;
+    // Fallback
+    if (currentPath.endsWith('/' + hrefPath) || currentPath === '/' + hrefPath) return true;
     
     return false;
   };

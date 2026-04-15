@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,8 @@ const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getIt
 const SuperAdminPanel = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'overview';
 
   const roleLabels = {
     super_admin: t('role_super_admin', 'مالك التطبيق'),
@@ -43,7 +46,7 @@ const SuperAdminPanel = () => {
   const [data, setData] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [roleFilter, setRoleFilter] = useState('');
   const [compoundFilter, setCompoundFilter] = useState('');
   // Subscription codes state
@@ -68,6 +71,19 @@ const SuperAdminPanel = () => {
   const [refStats, setRefStats] = useState(null);
 
   useEffect(() => { fetchDashboard(); }, []);
+
+  // Sync tab with URL
+  useEffect(() => {
+    const urlTab = searchParams.get('tab');
+    if (urlTab && urlTab !== activeTab) {
+      setActiveTab(urlTab);
+    }
+  }, [searchParams]);
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   const fetchDashboard = async () => {
     try {
@@ -266,7 +282,7 @@ const SuperAdminPanel = () => {
             { id: 'analytics', label: t('sa_analytics', 'تحليلات الاشتراكات') },
             { id: 'translations', label: t('sa_translations', 'إدارة الترجمات') },
           ].map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+            <button key={tab.id} onClick={() => handleTabChange(tab.id)}
               className={`px-5 py-2.5 rounded-lg text-sm font-medium ${activeTab === tab.id ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
               data-testid={`tab-${tab.id}`}>{tab.label}</button>
           ))}

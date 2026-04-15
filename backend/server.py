@@ -2419,6 +2419,8 @@ app.include_router(invoices_router)
 app.include_router(email_notif_router)
 from routes.translations import router as translations_router
 app.include_router(translations_router, prefix="/api", tags=["translations"])
+from routes.owner_subscriptions import router as owner_subs_router
+app.include_router(owner_subs_router, tags=["owner"])
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

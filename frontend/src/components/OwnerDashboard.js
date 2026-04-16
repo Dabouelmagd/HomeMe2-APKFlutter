@@ -10,6 +10,7 @@ import {
   KeyIcon,
   ChartBarIcon,
   ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   TicketIcon,
   SpeakerWaveIcon,
   UserGroupIcon,
@@ -91,13 +92,20 @@ const OwnerDashboard = () => {
       </div>
 
       {/* Financial Overview - Main Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/app/owner-budget')}>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center"><ArrowTrendingUpIcon className="w-5 h-5 text-emerald-600" /></div>
             <span className="text-xs text-gray-500">{t('budget_total_revenue', 'إجمالي الإيرادات')}</span>
           </div>
-          <p className="text-2xl font-black text-gray-900">{fmt(s.total_revenue)} <span className="text-xs font-normal text-gray-400">{t('sm_egp', 'ج.م')}</span></p>
+          <p className="text-2xl font-black text-emerald-600">{fmt(s.total_revenue)} <span className="text-xs font-normal text-gray-400">{t('sm_egp', 'ج.م')}</span></p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/app/owner-budget')}>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center"><ArrowTrendingDownIcon className="w-5 h-5 text-red-600" /></div>
+            <span className="text-xs text-gray-500">{t('budget_total_expenses', 'إجمالي المصروفات')}</span>
+          </div>
+          <p className="text-2xl font-black text-red-500">{fmt(s.total_expenses)} <span className="text-xs font-normal text-gray-400">{t('sm_egp', 'ج.م')}</span></p>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/app/owner-budget')}>
           <div className="flex items-center gap-3 mb-2">
@@ -105,6 +113,7 @@ const OwnerDashboard = () => {
             <span className="text-xs text-gray-500">{t('budget_net_profit', 'صافي الربح')}</span>
           </div>
           <p className={`text-2xl font-black ${s.net_profit >= 0 ? 'text-blue-600' : 'text-red-500'}`}>{fmt(s.net_profit)} <span className="text-xs font-normal text-gray-400">{t('sm_egp', 'ج.م')}</span></p>
+          <p className="text-[10px] text-gray-400 mt-0.5">{t('budget_profit_margin', 'هامش الربح')}: {s.profit_margin || 0}%</p>
         </div>
         <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/app/super-admin?tab=compounds')}>
           <div className="flex items-center gap-3 mb-2">
@@ -112,13 +121,15 @@ const OwnerDashboard = () => {
             <span className="text-xs text-gray-500">{t('od_total_compounds', 'المجمعات السكنية')}</span>
           </div>
           <p className="text-2xl font-black text-gray-900">{compounds.length}</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">{totalUsers} {t('od_users', 'مستخدم')}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/app/super-admin?tab=users')}>
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/app/company-subscriptions')}>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center"><UsersIcon className="w-5 h-5 text-purple-600" /></div>
-            <span className="text-xs text-gray-500">{t('od_total_users', 'إجمالي المستخدمين')}</span>
+            <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center"><BuildingOffice2Icon className="w-5 h-5 text-purple-600" /></div>
+            <span className="text-xs text-gray-500">{t('od_mgmt_companies', 'شركات الإدارة')}</span>
           </div>
-          <p className="text-2xl font-black text-gray-900">{totalUsers}</p>
+          <p className="text-2xl font-black text-gray-900">{budget?.subscriptions?.total_company_subs || 0}</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">{budget?.subscriptions?.active_company_subs || 0} {t('cs_active', 'نشطة')}</p>
         </div>
       </div>
 

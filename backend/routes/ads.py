@@ -92,6 +92,20 @@ async def get_all_ads(current_user: dict = Depends(require_super_admin)):
     return {"ads": ads, "stats": stats}
 
 
+@router.get("/ads/by-compounds")
+async def get_ads_by_compounds(compound_ids: str = "", current_user: dict = Depends(require_super_admin)):
+    """Get ads that target specific compounds"""
+    db = get_db()
+    cids = [c.strip() for c in compound_ids.split(",") if c.strip()] if compound_ids else []
+    all_ads = await db.internal_ads.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    if cids:
+        filtered = [a for a in all_ads if any(c in a.get("target_compounds", []) for c in cids) or (not a.get("target_compounds") and False)]
+    else:
+        filtered = all_ads
+    return {"ads": filtered}
+
+
+
 @router.get("/ads/active")
 async def get_active_ads(position: str = "", compound_id: str = "", current_user: dict = Depends(get_current_user)):
     """Get active ads for display inside the app"""

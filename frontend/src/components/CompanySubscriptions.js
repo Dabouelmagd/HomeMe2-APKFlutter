@@ -36,6 +36,17 @@ const CompanySubscriptions = () => {
   const [actionModal, setActionModal] = useState(null); // {companyId, type}
   const [modalValue, setModalValue] = useState('');
   const [modalNote, setModalNote] = useState('');
+  const [companyAds, setCompanyAds] = useState([]);
+
+  const fetchCompanyAds = async (compoundIds) => {
+    if (!compoundIds || compoundIds.length === 0) { setCompanyAds([]); return; }
+    try {
+      const res = await axios.get(`${API}/ads/by-compounds`, {
+        ...getHeaders(), params: { compound_ids: compoundIds.join(',') }
+      });
+      setCompanyAds(res.data.ads || []);
+    } catch { setCompanyAds([]); }
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -179,7 +190,13 @@ const CompanySubscriptions = () => {
               {/* Company Header */}
               <div
                 className="px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={() => setExpandedCompany(expandedCompany === company.id ? null : company.id)}
+                onClick={() => {
+                  const isExpanding = expandedCompany !== company.id;
+                  setExpandedCompany(isExpanding ? company.id : null);
+                  if (isExpanding && company.compounds?.length > 0) {
+                    fetchCompanyAds(company.compounds.map(c => c.id));
+                  }
+                }}
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${company.is_active ? 'bg-gradient-to-br from-blue-500 to-indigo-600' : 'bg-gray-400'}`}>
@@ -298,6 +315,60 @@ const CompanySubscriptions = () => {
                           </div>
                         </div>
                       </div>
+
+                      {/* Company Ads Management */}
+                      {companyAds.length > 0 && (
+                        <div className="mt-4 pt-3 border-t border-gray-200">
+                          <h5 className="font-medium text-gray-800 mb-2 text-sm">{t('cs_company_ads', 'إعلانات الشركة')} ({companyAds.length})</h5>
+                          <div className="space-y-2">
+                            {companyAds.map(ad => {
+                              const posLabels = { banner: t('sa_pos_banner','بانر'), sidebar: t('sa_pos_sidebar','جانبي'), inline: t('sa_pos_inline','داخلي'), dashboard: t('sa_pos_dashboard','لوحة التحكم') };
+                              return (
+                                <div key={ad.id} className="bg-white border border-gray-200 rounded-lg p-3">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="font-bold text-gray-900 text-xs">{ad.title}</span>
+                                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${ad.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                          {ad.is_active ? t('sp_active','نشط') : t('sp_inactive','معطل')}
+                                        </span>
+                                        <span className="px-1.5 py-0.5 rounded text-[9px] bg-blue-100 text-blue-600">{posLabels[ad.position] || ad.position}</span>
+                                        {ad.dimensions && <span className="px-1.5 py-0.5 rounded text-[9px] bg-gray-100 text-gray-600">{ad.dimensions}</span>}
+                                        {ad.image_url && <span className="px-1.5 py-0.5 rounded text-[9px] bg-indigo-100 text-indigo-600">{t('cs_ad_image', 'صورة')}</span>}
+                                        {ad.image_url && ad.image_url.match(/\.(mp4|mov|webm)$/i) && <span className="px-1.5 py-0.5 rounded text-[9px] bg-rose-100 text-rose-600">{t('cs_ad_video', 'فيديو')}</span>}
+                                      </div>
+                                      <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-400 flex-wrap">
+                                        {ad.is_gift ? (
+                                          <span className="text-pink-500 font-medium">{t('ad_gift', 'هدية')}</span>
+                                        ) : ad.ad_value > 0 ? (
+                                          <span className="text-emerald-600 font-medium">{ad.ad_value.toLocaleString()} {t('sm_egp', 'ج.م')}</span>
+                                        ) : null}
+                                        {ad.start_date && <span>{t('ad_start_date', 'بداية')}: {ad.start_date}</span>}
+                                        {ad.end_date && <span>{t('ad_end_date', 'نهاية')}: {ad.end_date}</span>}
+                                        <span>{t('ad_views', 'مشاهدات')}: {ad.views || 0}</span>
+                                        <span>{t('ad_clicks', 'نقرات')}: {ad.clicks || 0}</span>
+                                      </div>
+                                    </div>
+                                    <div className="flex gap-1 flex-shrink-0">
+                                      <button onClick={async () => {
+                                        try { await axios.put(`${API}/ads/${ad.id}/toggle`, {}, getHeaders()); toast.success(t('sa_updated', 'تم')); fetchCompanyAds((company.compounds || []).map(c => c.id)); } catch { toast.error(t('sa_failed', 'فشل')); }
+                                      }} className={`px-2 py-1 text-[10px] rounded ${ad.is_active ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`}>
+                                        {ad.is_active ? t('sp_deactivate','إيقاف') : t('sp_activate','تفعيل')}
+                                      </button>
+                                      <button onClick={async () => {
+                                        if (!window.confirm(t('sa_confirm_delete', 'هل أنت متأكد؟'))) return;
+                                        try { await axios.delete(`${API}/ads/${ad.id}`, getHeaders()); toast.success(t('sa_deleted', 'تم الحذف')); fetchCompanyAds((company.compounds || []).map(c => c.id)); } catch { toast.error(t('sa_failed', 'فشل')); }
+                                      }} className="px-2 py-1 text-[10px] bg-red-100 text-red-600 rounded">
+                                        {t('sa_delete', 'حذف')}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Actions */}

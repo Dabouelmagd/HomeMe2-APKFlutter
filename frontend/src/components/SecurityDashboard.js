@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import {
   ShieldCheckIcon,
   UsersIcon,
@@ -12,357 +12,255 @@ import {
   XCircleIcon,
   IdentificationIcon,
   ExclamationTriangleIcon,
-  CalendarDaysIcon,
-  BellIcon
+  BellIcon,
+  ArrowPathIcon,
+  EyeIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
-import { formatRelativeTime } from '../utils/dateUtils';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const getHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
 const SecurityDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  
+
   const [activeTab, setActiveTab] = useState('visitors');
   const [securityLogs, setSecurityLogs] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    todayVisitors: 0,
-    checkedIn: 0,
-    checkedOut: 0,
-    unreadMessages: 0
-  });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [stats, setStats] = useState({ todayVisitors: 0, checkedIn: 0, checkedOut: 0, unreadMessages: 0 });
 
   useEffect(() => {
-    fetchSecurityData();
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchSecurityData, 30000);
+    fetchData();
+    const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  const fetchSecurityData = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-      
       const [logsRes, messagesRes] = await Promise.all([
-        axios.get(`${API}/security/visitor-logs`, { headers }),
-        axios.get(`${API}/security/messages`, { headers }).catch(() => ({ data: { messages: [] } }))
+        axios.get(`${API}/security/visitor-logs`, getHeaders()).catch(() => ({ data: { logs: [] } })),
+        axios.get(`${API}/security/messages`, getHeaders()).catch(() => ({ data: { messages: [] } })),
       ]);
-      
+
       const logs = logsRes.data.logs || [];
+      const msgs = messagesRes.data.messages || [];
       setSecurityLogs(logs);
-      setMessages(messagesRes.data.messages || []);
-      
-      // Calculate stats
+      setMessages(msgs);
+
       const today = new Date().toDateString();
-      const todayLogs = logs.filter(log => new Date(log.timestamp || log.created_at).toDateString() === today);
-      
+      const todayLogs = logs.filter(l => new Date(l.timestamp || l.created_at).toDateString() === today);
       setStats({
         todayVisitors: todayLogs.length,
-        checkedIn: logs.filter(log => log.action === 'check_in').length,
-        checkedOut: logs.filter(log => log.action === 'check_out').length,
-        unreadMessages: (messagesRes.data.messages || []).filter(m => !m.read).length
+        checkedIn: logs.filter(l => l.action === 'check_in').length,
+        checkedOut: logs.filter(l => l.action === 'check_out').length,
+        unreadMessages: msgs.filter(m => !m.read).length,
       });
-      
-    } catch (error) {
-      console.error('Error fetching security data:', error);
-      toast.error(t('failed_to_load_data'));
-    } finally {
-      setLoading(false);
-    }
+    } catch { /* silent */ }
+    finally { setLoading(false); }
   };
 
-  const markMessageAsRead = async (messageId) => {
+  const markRead = async (id) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.patch(
-        `${API}/security/messages/${messageId}/read`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchSecurityData();
-    } catch (error) {
-      console.error('Error marking message as read:', error);
-    }
+      await axios.patch(`${API}/security/messages/${id}/read`, {}, getHeaders());
+      fetchData();
+    } catch { /* silent */ }
+  };
+
+  const filteredLogs = securityLogs.filter(l =>
+    !searchQuery || (l.visitor_name || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const timeAgo = (ts) => {
+    if (!ts) return '';
+    const diff = (Date.now() - new Date(ts).getTime()) / 1000;
+    if (diff < 60) return t('sec_just_now', 'الآن');
+    if (diff < 3600) return `${Math.floor(diff / 60)} ${t('sec_min', 'د')}`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} ${t('sec_hr', 'س')}`;
+    return `${Math.floor(diff / 86400)} ${t('sec_day', 'ي')}`;
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">{t('loading')}</p>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${isRTL ? 'rtl' : 'ltr'}`}>
+    <div className="space-y-5" dir={isRTL ? 'rtl' : 'ltr'} data-testid="security-dashboard">
       {/* Header */}
-      <div className="bg-white shadow-lg border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4 rtl:space-x-reverse">
-              <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-4 rounded-2xl shadow-xl">
-                <ShieldCheckIcon className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  {t('security_dashboard')}
-                </h1>
-                <p className="text-gray-600 mt-1">
-                  {t('welcome')}, <span className="font-semibold">{user?.username || user?.email}</span>
-                </p>
-                <p className="text-sm text-gray-500">{user?.compound_name || t('compound')}</p>
-              </div>
+      <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-cyan-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-cyan-500/15 via-transparent to-transparent"></div>
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+              <ShieldCheckIcon className="w-7 h-7 text-white" />
             </div>
-            <button
-              onClick={logout}
-              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl transition-all shadow-lg"
-            >
-              {t('logout')}
-            </button>
+            <div>
+              <h1 className="text-xl font-black" data-testid="sec-title">{t('sec_dashboard', 'لوحة تحكم الأمن')}</h1>
+              <p className="text-cyan-300 text-xs">{t('sec_welcome', 'مرحباً')}، {user?.full_name || user?.username}</p>
+              <p className="text-[10px] text-gray-400">{user?.compound_name || ''}</p>
+            </div>
+          </div>
+          <div className="hidden sm:flex flex-col items-end gap-1">
+            <div className="flex items-center gap-2 bg-green-500/15 backdrop-blur px-3 py-1.5 rounded-lg border border-green-500/25">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+              <span className="text-xs text-green-300">{t('sec_monitoring', 'مراقبة مباشرة')}</span>
+            </div>
+            <span className="text-[10px] text-gray-500">{new Date().toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
           </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl p-6 text-white shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-100 text-sm font-medium">{t('today_visitors')}</p>
-                <p className="text-4xl font-bold mt-2">{stats.todayVisitors}</p>
-              </div>
-              <UsersIcon className="h-12 w-12 text-green-100" />
-            </div>
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { label: t('sec_today_visitors', 'زوار اليوم'), value: stats.todayVisitors, icon: UsersIcon, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' },
+          { label: t('sec_checked_in', 'دخول'), value: stats.checkedIn, icon: CheckCircleIcon, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' },
+          { label: t('sec_checked_out', 'خروج'), value: stats.checkedOut, icon: XCircleIcon, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' },
+          { label: t('sec_new_msgs', 'رسائل جديدة'), value: stats.unreadMessages, icon: BellIcon, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' },
+        ].map((s, i) => (
+          <div key={i} className={`${s.bg} rounded-xl border ${s.border} p-4 hover:shadow-md transition-all`} data-testid={`sec-stat-${i}`}>
+            <s.icon className={`w-5 h-5 ${s.color} mb-2`} />
+            <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+            <p className="text-[10px] text-gray-500 mt-0.5">{s.label}</p>
           </div>
-          
-          <div className="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl p-6 text-white shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-blue-100 text-sm font-medium">{t('checked_in')}</p>
-                <p className="text-4xl font-bold mt-2">{stats.checkedIn}</p>
-              </div>
-              <CheckCircleIcon className="h-12 w-12 text-blue-100" />
-            </div>
-          </div>
-          
-          <div className="bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl p-6 text-white shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-orange-100 text-sm font-medium">{t('checked_out')}</p>
-                <p className="text-4xl font-bold mt-2">{stats.checkedOut}</p>
-              </div>
-              <XCircleIcon className="h-12 w-12 text-orange-100" />
-            </div>
-          </div>
-          
-          <div className="bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl p-6 text-white shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-purple-100 text-sm font-medium">{t('new_messages')}</p>
-                <p className="text-4xl font-bold mt-2">{stats.unreadMessages}</p>
-              </div>
-              <BellIcon className="h-12 w-12 text-purple-100" />
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="bg-white rounded-2xl shadow-lg p-2 mb-8">
-          <nav className="flex gap-2" aria-label="Tabs">
-            <button
-              onClick={() => setActiveTab('visitors')}
-              className={`flex-1 py-4 px-6 rounded-xl font-semibold text-sm transition-all transform ${
-                activeTab === 'visitors'
-                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg scale-105'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-              }`}
-            >
-              <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
-                <IdentificationIcon className="w-5 h-5" />
-                <span>{t('visitor_log')}</span>
-                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                  activeTab === 'visitors' ? 'bg-white bg-opacity-20' : 'bg-blue-100 text-blue-600'
-                }`}>
-                  {securityLogs.length}
-                </span>
-              </div>
-            </button>
-            
-            <button
-              onClick={() => setActiveTab('messages')}
-              className={`flex-1 py-4 px-6 rounded-xl font-semibold text-sm transition-all transform ${
-                activeTab === 'messages'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg scale-105'
-                  : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-              }`}
-            >
-              <div className="flex items-center justify-center space-x-2 rtl:space-x-reverse">
-                <ChatBubbleLeftRightIcon className="w-5 h-5" />
-                <span>{t('resident_messages')}</span>
-                {stats.unreadMessages > 0 && (
-                  <span className="px-2 py-1 rounded-full text-xs font-bold bg-red-500 text-white animate-pulse">
-                    {stats.unreadMessages}
-                  </span>
-                )}
-              </div>
-            </button>
-          </nav>
-        </div>
-
-        {/* Content */}
-        <div className="space-y-4">
-          {/* Visitor Logs Tab */}
-          {activeTab === 'visitors' && (
-            <>
-              {securityLogs.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
-                  <IdentificationIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('no_visitor_logs')}</h3>
-                  <p className="text-gray-600">{t('visitor_logs_will_appear_here')}</p>
-                </div>
-              ) : (
-                securityLogs.map((log) => (
-                  <div key={log.id || log._id} className="bg-white rounded-2xl border-2 border-gray-100 shadow-lg hover:shadow-xl transition-all">
-                    <div className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-4 rtl:space-x-reverse mb-4">
-                            <div className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                              log.action === 'check_in' ? 'bg-green-100' : 'bg-orange-100'
-                            }`}>
-                              {log.action === 'check_in' ? (
-                                <CheckCircleIcon className="w-7 h-7 text-green-600" />
-                              ) : (
-                                <XCircleIcon className="w-7 h-7 text-orange-600" />
-                              )}
-                            </div>
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-900">{log.visitor_name}</h3>
-                              <p className="text-sm text-gray-500">
-                                {log.action === 'check_in' ? t('checked_in') : t('checked_out')}
-                              </p>
-                            </div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              log.action === 'check_in' 
-                                ? 'bg-green-100 text-green-700' 
-                                : 'bg-orange-100 text-orange-700'
-                            }`}>
-                              {formatRelativeTime(log.timestamp || log.created_at)}
-                            </span>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                            <div className="bg-gray-50 rounded-lg p-3">
-                              <p className="text-xs text-gray-500 mb-1">{t('checked_by')}</p>
-                              <p className="text-sm font-semibold text-gray-900">{log.checked_by}</p>
-                            </div>
-                            <div className="bg-gray-50 rounded-lg p-3">
-                              <p className="text-xs text-gray-500 mb-1">{t('id_verified')}</p>
-                              <p className="text-sm font-semibold text-gray-900">
-                                {log.id_verified ? '✓ ' + t('yes') : '✗ ' + t('no')}
-                              </p>
-                            </div>
-                            {log.temperature_check && (
-                              <div className="bg-gray-50 rounded-lg p-3">
-                                <p className="text-xs text-gray-500 mb-1">{t('temperature')}</p>
-                                <p className="text-sm font-semibold text-gray-900">{log.temperature_check}°C</p>
-                              </div>
-                            )}
-                            <div className="bg-gray-50 rounded-lg p-3">
-                              <p className="text-xs text-gray-500 mb-1">{t('photo')}</p>
-                              <p className="text-sm font-semibold text-gray-900">
-                                {log.photo_taken ? '✓ ' + t('yes') : '✗ ' + t('no')}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {log.security_notes && (
-                            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg">
-                              <p className="text-xs text-yellow-700 font-semibold mb-1">{t('security_notes')}:</p>
-                              <p className="text-sm text-yellow-800">{log.security_notes}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </>
-          )}
-
-          {/* Messages Tab */}
-          {activeTab === 'messages' && (
-            <>
-              {messages.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-2xl shadow-lg">
-                  <ChatBubbleLeftRightIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('no_messages')}</h3>
-                  <p className="text-gray-600">{t('messages_from_residents_will_appear_here')}</p>
-                </div>
-              ) : (
-                messages.map((message) => (
-                  <div 
-                    key={message.id || message._id} 
-                    className={`bg-white rounded-2xl border-2 shadow-lg hover:shadow-xl transition-all cursor-pointer ${
-                      message.read ? 'border-gray-100' : 'border-purple-200 bg-purple-50'
-                    }`}
-                    onClick={() => !message.read && markMessageAsRead(message.id || message._id)}
-                  >
-                    <div className="p-6">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                          <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center">
-                            <ChatBubbleLeftRightIcon className="h-6 w-6 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-bold text-gray-900">{message.sender_name}</h3>
-                            <p className="text-sm text-gray-500">{t('unit')} {message.unit_number}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                          {!message.read && (
-                            <span className="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full">
-                              {t('new')}
-                            </span>
-                          )}
-                          <span className="text-sm text-gray-500">
-                            {formatRelativeTime(message.created_at)}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {message.subject && (
-                        <h4 className="text-md font-semibold text-gray-800 mb-2">{message.subject}</h4>
-                      )}
-                      
-                      <p className="text-gray-700 leading-relaxed">{message.content || message.message}</p>
-                      
-                      {message.category && (
-                        <div className="mt-3">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {message.category}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </>
-          )}
-        </div>
+        ))}
       </div>
+
+      {/* Tabs + Search */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex gap-2">
+          {[
+            { id: 'visitors', label: t('sec_visitor_log', 'سجل الزوار'), icon: IdentificationIcon, count: securityLogs.length },
+            { id: 'messages', label: t('sec_messages', 'رسائل السكان'), icon: ChatBubbleLeftRightIcon, count: stats.unreadMessages },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/25' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
+              data-testid={`sec-tab-${tab.id}`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+              {tab.count > 0 && <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === tab.id ? 'bg-white/20' : 'bg-cyan-100 text-cyan-700'}`}>{tab.count}</span>}
+            </button>
+          ))}
+        </div>
+        {activeTab === 'visitors' && (
+          <div className="relative flex-1">
+            <MagnifyingGlassIcon className="w-4 h-4 absolute top-2.5 start-3 text-gray-400" />
+            <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+              placeholder={t('sec_search', 'بحث عن زائر...')}
+              className="w-full ps-9 pe-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-cyan-500 focus:border-cyan-500"
+              data-testid="sec-search-input" />
+          </div>
+        )}
+        <button onClick={fetchData} className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-600 hover:bg-gray-50 transition-all" data-testid="sec-refresh">
+          <ArrowPathIcon className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Visitor Logs */}
+      {activeTab === 'visitors' && (
+        <div className="space-y-3" data-testid="sec-visitors-tab">
+          {filteredLogs.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
+              <IdentificationIcon className="w-12 h-12 mb-3" />
+              <p className="text-sm">{t('sec_no_logs', 'لا يوجد سجل زوار')}</p>
+            </div>
+          ) : (
+            filteredLogs.map((log, i) => (
+              <div key={log.id || i} className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all overflow-hidden" data-testid={`visitor-log-${i}`}>
+                <div className="p-4 flex items-start gap-4">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${log.action === 'check_in' ? 'bg-emerald-100' : 'bg-amber-100'}`}>
+                    {log.action === 'check_in'
+                      ? <CheckCircleIcon className="w-5 h-5 text-emerald-600" />
+                      : <XCircleIcon className="w-5 h-5 text-amber-600" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-sm font-bold text-gray-900">{log.visitor_name}</h3>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${log.action === 'check_in' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {log.action === 'check_in' ? t('sec_entry', 'دخول') : t('sec_exit', 'خروج')}
+                      </span>
+                      <span className="text-[10px] text-gray-400">{timeAgo(log.timestamp || log.created_at)}</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {log.checked_by && (
+                        <span className="px-2 py-0.5 bg-gray-100 rounded text-[10px] text-gray-600">
+                          {t('sec_by', 'بواسطة')}: {log.checked_by}
+                        </span>
+                      )}
+                      {log.id_verified !== undefined && (
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${log.id_verified ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          {t('sec_id', 'الهوية')}: {log.id_verified ? t('sec_verified', 'تم التحقق') : t('sec_not_verified', 'لم يتحقق')}
+                        </span>
+                      )}
+                      {log.photo_taken && (
+                        <span className="px-2 py-0.5 bg-blue-100 rounded text-[10px] text-blue-700">
+                          <EyeIcon className="w-3 h-3 inline-block me-0.5" />{t('sec_photo', 'صورة')}
+                        </span>
+                      )}
+                      {log.temperature_check && (
+                        <span className="px-2 py-0.5 bg-purple-100 rounded text-[10px] text-purple-700">{log.temperature_check}°C</span>
+                      )}
+                    </div>
+                    {log.security_notes && (
+                      <div className="mt-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5">
+                        <p className="text-[10px] text-amber-700"><ExclamationTriangleIcon className="w-3 h-3 inline-block me-1" />{log.security_notes}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Messages */}
+      {activeTab === 'messages' && (
+        <div className="space-y-3" data-testid="sec-messages-tab">
+          {messages.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-gray-400 bg-white rounded-xl border border-gray-100">
+              <ChatBubbleLeftRightIcon className="w-12 h-12 mb-3" />
+              <p className="text-sm">{t('sec_no_msgs', 'لا توجد رسائل')}</p>
+            </div>
+          ) : (
+            messages.map((msg, i) => (
+              <div key={msg.id || i}
+                className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-all overflow-hidden cursor-pointer ${!msg.read ? 'border-cyan-200 bg-cyan-50/30' : 'border-gray-100'}`}
+                onClick={() => !msg.read && markRead(msg.id)}
+                data-testid={`sec-msg-${i}`}
+              >
+                <div className="p-4 flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-white">{(msg.sender_name || 'U').charAt(0)}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <h3 className="text-sm font-bold text-gray-900">{msg.sender_name}</h3>
+                      {msg.unit_number && <span className="text-[10px] text-gray-400">{t('unit', 'وحدة')} {msg.unit_number}</span>}
+                      {!msg.read && <span className="px-1.5 py-0.5 bg-red-500 text-white text-[9px] font-bold rounded-full">{t('sec_new', 'جديد')}</span>}
+                    </div>
+                    {msg.subject && <p className="text-xs font-medium text-gray-700 mb-0.5">{msg.subject}</p>}
+                    <p className="text-[10px] text-gray-500 truncate">{msg.content || msg.message}</p>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="text-[9px] text-gray-400">{timeAgo(msg.created_at)}</span>
+                      {msg.category && <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[9px] rounded">{msg.category}</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -252,6 +252,9 @@ const ResidentDashboard = () => {
         </div>
       </div>
 
+      {/* Service Rating Widget */}
+      <ServiceRatingWidget />
+
       {/* Quick Actions */}
       <div>
         <h3 className="font-bold text-gray-900 mb-3 text-sm">{t('rd_quick_actions', 'الوصول السريع')}</h3>
@@ -274,3 +277,129 @@ const ResidentDashboard = () => {
 };
 
 export default ResidentDashboard;
+
+// Service Rating Widget
+const ServiceRatingWidget = () => {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  const [recentItems, setRecentItems] = useState([]);
+  const [ratingItem, setRatingItem] = useState(null);
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    // Fetch recent maintenance requests and service bookings
+    Promise.all([
+      axios.get(`${API}/maintenance`, getHeaders()).then(r => (r.data.requests || []).slice(0, 3).map(r => ({ ...r, _type: 'maintenance' }))).catch(() => []),
+      axios.get(`${API}/services/my-bookings`, getHeaders()).then(r => (r.data.bookings || []).slice(0, 3).map(b => ({ ...b, _type: 'service' }))).catch(() => []),
+    ]).then(([m, s]) => setRecentItems([...m, ...s].slice(0, 4)));
+  }, []);
+
+  const submitRating = async () => {
+    if (!ratingItem || selectedRating === 0) return;
+    setSubmitting(true);
+    try {
+      await axios.post(`${API}/ratings`, {
+        target_type: ratingItem._type,
+        target_id: ratingItem.id,
+        rating: selectedRating,
+        comment,
+      }, getHeaders());
+      toast.success(t('rd_rating_success', 'تم إرسال التقييم بنجاح'));
+      setRatingItem(null);
+      setSelectedRating(0);
+      setComment('');
+    } catch {
+      toast.error(t('rd_rating_fail', 'فشل إرسال التقييم'));
+    }
+    setSubmitting(false);
+  };
+
+  if (recentItems.length === 0) return null;
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5" data-testid="rating-widget">
+      <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2 mb-3">
+        <StarIcon className="w-4 h-4 text-amber-500" />
+        {t('rd_rate_services', 'قيّم الخدمات')}
+      </h3>
+
+      {!ratingItem ? (
+        <div className="space-y-2">
+          <p className="text-xs text-gray-500 mb-2">{t('rd_rate_desc', 'اختر خدمة أو طلب صيانة لتقييمه:')}</p>
+          {recentItems.map((item, i) => (
+            <button key={i} onClick={() => setRatingItem(item)}
+              className="w-full flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors text-start"
+              data-testid={`rate-item-${i}`}
+            >
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${item._type === 'maintenance' ? 'bg-orange-100' : 'bg-purple-100'}`}>
+                {item._type === 'maintenance'
+                  ? <WrenchScrewdriverIcon className="w-4 h-4 text-orange-600" />
+                  : <StarIcon className="w-4 h-4 text-purple-600" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-gray-900 truncate">{item.title || item.service_name || item.description || t('rd_service', 'خدمة')}</p>
+                <p className="text-[10px] text-gray-400">{item._type === 'maintenance' ? t('rd_maintenance', 'صيانة') : t('rd_service', 'خدمة')}</p>
+              </div>
+              <StarIcon className="w-4 h-4 text-gray-300" />
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 bg-blue-50 rounded-lg p-3">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${ratingItem._type === 'maintenance' ? 'bg-orange-100' : 'bg-purple-100'}`}>
+              {ratingItem._type === 'maintenance'
+                ? <WrenchScrewdriverIcon className="w-4 h-4 text-orange-600" />
+                : <StarIcon className="w-4 h-4 text-purple-600" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-gray-900 truncate">{ratingItem.title || ratingItem.service_name || ratingItem.description}</p>
+            </div>
+            <button onClick={() => { setRatingItem(null); setSelectedRating(0); }} className="text-xs text-gray-400 hover:text-gray-600">{t('rd_cancel', 'إلغاء')}</button>
+          </div>
+
+          {/* Stars */}
+          <div className="flex items-center justify-center gap-1" data-testid="rating-stars">
+            {[1, 2, 3, 4, 5].map(star => (
+              <button key={star}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+                onClick={() => setSelectedRating(star)}
+                className="p-1 transition-transform hover:scale-125"
+                data-testid={`star-${star}`}
+              >
+                <svg className={`w-8 h-8 ${(hoverRating || selectedRating) >= star ? 'text-amber-400 fill-amber-400' : 'text-gray-300'}`} viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                </svg>
+              </button>
+            ))}
+          </div>
+          <p className="text-center text-xs text-gray-500">
+            {selectedRating === 1 && t('rd_rating_1', 'سيء')}
+            {selectedRating === 2 && t('rd_rating_2', 'مقبول')}
+            {selectedRating === 3 && t('rd_rating_3', 'جيد')}
+            {selectedRating === 4 && t('rd_rating_4', 'جيد جداً')}
+            {selectedRating === 5 && t('rd_rating_5', 'ممتاز')}
+          </p>
+
+          <textarea value={comment} onChange={e => setComment(e.target.value)}
+            placeholder={t('rd_comment_placeholder', 'أضف تعليقاً (اختياري)...')}
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs resize-none h-16 focus:ring-amber-400 focus:border-amber-400"
+            data-testid="rating-comment" />
+
+          <button onClick={submitRating} disabled={submitting || selectedRating === 0}
+            className="w-full py-2 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-400 transition-all disabled:opacity-50"
+            data-testid="submit-rating-btn"
+          >
+            {submitting ? '...' : t('rd_submit_rating', 'إرسال التقييم')}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};

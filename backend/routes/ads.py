@@ -105,6 +105,41 @@ async def get_ads_by_compounds(compound_ids: str = "", current_user: dict = Depe
     return {"ads": filtered}
 
 
+# ==================== Hybrid Ad Settings ====================
+
+@router.get("/ads/ad-settings")
+async def get_ad_settings(current_user: dict = Depends(get_current_user)):
+    """Get ad display settings for each position"""
+    db = get_db()
+    settings = await db.app_settings.find_one({"key": "ad_settings"}, {"_id": 0}) or {}
+    defaults = {
+        "banner": {"mode": "internal_first", "adsense_enabled": True, "internal_enabled": True},
+        "sidebar": {"mode": "internal_first", "adsense_enabled": False, "internal_enabled": True},
+        "dashboard": {"mode": "internal_only", "adsense_enabled": False, "internal_enabled": True},
+        "inline": {"mode": "internal_first", "adsense_enabled": True, "internal_enabled": True},
+    }
+    positions = settings.get("positions", defaults)
+    return {
+        "adsense_publisher_id": settings.get("adsense_publisher_id", "ca-pub-5928973437129941"),
+        "adsense_global_enabled": settings.get("adsense_global_enabled", True),
+        "positions": positions,
+    }
+
+
+@router.put("/ads/ad-settings")
+async def update_ad_settings(body: dict, current_user: dict = Depends(require_super_admin)):
+    """Update ad display settings"""
+    db = get_db()
+    update = {"key": "ad_settings"}
+    if "adsense_global_enabled" in body:
+        update["adsense_global_enabled"] = body["adsense_global_enabled"]
+    if "adsense_publisher_id" in body:
+        update["adsense_publisher_id"] = body["adsense_publisher_id"]
+    if "positions" in body:
+        update["positions"] = body["positions"]
+    await db.app_settings.update_one({"key": "ad_settings"}, {"$set": update}, upsert=True)
+    return {"message": "تم تحديث إعدادات الإعلانات"}
+
 
 @router.get("/ads/active")
 async def get_active_ads(position: str = "", compound_id: str = "", current_user: dict = Depends(get_current_user)):
@@ -306,3 +341,39 @@ async def serve_ad_media(filename: str):
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="ملف غير موجود")
     return FileResponse(filepath)
+
+
+# ==================== Hybrid Ad Settings ====================
+
+@router.get("/ads/ad-settings")
+async def get_ad_settings(current_user: dict = Depends(get_current_user)):
+    """Get ad display settings for each position"""
+    db = get_db()
+    settings = await db.app_settings.find_one({"key": "ad_settings"}, {"_id": 0}) or {}
+    defaults = {
+        "banner": {"mode": "internal_first", "adsense_enabled": True, "internal_enabled": True},
+        "sidebar": {"mode": "internal_first", "adsense_enabled": False, "internal_enabled": True},
+        "dashboard": {"mode": "internal_only", "adsense_enabled": False, "internal_enabled": True},
+        "inline": {"mode": "internal_first", "adsense_enabled": True, "internal_enabled": True},
+    }
+    positions = settings.get("positions", defaults)
+    return {
+        "adsense_publisher_id": settings.get("adsense_publisher_id", "ca-pub-5928973437129941"),
+        "adsense_global_enabled": settings.get("adsense_global_enabled", True),
+        "positions": positions,
+    }
+
+
+@router.put("/ads/ad-settings")
+async def update_ad_settings(body: dict, current_user: dict = Depends(require_super_admin)):
+    """Update ad display settings"""
+    db = get_db()
+    update = {"key": "ad_settings"}
+    if "adsense_global_enabled" in body:
+        update["adsense_global_enabled"] = body["adsense_global_enabled"]
+    if "adsense_publisher_id" in body:
+        update["adsense_publisher_id"] = body["adsense_publisher_id"]
+    if "positions" in body:
+        update["positions"] = body["positions"]
+    await db.app_settings.update_one({"key": "ad_settings"}, {"$set": update}, upsert=True)
+    return {"message": "تم تحديث إعدادات الإعلانات"}

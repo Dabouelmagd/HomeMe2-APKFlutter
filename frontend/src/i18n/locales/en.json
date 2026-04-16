@@ -3494,5 +3494,18 @@
   "users": "Users",
   "view_balances_payments": "View Balances and Payments",
   "what_payment_methods": "What Payment Methods are Accepted?",
-  "yes_change_plan_anytime": "Yes, you can change your plan anytime. Changes take effect immediately."
+  "yes_change_plan_anytime": "Yes, you can change your plan anytime. Changes take effect immediately.",
+  "ad_hybrid_control": "Ad Control (Internal + AdSense)",
+  "ad_hybrid_desc": "Internal ads show first. If no internal ad, AdSense shows automatically (if enabled).",
+  "ad_toggle_adsense": "Toggle AdSense",
+  "ad_adsense_on": "AdSense Enabled",
+  "ad_adsense_off": "AdSense Disabled",
+  "ad_internal": "Internal Ads",
+  "od_net_loss": "Net Loss",
+  "od_compound": "compound",
+  "od_company": "company",
+  "od_mgmt_companies": "Management Companies",
+  "cs_ad_image": "Image",
+  "cs_ad_video": "Video",
+  "cs_company_ads": "Company Ads"
 }

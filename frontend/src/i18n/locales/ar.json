@@ -3467,5 +3467,18 @@
   "wg_subscription_s2_tip": "الاشتراك السنوي يوفر شهرين مجانًا",
   "wg_subscription_s2_title": "طرق الدفع",
   "wg_subscription_title": "الاشتراكات والدفع",
-  "wg_tip": "نصيحة"
+  "wg_tip": "نصيحة",
+  "ad_hybrid_control": "تحكم في الإعلانات (داخلي + AdSense)",
+  "ad_hybrid_desc": "الإعلانات الداخلية تظهر أولاً. لو مفيش إعلان داخلي، يظهر AdSense تلقائياً (لو مفعّل).",
+  "ad_toggle_adsense": "تبديل AdSense",
+  "ad_adsense_on": "AdSense مفعّل",
+  "ad_adsense_off": "AdSense متوقف",
+  "ad_internal": "إعلانات داخلية",
+  "od_net_loss": "صافي الخسارة",
+  "od_compound": "مجمع",
+  "od_company": "شركة",
+  "od_mgmt_companies": "شركات الإدارة",
+  "cs_ad_image": "صورة",
+  "cs_ad_video": "فيديو",
+  "cs_company_ads": "إعلانات الشركة"
 }

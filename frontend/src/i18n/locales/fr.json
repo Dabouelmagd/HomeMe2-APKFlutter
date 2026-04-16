@@ -3473,5 +3473,18 @@
   "welcome_home": "Bienvenue chez vous,",
   "what_payment_methods": "Quels sont les moyens de paiement acceptés?",
   "yearly_discount_note": "Économisez 10 % sur la première année avec une facturation annuelle!",
-  "yes_change_plan_anytime": "Oui, vous pouvez changer votre plan à tout moment. Les modifications prennent effet immédiatement."
+  "yes_change_plan_anytime": "Oui, vous pouvez changer votre plan à tout moment. Les modifications prennent effet immédiatement.",
+  "ad_hybrid_control": "Contrôle Pub (Interne + AdSense)",
+  "ad_hybrid_desc": "Les pubs internes s'affichent d'abord. Si aucune, AdSense prend le relais.",
+  "ad_toggle_adsense": "Basculer AdSense",
+  "ad_adsense_on": "AdSense Activé",
+  "ad_adsense_off": "AdSense Désactivé",
+  "ad_internal": "Pubs Internes",
+  "od_net_loss": "Perte Nette",
+  "od_compound": "complexe",
+  "od_company": "société",
+  "od_mgmt_companies": "Sociétés de Gestion",
+  "cs_ad_image": "Image",
+  "cs_ad_video": "Vidéo",
+  "cs_company_ads": "Pubs de la Société"
 }

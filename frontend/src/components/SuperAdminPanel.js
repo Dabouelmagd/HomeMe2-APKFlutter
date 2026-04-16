@@ -683,6 +683,62 @@ const SuperAdminPanel = () => {
               ))}
             </div>
 
+            {/* Hybrid Ad Control Panel */}
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-white">{t('ad_hybrid_control', 'تحكم في الإعلانات (داخلي + AdSense)')}</h3>
+                <button onClick={async () => {
+                  try {
+                    const res = await axios.get(`${API}/ads/ad-settings`, getToken());
+                    const s = res.data;
+                    // Toggle global adsense
+                    await axios.put(`${API}/ads/ad-settings`, { adsense_global_enabled: !s.adsense_global_enabled }, getToken());
+                    toast.success(!s.adsense_global_enabled ? t('ad_adsense_on', 'AdSense مفعّل') : t('ad_adsense_off', 'AdSense متوقف'));
+                  } catch { toast.error(t('sa_failed', 'فشل')); }
+                }} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-500" data-testid="toggle-adsense-global">
+                  {t('ad_toggle_adsense', 'تبديل AdSense')}
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mb-4">{t('ad_hybrid_desc', 'الإعلانات الداخلية تظهر أولاً. لو مفيش إعلان داخلي، يظهر AdSense تلقائياً (لو مفعّل).')}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {[
+                  { key: 'banner', label: t('sa_pos_banner', 'بانر أعلى'), desc: t('ad_desc_banner', 'أعلى صفحات المحتوى'), color: 'border-amber-500/30' },
+                  { key: 'sidebar', label: t('sa_pos_sidebar', 'شريط جانبي'), desc: t('ad_desc_sidebar', 'القائمة الجانبية'), color: 'border-indigo-500/30' },
+                  { key: 'dashboard', label: t('sa_pos_dashboard', 'لوحة التحكم'), desc: t('ad_desc_dashboard', 'داخل الداشبورد'), color: 'border-emerald-500/30' },
+                  { key: 'inline', label: t('sa_pos_inline', 'داخل المحتوى'), desc: t('ad_desc_inline', 'بين أقسام المحتوى'), color: 'border-purple-500/30' },
+                ].map(pos => (
+                  <div key={pos.key} className={`bg-gray-900 rounded-xl p-4 border ${pos.color}`}>
+                    <h4 className="font-bold text-white text-sm mb-1">{pos.label}</h4>
+                    <p className="text-[10px] text-gray-500 mb-3">{pos.desc}</p>
+                    <div className="space-y-2">
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <span className="text-xs text-gray-300">{t('ad_internal', 'إعلانات داخلية')}</span>
+                        <input type="checkbox" defaultChecked id={`internal-${pos.key}`} className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-green-500 focus:ring-green-500" />
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <span className="text-xs text-gray-300">AdSense</span>
+                        <input type="checkbox" defaultChecked={pos.key !== 'dashboard' && pos.key !== 'sidebar'} id={`adsense-${pos.key}`} className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500" />
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button onClick={async () => {
+                const positions = {};
+                ['banner', 'sidebar', 'dashboard', 'inline'].forEach(k => {
+                  const internal = document.getElementById(`internal-${k}`)?.checked ?? true;
+                  const adsense = document.getElementById(`adsense-${k}`)?.checked ?? false;
+                  positions[k] = { internal_enabled: internal, adsense_enabled: adsense, mode: internal ? (adsense ? 'internal_first' : 'internal_only') : (adsense ? 'adsense_only' : 'disabled') };
+                });
+                try {
+                  await axios.put(`${API}/ads/ad-settings`, { positions }, getToken());
+                  toast.success(t('sa_saved', 'تم الحفظ'));
+                } catch { toast.error(t('sa_failed', 'فشل')); }
+              }} className="mt-4 px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">
+                {t('save_changes', 'حفظ التغييرات')}
+              </button>
+            </div>
+
             <button onClick={() => setShowCreateAd(!showCreateAd)} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 mb-3" data-testid="create-ad-btn">
               + إنشاء إعلان جديد
             </button>

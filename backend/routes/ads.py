@@ -2,7 +2,7 @@
 Internal Ads Management System - Super Admin controlled
 """
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 from pydantic import BaseModel
 import uuid
@@ -299,6 +299,233 @@ async def get_ad_analytics(current_user: dict = Depends(require_super_admin)):
         "top_by_clicks": top_by_clicks,
         "top_by_views": top_by_views,
         "position_chart": position_chart,
+    }
+
+
+@router.get("/ads/analytics/realtime")
+async def get_realtime_ad_analytics(days: int = 30, current_user: dict = Depends(require_super_admin)):
+    """Real-time ad analytics with time-series data and CTR alerts"""
+    db = get_db()
+    now = datetime.now(timezone.utc)
+    start_date = (now - timedelta(days=days)).isoformat()
+
+    # Get all ads
+    ads = await db.internal_ads.find({}, {"_id": 0}).to_list(500)
+
+    # Get click events for the period
+    events = await db.ad_events.find(
+        {"timestamp": {"$gte": start_date}}, {"_id": 0}
+    ).sort("timestamp", 1).to_list(10000)
+
+    # Build daily time-series from events
+    daily_clicks = {}
+    hourly_clicks_today = {}
+    today_str = now.strftime("%Y-%m-%d")
+
+    for ev in events:
+        ts = ev.get("timestamp", "")
+        day = ts[:10] if len(ts) >= 10 else ""
+        hour = ts[11:13] if len(ts) >= 13 else ""
+
+        if day:
+            daily_clicks.setdefault(day, 0)
+            daily_clicks[day] += 1
+
+        if day == today_str and hour:
+            hourly_clicks_today.setdefault(hour, 0)
+            hourly_clicks_today[hour] += 1
+
+    # Build daily views approximation from ad views / days active
+    daily_series = []
+    for i in range(min(days, 30)):
+        d = (now - timedelta(days=i)).strftime("%Y-%m-%d")
+        clicks = daily_clicks.get(d, 0)
+        # Estimate daily views based on total views / active days
+        total_views_per_day = sum(a.get("views", 0) for a in ads) // max(days, 1)
+        daily_series.append({
+            "date": d,
+            "clicks": clicks,
+            "views": total_views_per_day + clicks * 5,
+            "ctr": round((clicks / max(total_views_per_day + clicks * 5, 1)) * 100, 2)
+        })
+    daily_series.reverse()
+
+    # Hourly breakdown for today
+    hourly_series = []
+    for h in range(24):
+        hh = f"{h:02d}"
+        hourly_series.append({
+            "hour": f"{hh}:00",
+            "clicks": hourly_clicks_today.get(hh, 0)
+        })
+
+    # CTR alerts - ads with notably high or changing CTR
+    alerts = []
+    for a in ads:
+        views = a.get("views", 0)
+        clicks = a.get("clicks", 0)
+        if views < 10:
+            continue
+        ctr = round((clicks / views) * 100, 2)
+        if ctr >= 5:
+            alerts.append({
+                "type": "high_ctr",
+                "severity": "success",
+                "ad_id": a.get("id"),
+                "ad_title": a.get("title"),
+                "message": f"CTR عالي: {ctr}%",
+                "ctr": ctr,
+                "views": views,
+                "clicks": clicks
+            })
+        elif ctr >= 2:
+            alerts.append({
+                "type": "good_ctr",
+                "severity": "info",
+                "ad_id": a.get("id"),
+                "ad_title": a.get("title"),
+                "message": f"CTR جيد: {ctr}%",
+                "ctr": ctr,
+                "views": views,
+                "clicks": clicks
+            })
+
+    # Ads with 0 clicks but many views
+    for a in ads:
+        views = a.get("views", 0)
+        clicks = a.get("clicks", 0)
+        if views > 50 and clicks == 0 and a.get("is_active"):
+            alerts.append({
+                "type": "no_clicks",
+                "severity": "warning",
+                "ad_id": a.get("id"),
+                "ad_title": a.get("title"),
+                "message": f"لا توجد نقرات رغم {views} مشاهدة",
+                "ctr": 0,
+                "views": views,
+                "clicks": 0
+            })
+
+    alerts.sort(key=lambda x: x.get("ctr", 0), reverse=True)
+
+    # Live summary
+    total_clicks = sum(a.get("clicks", 0) for a in ads)
+    total_views = sum(a.get("views", 0) for a in ads)
+    today_clicks = sum(v for k, v in daily_clicks.items() if k == today_str)
+
+    return {
+        "live_summary": {
+            "total_ads": len(ads),
+            "active_ads": len([a for a in ads if a.get("is_active")]),
+            "total_views": total_views,
+            "total_clicks": total_clicks,
+            "today_clicks": today_clicks,
+            "avg_ctr": round((total_clicks / max(total_views, 1)) * 100, 2),
+            "total_events_period": len(events),
+            "last_updated": now.isoformat(),
+        },
+        "daily_series": daily_series,
+        "hourly_today": hourly_series,
+        "alerts": alerts[:20],
+        "alert_counts": {
+            "high_ctr": len([a for a in alerts if a["type"] == "high_ctr"]),
+            "good_ctr": len([a for a in alerts if a["type"] == "good_ctr"]),
+            "no_clicks": len([a for a in alerts if a["type"] == "no_clicks"]),
+        }
+    }
+
+
+@router.get("/ads/analytics/financial")
+async def get_financial_ad_analytics(period: str = "monthly", current_user: dict = Depends(require_super_admin)):
+    """Detailed financial analytics for ads"""
+    db = get_db()
+    now = datetime.now(timezone.utc)
+    ads = await db.internal_ads.find({}, {"_id": 0}).to_list(500)
+
+    paid_ads = [a for a in ads if not a.get("is_gift")]
+    gift_ads = [a for a in ads if a.get("is_gift")]
+
+    # Revenue by position
+    rev_by_position = {}
+    for a in paid_ads:
+        pos = a.get("position", "other")
+        rev_by_position.setdefault(pos, {"revenue": 0, "count": 0, "clicks": 0, "views": 0})
+        rev_by_position[pos]["revenue"] += a.get("ad_value", 0)
+        rev_by_position[pos]["count"] += 1
+        rev_by_position[pos]["clicks"] += a.get("clicks", 0)
+        rev_by_position[pos]["views"] += a.get("views", 0)
+
+    position_revenue = [
+        {"position": k, **v, "cpc": round(v["revenue"] / max(v["clicks"], 1), 2), "cpv": round(v["revenue"] / max(v["views"], 1), 4)}
+        for k, v in rev_by_position.items()
+    ]
+
+    # Revenue by month (simulate from created_at)
+    monthly_revenue = {}
+    for a in paid_ads:
+        created = a.get("created_at", "")
+        month = created[:7] if len(created) >= 7 else "unknown"
+        monthly_revenue.setdefault(month, {"revenue": 0, "count": 0})
+        monthly_revenue[month]["revenue"] += a.get("ad_value", 0)
+        monthly_revenue[month]["count"] += 1
+
+    monthly_chart = sorted([
+        {"month": k, "revenue": v["revenue"], "count": v["count"]}
+        for k, v in monthly_revenue.items()
+    ], key=lambda x: x["month"])
+
+    # Overall financial summary
+    total_revenue = sum(a.get("ad_value", 0) for a in paid_ads)
+    total_clicks = sum(a.get("clicks", 0) for a in paid_ads)
+    total_views = sum(a.get("views", 0) for a in paid_ads)
+    avg_ad_value = round(total_revenue / max(len(paid_ads), 1), 2)
+    cost_per_click = round(total_revenue / max(total_clicks, 1), 2)
+    cost_per_view = round(total_revenue / max(total_views, 1), 4)
+
+    # Current month vs previous month
+    current_month = now.strftime("%Y-%m")
+    prev_month = (now.replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
+    current_rev = monthly_revenue.get(current_month, {}).get("revenue", 0)
+    prev_rev = monthly_revenue.get(prev_month, {}).get("revenue", 0)
+    growth = round(((current_rev - prev_rev) / max(prev_rev, 1)) * 100, 1) if prev_rev else 0
+
+    # Top earning ads
+    top_earners = sorted(paid_ads, key=lambda x: x.get("ad_value", 0), reverse=True)[:10]
+    top_earners_clean = [{
+        "id": a.get("id"), "title": a.get("title"), "position": a.get("position"),
+        "ad_value": a.get("ad_value", 0), "clicks": a.get("clicks", 0),
+        "views": a.get("views", 0),
+        "cpc": round(a.get("ad_value", 0) / max(a.get("clicks", 0), 1), 2),
+    } for a in top_earners]
+
+    # Projected revenue (based on active paid ads)
+    active_paid = [a for a in paid_ads if a.get("is_active")]
+    projected_monthly = sum(a.get("ad_value", 0) for a in active_paid)
+    projected_yearly = projected_monthly * 12
+
+    return {
+        "summary": {
+            "total_revenue": total_revenue,
+            "paid_ads_count": len(paid_ads),
+            "gift_ads_count": len(gift_ads),
+            "avg_ad_value": avg_ad_value,
+            "cost_per_click": cost_per_click,
+            "cost_per_view": cost_per_view,
+            "current_month_revenue": current_rev,
+            "previous_month_revenue": prev_rev,
+            "growth_percent": growth,
+            "projected_monthly": projected_monthly,
+            "projected_yearly": projected_yearly,
+        },
+        "position_revenue": position_revenue,
+        "monthly_chart": monthly_chart,
+        "top_earners": top_earners_clean,
+        "breakdown": {
+            "paid_revenue": total_revenue,
+            "gift_value": sum(a.get("ad_value", 0) for a in gift_ads),
+            "active_revenue": sum(a.get("ad_value", 0) for a in active_paid),
+            "inactive_revenue": total_revenue - sum(a.get("ad_value", 0) for a in active_paid),
+        }
     }
 
 

@@ -43,7 +43,8 @@ import {
   StarIcon,
   ExclamationTriangleIcon,
   ShieldCheckIcon,
-  LanguageIcon
+  LanguageIcon,
+  SignalIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
@@ -300,6 +301,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('sa_ads', 'إدارة الإعلانات'), href: 'super-admin?tab=ads', icon: SpeakerWaveIcon, show: true },
         { name: t('sa_referrals', 'الإحالات'), href: 'super-admin?tab=referrals', icon: UserGroupIcon, show: true },
         { name: t('advanced_analytics', 'تحليلات متقدمة'), href: 'analytics', icon: ChartPieIcon, show: true },
+        { name: t('ad_realtime_analytics', 'تحليلات الإعلانات'), href: 'ad-analytics', icon: SignalIcon, show: true },
         { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]

@@ -89,6 +89,7 @@ import IndividualRegistration from './components/IndividualRegistration';
 import GuestManagement from './components/GuestManagement';
 import EventsAnnouncements from './components/EventsAnnouncements';
 import AdvancedAnalytics from './components/AdvancedAnalytics';
+import AdRealtimeDashboard from './components/AdRealtimeDashboard';
 import DocumentManagement from './components/DocumentManagement';
 import VotingSystem from './components/VotingSystem';
 import SmartHomeIntegration from './components/SmartHomeIntegration';
@@ -618,6 +619,10 @@ function App() {
                 
                 <Route path="analytics" element={
                   <AdvancedAnalytics />
+                } />
+                
+                <Route path="ad-analytics" element={
+                  <AdRealtimeDashboard />
                 } />
                 
                 <Route path="documents" element={

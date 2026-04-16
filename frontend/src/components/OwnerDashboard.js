@@ -162,7 +162,7 @@ const OwnerDashboard = () => {
         </div>
 
         {/* Ads Performance */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/app/analytics')}>
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate('/app/ad-analytics')}>
           <div className="flex items-center gap-2 mb-4">
             <SpeakerWaveIcon className="w-5 h-5 text-amber-600" />
             <h3 className="font-bold text-gray-900 text-sm">{t('budget_ads', 'الإعلانات')}</h3>

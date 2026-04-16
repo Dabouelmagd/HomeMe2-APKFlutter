@@ -986,6 +986,248 @@ async def send_weekly_report_auto():
     return f"Weekly ad report sent to {to_email}"
 
 
+@router.get("/ads/analytics/export-pdf")
+async def export_ad_analytics_pdf(current_user: dict = Depends(require_super_admin)):
+    """Export ad analytics as PDF with charts"""
+    from fastapi.responses import StreamingResponse
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import mm
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+    import io
+
+    db = get_db()
+    ads = await db.internal_ads.find({}, {"_id": 0}).to_list(500)
+    now = datetime.now(timezone.utc)
+
+    pos_labels = {"banner": "Banner", "sidebar": "Sidebar", "inline": "Inline", "dashboard": "Dashboard"}
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=20*mm, bottomMargin=15*mm, leftMargin=15*mm, rightMargin=15*mm)
+
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('Title_AR', parent=styles['Title'], fontSize=22, spaceAfter=10, alignment=TA_CENTER)
+    subtitle_style = ParagraphStyle('Sub_AR', parent=styles['Normal'], fontSize=10, textColor=colors.gray, alignment=TA_CENTER, spaceAfter=20)
+    heading_style = ParagraphStyle('Heading_AR', parent=styles['Heading2'], fontSize=14, spaceAfter=8, spaceBefore=15, textColor=colors.HexColor('#1F2937'))
+    normal_style = ParagraphStyle('Normal_AR', parent=styles['Normal'], fontSize=10)
+
+    elements = []
+
+    # Title
+    elements.append(Paragraph("HomeMe - Ad Analytics Report", title_style))
+    elements.append(Paragraph(f"Generated: {now.strftime('%Y-%m-%d %H:%M')} UTC", subtitle_style))
+    elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#E5E7EB')))
+    elements.append(Spacer(1, 10))
+
+    # Summary Section
+    paid_ads = [a for a in ads if not a.get("is_gift")]
+    gift_ads = [a for a in ads if a.get("is_gift")]
+    total_revenue = sum(a.get("ad_value", 0) for a in paid_ads)
+    total_views = sum(a.get("views", 0) for a in ads)
+    total_clicks = sum(a.get("clicks", 0) for a in ads)
+    avg_ctr = round((total_clicks / max(total_views, 1)) * 100, 2)
+
+    elements.append(Paragraph("Financial Summary", heading_style))
+
+    summary_data = [
+        ["Metric", "Value"],
+        ["Total Ads", str(len(ads))],
+        ["Active Ads", str(len([a for a in ads if a.get("is_active")]))],
+        ["Paid Ads", str(len(paid_ads))],
+        ["Gift Ads", str(len(gift_ads))],
+        ["Total Revenue (EGP)", f"{total_revenue:,.2f}"],
+        ["Avg Ad Value (EGP)", f"{round(total_revenue / max(len(paid_ads), 1), 2):,.2f}"],
+        ["Total Views", f"{total_views:,}"],
+        ["Total Clicks", f"{total_clicks:,}"],
+        ["Average CTR", f"{avg_ctr}%"],
+        ["CPC (EGP)", f"{round(total_revenue / max(total_clicks, 1), 2):,.2f}"],
+        ["Projected Yearly (EGP)", f"{sum(a.get('ad_value', 0) for a in paid_ads if a.get('is_active')) * 12:,.2f}"],
+    ]
+
+    t_summary = Table(summary_data, colWidths=[200, 200])
+    t_summary.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1F2937')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D1D5DB')),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F9FAFB')]),
+        ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+    ]))
+    elements.append(t_summary)
+    elements.append(Spacer(1, 15))
+
+    # Revenue by Position
+    elements.append(Paragraph("Revenue by Position", heading_style))
+    pos_stats = {}
+    for a in paid_ads:
+        pos = a.get("position", "other")
+        pos_stats.setdefault(pos, {"count": 0, "revenue": 0, "views": 0, "clicks": 0})
+        pos_stats[pos]["count"] += 1
+        pos_stats[pos]["revenue"] += a.get("ad_value", 0)
+        pos_stats[pos]["views"] += a.get("views", 0)
+        pos_stats[pos]["clicks"] += a.get("clicks", 0)
+
+    pos_data = [["Position", "Ads", "Revenue (EGP)", "Views", "Clicks", "CPC (EGP)"]]
+    for pos, s in pos_stats.items():
+        pos_data.append([
+            pos_labels.get(pos, pos), str(s["count"]),
+            f"{s['revenue']:,.2f}", f"{s['views']:,}",
+            f"{s['clicks']:,}", f"{round(s['revenue'] / max(s['clicks'], 1), 2):,.2f}"
+        ])
+
+    t_pos = Table(pos_data, colWidths=[80, 50, 100, 80, 80, 80])
+    t_pos.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3B82F6')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D1D5DB')),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#EFF6FF')]),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+    ]))
+    elements.append(t_pos)
+    elements.append(Spacer(1, 15))
+
+    # All Ads Table
+    elements.append(Paragraph("All Ads Performance", heading_style))
+    ads_data = [["Title", "Position", "Views", "Clicks", "CTR%", "Value (EGP)", "Status"]]
+    for a in sorted(ads, key=lambda x: x.get("ad_value", 0), reverse=True):
+        views = a.get("views", 0)
+        clicks = a.get("clicks", 0)
+        ctr = round((clicks / max(views, 1)) * 100, 2)
+        ads_data.append([
+            a.get("title", "")[:30],
+            pos_labels.get(a.get("position", ""), a.get("position", "")),
+            f"{views:,}", f"{clicks:,}", f"{ctr}%",
+            "Gift" if a.get("is_gift") else f"{a.get('ad_value', 0):,.0f}",
+            "Active" if a.get("is_active") else "Inactive"
+        ])
+
+    t_ads = Table(ads_data, colWidths=[120, 60, 60, 55, 45, 70, 55])
+    t_ads.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#059669')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D1D5DB')),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#ECFDF5')]),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    elements.append(t_ads)
+
+    # Footer
+    elements.append(Spacer(1, 20))
+    elements.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor('#D1D5DB')))
+    footer_style = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, textColor=colors.gray, alignment=TA_CENTER)
+    elements.append(Paragraph(f"HomeMe Platform - Auto-generated report - {now.strftime('%Y-%m-%d')}", footer_style))
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "attachment; filename=ad_analytics_report.pdf"}
+    )
+
+
+async def check_ctr_alerts_and_notify():
+    """Check ads for high CTR and send push notifications to admins/owner"""
+    db = get_db()
+    ads = await db.internal_ads.find({"is_active": True}, {"_id": 0}).to_list(500)
+
+    high_ctr_ads = []
+    for a in ads:
+        views = a.get("views", 0)
+        clicks = a.get("clicks", 0)
+        if views < 10:
+            continue
+        ctr = round((clicks / views) * 100, 2)
+        if ctr >= 5:
+            # Check if we already notified about this ad recently
+            existing = await db.ctr_alerts.find_one({
+                "ad_id": a.get("id"),
+                "created_at": {"$gte": (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()}
+            })
+            if not existing:
+                high_ctr_ads.append({"ad": a, "ctr": ctr})
+
+    if not high_ctr_ads:
+        return 0
+
+    # Get admin/owner push subscriptions
+    admin_subs = await db.push_subscriptions.find({
+        "is_active": True,
+        "role": {"$in": ["app_owner", "super_admin"]}
+    }).to_list(100)
+
+    # Also get by user role from users collection
+    if not admin_subs:
+        admins = await db.users.find(
+            {"role": {"$in": ["app_owner", "super_admin"]}},
+            {"_id": 0, "id": 1}
+        ).to_list(10)
+        admin_ids = [u["id"] for u in admins]
+        admin_subs = await db.push_subscriptions.find({
+            "is_active": True,
+            "user_id": {"$in": admin_ids}
+        }).to_list(100)
+
+    sent_count = 0
+    for item in high_ctr_ads:
+        ad = item["ad"]
+        ctr = item["ctr"]
+
+        # Store alert record
+        await db.ctr_alerts.insert_one({
+            "ad_id": ad.get("id"),
+            "ad_title": ad.get("title"),
+            "ctr": ctr,
+            "views": ad.get("views", 0),
+            "clicks": ad.get("clicks", 0),
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+
+        # Also store as notification
+        await db.notifications.insert_one({
+            "id": str(uuid.uuid4()),
+            "type": "ctr_alert",
+            "title": f"CTR عالي: {ad.get('title', '')}",
+            "message": f"الإعلان حقق CTR {ctr}% ({ad.get('clicks',0)} نقرة من {ad.get('views',0)} مشاهدة)",
+            "is_read": False,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "data": {"ad_id": ad.get("id"), "ctr": ctr}
+        })
+
+        # Send push notifications
+        for sub in admin_subs:
+            try:
+                from push_notification_service import PushNotificationService
+                PushNotificationService.send_notification(
+                    subscription=sub,
+                    title=f"CTR عالي: {ad.get('title', '')}",
+                    body=f"الإعلان حقق نسبة نقر {ctr}% - {ad.get('clicks',0)} نقرة",
+                    url="/app/ad-analytics?tab=alerts",
+                    tag=f"ctr-alert-{ad.get('id')}",
+                    require_interaction=True,
+                    data={"type": "ctr_alert", "ad_id": ad.get("id"), "ctr": ctr}
+                )
+                sent_count += 1
+            except Exception as e:
+                logging.error(f"Failed to send CTR push notification: {e}")
+
+    logging.info(f"CTR alerts: {len(high_ctr_ads)} ads, {sent_count} notifications sent")
+    return len(high_ctr_ads)
+
+
 UPLOAD_DIR = "/app/backend/uploads/ads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 

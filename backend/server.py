@@ -2487,6 +2487,22 @@ async def start_daily_report_scheduler():
     asyncio.create_task(weekly_ad_report_scheduler())
     logging.info("Weekly ad report scheduler started (Sundays 8:00 AM)")
 
+    # CTR Alert Checker (every 6 hours)
+    async def ctr_alert_checker():
+        await asyncio.sleep(60)  # Wait 1 min after startup
+        while True:
+            try:
+                from routes.ads import check_ctr_alerts_and_notify
+                count = await check_ctr_alerts_and_notify()
+                if count > 0:
+                    logging.info(f"CTR alert check: {count} high CTR ads found and notified")
+            except Exception as e:
+                logging.error(f"CTR alert check error: {e}")
+            await asyncio.sleep(6 * 3600)  # 6 hours
+
+    asyncio.create_task(ctr_alert_checker())
+    logging.info("CTR alert checker started (every 6 hours)")
+
 # Push/Email/Reminders routes extracted to routes/
 
 

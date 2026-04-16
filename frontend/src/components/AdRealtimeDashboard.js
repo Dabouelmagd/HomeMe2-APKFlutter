@@ -258,6 +258,28 @@ const AdRealtimeDashboard = () => {
         </button>
         <button
           onClick={async () => {
+            setExporting(true);
+            try {
+              const res = await axios.get(`${API}/ads/analytics/export-pdf`, {
+                ...getHeaders(), responseType: 'blob'
+              });
+              const url = window.URL.createObjectURL(new Blob([res.data]));
+              const a = document.createElement('a'); a.href = url;
+              a.download = 'ad_analytics_report.pdf';
+              document.body.appendChild(a); a.click(); a.remove();
+              toast.success(t('ad_export_pdf_success', 'تم تصدير PDF بنجاح'));
+            } catch { toast.error(t('ad_export_fail', 'فشل التصدير')); }
+            setExporting(false);
+          }}
+          disabled={exporting}
+          className="flex items-center gap-1.5 px-3 py-2 bg-red-600 text-white rounded-lg text-xs font-medium hover:bg-red-500 transition-all disabled:opacity-50"
+          data-testid="export-pdf-btn"
+        >
+          <ArrowDownTrayIcon className={`w-3.5 h-3.5 ${exporting ? 'animate-bounce' : ''}`} />
+          PDF
+        </button>
+        <button
+          onClick={async () => {
             setSendingReport(true);
             try {
               const res = await axios.post(`${API}/ads/analytics/send-weekly-report`, {}, getHeaders());

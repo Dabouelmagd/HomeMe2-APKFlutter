@@ -6,56 +6,52 @@
 - Deployment: SPA static build served by FastAPI with catch-all fallback
 
 ## Latest Session (Feb 2026)
-### New Features Added:
+### Features Built:
 1. **Real-time Ad Analytics Dashboard** (`/app/ad-analytics`)
-   - Auto-refresh every 30s with live metrics
-   - Daily/hourly time-series charts (views, clicks, CTR)
-   - CTR alert notifications (toast for high-performing ads)
+   - Auto-refresh every 30s, daily/hourly charts, CTR alerts
 2. **Detailed Financial Reports**
-   - Revenue by position, monthly trends, CPC/CPV
-   - Projected monthly/yearly revenue
-   - Top earners table with ROI metrics
+   - Revenue by position, CPC/CPV, projected monthly/yearly, top earners
 3. **Export Reports (Excel/CSV)**
-   - Excel with 3 sheets: الإعلانات, الملخص المالي, الإيرادات حسب الموقع
-   - CSV with Arabic headers and BOM support
-4. **Period Comparison**
-   - Compare this month vs last month (default)
+   - Excel: 3 sheets (الإعلانات, الملخص المالي, الإيرادات حسب الموقع)
+   - CSV: Arabic headers with BOM
+4. **Period Comparison with Custom Date Filter**
+   - Custom date picker (4 inputs)
+   - Quick presets: هذا الشهر vs السابق, هذا الأسبوع vs السابق, هذا الربع vs السابق
    - Visual bar chart comparison
-   - Change % for all metrics
-5. **Weekly Email Report**
-   - HTML email with financial summary and top performers
-   - Sent to app owner email (dalia@datalifeai.com)
+5. **Automatic Weekly Email Report**
+   - Scheduled every Sunday 8AM (asyncio background task in server.py)
+   - Manual send button also available
+   - HTML email with summary + top performers sent to app owner
+6. **Hybrid Ad System Fix** - Resolved routing conflict
 
-### Previous Fixes:
-- Fixed Hybrid Ad System routing conflict
+## Background Schedulers
+- Daily reports: 7:00 AM daily (existing)
+- Weekly ad report: Sundays 8:00 AM (NEW)
 
-## Completed Features
-- Real-time Ad Analytics + Financial Reports + Export + Compare + Weekly Report (DONE)
-- Hybrid Ad System (AdSense + Internal Ads toggle) (DONE)
-- Auto-translate 955 missing keys (DONE)
-- Company offers/gifts/ads (DONE)
-- Owner Dashboard redesign with live data (DONE)
-- Full Referral CRUD + settings (DONE)
-- User edit/delete/assign (DONE)
-- SPA catch-all for production (DONE)
-- Full Owner CRUD for Codes/Coupons/Subscriptions (DONE)
-- Email Notifications with SMTP (DONE)
-- Internal Ads + Analytics (DONE)
-- Account Selector with active_role logic (DONE)
-- All previous features (DONE)
-
-## Key Endpoints Added This Session
+## Key Endpoints
 - `GET /api/ads/analytics/realtime?days=30`
 - `GET /api/ads/analytics/financial`
-- `GET /api/ads/analytics/compare`
+- `GET /api/ads/analytics/compare?period1_start=&period1_end=&period2_start=&period2_end=`
 - `GET /api/ads/analytics/export?format=excel|csv`
 - `POST /api/ads/analytics/send-weekly-report`
+
+## Completed Features
+- All Ad Analytics features (realtime, financial, export, compare, weekly report) (DONE)
+- Hybrid Ad System (DONE)
+- Auto-translate 955 missing keys (DONE)
+- Company offers/gifts/ads (DONE)
+- Owner Dashboard redesign (DONE)
+- Full Referral CRUD + settings (DONE)
+- Email Notifications with SMTP (DONE)
+- Internal Ads + Analytics (DONE)
+- SPA catch-all + Account Selector (DONE)
+- All previous features (DONE)
 
 ## Backlog
 - P2: Bank transfer API (pending user credentials)
 - P2: Smart Devices & Automation (deferred)
 
 ## Technical Notes
-- FastAPI routing: Static paths MUST be defined ABOVE dynamic paths
-- SPA fallback: StaticFiles catch-all at bottom of server.py is required
-- active_role vs user.role: UI context determined by localStorage active_role
+- FastAPI routing: Static paths ABOVE dynamic paths
+- SPA fallback: StaticFiles catch-all at bottom of server.py
+- active_role in localStorage determines UI context

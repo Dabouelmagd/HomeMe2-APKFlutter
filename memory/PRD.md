@@ -6,12 +6,18 @@
 - Deployment: SPA static build served by FastAPI with catch-all fallback
 
 ## Latest Session (Feb 2026)
-### Hybrid Ad System Fix: Resolved FastAPI routing conflict for /ads/ad-settings endpoint
-- Removed duplicate endpoint definitions that caused PUT /api/ads/ad-settings to return 400
-- Verified all ad CRUD operations still work correctly
-- Frontend hybrid ad toggles (AdSense vs Internal) fully functional
+### Real-time Ad Analytics Dashboard & Financial Reports
+- New dedicated page `/app/ad-analytics` with 3 tabs: البيانات الحية, التقارير المالية, التنبيهات
+- Real-time metrics: auto-refresh every 30s, live CTR tracking, daily/hourly time-series charts
+- Financial reports: revenue by position, monthly trends, CPC/CPV, projected yearly revenue, top earners
+- CTR alert system: toast notifications for high-performing ads, warning for zero-click ads
+- Backend: `GET /api/ads/analytics/realtime` + `GET /api/ads/analytics/financial`
+
+### Previous: Hybrid Ad System Fix
+- Fixed FastAPI routing conflict for /ads/ad-settings (removed duplicate endpoints)
 
 ## Completed Features
+- Real-time Ad Analytics Dashboard + Financial Reports (DONE)
 - Hybrid Ad System (AdSense + Internal Ads toggle per position) (DONE)
 - Auto-translate 955 missing keys (DONE)
 - Company offers/gifts/ads (DONE)
@@ -24,7 +30,7 @@
 - Email Notifications with SMTP (DONE)
 - Internal Ads + Analytics (DONE)
 - Account Selector with active_role logic (DONE)
-- Super Admin sidebar styling (Slate/Cyan) separated from Owner (Black/Rose) (DONE)
+- Super Admin sidebar styling separated from Owner (DONE)
 - All previous features (DONE)
 
 ## Backlog
@@ -32,6 +38,7 @@
 - P2: Smart Devices & Automation (deferred)
 
 ## Technical Notes
-- FastAPI routing: Static paths (e.g., /ads/ad-settings) MUST be defined ABOVE dynamic paths (e.g., /ads/{ad_id})
-- SPA fallback: StaticFiles catch-all at bottom of server.py is required for production page refresh
-- active_role vs user.role: UI context determined by localStorage active_role, not DB role
+- FastAPI routing: Static paths MUST be defined ABOVE dynamic paths
+- SPA fallback: StaticFiles catch-all at bottom of server.py is required
+- active_role vs user.role: UI context determined by localStorage active_role
+- New analytics endpoints are placed between /ads/analytics and UPLOAD_DIR in ads.py

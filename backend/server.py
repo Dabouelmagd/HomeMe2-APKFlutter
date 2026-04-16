@@ -1230,7 +1230,7 @@ async def send_push_notification(user_id: str, title: str, body: str, data: Dict
         subscriptions = await db.push_subscriptions.find({
             "user_id": user_id,
             "is_active": True
-        }).to_list(None)
+        }).to_list(100)
         
         if not subscriptions:
             return
@@ -1376,7 +1376,7 @@ async def search_messages(
             "compound_id": compound_id,
             "participants": user_id,
             "is_active": True
-        }).to_list(None)
+        }).to_list(500)
         
         user_chat_ids = [chat["id"] for chat in user_chats]
         

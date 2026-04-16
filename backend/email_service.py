@@ -13,6 +13,8 @@ from typing import Optional, List
 from datetime import datetime
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+
+APP_URL = os.environ.get('REACT_APP_BACKEND_URL', os.environ.get('APP_URL', 'https://homemeapp.net')).rstrip('/')
 import logging
 from pathlib import Path
 from dotenv import load_dotenv
@@ -129,7 +131,7 @@ class EmailService:
                     </ul>
                     
                     <center>
-                        <a href="https://homemeapp.net/login" class="btn">تسجيل الدخول الآن</a>
+                        <a href="{APP_URL}/login" class="btn">تسجيل الدخول الآن</a>
                     </center>
                 </div>
                 <div class="footer">
@@ -150,7 +152,7 @@ class EmailService:
         - اسم المستخدم: {username}
         - المجمع السكني: {compound_name or 'غير محدد'}
         
-        يمكنك تسجيل الدخول من: https://homemeapp.net/login
+        يمكنك تسجيل الدخول من: {APP_URL}/login
         
         مع تحيات فريق HomeMe
         """
@@ -197,7 +199,7 @@ class EmailService:
                     <p>يرجى سداد المبلغ في أقرب وقت ممكن لتجنب أي رسوم تأخير.</p>
                     
                     <center>
-                        <a href="https://homemeapp.net/payments" class="btn">ادفع الآن</a>
+                        <a href="{APP_URL}/payments" class="btn">ادفع الآن</a>
                     </center>
                 </div>
                 <div class="footer">
@@ -294,7 +296,7 @@ class EmailService:
                     </div>
                     
                     <center>
-                        <a href="https://homemeapp.net/residents" class="btn">عرض السكان</a>
+                        <a href="{APP_URL}/residents" class="btn">عرض السكان</a>
                     </center>
                 </div>
                 <div class="footer">
@@ -353,7 +355,7 @@ class EmailService:
                     </div>
                     
                     <center>
-                        <a href="https://homemeapp.net/maintenance" class="btn">عرض الطلب</a>
+                        <a href="{APP_URL}/maintenance" class="btn">عرض الطلب</a>
                     </center>
                 </div>
                 <div class="footer">

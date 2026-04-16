@@ -881,6 +881,111 @@ async def send_weekly_ad_report(current_user: dict = Depends(require_super_admin
     }
 
 
+async def send_weekly_report_auto():
+    """Auto-send weekly ad report (called by scheduler, no auth needed)"""
+    from email_service import EmailService
+
+    db = get_db()
+    email_svc = EmailService()
+    now = datetime.now(timezone.utc)
+    week_ago = (now - timedelta(days=7)).isoformat()
+
+    ads = await db.internal_ads.find({}, {"_id": 0}).to_list(500)
+    events = await db.ad_events.find({"timestamp": {"$gte": week_ago}}, {"_id": 0}).to_list(10000)
+
+    total_ads = len(ads)
+    active_ads = len([a for a in ads if a.get("is_active")])
+    total_views = sum(a.get("views", 0) for a in ads)
+    total_clicks = sum(a.get("clicks", 0) for a in ads)
+    week_clicks = len(events)
+    total_revenue = sum(a.get("ad_value", 0) for a in ads if not a.get("is_gift"))
+    avg_ctr = round((total_clicks / max(total_views, 1)) * 100, 2)
+
+    top_ads = sorted(
+        [a for a in ads if a.get("views", 0) > 0],
+        key=lambda x: (x.get("clicks", 0) / max(x.get("views", 0), 1)),
+        reverse=True
+    )[:5]
+
+    top_ads_html = ""
+    for a in top_ads:
+        ctr = round((a.get("clicks", 0) / max(a.get("views", 0), 1)) * 100, 2)
+        top_ads_html += f"""
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;">{a.get('title','')}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">{a.get('views',0):,}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">{a.get('clicks',0):,}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">{ctr}%</td>
+        </tr>"""
+
+    html = f"""
+    <div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;">
+        <div style="background:linear-gradient(135deg,#111827,#1f2937);padding:24px;text-align:center;">
+            <h1 style="color:#fff;margin:0;font-size:20px;">تقرير أداء الإعلانات الأسبوعي (تلقائي)</h1>
+            <p style="color:#9ca3af;margin:8px 0 0;font-size:13px;">HomeMe - {now.strftime('%Y-%m-%d')}</p>
+        </div>
+        <div style="padding:24px;">
+            <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+                <div style="flex:1;min-width:120px;background:#ecfdf5;border-radius:10px;padding:16px;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#059669;">{total_revenue:,.0f}</div>
+                    <div style="font-size:11px;color:#6b7280;margin-top:4px;">إيرادات (ج.م)</div>
+                </div>
+                <div style="flex:1;min-width:120px;background:#eff6ff;border-radius:10px;padding:16px;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#2563eb;">{total_views:,}</div>
+                    <div style="font-size:11px;color:#6b7280;margin-top:4px;">مشاهدات</div>
+                </div>
+                <div style="flex:1;min-width:120px;background:#fef3c7;border-radius:10px;padding:16px;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#d97706;">{total_clicks:,}</div>
+                    <div style="font-size:11px;color:#6b7280;margin-top:4px;">نقرات</div>
+                </div>
+            </div>
+            <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:24px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:#6b7280;font-size:13px;">إجمالي الإعلانات</span>
+                    <span style="font-weight:700;">{total_ads}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:#6b7280;font-size:13px;">إعلانات نشطة</span>
+                    <span style="font-weight:700;color:#059669;">{active_ads}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:#6b7280;font-size:13px;">نقرات هذا الأسبوع</span>
+                    <span style="font-weight:700;color:#d97706;">{week_clicks}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:#6b7280;font-size:13px;">متوسط CTR</span>
+                    <span style="font-weight:700;color:#e11d48;">{avg_ctr}%</span>
+                </div>
+            </div>
+            <h3 style="font-size:15px;margin:0 0 12px;">أفضل الإعلانات أداءً</h3>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <thead>
+                    <tr style="background:#f3f4f6;">
+                        <th style="padding:8px 12px;text-align:right;">الإعلان</th>
+                        <th style="padding:8px 12px;text-align:center;">مشاهدات</th>
+                        <th style="padding:8px 12px;text-align:center;">نقرات</th>
+                        <th style="padding:8px 12px;text-align:center;">CTR</th>
+                    </tr>
+                </thead>
+                <tbody>{top_ads_html}</tbody>
+            </table>
+        </div>
+        <div style="background:#f9fafb;padding:16px;text-align:center;font-size:11px;color:#9ca3af;">
+            هذا تقرير تلقائي أسبوعي من منصة HomeMe - يُرسل كل يوم أحد الساعة 8 صباحاً
+        </div>
+    </div>
+    """
+
+    owner = await db.users.find_one({"role": "app_owner"}, {"_id": 0})
+    to_email = owner.get("email", "") if owner else ""
+
+    if not to_email:
+        return "No owner email found"
+
+    await email_svc.send_email(to_email, "تقرير أداء الإعلانات الأسبوعي (تلقائي) - HomeMe", html)
+    return f"Weekly ad report sent to {to_email}"
+
+
 UPLOAD_DIR = "/app/backend/uploads/ads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 

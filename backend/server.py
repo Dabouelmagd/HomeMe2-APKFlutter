@@ -2465,6 +2465,28 @@ async def start_daily_report_scheduler():
     _daily_report_task = asyncio.create_task(daily_report_scheduler())
     logging.info("Daily report scheduler started (7:00 AM daily)")
 
+    # Weekly Ad Report Scheduler (Sundays at 8:00 AM)
+    async def weekly_ad_report_scheduler():
+        while True:
+            now = datetime.now()
+            # Find next Sunday at 8:00 AM
+            days_until_sunday = (6 - now.weekday()) % 7
+            if days_until_sunday == 0 and now.hour >= 8:
+                days_until_sunday = 7
+            next_sunday = (now + timedelta(days=days_until_sunday)).replace(hour=8, minute=0, second=0, microsecond=0)
+            wait_seconds = (next_sunday - now).total_seconds()
+            logging.info(f"Next weekly ad report scheduled at {next_sunday} (in {wait_seconds/3600:.1f} hours)")
+            await asyncio.sleep(wait_seconds)
+            try:
+                from routes.ads import send_weekly_report_auto
+                result = await send_weekly_report_auto()
+                logging.info(f"Weekly ad report sent: {result}")
+            except Exception as e:
+                logging.error(f"Weekly ad report error: {e}")
+
+    asyncio.create_task(weekly_ad_report_scheduler())
+    logging.info("Weekly ad report scheduler started (Sundays 8:00 AM)")
+
 # Push/Email/Reminders routes extracted to routes/
 
 

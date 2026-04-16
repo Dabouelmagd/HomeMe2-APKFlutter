@@ -45,6 +45,11 @@ const AdRealtimeDashboard = () => {
   const [lastRefresh, setLastRefresh] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [comparison, setComparison] = useState(null);
+  const [compareLoading, setCompareLoading] = useState(false);
+  const [p1Start, setP1Start] = useState('');
+  const [p1End, setP1End] = useState('');
+  const [p2Start, setP2Start] = useState('');
+  const [p2End, setP2End] = useState('');
   const [sendingReport, setSendingReport] = useState(false);
   const [exporting, setExporting] = useState(false);
   const intervalRef = useRef(null);
@@ -188,8 +193,10 @@ const AdRealtimeDashboard = () => {
             onClick={() => {
               setActiveTab(tab.id);
               if (tab.id === 'compare' && !comparison) {
+                setCompareLoading(true);
                 axios.get(`${API}/ads/analytics/compare`, getHeaders())
-                  .then(r => setComparison(r.data)).catch(() => {});
+                  .then(r => { setComparison(r.data); setCompareLoading(false); })
+                  .catch(() => setCompareLoading(false));
               }
             }}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/25' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
@@ -261,9 +268,10 @@ const AdRealtimeDashboard = () => {
           disabled={sendingReport}
           className="flex items-center gap-1.5 px-3 py-2 bg-purple-600 text-white rounded-lg text-xs font-medium hover:bg-purple-500 transition-all disabled:opacity-50"
           data-testid="send-weekly-report-btn"
+          title={t('ad_auto_report_hint', 'يُرسل تلقائياً كل أحد 8 صباحاً - أو اضغط للإرسال الآن')}
         >
           <EnvelopeIcon className={`w-3.5 h-3.5 ${sendingReport ? 'animate-spin' : ''}`} />
-          {t('ad_send_report', 'إرسال تقرير أسبوعي')}
+          {t('ad_send_report', 'إرسال تقرير')}
         </button>
       </div>
 
@@ -594,11 +602,121 @@ const AdRealtimeDashboard = () => {
       {/* === COMPARE TAB === */}
       {activeTab === 'compare' && (
         <div className="space-y-5" data-testid="compare-tab">
-          {!comparison ? (
-            <div className="flex justify-center py-16">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-rose-600"></div>
+          {/* Date Filter */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <CalendarDaysIcon className="w-4 h-4 text-indigo-500" />
+              {t('ad_compare_filter', 'اختيار فترات المقارنة')}
+            </h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                <h4 className="text-xs font-bold text-blue-700 mb-2">{t('ad_period_current', 'الفترة الأولى')}</h4>
+                <div className="flex gap-2">
+                  <input type="date" value={p1Start} onChange={e => setP1Start(e.target.value)}
+                    className="flex-1 px-3 py-1.5 text-xs border border-blue-200 rounded-lg bg-white focus:ring-blue-400 focus:border-blue-400"
+                    data-testid="p1-start-date" placeholder={t('ad_from', 'من')} />
+                  <input type="date" value={p1End} onChange={e => setP1End(e.target.value)}
+                    className="flex-1 px-3 py-1.5 text-xs border border-blue-200 rounded-lg bg-white focus:ring-blue-400 focus:border-blue-400"
+                    data-testid="p1-end-date" placeholder={t('ad_to', 'إلى')} />
+                </div>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                <h4 className="text-xs font-bold text-gray-700 mb-2">{t('ad_period_previous', 'الفترة الثانية')}</h4>
+                <div className="flex gap-2">
+                  <input type="date" value={p2Start} onChange={e => setP2Start(e.target.value)}
+                    className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:ring-gray-400 focus:border-gray-400"
+                    data-testid="p2-start-date" />
+                  <input type="date" value={p2End} onChange={e => setP2End(e.target.value)}
+                    className="flex-1 px-3 py-1.5 text-xs border border-gray-300 rounded-lg bg-white focus:ring-gray-400 focus:border-gray-400"
+                    data-testid="p2-end-date" />
+                </div>
+              </div>
             </div>
-          ) : (
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={async () => {
+                  setCompareLoading(true);
+                  try {
+                    const params = {};
+                    if (p1Start) params.period1_start = p1Start;
+                    if (p1End) params.period1_end = p1End;
+                    if (p2Start) params.period2_start = p2Start;
+                    if (p2End) params.period2_end = p2End;
+                    const res = await axios.get(`${API}/ads/analytics/compare`, { ...getHeaders(), params });
+                    setComparison(res.data);
+                  } catch { toast.error(t('ad_compare_fail', 'فشل تحميل المقارنة')); }
+                  setCompareLoading(false);
+                }}
+                disabled={compareLoading}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-medium hover:bg-indigo-500 transition-all disabled:opacity-50"
+                data-testid="compare-custom-btn"
+              >
+                {compareLoading ? <ArrowPathIcon className="w-3.5 h-3.5 inline-block animate-spin me-1" /> : <ScaleIcon className="w-3.5 h-3.5 inline-block me-1" />}
+                {t('ad_compare_btn', 'مقارنة')}
+              </button>
+              {/* Quick presets */}
+              {[
+                { label: t('ad_preset_month', 'هذا الشهر vs السابق'), preset: 'month' },
+                { label: t('ad_preset_week', 'هذا الأسبوع vs السابق'), preset: 'week' },
+                { label: t('ad_preset_quarter', 'هذا الربع vs السابق'), preset: 'quarter' },
+              ].map(p => (
+                <button key={p.preset}
+                  onClick={async () => {
+                    setCompareLoading(true);
+                    const now = new Date();
+                    let s1, e1, s2, e2;
+                    if (p.preset === 'month') {
+                      s1 = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0,10);
+                      e1 = now.toISOString().slice(0,10);
+                      const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                      s2 = lm.toISOString().slice(0,10);
+                      e2 = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().slice(0,10);
+                    } else if (p.preset === 'week') {
+                      const dayOfWeek = now.getDay();
+                      const sun = new Date(now); sun.setDate(now.getDate() - dayOfWeek);
+                      s1 = sun.toISOString().slice(0,10); e1 = now.toISOString().slice(0,10);
+                      const prevSun = new Date(sun); prevSun.setDate(sun.getDate() - 7);
+                      const prevSat = new Date(sun); prevSat.setDate(sun.getDate() - 1);
+                      s2 = prevSun.toISOString().slice(0,10); e2 = prevSat.toISOString().slice(0,10);
+                    } else {
+                      const q = Math.floor(now.getMonth() / 3);
+                      s1 = new Date(now.getFullYear(), q * 3, 1).toISOString().slice(0,10);
+                      e1 = now.toISOString().slice(0,10);
+                      s2 = new Date(now.getFullYear(), (q - 1) * 3, 1).toISOString().slice(0,10);
+                      e2 = new Date(now.getFullYear(), q * 3, 0).toISOString().slice(0,10);
+                    }
+                    setP1Start(s1); setP1End(e1); setP2Start(s2); setP2End(e2);
+                    try {
+                      const res = await axios.get(`${API}/ads/analytics/compare`, {
+                        ...getHeaders(), params: { period1_start: s1, period1_end: e1, period2_start: s2, period2_end: e2 }
+                      });
+                      setComparison(res.data);
+                    } catch { toast.error(t('ad_compare_fail', 'فشل المقارنة')); }
+                    setCompareLoading(false);
+                  }}
+                  className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-xs font-medium hover:bg-gray-200 transition-all"
+                  data-testid={`preset-${p.preset}`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {compareLoading && (
+            <div className="flex justify-center py-10">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+            </div>
+          )}
+
+          {!compareLoading && !comparison && (
+            <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+              <ScaleIcon className="w-12 h-12 mb-3" />
+              <p className="text-sm">{t('ad_compare_empty', 'اختر فترتين أو استخدم الاختصارات للمقارنة')}</p>
+            </div>
+          )}
+
+          {!compareLoading && comparison && (
             <>
               <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
                 <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">

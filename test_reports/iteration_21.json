@@ -1,0 +1,85 @@
+{
+  "summary": "Verified 2 new features: 1) Auto-scheduled weekly ad report (Sundays 8AM via background task), 2) Custom date picker filter in Compare tab. Backend scheduler confirmed running. Frontend Compare tab has all required elements.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_21.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Weekly scheduler correctly implemented in server.py - runs every Sunday 8AM",
+    "Backend logs confirm: 'Weekly ad report scheduler started (Sundays 8:00 AM)' and 'Next weekly ad report scheduled at 2026-04-19 08:00:00'",
+    "Compare API (GET /api/ads/analytics/compare) supports custom date params: period1_start, period1_end, period2_start, period2_end",
+    "Compare API returns correct data with default (this month vs last month) and custom date ranges",
+    "Frontend Compare tab has 4 date inputs with data-testid: p1-start-date, p1-end-date, p2-start-date, p2-end-date",
+    "Compare button (مقارنة) with data-testid='compare-custom-btn' present",
+    "3 preset buttons (month, week, quarter) with data-testid='preset-month/week/quarter' present",
+    "Send weekly report button has tooltip about auto scheduling: 'يُرسل تلقائياً كل أحد 8 صباحاً - أو اضغط للإرسال الآن'"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "super_admin": {
+      "username": "superadmin",
+      "password": "SuperAdmin2024!"
+    }
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Ad Analytics Dashboard at /app/ad-analytics has 4 tabs. Compare tab now has custom date filtering with 4 date inputs and 3 preset buttons. Weekly scheduler runs as asyncio background task in server.py (Sundays 8AM). All features verified working.",
+  "features_tested": {
+    "backend_scheduler": {
+      "weekly_ad_report_scheduler_started": "VERIFIED - Log shows 'Weekly ad report scheduler started (Sundays 8:00 AM)'",
+      "next_scheduled_time": "VERIFIED - Log shows 'Next weekly ad report scheduled at 2026-04-19 08:00:00'",
+      "send_weekly_report_auto_function": "VERIFIED - Function exists in /app/backend/routes/ads.py (lines 884-986)"
+    },
+    "backend_api": {
+      "GET /api/ads/analytics/compare (default)": "PASSED - Returns period1 (2026-04-01 to 2026-04-16), period2 (2026-03-01 to 2026-03-31), changes",
+      "GET /api/ads/analytics/compare (custom dates)": "PASSED - Custom params period1_start, period1_end, period2_start, period2_end work correctly"
+    },
+    "frontend_ui": {
+      "ad-realtime-dashboard": "FOUND",
+      "tab-realtime": "FOUND",
+      "tab-financial": "FOUND",
+      "tab-compare": "FOUND",
+      "tab-alerts": "FOUND",
+      "p1-start-date": "FOUND",
+      "p1-end-date": "FOUND",
+      "p2-start-date": "FOUND",
+      "p2-end-date": "FOUND",
+      "compare-custom-btn": "FOUND",
+      "preset-month": "FOUND",
+      "preset-week": "FOUND",
+      "preset-quarter": "FOUND",
+      "export-excel-btn": "FOUND",
+      "export-csv-btn": "FOUND",
+      "send-weekly-report-btn": "FOUND with tooltip about auto scheduling"
+    },
+    "integration": {
+      "compare_tab_loads_data": "PASSED - 5 comparison metrics displayed after clicking month preset",
+      "date_pickers_functional": "PASSED - Date inputs accept values and trigger comparison"
+    }
+  },
+  "api_response_samples": {
+    "compare_default": {
+      "period1": {"start": "2026-04-01", "end": "2026-04-16", "clicks": 1, "views": 210, "ctr": 0.48},
+      "period2": {"start": "2026-03-01", "end": "2026-03-31", "clicks": 0, "views": 206, "ctr": 0},
+      "changes": {"clicks": 100.0, "views": 1.9, "ctr": 0.48, "revenue": 100.0, "new_ads": 100.0}
+    }
+  },
+  "scheduler_logs": {
+    "startup_log": "2026-04-16 23:27:18,918 - root - INFO - Weekly ad report scheduler started (Sundays 8:00 AM)",
+    "next_run_log": "2026-04-16 23:27:18,921 - root - INFO - Next weekly ad report scheduled at 2026-04-19 08:00:00 (in 56.5 hours)"
+  }
+}

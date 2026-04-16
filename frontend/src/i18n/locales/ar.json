@@ -2902,5 +2902,21 @@
   "sa_no_users": "لا يوجد مستخدمين",
   "owner_app_control": "تحكم عام للأبلكيشن",
   "owner_company_control": "تحكم في حسابات شركات الإدارة",
-  "owner_compound_control": "تحكم في اشتراكات الكمبوند"
+  "owner_compound_control": "تحكم في اشتراكات الكمبوند",
+  "sa_edit_user": "تعديل المستخدم",
+  "sa_confirm_delete_user": "هل أنت متأكد من حذف هذا المستخدم؟",
+  "sa_user_deleted": "تم حذف المستخدم",
+  "sa_user_updated": "تم تحديث المستخدم",
+  "sa_no_compound": "بدون مجمع",
+  "sa_compound": "المجمع السكني",
+  "sa_ref_settings": "إعدادات برنامج الإحالات",
+  "sa_ref_prefix": "بادئة كود الإحالة",
+  "sa_ref_reward_type": "نوع المكافأة",
+  "sa_ref_coupon": "كوبون خصم",
+  "sa_ref_days": "أيام إضافية",
+  "sa_ref_discount": "خصم مباشر",
+  "sa_ref_reward_value": "قيمة المكافأة",
+  "sa_ref_min": "الحد الأدنى للإحالات",
+  "sa_all_ref_codes": "جميع أكواد الإحالة",
+  "sa_code": "الكود"
 }

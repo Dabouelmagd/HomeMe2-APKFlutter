@@ -3125,5 +3125,18 @@
   "sa_no_users": "Aucun utilisateur",
   "owner_app_control": "Contrôle Général",
   "owner_company_control": "Comptes des Sociétés de Gestion",
-  "owner_compound_control": "Abonnements des Complexes"
+  "owner_compound_control": "Abonnements des Complexes",
+  "sa_edit_user": "Modifier l'Utilisateur",
+  "sa_confirm_delete_user": "Êtes-vous sûr de vouloir supprimer?",
+  "sa_user_deleted": "Utilisateur supprimé",
+  "sa_user_updated": "Utilisateur mis à jour",
+  "sa_ref_settings": "Paramètres du Programme",
+  "sa_ref_prefix": "Préfixe du Code",
+  "sa_ref_reward_type": "Type de Récompense",
+  "sa_ref_coupon": "Coupon",
+  "sa_ref_days": "Jours Supplémentaires",
+  "sa_ref_discount": "Réduction Directe",
+  "sa_ref_reward_value": "Valeur",
+  "sa_ref_min": "Min Parrainages",
+  "sa_all_ref_codes": "Tous les Codes"
 }

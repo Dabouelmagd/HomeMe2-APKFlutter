@@ -23,7 +23,7 @@ const PrivacySettings = () => {
   const handlePrivacyUpdate = async () => {
     setSaving(true);
     try {
-      await axios.put(`${API}/users/${user.id}/privacy`, privacySettings);
+      await axios.put(`${API}/users/${user.id}/privacy`, privacySettings, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       toast.success(t('privacy_settings_updated_successfully', 'تم تحديث إعدادات الخصوصية'));
     } catch (error) {
       toast.error(t('failed_to_update_privacy_settings', 'فشل تحديث إعدادات الخصوصية'));

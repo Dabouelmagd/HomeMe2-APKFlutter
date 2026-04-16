@@ -72,6 +72,7 @@ const SuperAdminPanel = () => {
   // Edit modals
   const [editCode, setEditCode] = useState(null);
   const [editCoupon, setEditCoupon] = useState(null);
+  const [editUser, setEditUser] = useState(null);
   // User subscriptions
   const [userSubs, setUserSubs] = useState([]);
   const [userSubStats, setUserSubStats] = useState({});
@@ -389,6 +390,7 @@ const SuperAdminPanel = () => {
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sp_email', 'البريد')}</th>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_role', 'الدور')}</th>
                     <th className="px-4 py-3 text-right text-gray-400 font-medium">{t('sa_change_role', 'تغيير الدور')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400 font-medium">{t('sa_actions', 'إجراءات')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
@@ -411,6 +413,19 @@ const SuperAdminPanel = () => {
                         >
                           {Object.entries(roleLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                         </select>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-1 justify-center">
+                          <button onClick={() => setEditUser(u)} className="px-2 py-1 text-xs bg-blue-600/20 text-blue-400 rounded hover:bg-blue-600/30">{t('sa_edit', 'تعديل')}</button>
+                          <button onClick={async () => {
+                            if (!window.confirm(t('sa_confirm_delete_user', `هل أنت متأكد من حذف ${u.full_name || u.username}؟`))) return;
+                            try {
+                              await axios.delete(`${API}/admin/users/${u.id}`, getToken());
+                              toast.success(t('sa_user_deleted', 'تم حذف المستخدم'));
+                              fetchUsers();
+                            } catch { toast.error(t('sa_failed', 'فشل')); }
+                          }} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded hover:bg-red-600/30">{t('sa_delete', 'حذف')}</button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -973,6 +988,75 @@ const SuperAdminPanel = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* Referral Settings */}
+                <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
+                  <h3 className="font-bold text-white mb-4">{t('sa_ref_settings', 'إعدادات برنامج الإحالات')}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">{t('sa_ref_prefix', 'بادئة كود الإحالة')}</label>
+                      <input id="ref-prefix" defaultValue={refStats.settings?.prefix || 'HOMEME'} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="HOMEME" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">{t('sa_ref_reward_type', 'نوع المكافأة')}</label>
+                      <select id="ref-reward-type" defaultValue={refStats.settings?.reward_type || 'coupon'} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                        <option value="coupon">{t('sa_ref_coupon', 'كوبون خصم')}</option>
+                        <option value="days">{t('sa_ref_days', 'أيام إضافية')}</option>
+                        <option value="discount">{t('sa_ref_discount', 'خصم مباشر')}</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">{t('sa_ref_reward_value', 'قيمة المكافأة')}</label>
+                      <input id="ref-reward-value" type="number" min="1" defaultValue={refStats.settings?.reward_value || 10} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-400 mb-1">{t('sa_ref_min', 'الحد الأدنى للإحالات')}</label>
+                      <input id="ref-min" type="number" min="1" defaultValue={refStats.settings?.min_referrals || 3} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                    </div>
+                  </div>
+                  <button onClick={async () => {
+                    try {
+                      const res = await axios.put(`${API}/referral/settings`, {
+                        prefix: document.getElementById('ref-prefix')?.value,
+                        reward_type: document.getElementById('ref-reward-type')?.value,
+                        reward_value: parseFloat(document.getElementById('ref-reward-value')?.value) || 10,
+                        min_referrals: parseInt(document.getElementById('ref-min')?.value) || 3,
+                      }, getToken());
+                      toast.success(res.data.message);
+                      fetchRefStats();
+                    } catch { toast.error(t('sa_failed', 'فشل')); }
+                  }} className="mt-4 px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500" data-testid="save-ref-settings">
+                    {t('save_changes', 'حفظ التغييرات')}
+                  </button>
+                </div>
+
+                {/* All Referral Codes Table */}
+                <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden mb-6">
+                  <div className="px-5 py-3 border-b border-gray-700">
+                    <h3 className="font-bold text-white">{t('sa_all_ref_codes', 'جميع أكواد الإحالة')}</h3>
+                  </div>
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-900/50">
+                      <tr>
+                        <th className="px-4 py-3 text-right text-gray-400">{t('sa_code', 'الكود')}</th>
+                        <th className="px-4 py-3 text-center text-gray-400">{t('sa_total_referrals', 'الإحالات')}</th>
+                        <th className="px-4 py-3 text-center text-gray-400">{t('sa_earned_coupons', 'كوبونات')}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-700">
+                      {(refStats.all_codes || []).map((r, i) => (
+                        <tr key={i} className="hover:bg-gray-750">
+                          <td className="px-4 py-3 font-mono text-green-400">{r.code}</td>
+                          <td className="px-4 py-3 text-center font-bold text-white">{r.total_invited}</td>
+                          <td className="px-4 py-3 text-center text-amber-400">{r.coupons_earned}</td>
+                        </tr>
+                      ))}
+                      {(refStats.all_codes || []).length === 0 && <tr><td colSpan="3" className="px-4 py-6 text-center text-gray-500">{t('sa_no_referrals', 'لا توجد إحالات بعد')}</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Top Referrers */}
                 <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
                   <h3 className="font-bold text-lg mb-4">{t('sa_top_referrers', 'أفضل المُحيلين')}</h3>
                   {refStats.top_referrers?.length > 0 ? (
@@ -1320,6 +1404,59 @@ const SuperAdminPanel = () => {
             <div className="flex gap-3 pt-2">
               <button onClick={handleEditCoupon} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">{t('cs_confirm', 'تأكيد')}</button>
               <button onClick={() => setEditCoupon(null)} className="px-4 py-2.5 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('cs_cancel', 'إلغاء')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {editUser && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setEditUser(null)}>
+          <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-gray-700" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white">{t('sa_edit_user', 'تعديل المستخدم')}: <span className="text-blue-400">{editUser.full_name || editUser.username}</span></h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sp_name', 'الاسم')}</label>
+                <input value={editUser.full_name || ''} onChange={e => setEditUser({...editUser, full_name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sp_email', 'البريد')}</label>
+                <input value={editUser.email || ''} onChange={e => setEditUser({...editUser, email: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sp_phone', 'الهاتف')}</label>
+                <input value={editUser.phone || ''} onChange={e => setEditUser({...editUser, phone: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_role', 'الدور')}</label>
+                <select value={editUser.role} onChange={e => setEditUser({...editUser, role: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                  {Object.entries(roleLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_compound', 'المجمع السكني')}</label>
+                <select value={editUser.compound_id || ''} onChange={e => setEditUser({...editUser, compound_id: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                  <option value="">{t('sa_no_compound', 'بدون مجمع')}</option>
+                  {compounds.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button onClick={async () => {
+                try {
+                  await axios.put(`${API}/database/users/${editUser.id}`, {
+                    full_name: editUser.full_name,
+                    email: editUser.email,
+                    phone: editUser.phone,
+                    role: editUser.role,
+                    compound_id: editUser.compound_id,
+                  }, getToken());
+                  toast.success(t('sa_user_updated', 'تم تحديث المستخدم'));
+                  setEditUser(null);
+                  fetchUsers();
+                } catch { toast.error(t('sa_failed', 'فشل')); }
+              }} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">{t('cs_confirm', 'تأكيد')}</button>
+              <button onClick={() => setEditUser(null)} className="px-4 py-2.5 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('cs_cancel', 'إلغاء')}</button>
             </div>
           </div>
         </div>

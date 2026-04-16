@@ -37,7 +37,7 @@ const ProfileSettings = () => {
       }
 
       const response = await axios.put(`${API}/users/${user.id}/profile`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
       updateUser({ ...user, ...response.data });
@@ -61,7 +61,7 @@ const ProfileSettings = () => {
       await axios.put(`${API}/users/${user.id}/password`, {
         current_password: profileData.current_password,
         new_password: profileData.new_password
-      });
+      }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
       toast.success(t('password_updated_successfully', 'تم تحديث كلمة المرور'));
       setProfileData(prev => ({ ...prev, current_password: '', new_password: '', confirm_password: '' }));

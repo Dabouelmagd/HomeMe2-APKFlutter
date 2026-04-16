@@ -127,17 +127,47 @@ async def use_referral_code(data: ReferralUse, current_user: dict = Depends(get_
 
 @router.get("/referral/stats")
 async def get_referral_stats(current_user: dict = Depends(get_current_user)):
-    """Get referral statistics for Super Admin"""
-    if current_user.get("role") != "super_admin":
+    """Get referral statistics for Super Admin / App Owner"""
+    if current_user.get("role") not in ["super_admin", "app_owner"]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     db = get_db()
     refs = await db.referrals.find({}, {"_id": 0}).to_list(500)
     total_referrals = sum(r.get("total_invited", 0) for r in refs)
     total_coupons = sum(r.get("coupons_earned", 0) for r in refs)
     top_referrers = sorted(refs, key=lambda x: x.get("total_invited", 0), reverse=True)[:10]
+
+    # Get referral settings
+    settings = await db.app_settings.find_one({"key": "referral_settings"}, {"_id": 0}) or {}
+
     return {
         "total_referral_codes": len(refs),
         "total_referrals": total_referrals,
         "total_coupons_earned": total_coupons,
-        "top_referrers": [{"code": r["code"], "user_id": r["user_id"], "total": r.get("total_invited", 0)} for r in top_referrers]
+        "top_referrers": [{"code": r["code"], "user_id": r["user_id"], "total": r.get("total_invited", 0)} for r in top_referrers],
+        "all_codes": [{"code": r["code"], "user_id": r["user_id"], "total_invited": r.get("total_invited", 0), "coupons_earned": r.get("coupons_earned", 0)} for r in refs],
+        "settings": {
+            "prefix": settings.get("prefix", "HOMEME"),
+            "reward_type": settings.get("reward_type", "coupon"),
+            "reward_value": settings.get("reward_value", 10),
+            "min_referrals": settings.get("min_referrals", 3),
+        }
     }
+
+
+@router.put("/referral/settings")
+async def update_referral_settings(body: dict, current_user: dict = Depends(get_current_user)):
+    """Update referral program settings"""
+    if current_user.get("role") not in ["super_admin", "app_owner"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    db = get_db()
+    update = {}
+    for field in ["prefix", "reward_type", "reward_value", "min_referrals"]:
+        if field in body:
+            update[field] = body[field]
+    if update:
+        await db.app_settings.update_one(
+            {"key": "referral_settings"},
+            {"$set": {**update, "key": "referral_settings"}},
+            upsert=True
+        )
+    return {"message": "تم تحديث إعدادات الإحالات", "settings": update}

@@ -355,13 +355,15 @@ const LanguageInitializer = () => {
   const { i18n } = useTranslation();
   
   useEffect(() => {
-    // Initialize language from localStorage or default
+    // Initialize language from localStorage or default to Arabic
     const storedLanguage = localStorage.getItem('i18nextLng');
-    if (storedLanguage && ['en', 'ar', 'fr'].includes(storedLanguage)) {
-      if (i18n.language !== storedLanguage) {
-        i18n.changeLanguage(storedLanguage);
-      }
+    const normalized = storedLanguage ? storedLanguage.split('-')[0].toLowerCase() : 'ar';
+    const validLang = ['en', 'ar', 'fr'].includes(normalized) ? normalized : 'ar';
+    if (i18n.language !== validLang) {
+      i18n.changeLanguage(validLang);
     }
+    // Update html lang attribute
+    document.documentElement.setAttribute('lang', validLang);
   }, [i18n]);
   
   useEffect(() => {

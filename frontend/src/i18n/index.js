@@ -11,10 +11,12 @@ const resources = {
 };
 
 const savedLanguage = localStorage.getItem('i18nextLng');
-const defaultLng = (savedLanguage && ['ar', 'en', 'fr'].includes(savedLanguage)) ? savedLanguage : 'ar';
+// Normalize saved language (handle cases like 'ar-EG', 'en-US', etc.)
+const normalizedLang = savedLanguage ? savedLanguage.split('-')[0].toLowerCase() : null;
+const defaultLng = (normalizedLang && ['ar', 'en', 'fr'].includes(normalizedLang)) ? normalizedLang : 'ar';
 
-// Ensure Arabic is set as default on first visit
-if (!savedLanguage) {
+// Always force Arabic on first visit or invalid stored language
+if (!savedLanguage || !['ar', 'en', 'fr'].includes(normalizedLang)) {
   localStorage.setItem('i18nextLng', 'ar');
 }
 

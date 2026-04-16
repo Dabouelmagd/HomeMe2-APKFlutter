@@ -279,7 +279,7 @@ const Layout = ({ children, isTrialMode = false }) => {
   // Role-based theme
   const roleTheme = {
     app_owner: { active: 'from-rose-600 to-purple-700', hover: 'hover:bg-rose-500/10', text: 'text-rose-400', dot: 'bg-rose-500', sidebarBg: 'bg-gray-950', sidebarBorder: 'border-rose-900/50', sidebarText: 'text-gray-300', sidebarHeading: 'text-rose-400' },
-    super_admin: { active: 'from-purple-500 to-pink-500', hover: 'hover:bg-purple-500/10', text: 'text-purple-400', dot: 'bg-purple-500', sidebarBg: 'bg-gray-950', sidebarBorder: 'border-purple-900/50', sidebarText: 'text-gray-300', sidebarHeading: 'text-purple-400' },
+    super_admin: { active: 'from-cyan-500 to-blue-600', hover: 'hover:bg-cyan-500/10', text: 'text-cyan-400', dot: 'bg-cyan-500', sidebarBg: 'bg-slate-900', sidebarBorder: 'border-cyan-800/40', sidebarText: 'text-slate-300', sidebarHeading: 'text-cyan-400' },
     company_admin: { active: 'from-indigo-600 to-indigo-700', hover: 'hover:bg-indigo-50', text: 'text-indigo-600', dot: 'bg-indigo-500' },
     admin: { active: 'from-blue-600 to-blue-700', hover: 'hover:bg-blue-50', text: 'text-blue-600', dot: 'bg-blue-500' },
     manager: { active: 'from-emerald-600 to-emerald-700', hover: 'hover:bg-emerald-50', text: 'text-emerald-600', dot: 'bg-emerald-500' },

@@ -144,6 +144,15 @@ const AuthProvider = ({ children }) => {
       axios.get(`${API}/auth/me`)
         .then(response => {
           const userData = response.data;
+          // Restore active_role from localStorage if user selected a different role in AccountSelector
+          const savedRole = localStorage.getItem('selectedRole');
+          if (savedRole && savedRole !== userData.role) {
+            userData.active_role = savedRole;
+          }
+          const savedCompoundId = localStorage.getItem('selectedCompoundId');
+          if (savedCompoundId) {
+            userData.selected_compound_id = savedCompoundId;
+          }
           setUser(userData);
           
           // Update localStorage with fresh user data
@@ -716,14 +725,15 @@ function App() {
 // Dashboard Router Component
 const DashboardRouter = () => {
   const { user } = useAuth();
+  const activeRole = user?.active_role || user?.role;
   
-  if (user?.role === 'app_owner') {
+  if (activeRole === 'app_owner') {
     return <OwnerDashboard />;
-  } else if (user?.role === 'super_admin' || user?.role === 'company_admin') {
+  } else if (activeRole === 'super_admin' || activeRole === 'company_admin') {
     return <AdminDashboard />;
-  } else if (user?.role === 'admin' || user?.role === 'manager') {
+  } else if (activeRole === 'admin' || activeRole === 'manager') {
     return <AdminDashboard />;
-  } else if (user?.role === 'security') {
+  } else if (activeRole === 'security') {
     return <SecurityDashboard />;
   } else {
     return <ResidentDashboard />;

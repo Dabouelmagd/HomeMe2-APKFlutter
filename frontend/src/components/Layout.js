@@ -268,12 +268,13 @@ const Layout = ({ children, isTrialMode = false }) => {
     return state === undefined ? true : state;
   };
 
-  const isAdminRole = ['admin','company_admin','super_admin','app_owner'].includes(user?.role);
-  const isStaffRole = ['admin','company_admin','super_admin','app_owner','manager'].includes(user?.role);
-  const isSecurityRole = ['admin','company_admin','super_admin','app_owner','manager','security'].includes(user?.role);
+  const activeRole = user?.active_role || user?.role;
+  const isAdminRole = ['admin','company_admin','super_admin','app_owner'].includes(activeRole);
+  const isStaffRole = ['admin','company_admin','super_admin','app_owner','manager'].includes(activeRole);
+  const isSecurityRole = ['admin','company_admin','super_admin','app_owner','manager','security'].includes(activeRole);
 
-  const isAppOwner = user?.role === 'app_owner';
-  const isSuperAdmin = user?.role === 'super_admin' || isAppOwner;
+  const isAppOwner = activeRole === 'app_owner';
+  const isSuperAdmin = activeRole === 'super_admin' || isAppOwner;
 
   // Role-based theme
   const roleTheme = {
@@ -285,7 +286,7 @@ const Layout = ({ children, isTrialMode = false }) => {
     security: { active: 'from-amber-600 to-amber-700', hover: 'hover:bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500' },
     resident: { active: 'from-teal-600 to-teal-700', hover: 'hover:bg-teal-50', text: 'text-teal-600', dot: 'bg-teal-500' },
   };
-  const theme = roleTheme[user?.role] || roleTheme.resident;
+  const theme = roleTheme[activeRole] || roleTheme.resident;
 
   // App Owner gets a completely different navigation
   const ownerNavigationSections = [
@@ -331,7 +332,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('residents_list'), href: 'residents', icon: UserGroupIcon, show: isStaffRole },
         { name: t('user_management'), href: 'users', icon: UsersIcon, show: isAdminRole },
         { name: t('monitoring_dashboard'), href: 'monitoring', icon: ChartPieIcon, show: isStaffRole },
-        { name: t('compounds_management', 'Compounds Management'), href: 'compounds-management', icon: HomeIcon, show: user?.role === 'app_owner' || user?.role === 'super_admin' || user?.role === 'company_admin' },
+        { name: t('compounds_management', 'Compounds Management'), href: 'compounds-management', icon: HomeIcon, show: activeRole === 'app_owner' || activeRole === 'super_admin' || activeRole === 'company_admin' },
       ]
     },
     {
@@ -380,8 +381,8 @@ const Layout = ({ children, isTrialMode = false }) => {
       title: t('admin_tools'),
       items: [
         { name: t('advanced_analytics'), href: 'analytics', icon: ChartBarIcon, show: isStaffRole },
-        { name: t('subscription_codes_management'), href: 'subscription-codes', icon: KeyIcon, show: user?.role === 'app_owner' },
-        { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole || user?.role === 'company_admin' },
+        { name: t('subscription_codes_management'), href: 'subscription-codes', icon: KeyIcon, show: activeRole === 'app_owner' },
+        { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole || activeRole === 'company_admin' },
       ]
     },
     {

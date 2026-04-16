@@ -2535,3 +2535,40 @@ async def startup_db_client():
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+
+# ==================== SPA CATCH-ALL ====================
+# Serve React frontend build for production deployment
+# This must be the LAST route to not interfere with API routes
+import os as _os
+_frontend_build = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "frontend", "build")
+
+if _os.path.exists(_frontend_build):
+    from fastapi.responses import FileResponse as _FileResponse
+
+    # Serve static assets from build
+    app.mount("/static", StaticFiles(directory=_os.path.join(_frontend_build, "static")), name="frontend_static")
+
+    # Serve other build files (manifest, icons, etc.)
+    @app.get("/manifest.json")
+    @app.get("/favicon.ico")
+    @app.get("/logo192.png")
+    @app.get("/logo512.png")
+    @app.get("/robots.txt")
+    @app.get("/ads.txt")
+    async def serve_build_file(request: Request):
+        file_path = _os.path.join(_frontend_build, request.url.path.lstrip("/"))
+        if _os.path.exists(file_path):
+            return _FileResponse(file_path)
+        raise HTTPException(404)
+
+    # SPA catch-all: serve index.html for any non-API route
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        # Don't catch API routes or upload routes
+        if full_path.startswith("api/") or full_path.startswith("uploads/"):
+            raise HTTPException(404)
+        index_path = _os.path.join(_frontend_build, "index.html")
+        if _os.path.exists(index_path):
+            return _FileResponse(index_path, media_type="text/html")
+        raise HTTPException(404, "Frontend build not found")

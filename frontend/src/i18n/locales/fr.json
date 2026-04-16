@@ -3104,5 +3104,14 @@
   "cl_activate": "Activé",
   "cl_coupon": "Coupon",
   "cl_price": "Modification Prix",
-  "cl_extend": "Extension"
+  "cl_extend": "Extension",
+  "sa_test_email": "Tester l'Email",
+  "sa_send_custom": "Email Personnalisé",
+  "sa_email_to": "Email du Destinataire",
+  "sa_send_all": "Envoyer à Tous",
+  "sa_email_subject": "Sujet",
+  "sa_email_message": "Texte du message...",
+  "sa_send_email_btn": "Envoyer",
+  "sa_fill_fields": "Sujet et message requis",
+  "sa_email_required": "Entrez un email ou sélectionnez envoyer à tous"
 }

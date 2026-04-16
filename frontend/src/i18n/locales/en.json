@@ -3347,5 +3347,14 @@
   "cl_activate": "Activated",
   "cl_coupon": "Coupon",
   "cl_price": "Price Update",
-  "cl_extend": "Extension"
+  "cl_extend": "Extension",
+  "sa_test_email": "Test Email",
+  "sa_send_custom": "Send Custom Email",
+  "sa_email_to": "Recipient Email",
+  "sa_send_all": "Send to All",
+  "sa_email_subject": "Subject",
+  "sa_email_message": "Message text...",
+  "sa_send_email_btn": "Send Email",
+  "sa_fill_fields": "Subject and message are required",
+  "sa_email_required": "Enter email or select send to all"
 }

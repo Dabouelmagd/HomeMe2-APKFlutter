@@ -2878,5 +2878,15 @@
   "cl_activate": "تفعيل",
   "cl_coupon": "كوبون خصم",
   "cl_price": "تعديل سعر",
-  "cl_extend": "تمديد"
+  "cl_extend": "تمديد",
+  "sa_test_email": "اختبار البريد",
+  "sa_send_reminders": "إرسال التذكيرات الآن",
+  "sa_send_custom": "إرسال بريد مخصص",
+  "sa_email_to": "البريد الإلكتروني للمستلم",
+  "sa_send_all": "إرسال للكل",
+  "sa_email_subject": "الموضوع",
+  "sa_email_message": "نص الرسالة...",
+  "sa_send_email_btn": "إرسال البريد",
+  "sa_fill_fields": "الموضوع والرسالة مطلوبين",
+  "sa_email_required": "أدخل البريد أو اختر إرسال للكل"
 }

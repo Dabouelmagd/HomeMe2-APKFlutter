@@ -270,3 +270,82 @@ async def get_email_settings(current_user: dict = Depends(require_super_admin)):
         "from_name": os.environ.get("SMTP_FROM_NAME", "HomeMe"),
         "languages": ["ar", "en", "fr"]
     }
+
+
+@router.post("/notifications/send-custom-email")
+async def send_custom_email(body: dict, current_user: dict = Depends(require_super_admin)):
+    """Send a custom email to specific user or all users with email"""
+    db = get_db()
+    to_email = body.get("to_email", "")
+    subject = body.get("subject", "")
+    message = body.get("message", "")
+    send_to_all = body.get("send_to_all", False)
+
+    if not subject or not message:
+        raise HTTPException(400, "الموضوع والرسالة مطلوبين")
+
+    if not to_email and not send_to_all:
+        raise HTTPException(400, "البريد الإلكتروني مطلوب أو اختر إرسال للكل")
+
+    html = f"""<div dir="rtl" style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc;">
+      <div style="background: linear-gradient(135deg, #2563eb, #4f46e5); padding: 30px; text-align: center;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">HomeMe</h1>
+        <p style="color: #dbeafe; margin: 8px 0 0;">إدارة المجتمعات السكنية</p>
+      </div>
+      <div style="padding: 30px; background: white;">
+        <h2 style="color: #1e293b; margin: 0 0 15px;">{subject}</h2>
+        <div style="color: #475569; font-size: 15px; line-height: 1.8; white-space: pre-wrap;">{message}</div>
+      </div>
+      <div style="padding: 20px; text-align: center; background: #f8fafc; border-top: 1px solid #e2e8f0;">
+        <p style="color: #94a3b8; font-size: 12px; margin: 0;">HomeMe | info@datalifeai.com</p>
+      </div>
+    </div>"""
+
+    sent_count = 0
+    failed = []
+
+    if send_to_all:
+        users = await db.users.find({"email": {"$exists": True, "$ne": ""}}, {"_id": 0, "email": 1}).to_list(5000)
+        emails = list(set(u["email"] for u in users if u.get("email")))
+        for email in emails:
+            try:
+                await email_service.send_email(email, f"{subject} - HomeMe", html)
+                sent_count += 1
+            except Exception as e:
+                failed.append(email)
+                logging.error(f"Failed to send to {email}: {e}")
+    else:
+        try:
+            await email_service.send_email(to_email, f"{subject} - HomeMe", html)
+            sent_count = 1
+        except Exception as e:
+            raise HTTPException(500, f"فشل إرسال البريد: {str(e)}")
+
+    return {
+        "message": f"تم إرسال {sent_count} بريد إلكتروني" + (f" | فشل: {len(failed)}" if failed else ""),
+        "sent": sent_count,
+        "failed": len(failed)
+    }
+
+
+@router.post("/notifications/test-email")
+async def test_email_connection(current_user: dict = Depends(require_super_admin)):
+    """Test SMTP connection by sending to the configured email"""
+    import os
+    from_email = os.environ.get("SMTP_FROM_EMAIL", "")
+
+    html = """<div dir="rtl" style="font-family: Arial; max-width: 600px; margin: 0 auto;">
+      <div style="background: linear-gradient(135deg, #2563eb, #4f46e5); padding: 30px; text-align: center;">
+        <h1 style="color: white;">HomeMe</h1>
+      </div>
+      <div style="padding: 30px; background: white; text-align: center;">
+        <h2 style="color: #16a34a;">البريد الإلكتروني يعمل بنجاح!</h2>
+        <p style="color: #64748b;">هذا بريد اختباري من منصة HomeMe</p>
+      </div>
+    </div>"""
+
+    try:
+        await email_service.send_email(from_email, "HomeMe - اختبار البريد الإلكتروني", html)
+        return {"status": "ok", "message": f"تم إرسال بريد اختباري إلى {from_email}"}
+    except Exception as e:
+        raise HTTPException(500, f"فشل الاتصال: {str(e)}")

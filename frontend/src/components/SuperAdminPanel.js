@@ -952,19 +952,85 @@ const SuperAdminPanel = () => {
           <div data-testid="analytics-tab">
             {/* Email Notifications */}
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="font-bold text-white">{t('sa_email_notif', 'إشعارات البريد الإلكتروني')}</h3>
-                  <p className="text-xs text-gray-400 mt-1">{t('sa_send_from')} info@datalifeai.com</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('sa_send_from', 'الإرسال من')} info@datalifeai.com</p>
                 </div>
-                <button onClick={async () => {
-                  try {
-                    const res = await axios.post(`${API}/notifications/send-reminders`, {}, getToken());
-                    toast.success(res.data.message);
-                  } catch { toast.error(t('sp_send_failed', 'فشل في الإرسال')); }
-                }} className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500" data-testid="send-reminders-btn">
-                  إرسال التذكيرات الآن
-                </button>
+                <div className="flex items-center gap-2">
+                  <button onClick={async () => {
+                    try {
+                      const res = await axios.post(`${API}/notifications/test-email`, {}, getToken());
+                      toast.success(res.data.message);
+                    } catch { toast.error(t('sp_send_failed', 'فشل في الإرسال')); }
+                  }} className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg text-xs font-medium hover:bg-gray-600" data-testid="test-email-btn">
+                    {t('sa_test_email', 'اختبار البريد')}
+                  </button>
+                  <button onClick={async () => {
+                    try {
+                      const res = await axios.post(`${API}/notifications/send-reminders`, {}, getToken());
+                      toast.success(res.data.message);
+                    } catch { toast.error(t('sp_send_failed', 'فشل في الإرسال')); }
+                  }} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-500" data-testid="send-reminders-btn">
+                    {t('sa_send_reminders', 'إرسال التذكيرات الآن')}
+                  </button>
+                </div>
+              </div>
+
+              {/* Custom Email Form */}
+              <div className="border-t border-gray-700 pt-4">
+                <h4 className="text-sm font-semibold text-gray-300 mb-3">{t('sa_send_custom', 'إرسال بريد مخصص')}</h4>
+                <div className="space-y-3">
+                  <div className="flex gap-3">
+                    <input
+                      id="custom-email-to"
+                      type="email"
+                      placeholder={t('sa_email_to', 'البريد الإلكتروني للمستلم')}
+                      className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500"
+                      data-testid="custom-email-to"
+                    />
+                    <label className="flex items-center gap-1.5 cursor-pointer text-xs text-gray-400 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        id="send-to-all"
+                        className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-900 text-blue-500"
+                        data-testid="send-to-all"
+                      />
+                      {t('sa_send_all', 'إرسال للكل')}
+                    </label>
+                  </div>
+                  <input
+                    id="custom-email-subject"
+                    type="text"
+                    placeholder={t('sa_email_subject', 'الموضوع')}
+                    className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500"
+                    data-testid="custom-email-subject"
+                  />
+                  <textarea
+                    id="custom-email-message"
+                    rows="3"
+                    placeholder={t('sa_email_message', 'نص الرسالة...')}
+                    className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 resize-none"
+                    data-testid="custom-email-message"
+                  ></textarea>
+                  <button onClick={async () => {
+                    const to = document.getElementById('custom-email-to')?.value || '';
+                    const subject = document.getElementById('custom-email-subject')?.value || '';
+                    const message = document.getElementById('custom-email-message')?.value || '';
+                    const sendAll = document.getElementById('send-to-all')?.checked || false;
+                    if (!subject || !message) { toast.error(t('sa_fill_fields', 'الموضوع والرسالة مطلوبين')); return; }
+                    if (!to && !sendAll) { toast.error(t('sa_email_required', 'أدخل البريد أو اختر إرسال للكل')); return; }
+                    try {
+                      const res = await axios.post(`${API}/notifications/send-custom-email`, { to_email: to, subject, message, send_to_all: sendAll }, getToken());
+                      toast.success(res.data.message);
+                      document.getElementById('custom-email-to').value = '';
+                      document.getElementById('custom-email-subject').value = '';
+                      document.getElementById('custom-email-message').value = '';
+                    } catch(err) { toast.error(err.response?.data?.detail || t('sp_send_failed', 'فشل في الإرسال')); }
+                  }} className="w-full px-4 py-2.5 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500" data-testid="send-custom-email-btn">
+                    {t('sa_send_email_btn', 'إرسال البريد')}
+                  </button>
+                </div>
               </div>
             </div>
 

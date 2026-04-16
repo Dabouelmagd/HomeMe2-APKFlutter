@@ -18,6 +18,7 @@ import {
   PhoneIcon,
   CalendarIcon,
   FunnelIcon,
+  TicketIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -32,6 +33,9 @@ const CompanySubscriptions = () => {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [expandedCompany, setExpandedCompany] = useState(null);
+  const [actionModal, setActionModal] = useState(null); // {companyId, type}
+  const [modalValue, setModalValue] = useState('');
+  const [modalNote, setModalNote] = useState('');
 
   const fetchData = useCallback(async () => {
     try {
@@ -273,25 +277,43 @@ const CompanySubscriptions = () => {
                         <button
                           onClick={() => handleAction(company.id, 'renew', { months: 12 })}
                           className="w-full flex items-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-500 transition-colors"
+                          data-testid={`renew-year-${company.id}`}
                         >
                           <ArrowPathIcon className="w-4 h-4" />
                           {t('cs_renew_year', 'تجديد لسنة')}
                         </button>
 
-                        <div className="grid grid-cols-2 gap-2">
-                          <button
-                            onClick={() => handleAction(company.id, 'renew', { months: 6 })}
-                            className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200"
-                          >
+                        <div className="grid grid-cols-3 gap-2">
+                          <button onClick={() => handleAction(company.id, 'renew', { months: 6 })}
+                            className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200">
                             {t('cs_renew_6m', 'تجديد 6 شهور')}
                           </button>
-                          <button
-                            onClick={() => handleAction(company.id, 'renew', { months: 3 })}
-                            className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200"
-                          >
+                          <button onClick={() => handleAction(company.id, 'renew', { months: 3 })}
+                            className="flex items-center justify-center gap-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200">
                             {t('cs_renew_3m', 'تجديد 3 شهور')}
                           </button>
+                          <button onClick={() => { setActionModal({ companyId: company.id, type: 'extend' }); setModalValue('30'); setModalNote(''); }}
+                            className="flex items-center justify-center gap-1 px-3 py-2 bg-purple-100 text-purple-700 rounded-lg text-xs font-medium hover:bg-purple-200">
+                            {t('cs_custom_extend', 'تمديد مخصص')}
+                          </button>
                         </div>
+
+                        {/* Apply Coupon */}
+                        <button onClick={() => { setActionModal({ companyId: company.id, type: 'coupon' }); setModalValue(''); }}
+                          className="w-full flex items-center gap-2 px-4 py-2.5 bg-pink-50 text-pink-700 rounded-lg text-sm font-medium hover:bg-pink-100 border border-pink-200 transition-colors"
+                          data-testid={`apply-coupon-${company.id}`}>
+                          <TicketIcon className="w-4 h-4" />
+                          {t('cs_apply_coupon', 'تطبيق كوبون خصم')}
+                        </button>
+
+                        {/* Update Price */}
+                        <button onClick={() => { setActionModal({ companyId: company.id, type: 'price' }); setModalValue(String(company.plan_price || 0)); setModalNote(''); }}
+                          className="w-full flex items-center gap-2 px-4 py-2.5 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-100 border border-amber-200 transition-colors"
+                          data-testid={`update-price-${company.id}`}>
+                          <CurrencyDollarIcon className="w-4 h-4" />
+                          {t('cs_update_price', 'تعديل السعر')}
+                          <span className="ms-auto text-xs text-amber-500">{(company.plan_price || 0).toLocaleString()} {t('sm_egp', 'ج.م')}</span>
+                        </button>
 
                         {company.is_active ? (
                           <button
@@ -302,10 +324,8 @@ const CompanySubscriptions = () => {
                             {t('cs_suspend', 'إيقاف الاشتراك')}
                           </button>
                         ) : (
-                          <button
-                            onClick={() => handleAction(company.id, 'activate')}
-                            className="w-full flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-medium hover:bg-emerald-100 border border-emerald-200 transition-colors"
-                          >
+                          <button onClick={() => handleAction(company.id, 'activate')}
+                            className="w-full flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-medium hover:bg-emerald-100 border border-emerald-200 transition-colors">
                             <CheckCircleIcon className="w-4 h-4" />
                             {t('cs_activate', 'تفعيل الاشتراك')}
                           </button>
@@ -314,16 +334,23 @@ const CompanySubscriptions = () => {
                         {/* Change Plan */}
                         <div className="pt-2 border-t border-gray-200">
                           <label className="block text-xs text-gray-500 mb-1">{t('cs_change_plan', 'تغيير الخطة')}</label>
-                          <select
-                            value={company.plan}
+                          <select value={company.plan}
                             onChange={e => handleAction(company.id, 'change_plan', { plan: e.target.value })}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
-                          >
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:outline-none">
                             <option value="company_startup">{planLabels.company_startup}</option>
                             <option value="company_business">{planLabels.company_business}</option>
                             <option value="company_enterprise">{planLabels.company_enterprise}</option>
                           </select>
                         </div>
+
+                        {/* Applied Coupon Info */}
+                        {company.applied_coupon && (
+                          <div className="mt-1 px-3 py-2 bg-pink-50 rounded-lg text-xs text-pink-600 flex items-center gap-1">
+                            <TicketIcon className="w-3 h-3" />
+                            {t('cs_coupon_applied', 'كوبون مطبّق')}: <strong>{company.applied_coupon}</strong>
+                            {company.discount_desc && <span className="text-pink-400 ms-1">({company.discount_desc})</span>}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -331,6 +358,74 @@ const CompanySubscriptions = () => {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Action Modal */}
+      {actionModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setActionModal(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-md p-6 space-y-4 shadow-xl" dir={isRTL ? 'rtl' : 'ltr'} onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-gray-900">
+              {actionModal.type === 'coupon' && t('cs_apply_coupon', 'تطبيق كوبون خصم')}
+              {actionModal.type === 'price' && t('cs_update_price', 'تعديل السعر')}
+              {actionModal.type === 'extend' && t('cs_custom_extend', 'تمديد مخصص')}
+            </h3>
+
+            {actionModal.type === 'coupon' && (
+              <div>
+                <label className="block text-sm text-gray-600 mb-1">{t('cs_coupon_code', 'كود الكوبون')}</label>
+                <input value={modalValue} onChange={e => setModalValue(e.target.value.toUpperCase())}
+                  placeholder="WELCOME20" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none uppercase"
+                  data-testid="modal-coupon-input" />
+              </div>
+            )}
+
+            {actionModal.type === 'price' && (
+              <>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">{t('cs_new_price', 'السعر الجديد (ج.م)')}</label>
+                  <input type="number" min="0" value={modalValue} onChange={e => setModalValue(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+                    data-testid="modal-price-input" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">{t('cs_note', 'ملاحظة (اختياري)')}</label>
+                  <input value={modalNote} onChange={e => setModalNote(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none" />
+                </div>
+              </>
+            )}
+
+            {actionModal.type === 'extend' && (
+              <>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">{t('cs_days_count', 'عدد الأيام')}</label>
+                  <input type="number" min="1" value={modalValue} onChange={e => setModalValue(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+                    data-testid="modal-days-input" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">{t('cs_note', 'ملاحظة (اختياري)')}</label>
+                  <input value={modalNote} onChange={e => setModalNote(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none" />
+                </div>
+              </>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button onClick={() => {
+                if (actionModal.type === 'coupon') handleAction(actionModal.companyId, 'apply_coupon', { coupon_code: modalValue });
+                if (actionModal.type === 'price') handleAction(actionModal.companyId, 'update_price', { price: parseFloat(modalValue), note: modalNote });
+                if (actionModal.type === 'extend') handleAction(actionModal.companyId, 'extend', { days: parseInt(modalValue), note: modalNote });
+                setActionModal(null);
+              }}
+                disabled={!modalValue.trim()}
+                className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500 disabled:opacity-40 transition-colors"
+                data-testid="modal-confirm">{t('cs_confirm', 'تأكيد')}</button>
+              <button onClick={() => setActionModal(null)}
+                className="px-4 py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">{t('cs_cancel', 'إلغاء')}</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

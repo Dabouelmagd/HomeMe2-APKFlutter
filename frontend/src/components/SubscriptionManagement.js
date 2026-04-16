@@ -25,6 +25,7 @@ export default function SubscriptionManagement() {
   const [invoices, setInvoices] = useState([]);
   const [invoiceStats, setInvoiceStats] = useState({});
   const [showHistory, setShowHistory] = useState(false);
+  const [changelog, setChangelog] = useState([]);
 
   const fetchSub = useCallback(async () => {
     try {
@@ -40,7 +41,14 @@ export default function SubscriptionManagement() {
     } catch { /* */ }
   }, []);
 
-  useEffect(() => { fetchSub(); fetchMethods(); fetchInvoices(); }, [fetchSub, fetchMethods]);
+  useEffect(() => { fetchSub(); fetchMethods(); fetchInvoices(); fetchChangelog(); }, [fetchSub, fetchMethods]);
+
+  const fetchChangelog = async () => {
+    try {
+      const res = await axios.get(`${API}/owner/subscription-changelog`, getToken());
+      setChangelog(res.data.logs || []);
+    } catch { /* */ }
+  };
 
   const fetchInvoices = async () => {
     try {
@@ -305,6 +313,51 @@ export default function SubscriptionManagement() {
                 <p className="text-xs mt-1">{t('sub_auto_invoices', 'سيتم إنشاء الفواتير تلقائياً عند كل عملية دفع')}</p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Subscription Changelog from Owner */}
+        {changelog.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden" data-testid="sub-changelog">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h3 className="font-bold text-gray-900">{t('sub_changelog', 'سجل تعديلات الاشتراك')}</h3>
+              <p className="text-xs text-gray-500 mt-0.5">{t('sub_changelog_desc', 'التعديلات التي أجراها مالك التطبيق على اشتراككم')}</p>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {changelog.map((log, idx) => {
+                const actionLabels = {
+                  change_plan: t('cl_change_plan', 'تغيير الخطة'),
+                  renew: t('cl_renew', 'تجديد'),
+                  suspend: t('cl_suspend', 'إيقاف'),
+                  activate: t('cl_activate', 'تفعيل'),
+                  apply_coupon: t('cl_coupon', 'كوبون خصم'),
+                  update_price: t('cl_price', 'تعديل سعر'),
+                  extend: t('cl_extend', 'تمديد'),
+                };
+                const actionColors = {
+                  change_plan: 'bg-blue-100 text-blue-700',
+                  renew: 'bg-green-100 text-green-700',
+                  suspend: 'bg-red-100 text-red-700',
+                  activate: 'bg-emerald-100 text-emerald-700',
+                  apply_coupon: 'bg-pink-100 text-pink-700',
+                  update_price: 'bg-amber-100 text-amber-700',
+                  extend: 'bg-purple-100 text-purple-700',
+                };
+                return (
+                  <div key={idx} className="px-6 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${actionColors[log.action] || 'bg-gray-100 text-gray-600'}`}>
+                        {actionLabels[log.action] || log.action}
+                      </span>
+                      <span className="text-sm text-gray-700">{log.description}</span>
+                    </div>
+                    <span className="text-xs text-gray-400 whitespace-nowrap">
+                      {new Date(log.performed_at).toLocaleDateString('ar-EG')}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

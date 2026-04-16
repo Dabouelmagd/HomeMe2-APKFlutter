@@ -14,6 +14,53 @@ from helpers import serialize_datetime
 router = APIRouter(prefix="/api")
 
 
+async def _log_sub_change(db, company_id, user, action, description, details=None):
+    """Log subscription changes for audit trail"""
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0, "name": 1})
+    log = {
+        "id": str(uuid.uuid4()),
+        "company_id": company_id,
+        "company_name": company.get("name", "") if company else "",
+        "action": action,
+        "description": description,
+        "details": details or {},
+        "performed_by": user.get("id", ""),
+        "performed_by_name": user.get("full_name", user.get("username", "")),
+        "performed_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.subscription_changelog.insert_one(log)
+
+
+@router.get("/owner/subscription-changelog")
+async def get_subscription_changelog(
+    company_id: str = "",
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get subscription change log - visible to owner and compound admins"""
+    db = get_db()
+    query = {}
+
+    role = current_user.get("role", "")
+    if role in ["app_owner", "super_admin"]:
+        if company_id:
+            query["company_id"] = company_id
+    else:
+        # Compound admins can only see their own company changes
+        user_compound = current_user.get("compound_id", "")
+        if user_compound:
+            cc = await db.compound_companies.find_one({"compound_id": user_compound}, {"_id": 0, "company_id": 1})
+            if cc:
+                query["company_id"] = cc["company_id"]
+            else:
+                return {"logs": []}
+        else:
+            return {"logs": []}
+
+    logs = await db.subscription_changelog.find(query, {"_id": 0}).sort("performed_at", -1).to_list(limit)
+    return {"logs": logs}
+
+
 @router.get("/owner/company-subscriptions")
 async def get_company_subscriptions(
     search: str = "",
@@ -114,6 +161,8 @@ async def get_company_subscriptions(
             "total_residents": total_residents,
             "total_families": total_families,
             "compounds": [{"id": c.get("id", c.get("compound_id", "")), "name": c.get("name", "")} for c in compounds],
+            "applied_coupon": sub.get("applied_coupon", "") if sub else "",
+            "discount_desc": sub.get("discount_desc", "") if sub else "",
         }
         results.append(serialize_datetime(entry))
 
@@ -158,10 +207,13 @@ async def update_company_subscription(
         new_plan = body.get("plan")
         if not new_plan:
             raise HTTPException(400, "Plan is required")
+        sub = await db.company_subscriptions.find_one({"company_id": company_id}, {"_id": 0})
+        old_plan = sub.get("plan", "starter") if sub else "starter"
         await db.company_subscriptions.update_one(
             {"company_id": company_id},
             {"$set": {"plan": new_plan, "updated_at": datetime.now(timezone.utc)}}
         )
+        await _log_sub_change(db, company_id, current_user, "change_plan", f"تغيير الخطة من {old_plan} إلى {new_plan}", {"old_plan": old_plan, "new_plan": new_plan})
         return {"status": "ok", "message": "Plan updated"}
 
     elif action == "renew":
@@ -174,6 +226,7 @@ async def update_company_subscription(
                 "updated_at": datetime.now(timezone.utc)
             }}
         )
+        await _log_sub_change(db, company_id, current_user, "renew", f"تجديد {months} شهر", {"months": months})
         return {"status": "ok", "message": f"Renewed for {months} months"}
 
     elif action == "suspend":
@@ -181,6 +234,7 @@ async def update_company_subscription(
             {"company_id": company_id},
             {"$set": {"status": "cancelled", "updated_at": datetime.now(timezone.utc)}}
         )
+        await _log_sub_change(db, company_id, current_user, "suspend", "إيقاف الاشتراك")
         return {"status": "ok", "message": "Subscription suspended"}
 
     elif action == "activate":
@@ -192,7 +246,82 @@ async def update_company_subscription(
                 "updated_at": datetime.now(timezone.utc)
             }}
         )
+        await _log_sub_change(db, company_id, current_user, "activate", "Subscription activated")
         return {"status": "ok", "message": "Subscription activated"}
+
+    elif action == "apply_coupon":
+        coupon_code = body.get("coupon_code", "").strip().upper()
+        if not coupon_code:
+            raise HTTPException(400, "Coupon code is required")
+        coupon = await db.coupons.find_one({"code": coupon_code, "is_active": True}, {"_id": 0})
+        if not coupon:
+            raise HTTPException(404, "كوبون غير صالح أو غير نشط")
+        if coupon.get("max_uses", 100) <= coupon.get("times_used", 0):
+            raise HTTPException(400, "الكوبون وصل الحد الأقصى للاستخدام")
+
+        sub = await db.company_subscriptions.find_one({"company_id": company_id}, {"_id": 0})
+        discount_type = coupon.get("discount_type", "percentage")
+        discount_value = coupon.get("discount_value", 0)
+        old_price = sub.get("plan_price", 0) if sub else 0
+
+        if discount_type == "percentage":
+            new_price = max(0, old_price - (old_price * discount_value / 100))
+            desc = f"خصم {discount_value}% بكوبون {coupon_code}"
+        else:
+            new_price = max(0, old_price - discount_value)
+            desc = f"خصم {discount_value} بكوبون {coupon_code}"
+
+        await db.company_subscriptions.update_one(
+            {"company_id": company_id},
+            {"$set": {
+                "plan_price": new_price,
+                "applied_coupon": coupon_code,
+                "discount_desc": desc,
+                "updated_at": datetime.now(timezone.utc)
+            }}
+        )
+        await db.coupons.update_one({"code": coupon_code}, {"$inc": {"times_used": 1}})
+        await _log_sub_change(db, company_id, current_user, "apply_coupon", desc, {"coupon": coupon_code, "old_price": old_price, "new_price": new_price})
+        return {"status": "ok", "message": desc, "new_price": new_price}
+
+    elif action == "update_price":
+        new_price = body.get("price")
+        if new_price is None or new_price < 0:
+            raise HTTPException(400, "Invalid price")
+        note = body.get("note", "")
+        sub = await db.company_subscriptions.find_one({"company_id": company_id}, {"_id": 0})
+        old_price = sub.get("plan_price", 0) if sub else 0
+        await db.company_subscriptions.update_one(
+            {"company_id": company_id},
+            {"$set": {"plan_price": new_price, "updated_at": datetime.now(timezone.utc)}}
+        )
+        await _log_sub_change(db, company_id, current_user, "update_price", f"تعديل السعر من {old_price} إلى {new_price}" + (f" - {note}" if note else ""), {"old_price": old_price, "new_price": new_price})
+        return {"status": "ok", "message": f"Price updated to {new_price}"}
+
+    elif action == "extend":
+        days = body.get("days", 30)
+        if days <= 0:
+            raise HTTPException(400, "Invalid days")
+        note = body.get("note", "")
+        sub = await db.company_subscriptions.find_one({"company_id": company_id}, {"_id": 0})
+        end_raw = sub.get("current_period_end") if sub else None
+        if isinstance(end_raw, str):
+            try:
+                end_date = datetime.fromisoformat(end_raw.replace("Z", "+00:00"))
+            except Exception:
+                end_date = datetime.now(timezone.utc)
+        elif isinstance(end_raw, datetime):
+            end_date = end_raw if end_raw.tzinfo else end_raw.replace(tzinfo=timezone.utc)
+        else:
+            end_date = datetime.now(timezone.utc)
+
+        new_end = end_date + timedelta(days=days)
+        await db.company_subscriptions.update_one(
+            {"company_id": company_id},
+            {"$set": {"current_period_end": new_end, "status": "active", "updated_at": datetime.now(timezone.utc)}}
+        )
+        await _log_sub_change(db, company_id, current_user, "extend", f"تمديد {days} يوم" + (f" - {note}" if note else ""), {"days": days})
+        return {"status": "ok", "message": f"Extended by {days} days"}
 
     else:
         raise HTTPException(400, f"Unknown action: {action}")

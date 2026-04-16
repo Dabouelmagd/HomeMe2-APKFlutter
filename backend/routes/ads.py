@@ -529,6 +529,358 @@ async def get_financial_ad_analytics(period: str = "monthly", current_user: dict
     }
 
 
+@router.get("/ads/analytics/compare")
+async def compare_ad_periods(
+    period1_start: str = "", period1_end: str = "",
+    period2_start: str = "", period2_end: str = "",
+    current_user: dict = Depends(require_super_admin)
+):
+    """Compare ad performance between two time periods"""
+    db = get_db()
+    now = datetime.now(timezone.utc)
+
+    # Default: this month vs last month
+    if not period1_start:
+        first_of_month = now.replace(day=1)
+        period1_start = first_of_month.strftime("%Y-%m-%d")
+        period1_end = now.strftime("%Y-%m-%d")
+        last_month_end = first_of_month - timedelta(days=1)
+        last_month_start = last_month_end.replace(day=1)
+        period2_start = last_month_start.strftime("%Y-%m-%d")
+        period2_end = last_month_end.strftime("%Y-%m-%d")
+
+    ads = await db.internal_ads.find({}, {"_id": 0}).to_list(500)
+    events = await db.ad_events.find({}, {"_id": 0}).to_list(20000)
+
+    def calc_period(start, end):
+        p_events = [e for e in events if start <= e.get("timestamp", "")[:10] <= end]
+        p_clicks = len(p_events)
+        # Ads created in this period
+        p_ads = [a for a in ads if start <= a.get("created_at", "")[:10] <= end]
+        p_revenue = sum(a.get("ad_value", 0) for a in p_ads if not a.get("is_gift"))
+        p_new_ads = len(p_ads)
+        # All active ads during period
+        active_in_period = [a for a in ads if
+            (not a.get("start_date") or a.get("start_date", "") <= end) and
+            (not a.get("end_date") or a.get("end_date", "") >= start)]
+        p_views = sum(a.get("views", 0) for a in active_in_period)
+        p_ctr = round((p_clicks / max(p_views, 1)) * 100, 2)
+        return {
+            "start": start, "end": end,
+            "clicks": p_clicks, "views": p_views, "ctr": p_ctr,
+            "revenue": p_revenue, "new_ads": p_new_ads,
+            "active_ads": len(active_in_period),
+        }
+
+    p1 = calc_period(period1_start, period1_end)
+    p2 = calc_period(period2_start, period2_end)
+
+    # Calculate changes
+    def pct_change(new, old):
+        if old == 0:
+            return 100.0 if new > 0 else 0
+        return round(((new - old) / old) * 100, 1)
+
+    changes = {
+        "clicks": pct_change(p1["clicks"], p2["clicks"]),
+        "views": pct_change(p1["views"], p2["views"]),
+        "ctr": round(p1["ctr"] - p2["ctr"], 2),
+        "revenue": pct_change(p1["revenue"], p2["revenue"]),
+        "new_ads": pct_change(p1["new_ads"], p2["new_ads"]),
+    }
+
+    return {"period1": p1, "period2": p2, "changes": changes}
+
+
+@router.get("/ads/analytics/export")
+async def export_ad_analytics(format: str = "excel", current_user: dict = Depends(require_super_admin)):
+    """Export ad analytics as Excel or CSV"""
+    from fastapi.responses import StreamingResponse
+    import io
+
+    db = get_db()
+    ads = await db.internal_ads.find({}, {"_id": 0}).to_list(500)
+
+    pos_labels = {"banner": "بانر", "sidebar": "جانبي", "inline": "داخلي", "dashboard": "لوحة التحكم"}
+
+    if format == "csv":
+        output = io.StringIO()
+        output.write('\ufeff')  # BOM for Arabic support
+        output.write("العنوان,الموقع,المشاهدات,النقرات,CTR%,القيمة,هدية,الحالة,تاريخ الإنشاء\n")
+        for a in ads:
+            views = a.get("views", 0)
+            clicks = a.get("clicks", 0)
+            ctr = round((clicks / max(views, 1)) * 100, 2)
+            pos = pos_labels.get(a.get("position", ""), a.get("position", ""))
+            gift = "نعم" if a.get("is_gift") else "لا"
+            status = "نشط" if a.get("is_active") else "متوقف"
+            output.write(f'"{a.get("title","")}","{pos}",{views},{clicks},{ctr},{a.get("ad_value",0)},{gift},{status},"{a.get("created_at","")[:10]}"\n')
+
+        # Summary
+        total_rev = sum(a.get("ad_value", 0) for a in ads if not a.get("is_gift"))
+        total_views = sum(a.get("views", 0) for a in ads)
+        total_clicks = sum(a.get("clicks", 0) for a in ads)
+        output.write(f'\n"الملخص",,{total_views},{total_clicks},{round((total_clicks/max(total_views,1))*100,2)},{total_rev},,,""\n')
+
+        content = output.getvalue().encode('utf-8-sig')
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type="text/csv; charset=utf-8",
+            headers={"Content-Disposition": "attachment; filename=ad_analytics_report.csv"}
+        )
+
+    # Excel format
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+
+    wb = Workbook()
+
+    # Sheet 1: All Ads
+    ws = wb.active
+    ws.title = "الإعلانات"
+    ws.sheet_view.rightToLeft = True
+
+    header_font = Font(bold=True, color="FFFFFF", size=11)
+    header_fill = PatternFill(start_color="1F2937", end_color="1F2937", fill_type="solid")
+    green_fill = PatternFill(start_color="D1FAE5", end_color="D1FAE5", fill_type="solid")
+    red_fill = PatternFill(start_color="FEE2E2", end_color="FEE2E2", fill_type="solid")
+    thin_border = Border(
+        left=Side(style='thin'), right=Side(style='thin'),
+        top=Side(style='thin'), bottom=Side(style='thin')
+    )
+
+    headers = ["العنوان", "الموقع", "المشاهدات", "النقرات", "CTR%", "القيمة (ج.م)", "هدية", "الحالة", "تاريخ الإنشاء"]
+    for col, h in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=h)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal='center')
+        cell.border = thin_border
+
+    for i, a in enumerate(ads, 2):
+        views = a.get("views", 0)
+        clicks = a.get("clicks", 0)
+        ctr = round((clicks / max(views, 1)) * 100, 2)
+        row_data = [
+            a.get("title", ""),
+            pos_labels.get(a.get("position", ""), a.get("position", "")),
+            views, clicks, ctr,
+            a.get("ad_value", 0),
+            "نعم" if a.get("is_gift") else "لا",
+            "نشط" if a.get("is_active") else "متوقف",
+            a.get("created_at", "")[:10]
+        ]
+        for col, val in enumerate(row_data, 1):
+            cell = ws.cell(row=i, column=col, value=val)
+            cell.border = thin_border
+            cell.alignment = Alignment(horizontal='center')
+
+        # Color status
+        status_cell = ws.cell(row=i, column=8)
+        status_cell.fill = green_fill if a.get("is_active") else red_fill
+
+    # Auto-width
+    for col in range(1, len(headers) + 1):
+        ws.column_dimensions[chr(64 + col) if col <= 26 else 'A'].width = 18
+
+    # Sheet 2: Financial Summary
+    ws2 = wb.create_sheet("الملخص المالي")
+    ws2.sheet_view.rightToLeft = True
+
+    paid_ads = [a for a in ads if not a.get("is_gift")]
+    total_revenue = sum(a.get("ad_value", 0) for a in paid_ads)
+    total_clicks_all = sum(a.get("clicks", 0) for a in ads)
+    total_views_all = sum(a.get("views", 0) for a in ads)
+
+    summary_data = [
+        ("إجمالي الإعلانات", len(ads)),
+        ("إعلانات مدفوعة", len(paid_ads)),
+        ("إعلانات هدية", len(ads) - len(paid_ads)),
+        ("إعلانات نشطة", len([a for a in ads if a.get("is_active")])),
+        ("إجمالي الإيرادات (ج.م)", total_revenue),
+        ("متوسط قيمة الإعلان (ج.م)", round(total_revenue / max(len(paid_ads), 1), 2)),
+        ("إجمالي المشاهدات", total_views_all),
+        ("إجمالي النقرات", total_clicks_all),
+        ("متوسط CTR%", round((total_clicks_all / max(total_views_all, 1)) * 100, 2)),
+        ("تكلفة النقرة CPC (ج.م)", round(total_revenue / max(total_clicks_all, 1), 2)),
+        ("الإيرادات المتوقعة سنوياً (ج.م)", sum(a.get("ad_value", 0) for a in paid_ads if a.get("is_active")) * 12),
+    ]
+
+    ws2.cell(row=1, column=1, value="المؤشر").font = header_font
+    ws2.cell(row=1, column=1).fill = header_fill
+    ws2.cell(row=1, column=1).border = thin_border
+    ws2.cell(row=1, column=2, value="القيمة").font = header_font
+    ws2.cell(row=1, column=2).fill = header_fill
+    ws2.cell(row=1, column=2).border = thin_border
+
+    for i, (label, val) in enumerate(summary_data, 2):
+        ws2.cell(row=i, column=1, value=label).border = thin_border
+        cell = ws2.cell(row=i, column=2, value=val)
+        cell.border = thin_border
+        cell.alignment = Alignment(horizontal='center')
+
+    ws2.column_dimensions['A'].width = 35
+    ws2.column_dimensions['B'].width = 20
+
+    # Sheet 3: Revenue by Position
+    ws3 = wb.create_sheet("الإيرادات حسب الموقع")
+    ws3.sheet_view.rightToLeft = True
+    pos_headers = ["الموقع", "عدد الإعلانات", "الإيرادات (ج.م)", "المشاهدات", "النقرات", "CPC (ج.م)"]
+    for col, h in enumerate(pos_headers, 1):
+        cell = ws3.cell(row=1, column=col, value=h)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.border = thin_border
+
+    pos_stats = {}
+    for a in paid_ads:
+        pos = a.get("position", "other")
+        pos_stats.setdefault(pos, {"count": 0, "revenue": 0, "views": 0, "clicks": 0})
+        pos_stats[pos]["count"] += 1
+        pos_stats[pos]["revenue"] += a.get("ad_value", 0)
+        pos_stats[pos]["views"] += a.get("views", 0)
+        pos_stats[pos]["clicks"] += a.get("clicks", 0)
+
+    for i, (pos, s) in enumerate(pos_stats.items(), 2):
+        row = [pos_labels.get(pos, pos), s["count"], s["revenue"], s["views"], s["clicks"],
+               round(s["revenue"] / max(s["clicks"], 1), 2)]
+        for col, val in enumerate(row, 1):
+            cell = ws3.cell(row=i, column=col, value=val)
+            cell.border = thin_border
+            cell.alignment = Alignment(horizontal='center')
+
+    for col in range(1, len(pos_headers) + 1):
+        ws3.column_dimensions[chr(64 + col)].width = 18
+
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=ad_analytics_report.xlsx"}
+    )
+
+
+@router.post("/ads/analytics/send-weekly-report")
+async def send_weekly_ad_report(current_user: dict = Depends(require_super_admin)):
+    """Send weekly ad performance report via email"""
+    from email_service import EmailService
+
+    db = get_db()
+    email_svc = EmailService()
+    now = datetime.now(timezone.utc)
+    week_ago = (now - timedelta(days=7)).isoformat()
+
+    ads = await db.internal_ads.find({}, {"_id": 0}).to_list(500)
+    events = await db.ad_events.find({"timestamp": {"$gte": week_ago}}, {"_id": 0}).to_list(10000)
+
+    total_ads = len(ads)
+    active_ads = len([a for a in ads if a.get("is_active")])
+    total_views = sum(a.get("views", 0) for a in ads)
+    total_clicks = sum(a.get("clicks", 0) for a in ads)
+    week_clicks = len(events)
+    total_revenue = sum(a.get("ad_value", 0) for a in ads if not a.get("is_gift"))
+    avg_ctr = round((total_clicks / max(total_views, 1)) * 100, 2)
+
+    # Top 5 ads by CTR
+    top_ads = sorted(
+        [a for a in ads if a.get("views", 0) > 0],
+        key=lambda x: (x.get("clicks", 0) / max(x.get("views", 0), 1)),
+        reverse=True
+    )[:5]
+
+    top_ads_html = ""
+    for a in top_ads:
+        ctr = round((a.get("clicks", 0) / max(a.get("views", 0), 1)) * 100, 2)
+        top_ads_html += f"""
+        <tr>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;">{a.get('title','')}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">{a.get('views',0):,}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">{a.get('clicks',0):,}</td>
+            <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">{ctr}%</td>
+        </tr>"""
+
+    html = f"""
+    <div dir="rtl" style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;">
+        <div style="background:linear-gradient(135deg,#111827,#1f2937);padding:24px;text-align:center;">
+            <h1 style="color:#fff;margin:0;font-size:20px;">تقرير أداء الإعلانات الأسبوعي</h1>
+            <p style="color:#9ca3af;margin:8px 0 0;font-size:13px;">HomeMe - {now.strftime('%Y-%m-%d')}</p>
+        </div>
+        <div style="padding:24px;">
+            <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+                <div style="flex:1;min-width:120px;background:#ecfdf5;border-radius:10px;padding:16px;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#059669;">{total_revenue:,.0f}</div>
+                    <div style="font-size:11px;color:#6b7280;margin-top:4px;">إيرادات (ج.م)</div>
+                </div>
+                <div style="flex:1;min-width:120px;background:#eff6ff;border-radius:10px;padding:16px;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#2563eb;">{total_views:,}</div>
+                    <div style="font-size:11px;color:#6b7280;margin-top:4px;">مشاهدات</div>
+                </div>
+                <div style="flex:1;min-width:120px;background:#fef3c7;border-radius:10px;padding:16px;text-align:center;">
+                    <div style="font-size:24px;font-weight:900;color:#d97706;">{total_clicks:,}</div>
+                    <div style="font-size:11px;color:#6b7280;margin-top:4px;">نقرات</div>
+                </div>
+            </div>
+            <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:24px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:#6b7280;font-size:13px;">إجمالي الإعلانات</span>
+                    <span style="font-weight:700;">{total_ads}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:#6b7280;font-size:13px;">إعلانات نشطة</span>
+                    <span style="font-weight:700;color:#059669;">{active_ads}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="color:#6b7280;font-size:13px;">نقرات هذا الأسبوع</span>
+                    <span style="font-weight:700;color:#d97706;">{week_clicks}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                    <span style="color:#6b7280;font-size:13px;">متوسط CTR</span>
+                    <span style="font-weight:700;color:#e11d48;">{avg_ctr}%</span>
+                </div>
+            </div>
+            <h3 style="font-size:15px;margin:0 0 12px;">أفضل الإعلانات أداءً</h3>
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <thead>
+                    <tr style="background:#f3f4f6;">
+                        <th style="padding:8px 12px;text-align:right;">الإعلان</th>
+                        <th style="padding:8px 12px;text-align:center;">مشاهدات</th>
+                        <th style="padding:8px 12px;text-align:center;">نقرات</th>
+                        <th style="padding:8px 12px;text-align:center;">CTR</th>
+                    </tr>
+                </thead>
+                <tbody>{top_ads_html}</tbody>
+            </table>
+        </div>
+        <div style="background:#f9fafb;padding:16px;text-align:center;font-size:11px;color:#9ca3af;">
+            هذا تقرير تلقائي من منصة HomeMe - لإيقاف التقارير، تواصل مع الدعم
+        </div>
+    </div>
+    """
+
+    # Send to owner email
+    owner = await db.users.find_one({"role": "app_owner"}, {"_id": 0})
+    to_email = owner.get("email", current_user.get("email", "")) if owner else current_user.get("email", "")
+
+    if not to_email:
+        raise HTTPException(status_code=400, detail="لم يتم العثور على بريد إلكتروني للمالك")
+
+    await email_svc.send_email(to_email, "تقرير أداء الإعلانات الأسبوعي - HomeMe", html)
+
+    return {
+        "message": f"تم إرسال التقرير الأسبوعي إلى {to_email}",
+        "to_email": to_email,
+        "summary": {
+            "total_revenue": total_revenue,
+            "total_views": total_views,
+            "total_clicks": total_clicks,
+            "week_clicks": week_clicks,
+            "avg_ctr": avg_ctr,
+        }
+    }
+
+
 UPLOAD_DIR = "/app/backend/uploads/ads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 

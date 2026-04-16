@@ -24,6 +24,9 @@ import {
   CurrencyDollarIcon,
   SignalIcon,
   CalendarDaysIcon,
+  ArrowDownTrayIcon,
+  EnvelopeIcon,
+  ScaleIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -41,6 +44,9 @@ const AdRealtimeDashboard = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [lastRefresh, setLastRefresh] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [comparison, setComparison] = useState(null);
+  const [sendingReport, setSendingReport] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const intervalRef = useRef(null);
   const prevAlertsRef = useRef([]);
 
@@ -170,15 +176,22 @@ const AdRealtimeDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {[
           { id: 'realtime', label: t('ad_tab_realtime', 'البيانات الحية'), icon: SignalIcon },
           { id: 'financial', label: t('ad_tab_financial', 'التقارير المالية'), icon: BanknotesIcon },
+          { id: 'compare', label: t('ad_tab_compare', 'مقارنة الفترات'), icon: ScaleIcon },
           { id: 'alerts', label: t('ad_tab_alerts', 'التنبيهات'), icon: BellAlertIcon, count: alerts.length },
         ].map(tab => (
           <button
             key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            onClick={() => {
+              setActiveTab(tab.id);
+              if (tab.id === 'compare' && !comparison) {
+                axios.get(`${API}/ads/analytics/compare`, getHeaders())
+                  .then(r => setComparison(r.data)).catch(() => {});
+              }
+            }}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab.id ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/25' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
             data-testid={`tab-${tab.id}`}
           >
@@ -189,6 +202,69 @@ const AdRealtimeDashboard = () => {
             )}
           </button>
         ))}
+
+        {/* Action Buttons */}
+        <div className="flex-1"></div>
+        <button
+          onClick={async () => {
+            setExporting(true);
+            try {
+              const res = await axios.get(`${API}/ads/analytics/export?format=excel`, {
+                ...getHeaders(), responseType: 'blob'
+              });
+              const url = window.URL.createObjectURL(new Blob([res.data]));
+              const a = document.createElement('a'); a.href = url;
+              a.download = 'ad_analytics_report.xlsx';
+              document.body.appendChild(a); a.click(); a.remove();
+              toast.success(t('ad_export_success', 'تم تصدير التقرير بنجاح'));
+            } catch { toast.error(t('ad_export_fail', 'فشل التصدير')); }
+            setExporting(false);
+          }}
+          disabled={exporting}
+          className="flex items-center gap-1.5 px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-500 transition-all disabled:opacity-50"
+          data-testid="export-excel-btn"
+        >
+          <ArrowDownTrayIcon className={`w-3.5 h-3.5 ${exporting ? 'animate-bounce' : ''}`} />
+          {t('ad_export_excel', 'تصدير Excel')}
+        </button>
+        <button
+          onClick={async () => {
+            setExporting(true);
+            try {
+              const res = await axios.get(`${API}/ads/analytics/export?format=csv`, {
+                ...getHeaders(), responseType: 'blob'
+              });
+              const url = window.URL.createObjectURL(new Blob([res.data]));
+              const a = document.createElement('a'); a.href = url;
+              a.download = 'ad_analytics_report.csv';
+              document.body.appendChild(a); a.click(); a.remove();
+              toast.success(t('ad_export_csv_success', 'تم تصدير CSV بنجاح'));
+            } catch { toast.error(t('ad_export_fail', 'فشل التصدير')); }
+            setExporting(false);
+          }}
+          disabled={exporting}
+          className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-500 transition-all disabled:opacity-50"
+          data-testid="export-csv-btn"
+        >
+          <ArrowDownTrayIcon className={`w-3.5 h-3.5 ${exporting ? 'animate-bounce' : ''}`} />
+          CSV
+        </button>
+        <button
+          onClick={async () => {
+            setSendingReport(true);
+            try {
+              const res = await axios.post(`${API}/ads/analytics/send-weekly-report`, {}, getHeaders());
+              toast.success(`${t('ad_report_sent', 'تم إرسال التقرير إلى')} ${res.data.to_email}`);
+            } catch { toast.error(t('ad_report_fail', 'فشل إرسال التقرير')); }
+            setSendingReport(false);
+          }}
+          disabled={sendingReport}
+          className="flex items-center gap-1.5 px-3 py-2 bg-purple-600 text-white rounded-lg text-xs font-medium hover:bg-purple-500 transition-all disabled:opacity-50"
+          data-testid="send-weekly-report-btn"
+        >
+          <EnvelopeIcon className={`w-3.5 h-3.5 ${sendingReport ? 'animate-spin' : ''}`} />
+          {t('ad_send_report', 'إرسال تقرير أسبوعي')}
+        </button>
       </div>
 
       {/* === REALTIME TAB === */}
@@ -509,6 +585,91 @@ const AdRealtimeDashboard = () => {
                   </div>
                 </div>
               )}
+            </>
+          )}
+        </div>
+      )}
+
+
+      {/* === COMPARE TAB === */}
+      {activeTab === 'compare' && (
+        <div className="space-y-5" data-testid="compare-tab">
+          {!comparison ? (
+            <div className="flex justify-center py-16">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-rose-600"></div>
+            </div>
+          ) : (
+            <>
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <ScaleIcon className="w-4 h-4 text-indigo-500" />
+                  {t('ad_compare_title', 'مقارنة الأداء بين فترتين')}
+                </h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                    <h4 className="text-xs font-bold text-blue-700 mb-1">{t('ad_period_current', 'الفترة الحالية')}</h4>
+                    <p className="text-[10px] text-gray-500">{comparison.period1?.start} → {comparison.period1?.end}</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <h4 className="text-xs font-bold text-gray-700 mb-1">{t('ad_period_previous', 'الفترة السابقة')}</h4>
+                    <p className="text-[10px] text-gray-500">{comparison.period2?.start} → {comparison.period2?.end}</p>
+                  </div>
+                </div>
+
+                {/* Comparison Metrics */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {[
+                    { label: t('ad_clicks', 'النقرات'), p1: comparison.period1?.clicks, p2: comparison.period2?.clicks, change: comparison.changes?.clicks, color: 'amber' },
+                    { label: t('ad_views', 'المشاهدات'), p1: comparison.period1?.views, p2: comparison.period2?.views, change: comparison.changes?.views, color: 'purple' },
+                    { label: 'CTR', p1: `${comparison.period1?.ctr}%`, p2: `${comparison.period2?.ctr}%`, change: comparison.changes?.ctr, color: 'rose', isCtr: true },
+                    { label: t('ad_revenue', 'الإيرادات'), p1: fmtEgp(comparison.period1?.revenue), p2: fmtEgp(comparison.period2?.revenue), change: comparison.changes?.revenue, color: 'emerald' },
+                    { label: t('ad_new_ads', 'إعلانات جديدة'), p1: comparison.period1?.new_ads, p2: comparison.period2?.new_ads, change: comparison.changes?.new_ads, color: 'blue' },
+                  ].map((m, i) => (
+                    <div key={i} className="bg-white rounded-xl border border-gray-200 p-4" data-testid={`compare-metric-${i}`}>
+                      <p className="text-[10px] text-gray-500 mb-2">{m.label}</p>
+                      <div className="flex items-end justify-between gap-2 mb-2">
+                        <div>
+                          <p className={`text-lg font-black text-${m.color}-600`}>{m.p1}</p>
+                          <p className="text-[9px] text-gray-400">{t('ad_period_current', 'الحالية')}</p>
+                        </div>
+                        <div className="text-end">
+                          <p className="text-sm font-bold text-gray-400">{m.p2}</p>
+                          <p className="text-[9px] text-gray-400">{t('ad_period_previous', 'السابقة')}</p>
+                        </div>
+                      </div>
+                      <div className={`flex items-center gap-1 ${m.change > 0 ? 'text-green-600' : m.change < 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                        {m.change > 0 ? <ArrowTrendingUpIcon className="w-3 h-3" /> : m.change < 0 ? <ArrowTrendingDownIcon className="w-3 h-3" /> : null}
+                        <span className="text-xs font-bold">
+                          {m.isCtr ? `${m.change > 0 ? '+' : ''}${m.change}%` : `${m.change > 0 ? '+' : ''}${m.change}%`}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Visual Comparison Bar Chart */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+                <h3 className="text-sm font-bold text-gray-900 mb-4">{t('ad_compare_chart', 'مقارنة بصرية')}</h3>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={[
+                      { name: t('ad_clicks', 'النقرات'), [t('ad_period_current', 'الحالية')]: comparison.period1?.clicks, [t('ad_period_previous', 'السابقة')]: comparison.period2?.clicks },
+                      { name: t('ad_views', 'المشاهدات'), [t('ad_period_current', 'الحالية')]: comparison.period1?.views, [t('ad_period_previous', 'السابقة')]: comparison.period2?.views },
+                      { name: t('ad_new_ads', 'إعلانات جديدة'), [t('ad_period_current', 'الحالية')]: comparison.period1?.new_ads, [t('ad_period_previous', 'السابقة')]: comparison.period2?.new_ads },
+                      { name: t('ad_revenue', 'الإيرادات'), [t('ad_period_current', 'الحالية')]: comparison.period1?.revenue, [t('ad_period_previous', 'السابقة')]: comparison.period2?.revenue },
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
+                      <XAxis dataKey="name" tick={{ fill: '#9CA3AF', fontSize: 11 }} reversed={isRTL} />
+                      <YAxis tick={{ fill: '#9CA3AF', fontSize: 10 }} orientation={isRTL ? 'right' : 'left'} />
+                      <Tooltip contentStyle={{ borderRadius: '12px', border: '1px solid #E5E7EB', fontSize: '12px' }} />
+                      <Legend wrapperStyle={{ fontSize: '11px' }} />
+                      <Bar dataKey={t('ad_period_current', 'الحالية')} fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey={t('ad_period_previous', 'السابقة')} fill="#D1D5DB" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
             </>
           )}
         </div>

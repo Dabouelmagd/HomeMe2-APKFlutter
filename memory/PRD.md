@@ -4,25 +4,23 @@
 - Frontend: React + Tailwind + Recharts + i18next
 - Backend: FastAPI + MongoDB + Stripe + PayPal + OpenAI GPT-4o-mini
 
-## Latest: Full CRUD for Owner (Apr 16, 2026)
-- Subscription Codes: Create, Edit (modal), Toggle, Delete, Copy, Bulk create
-- Coupons: Create, Edit (modal with code/type/value/max/notes), Toggle, Delete, Copy
-- User Subscriptions: New tab - view all users, activate/deactivate/extend/change plan
-- Company Subscriptions: Apply coupon, update price, custom extend, renew, suspend, change plan
-- Edit endpoints: PUT /subscription-codes/{code}, PUT /coupons/{coupon_id}
-- Owner endpoints: GET/PUT /owner/user-subscriptions
+## Latest Session (Apr 16, 2026)
+### Auto-Translation: 955 missing keys translated (535 AR + 99 EN + 321 FR) - all 3 languages now 3310 keys
+### Company Management: Added send offers/gifts via email + create targeted ads for company compounds
+### Owner Dashboard Redesign: Live financial data, subscription stats, ad performance, reminders, gifts/coupons overview
 
 ## Completed Features
-- Full Owner CRUD for Codes/Coupons/Subscriptions (DONE - Apr 16, 2026)
+- Auto-translate 955 missing keys (DONE)
+- Company offers/gifts/ads (DONE)
+- Owner Dashboard redesign with live data (DONE)
+- Full Referral CRUD + settings (DONE)
+- User edit/delete/assign (DONE)
+- Settings auth fix (DONE)
+- SPA catch-all for production (DONE)
+- Full Owner CRUD for Codes/Coupons/Subscriptions (DONE)
 - Email Notifications with SMTP (DONE)
-- AI Auto-Translation (DONE)
-- Homepage-first, Ad Placement Guide (DONE)
 - Internal Ads + Analytics (DONE)
-- Sidebar Reorganization + Budget + Reminders (DONE)
-- Company Subscriptions Management (DONE)
-- Account Selector, Translation Management (DONE)
-- Full i18n (EN/AR/FR), App Owner role (DONE)
-- Payment (Stripe + PayPal), Subscriptions (DONE)
+- All previous features (DONE)
 
 ## Backlog
 - P2: Bank transfer API (pending user credentials)

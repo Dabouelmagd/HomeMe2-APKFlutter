@@ -268,6 +268,36 @@ const CompanySubscriptions = () => {
                           </div>
                         </div>
                       )}
+
+                      {/* Send Offer / Gift */}
+                      <div className="mt-4 pt-3 border-t border-gray-200">
+                        <h5 className="font-medium text-gray-800 mb-2 text-sm">{t('cs_send_offer', 'إرسال عرض أو هدية')}</h5>
+                        <div className="space-y-2">
+                          <input id={`offer-msg-${company.id}`} placeholder={t('cs_offer_text', 'نص العرض أو الهدية...')} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" />
+                          <div className="flex gap-2">
+                            <button onClick={async () => {
+                              const msg = document.getElementById(`offer-msg-${company.id}`)?.value;
+                              if (!msg) return toast.error(t('cs_enter_offer', 'أدخل نص العرض'));
+                              try {
+                                await axios.post(`${API}/notifications/send-custom-email`, {
+                                  to_email: company.contact_email,
+                                  subject: `عرض خاص - HomeMe`,
+                                  message: msg,
+                                }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+                                toast.success(t('cs_offer_sent', 'تم إرسال العرض'));
+                                document.getElementById(`offer-msg-${company.id}`).value = '';
+                              } catch { toast.error(t('sa_failed', 'فشل')); }
+                            }} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-medium hover:bg-emerald-500">
+                              <EnvelopeIcon className="w-3.5 h-3.5" />
+                              {t('cs_send_email_offer', 'إرسال بالإيميل')}
+                            </button>
+                            <button onClick={() => { setActionModal({ companyId: company.id, type: 'add_ad', companyName: company.name, compoundIds: (company.compounds || []).map(c => c.id) }); setModalValue(''); setModalNote(''); }}
+                              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-100 text-amber-700 rounded-lg text-xs font-medium hover:bg-amber-200 border border-amber-200">
+                              {t('cs_add_ad', 'إضافة إعلان للشركة')}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Actions */}
@@ -369,6 +399,7 @@ const CompanySubscriptions = () => {
               {actionModal.type === 'coupon' && t('cs_apply_coupon', 'تطبيق كوبون خصم')}
               {actionModal.type === 'price' && t('cs_update_price', 'تعديل السعر')}
               {actionModal.type === 'extend' && t('cs_custom_extend', 'تمديد مخصص')}
+              {actionModal.type === 'add_ad' && `${t('cs_add_ad', 'إضافة إعلان')} - ${actionModal.companyName || ''}`}
             </h3>
 
             {actionModal.type === 'coupon' && (
@@ -412,11 +443,57 @@ const CompanySubscriptions = () => {
               </>
             )}
 
+            {actionModal.type === 'add_ad' && (
+              <>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">{t('sa_title', 'عنوان الإعلان')}</label>
+                  <input value={modalValue} onChange={e => setModalValue(e.target.value)} placeholder={t('cs_ad_title_ph', 'عرض خاص لشركة...')}
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">{t('sa_description', 'الوصف')}</label>
+                  <textarea value={modalNote} onChange={e => setModalNote(e.target.value)} rows="2"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none resize-none" />
+                </div>
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <label className="block text-sm text-gray-600 mb-1">{t('sa_position', 'الموقع')}</label>
+                    <select id="ad-position" className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm">
+                      <option value="dashboard">{t('sa_pos_dashboard', 'لوحة التحكم')}</option>
+                      <option value="banner">{t('sa_pos_banner', 'بانر')}</option>
+                      <option value="inline">{t('sa_pos_inline', 'داخلي')}</option>
+                    </select>
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm text-gray-600 mb-1 flex items-center gap-1">
+                      <input type="checkbox" id="ad-gift" className="w-3.5 h-3.5" />
+                      {t('ad_is_gift', 'هدية مجانية')}
+                    </label>
+                    <input type="number" id="ad-value" min="0" defaultValue="0" placeholder={t('ad_value', 'القيمة')}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm" />
+                  </div>
+                </div>
+              </>
+            )}
+
             <div className="flex gap-3 pt-2">
-              <button onClick={() => {
+              <button onClick={async () => {
                 if (actionModal.type === 'coupon') handleAction(actionModal.companyId, 'apply_coupon', { coupon_code: modalValue });
                 if (actionModal.type === 'price') handleAction(actionModal.companyId, 'update_price', { price: parseFloat(modalValue), note: modalNote });
                 if (actionModal.type === 'extend') handleAction(actionModal.companyId, 'extend', { days: parseInt(modalValue), note: modalNote });
+                if (actionModal.type === 'add_ad') {
+                  try {
+                    await axios.post(`${API}/ads`, {
+                      title: modalValue,
+                      description: modalNote,
+                      position: document.getElementById('ad-position')?.value || 'dashboard',
+                      is_gift: document.getElementById('ad-gift')?.checked || false,
+                      ad_value: parseFloat(document.getElementById('ad-value')?.value) || 0,
+                      target_compounds: actionModal.compoundIds || [],
+                    }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+                    toast.success(t('cs_ad_created', 'تم إنشاء الإعلان'));
+                  } catch { toast.error(t('sa_failed', 'فشل')); }
+                }
                 setActionModal(null);
               }}
                 disabled={!modalValue.trim()}

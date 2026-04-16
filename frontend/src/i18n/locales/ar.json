@@ -2918,5 +2918,19 @@
   "sa_ref_reward_value": "قيمة المكافأة",
   "sa_ref_min": "الحد الأدنى للإحالات",
   "sa_all_ref_codes": "جميع أكواد الإحالة",
-  "sa_code": "الكود"
+  "sa_code": "الكود",
+  "sa_ref_money": "مبلغ مادي (ج.م)",
+  "sa_ref_months": "شهور إضافية",
+  "sa_ref_percentage": "نسبة خصم %",
+  "sa_ref_value_hint": "مثال: 100 ج.م أو 2 شهر أو 15%",
+  "sa_ref_custom_code": "كود مخصص (اختياري)",
+  "sa_create_ref": "إنشاء كود إحالة",
+  "sa_ref_owner": "صاحب الكود",
+  "sa_ref_compound": "المجمع",
+  "sa_ref_reward": "المكافأة",
+  "sa_duplicate": "تكرار",
+  "sa_ref_duplicated": "تم التكرار",
+  "sa_confirm_delete": "هل أنت متأكد؟",
+  "sa_deleted": "تم الحذف",
+  "sa_saved": "تم الحفظ"
 }

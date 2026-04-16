@@ -995,19 +995,21 @@ const SuperAdminPanel = () => {
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">{t('sa_ref_prefix', 'بادئة كود الإحالة')}</label>
-                      <input id="ref-prefix" defaultValue={refStats.settings?.prefix || 'HOMEME'} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="HOMEME" />
+                      <input id="ref-prefix" defaultValue={refStats.settings?.prefix || 'HOMEME'} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
                     </div>
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">{t('sa_ref_reward_type', 'نوع المكافأة')}</label>
-                      <select id="ref-reward-type" defaultValue={refStats.settings?.reward_type || 'coupon'} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                      <select id="ref-reward-type" defaultValue={refStats.settings?.reward_type || 'months'} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                        <option value="money">{t('sa_ref_money', 'مبلغ مادي (ج.م)')}</option>
+                        <option value="months">{t('sa_ref_months', 'شهور إضافية')}</option>
+                        <option value="percentage">{t('sa_ref_percentage', 'نسبة خصم %')}</option>
                         <option value="coupon">{t('sa_ref_coupon', 'كوبون خصم')}</option>
-                        <option value="days">{t('sa_ref_days', 'أيام إضافية')}</option>
-                        <option value="discount">{t('sa_ref_discount', 'خصم مباشر')}</option>
                       </select>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">{t('sa_ref_reward_value', 'قيمة المكافأة')}</label>
-                      <input id="ref-reward-value" type="number" min="1" defaultValue={refStats.settings?.reward_value || 10} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                      <input id="ref-reward-value" type="number" min="1" defaultValue={refStats.settings?.reward_value || 1} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                      <p className="text-[10px] text-gray-500 mt-1">{t('sa_ref_value_hint', 'مثال: 100 ج.م أو 2 شهر أو 15%')}</p>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-400 mb-1">{t('sa_ref_min', 'الحد الأدنى للإحالات')}</label>
@@ -1016,22 +1018,38 @@ const SuperAdminPanel = () => {
                   </div>
                   <button onClick={async () => {
                     try {
-                      const res = await axios.put(`${API}/referral/settings`, {
+                      await axios.put(`${API}/referral/settings`, {
                         prefix: document.getElementById('ref-prefix')?.value,
                         reward_type: document.getElementById('ref-reward-type')?.value,
-                        reward_value: parseFloat(document.getElementById('ref-reward-value')?.value) || 10,
+                        reward_value: parseFloat(document.getElementById('ref-reward-value')?.value) || 1,
                         min_referrals: parseInt(document.getElementById('ref-min')?.value) || 3,
                       }, getToken());
-                      toast.success(res.data.message);
+                      toast.success(t('sa_saved', 'تم الحفظ'));
                       fetchRefStats();
                     } catch { toast.error(t('sa_failed', 'فشل')); }
-                  }} className="mt-4 px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500" data-testid="save-ref-settings">
+                  }} className="mt-4 px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">
                     {t('save_changes', 'حفظ التغييرات')}
                   </button>
                 </div>
 
+                {/* Create New Referral */}
+                <div className="flex gap-3 mb-4">
+                  <input id="new-ref-code" placeholder={t('sa_ref_custom_code', 'كود مخصص (اختياري)')} className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500" />
+                  <button onClick={async () => {
+                    try {
+                      const code = document.getElementById('new-ref-code')?.value || '';
+                      const res = await axios.post(`${API}/referral/create`, { code }, getToken());
+                      toast.success(res.data.message);
+                      document.getElementById('new-ref-code').value = '';
+                      fetchRefStats();
+                    } catch (err) { toast.error(err.response?.data?.detail || t('sa_failed', 'فشل')); }
+                  }} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">
+                    + {t('sa_create_ref', 'إنشاء كود إحالة')}
+                  </button>
+                </div>
+
                 {/* All Referral Codes Table */}
-                <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden mb-6">
+                <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
                   <div className="px-5 py-3 border-b border-gray-700">
                     <h3 className="font-bold text-white">{t('sa_all_ref_codes', 'جميع أكواد الإحالة')}</h3>
                   </div>
@@ -1039,41 +1057,47 @@ const SuperAdminPanel = () => {
                     <thead className="bg-gray-900/50">
                       <tr>
                         <th className="px-4 py-3 text-right text-gray-400">{t('sa_code', 'الكود')}</th>
+                        <th className="px-4 py-3 text-right text-gray-400">{t('sa_ref_owner', 'صاحب الكود')}</th>
+                        <th className="px-4 py-3 text-right text-gray-400">{t('sa_ref_compound', 'المجمع')}</th>
                         <th className="px-4 py-3 text-center text-gray-400">{t('sa_total_referrals', 'الإحالات')}</th>
-                        <th className="px-4 py-3 text-center text-gray-400">{t('sa_earned_coupons', 'كوبونات')}</th>
+                        <th className="px-4 py-3 text-center text-gray-400">{t('sa_ref_reward', 'المكافأة')}</th>
+                        <th className="px-4 py-3 text-center text-gray-400">{t('sa_actions', 'إجراءات')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700">
-                      {(refStats.all_codes || []).map((r, i) => (
-                        <tr key={i} className="hover:bg-gray-750">
-                          <td className="px-4 py-3 font-mono text-green-400">{r.code}</td>
+                      {(refStats.all_codes || []).map((r) => (
+                        <tr key={r.code} className="hover:bg-gray-750">
+                          <td className="px-4 py-3 font-mono text-green-400 text-xs">{r.code}</td>
+                          <td className="px-4 py-3 text-white text-xs">{r.user_name || '-'}</td>
+                          <td className="px-4 py-3 text-gray-300 text-xs">{r.compound_name || '-'}</td>
                           <td className="px-4 py-3 text-center font-bold text-white">{r.total_invited}</td>
-                          <td className="px-4 py-3 text-center text-amber-400">{r.coupons_earned}</td>
+                          <td className="px-4 py-3 text-center text-xs">
+                            {r.reward_given ? (
+                              <span className="px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full">{r.reward_given}</span>
+                            ) : (
+                              <span className="text-gray-500">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <div className="flex gap-1 justify-center">
+                              <button onClick={async () => {
+                                try { await axios.post(`${API}/referral/${r.code}/duplicate`, {}, getToken()); toast.success(t('sa_ref_duplicated', 'تم التكرار')); fetchRefStats(); } catch { toast.error(t('sa_failed', 'فشل')); }
+                              }} className="px-2 py-1 text-xs bg-purple-600/20 text-purple-400 rounded" title={t('sa_duplicate', 'تكرار')}>
+                                {t('sa_duplicate', 'تكرار')}
+                              </button>
+                              <button onClick={async () => {
+                                if (!window.confirm(t('sa_confirm_delete', 'هل أنت متأكد؟'))) return;
+                                try { await axios.delete(`${API}/referral/${r.code}`, getToken()); toast.success(t('sa_deleted', 'تم الحذف')); fetchRefStats(); } catch { toast.error(t('sa_failed', 'فشل')); }
+                              }} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">
+                                {t('sa_delete', 'حذف')}
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
-                      {(refStats.all_codes || []).length === 0 && <tr><td colSpan="3" className="px-4 py-6 text-center text-gray-500">{t('sa_no_referrals', 'لا توجد إحالات بعد')}</td></tr>}
+                      {(refStats.all_codes || []).length === 0 && <tr><td colSpan="6" className="px-4 py-6 text-center text-gray-500">{t('sa_no_referrals', 'لا توجد إحالات بعد')}</td></tr>}
                     </tbody>
                   </table>
-                </div>
-
-                {/* Top Referrers */}
-                <div className="bg-gray-800 rounded-xl border border-gray-700 p-5">
-                  <h3 className="font-bold text-lg mb-4">{t('sa_top_referrers', 'أفضل المُحيلين')}</h3>
-                  {refStats.top_referrers?.length > 0 ? (
-                    <div className="space-y-2">
-                      {refStats.top_referrers.map((r, i) => (
-                        <div key={i} className="flex items-center gap-3 bg-gray-900 rounded-lg p-3">
-                          <span className="text-xs font-bold text-gray-500 w-6">{i + 1}</span>
-                          <span className="font-mono text-green-400 text-sm">{r.code}</span>
-                          <div className="flex-1" />
-                          <span className="text-lg font-bold text-white">{r.total}</span>
-                          <span className="text-xs text-gray-400">{t('sa_referral', 'إحالة')}</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-center text-gray-500 py-4">{t('sa_no_referrals', 'لا توجد إحالات بعد')}</p>
-                  )}
                 </div>
               </>
             ) : (

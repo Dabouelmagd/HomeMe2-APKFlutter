@@ -3381,5 +3381,19 @@
   "sa_ref_discount": "Direct Discount",
   "sa_ref_reward_value": "Reward Value",
   "sa_ref_min": "Min Referrals",
-  "sa_all_ref_codes": "All Referral Codes"
+  "sa_all_ref_codes": "All Referral Codes",
+  "sa_ref_money": "Money (EGP)",
+  "sa_ref_months": "Extra Months",
+  "sa_ref_percentage": "Discount %",
+  "sa_ref_value_hint": "Example: 100 EGP or 2 months or 15%",
+  "sa_ref_custom_code": "Custom code (optional)",
+  "sa_create_ref": "Create Referral Code",
+  "sa_ref_owner": "Code Owner",
+  "sa_ref_compound": "Compound",
+  "sa_ref_reward": "Reward",
+  "sa_duplicate": "Duplicate",
+  "sa_ref_duplicated": "Duplicated",
+  "sa_confirm_delete": "Are you sure?",
+  "sa_deleted": "Deleted",
+  "sa_saved": "Saved"
 }

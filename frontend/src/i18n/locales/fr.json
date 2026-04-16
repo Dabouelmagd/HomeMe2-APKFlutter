@@ -3138,5 +3138,19 @@
   "sa_ref_discount": "Réduction Directe",
   "sa_ref_reward_value": "Valeur",
   "sa_ref_min": "Min Parrainages",
-  "sa_all_ref_codes": "Tous les Codes"
+  "sa_all_ref_codes": "Tous les Codes",
+  "sa_ref_money": "Montant (EGP)",
+  "sa_ref_months": "Mois Supplémentaires",
+  "sa_ref_percentage": "Réduction %",
+  "sa_ref_value_hint": "Exemple: 100 EGP ou 2 mois ou 15%",
+  "sa_ref_custom_code": "Code personnalisé (optionnel)",
+  "sa_create_ref": "Créer un Code",
+  "sa_ref_owner": "Propriétaire",
+  "sa_ref_compound": "Complexe",
+  "sa_ref_reward": "Récompense",
+  "sa_duplicate": "Dupliquer",
+  "sa_ref_duplicated": "Dupliqué",
+  "sa_confirm_delete": "Êtes-vous sûr?",
+  "sa_deleted": "Supprimé",
+  "sa_saved": "Enregistré"
 }

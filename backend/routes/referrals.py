@@ -132,23 +132,42 @@ async def get_referral_stats(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="غير مصرح")
     db = get_db()
     refs = await db.referrals.find({}, {"_id": 0}).to_list(500)
+
+    # Enrich with user names and compound names
+    user_ids = [r.get("user_id") for r in refs if r.get("user_id")]
+    users = {u["id"]: u for u in await db.users.find({"id": {"$in": user_ids}}, {"_id": 0, "id": 1, "full_name": 1, "username": 1, "compound_id": 1}).to_list(500)} if user_ids else {}
+    compounds = {c["id"]: c["name"] for c in await db.compounds.find({}, {"_id": 0, "id": 1, "name": 1}).to_list(100)}
+
     total_referrals = sum(r.get("total_invited", 0) for r in refs)
     total_coupons = sum(r.get("coupons_earned", 0) for r in refs)
     top_referrers = sorted(refs, key=lambda x: x.get("total_invited", 0), reverse=True)[:10]
 
-    # Get referral settings
     settings = await db.app_settings.find_one({"key": "referral_settings"}, {"_id": 0}) or {}
+
+    def enrich(r):
+        u = users.get(r.get("user_id"), {})
+        cid = u.get("compound_id", "")
+        return {
+            "code": r["code"],
+            "user_id": r.get("user_id", ""),
+            "user_name": u.get("full_name") or u.get("username", ""),
+            "compound_name": compounds.get(cid, ""),
+            "total_invited": r.get("total_invited", 0),
+            "coupons_earned": r.get("coupons_earned", 0),
+            "reward_given": r.get("reward_given", ""),
+            "created_at": r.get("created_at", ""),
+        }
 
     return {
         "total_referral_codes": len(refs),
         "total_referrals": total_referrals,
         "total_coupons_earned": total_coupons,
-        "top_referrers": [{"code": r["code"], "user_id": r["user_id"], "total": r.get("total_invited", 0)} for r in top_referrers],
-        "all_codes": [{"code": r["code"], "user_id": r["user_id"], "total_invited": r.get("total_invited", 0), "coupons_earned": r.get("coupons_earned", 0)} for r in refs],
+        "top_referrers": [enrich(r) for r in top_referrers],
+        "all_codes": [enrich(r) for r in refs],
         "settings": {
             "prefix": settings.get("prefix", "HOMEME"),
-            "reward_type": settings.get("reward_type", "coupon"),
-            "reward_value": settings.get("reward_value", 10),
+            "reward_type": settings.get("reward_type", "months"),
+            "reward_value": settings.get("reward_value", 1),
             "min_referrals": settings.get("min_referrals", 3),
         }
     }
@@ -171,3 +190,106 @@ async def update_referral_settings(body: dict, current_user: dict = Depends(get_
             upsert=True
         )
     return {"message": "تم تحديث إعدادات الإحالات", "settings": update}
+
+
+@router.delete("/referral/{code}")
+async def delete_referral(code: str, current_user: dict = Depends(get_current_user)):
+    """Delete a referral code"""
+    if current_user.get("role") not in ["super_admin", "app_owner"]:
+        raise HTTPException(403, "غير مصرح")
+    db = get_db()
+    result = await db.referrals.delete_one({"code": code})
+    if result.deleted_count == 0:
+        raise HTTPException(404, "الكود غير موجود")
+    return {"message": f"تم حذف الكود {code}"}
+
+
+@router.put("/referral/{code}")
+async def update_referral(code: str, body: dict, current_user: dict = Depends(get_current_user)):
+    """Update a referral code (reset, change reward)"""
+    if current_user.get("role") not in ["super_admin", "app_owner"]:
+        raise HTTPException(403, "غير مصرح")
+    db = get_db()
+    ref = await db.referrals.find_one({"code": code})
+    if not ref:
+        raise HTTPException(404, "الكود غير موجود")
+
+    update = {}
+    if "reward_given" in body:
+        update["reward_given"] = body["reward_given"]
+    if "total_invited" in body:
+        update["total_invited"] = body["total_invited"]
+    if "coupons_earned" in body:
+        update["coupons_earned"] = body["coupons_earned"]
+    if "new_code" in body and body["new_code"].strip():
+        existing = await db.referrals.find_one({"code": body["new_code"].upper()})
+        if existing and existing.get("code") != code:
+            raise HTTPException(400, "الكود مستخدم بالفعل")
+        update["code"] = body["new_code"].upper()
+
+    if update:
+        await db.referrals.update_one({"code": code}, {"$set": update})
+    return {"message": "تم تحديث الإحالة"}
+
+
+@router.post("/referral/create")
+async def create_referral_admin(body: dict, current_user: dict = Depends(get_current_user)):
+    """Admin creates a referral code for a user"""
+    if current_user.get("role") not in ["super_admin", "app_owner"]:
+        raise HTTPException(403, "غير مصرح")
+    db = get_db()
+    user_id = body.get("user_id", "")
+    custom_code = body.get("code", "").upper().strip()
+
+    if custom_code:
+        existing = await db.referrals.find_one({"code": custom_code})
+        if existing:
+            raise HTTPException(400, "الكود مستخدم بالفعل")
+        code = custom_code
+    else:
+        settings = await db.app_settings.find_one({"key": "referral_settings"}, {"_id": 0}) or {}
+        prefix = settings.get("prefix", "HOMEME")
+        code = f"{prefix}-" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        while await db.referrals.find_one({"code": code}):
+            code = f"{prefix}-" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+
+    ref = {
+        "code": code,
+        "user_id": user_id,
+        "total_invited": 0,
+        "coupons_earned": 0,
+        "reward_given": "",
+        "invited_users": [],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.referrals.insert_one(ref)
+    return {"message": f"تم إنشاء كود الإحالة {code}", "code": code}
+
+
+@router.post("/referral/{code}/duplicate")
+async def duplicate_referral(code: str, current_user: dict = Depends(get_current_user)):
+    """Duplicate a referral code"""
+    if current_user.get("role") not in ["super_admin", "app_owner"]:
+        raise HTTPException(403, "غير مصرح")
+    db = get_db()
+    ref = await db.referrals.find_one({"code": code}, {"_id": 0})
+    if not ref:
+        raise HTTPException(404, "الكود غير موجود")
+
+    settings = await db.app_settings.find_one({"key": "referral_settings"}, {"_id": 0}) or {}
+    prefix = settings.get("prefix", "HOMEME")
+    new_code = f"{prefix}-" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    while await db.referrals.find_one({"code": new_code}):
+        new_code = f"{prefix}-" + ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+
+    new_ref = {
+        "code": new_code,
+        "user_id": ref.get("user_id", ""),
+        "total_invited": 0,
+        "coupons_earned": 0,
+        "reward_given": "",
+        "invited_users": [],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.referrals.insert_one(new_ref)
+    return {"message": f"تم تكرار الكود → {new_code}", "code": new_code}

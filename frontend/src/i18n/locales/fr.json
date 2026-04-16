@@ -3113,5 +3113,14 @@
   "sa_email_message": "Texte du message...",
   "sa_send_email_btn": "Envoyer",
   "sa_fill_fields": "Sujet et message requis",
-  "sa_email_required": "Entrez un email ou sélectionnez envoyer à tous"
+  "sa_email_required": "Entrez un email ou sélectionnez envoyer à tous",
+  "sa_user_subs": "Abonnements Utilisateurs",
+  "sa_edit": "Modifier",
+  "sa_edit_code": "Modifier le Code",
+  "sa_edit_coupon": "Modifier le Coupon",
+  "sa_activate_sub": "Activer l'Abonnement",
+  "sa_search_user": "Rechercher par nom ou email...",
+  "sa_sub_end": "Date de Fin",
+  "sp_expired_label": "Expiré",
+  "sa_no_users": "Aucun utilisateur"
 }

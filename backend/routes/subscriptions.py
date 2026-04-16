@@ -226,6 +226,25 @@ async def delete_code(code: str, current_user: dict = Depends(require_super_admi
         raise HTTPException(status_code=500, detail="فشل في حذف الكود")
 
 
+@router.put("/subscription-codes/{code}")
+async def update_code(code: str, body: dict, current_user: dict = Depends(require_super_admin)):
+    """Update a subscription code"""
+    db = get_db()
+    existing = await db.subscription_codes.find_one({"code": code})
+    if not existing:
+        raise HTTPException(404, "الكود غير موجود")
+    update = {}
+    for field in ["plan", "type", "max_uses", "notes", "duration_months"]:
+        if field in body:
+            update[field] = body[field]
+    if "code_type" in body:
+        update["type"] = body["code_type"]
+    if update:
+        await db.subscription_codes.update_one({"code": code}, {"$set": update})
+    return {"message": "تم تحديث الكود", "updated": update}
+
+
+
 # ==================== USER: Activate Code ====================
 
 @router.post("/subscription-codes/activate")
@@ -302,3 +321,110 @@ async def get_my_subscription(current_user: dict = Depends(get_current_user)):
         "subscription_end": current_user.get("subscription_end"),
         "subscription_code_used": current_user.get("subscription_code_used")
     }
+
+
+
+# ==================== OWNER: User Subscription Management ====================
+
+@router.get("/owner/user-subscriptions")
+async def get_user_subscriptions(
+    search: str = "",
+    status: str = "",
+    page: int = 1,
+    per_page: int = 20,
+    current_user: dict = Depends(require_super_admin)
+):
+    """Get all user subscriptions for owner management"""
+    db = get_db()
+    query = {}
+    if status == "active":
+        query["subscription_active"] = True
+    elif status == "expired":
+        query["subscription_active"] = False
+    if search:
+        query["$or"] = [
+            {"username": {"$regex": search, "$options": "i"}},
+            {"full_name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}},
+        ]
+
+    total = await db.users.count_documents(query)
+    users = await db.users.find(query, {"_id": 0, "password": 0}).sort("created_at", -1).skip((page - 1) * per_page).to_list(per_page)
+
+    active = await db.users.count_documents({"subscription_active": True})
+    expired = await db.users.count_documents({"subscription_active": False, "subscription_end": {"$exists": True}})
+
+    return {
+        "users": [{
+            "id": u.get("id", ""),
+            "username": u.get("username", ""),
+            "full_name": u.get("full_name", ""),
+            "email": u.get("email", ""),
+            "phone": u.get("phone", ""),
+            "role": u.get("role", "resident"),
+            "subscription_active": u.get("subscription_active", False),
+            "subscription_plan": u.get("subscription_plan", ""),
+            "subscription_type": u.get("subscription_type", ""),
+            "subscription_start": u.get("subscription_start"),
+            "subscription_end": u.get("subscription_end"),
+            "subscription_code_used": u.get("subscription_code_used", ""),
+        } for u in users],
+        "total": total,
+        "stats": {"active": active, "expired": expired, "total": total},
+        "page": page,
+        "per_page": per_page,
+    }
+
+
+@router.put("/owner/user-subscriptions/{user_id}")
+async def update_user_subscription(user_id: str, body: dict, current_user: dict = Depends(require_super_admin)):
+    """Owner can update any user's subscription"""
+    db = get_db()
+    from datetime import timedelta, timezone
+
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(404, "المستخدم غير موجود")
+
+    action = body.get("action")
+    now = datetime.now(timezone.utc)
+
+    if action == "activate":
+        days = body.get("days", 365)
+        plan = body.get("plan", user.get("subscription_plan", "basic"))
+        await db.users.update_one({"id": user_id}, {"$set": {
+            "subscription_active": True,
+            "subscription_plan": plan,
+            "subscription_start": now.isoformat(),
+            "subscription_end": (now + timedelta(days=days)).isoformat(),
+        }})
+        return {"message": f"تم تفعيل اشتراك {user.get('full_name', user.get('username', ''))} لمدة {days} يوم"}
+
+    elif action == "deactivate":
+        await db.users.update_one({"id": user_id}, {"$set": {"subscription_active": False}})
+        return {"message": f"تم إلغاء اشتراك {user.get('full_name', user.get('username', ''))}"}
+
+    elif action == "extend":
+        days = body.get("days", 30)
+        end_str = user.get("subscription_end")
+        if end_str:
+            try:
+                end = datetime.fromisoformat(str(end_str).replace("Z", "+00:00"))
+            except Exception:
+                end = now
+        else:
+            end = now
+        new_end = end + timedelta(days=days)
+        await db.users.update_one({"id": user_id}, {"$set": {
+            "subscription_end": new_end.isoformat(),
+            "subscription_active": True,
+        }})
+        return {"message": f"تم تمديد {days} يوم"}
+
+    elif action == "change_plan":
+        plan = body.get("plan", "basic")
+        await db.users.update_one({"id": user_id}, {"$set": {"subscription_plan": plan}})
+        return {"message": f"تم تغيير الخطة إلى {plan}"}
+
+    else:
+        raise HTTPException(400, "إجراء غير معروف")

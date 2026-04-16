@@ -3356,5 +3356,14 @@
   "sa_email_message": "Message text...",
   "sa_send_email_btn": "Send Email",
   "sa_fill_fields": "Subject and message are required",
-  "sa_email_required": "Enter email or select send to all"
+  "sa_email_required": "Enter email or select send to all",
+  "sa_user_subs": "User Subscriptions",
+  "sa_edit": "Edit",
+  "sa_edit_code": "Edit Code",
+  "sa_edit_coupon": "Edit Coupon",
+  "sa_activate_sub": "Activate Subscription",
+  "sa_search_user": "Search by name or email...",
+  "sa_sub_end": "End Date",
+  "sp_expired_label": "Expired",
+  "sa_no_users": "No users found"
 }

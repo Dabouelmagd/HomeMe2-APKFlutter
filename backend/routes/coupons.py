@@ -166,3 +166,20 @@ async def delete_coupon(coupon_id: str, current_user: dict = Depends(require_sup
     except Exception as e:
         logging.error(f"Error deleting coupon: {e}")
         raise HTTPException(status_code=500, detail="فشل")
+
+
+
+@router.put("/coupons/{coupon_id}")
+async def update_coupon(coupon_id: str, body: dict, current_user: dict = Depends(require_super_admin)):
+    """Update coupon details"""
+    db = get_db()
+    coupon = await db.coupons.find_one({"id": coupon_id})
+    if not coupon:
+        raise HTTPException(404, "كوبون غير موجود")
+    update = {}
+    for field in ["code", "discount_type", "discount_value", "max_uses", "notes"]:
+        if field in body:
+            update[field] = body[field]
+    if update:
+        await db.coupons.update_one({"id": coupon_id}, {"$set": update})
+    return {"message": "تم تحديث الكوبون", "updated": update}

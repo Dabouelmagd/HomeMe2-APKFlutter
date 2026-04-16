@@ -2888,5 +2888,16 @@
   "sa_email_message": "نص الرسالة...",
   "sa_send_email_btn": "إرسال البريد",
   "sa_fill_fields": "الموضوع والرسالة مطلوبين",
-  "sa_email_required": "أدخل البريد أو اختر إرسال للكل"
+  "sa_email_required": "أدخل البريد أو اختر إرسال للكل",
+  "sa_user_subs": "اشتراكات المستخدمين",
+  "sa_edit": "تعديل",
+  "sa_edit_code": "تعديل الكود",
+  "sa_edit_coupon": "تعديل الكوبون",
+  "sa_activate_sub": "تفعيل اشتراك",
+  "sa_search_user": "بحث بالاسم أو الإيميل...",
+  "sa_user": "المستخدم",
+  "sa_sub_end": "تاريخ الانتهاء",
+  "sp_expired_label": "منتهي",
+  "sp_day": "يوم",
+  "sa_no_users": "لا يوجد مستخدمين"
 }

@@ -69,6 +69,15 @@ const SuperAdminPanel = () => {
   const [newAd, setNewAd] = useState({ title: '', image_url: '', link_url: '', description: '', position: 'banner', dimensions: '', ad_value: 0, is_gift: false, start_date: '', end_date: '', target_compounds: [] });
   // Referrals
   const [refStats, setRefStats] = useState(null);
+  // Edit modals
+  const [editCode, setEditCode] = useState(null);
+  const [editCoupon, setEditCoupon] = useState(null);
+  // User subscriptions
+  const [userSubs, setUserSubs] = useState([]);
+  const [userSubStats, setUserSubStats] = useState({});
+  const [userSubSearch, setUserSubSearch] = useState('');
+  const [userSubFilter, setUserSubFilter] = useState('');
+  const [userSubAction, setUserSubAction] = useState(null);
 
   useEffect(() => { fetchDashboard(); }, []);
 
@@ -216,6 +225,46 @@ const SuperAdminPanel = () => {
   };
   useEffect(() => { if (activeTab === 'referrals') fetchRefStats(); }, [activeTab]);
 
+  // Edit code/coupon
+  const handleEditCode = async () => {
+    if (!editCode) return;
+    try {
+      await axios.put(`${API}/subscription-codes/${editCode.code}`, editCode, getToken());
+      toast.success(t('sa_updated', 'تم التحديث'));
+      setEditCode(null);
+      fetchCodes();
+    } catch { toast.error(t('sa_failed', 'فشل')); }
+  };
+  const handleEditCoupon = async () => {
+    if (!editCoupon) return;
+    try {
+      await axios.put(`${API}/coupons/${editCoupon.id}`, editCoupon, getToken());
+      toast.success(t('sa_updated', 'تم التحديث'));
+      setEditCoupon(null);
+      fetchCoupons();
+    } catch { toast.error(t('sa_failed', 'فشل')); }
+  };
+
+  // User Subscriptions
+  const fetchUserSubs = async () => {
+    try {
+      const res = await axios.get(`${API}/owner/user-subscriptions`, {
+        ...getToken(), params: { search: userSubSearch, status: userSubFilter, per_page: 50 }
+      });
+      setUserSubs(res.data.users || []);
+      setUserSubStats(res.data.stats || {});
+    } catch { /* */ }
+  };
+  const handleUserSubAction = async (userId, action, extra = {}) => {
+    try {
+      const res = await axios.put(`${API}/owner/user-subscriptions/${userId}`, { action, ...extra }, getToken());
+      toast.success(res.data.message);
+      setUserSubAction(null);
+      fetchUserSubs();
+    } catch (err) { toast.error(err.response?.data?.detail || t('sa_failed', 'فشل')); }
+  };
+  useEffect(() => { if (activeTab === 'user_subs') fetchUserSubs(); }, [activeTab, userSubSearch, userSubFilter]);
+
   if (loading) {
     return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div></div>;
   }
@@ -277,6 +326,7 @@ const SuperAdminPanel = () => {
             { id: 'users', label: t('sa_users') },
             { id: 'codes', label: t('sa_sub_codes', 'أكواد الاشتراك') },
             { id: 'coupons', label: t('sa_coupons', 'كوبونات الخصم') },
+            { id: 'user_subs', label: t('sa_user_subs', 'اشتراكات المستخدمين') },
             { id: 'ads', label: t('sa_ads', 'الإعلانات') },
             { id: 'referrals', label: t('sa_referrals', 'الإحالات') },
             { id: 'analytics', label: t('sa_analytics', 'تحليلات الاشتراكات') },
@@ -481,7 +531,7 @@ const SuperAdminPanel = () => {
                         </td>
                         <td className="px-4 py-3 text-center">
                           <div className="flex gap-1 justify-center">
-                            <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success(t('sp_copied','تم النسخ')); }} className="px-2 py-1 text-xs bg-gray-700 rounded hover:bg-gray-600" title={t('sp_copy','نسخ')}>{t('sp_copy','نسخ')}</button>
+                            <button onClick={() => setEditCode({...c})} className="px-2 py-1 text-xs bg-blue-600/20 text-blue-400 rounded hover:bg-blue-600/30">{t('sa_edit', 'تعديل')}</button>
                             <button onClick={() => handleToggleCode(c.code)} className={`px-2 py-1 text-xs rounded ${c.is_active ? 'bg-amber-600/20 text-amber-400 hover:bg-amber-600/30' : 'bg-green-600/20 text-green-400 hover:bg-green-600/30'}`}>
                               {c.is_active ? t('sp_deactivate','تعطيل') : t('sp_activate','تفعيل')}
                             </button>
@@ -581,6 +631,7 @@ const SuperAdminPanel = () => {
                       <td className="px-4 py-3 text-center">
                         <div className="flex gap-1 justify-center">
                           <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success(t('sp_copied','تم النسخ')); }} className="px-2 py-1 text-xs bg-gray-700 rounded hover:bg-gray-600">{t('sp_copy','نسخ')}</button>
+                          <button onClick={() => setEditCoupon({...c})} className="px-2 py-1 text-xs bg-blue-600/20 text-blue-400 rounded hover:bg-blue-600/30">{t('sa_edit', 'تعديل')}</button>
                           <button onClick={() => handleToggleCoupon(c.id)} className={`px-2 py-1 text-xs rounded ${c.is_active ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'}`}>
                             {c.is_active ? t('sp_deactivate','تعطيل') : t('sp_activate','تفعيل')}
                           </button>
@@ -1122,7 +1173,200 @@ const SuperAdminPanel = () => {
           <TranslationManager />
         )}
 
+        {/* User Subscriptions Tab */}
+        {activeTab === 'user_subs' && (
+          <div data-testid="user-subs-tab">
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              {[
+                { label: t('sa_total_users', 'إجمالي المستخدمين'), value: userSubStats.total || 0, color: 'text-blue-400' },
+                { label: t('sa_active_subs', 'اشتراكات نشطة'), value: userSubStats.active || 0, color: 'text-green-400' },
+                { label: t('sa_expired_subs', 'منتهية'), value: userSubStats.expired || 0, color: 'text-red-400' },
+              ].map((s, i) => (
+                <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
+                  <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                  <p className="text-xs text-gray-400">{s.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex gap-3 mb-4">
+              <input value={userSubSearch} onChange={e => setUserSubSearch(e.target.value)} placeholder={t('sa_search_user', 'بحث بالاسم أو الإيميل...')} className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              <select value={userSubFilter} onChange={e => setUserSubFilter(e.target.value)} className="bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                <option value="">{t('cs_all', 'الكل')}</option>
+                <option value="active">{t('cs_active', 'نشطة')}</option>
+                <option value="expired">{t('cs_expired', 'منتهية')}</option>
+              </select>
+            </div>
+
+            <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-900/50">
+                  <tr>
+                    <th className="px-4 py-3 text-right text-gray-400">{t('sa_user', 'المستخدم')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_plan', 'الخطة')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_sub_end', 'تاريخ الانتهاء')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_status', 'الحالة')}</th>
+                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_actions', 'إجراءات')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {userSubs.map(u => (
+                    <tr key={u.id} className="hover:bg-gray-750">
+                      <td className="px-4 py-3">
+                        <div className="font-bold text-white text-xs">{u.full_name || u.username}</div>
+                        <div className="text-[10px] text-gray-500">{u.email}</div>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-blue-500/20 text-blue-300">{u.subscription_plan || '-'}</span>
+                      </td>
+                      <td className="px-4 py-3 text-center text-xs text-gray-300">
+                        {u.subscription_end ? new Date(u.subscription_end).toLocaleDateString('ar-EG') : '-'}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.subscription_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                          {u.subscription_active ? t('sp_active','نشط') : t('sp_expired_label','منتهي')}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex gap-1 justify-center flex-wrap">
+                          {u.subscription_active ? (
+                            <>
+                              <button onClick={() => handleUserSubAction(u.id, 'extend', { days: 30 })} className="px-2 py-1 text-xs bg-blue-600/20 text-blue-400 rounded">+30 {t('sp_day','يوم')}</button>
+                              <button onClick={() => setUserSubAction({ userId: u.id, name: u.full_name || u.username, type: 'change_plan', plan: u.subscription_plan || 'basic' })} className="px-2 py-1 text-xs bg-purple-600/20 text-purple-400 rounded">{t('cs_change_plan','تغيير')}</button>
+                              <button onClick={() => handleUserSubAction(u.id, 'deactivate')} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">{t('sp_deactivate','إلغاء')}</button>
+                            </>
+                          ) : (
+                            <>
+                              <button onClick={() => setUserSubAction({ userId: u.id, name: u.full_name || u.username, type: 'activate', plan: 'basic', days: 365 })} className="px-2 py-1 text-xs bg-green-600/20 text-green-400 rounded">{t('sp_activate','تفعيل')}</button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {userSubs.length === 0 && <tr><td colSpan="5" className="px-4 py-8 text-center text-gray-500">{t('sa_no_users', 'لا يوجد مستخدمين')}</td></tr>}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
       </div>
+
+      {/* Edit Code Modal */}
+      {editCode && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setEditCode(null)}>
+          <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-gray-700" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white">{t('sa_edit_code', 'تعديل الكود')}: <span className="text-green-400 font-mono">{editCode.code}</span></h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_plan', 'الخطة')}</label>
+                <select value={editCode.plan || ''} onChange={e => setEditCode({...editCode, plan: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                  <option value="starter">{t('sp_free','مجاني')}</option>
+                  <option value="basic">{t('sp_basic','أساسي')}</option>
+                  <option value="pro">{t('sp_pro','احترافي')}</option>
+                  <option value="premium">{t('sp_premium','متقدم')}</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sp_max_uses', 'الحد الأقصى')}</label>
+                <input type="number" min="1" value={editCode.max_uses || 1} onChange={e => setEditCode({...editCode, max_uses: parseInt(e.target.value) || 1})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_notes', 'ملاحظات')}</label>
+                <input value={editCode.notes || ''} onChange={e => setEditCode({...editCode, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button onClick={handleEditCode} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">{t('cs_confirm', 'تأكيد')}</button>
+              <button onClick={() => setEditCode(null)} className="px-4 py-2.5 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('cs_cancel', 'إلغاء')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Coupon Modal */}
+      {editCoupon && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setEditCoupon(null)}>
+          <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-gray-700" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white">{t('sa_edit_coupon', 'تعديل الكوبون')}: <span className="text-amber-400 font-mono">{editCoupon.code}</span></h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_coupon_code', 'كود الكوبون')}</label>
+                <input value={editCoupon.code || ''} onChange={e => setEditCoupon({...editCoupon, code: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">{t('sa_discount_type', 'نوع الخصم')}</label>
+                  <select value={editCoupon.discount_type} onChange={e => setEditCoupon({...editCoupon, discount_type: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                    <option value="percentage">%</option>
+                    <option value="fixed">{t('sp_egp', 'ج.م')}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">{t('sp_discount_value', 'القيمة')}</label>
+                  <input type="number" min="0" value={editCoupon.discount_value} onChange={e => setEditCoupon({...editCoupon, discount_value: parseFloat(e.target.value) || 0})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_max_usage', 'الحد الأقصى')}</label>
+                <input type="number" min="1" value={editCoupon.max_uses} onChange={e => setEditCoupon({...editCoupon, max_uses: parseInt(e.target.value) || 1})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_notes', 'ملاحظات')}</label>
+                <input value={editCoupon.notes || ''} onChange={e => setEditCoupon({...editCoupon, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button onClick={handleEditCoupon} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">{t('cs_confirm', 'تأكيد')}</button>
+              <button onClick={() => setEditCoupon(null)} className="px-4 py-2.5 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('cs_cancel', 'إلغاء')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Sub Action Modal */}
+      {userSubAction && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setUserSubAction(null)}>
+          <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-gray-700" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-white">
+              {userSubAction.type === 'activate' && t('sa_activate_sub', 'تفعيل اشتراك')}
+              {userSubAction.type === 'change_plan' && t('cs_change_plan', 'تغيير الخطة')}
+              : <span className="text-blue-400">{userSubAction.name}</span>
+            </h3>
+            {userSubAction.type === 'activate' && (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">{t('sa_plan', 'الخطة')}</label>
+                  <select value={userSubAction.plan} onChange={e => setUserSubAction({...userSubAction, plan: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                    <option value="basic">{t('sp_basic','أساسي')}</option>
+                    <option value="pro">{t('sp_pro','احترافي')}</option>
+                    <option value="premium">{t('sp_premium','متقدم')}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">{t('cs_days_count', 'عدد الأيام')}</label>
+                  <input type="number" min="1" value={userSubAction.days} onChange={e => setUserSubAction({...userSubAction, days: parseInt(e.target.value) || 30})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                </div>
+              </div>
+            )}
+            {userSubAction.type === 'change_plan' && (
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_plan', 'الخطة')}</label>
+                <select value={userSubAction.plan} onChange={e => setUserSubAction({...userSubAction, plan: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                  <option value="basic">{t('sp_basic','أساسي')}</option>
+                  <option value="pro">{t('sp_pro','احترافي')}</option>
+                  <option value="premium">{t('sp_premium','متقدم')}</option>
+                </select>
+              </div>
+            )}
+            <div className="flex gap-3 pt-2">
+              <button onClick={() => handleUserSubAction(userSubAction.userId, userSubAction.type, { plan: userSubAction.plan, days: userSubAction.days })} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">{t('cs_confirm', 'تأكيد')}</button>
+              <button onClick={() => setUserSubAction(null)} className="px-4 py-2.5 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('cs_cancel', 'إلغاء')}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -3365,5 +3365,8 @@
   "sa_search_user": "Search by name or email...",
   "sa_sub_end": "End Date",
   "sp_expired_label": "Expired",
-  "sa_no_users": "No users found"
+  "sa_no_users": "No users found",
+  "owner_app_control": "General App Control",
+  "owner_company_control": "Management Company Accounts",
+  "owner_compound_control": "Compound Subscriptions"
 }

@@ -2899,5 +2899,8 @@
   "sa_sub_end": "تاريخ الانتهاء",
   "sp_expired_label": "منتهي",
   "sp_day": "يوم",
-  "sa_no_users": "لا يوجد مستخدمين"
+  "sa_no_users": "لا يوجد مستخدمين",
+  "owner_app_control": "تحكم عام للأبلكيشن",
+  "owner_company_control": "تحكم في حسابات شركات الإدارة",
+  "owner_compound_control": "تحكم في اشتراكات الكمبوند"
 }

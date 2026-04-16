@@ -3122,5 +3122,8 @@
   "sa_search_user": "Rechercher par nom ou email...",
   "sa_sub_end": "Date de Fin",
   "sp_expired_label": "Expiré",
-  "sa_no_users": "Aucun utilisateur"
+  "sa_no_users": "Aucun utilisateur",
+  "owner_app_control": "Contrôle Général",
+  "owner_company_control": "Comptes des Sociétés de Gestion",
+  "owner_compound_control": "Abonnements des Complexes"
 }

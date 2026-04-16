@@ -3078,5 +3078,12 @@
   "ad_desc_inline": "Entre les sections de contenu",
   "ad_see_residents": "Résidents uniquement",
   "ad_see_all": "Tous (sauf Propriétaire)",
-  "ad_see_residents_admins": "Résidents et Admins"
+  "ad_see_residents_admins": "Résidents et Admins",
+  "tm_auto_translate": "Traduction automatique",
+  "tm_translating": "Traduction...",
+  "tm_auto_translated": "Traduit",
+  "tm_no_missing": "Aucun texte manquant",
+  "tm_auto_failed": "Échec de la traduction",
+  "tm_translating_key": "Traduction en cours...",
+  "tm_translated_key": "Clé traduite"
 }

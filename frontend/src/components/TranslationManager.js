@@ -16,6 +16,7 @@ import {
   LanguageIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  SparklesIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -36,6 +37,7 @@ const TranslationManager = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newKey, setNewKey] = useState({ key: '', en: '', ar: '', fr: '' });
   const [importing, setImporting] = useState(null);
+  const [autoTranslating, setAutoTranslating] = useState(null);
 
   const fetchTranslations = useCallback(async () => {
     try {
@@ -115,6 +117,43 @@ const TranslationManager = () => {
     }
   };
 
+  const handleAutoTranslate = async (lang) => {
+    setAutoTranslating(lang);
+    try {
+      const res = await axios.post(`${API}/translations/auto-translate`, {
+        target_lang: lang,
+        max_keys: 25,
+      }, getToken());
+      const count = res.data.translated || 0;
+      if (count > 0) {
+        toast.success(`${t('tm_auto_translated', 'تم ترجمة')} ${count} ${t('tm_keys', 'مفتاح')} → ${langLabel[lang]}`);
+        fetchTranslations();
+      } else {
+        toast.info(t('tm_no_missing', 'لا توجد نصوص ناقصة لهذه اللغة'));
+      }
+    } catch (err) {
+      toast.error(t('tm_auto_failed', 'فشل الترجمة التلقائية'));
+    } finally {
+      setAutoTranslating(null);
+    }
+  };
+
+  const handleAutoTranslateSingle = async (key, targetLang) => {
+    try {
+      toast.loading(t('tm_translating_key', 'جاري ترجمة المفتاح...'), { id: `translate-${key}` });
+      const res = await axios.post(`${API}/translations/auto-translate-single`, {
+        key,
+        target_lang: targetLang,
+      }, getToken());
+      if (res.data.value) {
+        setRows(prev => prev.map(r => r.key === key ? { ...r, [targetLang]: res.data.value, missing: r.missing.filter(m => m !== targetLang) } : r));
+        toast.success(t('tm_translated_key', 'تم ترجمة المفتاح'), { id: `translate-${key}` });
+      }
+    } catch {
+      toast.error(t('tm_auto_failed', 'فشل الترجمة'), { id: `translate-${key}` });
+    }
+  };
+
   const langLabel = { en: 'English', ar: 'العربية', fr: 'Français' };
   const langFlag = { en: '🇺🇸', ar: '🇪🇬', fr: '🇫🇷' };
 
@@ -144,9 +183,24 @@ const TranslationManager = () => {
                   <div className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-green-500' : pct > 80 ? 'bg-amber-500' : 'bg-red-500'}`} style={{ width: `${pct}%` }} />
                 </div>
                 {s.missing > 0 && (
-                  <p className="text-xs text-red-400 mt-1 flex items-center gap-1">
-                    <ExclamationTriangleIcon className="w-3 h-3" />{s.missing} {t('tm_missing', 'missing')}
-                  </p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-xs text-red-400 flex items-center gap-1">
+                      <ExclamationTriangleIcon className="w-3 h-3" />{s.missing} {t('tm_missing', 'missing')}
+                    </p>
+                    <button
+                      onClick={() => handleAutoTranslate(lang)}
+                      disabled={autoTranslating === lang}
+                      className="flex items-center gap-1 px-2 py-0.5 bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 rounded text-[10px] font-medium transition-colors disabled:opacity-50"
+                      data-testid={`tm-auto-translate-${lang}`}
+                    >
+                      {autoTranslating === lang ? (
+                        <div className="animate-spin rounded-full h-3 w-3 border-b border-purple-300"></div>
+                      ) : (
+                        <SparklesIcon className="w-3 h-3" />
+                      )}
+                      {autoTranslating === lang ? t('tm_translating', 'جاري...') : t('tm_auto_translate', 'ترجمة تلقائية')}
+                    </button>
+                  </div>
                 )}
               </div>
             );
@@ -287,6 +341,18 @@ const TranslationManager = () => {
                           >
                             <span className="truncate max-w-[300px] text-xs">{row[lang] || `[${t('tm_empty', 'empty')}]`}</span>
                             <PencilSquareIcon className="w-3 h-3 text-gray-600 opacity-0 group-hover:opacity-100 flex-shrink-0" />
+                            {isEmpty && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAutoTranslateSingle(row.key, lang);
+                                }}
+                                className="p-0.5 text-purple-400 opacity-0 group-hover:opacity-100 hover:bg-purple-500/20 rounded flex-shrink-0"
+                                title={t('tm_auto_translate', 'ترجمة تلقائية')}
+                              >
+                                <SparklesIcon className="w-3 h-3" />
+                              </button>
+                            )}
                           </div>
                         )}
                       </td>

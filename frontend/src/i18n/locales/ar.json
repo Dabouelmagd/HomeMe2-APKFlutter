@@ -2824,5 +2824,15 @@
   "ad_desc_inline": "بين أقسام المحتوى في الداشبورد",
   "ad_see_residents": "السكان فقط",
   "ad_see_all": "الكل (ما عدا المالك)",
-  "ad_see_residents_admins": "السكان والمديرين"
+  "ad_see_residents_admins": "السكان والمديرين",
+  "tm_auto_translate": "ترجمة تلقائية",
+  "tm_translating": "جاري الترجمة...",
+  "tm_auto_translated": "تم ترجمة",
+  "tm_no_missing": "لا توجد نصوص ناقصة",
+  "tm_auto_failed": "فشل الترجمة التلقائية",
+  "tm_translating_key": "جاري ترجمة المفتاح...",
+  "tm_translated_key": "تم ترجمة المفتاح",
+  "cf_paid": "مدفوع",
+  "cf_paid_amount": "المبلغ المدفوع",
+  "cf_partial": "جزئي"
 }

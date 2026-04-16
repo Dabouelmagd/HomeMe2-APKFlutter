@@ -3296,5 +3296,12 @@
   "ad_desc_inline": "Between dashboard content sections",
   "ad_see_residents": "Residents only",
   "ad_see_all": "All (except Owner)",
-  "ad_see_residents_admins": "Residents & Admins"
+  "ad_see_residents_admins": "Residents & Admins",
+  "tm_auto_translate": "Auto Translate",
+  "tm_translating": "Translating...",
+  "tm_auto_translated": "Translated",
+  "tm_no_missing": "No missing texts",
+  "tm_auto_failed": "Auto-translate failed",
+  "tm_translating_key": "Translating key...",
+  "tm_translated_key": "Key translated"
 }

@@ -2,25 +2,18 @@
 
 ## Architecture
 - Frontend: React + Tailwind + Recharts + i18next
-- Backend: FastAPI + MongoDB + Stripe + PayPal
+- Backend: FastAPI + MongoDB + Stripe + PayPal + OpenAI GPT-4o-mini
 - i18n: en.json, ar.json, fr.json
 
-## Latest Changes (Apr 15, 2026)
-### Homepage First
-- Root URL "/" now shows the public HomePage instead of redirecting to login
-- Users see the marketing page first, then click "تسجيل الدخول" to enter the app
-
-### Arabic Default
-- Arabic is the default and fallback language (already configured in i18n/index.js)
-
-### Ad Placement Guide
-- Visual app layout map showing where each ad type appears (banner/sidebar/dashboard/inline)
-- Detailed table with: position, description, available sizes, audience, max count
-- Integrated directly in the owner's ads management page
+## Latest: Auto-Translate Feature (Apr 16, 2026)
+- Added AI-powered auto-translation for missing keys using GPT-4o-mini
+- Batch translation: translates up to 25 missing keys per click per language
+- Single key translation: click ✨ icon on any empty cell to translate instantly
+- Backend endpoints: /api/translations/auto-translate and /api/translations/auto-translate-single
 
 ## Completed Features
-- Homepage-first flow (DONE)
-- Ad Placement Guide in Owner panel (DONE)
+- AI Auto-Translation for missing keys (DONE - Apr 16, 2026)
+- Homepage-first flow, Ad Placement Guide (DONE)
 - Ad Analytics Reports in Advanced Analytics (DONE)
 - Internal Ad Display for Residents (DONE)
 - Enhanced Ads Management (DONE)

@@ -302,6 +302,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('sa_referrals', 'الإحالات'), href: 'super-admin?tab=referrals', icon: UserGroupIcon, show: true },
         { name: t('advanced_analytics', 'تحليلات متقدمة'), href: 'analytics', icon: ChartPieIcon, show: true },
         { name: t('ad_realtime_analytics', 'تحليلات الإعلانات'), href: 'ad-analytics', icon: SignalIcon, show: true },
+        { name: t('satisfaction_ratings', 'رضا العملاء'), href: 'satisfaction', icon: StarIcon, show: true },
         { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
@@ -324,8 +325,36 @@ const Layout = ({ children, isTrialMode = false }) => {
     },
   ];
 
+  // Super Admin = Operations Manager (no financial, no owner settings)
+  const superAdminNavigationSections = [
+    {
+      title: t('sa_operations', 'العمليات والإدارة'),
+      items: [
+        { name: t('owner_dashboard', 'لوحة التحكم'), href: 'dashboard', icon: HomeIcon, show: true },
+        { name: t('sa_compounds', 'المجمعات السكنية'), href: 'super-admin?tab=compounds', icon: BuildingOfficeIcon, show: true },
+        { name: t('sa_users', 'إدارة المستخدمين'), href: 'super-admin?tab=users', icon: UsersIcon, show: true },
+        { name: t('satisfaction_ratings', 'رضا العملاء'), href: 'satisfaction', icon: StarIcon, show: true },
+      ]
+    },
+    {
+      title: t('sa_ads_section', 'الإعلانات والحملات'),
+      items: [
+        { name: t('sa_ads', 'إدارة الإعلانات'), href: 'super-admin?tab=ads', icon: SpeakerWaveIcon, show: true },
+        { name: t('ad_realtime_analytics', 'تقارير الإعلانات'), href: 'ad-analytics', icon: SignalIcon, show: true },
+      ]
+    },
+    {
+      title: t('sa_communication', 'التواصل والتقارير'),
+      items: [
+        { name: t('advanced_analytics', 'تحليلات المجمعات'), href: 'analytics', icon: ChartPieIcon, show: true },
+        { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
+        { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
+      ]
+    },
+  ];
+
   // Organized navigation by role
-  const navigationSections = isAppOwner ? ownerNavigationSections : [
+  const navigationSections = isAppOwner ? ownerNavigationSections : (activeRole === 'super_admin' ? superAdminNavigationSections : [
     {
       title: t('main_sections'),
       items: [
@@ -394,7 +423,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('help_center'), href: 'help', icon: QuestionMarkCircleIcon, show: true },
       ]
     }
-  ];
+  ]);
 
   // Improved isActive function to correctly match current route
   const isActive = (href) => {

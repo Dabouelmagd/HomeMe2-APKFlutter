@@ -40,4 +40,12 @@ i18n
     }
   });
 
+// Always persist language changes to localStorage
+i18n.on('languageChanged', (lng) => {
+  const normalized = lng.split('-')[0].toLowerCase();
+  localStorage.setItem('i18nextLng', normalized);
+  document.dir = normalized === 'ar' ? 'rtl' : 'ltr';
+  document.documentElement.lang = normalized;
+});
+
 export default i18n;

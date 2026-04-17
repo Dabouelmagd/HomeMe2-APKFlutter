@@ -333,6 +333,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('owner_dashboard', 'لوحة التحكم'), href: 'dashboard', icon: HomeIcon, show: true },
         { name: t('sa_compounds', 'المجمعات السكنية'), href: 'super-admin?tab=compounds', icon: BuildingOfficeIcon, show: true },
         { name: t('sa_users', 'إدارة المستخدمين'), href: 'super-admin?tab=users', icon: UsersIcon, show: true },
+        { name: t('od_mgmt_companies', 'شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
         { name: t('satisfaction_ratings', 'رضا العملاء'), href: 'satisfaction', icon: StarIcon, show: true },
       ]
     },

@@ -16,6 +16,7 @@ const LanguageSwitcher = ({ className = "" }) => {
 
   const changeLanguage = (langCode) => {
     i18n.changeLanguage(langCode);
+    localStorage.setItem('i18nextLng', langCode);
     
     // Update document direction for RTL support
     document.dir = langCode === 'ar' ? 'rtl' : 'ltr';

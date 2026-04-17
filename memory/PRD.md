@@ -2,19 +2,17 @@
 
 ## Architecture
 - Frontend: React + Tailwind + Recharts + i18next
-- Backend: FastAPI + MongoDB + Stripe + PayPal + OpenAI GPT-4o-mini
+- Backend: FastAPI + MongoDB
 
-## Role Hierarchy (Updated Feb 2026)
-- **App Owner**: Full access - financial, subscriptions, ads, settings
-- **Super Admin**: Operations only - NO revenue/budget/subscriptions/referrals. CAN manage compounds, users, ads, translations, satisfaction
-- **Company Admin / Admin / Manager**: Compound-level
-- **Security / Resident**: Limited dashboards
+## Role Hierarchy
+- **App Owner**: Full access
+- **Super Admin**: Operations only + شركات الإدارة. NO financial data
 
-## Financial Data Restrictions (Super Admin)
-Pages modified to hide financial data for super_admin:
-- `/app/analytics`: Revenue card hidden, Financial tab hidden, Revenue chart hidden
-- `/app/ad-analytics`: Financial tab hidden, Export buttons hidden, Revenue in compare hidden
-- Sidebar: No budget, subscriptions, referrals, codes, coupons
+## Latest Fixes (Feb 2026)
+- Added 40+ missing Arabic translations for analytics page
+- Fixed language persistence on page refresh (i18n languageChanged event)
+- Added شركات الإدارة to Super Admin sidebar
+- Hidden financial data from Super Admin across all pages
 
 ## Backlog
 - P2: Bank transfer API (pending user credentials)

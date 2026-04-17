@@ -21,12 +21,17 @@ import {
   TicketIcon,
 } from '@heroicons/react/24/outline';
 
+import { useAuth } from '../App';
+
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
 const CompanySubscriptions = () => {
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const isRTL = i18n.language === 'ar';
+  const activeRole = user?.active_role || user?.role || '';
+  const isSuperAdminOnly = activeRole === 'super_admin';
   const [companies, setCompanies] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
@@ -107,7 +112,7 @@ const CompanySubscriptions = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${isSuperAdminOnly ? '3' : '4'} gap-4`}>
         <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
@@ -135,6 +140,7 @@ const CompanySubscriptions = () => {
           </div>
           <p className="text-3xl font-bold text-red-600">{stats.expired || 0}</p>
         </div>
+        {!isSuperAdminOnly && (
         <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
@@ -144,6 +150,7 @@ const CompanySubscriptions = () => {
           </div>
           <p className="text-3xl font-bold text-gray-900">{(stats.total_monthly_revenue || 0).toLocaleString()} <span className="text-sm text-gray-400">{t('sm_egp', 'ج.م')}</span></p>
         </div>
+        )}
       </div>
 
       {/* Toolbar */}
@@ -338,11 +345,11 @@ const CompanySubscriptions = () => {
                                         {ad.image_url && ad.image_url.match(/\.(mp4|mov|webm)$/i) && <span className="px-1.5 py-0.5 rounded text-[9px] bg-rose-100 text-rose-600">{t('cs_ad_video', 'فيديو')}</span>}
                                       </div>
                                       <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-400 flex-wrap">
-                                        {ad.is_gift ? (
+                                        {!isSuperAdminOnly && (ad.is_gift ? (
                                           <span className="text-pink-500 font-medium">{t('ad_gift', 'هدية')}</span>
                                         ) : ad.ad_value > 0 ? (
                                           <span className="text-emerald-600 font-medium">{ad.ad_value.toLocaleString()} {t('sm_egp', 'ج.م')}</span>
-                                        ) : null}
+                                        ) : null)}
                                         {ad.start_date && <span>{t('ad_start_date', 'بداية')}: {ad.start_date}</span>}
                                         {ad.end_date && <span>{t('ad_end_date', 'نهاية')}: {ad.end_date}</span>}
                                         <span>{t('ad_views', 'مشاهدات')}: {ad.views || 0}</span>

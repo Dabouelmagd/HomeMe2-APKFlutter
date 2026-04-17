@@ -5,14 +5,16 @@
 - Backend: FastAPI + MongoDB
 
 ## Role Hierarchy
-- **App Owner**: Full access
-- **Super Admin**: Operations only + شركات الإدارة. NO financial data
+- **App Owner**: Full access - all financial data, subscriptions, settings
+- **Super Admin**: Operations only - compounds, users, companies, ads, translations. NO financial data (revenue, budget, subscriptions mgmt, referrals)
 
-## Latest Fixes (Feb 2026)
-- Added 40+ missing Arabic translations for analytics page
-- Fixed language persistence on page refresh (i18n languageChanged event)
+## Latest Fixes
+- Added 40+ missing Arabic translations
+- Fixed language persistence on refresh
 - Added شركات الإدارة to Super Admin sidebar
-- Hidden financial data from Super Admin across all pages
+- Hidden revenue data from Super Admin across: analytics, ad-analytics, company-subscriptions
+- Auto-translated remaining EN/FR keys via LLM
+- Company page shows operational data without revenue for Super Admin
 
 ## Backlog
 - P2: Bank transfer API (pending user credentials)

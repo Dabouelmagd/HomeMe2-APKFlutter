@@ -37,6 +37,8 @@ const AdRealtimeDashboard = () => {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const activeRole = user?.active_role || user?.role;
+  const isSuperAdminOnly = activeRole === 'super_admin';
   const [activeTab, setActiveTab] = useState('realtime');
   const [realtime, setRealtime] = useState(null);
   const [financial, setFinancial] = useState(null);
@@ -184,7 +186,7 @@ const AdRealtimeDashboard = () => {
       <div className="flex flex-wrap gap-2">
         {[
           { id: 'realtime', label: t('ad_tab_realtime', 'البيانات الحية'), icon: SignalIcon },
-          { id: 'financial', label: t('ad_tab_financial', 'التقارير المالية'), icon: BanknotesIcon },
+          ...(isSuperAdminOnly ? [] : [{ id: 'financial', label: t('ad_tab_financial', 'التقارير المالية'), icon: BanknotesIcon }]),
           { id: 'compare', label: t('ad_tab_compare', 'مقارنة الفترات'), icon: ScaleIcon },
           { id: 'alerts', label: t('ad_tab_alerts', 'التنبيهات'), icon: BellAlertIcon, count: alerts.length },
         ].map(tab => (
@@ -212,6 +214,7 @@ const AdRealtimeDashboard = () => {
 
         {/* Action Buttons */}
         <div className="flex-1"></div>
+        {!isSuperAdminOnly && (<>
         <button
           onClick={async () => {
             setExporting(true);
@@ -295,6 +298,7 @@ const AdRealtimeDashboard = () => {
           <EnvelopeIcon className={`w-3.5 h-3.5 ${sendingReport ? 'animate-spin' : ''}`} />
           {t('ad_send_report', 'إرسال تقرير')}
         </button>
+        </>)}
       </div>
 
       {/* === REALTIME TAB === */}
@@ -762,7 +766,7 @@ const AdRealtimeDashboard = () => {
                     { label: t('ad_clicks', 'النقرات'), p1: comparison.period1?.clicks, p2: comparison.period2?.clicks, change: comparison.changes?.clicks, color: 'amber' },
                     { label: t('ad_views', 'المشاهدات'), p1: comparison.period1?.views, p2: comparison.period2?.views, change: comparison.changes?.views, color: 'purple' },
                     { label: 'CTR', p1: `${comparison.period1?.ctr}%`, p2: `${comparison.period2?.ctr}%`, change: comparison.changes?.ctr, color: 'rose', isCtr: true },
-                    { label: t('ad_revenue', 'الإيرادات'), p1: fmtEgp(comparison.period1?.revenue), p2: fmtEgp(comparison.period2?.revenue), change: comparison.changes?.revenue, color: 'emerald' },
+                    ...(!isSuperAdminOnly ? [{ label: t('ad_revenue', 'الإيرادات'), p1: fmtEgp(comparison.period1?.revenue), p2: fmtEgp(comparison.period2?.revenue), change: comparison.changes?.revenue, color: 'emerald' }] : []),
                     { label: t('ad_new_ads', 'إعلانات جديدة'), p1: comparison.period1?.new_ads, p2: comparison.period2?.new_ads, change: comparison.changes?.new_ads, color: 'blue' },
                   ].map((m, i) => (
                     <div key={i} className="bg-white rounded-xl border border-gray-200 p-4" data-testid={`compare-metric-${i}`}>
@@ -797,7 +801,7 @@ const AdRealtimeDashboard = () => {
                       { name: t('ad_clicks', 'النقرات'), [t('ad_period_current', 'الحالية')]: comparison.period1?.clicks, [t('ad_period_previous', 'السابقة')]: comparison.period2?.clicks },
                       { name: t('ad_views', 'المشاهدات'), [t('ad_period_current', 'الحالية')]: comparison.period1?.views, [t('ad_period_previous', 'السابقة')]: comparison.period2?.views },
                       { name: t('ad_new_ads', 'إعلانات جديدة'), [t('ad_period_current', 'الحالية')]: comparison.period1?.new_ads, [t('ad_period_previous', 'السابقة')]: comparison.period2?.new_ads },
-                      { name: t('ad_revenue', 'الإيرادات'), [t('ad_period_current', 'الحالية')]: comparison.period1?.revenue, [t('ad_period_previous', 'السابقة')]: comparison.period2?.revenue },
+                      ...(!isSuperAdminOnly ? [{ name: t('ad_revenue', 'الإيرادات'), [t('ad_period_current', 'الحالية')]: comparison.period1?.revenue, [t('ad_period_previous', 'السابقة')]: comparison.period2?.revenue }] : []),
                     ]}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#F3F4F6" />
                       <XAxis dataKey="name" tick={{ fill: '#9CA3AF', fontSize: 11 }} reversed={isRTL} />

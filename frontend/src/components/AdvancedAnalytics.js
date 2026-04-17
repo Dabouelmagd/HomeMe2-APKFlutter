@@ -37,6 +37,8 @@ const AdvancedAnalytics = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
+  const activeRole = user?.active_role || user?.role;
+  const isSuperAdminOnly = activeRole === 'super_admin';
   
   // Auto-translate backend data function
   const translateBackendData = (data) => {
@@ -346,7 +348,7 @@ const AdvancedAnalytics = () => {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${isSuperAdminOnly ? '3' : '4'} gap-6 mb-8`}>
         <MetricCard
           title={t('total_residents')}
           value={analytics.residents?.total || 0}
@@ -365,6 +367,7 @@ const AdvancedAnalytics = () => {
           subtitle={`${analytics.maintenance?.pending || 0} ${t('pending')}`}
         />
         
+        {!isSuperAdminOnly && (
         <MetricCard
           title={t('revenue_collected')}
           value={`$${(analytics.revenue?.total || 0).toLocaleString()}`}
@@ -373,6 +376,7 @@ const AdvancedAnalytics = () => {
           color="text-green-600"
           subtitle={`${analytics.revenue?.collection_rate || 0}% ${t('collection_rate')}`}
         />
+        )}
         
         <MetricCard
           title={t('user_engagement')}
@@ -391,7 +395,7 @@ const AdvancedAnalytics = () => {
             { key: 'overview', label: t('overview'), icon: ChartBarIcon },
             { key: 'residents', label: t('residents'), icon: UsersIcon },
             { key: 'maintenance', label: t('maintenance'), icon: WrenchScrewdriverIcon },
-            { key: 'financial', label: t('financial'), icon: CurrencyDollarIcon },
+            ...(isSuperAdminOnly ? [] : [{ key: 'financial', label: t('financial'), icon: CurrencyDollarIcon }]),
             { key: 'engagement', label: t('engagement'), icon: BellIcon },
             { key: 'ads', label: t('ad_analytics_tab', 'تقارير الإعلانات'), icon: SpeakerWaveIcon }
           ].map(tab => {
@@ -438,6 +442,7 @@ const AdvancedAnalytics = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {!isSuperAdminOnly && (
               <ChartContainer title={t('revenue_trend')}>
                 <SimpleChart 
                   data={analytics.charts?.revenue_trend || []}
@@ -445,6 +450,7 @@ const AdvancedAnalytics = () => {
                   color="#10B981"
                 />
               </ChartContainer>
+              )}
               
               <ChartContainer title={t('user_activity_trend')}>
                 <SimpleChart 
@@ -719,14 +725,14 @@ const AdvancedAnalytics = () => {
 
       {/* Ads Analytics Tab */}
       {activeTab === 'ads' && (
-        <AdsAnalyticsTab data={adAnalytics} t={t} />
+        <AdsAnalyticsTab data={adAnalytics} t={t} hideRevenue={isSuperAdminOnly} />
       )}
     </div>
   );
 };
 
 // Ads Analytics Sub-component
-const AdsAnalyticsTab = ({ data, t }) => {
+const AdsAnalyticsTab = ({ data, t, hideRevenue = false }) => {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
 
@@ -756,7 +762,7 @@ const AdsAnalyticsTab = ({ data, t }) => {
           { label: t('ad_views', 'المشاهدات'), value: (s.total_views || 0).toLocaleString(), color: 'text-purple-600', bg: 'bg-purple-50' },
           { label: t('ad_clicks', 'النقرات'), value: (s.total_clicks || 0).toLocaleString(), color: 'text-amber-600', bg: 'bg-amber-50' },
           { label: t('ad_avg_ctr', 'متوسط CTR'), value: `${s.avg_ctr || 0}%`, color: 'text-rose-600', bg: 'bg-rose-50' },
-          { label: t('ad_revenue', 'الإيرادات'), value: `${(s.total_revenue || 0).toLocaleString()} ${t('sm_egp','ج.م')}`, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+          ...(!hideRevenue ? [{ label: t('ad_revenue', 'الإيرادات'), value: `${(s.total_revenue || 0).toLocaleString()} ${t('sm_egp','ج.م')}`, color: 'text-emerald-600', bg: 'bg-emerald-50' }] : []),
           { label: t('ad_gifts', 'هدايا'), value: s.gift_ads, color: 'text-pink-600', bg: 'bg-pink-50' },
         ].map((c, i) => (
           <div key={i} className={`${c.bg} rounded-xl p-4 text-center`}>
@@ -912,7 +918,7 @@ const AdsAnalyticsTab = ({ data, t }) => {
                 <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('ad_views', 'المشاهدات')}</th>
                 <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('ad_clicks', 'النقرات')}</th>
                 <th className="px-4 py-3 text-center text-gray-500 font-medium">CTR</th>
-                <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('ad_value_col', 'القيمة')}</th>
+                {!hideRevenue && <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('ad_value_col', 'القيمة')}</th>}
                 <th className="px-4 py-3 text-center text-gray-500 font-medium">{t('sa_status', 'الحالة')}</th>
               </tr>
             </thead>
@@ -928,6 +934,7 @@ const AdsAnalyticsTab = ({ data, t }) => {
                       {a.ctr}%
                     </span>
                   </td>
+                  {!hideRevenue && (
                   <td className="px-4 py-3 text-center text-xs">
                     {a.is_gift ? (
                       <span className="px-2 py-0.5 bg-pink-100 text-pink-600 rounded-full font-medium">{t('ad_gift', 'هدية')}</span>
@@ -935,6 +942,7 @@ const AdsAnalyticsTab = ({ data, t }) => {
                       <span className="text-emerald-600 font-bold">{(a.ad_value || 0).toLocaleString()} {t('sm_egp','ج.م')}</span>
                     )}
                   </td>
+                  )}
                   <td className="px-4 py-3 text-center">
                     <span className={`w-2 h-2 rounded-full inline-block ${a.is_active ? 'bg-green-500' : 'bg-red-400'}`}></span>
                   </td>

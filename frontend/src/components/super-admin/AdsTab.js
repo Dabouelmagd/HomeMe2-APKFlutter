@@ -6,6 +6,115 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
 /**
+ * AdPreview — معاينة مباشرة لشكل الإعلان النهائي بناءً على الـ position المختار
+ * يحاكي نفس الشكل الذي سيظهر على الصفحة الرئيسية / لوحة التحكم
+ */
+const AdPreview = ({ ad, t }) => {
+  const resolvedSrc = ad?.image_url
+    ? (ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url)
+    : null;
+
+  const isVideo = (ad?.media_type === 'video') || (resolvedSrc && /\.(mp4|webm|mov)(\?|$)/i.test(resolvedSrc));
+
+  // المواقع التي تستخدم variant=full (شريط عريض بملء العرض)
+  const fullPositions = ['homepage_hero', 'homepage_mid', 'homepage_footer', 'banner', 'login_page', 'notification'];
+  // المواقع التي تستخدم card (مربع)
+  const cardPositions = ['dashboard', 'services_page', 'splash', 'popup'];
+  // سايدبار / inline / sidebar = slim
+  const slimPositions = ['sidebar', 'inline'];
+
+  const pos = ad?.position || 'banner';
+  const variant = fullPositions.includes(pos) ? 'full' : cardPositions.includes(pos) ? 'card' : slimPositions.includes(pos) ? 'slim' : 'full';
+
+  const commonWrapper = "relative rounded-xl overflow-hidden shadow-md";
+  const adLabel = <span className="absolute top-2 end-2 text-[9px] bg-black/50 text-white/80 px-1.5 py-0.5 rounded pointer-events-none z-10">{t('ad_label', 'إعلان')}</span>;
+
+  return (
+    <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border-2 border-dashed border-indigo-300 p-4" dir="rtl" data-testid="ad-preview">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] font-bold text-indigo-600 bg-indigo-100 px-2 py-0.5 rounded-full">{t('ad_preview_label', '👁️ معاينة مباشرة')}</span>
+        <span className="text-[9px] text-gray-500">{t('ad_preview_variant', 'الشكل')}: {variant}</span>
+      </div>
+
+      {!ad?.title && !resolvedSrc ? (
+        <div className="flex items-center justify-center py-8 text-gray-400">
+          <div className="text-center">
+            <span className="text-3xl">🖼️</span>
+            <p className="text-xs mt-1">{t('ad_preview_empty', 'ابدئي بإدخال العنوان أو رفع الصورة لرؤية المعاينة')}</p>
+          </div>
+        </div>
+      ) : variant === 'full' ? (
+        <div className={commonWrapper}>
+          {resolvedSrc ? (
+            isVideo ? (
+              <video src={resolvedSrc} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} muted loop autoPlay playsInline />
+            ) : (
+              <img src={resolvedSrc} alt={ad.title} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} />
+            )
+          ) : (
+            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex-1 text-white">
+                  <h3 className="font-bold text-sm">{ad.title || t('ad_preview_title_ph', 'عنوان الإعلان')}</h3>
+                  {ad.description && <p className="text-xs text-white/70 mt-0.5">{ad.description}</p>}
+                </div>
+                {ad.link_url && <span className="text-xs bg-white/20 px-3 py-1 rounded-full text-white whitespace-nowrap">{t('ad_learn_more', 'اعرف أكثر')}</span>}
+              </div>
+            </div>
+          )}
+          {adLabel}
+        </div>
+      ) : variant === 'card' ? (
+        <div className={`${commonWrapper} bg-white max-w-sm mx-auto`}>
+          {resolvedSrc && (
+            isVideo ? (
+              <video src={resolvedSrc} className="w-full h-32 object-cover" muted loop autoPlay playsInline />
+            ) : (
+              <img src={resolvedSrc} alt={ad.title} className="w-full h-32 object-cover" />
+            )
+          )}
+          <div className="p-3">
+            <h3 className="font-bold text-sm text-gray-900">{ad.title || t('ad_preview_title_ph', 'عنوان الإعلان')}</h3>
+            {ad.description && <p className="text-xs text-gray-500 mt-1">{ad.description}</p>}
+            {ad.link_url && <span className="inline-block mt-2 text-xs text-blue-600 font-medium">{t('ad_learn_more', 'اعرف أكثر')} →</span>}
+          </div>
+          {adLabel}
+        </div>
+      ) : (
+        /* slim */
+        <div className={`${commonWrapper} flex items-center gap-3 bg-gradient-to-r from-indigo-50 to-blue-50 border border-indigo-100 px-3 py-2.5`}>
+          {resolvedSrc && !isVideo && <img src={resolvedSrc} alt="" className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />}
+          <div className="flex-1 min-w-0">
+            <h4 className="text-xs font-bold text-gray-800 truncate">{ad.title || t('ad_preview_title_ph', 'عنوان الإعلان')}</h4>
+            {ad.description && <p className="text-[10px] text-gray-500 truncate">{ad.description}</p>}
+          </div>
+          <span className="text-[8px] text-indigo-500 bg-indigo-100 px-1.5 py-0.5 rounded flex-shrink-0">{t('ad_label', 'إعلان')}</span>
+        </div>
+      )}
+
+      {/* معلومات الإعلان */}
+      <div className="mt-3 pt-3 border-t border-indigo-200/50 space-y-1">
+        {ad?.link_url && (
+          <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
+            <span>🔗</span>
+            <span className="truncate font-mono" dir="ltr">{ad.link_url}</span>
+          </div>
+        )}
+        {(ad?.start_date || ad?.end_date) && (
+          <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
+            <span>📅</span>
+            <span>{ad.start_date || '—'} → {ad.end_date || '∞'}</span>
+          </div>
+        )}
+        {ad?.is_gift && (
+          <div className="text-[10px] text-pink-600 font-bold">🎁 {t('ad_gift_preview', 'إعلان هدية - لا يُحتسب في الإيرادات')}</div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/**
  * AdsTab — extracted from SuperAdminPanel.js to reduce its size.
  * Pure JSX + handlers wired through props; no new behavior.
  */
@@ -359,6 +468,10 @@ const AdsTab = ({
               </label>
             </div>
           </div>
+          {/* Live Preview للإنشاء */}
+          <div className="mb-4">
+            <AdPreview ad={newAd} t={t} />
+          </div>
           <div className="flex gap-3">
             <button onClick={handleCreateAd} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">{t('sa_create', 'إنشاء')}</button>
             <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
@@ -670,6 +783,10 @@ const AdsTab = ({
                 <input type="checkbox" checked={editAd.is_active !== false} onChange={e => setEditAd({ ...editAd, is_active: e.target.checked })} className="w-4 h-4 rounded bg-gray-800 border-gray-600 text-green-500" />
                 <span className="text-xs text-gray-300">{t('sp_active', 'نشط')}</span>
               </label>
+            </div>
+            {/* Live Preview للتعديل */}
+            <div className="mb-4">
+              <AdPreview ad={editAd} t={t} />
             </div>
             <div className="flex gap-3">
               <button onClick={handleUpdateAd} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500" data-testid="save-edit-ad">{t('sa_save_changes', 'حفظ التغييرات')}</button>

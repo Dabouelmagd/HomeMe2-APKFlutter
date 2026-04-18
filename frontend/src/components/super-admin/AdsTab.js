@@ -90,13 +90,17 @@ const AdsTab = ({
           <h3 className="text-lg font-bold text-white">{t('ad_hybrid_control', 'تحكم في الإعلانات (داخلي + AdSense)')}</h3>
           <button onClick={async () => {
             try {
-              const res = await axios.get(`${API}/ads/ad-settings`, getToken());
-              const s = res.data;
-              await axios.put(`${API}/ads/ad-settings`, { adsense_global_enabled: !s.adsense_global_enabled }, getToken());
-              toast.success(!s.adsense_global_enabled ? t('ad_adsense_on', 'AdSense مفعّل') : t('ad_adsense_off', 'AdSense متوقف'));
-            } catch { toast.error(t('sa_failed', 'فشل')); }
-          }} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-500" data-testid="toggle-adsense-global">
-            {t('ad_toggle_adsense', 'تبديل AdSense')}
+              const current = adSettings?.adsense_global_enabled !== false;
+              const next = !current;
+              await axios.put(`${API}/ads/ad-settings`, { adsense_global_enabled: next }, getToken());
+              setAdSettings(prev => ({ ...(prev || {}), adsense_global_enabled: next }));
+              toast.success(next ? t('ad_adsense_on', 'AdSense مفعّل') : t('ad_adsense_off', 'AdSense متوقف'));
+            } catch (err) {
+              console.error('Toggle AdSense error:', err);
+              toast.error(err.response?.data?.detail || t('sa_failed', 'فشل'));
+            }
+          }} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${adSettings?.adsense_global_enabled !== false ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-gray-600 hover:bg-gray-500 text-gray-200'}`} data-testid="toggle-adsense-global">
+            {adSettings?.adsense_global_enabled !== false ? `✓ ${t('ad_adsense_on_label', 'AdSense مفعّل')}` : `○ ${t('ad_adsense_off_label', 'AdSense متوقف')}`}
           </button>
         </div>
         <p className="text-xs text-gray-400 mb-4">{t('ad_hybrid_desc', 'الإعلانات الداخلية تظهر أولاً. لو مفيش إعلان داخلي، يظهر AdSense تلقائياً (لو مفعّل).')}</p>
@@ -248,7 +252,7 @@ const AdsTab = ({
                 const formData = new FormData();
                 formData.append('file', file);
                 try {
-                  const res = await axios.post(`${API}/ads/upload`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
+                  const res = await axios.post(`${API}/ads/upload-media`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
                   setNewAd({ ...newAd, image_url: res.data.url, media_type: file.type.startsWith('video') ? 'video' : 'image' });
                   toast.success(t('sa_uploaded', 'تم الرفع'));
                 } catch { toast.error(t('sa_upload_failed', 'فشل الرفع')); }
@@ -561,7 +565,7 @@ const AdsTab = ({
                   const formData = new FormData();
                   formData.append('file', file);
                   try {
-                    const res = await axios.post(`${API}/ads/upload`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
+                    const res = await axios.post(`${API}/ads/upload-media`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
                     setEditAd({ ...editAd, image_url: res.data.url });
                     toast.success(t('sa_uploaded', 'تم الرفع'));
                   } catch { toast.error(t('sa_upload_failed', 'فشل الرفع')); }

@@ -23,23 +23,33 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
   const [dismissed, setDismissed] = useState([]);
   const [adSettings, setAdSettings] = useState(null);
 
+  const isPublicPosition = ['homepage_hero', 'homepage_mid', 'homepage_footer', 'login_page'].includes(position);
+
   const fetchAds = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) return;
-      const [adsRes, settingsRes] = await Promise.all([
-        axios.get(`${API}/ads/active`, {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { position, compound_id: user?.compound_id || '' }
-        }),
-        axios.get(`${API}/ads/ad-settings`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }).catch(() => ({ data: null }))
-      ]);
-      setAds(adsRes.data.ads || []);
-      setAdSettings(settingsRes.data);
+
+      if (isPublicPosition) {
+        // Public endpoint - no auth needed
+        const res = await axios.get(`${API}/ads/public`, { params: { position } });
+        setAds(res.data.ads || []);
+        setAdSettings(res.data.settings || null);
+      } else {
+        if (!token) return;
+        const [adsRes, settingsRes] = await Promise.all([
+          axios.get(`${API}/ads/active`, {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { position, compound_id: user?.compound_id || '' }
+          }),
+          axios.get(`${API}/ads/ad-settings`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(() => ({ data: null }))
+        ]);
+        setAds(adsRes.data.ads || []);
+        setAdSettings(settingsRes.data);
+      }
     } catch { /* silent */ }
-  }, [position, user?.compound_id]);
+  }, [position, user?.compound_id, isPublicPosition]);
 
   useEffect(() => { fetchAds(); }, [fetchAds]);
 

@@ -17,6 +17,8 @@ import {
   QrCodeIcon, ClockIcon, PresentationChartBarIcon
 } from '@heroicons/react/24/outline';
 
+import InternalAdBanner from './InternalAdBanner';
+
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -482,17 +484,10 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Google Ad Space 1 - After Hero */}
-      <div className="bg-gray-100 py-2 text-center" data-testid="ad-space-1">
+      {/* Ad Space 1 - After Hero (Homepage Hero) */}
+      <div className="bg-gray-100 py-3 text-center" data-testid="ad-space-1">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden" style={{ minHeight: '90px', maxHeight: '100px' }}>
-            <ins className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-5928973437129941"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-          </div>
+          <InternalAdBanner position="homepage_hero" maxAds={1} variant="full" className="" />
         </div>
       </div>
 
@@ -613,17 +608,10 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Google Ad Space 2 - Before Pricing */}
-      <div className="bg-slate-900 py-2 text-center">
+      {/* Ad Space 2 - Before Pricing (Homepage Mid) */}
+      <div className="bg-slate-900 py-3 text-center">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="rounded-lg overflow-hidden" style={{ minHeight: '90px', maxHeight: '100px' }}>
-            <ins className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-5928973437129941"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-          </div>
+          <InternalAdBanner position="homepage_mid" maxAds={1} variant="full" className="" />
         </div>
       </div>
 
@@ -960,17 +948,10 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Google Ad Space 3 - Before CTA */}
-      <div className="bg-gray-50 py-2 text-center">
+      {/* Ad Space 3 - Before CTA (Homepage Footer) */}
+      <div className="bg-gray-50 py-3 text-center">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden" style={{ minHeight: '90px', maxHeight: '100px' }}>
-            <ins className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-5928973437129941"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            />
-          </div>
+          <InternalAdBanner position="homepage_footer" maxAds={1} variant="full" className="" />
         </div>
       </div>
 

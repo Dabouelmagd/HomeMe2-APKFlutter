@@ -160,6 +160,32 @@ async def update_ad_settings(body: dict, current_user: dict = Depends(require_su
     return {"message": "تم تحديث إعدادات الإعلانات"}
 
 
+@router.get("/ads/public")
+async def get_public_ads(position: str = ""):
+    """Get active ads for public pages (no auth required)"""
+    db = get_db()
+    homepage_positions = ["homepage_hero", "homepage_mid", "homepage_footer", "login_page"]
+    query = {"is_active": True}
+    if position and position in homepage_positions:
+        query["position"] = position
+    else:
+        query["position"] = {"$in": homepage_positions}
+
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    ads = await db.internal_ads.find(query, {"_id": 0}).sort("priority", -1).to_list(20)
+    valid = []
+    for a in ads:
+        if a.get("start_date") and a["start_date"] > now:
+            continue
+        if a.get("end_date") and a["end_date"] < now:
+            continue
+        valid.append(a)
+
+    # Settings
+    settings = await db.app_settings.find_one({"key": "ad_settings"}, {"_id": 0}) or {}
+    return {"ads": valid, "settings": settings}
+
+
 @router.get("/ads/active")
 async def get_active_ads(position: str = "", compound_id: str = "", current_user: dict = Depends(get_current_user)):
     """Get active ads for display inside the app"""

@@ -75,6 +75,70 @@ const CompoundDetailModal = ({ compoundId, onClose, t, isSuperAdminOnly }) => {
     }
   };
 
+  // تصدير CSV ذكي — يعرف ماذا يُصدّر حسب التبويب المفتوح
+  const exportCSV = () => {
+    if (!data) return;
+    let rows = [];
+    let headers = [];
+    let filename = `${data.compound.name}_${activeView}_${new Date().toISOString().slice(0, 10)}.csv`;
+
+    switch (activeView) {
+      case 'users': {
+        headers = ['Name', 'Username', 'Email', 'Phone', 'Role', 'Unit', 'Active'];
+        Object.entries(data.users_by_role).forEach(([role, users]) => {
+          users.forEach(u => {
+            rows.push([u.full_name || '', u.username || '', u.email || '', u.phone || '', roleLabels[role] || role, u.unit_number || '', u.is_active === false ? 'No' : 'Yes']);
+          });
+        });
+        break;
+      }
+      case 'families': {
+        headers = ['Family Name', 'Head', 'Unit', 'Members Count'];
+        data.families.forEach(f => rows.push([f.family_name || f.name || '', f.head_name || '', f.unit_number || '', (f.members || []).length]));
+        break;
+      }
+      case 'complaints': {
+        headers = ['Title', 'Status', 'Description', 'Created At'];
+        data.recent_complaints.forEach(c => rows.push([c.title || c.subject || '', c.status || '', (c.description || c.content || '').replace(/\n/g, ' '), c.created_at || '']));
+        break;
+      }
+      case 'services': {
+        headers = ['Service', 'Description', 'Price', 'Active'];
+        data.services.forEach(s => rows.push([s.name || '', s.description || '', s.price || 0, s.is_active ? 'Yes' : 'No']));
+        break;
+      }
+      case 'ads': {
+        headers = ['Title', 'Position', 'Views', 'Clicks', 'Active'];
+        data.ads.forEach(a => rows.push([a.title || '', a.position || '', a.views || 0, a.clicks || 0, a.is_active ? 'Yes' : 'No']));
+        break;
+      }
+      default: {
+        // overview — export full summary
+        headers = ['Metric', 'Value'];
+        rows = Object.entries(data.stats).map(([k, v]) => [k, v]);
+        filename = `${data.compound.name}_summary_${new Date().toISOString().slice(0, 10)}.csv`;
+        break;
+      }
+    }
+
+    if (rows.length === 0) {
+      toast.error(t('cd_no_export', 'لا توجد بيانات للتصدير'));
+      return;
+    }
+
+    const csv = [headers, ...rows]
+      .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(t('cd_exported', `تم تصدير ${rows.length} صف`));
+  };
+
   if (!compoundId) return null;
 
   const roleLabels = {
@@ -118,6 +182,21 @@ const CompoundDetailModal = ({ compoundId, onClose, t, isSuperAdminOnly }) => {
                 </div>
               </div>
               <button onClick={onClose} className="text-gray-400 hover:text-white text-2xl" data-testid="close-compound-modal">×</button>
+            </div>
+
+            {/* Action bar */}
+            <div className="px-5 py-2 bg-gray-900/30 border-b border-gray-700/50 flex items-center justify-between">
+              <span className="text-[10px] text-gray-500">
+                {activeView === 'overview' ? t('cd_action_overview', 'ملخص شامل') : t('cd_action_detail', 'تفاصيل')}: <span className="text-gray-300 font-medium">{data.compound.name}</span>
+              </span>
+              <button
+                onClick={exportCSV}
+                className="px-3 py-1.5 bg-emerald-600/20 text-emerald-300 border border-emerald-600/40 rounded-lg text-[11px] font-bold hover:bg-emerald-600/30 transition-all flex items-center gap-1.5"
+                data-testid="cd-export-csv"
+                title={t('cd_export_current', 'تصدير محتوى التبويب الحالي')}
+              >
+                📥 {t('cd_export_csv', 'تصدير CSV')}
+              </button>
             </div>
 
             {/* Tabs */}

@@ -500,6 +500,105 @@ const HomePage = () => {
         </div>
       </div>
 
+      {/* Resident Portal — قسم مخصص للسكان والمستخدمين الجدد */}
+      <section className="relative py-14 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 overflow-hidden" data-testid="resident-portal-section">
+        <div className="absolute inset-0 pointer-events-none opacity-5">
+          <div className="absolute top-0 end-0 text-9xl">🏠</div>
+          <div className="absolute bottom-0 start-0 text-9xl">👨‍👩‍👧</div>
+        </div>
+        <div className="max-w-6xl mx-auto px-4 relative z-10">
+          <div className="text-center mb-8">
+            <span className="inline-block px-4 py-1.5 bg-emerald-500/15 text-emerald-700 rounded-full text-xs font-bold mb-3">
+              🏡 {t('hp_residents_badge', 'بوابة السكان')}
+            </span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>
+              {t('hp_residents_title', 'هل أنت ساكن في أحد مجتمعاتنا؟')}
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
+              {t('hp_residents_subtitle', 'ادخل بوابتك الخاصة لإدارة وحدتك، دفع الفواتير، طلب الخدمات، والتواصل مع إدارة مجتمعك — كل شيء في مكان واحد')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl mx-auto">
+            {/* كارت تسجيل الدخول للسكان */}
+            <div className="bg-white rounded-2xl border-2 border-emerald-200 p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all group" data-testid="resident-login-card">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-emerald-500/25">
+                  🔑
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900">{t('hp_already_resident', 'أنا ساكن مسجل')}</h3>
+                  <p className="text-xs text-gray-500">{t('hp_already_resident_desc', 'لدي حساب بالفعل')}</p>
+                </div>
+              </div>
+              <ul className="space-y-1.5 text-xs text-gray-600 mb-5">
+                <li className="flex items-center gap-2"><span className="text-emerald-500">✓</span> {t('hp_res_feat1', 'ادفع فواتير الصيانة والمرافق')}</li>
+                <li className="flex items-center gap-2"><span className="text-emerald-500">✓</span> {t('hp_res_feat2', 'اطلب خدمات الصيانة والنظافة')}</li>
+                <li className="flex items-center gap-2"><span className="text-emerald-500">✓</span> {t('hp_res_feat3', 'تواصل مع الإدارة والأمن')}</li>
+                <li className="flex items-center gap-2"><span className="text-emerald-500">✓</span> {t('hp_res_feat4', 'استقبل الإشعارات والإعلانات')}</li>
+              </ul>
+              <Link
+                to="/login"
+                state={{ fromResidentPortal: true }}
+                className="block w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-bold text-sm text-center hover:shadow-xl hover:shadow-emerald-500/30 transition-all"
+                data-testid="resident-login-btn"
+              >
+                {t('hp_resident_login', 'تسجيل الدخول كساكن')} ←
+              </Link>
+            </div>
+
+            {/* كارت التسجيل الجديد */}
+            <div className="bg-white rounded-2xl border-2 border-blue-200 p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all group" data-testid="resident-register-card">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-blue-500/25">
+                  ✨
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg text-gray-900">{t('hp_new_resident', 'ساكن جديد؟')}</h3>
+                  <p className="text-xs text-gray-500">{t('hp_new_resident_desc', 'أنشئ حسابك الآن')}</p>
+                </div>
+              </div>
+              <ul className="space-y-1.5 text-xs text-gray-600 mb-4">
+                <li className="flex items-center gap-2"><span className="text-blue-500">✓</span> {t('hp_new_feat1', 'سجّل برقم وحدتك وكود الدعوة من الإدارة')}</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500">✓</span> {t('hp_new_feat2', 'أضف أفراد أسرتك بسهولة')}</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500">✓</span> {t('hp_new_feat3', 'تفعيل فوري خلال دقائق')}</li>
+                <li className="flex items-center gap-2"><span className="text-blue-500">✓</span> {t('hp_new_feat4', 'مجاني بالكامل للسكان')}</li>
+              </ul>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-2 mb-4">
+                <p className="text-[10px] text-amber-700 flex items-center gap-1.5">
+                  <span>💡</span>
+                  {t('hp_need_invite', 'تحتاج كود دعوة من إدارة مجتمعك لتفعيل الحساب')}
+                </p>
+              </div>
+              <Link
+                to="/register"
+                state={{ accountType: 'resident' }}
+                className="block w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-sm text-center hover:shadow-xl hover:shadow-blue-500/30 transition-all"
+                data-testid="resident-register-btn"
+              >
+                {t('hp_resident_register', 'إنشاء حساب ساكن جديد')} ←
+              </Link>
+            </div>
+          </div>
+
+          {/* فاصل للأدوار الإدارية */}
+          <div className="mt-10 text-center">
+            <div className="inline-flex items-center gap-3 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-full px-5 py-2.5 shadow-sm">
+              <span className="text-xs text-gray-500">
+                {t('hp_admin_note', 'للمديرين ومالكي المجتمعات والشركات')}:
+              </span>
+              <Link to="/login" className="text-xs text-purple-600 font-bold hover:text-purple-700 flex items-center gap-1" data-testid="admin-login-link">
+                🛡️ {t('hp_admin_login', 'دخول الإدارة')}
+              </Link>
+              <span className="text-gray-300">•</span>
+              <Link to="/register" className="text-xs text-indigo-600 font-bold hover:text-indigo-700 flex items-center gap-1" data-testid="business-register-link">
+                💼 {t('hp_business_register', 'تسجيل مؤسسة')}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Registration Types */}
       <section className="py-16 bg-gray-50/80" id="register-types" data-testid="registration-section">
         <div className="max-w-7xl mx-auto px-4">

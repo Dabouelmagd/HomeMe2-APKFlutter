@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -6,9 +6,156 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
 /**
- * AdPreview — معاينة مباشرة لشكل الإعلان النهائي بناءً على الـ position المختار
- * يحاكي نفس الشكل الذي سيظهر على الصفحة الرئيسية / لوحة التحكم
+ * المقاسات الموصى بها لكل موقع (width x height)
  */
+const RECOMMENDED_SIZES = {
+  homepage_hero: { w: 970, h: 250, minW: 728, minH: 90 },
+  homepage_mid: { w: 728, h: 90, minW: 468, minH: 60 },
+  homepage_footer: { w: 728, h: 90, minW: 320, minH: 50 },
+  banner: { w: 970, h: 250, minW: 728, minH: 90 },
+  sidebar: { w: 300, h: 250, minW: 160, minH: 600 },
+  dashboard: { w: 336, h: 280, minW: 300, minH: 250 },
+  inline: { w: 728, h: 90, minW: 320, minH: 50 },
+  login_page: { w: 728, h: 90, minW: 300, minH: 250 },
+  popup: { w: 400, h: 300, minW: 300, minH: 250 },
+  notification: { w: 728, h: 90, minW: 320, minH: 50 },
+  splash: { w: 320, h: 480, minW: 300, minH: 250 },
+  services_page: { w: 728, h: 90, minW: 300, minH: 250 },
+};
+
+const MAX_TITLE_LENGTHS = {
+  homepage_hero: 60, homepage_mid: 50, homepage_footer: 40, banner: 60,
+  sidebar: 25, dashboard: 35, inline: 45, login_page: 40,
+  popup: 30, notification: 40, splash: 25, services_page: 40,
+};
+
+/**
+ * AdHealthChecker — فحص ذكي للصورة + الرابط + العنوان
+ */
+const AdHealthChecker = ({ ad, t }) => {
+  const [imgDims, setImgDims] = useState(null);
+  const [linkCheck, setLinkCheck] = useState(null); // null | 'checking' | {ok, status, error}
+  const resolvedSrc = ad?.image_url
+    ? (ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url)
+    : null;
+
+  // فحص أبعاد الصورة عند تغيّرها
+  useEffect(() => {
+    setImgDims(null);
+    if (!resolvedSrc) return;
+    if ((ad?.media_type === 'video') || /\.(mp4|webm|mov)(\?|$)/i.test(resolvedSrc)) return;
+    const img = new Image();
+    img.onload = () => setImgDims({ w: img.naturalWidth, h: img.naturalHeight });
+    img.onerror = () => setImgDims({ error: true });
+    img.src = resolvedSrc;
+  }, [resolvedSrc, ad?.media_type]);
+
+  // فحص الرابط (debounced — بعد ثانية من التوقف عن الكتابة)
+  useEffect(() => {
+    if (!ad?.link_url || !ad.link_url.trim()) {
+      setLinkCheck(null);
+      return;
+    }
+    setLinkCheck('checking');
+    const timer = setTimeout(async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`${API}/ads/check-url`, {
+          params: { url: ad.link_url },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setLinkCheck(res.data);
+      } catch {
+        setLinkCheck({ ok: false, error: 'request_failed' });
+      }
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [ad?.link_url]);
+
+  const pos = ad?.position || 'banner';
+  const rec = RECOMMENDED_SIZES[pos];
+  const maxTitleLen = MAX_TITLE_LENGTHS[pos] || 50;
+  const titleLen = (ad?.title || '').length;
+
+  const warnings = [];
+  const infos = [];
+
+  // فحص الصورة
+  if (resolvedSrc && imgDims && !imgDims.error) {
+    if (rec && (imgDims.w < rec.minW || imgDims.h < rec.minH)) {
+      warnings.push({
+        icon: '🖼️',
+        msg: t('chk_img_small', `الصورة ${imgDims.w}×${imgDims.h} أصغر من الحد الأدنى المطلوب ${rec.minW}×${rec.minH} — قد تظهر ضبابية`),
+      });
+    } else if (rec && (imgDims.w < rec.w || imgDims.h < rec.h)) {
+      infos.push({
+        icon: '💡',
+        msg: t('chk_img_ok_small', `الصورة ${imgDims.w}×${imgDims.h} مقبولة. المقاس المثالي ${rec.w}×${rec.h} لأفضل جودة`),
+      });
+    }
+  } else if (imgDims?.error) {
+    warnings.push({ icon: '❌', msg: t('chk_img_broken', 'فشل تحميل الصورة — تأكدي من الرابط') });
+  }
+
+  // فحص العنوان
+  if (titleLen > maxTitleLen) {
+    warnings.push({
+      icon: '📝',
+      msg: t('chk_title_long', `العنوان ${titleLen} حرف، سيُقطع عند ${maxTitleLen} حرف في هذا المكان`),
+    });
+  } else if (titleLen > 0 && titleLen > maxTitleLen - 10) {
+    infos.push({
+      icon: 'ℹ️',
+      msg: t('chk_title_near_limit', `العنوان قريب من الحد الأقصى (${titleLen}/${maxTitleLen})`),
+    });
+  }
+
+  // فحص الرابط
+  if (linkCheck === 'checking') {
+    infos.push({ icon: '⏳', msg: t('chk_link_checking', 'جاري فحص الرابط...') });
+  } else if (linkCheck && !linkCheck.ok) {
+    const errMap = {
+      timeout: t('chk_link_timeout', 'الرابط لا يستجيب (timeout)'),
+      connection_failed: t('chk_link_no_host', 'الرابط غير موجود أو الدومين خطأ'),
+      empty: t('chk_link_empty', 'الرابط فارغ'),
+    };
+    const msg = linkCheck.status >= 400
+      ? t('chk_link_404', `الرابط لا يعمل (خطأ ${linkCheck.status})`)
+      : errMap[linkCheck.error] || t('chk_link_failed', 'الرابط لا يعمل');
+    warnings.push({ icon: '🔗', msg });
+  } else if (linkCheck?.ok) {
+    infos.push({ icon: '✅', msg: t('chk_link_ok', `الرابط يعمل (${linkCheck.status})`) });
+  }
+
+  if (warnings.length === 0 && infos.length === 0) {
+    // إذا لم يُدخل شيء، لا نعرض شيئاً
+    if (!ad?.title && !resolvedSrc && !ad?.link_url) return null;
+    return (
+      <div className="mt-2 bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 text-[11px] text-emerald-700 flex items-center gap-2" data-testid="ad-health-ok">
+        <span>✅</span>
+        <span>{t('chk_all_good', 'كل شيء يبدو ممتازاً — يمكنك الحفظ')}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-2 space-y-1" data-testid="ad-health-checker">
+      {warnings.map((w, i) => (
+        <div key={`w${i}`} className="bg-amber-50 border border-amber-200 rounded-lg p-2 text-[11px] text-amber-800 flex items-start gap-2">
+          <span className="flex-shrink-0">{w.icon}</span>
+          <span>{w.msg}</span>
+        </div>
+      ))}
+      {infos.map((info, i) => (
+        <div key={`i${i}`} className={`border rounded-lg p-2 text-[11px] flex items-start gap-2 ${info.icon === '✅' ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-blue-50 border-blue-200 text-blue-700'}`}>
+          <span className="flex-shrink-0">{info.icon}</span>
+          <span>{info.msg}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const AdPreview = ({ ad, t }) => {
   const resolvedSrc = ad?.image_url
     ? (ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url)
@@ -110,6 +257,9 @@ const AdPreview = ({ ad, t }) => {
           <div className="text-[10px] text-pink-600 font-bold">🎁 {t('ad_gift_preview', 'إعلان هدية - لا يُحتسب في الإيرادات')}</div>
         )}
       </div>
+
+      {/* Smart Health Checker */}
+      <AdHealthChecker ad={ad} t={t} />
     </div>
   );
 };

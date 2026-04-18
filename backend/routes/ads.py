@@ -9,6 +9,7 @@ import uuid
 import logging
 import os
 import base64
+import httpx
 
 from database import get_db
 from auth_deps import get_current_user, require_super_admin
@@ -1488,3 +1489,41 @@ async def serve_ad_media(filename: str):
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="ملف غير موجود")
     return FileResponse(filepath)
+
+
+@router.get("/ads/check-url")
+async def check_ad_url(url: str, current_user: dict = Depends(get_current_user)):
+    """التحقق من صحة الرابط (server-side لتجنّب CORS)"""
+    if not url or not url.strip():
+        return {"ok": False, "status": 0, "error": "empty"}
+    full = url.strip()
+    if not full.startswith(("http://", "https://")):
+        full = "https://" + full
+    try:
+        async with httpx.AsyncClient(timeout=8.0, follow_redirects=True) as client:
+            try:
+                resp = await client.head(full)
+                # بعض المواقع لا تدعم HEAD — نجرب GET خفيف
+                if resp.status_code >= 400 and resp.status_code != 405:
+                    pass
+                elif resp.status_code == 405:
+                    resp = await client.get(full, headers={"Range": "bytes=0-0"})
+                return {
+                    "ok": 200 <= resp.status_code < 400,
+                    "status": resp.status_code,
+                    "final_url": str(resp.url),
+                }
+            except httpx.HTTPError:
+                # محاولة GET كـ fallback
+                resp = await client.get(full, headers={"Range": "bytes=0-0"})
+                return {
+                    "ok": 200 <= resp.status_code < 400,
+                    "status": resp.status_code,
+                    "final_url": str(resp.url),
+                }
+    except httpx.TimeoutException:
+        return {"ok": False, "status": 0, "error": "timeout"}
+    except httpx.ConnectError:
+        return {"ok": False, "status": 0, "error": "connection_failed"}
+    except Exception as e:
+        return {"ok": False, "status": 0, "error": str(e)[:100]}

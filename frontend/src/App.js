@@ -132,43 +132,62 @@ export const useNotifications = () => {
   return context;
 };
 
+import {
+  getCurrentSession,
+  saveCurrentSession,
+  removeCurrentSession,
+  getActiveSessions,
+  switchToSession,
+  cleanupStaleSessions,
+  migrateFromLegacy,
+} from './utils/sessionManager';
+
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    // Cleanup old sessions and migrate legacy storage
+    cleanupStaleSessions();
+    migrateFromLegacy();
+
+    // Get this tab's session
+    const session = getCurrentSession();
+    const token = session?.token || localStorage.getItem('token');
+
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
-      // Verify token by calling /auth/me endpoint
       axios.get(`${API}/auth/me`)
         .then(response => {
           const userData = response.data;
-          // Restore active_role from localStorage if user selected a different role in AccountSelector
-          const savedRole = localStorage.getItem('selectedRole');
+          // Restore role from session-specific storage
+          const savedRole = session?.selectedRole || localStorage.getItem('selectedRole');
           if (savedRole && savedRole !== userData.role) {
             userData.active_role = savedRole;
           }
-          const savedCompoundId = localStorage.getItem('selectedCompoundId');
+          const savedCompoundId = session?.selectedCompoundId || localStorage.getItem('selectedCompoundId');
           if (savedCompoundId) {
             userData.selected_compound_id = savedCompoundId;
           }
           setUser(userData);
           
-          // Update localStorage with fresh user data
+          // Update session storage
+          saveCurrentSession(token, userData, {
+            selectedRole: savedRole,
+            selectedCompoundId: savedCompoundId,
+          });
+          // Keep legacy storage in sync for backward compatibility
+          localStorage.setItem('token', token);
           localStorage.setItem('user', JSON.stringify(userData));
           
-          // Initialize WebSocket connection
           initializeSocket(userData.id);
-          
-          // Initialize push notifications for already logged-in users
           initializePushNotifications();
         })
         .catch(error => {
           console.log('Token verification failed:', error);
-          // Token is invalid or expired, clear it
+          removeCurrentSession();
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           delete axios.defaults.headers.common['Authorization'];
@@ -199,6 +218,9 @@ const AuthProvider = ({ children }) => {
       const response = await axios.post(`${API}/auth/login`, credentials);
       const { access_token, user: userData } = response.data;
       
+      // Save to multi-session manager (tab-specific)
+      saveCurrentSession(access_token, userData);
+      // Keep legacy storage for backward compatibility
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(userData));
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
@@ -206,12 +228,9 @@ const AuthProvider = ({ children }) => {
       setUser(userData);
       initializeSocket(userData.id);
       
-      // Auto-subscribe to push notifications after login
       setTimeout(() => {
         autoSubscribeToPush().then(success => {
-          if (success) {
-            console.log('Push notifications enabled automatically');
-          }
+          if (success) console.log('Push notifications enabled');
         });
       }, 1500);
       
@@ -237,11 +256,19 @@ const AuthProvider = ({ children }) => {
   };
 
   const updateUser = (updatedUser) => {
+    const session = getCurrentSession();
+    if (session) {
+      saveCurrentSession(session.token, updatedUser, {
+        selectedRole: updatedUser.active_role || session.selectedRole,
+        selectedCompoundId: updatedUser.selected_compound_id || session.selectedCompoundId,
+      });
+    }
     localStorage.setItem('user', JSON.stringify(updatedUser));
     setUser(updatedUser);
   };
 
   const logout = () => {
+    removeCurrentSession();
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('selectedCompoundId');
@@ -257,6 +284,23 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  // Switch to another active session (for multi-account)
+  const switchSession = (targetSessionId) => {
+    const target = switchToSession(targetSessionId);
+    if (!target) return false;
+    
+    // Update axios and state
+    axios.defaults.headers.common['Authorization'] = `Bearer ${target.token}`;
+    localStorage.setItem('token', target.token);
+    localStorage.setItem('user', JSON.stringify(target.user));
+    if (target.selectedRole) localStorage.setItem('selectedRole', target.selectedRole);
+    if (target.selectedCompoundId) localStorage.setItem('selectedCompoundId', target.selectedCompoundId);
+    
+    setUser(target.user);
+    window.location.reload();
+    return true;
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -264,6 +308,8 @@ const AuthProvider = ({ children }) => {
       register,
       logout,
       updateUser,
+      switchSession,
+      getActiveSessions,
       loading,
       socket
     }}>

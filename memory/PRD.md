@@ -1,23 +1,16 @@
 # HomeMe PRD
 
-## Ad Positions - All 12 Connected
-| Position | Max | Component | File | Auth |
-|---|---|---|---|---|
-| homepage_hero | 3 | InternalAdBanner | HomePage.js (after hero) | Public |
-| homepage_mid | 2 | InternalAdBanner | HomePage.js (before pricing) | Public |
-| homepage_footer | 2 | InternalAdBanner | HomePage.js (before CTA) | Public |
-| banner | 5 | InternalAdBanner | Layout.js | Auth |
-| sidebar | 3 | InternalAdBanner | Layout.js | Auth |
-| dashboard | 2 | InternalAdBanner | ResidentDashboard.js | Auth |
-| inline | 4 | InternalAdBanner | ResidentDashboard.js | Auth |
-| login_page | 2 | InternalAdBanner | Login.js | Public |
-| popup | 1 | PopupAdOverlay | Layout.js | Auth |
-| notification | 2 | InternalAdBanner | NotificationCenter.js | Auth |
-| splash | 1 | InternalAdBanner | App.js | Auth |
-| services_page | 3 | InternalAdBanner | ServicesManagement.js | Auth |
+## Multi-Session System
+- Each browser tab gets unique sessionId (sessionStorage)
+- All sessions stored in localStorage (shared)
+- Session Switcher in header shows current account + other active accounts
+- "Add Account" opens new tab for login
+- Each tab survives refresh independently
 
-## Public API
-- GET /api/ads/public?position= (no auth, homepage/login only)
+## Files
+- /app/frontend/src/utils/sessionManager.js - Session management utility
+- /app/frontend/src/components/SessionSwitcher.js - UI component
+- /app/frontend/src/App.js - AuthProvider uses session manager
 
 ## Backlog
 - P2: Bank transfer API

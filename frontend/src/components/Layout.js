@@ -48,6 +48,7 @@ import {
   SignalIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
+import SessionSwitcher from './SessionSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
 import ThemeToggle from './ThemeToggle';
 import BackButton from './BackButton';
@@ -786,6 +787,9 @@ const Layout = ({ children, isTrialMode = false }) => {
                   </div>
                 </div>
               </div>
+
+              {/* Session Switcher */}
+              <SessionSwitcher />
 
               {/* Theme Toggle */}
               <ThemeToggle />

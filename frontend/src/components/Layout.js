@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useNotifications } from '../App';
 import {
@@ -880,7 +881,82 @@ const Layout = ({ children, isTrialMode = false }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
             </svg>
           </button>
+
+          {/* Popup Ad - appears once per session */}
+          <PopupAdOverlay />
         </main>
+      </div>
+    </div>
+  );
+};
+
+// Popup Ad Overlay - shows once per session
+const PopupAdOverlay = () => {
+  const [show, setShow] = useState(false);
+  const [ad, setAd] = useState(null);
+
+  useEffect(() => {
+    const shown = sessionStorage.getItem('popup_ad_shown');
+    if (shown) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/ads/active`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: { position: 'popup' }
+        });
+        const ads = res.data.ads || [];
+        if (ads.length > 0) {
+          setAd(ads[0]);
+          setShow(true);
+          sessionStorage.setItem('popup_ad_shown', '1');
+          // Track view
+          axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/ads/${ads[0].id}/view`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+          }).catch(() => {});
+        }
+      } catch { /* silent */ }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!show || !ad) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" data-testid="popup-ad-overlay">
+      <div className="relative max-w-md w-full mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+        <button onClick={() => setShow(false)} className="absolute top-3 end-3 z-10 w-8 h-8 bg-black/40 hover:bg-black/60 rounded-full flex items-center justify-center text-white transition-colors">
+          <XMarkIcon className="w-5 h-5" />
+        </button>
+        {ad.image_url && (
+          <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url}
+            alt={ad.title} className="w-full h-48 object-cover" />
+        )}
+        <div className="p-5">
+          <h3 className="text-lg font-bold text-gray-900 mb-1">{ad.title}</h3>
+          {ad.description && <p className="text-sm text-gray-600 mb-3">{ad.description}</p>}
+          <div className="flex gap-2">
+            {ad.link_url && (
+              <a href={ad.link_url} target="_blank" rel="noopener noreferrer"
+                onClick={() => {
+                  const token = localStorage.getItem('token');
+                  axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/ads/${ad.id}/click`, {}, {
+                    headers: { Authorization: `Bearer ${token}` }
+                  }).catch(() => {});
+                }}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white text-center rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors">
+                اعرف أكثر
+              </a>
+            )}
+            <button onClick={() => setShow(false)} className="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors">
+              إغلاق
+            </button>
+          </div>
+        </div>
+        <span className="absolute top-3 start-3 text-[9px] bg-black/30 text-white px-2 py-0.5 rounded-full">إعلان</span>
       </div>
     </div>
   );

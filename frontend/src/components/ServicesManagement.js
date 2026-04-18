@@ -25,6 +25,7 @@ import {
   CheckCircleIcon,
   XCircleIcon
 } from '@heroicons/react/24/outline';
+import InternalAdBanner from './InternalAdBanner';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -916,6 +917,11 @@ const ServicesManagement = () => {
             : t('view_available_services')
           }
         </p>
+      </div>
+
+      {/* Services Page Ad */}
+      <div className="mb-6">
+        <InternalAdBanner position="services_page" maxAds={1} variant="full" />
       </div>
 
       {/* Tab Navigation - Centered with Better Spacing */}

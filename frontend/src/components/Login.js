@@ -11,6 +11,7 @@ import {
   hasBiometricRegistered 
 } from '../services/webauthn';
 import { FingerPrintIcon } from '@heroicons/react/24/outline';
+import InternalAdBanner from './InternalAdBanner';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -323,6 +324,11 @@ const Login = () => {
               {t('register_here')}
             </Link>
           </p>
+        </div>
+
+        {/* Login Page Ad */}
+        <div className="mt-4">
+          <InternalAdBanner position="login_page" maxAds={1} variant="slim" />
         </div>
       </div>
     </div>

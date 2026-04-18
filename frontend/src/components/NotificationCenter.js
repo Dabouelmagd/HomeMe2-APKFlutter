@@ -15,6 +15,7 @@ import {
   MagnifyingGlassIcon,
   EllipsisVerticalIcon
 } from '@heroicons/react/24/outline';
+import InternalAdBanner from './InternalAdBanner';
 import { formatRelativeTime } from '../utils/dateUtils';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -158,6 +159,10 @@ const NotificationCenter = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+      {/* Notification Page Ad */}
+      <div className="max-w-6xl mx-auto px-6 pt-4">
+        <InternalAdBanner position="notification" maxAds={1} variant="slim" />
+      </div>
       {/* Enhanced Header Section */}
       <div className="bg-white shadow-lg">
         <div className="max-w-6xl mx-auto px-6 py-8">

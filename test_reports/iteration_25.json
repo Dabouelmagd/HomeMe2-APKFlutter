@@ -1,0 +1,69 @@
+{
+  "summary": "Iteration 25: Verified InternalAdBanner integration across all 12 ad positions. Backend API returns correct slot_stats with 30 total slots. Frontend components have ad banners in Login, Layout, App, Services, and Notifications pages.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration25_ad_positions.py",
+    "/app/test_reports/pytest/iteration25_ad_positions_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/backend/tests/test_iteration25_ad_positions.py"
+  ],
+  "success_rate": {
+    "backend": "100% (13/13 tests passed)",
+    "frontend": "100% (all ad positions verified)"
+  },
+  "test_credentials": "Owner: Owner_homeme/Dalia1234@, SuperAdmin: superadmin/SuperAdmin2024!",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All 12 ad positions are working: homepage_hero, homepage_mid, homepage_footer, banner, sidebar, dashboard, inline, login_page, popup, notification, splash, services_page. Backend returns slot_stats with correct MAX_SLOTS values (total 30 slots). Frontend has InternalAdBanner in Login.js (login_page), Layout.js (banner, sidebar, PopupAdOverlay), App.js (splash), ServicesManagement.js (services_page), NotificationCenter.js (notification). Ad creation form has all 12 positions in 3 optgroups (website/app/special).",
+  "verified_features": {
+    "backend_api": {
+      "GET /api/ads": "Returns slot_stats with all 12 positions and correct booked/available counts",
+      "GET /api/ads/active": "Works for all new positions (login_page, popup, splash, services_page, notification)",
+      "POST /api/ads": "Can create ads with new positions (login_page, services_page tested)"
+    },
+    "frontend_components": {
+      "Login.js": "InternalAdBanner position='login_page' at line 331",
+      "Layout.js": "InternalAdBanner position='banner' at line 832, position='sidebar' at line 609, PopupAdOverlay at line 886",
+      "App.js": "InternalAdBanner position='splash' at line 338 (during loading state)",
+      "ServicesManagement.js": "InternalAdBanner position='services_page' at line 924",
+      "NotificationCenter.js": "InternalAdBanner position='notification' at line 164"
+    },
+    "super_admin_panel": {
+      "ads_tab": "Shows 12 position cards with availability bars",
+      "ad_creation_form": "Has all 12 positions in 3 optgroups (website/app/special)",
+      "position_labels": "All 12 Arabic labels present"
+    },
+    "popup_ad_overlay": {
+      "delay": "Shows after 3 seconds",
+      "session_storage": "Only shows once per session",
+      "data_testid": "popup-ad-overlay"
+    }
+  },
+  "max_slots_by_position": {
+    "homepage_hero": 3,
+    "homepage_mid": 2,
+    "homepage_footer": 2,
+    "banner": 5,
+    "sidebar": 3,
+    "dashboard": 2,
+    "inline": 4,
+    "login_page": 2,
+    "popup": 1,
+    "notification": 2,
+    "splash": 1,
+    "services_page": 3,
+    "total": 30
+  }
+}

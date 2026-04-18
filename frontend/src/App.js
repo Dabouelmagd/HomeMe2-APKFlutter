@@ -90,6 +90,7 @@ import GuestManagement from './components/GuestManagement';
 import EventsAnnouncements from './components/EventsAnnouncements';
 import AdvancedAnalytics from './components/AdvancedAnalytics';
 import AdRealtimeDashboard from './components/AdRealtimeDashboard';
+import InternalAdBanner from './components/InternalAdBanner';
 import DocumentManagement from './components/DocumentManagement';
 import VotingSystem from './components/VotingSystem';
 import SmartHomeIntegration from './components/SmartHomeIntegration';
@@ -330,8 +331,12 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mb-6"></div>
+        {/* Splash Ad during loading */}
+        <div className="w-full max-w-md px-4">
+          <InternalAdBanner position="splash" maxAds={1} variant="full" />
+        </div>
       </div>
     );
   }

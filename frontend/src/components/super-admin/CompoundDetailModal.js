@@ -12,6 +12,7 @@ const CompoundDetailModal = ({ compoundId, onClose, t, isSuperAdminOnly }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeView, setActiveView] = useState('overview');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!compoundId) return;
@@ -28,7 +29,51 @@ const CompoundDetailModal = ({ compoundId, onClose, t, isSuperAdminOnly }) => {
       }
     };
     fetch();
-  }, [compoundId, onClose, t]);
+  }, [compoundId, onClose, t, refreshKey]);
+
+  const reload = () => setRefreshKey(k => k + 1);
+
+  const handleChangeRole = async (userId, newRole) => {
+    try {
+      // نستخدم super-admin endpoint الذي يدعم كل المجتمعات (وليس مقيد بمجمع المستخدم الحالي)
+      await axios.put(`${API}/super-admin/users/${userId}/role?role=${newRole}`, {}, getToken());
+      toast.success(t('cd_role_changed', 'تم تغيير الدور'));
+      reload();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('cd_failed', 'فشل'));
+    }
+  };
+
+  const handleDeleteUser = async (u) => {
+    if (!window.confirm(t('cd_confirm_delete_user', `هل تريدين حذف ${u.full_name || u.username}؟`))) return;
+    try {
+      await axios.delete(`${API}/admin/users/${u.id}`, getToken());
+      toast.success(t('cd_user_deleted', 'تم حذف المستخدم'));
+      reload();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('cd_failed', 'فشل'));
+    }
+  };
+
+  const handleToggleUserActive = async (u) => {
+    try {
+      await axios.put(`${API}/admin/users/${u.id}/status`, { is_active: !u.is_active }, getToken());
+      toast.success(u.is_active ? t('cd_user_disabled', 'تم تعطيل المستخدم') : t('cd_user_enabled', 'تم تفعيل المستخدم'));
+      reload();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('cd_failed', 'فشل'));
+    }
+  };
+
+  const handleUpdateUserField = async (userId, field, value) => {
+    try {
+      await axios.put(`${API}/database/users/${userId}`, { [field]: value }, getToken());
+      toast.success(t('cd_updated', 'تم التحديث'));
+      reload();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('cd_failed', 'فشل'));
+    }
+  };
 
   if (!compoundId) return null;
 
@@ -144,17 +189,59 @@ const CompoundDetailModal = ({ compoundId, onClose, t, isSuperAdminOnly }) => {
                       </div>
                       <div className="divide-y divide-gray-700/50">
                         {users.map(u => (
-                          <div key={u.id} className="px-4 py-2.5 flex items-center justify-between hover:bg-gray-800/50">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
-                                {(u.full_name || u.username || '?').charAt(0).toUpperCase()}
+                          <div key={u.id} className="px-4 py-3 hover:bg-gray-800/50" data-testid={`cd-user-row-${u.id}`}>
+                            <div className="flex items-center justify-between gap-3 flex-wrap">
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${u.is_active === false ? 'bg-gray-600 opacity-50' : 'bg-gradient-to-br from-blue-600 to-purple-600'}`}>
+                                  {(u.full_name || u.username || '?').charAt(0).toUpperCase()}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <p className={`text-sm font-medium truncate ${u.is_active === false ? 'text-gray-500 line-through' : 'text-white'}`}>{u.full_name || u.username}</p>
+                                    {u.is_active === false && <span className="text-[9px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded">{t('cd_inactive', 'معطل')}</span>}
+                                    {u.unit_number && <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">{t('cd_unit', 'وحدة')} {u.unit_number}</span>}
+                                  </div>
+                                  <p className="text-[10px] text-gray-400 truncate">{u.email} {u.phone && `· ${u.phone}`}</p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="text-sm font-medium text-white">{u.full_name || u.username}</p>
-                                <p className="text-[10px] text-gray-400">{u.email} {u.phone && `· ${u.phone}`}</p>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <select
+                                  value={u.role}
+                                  onChange={(e) => handleChangeRole(u.id, e.target.value)}
+                                  className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-[10px] text-white"
+                                  data-testid={`cd-role-select-${u.id}`}
+                                >
+                                  {Object.entries(roleLabels).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                                </select>
+                                <button
+                                  onClick={() => {
+                                    const newUnit = window.prompt(t('cd_enter_unit', 'رقم الوحدة الجديد:'), u.unit_number || '');
+                                    if (newUnit !== null) handleUpdateUserField(u.id, 'unit_number', newUnit);
+                                  }}
+                                  className="px-2 py-1 text-[10px] bg-blue-600/20 text-blue-400 rounded hover:bg-blue-600/30"
+                                  data-testid={`cd-edit-unit-${u.id}`}
+                                  title={t('cd_edit_unit', 'تعديل الوحدة')}
+                                >
+                                  🏠
+                                </button>
+                                <button
+                                  onClick={() => handleToggleUserActive(u)}
+                                  className={`px-2 py-1 text-[10px] rounded ${u.is_active === false ? 'bg-green-600/20 text-green-400 hover:bg-green-600/30' : 'bg-amber-600/20 text-amber-400 hover:bg-amber-600/30'}`}
+                                  data-testid={`cd-toggle-${u.id}`}
+                                  title={u.is_active === false ? t('cd_activate', 'تفعيل') : t('cd_deactivate', 'تعطيل')}
+                                >
+                                  {u.is_active === false ? '▶' : '⏸'}
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteUser(u)}
+                                  className="px-2 py-1 text-[10px] bg-red-600/20 text-red-400 rounded hover:bg-red-600/30"
+                                  data-testid={`cd-delete-user-${u.id}`}
+                                  title={t('cd_delete_user', 'حذف')}
+                                >
+                                  🗑️
+                                </button>
                               </div>
                             </div>
-                            {u.unit_number && <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">{t('cd_unit', 'وحدة')} {u.unit_number}</span>}
                           </div>
                         ))}
                       </div>

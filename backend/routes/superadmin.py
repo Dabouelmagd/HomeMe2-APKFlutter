@@ -190,7 +190,7 @@ async def super_admin_update_role(user_id: str, role: str, current_user: dict = 
         if role not in valid_roles:
             raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {valid_roles}")
         result = await db.users.update_one({"id": user_id}, {"$set": {"role": role}})
-        if result.modified_count == 0:
+        if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="User not found")
         return {"message": f"تم تغيير الدور إلى {role}"}
     except HTTPException:

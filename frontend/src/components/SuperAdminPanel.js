@@ -477,9 +477,13 @@ const SuperAdminPanel = () => {
                             try {
                               await axios.delete(`${API}/admin/users/${u.id}`, getToken());
                               toast.success(t('sa_user_deleted', 'تم حذف المستخدم'));
-                              fetchUsers();
-                            } catch { toast.error(t('sa_failed', 'فشل')); }
-                          }} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded hover:bg-red-600/30">{t('sa_delete', 'حذف')}</button>
+                              setUsers(prev => prev.filter(x => x.id !== u.id));
+                              fetchDashboard();
+                            } catch (err) {
+                              console.error('Delete user error:', err);
+                              toast.error(err?.response?.data?.detail || t('sa_failed', 'فشل'));
+                            }
+                          }} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded hover:bg-red-600/30" data-testid={`delete-user-btn-${u.id}`}>{t('sa_delete', 'حذف')}</button>
                         </div>
                       </td>
                     </tr>
@@ -1915,7 +1919,7 @@ const SuperAdminPanel = () => {
                   }, getToken());
                   toast.success(t('sa_user_updated', 'تم تحديث المستخدم'));
                   setEditUser(null);
-                  fetchUsers();
+                  fetchDashboard();
                 } catch { toast.error(t('sa_failed', 'فشل')); }
               }} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">{t('cs_confirm', 'تأكيد')}</button>
               <button onClick={() => setEditUser(null)} className="px-4 py-2.5 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('cs_cancel', 'إلغاء')}</button>

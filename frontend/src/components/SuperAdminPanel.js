@@ -807,9 +807,93 @@ const SuperAdminPanel = () => {
               </button>
             </div>
 
-            <button onClick={() => setShowCreateAd(!showCreateAd)} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 mb-3" data-testid="create-ad-btn">
-              + إنشاء إعلان جديد
+            <button onClick={() => { setShowCreateAd(!showCreateAd); if (!showCreateAd) setTimeout(() => document.getElementById('create-ad-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 mb-3" data-testid="create-ad-btn">
+              + {t('sa_create_ad_btn', 'إنشاء إعلان جديد')}
             </button>
+
+            {/* Create Ad Form - RIGHT after button */}
+            {showCreateAd && (
+              <div id="create-ad-section" className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
+                <h3 className="text-lg font-bold mb-4">{t('sa_create_ad', 'إنشاء إعلان داخلي')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_title', 'عنوان الإعلان')}</label>
+                    <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t("sp_ad_title", "عنوان الإعلان")} />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_position', 'الموقع')}</label>
+                    <select value={newAd.position} onChange={e => setNewAd({...newAd, position: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                      <optgroup label={t('pos_group_website', '--- الموقع الإلكتروني ---')}>
+                        <option value="homepage_hero">{t('pos_homepage_hero', 'الصفحة الرئيسية - هيرو')}</option>
+                        <option value="homepage_mid">{t('pos_homepage_mid', 'الصفحة الرئيسية - وسط')}</option>
+                        <option value="homepage_footer">{t('pos_homepage_footer', 'الصفحة الرئيسية - أسفل')}</option>
+                        <option value="login_page">{t('pos_login', 'صفحة تسجيل الدخول')}</option>
+                      </optgroup>
+                      <optgroup label={t('pos_group_app', '--- التطبيق ---')}>
+                        <option value="banner">{t('sa_pos_banner', 'بانر أعلى التطبيق')}</option>
+                        <option value="sidebar">{t('sa_pos_sidebar', 'الشريط الجانبي')}</option>
+                        <option value="inline">{t('sa_pos_inline', 'داخل المحتوى')}</option>
+                        <option value="dashboard">{t('sa_pos_dashboard', 'لوحة تحكم المقيمين')}</option>
+                        <option value="services_page">{t('pos_services', 'صفحة الخدمات')}</option>
+                      </optgroup>
+                      <optgroup label={t('pos_group_special', '--- أنواع خاصة ---')}>
+                        <option value="popup">{t('pos_popup', 'إعلان منبثق (Popup)')}</option>
+                        <option value="notification">{t('pos_notification', 'إعلان إشعارات')}</option>
+                        <option value="splash">{t('pos_splash', 'شاشة التحميل')}</option>
+                      </optgroup>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_link_url', 'رابط الإعلان')}</label>
+                    <input type="text" value={newAd.link_url} onChange={e => setNewAd({...newAd, link_url: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_media', 'رفع صورة أو فيديو')}</label>
+                    <input type="file" accept="image/*,video/mp4,video/webm" onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      try {
+                        const res = await axios.post(`${API}/ads/upload`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
+                        setNewAd({ ...newAd, image_url: res.data.url, media_type: file.type.startsWith('video') ? 'video' : 'image' });
+                        toast.success(t('sa_uploaded', 'تم الرفع'));
+                      } catch { toast.error(t('sa_upload_failed', 'فشل الرفع')); }
+                    }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-green-600 file:text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_description', 'الوصف')}</label>
+                    <input type="text" value={newAd.description || ''} onChange={e => setNewAd({...newAd, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t('sa_ad_desc_placeholder', 'وصف مختصر للإعلان')} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_value', 'القيمة (ج.م)')}</label>
+                    <input type="number" value={newAd.ad_value} onChange={e => setNewAd({...newAd, ad_value: parseFloat(e.target.value) || 0})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_start_date', 'تاريخ البداية')}</label>
+                    <input type="date" value={newAd.start_date || ''} onChange={e => setNewAd({...newAd, start_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-400 mb-1">{t('sa_end_date', 'تاريخ النهاية')}</label>
+                    <input type="date" value={newAd.end_date || ''} onChange={e => setNewAd({...newAd, end_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                  </div>
+                  <div className="flex items-end gap-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={newAd.is_gift || false} onChange={e => setNewAd({...newAd, is_gift: e.target.checked})} className="w-4 h-4 rounded bg-gray-800 border-gray-600 text-pink-500" />
+                      <span className="text-xs text-gray-300">{t('sa_gift', 'هدية')}</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <button onClick={createAd} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">{t('sa_create', 'إنشاء')}</button>
+                  <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
+                </div>
+              </div>
+            )}
 
             {/* Ad Placement Guide */}
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
@@ -982,129 +1066,7 @@ const SuperAdminPanel = () => {
               </table>
             </div>
 
-            {showCreateAd && (
-              <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
-                <h3 className="text-lg font-bold mb-4">{t('sa_create_ad', 'إنشاء إعلان داخلي')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_title', 'عنوان الإعلان')}</label>
-                    <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t("sp_ad_title", "عنوان الإعلان")} />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_media', 'رفع صورة أو فيديو')}</label>
-                    <input type="file" accept="image/*,video/mp4,video/webm" onChange={async (e) => {
-                      const file = e.target.files[0];
-                      if (!file) return;
-                      const formData = new FormData();
-                      formData.append('file', file);
-                      try {
-                        const res = await axios.post(`${API}/ads/upload-media`, formData, { ...getToken(), headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
-                        setNewAd({...newAd, image_url: res.data.url});
-                        toast.success(t('sp_uploaded', 'تم الرفع'));
-                      } catch (err) { toast.error(err.response?.data?.detail || t('sa_upload_failed', 'فشل في الرفع')); }
-                    }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-purple-600 file:text-white file:text-xs file:cursor-pointer" />
-                    {newAd.image_url && <p className="text-xs text-green-400 mt-1">{t('sp_uploaded', 'تم الرفع')}: {newAd.image_url}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('sa_ext_image', 'أو رابط صورة خارجي')}</label>
-                    <input type="text" value={newAd.image_url} onChange={e => setNewAd({...newAd, image_url: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_link', 'رابط الإعلان')}</label>
-                    <input type="text" value={newAd.link_url} onChange={e => setNewAd({...newAd, link_url: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('sa_description', 'الوصف')}</label>
-                    <input type="text" value={newAd.description} onChange={e => setNewAd({...newAd, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t("sp_desc", "وصف مختصر...")} />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('sa_position', 'الموقع')}</label>
-                    <select value={newAd.position} onChange={e => setNewAd({...newAd, position: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
-                      <optgroup label={t('pos_group_website', '--- الموقع الإلكتروني ---')}>
-                        <option value="homepage_hero">{t('pos_homepage_hero', 'الصفحة الرئيسية - هيرو')}</option>
-                        <option value="homepage_mid">{t('pos_homepage_mid', 'الصفحة الرئيسية - وسط')}</option>
-                        <option value="homepage_footer">{t('pos_homepage_footer', 'الصفحة الرئيسية - أسفل')}</option>
-                        <option value="login_page">{t('pos_login', 'صفحة تسجيل الدخول')}</option>
-                      </optgroup>
-                      <optgroup label={t('pos_group_app', '--- التطبيق ---')}>
-                        <option value="banner">{t('sa_pos_banner', 'بانر أعلى التطبيق')}</option>
-                        <option value="sidebar">{t('sa_pos_sidebar', 'الشريط الجانبي')}</option>
-                        <option value="inline">{t('sa_pos_inline', 'داخل المحتوى')}</option>
-                        <option value="dashboard">{t('sa_pos_dashboard', 'لوحة تحكم المقيمين')}</option>
-                        <option value="services_page">{t('pos_services', 'صفحة الخدمات')}</option>
-                      </optgroup>
-                      <optgroup label={t('pos_group_special', '--- أنواع خاصة ---')}>
-                        <option value="popup">{t('pos_popup', 'إعلان منبثق (Popup)')}</option>
-                        <option value="notification">{t('pos_notification', 'إعلان إشعارات')}</option>
-                        <option value="splash">{t('pos_splash', 'شاشة التحميل')}</option>
-                      </optgroup>
-                    </select>
-                  </div>
-                </div>
-                {/* New Fields Row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-4">
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('ad_dimensions', 'المقاسات')}</label>
-                    <select value={newAd.dimensions} onChange={e => setNewAd({...newAd, dimensions: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
-                      <option value="">{t('ad_select_size', 'اختر المقاس')}</option>
-                      <option value="728x90">728x90 (Leaderboard)</option>
-                      <option value="300x250">300x250 (Medium Rectangle)</option>
-                      <option value="336x280">336x280 (Large Rectangle)</option>
-                      <option value="160x600">160x600 (Wide Skyscraper)</option>
-                      <option value="320x50">320x50 (Mobile Banner)</option>
-                      <option value="970x250">970x250 (Billboard)</option>
-                      <option value="custom">{t('ad_custom_size', 'مقاس مخصص')}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('ad_value', 'قيمة الإعلان (ج.م)')}</label>
-                    <input type="number" min="0" value={newAd.ad_value} onChange={e => setNewAd({...newAd, ad_value: parseFloat(e.target.value) || 0})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="0" />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('ad_start_date', 'تاريخ البداية')}</label>
-                    <input type="date" value={newAd.start_date} onChange={e => setNewAd({...newAd, start_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-400 mb-1">{t('ad_end_date', 'تاريخ النهاية')}</label>
-                    <input type="date" value={newAd.end_date} onChange={e => setNewAd({...newAd, end_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
-                  </div>
-                  <div className="flex items-end pb-1">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={newAd.is_gift} onChange={e => setNewAd({...newAd, is_gift: e.target.checked, ad_value: e.target.checked ? 0 : newAd.ad_value})} className="w-4 h-4 rounded border-gray-600 bg-gray-900 text-pink-500 focus:ring-pink-500" />
-                      <span className="text-sm text-pink-400 font-medium">{t('ad_is_gift', 'إعلان هدية (مجاني)')}</span>
-                    </label>
-                  </div>
-                </div>
-                {/* Compound Targeting */}
-                <div className="mb-4">
-                  <label className="block text-xs text-gray-400 mb-2">{t('ad_target_compounds', 'الكمبوندات المستهدفة (اتركه فارغ = كل الكمبوندات)')}</label>
-                  <div className="flex flex-wrap gap-2">
-                    {compounds.map(c => (
-                      <label key={c.id} className="flex items-center gap-1.5 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={newAd.target_compounds.includes(c.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setNewAd({...newAd, target_compounds: [...newAd.target_compounds, c.id]});
-                            } else {
-                              setNewAd({...newAd, target_compounds: newAd.target_compounds.filter(id => id !== c.id)});
-                            }
-                          }}
-                          className="w-3.5 h-3.5 rounded border-gray-600 bg-gray-900 text-blue-500 focus:ring-blue-500"
-                        />
-                        <span className="text-xs text-gray-300">{c.name}</span>
-                      </label>
-                    ))}
-                    {compounds.length === 0 && <span className="text-xs text-gray-500">{t('ad_no_compounds', 'لا توجد كمبوندات')}</span>}
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
-                </div>
-              </div>
-            )}
-
+            {/* Ads List Table */}
             <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
               <table className="w-full text-sm">
                 <thead className="bg-gray-900/50">
@@ -1142,11 +1104,11 @@ const SuperAdminPanel = () => {
                             </div>
                           ) : <span className="text-gray-500">-</span>}
                         </td>
-                        <td className="px-4 py-3 text-center">
+                        <td className="px-4 py-3 text-center text-xs">
                           {a.is_gift ? (
-                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-pink-500/20 text-pink-400">{t('ad_gift', 'هدية')}</span>
+                            <span className="px-2 py-0.5 bg-pink-500/20 text-pink-400 rounded-full text-[10px]">{t('ad_gift', 'هدية')}</span>
                           ) : (
-                            <span className="text-emerald-400 font-bold text-xs">{(a.ad_value || 0).toLocaleString()} {t('sm_egp','ج.م')}</span>
+                            <span className="text-emerald-400 font-bold">{(a.ad_value || 0).toLocaleString()} {t('sm_egp','ج.م')}</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-center text-gray-300">{a.clicks || 0}</td>

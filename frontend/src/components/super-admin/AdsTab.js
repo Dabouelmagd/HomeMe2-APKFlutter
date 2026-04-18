@@ -1,0 +1,693 @@
+import React from 'react';
+import axios from 'axios';
+import { toast } from 'sonner';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+
+/**
+ * AdsTab — extracted from SuperAdminPanel.js to reduce its size.
+ * Pure JSX + handlers wired through props; no new behavior.
+ */
+const AdsTab = ({
+  t,
+  isSuperAdminOnly,
+  ads,
+  adStats,
+  adSettings,
+  setAdSettings,
+  showCreateAd,
+  setShowCreateAd,
+  newAd,
+  setNewAd,
+  handleCreateAd,
+  handleToggleAd,
+  handleDeleteAd,
+  campaigns,
+  campaignStats,
+  showCreateCampaign,
+  setShowCreateCampaign,
+  newCampaign,
+  setNewCampaign,
+  handleCreateCampaign,
+  handleCampaignAction,
+}) => {
+  const ALL_POSITIONS = [
+    { key: 'homepage_hero', label: t('pos_homepage_hero', 'الصفحة الرئيسية - هيرو'), desc: t('pos_desc_homepage_hero', 'بانر كبير أعلى الصفحة الرئيسية للويب'), color: 'border-rose-500/30', icon: '🏠', maxSlots: 3 },
+    { key: 'homepage_mid', label: t('pos_homepage_mid', 'الصفحة الرئيسية - وسط'), desc: t('pos_desc_homepage_mid', 'إعلان وسط محتوى الصفحة الرئيسية'), color: 'border-rose-400/30', icon: '📄', maxSlots: 2 },
+    { key: 'homepage_footer', label: t('pos_homepage_footer', 'الصفحة الرئيسية - أسفل'), desc: t('pos_desc_homepage_footer', 'بانر أسفل الصفحة الرئيسية'), color: 'border-rose-300/30', icon: '⬇️', maxSlots: 2 },
+    { key: 'banner', label: t('sa_pos_banner', 'بانر أعلى التطبيق'), desc: t('ad_desc_banner', 'أعلى صفحات التطبيق الداخلية'), color: 'border-amber-500/30', icon: '📢', maxSlots: 5 },
+    { key: 'sidebar', label: t('sa_pos_sidebar', 'الشريط الجانبي'), desc: t('ad_desc_sidebar', 'القائمة الجانبية للتطبيق'), color: 'border-indigo-500/30', icon: '📌', maxSlots: 3 },
+    { key: 'dashboard', label: t('sa_pos_dashboard', 'لوحة تحكم المقيمين'), desc: t('ad_desc_dashboard', 'داخل داشبورد المقيمين'), color: 'border-emerald-500/30', icon: '📊', maxSlots: 2 },
+    { key: 'inline', label: t('sa_pos_inline', 'داخل المحتوى'), desc: t('ad_desc_inline', 'بين أقسام المحتوى'), color: 'border-purple-500/30', icon: '📰', maxSlots: 4 },
+    { key: 'login_page', label: t('pos_login', 'صفحة تسجيل الدخول'), desc: t('pos_desc_login', 'إعلان في صفحة الدخول'), color: 'border-sky-500/30', icon: '🔑', maxSlots: 2 },
+    { key: 'popup', label: t('pos_popup', 'إعلان منبثق (Popup)'), desc: t('pos_desc_popup', 'نافذة منبثقة عند فتح التطبيق'), color: 'border-orange-500/30', icon: '💬', maxSlots: 1 },
+    { key: 'notification', label: t('pos_notification', 'إعلان إشعارات'), desc: t('pos_desc_notification', 'داخل قائمة الإشعارات'), color: 'border-pink-500/30', icon: '🔔', maxSlots: 2 },
+    { key: 'splash', label: t('pos_splash', 'شاشة التحميل'), desc: t('pos_desc_splash', 'أثناء تحميل التطبيق'), color: 'border-cyan-500/30', icon: '⏳', maxSlots: 1 },
+    { key: 'services_page', label: t('pos_services', 'صفحة الخدمات'), desc: t('pos_desc_services', 'داخل صفحة الخدمات والعروض'), color: 'border-teal-500/30', icon: '⭐', maxSlots: 3 },
+  ];
+
+  const adsByPos = {};
+  (ads || []).forEach(a => {
+    const p = a.position || 'unknown';
+    if (!adsByPos[p]) adsByPos[p] = [];
+    adsByPos[p].push(a);
+  });
+
+  const totalSlots = ALL_POSITIONS.reduce((s, p) => s + p.maxSlots, 0);
+  const totalBooked = Object.values(adsByPos).reduce((s, v) => s + v.length, 0);
+
+  const posLabels = {
+    banner: t('sa_pos_banner','بانر أعلى'), sidebar: t('sa_pos_sidebar','جانبي'), inline: t('sa_pos_inline','داخلي'), dashboard: t('sa_pos_dashboard','لوحة التحكم'),
+    homepage_hero: t('pos_homepage_hero','الرئيسية-هيرو'), homepage_mid: t('pos_homepage_mid','الرئيسية-وسط'), homepage_footer: t('pos_homepage_footer','الرئيسية-أسفل'),
+    login_page: t('pos_login','صفحة الدخول'), popup: t('pos_popup','منبثق'), notification: t('pos_notification','إشعارات'), splash: t('pos_splash','شاشة التحميل'), services_page: t('pos_services','الخدمات'),
+  };
+
+  return (
+    <div data-testid="ads-tab">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        {[
+          { label: t('sa_total_ads', 'إجمالي الإعلانات'), value: adStats.total || 0, color: 'text-blue-400' },
+          { label: t('sa_active_count', 'نشطة'), value: adStats.active || 0, color: 'text-green-400' },
+          { label: t('sa_total_clicks', 'إجمالي النقرات'), value: adStats.total_clicks || 0, color: 'text-amber-400' },
+          { label: t('sa_total_views', 'إجمالي المشاهدات'), value: adStats.total_views || 0, color: 'text-purple-400' },
+          ...(!isSuperAdminOnly ? [{ label: t('ad_total_revenue', 'إيرادات الإعلانات'), value: `${(adStats.total_revenue || 0).toLocaleString()} ${t('sm_egp','ج.م')}`, color: 'text-emerald-400' }] : []),
+          { label: t('ad_gift_count', 'إعلانات هدية'), value: adStats.gift_ads || 0, color: 'text-pink-400' },
+        ].map((s, i) => (
+          <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
+            <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+            <p className="text-xs text-gray-400">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Hybrid Ad Control Panel */}
+      <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-white">{t('ad_hybrid_control', 'تحكم في الإعلانات (داخلي + AdSense)')}</h3>
+          <button onClick={async () => {
+            try {
+              const res = await axios.get(`${API}/ads/ad-settings`, getToken());
+              const s = res.data;
+              await axios.put(`${API}/ads/ad-settings`, { adsense_global_enabled: !s.adsense_global_enabled }, getToken());
+              toast.success(!s.adsense_global_enabled ? t('ad_adsense_on', 'AdSense مفعّل') : t('ad_adsense_off', 'AdSense متوقف'));
+            } catch { toast.error(t('sa_failed', 'فشل')); }
+          }} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-500" data-testid="toggle-adsense-global">
+            {t('ad_toggle_adsense', 'تبديل AdSense')}
+          </button>
+        </div>
+        <p className="text-xs text-gray-400 mb-4">{t('ad_hybrid_desc', 'الإعلانات الداخلية تظهر أولاً. لو مفيش إعلان داخلي، يظهر AdSense تلقائياً (لو مفعّل).')}</p>
+
+        {/* Summary */}
+        <div className="grid grid-cols-3 gap-3 mb-5">
+          <div className="bg-gray-900 rounded-xl p-4 text-center border border-gray-700">
+            <p className="text-2xl font-black text-blue-400">{totalSlots}</p>
+            <p className="text-[10px] text-gray-500">{t('ad_total_slots', 'إجمالي الأماكن')}</p>
+          </div>
+          <div className="bg-gray-900 rounded-xl p-4 text-center border border-green-800">
+            <p className="text-2xl font-black text-green-400">{totalBooked}</p>
+            <p className="text-[10px] text-gray-500">{t('ad_booked_slots', 'محجوزة')}</p>
+          </div>
+          <div className="bg-gray-900 rounded-xl p-4 text-center border border-amber-800">
+            <p className="text-2xl font-black text-amber-400">{totalSlots - totalBooked}</p>
+            <p className="text-[10px] text-gray-500">{t('ad_available_slots', 'متاحة')}</p>
+          </div>
+        </div>
+
+        {/* Position Cards with Slot Details */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {ALL_POSITIONS.map(pos => {
+            const posAds = adsByPos[pos.key] || [];
+            const booked = posAds.length;
+            const pct = Math.round((booked / pos.maxSlots) * 100);
+            return (
+              <div key={pos.key} className={`bg-gray-900 rounded-xl border ${pos.color} hover:bg-gray-800/80 transition-colors overflow-hidden`}>
+                <div className="p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm">{pos.icon}</span>
+                      <h4 className="font-bold text-white text-xs">{pos.label}</h4>
+                    </div>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${pct >= 100 ? 'bg-red-500/20 text-red-400' : pct > 0 ? 'bg-amber-500/20 text-amber-400' : 'bg-gray-700 text-gray-500'}`}>
+                      {booked}/{pos.maxSlots}
+                    </span>
+                  </div>
+                  <p className="text-[8px] text-gray-500 mb-2">{pos.desc}</p>
+                  <div className="bg-gray-800 rounded-full h-1.5 mb-2">
+                    <div className={`h-1.5 rounded-full transition-all ${pct >= 100 ? 'bg-red-500' : pct >= 50 ? 'bg-amber-500' : 'bg-green-500'}`} style={{ width: `${Math.min(pct, 100)}%` }}></div>
+                  </div>
+                </div>
+                <div className="border-t border-gray-800 px-3 py-2 space-y-1">
+                  {Array.from({ length: pos.maxSlots }).map((_, slotIdx) => {
+                    const ad = posAds[slotIdx];
+                    return (
+                      <div key={slotIdx} className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${ad ? 'bg-gray-800' : 'bg-gray-800/40 border border-dashed border-gray-700'}`}>
+                        <span className="text-[9px] text-gray-600 font-mono w-4 flex-shrink-0">#{slotIdx + 1}</span>
+                        {ad ? (
+                          <>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[10px] font-bold text-white truncate">{ad.title}</p>
+                              <div className="flex items-center gap-1.5 mt-0.5">
+                                <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${ad.is_active ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                                <span className="text-[8px] text-gray-500">{ad.is_active ? t('sp_active','نشط') : t('sp_disabled','معطل')}</span>
+                                {ad.views > 0 && <span className="text-[8px] text-purple-400">{ad.views} {t('ad_views_short','مشاهدة')}</span>}
+                                {ad.clicks > 0 && <span className="text-[8px] text-amber-400">{ad.clicks} {t('ad_clicks_short','نقرة')}</span>}
+                              </div>
+                            </div>
+                            {!isSuperAdminOnly && ad.ad_value > 0 && !ad.is_gift && (
+                              <span className="text-[8px] text-emerald-400 font-bold flex-shrink-0">{ad.ad_value}{t('sm_egp','ج.م')}</span>
+                            )}
+                            {ad.is_gift && <span className="text-[8px] text-pink-400 flex-shrink-0">{t('ad_gift','هدية')}</span>}
+                          </>
+                        ) : (
+                          <span className="text-[9px] text-gray-600 italic">{t('ad_slot_empty', 'فارغ - متاح للحجز')}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="border-t border-gray-800 px-3 py-2 flex items-center gap-2">
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" checked={adSettings?.positions?.[pos.key]?.internal_enabled !== false} onChange={(e) => {
+                      setAdSettings(prev => ({...prev, positions: {...(prev.positions || {}), [pos.key]: {...(prev.positions?.[pos.key] || {}), internal_enabled: e.target.checked}}}));
+                    }} id={`internal-${pos.key}`} className="w-3 h-3 rounded border-gray-600 bg-gray-800 text-green-500 focus:ring-green-500" />
+                    <span className="text-[9px] text-gray-400">{t('ad_internal', 'داخلي')}</span>
+                  </label>
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" checked={adSettings?.positions?.[pos.key]?.adsense_enabled !== false && !['dashboard','sidebar','popup','splash','notification'].includes(pos.key) || adSettings?.positions?.[pos.key]?.adsense_enabled === true} onChange={(e) => {
+                      setAdSettings(prev => ({...prev, positions: {...(prev.positions || {}), [pos.key]: {...(prev.positions?.[pos.key] || {}), adsense_enabled: e.target.checked}}}));
+                    }} id={`adsense-${pos.key}`} className="w-3 h-3 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500" />
+                    <span className="text-[9px] text-gray-400">AdSense</span>
+                  </label>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <button onClick={async () => {
+          try {
+            const positions = adSettings.positions || {};
+            await axios.put(`${API}/ads/ad-settings`, { positions }, getToken());
+            toast.success(t('ad_settings_saved', 'تم حفظ الإعدادات'));
+          } catch { toast.error(t('sa_failed', 'فشل')); }
+        }} className="mt-4 px-5 py-2.5 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 transition-all w-full">
+          {t('save_changes', 'حفظ التغييرات')}
+        </button>
+      </div>
+
+      <button onClick={() => { setShowCreateAd(!showCreateAd); if (!showCreateAd) setTimeout(() => document.getElementById('create-ad-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 mb-3" data-testid="create-ad-btn">
+        + {t('sa_create_ad_btn', 'إنشاء إعلان جديد')}
+      </button>
+
+      {/* Create Ad Form */}
+      {showCreateAd && (
+        <div id="create-ad-section" className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
+          <h3 className="text-lg font-bold mb-4">{t('sa_create_ad', 'إنشاء إعلان داخلي')}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_title', 'عنوان الإعلان')}</label>
+              <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t("sp_ad_title", "عنوان الإعلان")} />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_position', 'الموقع')}</label>
+              <select value={newAd.position} onChange={e => setNewAd({...newAd, position: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
+                <optgroup label={t('pos_group_website', '--- الموقع الإلكتروني ---')}>
+                  <option value="homepage_hero">{t('pos_homepage_hero', 'الصفحة الرئيسية - هيرو')}</option>
+                  <option value="homepage_mid">{t('pos_homepage_mid', 'الصفحة الرئيسية - وسط')}</option>
+                  <option value="homepage_footer">{t('pos_homepage_footer', 'الصفحة الرئيسية - أسفل')}</option>
+                  <option value="login_page">{t('pos_login', 'صفحة تسجيل الدخول')}</option>
+                </optgroup>
+                <optgroup label={t('pos_group_app', '--- التطبيق ---')}>
+                  <option value="banner">{t('sa_pos_banner', 'بانر أعلى التطبيق')}</option>
+                  <option value="sidebar">{t('sa_pos_sidebar', 'الشريط الجانبي')}</option>
+                  <option value="inline">{t('sa_pos_inline', 'داخل المحتوى')}</option>
+                  <option value="dashboard">{t('sa_pos_dashboard', 'لوحة تحكم المقيمين')}</option>
+                  <option value="services_page">{t('pos_services', 'صفحة الخدمات')}</option>
+                </optgroup>
+                <optgroup label={t('pos_group_special', '--- أنواع خاصة ---')}>
+                  <option value="popup">{t('pos_popup', 'إعلان منبثق (Popup)')}</option>
+                  <option value="notification">{t('pos_notification', 'إعلان إشعارات')}</option>
+                  <option value="splash">{t('pos_splash', 'شاشة التحميل')}</option>
+                </optgroup>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_link_url', 'رابط الإعلان')}</label>
+              <input type="text" value={newAd.link_url} onChange={e => setNewAd({...newAd, link_url: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_media', 'رفع صورة أو فيديو')}</label>
+              <input type="file" accept="image/*,video/mp4,video/webm" onChange={async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const formData = new FormData();
+                formData.append('file', file);
+                try {
+                  const res = await axios.post(`${API}/ads/upload`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
+                  setNewAd({ ...newAd, image_url: res.data.url, media_type: file.type.startsWith('video') ? 'video' : 'image' });
+                  toast.success(t('sa_uploaded', 'تم الرفع'));
+                } catch { toast.error(t('sa_upload_failed', 'فشل الرفع')); }
+              }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-green-600 file:text-white" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_description', 'الوصف')}</label>
+              <input type="text" value={newAd.description || ''} onChange={e => setNewAd({...newAd, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t('sa_ad_desc_placeholder', 'وصف مختصر للإعلان')} />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_value', 'القيمة (ج.م)')}</label>
+              <input type="number" value={newAd.ad_value} onChange={e => setNewAd({...newAd, ad_value: parseFloat(e.target.value) || 0})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_start_date', 'تاريخ البداية')}</label>
+              <input type="date" value={newAd.start_date || ''} onChange={e => setNewAd({...newAd, start_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_end_date', 'تاريخ النهاية')}</label>
+              <input type="date" value={newAd.end_date || ''} onChange={e => setNewAd({...newAd, end_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+            </div>
+            <div className="flex items-end gap-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={newAd.is_gift || false} onChange={e => setNewAd({...newAd, is_gift: e.target.checked})} className="w-4 h-4 rounded bg-gray-800 border-gray-600 text-pink-500" />
+                <span className="text-xs text-gray-300">{t('sa_gift', 'هدية')}</span>
+              </label>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button onClick={handleCreateAd} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">{t('sa_create', 'إنشاء')}</button>
+            <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
+          </div>
+        </div>
+      )}
+
+      {/* Ad Placement Guide */}
+      <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
+        <h3 className="text-lg font-bold text-white mb-4">{t('ad_placement_guide', 'دليل أماكن الإعلانات ومقاساتها')}</h3>
+
+        <h4 className="text-sm font-bold text-rose-400 mb-3 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+          {t('ad_section_website', 'الموقع الإلكتروني (Landing Page)')}
+        </h4>
+        <div className="bg-gray-900 rounded-xl p-4 mb-4 border border-gray-700">
+          <div className="flex flex-col gap-2" style={{ minHeight: '200px' }}>
+            <div className="bg-rose-600/20 border border-rose-500 border-dashed rounded-lg p-3 text-center">
+              <span className="text-xs font-bold text-rose-400">homepage_hero</span>
+              <span className="text-[9px] text-rose-300 mx-2">— {t('pos_desc_homepage_hero', 'بانر كبير أعلى الصفحة الرئيسية')}</span>
+              <span className="text-[9px] text-rose-200 bg-rose-500/20 px-1.5 py-0.5 rounded">970x250 / 728x90 / 320x100</span>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1 bg-gray-800 rounded h-16 border border-gray-700"></div>
+              <div className="flex-1 bg-gray-800 rounded h-16 border border-gray-700"></div>
+              <div className="flex-1 bg-gray-800 rounded h-16 border border-gray-700"></div>
+            </div>
+            <div className="bg-pink-600/20 border border-pink-500 border-dashed rounded-lg p-2.5 text-center">
+              <span className="text-xs font-bold text-pink-400">homepage_mid</span>
+              <span className="text-[9px] text-pink-300 mx-2">— {t('pos_desc_homepage_mid', 'وسط محتوى الصفحة الرئيسية')}</span>
+              <span className="text-[9px] text-pink-200 bg-pink-500/20 px-1.5 py-0.5 rounded">728x90 / 468x60</span>
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1 bg-gray-800 rounded h-10 border border-gray-700"></div>
+              <div className="flex-1 bg-gray-800 rounded h-10 border border-gray-700"></div>
+            </div>
+            <div className="bg-red-600/20 border border-red-500 border-dashed rounded-lg p-2.5 text-center">
+              <span className="text-xs font-bold text-red-400">homepage_footer</span>
+              <span className="text-[9px] text-red-300 mx-2">— {t('pos_desc_homepage_footer', 'أسفل الصفحة الرئيسية قبل CTA')}</span>
+              <span className="text-[9px] text-red-200 bg-red-500/20 px-1.5 py-0.5 rounded">728x90 / 320x50</span>
+            </div>
+          </div>
+        </div>
+
+        <h4 className="text-sm font-bold text-amber-400 mb-3 mt-5 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+          {t('ad_section_app', 'داخل التطبيق (بعد تسجيل الدخول)')}
+        </h4>
+        <div className="bg-gray-900 rounded-xl p-4 mb-4 border border-gray-700">
+          <div className="flex gap-3" style={{ minHeight: '300px' }}>
+            <div className="w-40 flex-shrink-0 bg-gray-800 rounded-lg border border-gray-600 p-2 flex flex-col">
+              <div className="text-[9px] text-gray-500 text-center mb-1">SIDEBAR</div>
+              <div className="flex-1 space-y-1">
+                <div className="bg-gray-700 rounded h-3 w-full"></div>
+                <div className="bg-gray-700 rounded h-3 w-3/4"></div>
+                <div className="bg-gray-700 rounded h-3 w-full"></div>
+                <div className="bg-gray-700 rounded h-3 w-2/3"></div>
+              </div>
+              <div className="mt-auto pt-2 border-t border-gray-600">
+                <div className="bg-indigo-600/30 border border-indigo-500 border-dashed rounded-lg p-2 text-center">
+                  <span className="text-[10px] font-bold text-indigo-400">sidebar</span>
+                  <div className="text-[8px] text-indigo-300 mt-0.5">160x600 · 300x250</div>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 flex flex-col gap-2">
+              <div className="bg-amber-600/20 border border-amber-500 border-dashed rounded-lg p-3 text-center">
+                <span className="text-xs font-bold text-amber-400">banner</span>
+                <span className="text-[9px] text-amber-300 mx-2">— {t('ad_pos_top', 'بانر أعلى الصفحة')}</span>
+                <span className="text-[9px] text-amber-200 bg-amber-500/20 px-1.5 py-0.5 rounded">728x90 / 970x250</span>
+              </div>
+              <div className="bg-gray-800 rounded-lg border border-gray-600 p-3 flex-1 flex flex-col">
+                <div className="flex gap-2 mb-2">
+                  <div className="flex-1 bg-gray-700 rounded h-10"></div>
+                  <div className="flex-1 bg-gray-700 rounded h-10"></div>
+                  <div className="flex-1 bg-gray-700 rounded h-10"></div>
+                </div>
+                <div className="bg-emerald-600/20 border border-emerald-500 border-dashed rounded-lg p-2.5 text-center mb-2">
+                  <span className="text-xs font-bold text-emerald-400">dashboard</span>
+                  <span className="text-[9px] text-emerald-300 mx-2">— {t('ad_pos_dash', 'داخل لوحة التحكم')}</span>
+                  <span className="text-[9px] text-emerald-200 bg-emerald-500/20 px-1.5 py-0.5 rounded">300x250 / 336x280</span>
+                </div>
+                <div className="bg-purple-600/20 border border-purple-500 border-dashed rounded-lg p-2.5 text-center mb-2">
+                  <span className="text-xs font-bold text-purple-400">inline</span>
+                  <span className="text-[9px] text-purple-300 mx-2">— {t('ad_pos_inline', 'بين المحتوى')}</span>
+                  <span className="text-[9px] text-purple-200 bg-purple-500/20 px-1.5 py-0.5 rounded">728x90 / 320x50</span>
+                </div>
+                <div className="bg-teal-600/20 border border-teal-500 border-dashed rounded-lg p-2 text-center">
+                  <span className="text-[10px] font-bold text-teal-400">services_page</span>
+                  <span className="text-[9px] text-teal-300 mx-2">— {t('pos_desc_services', 'صفحة الخدمات')}</span>
+                  <span className="text-[9px] text-teal-200 bg-teal-500/20 px-1.5 py-0.5 rounded">728x90 / 300x250</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h4 className="text-sm font-bold text-cyan-400 mb-3 mt-5 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
+          {t('ad_section_special', 'أنواع خاصة')}
+        </h4>
+        <div className="bg-gray-900 rounded-xl p-4 mb-4 border border-gray-700">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="bg-sky-600/20 border border-sky-500 border-dashed rounded-lg p-3 text-center">
+              <span className="text-lg mb-1 block">🔑</span>
+              <span className="text-[10px] font-bold text-sky-400 block">login_page</span>
+              <span className="text-[8px] text-sky-300 block mt-0.5">{t('pos_desc_login', 'صفحة تسجيل الدخول')}</span>
+              <span className="text-[8px] text-sky-200 bg-sky-500/20 px-1.5 py-0.5 rounded mt-1 inline-block">728x90 / 300x250</span>
+            </div>
+            <div className="bg-orange-600/20 border border-orange-500 border-dashed rounded-lg p-3 text-center">
+              <span className="text-lg mb-1 block">💬</span>
+              <span className="text-[10px] font-bold text-orange-400 block">popup</span>
+              <span className="text-[8px] text-orange-300 block mt-0.5">{t('pos_desc_popup', 'نافذة منبثقة')}</span>
+              <span className="text-[8px] text-orange-200 bg-orange-500/20 px-1.5 py-0.5 rounded mt-1 inline-block">400x300 / 300x250</span>
+            </div>
+            <div className="bg-cyan-600/20 border border-cyan-500 border-dashed rounded-lg p-3 text-center">
+              <span className="text-lg mb-1 block">⏳</span>
+              <span className="text-[10px] font-bold text-cyan-400 block">splash</span>
+              <span className="text-[8px] text-cyan-300 block mt-0.5">{t('pos_desc_splash', 'شاشة التحميل')}</span>
+              <span className="text-[8px] text-cyan-200 bg-cyan-500/20 px-1.5 py-0.5 rounded mt-1 inline-block">320x480 / 300x250</span>
+            </div>
+            <div className="bg-pink-600/20 border border-pink-500 border-dashed rounded-lg p-3 text-center">
+              <span className="text-lg mb-1 block">🔔</span>
+              <span className="text-[10px] font-bold text-pink-400 block">notification</span>
+              <span className="text-[8px] text-pink-300 block mt-0.5">{t('pos_desc_notification', 'صفحة الإشعارات')}</span>
+              <span className="text-[8px] text-pink-200 bg-pink-500/20 px-1.5 py-0.5 rounded mt-1 inline-block">728x90 / 320x50</span>
+            </div>
+          </div>
+        </div>
+
+        <table className="w-full text-sm" data-testid="ad-placement-table">
+          <thead>
+            <tr className="border-b border-gray-700">
+              <th className="px-3 py-2 text-right text-gray-400 font-medium">{t('ad_place', 'الموقع')}</th>
+              <th className="px-3 py-2 text-center text-gray-400 font-medium">{t('ad_place_desc', 'الوصف')}</th>
+              <th className="px-3 py-2 text-center text-gray-400 font-medium">{t('ad_sizes', 'المقاسات المتاحة')}</th>
+              <th className="px-3 py-2 text-center text-gray-400 font-medium">{t('ad_who_sees', 'من يشاهده')}</th>
+              <th className="px-3 py-2 text-center text-gray-400 font-medium">{t('ad_max_count', 'العدد الأقصى')}</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-700/50">
+            {[
+              { name: 'homepage_hero', color: 'rose', desc: t('pos_desc_homepage_hero','بانر كبير أعلى الصفحة الرئيسية'), sizes: '970x250 · 728x90 · 320x100', who: t('ad_see_public','الجميع (عام)'), max: 3 },
+              { name: 'homepage_mid', color: 'pink', desc: t('pos_desc_homepage_mid','وسط محتوى الصفحة الرئيسية'), sizes: '728x90 · 468x60', who: t('ad_see_public','الجميع (عام)'), max: 2 },
+              { name: 'homepage_footer', color: 'red', desc: t('pos_desc_homepage_footer','أسفل الصفحة الرئيسية'), sizes: '728x90 · 320x50', who: t('ad_see_public','الجميع (عام)'), max: 2 },
+              { name: 'banner', color: 'amber', desc: t('ad_desc_banner','بانر أعلى صفحات المحتوى'), sizes: '728x90 · 970x250 · 320x50', who: t('ad_see_residents','السكان فقط'), max: 5 },
+              { name: 'sidebar', color: 'indigo', desc: t('ad_desc_sidebar','أسفل قائمة التنقل الجانبية'), sizes: '160x600 · 300x250', who: t('ad_see_all','الكل (ما عدا المالك)'), max: 3 },
+              { name: 'dashboard', color: 'emerald', desc: t('ad_desc_dashboard','داخل لوحة التحكم الرئيسية'), sizes: '300x250 · 336x280 · 728x90', who: t('ad_see_residents_admins','السكان والمديرين'), max: 2 },
+              { name: 'inline', color: 'purple', desc: t('ad_desc_inline','بين أقسام المحتوى في الداشبورد'), sizes: '728x90 · 320x50', who: t('ad_see_residents','السكان فقط'), max: 4 },
+              { name: 'services_page', color: 'teal', desc: t('pos_desc_services','صفحة الخدمات والعروض'), sizes: '728x90 · 300x250', who: t('ad_see_residents','السكان فقط'), max: 3 },
+              { name: 'login_page', color: 'sky', desc: t('pos_desc_login','صفحة تسجيل الدخول'), sizes: '728x90 · 300x250', who: t('ad_see_public','الجميع (عام)'), max: 2 },
+              { name: 'popup', color: 'orange', desc: t('pos_desc_popup','نافذة منبثقة عند فتح التطبيق'), sizes: '400x300 · 300x250', who: t('ad_see_residents_admins','السكان والمديرين'), max: 1 },
+              { name: 'splash', color: 'cyan', desc: t('pos_desc_splash','شاشة التحميل'), sizes: '320x480 · 300x250', who: t('ad_see_residents','السكان فقط'), max: 1 },
+              { name: 'notification', color: 'pink', desc: t('pos_desc_notification','صفحة الإشعارات'), sizes: '728x90 · 320x50', who: t('ad_see_residents','السكان فقط'), max: 2 },
+            ].map((p, i) => (
+              <tr key={i}>
+                <td className="px-3 py-2.5"><span className={`bg-${p.color}-500/20 text-${p.color}-400 px-2 py-0.5 rounded text-xs font-bold`}>{p.name}</span></td>
+                <td className="px-3 py-2.5 text-gray-300 text-xs text-center">{p.desc}</td>
+                <td className="px-3 py-2.5 text-center"><span className="text-xs text-gray-400">{p.sizes}</span></td>
+                <td className="px-3 py-2.5 text-center text-xs text-gray-300">{p.who}</td>
+                <td className="px-3 py-2.5 text-center text-xs font-bold text-gray-300">{p.max}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Ads List Table */}
+      <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-900/50">
+            <tr>
+              <th className="px-4 py-3 text-right text-gray-400">{t('sa_title', 'العنوان')}</th>
+              <th className="px-4 py-3 text-right text-gray-400">{t('sa_position', 'الموقع')}</th>
+              <th className="px-4 py-3 text-center text-gray-400">{t('ad_dimensions', 'المقاسات')}</th>
+              <th className="px-4 py-3 text-center text-gray-400">{t('ad_dates', 'المدة')}</th>
+              <th className="px-4 py-3 text-center text-gray-400">{t('ad_value_col', 'القيمة')}</th>
+              <th className="px-4 py-3 text-center text-gray-400">{t('sa_clicks', 'النقرات')}</th>
+              <th className="px-4 py-3 text-center text-gray-400">{t('sa_status', 'الحالة')}</th>
+              <th className="px-4 py-3 text-center text-gray-400">{t('sa_actions', 'إجراءات')}</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-700">
+            {ads.map(a => (
+              <tr key={a.id} className="hover:bg-gray-750">
+                <td className="px-4 py-3">
+                  <div className="font-bold text-white">{a.title}</div>
+                  <div className="text-xs text-gray-500">{a.description || '-'}</div>
+                </td>
+                <td className="px-4 py-3 text-gray-300 text-xs">{posLabels[a.position] || a.position}</td>
+                <td className="px-4 py-3 text-center text-gray-300 text-xs">{a.dimensions || '-'}</td>
+                <td className="px-4 py-3 text-center text-xs">
+                  {a.start_date || a.end_date ? (
+                    <div className="text-gray-300">
+                      {a.start_date && <div>{a.start_date}</div>}
+                      {a.end_date && <div className="text-gray-500">{t('ad_to', 'إلى')} {a.end_date}</div>}
+                    </div>
+                  ) : <span className="text-gray-500">-</span>}
+                </td>
+                <td className="px-4 py-3 text-center text-xs">
+                  {a.is_gift ? (
+                    <span className="px-2 py-0.5 bg-pink-500/20 text-pink-400 rounded-full text-[10px]">{t('ad_gift', 'هدية')}</span>
+                  ) : (
+                    <span className="text-emerald-400 font-bold">{(a.ad_value || 0).toLocaleString()} {t('sm_egp','ج.م')}</span>
+                  )}
+                </td>
+                <td className="px-4 py-3 text-center text-gray-300">{a.clicks || 0}</td>
+                <td className="px-4 py-3 text-center">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${a.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                    {a.is_active ? t('sp_active','نشط') : t('sp_disabled','معطل')}
+                  </span>
+                </td>
+                <td className="px-4 py-3 text-center">
+                  <div className="flex gap-1 justify-center">
+                    <button onClick={() => handleToggleAd(a.id)} className={`px-2 py-1 text-xs rounded ${a.is_active ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'}`}>
+                      {a.is_active ? t('sp_deactivate','تعطيل') : t('sp_activate','تفعيل')}
+                    </button>
+                    <button onClick={() => handleDeleteAd(a.id)} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">{t('sa_delete', 'حذف')}</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+            {ads.length === 0 && (
+              <tr><td colSpan="8" className="px-4 py-8 text-center text-gray-500">{t('sa_no_ads', 'لا توجد إعلانات بعد')}</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* CAMPAIGNS SECTION */}
+      <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mt-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-white">{t('campaigns_title', 'الحملات الإعلانية')}</h3>
+          <div className="flex items-center gap-3">
+            <div className="flex gap-2 text-xs">
+              <span className="bg-green-500/20 text-green-400 px-2 py-0.5 rounded">{campaignStats.active || 0} {t('camp_active', 'نشطة')}</span>
+              <span className="bg-gray-700 text-gray-400 px-2 py-0.5 rounded">{campaignStats.draft || 0} {t('camp_draft', 'مسودة')}</span>
+              <span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">{campaignStats.completed || 0} {t('camp_completed', 'مكتملة')}</span>
+            </div>
+            <button onClick={() => setShowCreateCampaign(!showCreateCampaign)} className="px-3 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-500" data-testid="create-campaign-btn">
+              + {t('camp_new', 'حملة جديدة')}
+            </button>
+          </div>
+        </div>
+
+        {showCreateCampaign && (
+          <div className="bg-gray-900 rounded-xl p-4 mb-4 border border-purple-500/30">
+            <h4 className="text-sm font-bold text-purple-400 mb-3">{t('camp_create', 'إنشاء حملة إعلانية جديدة')}</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="block text-[10px] text-gray-400 mb-1">{t('camp_name', 'اسم الحملة')}</label>
+                <input type="text" value={newCampaign.name} onChange={e => setNewCampaign({...newCampaign, name: e.target.value})} className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t('camp_name_ph', 'مثال: حملة رمضان 2026')} />
+              </div>
+              <div>
+                <label className="block text-[10px] text-gray-400 mb-1">{t('camp_desc', 'وصف الحملة')}</label>
+                <input type="text" value={newCampaign.description} onChange={e => setNewCampaign({...newCampaign, description: e.target.value})} className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+              <div>
+                <label className="block text-[10px] text-gray-400 mb-1">{t('camp_start', 'من')}</label>
+                <input type="date" value={newCampaign.start_date} onChange={e => setNewCampaign({...newCampaign, start_date: e.target.value})} className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-gray-400 mb-1">{t('camp_end', 'إلى')}</label>
+                <input type="date" value={newCampaign.end_date} onChange={e => setNewCampaign({...newCampaign, end_date: e.target.value})} className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-gray-400 mb-1">{t('camp_budget', 'الميزانية (ج.م)')}</label>
+                <input type="number" value={newCampaign.budget} onChange={e => setNewCampaign({...newCampaign, budget: parseFloat(e.target.value) || 0})} className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-[10px] text-gray-400 mb-1">{t('camp_free_trial', 'فترة مجانية (أيام)')}</label>
+                <input type="number" value={newCampaign.free_trial_days} onChange={e => setNewCampaign({...newCampaign, free_trial_days: parseInt(e.target.value) || 0})} className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-1.5 text-sm text-white" />
+              </div>
+            </div>
+            <div className="mb-3">
+              <label className="block text-[10px] text-gray-400 mb-1">{t('camp_select_ads', 'اختر الإعلانات في هذه الحملة')}</label>
+              <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto bg-gray-800 rounded-lg p-2 border border-gray-700">
+                {ads.map(a => (
+                  <label key={a.id} className={`flex items-center gap-1.5 cursor-pointer px-2 py-1 rounded-lg text-xs ${newCampaign.ad_ids.includes(a.id) ? 'bg-purple-600/30 text-purple-300 border border-purple-500/40' : 'bg-gray-700 text-gray-400 border border-gray-600'}`}>
+                    <input type="checkbox" checked={newCampaign.ad_ids.includes(a.id)} onChange={e => {
+                      setNewCampaign(prev => ({...prev, ad_ids: e.target.checked ? [...prev.ad_ids, a.id] : prev.ad_ids.filter(id => id !== a.id)}));
+                    }} className="hidden" />
+                    <span>{a.title}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-3 mb-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={newCampaign.auto_renew} onChange={e => setNewCampaign({...newCampaign, auto_renew: e.target.checked})} className="w-3.5 h-3.5 rounded bg-gray-800 border-gray-600 text-green-500" />
+                <span className="text-xs text-gray-300">{t('camp_auto_renew', 'تجديد تلقائي')}</span>
+              </label>
+              <select value={newCampaign.status} onChange={e => setNewCampaign({...newCampaign, status: e.target.value})} className="bg-gray-800 border border-gray-600 rounded-lg px-2 py-1 text-xs text-white">
+                <option value="draft">{t('camp_draft', 'مسودة')}</option>
+                <option value="active">{t('camp_active', 'تفعيل فوري')}</option>
+              </select>
+            </div>
+            <div className="flex gap-2">
+              <button onClick={handleCreateCampaign} className="px-4 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-500">{t('camp_create_btn', 'إنشاء الحملة')}</button>
+              <button onClick={() => setShowCreateCampaign(false)} className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg text-xs">{t('sa_cancel', 'إلغاء')}</button>
+            </div>
+          </div>
+        )}
+
+        {campaigns.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 text-sm">{t('camp_empty', 'لا توجد حملات إعلانية بعد')}</div>
+        ) : (
+          <div className="space-y-3">
+            {campaigns.map(c => {
+              const statusStyles = {
+                active: { bg: 'bg-green-500/10 border-green-500/30', badge: 'bg-green-500/20 text-green-400', label: t('camp_active', 'نشطة') },
+                draft: { bg: 'bg-gray-800 border-gray-700', badge: 'bg-gray-700 text-gray-400', label: t('camp_draft', 'مسودة') },
+                paused: { bg: 'bg-amber-500/10 border-amber-500/30', badge: 'bg-amber-500/20 text-amber-400', label: t('camp_paused', 'متوقفة') },
+                completed: { bg: 'bg-blue-500/10 border-blue-500/30', badge: 'bg-blue-500/20 text-blue-400', label: t('camp_completed', 'مكتملة') },
+                cancelled: { bg: 'bg-red-500/10 border-red-500/30', badge: 'bg-red-500/20 text-red-400', label: t('camp_cancelled', 'ملغية') },
+              };
+              const s = statusStyles[c.status] || statusStyles.draft;
+              const daysLeft = c.end_date ? Math.ceil((new Date(c.end_date) - new Date()) / 86400000) : 0;
+
+              return (
+                <div key={c.id} className={`rounded-xl border p-4 ${s.bg}`} data-testid={`campaign-${c.id}`}>
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="text-sm font-bold text-white truncate">{c.name}</h4>
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${s.badge}`}>{s.label}</span>
+                        {c.auto_renew && <span className="px-1.5 py-0.5 bg-green-900/40 text-green-400 rounded text-[9px]">{t('camp_auto', 'تجديد تلقائي')}</span>}
+                        {c.free_trial_days > 0 && <span className="px-1.5 py-0.5 bg-cyan-900/40 text-cyan-400 rounded text-[9px]">{c.free_trial_days} {t('camp_free_days', 'يوم مجاني')}</span>}
+                      </div>
+                      {c.description && <p className="text-[10px] text-gray-400">{c.description}</p>}
+                    </div>
+                    {!isSuperAdminOnly && c.budget > 0 && (
+                      <div className="text-end flex-shrink-0">
+                        <p className="text-lg font-black text-emerald-400">{c.budget.toLocaleString()}</p>
+                        <p className="text-[9px] text-gray-500">{t('sm_egp', 'ج.م')}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 mb-3 bg-gray-900/50 rounded-lg p-2.5">
+                    <div className="text-center">
+                      <p className="text-[9px] text-gray-500">{t('camp_from', 'من')}</p>
+                      <p className="text-xs font-bold text-white">{c.start_date}</p>
+                    </div>
+                    <div className="flex-1 relative">
+                      <div className="h-1 bg-gray-700 rounded-full">
+                        {c.status === 'active' && c.start_date && c.end_date && (
+                          <div className="h-1 bg-green-500 rounded-full" style={{
+                            width: `${Math.min(100, Math.max(5, ((new Date() - new Date(c.start_date)) / (new Date(c.end_date) - new Date(c.start_date))) * 100))}%`
+                          }}></div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[9px] text-gray-500">{t('camp_to', 'إلى')}</p>
+                      <p className="text-xs font-bold text-white">{c.end_date}</p>
+                    </div>
+                    {daysLeft > 0 && c.status === 'active' && (
+                      <span className={`text-[10px] font-bold ${daysLeft <= 3 ? 'text-red-400' : daysLeft <= 7 ? 'text-amber-400' : 'text-green-400'}`}>
+                        {daysLeft} {t('camp_days_left', 'يوم متبقي')}
+                      </span>
+                    )}
+                  </div>
+
+                  {(c.ads || []).length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-[10px] text-gray-500 mb-1">{t('camp_ads', 'إعلانات الحملة')} ({c.ads.length})</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {c.ads.map(a => (
+                          <span key={a.id} className={`px-2 py-0.5 rounded text-[10px] font-medium ${a.is_active ? 'bg-green-900/30 text-green-400 border border-green-700/30' : 'bg-gray-800 text-gray-500 border border-gray-700'}`}>
+                            {a.title}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex gap-3 mt-1 text-[10px] text-gray-500">
+                        <span>{c.total_views || 0} {t('ad_views_short', 'مشاهدة')}</span>
+                        <span>{c.total_clicks || 0} {t('ad_clicks_short', 'نقرة')}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {c.status === 'draft' && (
+                      <button onClick={() => handleCampaignAction(c.id, 'active')} className="px-2.5 py-1 bg-green-600/20 text-green-400 rounded-lg text-[10px] font-bold hover:bg-green-600/30">{t('camp_activate', 'تفعيل')}</button>
+                    )}
+                    {c.status === 'active' && (
+                      <button onClick={() => handleCampaignAction(c.id, 'paused')} className="px-2.5 py-1 bg-amber-600/20 text-amber-400 rounded-lg text-[10px] font-bold hover:bg-amber-600/30">{t('camp_pause', 'إيقاف مؤقت')}</button>
+                    )}
+                    {c.status === 'paused' && (
+                      <button onClick={() => handleCampaignAction(c.id, 'active')} className="px-2.5 py-1 bg-green-600/20 text-green-400 rounded-lg text-[10px] font-bold hover:bg-green-600/30">{t('camp_resume', 'استئناف')}</button>
+                    )}
+                    {(c.status === 'completed' || c.status === 'cancelled' || c.status === 'paused') && (
+                      <button onClick={() => {
+                        const newStart = prompt(t('camp_new_start', 'تاريخ بداية التجديد (YYYY-MM-DD):'), new Date().toISOString().slice(0, 10));
+                        if (newStart) handleCampaignAction(c.id, 'renew', { new_start_date: newStart });
+                      }} className="px-2.5 py-1 bg-blue-600/20 text-blue-400 rounded-lg text-[10px] font-bold hover:bg-blue-600/30">{t('camp_renew', 'تجديد')}</button>
+                    )}
+                    {c.status !== 'cancelled' && c.status !== 'completed' && (
+                      <button onClick={() => handleCampaignAction(c.id, 'cancelled')} className="px-2.5 py-1 bg-red-600/20 text-red-400 rounded-lg text-[10px] font-bold hover:bg-red-600/30">{t('camp_cancel', 'إلغاء')}</button>
+                    )}
+                    <button onClick={() => handleCampaignAction(c.id, 'delete')} className="px-2.5 py-1 bg-gray-700 text-gray-400 rounded-lg text-[10px] hover:bg-gray-600">{t('sa_delete', 'حذف')}</button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AdsTab;

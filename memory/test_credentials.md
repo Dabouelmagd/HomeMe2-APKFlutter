@@ -18,6 +18,11 @@
 - Password: admin123
 - Role: admin
 
+## Security (حارس)
+- Username: security
+- Password: Security2024!
+- Role: security
+
 ## Email (SMTP)
 - info@datalifeai.com (configured in backend .env)
 

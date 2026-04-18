@@ -1,0 +1,66 @@
+{
+  "summary": "Iteration 27: Verified SuperAdminPanel AdsTab refactor (no regression) and new Security Dashboard features (analytics, incidents CRUD, CSV export). Backend 13/13 pytest passed. Frontend flows validated end-to-end in Playwright. One minor auth-mismatch UX issue found: security user sees inc-delete-* button but DELETE /api/security/incidents/{id} requires admin (returns 403 silently).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "DELETE /api/security/incidents/{id}", "issue": "Requires require_admin but SecurityDashboard UI shows inc-delete-* button to security-role user, causing a silent 403 and toast 'فشل' when a security user tries to delete. Either (a) allow security role to delete own-compound incidents, or (b) hide inc-delete-{id} button for non-admin roles."},
+      {"endpoint": "POST /api/security/incidents", "issue": "In routes/security.py line 209, current_user.get('full_name') / .get('username') will raise AttributeError if current_user is a Pydantic User model (elsewhere current_user.id / current_user.compound_id use attribute access). Runtime did not raise in tests (likely due to __getattr__ or dict-like model), but this is inconsistent — use getattr(current_user, 'full_name', None) or current_user.full_name."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "SecurityDashboard incidents list", "issue": "Delete button (inc-delete-*) visible to security role but backend forbids it; user sees failure toast with no guidance", "selector": "[data-testid^='inc-delete-']", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Security Analytics 7-day trend chart", "issues": ["With zero visitor logs the 7 bars render as thin baseline lines only — consider showing a 'لا توجد بيانات' placeholder when total_visits==0 for clarity"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter27_security.py",
+    "/app/test_reports/pytest/iter27_security.xml"
+  ],
+  "test_cases_executed": [
+    {"case": "GET /api/security/analytics?days=7 returns success+trend(7)+hourly(24)+peak_hours(3)", "result": "PASS"},
+    {"case": "GET /api/security/analytics?days=500 clamps to 30", "result": "PASS"},
+    {"case": "GET /api/security/analytics without auth → 401/403", "result": "PASS"},
+    {"case": "POST /api/security/incidents with severity=high", "result": "PASS (id+status=open+severity=high)"},
+    {"case": "POST /api/security/incidents with severity=nuclear → 400", "result": "PASS"},
+    {"case": "GET /api/security/incidents returns {incidents,open_count,critical_open,total}", "result": "PASS"},
+    {"case": "PATCH /api/security/incidents/{id}?status=in_progress", "result": "PASS (status persisted)"},
+    {"case": "PATCH /api/security/incidents/{id}?status=resolved&resolution_notes=done sets resolved_at", "result": "PASS"},
+    {"case": "PATCH invalid status → 400", "result": "PASS"},
+    {"case": "DELETE /api/security/incidents/{id} as security user → 403", "result": "PASS (require_admin enforced)"},
+    {"case": "DELETE /api/security/incidents/{id} as super_admin → 200 + removed", "result": "PASS"},
+    {"case": "DELETE nonexistent incident → 404", "result": "PASS"},
+    {"case": "GET /api/security/visitor-logs", "result": "PASS"},
+    {"case": "UI: superadmin login + /app/super-admin?tab=ads renders ads-tab, create-ad-btn, create-campaign-btn, ad-placement-table", "result": "PASS (no regression post-refactor)"},
+    {"case": "UI: super-admin tabs overview/users/codes/coupons/analytics all render", "result": "PASS"},
+    {"case": "UI: security login → select-account(حراسة) → dashboard renders sec-tab-visitors/messages/incidents/analytics", "result": "PASS"},
+    {"case": "UI: sec-report-btn → sec-incident-form → fill + sec-inc-sev-high + sec-inc-submit creates incident", "result": "PASS"},
+    {"case": "UI: inc-progress-* → status becomes قيد المعالجة; inc-resolve-* → محلول", "result": "PASS"},
+    {"case": "UI: inc-delete-* as security user → silent 403 + failure toast", "result": "FAIL (permissions mismatch — minor)"},
+    {"case": "UI: sec-tab-analytics renders sec-trend-chart (7 bars), peak hours cards, 24h heatmap", "result": "PASS"},
+    {"case": "UI: sec-export-csv in visitors tab triggers Blob download visitor_logs_2026-04-18.csv", "result": "PASS"}
+  ],
+  "action_items": [
+    "Either allow security role to DELETE /api/security/incidents/{id} (change require_admin to get_current_user with compound scope), or hide inc-delete-{id} button in SecurityDashboard.js when current user role is 'security'.",
+    "Fix current_user.get('full_name') in /app/backend/routes/security.py:209 → use getattr(current_user, 'full_name', None) or current_user.full_name for consistency with rest of file.",
+    "Optional UX: show empty-state placeholder in sec-trend-chart when total_visits == 0."
+  ],
+  "critical_code_review_comments": [
+    "security.py create_security_incident uses attribute access current_user.id/compound_id but .get() for full_name/username in same function — inconsistent; risk of AttributeError depending on auth_deps model shape.",
+    "AdsTab.js extraction is clean but ~22 props drilled from parent — consider consolidating into a single context or a props object for maintainability; runtime verified all props resolved (no undefined errors).",
+    "DELETE /api/security/incidents/{id} permission model mismatches the UI: UI shows delete button to reporter (security), backend requires admin. Pick one consistently."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter27_security.py (new)"
+  ],
+  "success_rate": {"backend": "100% (13/13 passed)", "frontend": "~95% (all critical flows pass; inc-delete as security user fails by backend design)"},
+  "test_credentials": "superadmin/SuperAdmin2024! and security/Security2024! from /app/memory/test_credentials.md — both worked. select-account step required for both.",
+  "seed_data_creation": "Created + deleted one TEST_incident_iter27 via pytest; created one TEST_UI_inc via UI (left in resolved state, delete failed for security role).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Super-admin routes are under /app/super-admin (not /super-admin). Ads endpoints live under /api/ads/* not /api/super-admin/ads. Backend PATCH /api/security/incidents/{id} uses query params (status=..., resolution_notes=...). Security user delete button on incidents is permission-blocked by backend (require_admin) — leftover TEST_UI_inc incident exists in DB; next run can clean it as super_admin.",
+  "rca of the issue": "Minor UX issue: SecurityDashboard.js renders inc-delete-{id} regardless of role, but DELETE /api/security/incidents/{id} is guarded by require_admin. Result: security user clicks delete → backend 403 → frontend shows failure toast with no explanation. Either expand backend permission for reporter/same-compound security role or hide the delete button for non-admin roles."
+}

@@ -67,6 +67,7 @@ const SuperAdminPanel = () => {
   // Ads
   const [ads, setAds] = useState([]);
   const [adStats, setAdStats] = useState({});
+  const [adSettings, setAdSettings] = useState({});
   const [showCreateAd, setShowCreateAd] = useState(false);
   const [newAd, setNewAd] = useState({ title: '', image_url: '', link_url: '', description: '', position: 'banner', dimensions: '', ad_value: 0, is_gift: false, start_date: '', end_date: '', target_compounds: [] });
   // Referrals
@@ -202,7 +203,15 @@ const SuperAdminPanel = () => {
 
   // Ads
   const fetchAds = async () => {
-    try { const res = await axios.get(`${API}/ads`, getToken()); setAds(res.data.ads || []); setAdStats(res.data.stats || {}); } catch { /* */ }
+    try {
+      const [adsRes, settingsRes] = await Promise.all([
+        axios.get(`${API}/ads`, getToken()),
+        axios.get(`${API}/ads/ad-settings`, getToken()).catch(() => ({ data: {} })),
+      ]);
+      setAds(adsRes.data.ads || []);
+      setAdStats(adsRes.data.stats || {});
+      setAdSettings(settingsRes.data || {});
+    } catch { /* */ }
   };
   const handleCreateAd = async () => {
     try {
@@ -776,11 +785,15 @@ const SuperAdminPanel = () => {
                             </div>
                             <div className="flex items-center gap-2 mt-2">
                               <label className="flex items-center gap-1 cursor-pointer">
-                                <input type="checkbox" defaultChecked id={`internal-${pos.key}`} className="w-3 h-3 rounded border-gray-600 bg-gray-800 text-green-500 focus:ring-green-500" />
+                                <input type="checkbox" checked={adSettings?.positions?.[pos.key]?.internal_enabled !== false} onChange={(e) => {
+                                  setAdSettings(prev => ({...prev, positions: {...(prev.positions || {}), [pos.key]: {...(prev.positions?.[pos.key] || {}), internal_enabled: e.target.checked}}}));
+                                }} id={`internal-${pos.key}`} className="w-3 h-3 rounded border-gray-600 bg-gray-800 text-green-500 focus:ring-green-500" />
                                 <span className="text-[9px] text-gray-400">{t('ad_internal', 'داخلي')}</span>
                               </label>
                               <label className="flex items-center gap-1 cursor-pointer">
-                                <input type="checkbox" defaultChecked={!['dashboard','sidebar','popup','splash','notification'].includes(pos.key)} id={`adsense-${pos.key}`} className="w-3 h-3 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500" />
+                                <input type="checkbox" checked={adSettings?.positions?.[pos.key]?.adsense_enabled !== false && !['dashboard','sidebar','popup','splash','notification'].includes(pos.key) || adSettings?.positions?.[pos.key]?.adsense_enabled === true} onChange={(e) => {
+                                  setAdSettings(prev => ({...prev, positions: {...(prev.positions || {}), [pos.key]: {...(prev.positions?.[pos.key] || {}), adsense_enabled: e.target.checked}}}));
+                                }} id={`adsense-${pos.key}`} className="w-3 h-3 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500" />
                                 <span className="text-[9px] text-gray-400">AdSense</span>
                               </label>
                             </div>
@@ -792,17 +805,12 @@ const SuperAdminPanel = () => {
                 );
               })()}
               <button onClick={async () => {
-                const positions = {};
-                ['homepage_hero','homepage_mid','homepage_footer','banner','sidebar','dashboard','inline','login_page','popup','notification','splash','services_page'].forEach(k => {
-                  const internal = document.getElementById(`internal-${k}`)?.checked ?? true;
-                  const adsense = document.getElementById(`adsense-${k}`)?.checked ?? false;
-                  positions[k] = { internal_enabled: internal, adsense_enabled: adsense, mode: internal ? (adsense ? 'internal_first' : 'internal_only') : (adsense ? 'adsense_only' : 'disabled') };
-                });
                 try {
+                  const positions = adSettings.positions || {};
                   await axios.put(`${API}/ads/ad-settings`, { positions }, getToken());
-                  toast.success(t('sa_saved', 'تم الحفظ'));
+                  toast.success(t('ad_settings_saved', 'تم حفظ الإعدادات'));
                 } catch { toast.error(t('sa_failed', 'فشل')); }
-              }} className="mt-4 px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">
+              }} className="mt-4 px-5 py-2.5 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 transition-all w-full">
                 {t('save_changes', 'حفظ التغييرات')}
               </button>
             </div>

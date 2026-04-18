@@ -230,8 +230,14 @@ async def update_user(
     current_user: dict = Depends(get_current_user)
 ):
     db = get_db()
-    if current_user.get('username','') not in ["johndoe", "admin", "superadmin"]:
-        raise HTTPException(status_code=403, detail="Super admin access required")
+    # السماح لأدوار الإدارة (ليس فقط usernames ثابتة)
+    allowed_roles = ["super_admin", "admin", "company_admin", "app_owner"]
+    allowed_usernames = ["johndoe", "admin", "superadmin"]
+    if (
+        current_user.get("role") not in allowed_roles
+        and current_user.get("username", "") not in allowed_usernames
+    ):
+        raise HTTPException(status_code=403, detail="Admin access required")
     
     # Remove sensitive fields that shouldn't be updated
     allowed_fields = [
@@ -240,21 +246,28 @@ async def update_user(
     ]
     
     update_data = {k: v for k, v in user_data.items() if k in allowed_fields}
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No valid fields to update")
     
     result = await db.users.update_one(
         {"id": user_id},
         {"$set": update_data}
     )
     
-    if result.modified_count == 0:
+    if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="User not found")
     
     return {"message": "User updated successfully"}
 
 @router.delete("/database/users/{user_id}")
 async def delete_user(user_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user.get('username','') not in ["johndoe", "admin", "superadmin"]:
-        raise HTTPException(status_code=403, detail="Super admin access required")
+    allowed_roles = ["super_admin", "admin", "company_admin", "app_owner"]
+    allowed_usernames = ["johndoe", "admin", "superadmin"]
+    if (
+        current_user.get("role") not in allowed_roles
+        and current_user.get("username", "") not in allowed_usernames
+    ):
+        raise HTTPException(status_code=403, detail="Admin access required")
     
     # Don't allow deleting yourself
     if user_id == current_user['id']:

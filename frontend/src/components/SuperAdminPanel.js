@@ -1052,6 +1052,7 @@ const SuperAdminPanel = () => {
             </div>
             <div className="flex gap-3 pt-2">
               <button onClick={async () => {
+                if (!editUser.full_name?.trim()) { toast.error(t('sa_name_required', 'الاسم مطلوب')); return; }
                 try {
                   await axios.put(`${API}/database/users/${editUser.id}`, {
                     full_name: editUser.full_name,
@@ -1063,8 +1064,11 @@ const SuperAdminPanel = () => {
                   toast.success(t('sa_user_updated', 'تم تحديث المستخدم'));
                   setEditUser(null);
                   fetchDashboard();
-                } catch { toast.error(t('sa_failed', 'فشل')); }
-              }} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500">{t('cs_confirm', 'تأكيد')}</button>
+                } catch (err) {
+                  console.error('Update user error:', err);
+                  toast.error(err.response?.data?.detail || t('sa_failed', 'فشل'));
+                }
+              }} className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500" data-testid="save-edit-user">{t('cs_confirm', 'تأكيد')}</button>
               <button onClick={() => setEditUser(null)} className="px-4 py-2.5 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('cs_cancel', 'إلغاء')}</button>
             </div>
           </div>

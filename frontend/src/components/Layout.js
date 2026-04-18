@@ -762,29 +762,34 @@ const Layout = ({ children, isTrialMode = false }) => {
 
             <div className="flex items-center gap-3 rtl:flex-row-reverse">
               {/* User Info Card */}
-              <div className="flex items-center bg-white/80 backdrop-blur-sm px-3 py-2 rounded-lg border border-gray-200 shadow-sm">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm mr-2 rtl:mr-0 rtl:ml-2">
+              <div className={`flex items-center backdrop-blur-sm px-3 py-2 rounded-lg border shadow-sm ${
+                (activeRole === 'app_owner') ? 'bg-rose-50/80 border-rose-200' :
+                (activeRole === 'super_admin') ? 'bg-purple-50/80 border-purple-200' :
+                'bg-white/80 border-gray-200'
+              }`}>
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-2 rtl:mr-0 rtl:ml-2 ${
+                  (activeRole === 'app_owner') ? 'bg-gradient-to-br from-rose-500 to-pink-600' :
+                  (activeRole === 'super_admin') ? 'bg-gradient-to-br from-purple-500 to-indigo-600' :
+                  (activeRole === 'admin' || activeRole === 'company_admin') ? 'bg-gradient-to-br from-emerald-500 to-green-600' :
+                  (activeRole === 'security') ? 'bg-gradient-to-br from-slate-500 to-gray-600' :
+                  'bg-gradient-to-br from-blue-500 to-cyan-600'
+                }`}>
                   {(user?.full_name || user?.username || 'U').charAt(0).toUpperCase()}
                 </div>
                 <div className="flex flex-col items-start rtl:items-end">
                   <span className="text-sm font-semibold text-gray-900">{user?.full_name || user?.username}</span>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    {user?.unit_number && (
-                      <span className="flex items-center gap-1">
-                        <HomeIcon className="h-3 w-3" />
-                        {user.unit_number}
-                      </span>
-                    )}
-                    {user?.compound_name && (
-                      <>
-                        {user?.unit_number && <span>•</span>}
-                        <span className="flex items-center gap-1">
-                          <BuildingOffice2Icon className="h-3 w-3" />
-                          {user.compound_name}
-                        </span>
-                      </>
-                    )}
-                  </div>
+                  <span className={`text-[10px] font-medium ${
+                    (activeRole === 'app_owner') ? 'text-rose-500' :
+                    (activeRole === 'super_admin') ? 'text-purple-500' :
+                    (activeRole === 'admin') ? 'text-emerald-500' :
+                    'text-gray-400'
+                  }`}>
+                    {activeRole === 'app_owner' ? t('role_owner', 'مالك التطبيق') :
+                     activeRole === 'super_admin' ? t('role_super_admin', 'سوبر أدمن') :
+                     activeRole === 'admin' ? t('role_admin', 'مدير') :
+                     activeRole === 'security' ? t('role_security', 'أمن') :
+                     t('role_resident', 'مقيم')}
+                  </span>
                 </div>
               </div>
 

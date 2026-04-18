@@ -815,69 +815,137 @@ const SuperAdminPanel = () => {
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
               <h3 className="text-lg font-bold text-white mb-4">{t('ad_placement_guide', 'دليل أماكن الإعلانات ومقاساتها')}</h3>
               
-              {/* Visual App Layout Map */}
+              {/* ===== SECTION 1: WEBSITE (Landing Page) ===== */}
+              <h4 className="text-sm font-bold text-rose-400 mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-rose-500"></span>
+                {t('ad_section_website', 'الموقع الإلكتروني (Landing Page)')}
+              </h4>
               <div className="bg-gray-900 rounded-xl p-4 mb-4 border border-gray-700">
-                <div className="flex gap-3" style={{ minHeight: '280px' }}>
+                <div className="flex flex-col gap-2" style={{ minHeight: '200px' }}>
+                  {/* Hero */}
+                  <div className="bg-rose-600/20 border border-rose-500 border-dashed rounded-lg p-3 text-center">
+                    <span className="text-xs font-bold text-rose-400">homepage_hero</span>
+                    <span className="text-[9px] text-rose-300 mx-2">— {t('pos_desc_homepage_hero', 'بانر كبير أعلى الصفحة الرئيسية')}</span>
+                    <span className="text-[9px] text-rose-200 bg-rose-500/20 px-1.5 py-0.5 rounded">970x250 / 728x90 / 320x100</span>
+                  </div>
+                  {/* Content cards placeholder */}
+                  <div className="flex gap-2">
+                    <div className="flex-1 bg-gray-800 rounded h-16 border border-gray-700"></div>
+                    <div className="flex-1 bg-gray-800 rounded h-16 border border-gray-700"></div>
+                    <div className="flex-1 bg-gray-800 rounded h-16 border border-gray-700"></div>
+                  </div>
+                  {/* Mid */}
+                  <div className="bg-pink-600/20 border border-pink-500 border-dashed rounded-lg p-2.5 text-center">
+                    <span className="text-xs font-bold text-pink-400">homepage_mid</span>
+                    <span className="text-[9px] text-pink-300 mx-2">— {t('pos_desc_homepage_mid', 'وسط محتوى الصفحة الرئيسية')}</span>
+                    <span className="text-[9px] text-pink-200 bg-pink-500/20 px-1.5 py-0.5 rounded">728x90 / 468x60</span>
+                  </div>
+                  {/* More content */}
+                  <div className="flex gap-2">
+                    <div className="flex-1 bg-gray-800 rounded h-10 border border-gray-700"></div>
+                    <div className="flex-1 bg-gray-800 rounded h-10 border border-gray-700"></div>
+                  </div>
+                  {/* Footer */}
+                  <div className="bg-red-600/20 border border-red-500 border-dashed rounded-lg p-2.5 text-center">
+                    <span className="text-xs font-bold text-red-400">homepage_footer</span>
+                    <span className="text-[9px] text-red-300 mx-2">— {t('pos_desc_homepage_footer', 'أسفل الصفحة الرئيسية قبل CTA')}</span>
+                    <span className="text-[9px] text-red-200 bg-red-500/20 px-1.5 py-0.5 rounded">728x90 / 320x50</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ===== SECTION 2: APP (Dashboard) ===== */}
+              <h4 className="text-sm font-bold text-amber-400 mb-3 mt-5 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                {t('ad_section_app', 'داخل التطبيق (بعد تسجيل الدخول)')}
+              </h4>
+              <div className="bg-gray-900 rounded-xl p-4 mb-4 border border-gray-700">
+                <div className="flex gap-3" style={{ minHeight: '300px' }}>
                   {/* Sidebar mockup */}
-                  <div className="w-44 flex-shrink-0 bg-gray-800 rounded-lg border border-gray-600 p-2 flex flex-col">
+                  <div className="w-40 flex-shrink-0 bg-gray-800 rounded-lg border border-gray-600 p-2 flex flex-col">
                     <div className="text-[9px] text-gray-500 text-center mb-1">SIDEBAR</div>
                     <div className="flex-1 space-y-1">
                       <div className="bg-gray-700 rounded h-3 w-full"></div>
                       <div className="bg-gray-700 rounded h-3 w-3/4"></div>
                       <div className="bg-gray-700 rounded h-3 w-full"></div>
                       <div className="bg-gray-700 rounded h-3 w-2/3"></div>
-                      <div className="bg-gray-700 rounded h-3 w-full"></div>
                     </div>
                     <div className="mt-auto pt-2 border-t border-gray-600">
                       <div className="bg-indigo-600/30 border border-indigo-500 border-dashed rounded-lg p-2 text-center">
                         <span className="text-[10px] font-bold text-indigo-400">sidebar</span>
-                        <div className="text-[8px] text-indigo-300 mt-0.5">160x600</div>
+                        <div className="text-[8px] text-indigo-300 mt-0.5">160x600 · 300x250</div>
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Main content mockup */}
+                  {/* Main content */}
                   <div className="flex-1 flex flex-col gap-2">
-                    {/* Top banner */}
                     <div className="bg-amber-600/20 border border-amber-500 border-dashed rounded-lg p-3 text-center">
                       <span className="text-xs font-bold text-amber-400">banner</span>
                       <span className="text-[9px] text-amber-300 mx-2">— {t('ad_pos_top', 'بانر أعلى الصفحة')}</span>
                       <span className="text-[9px] text-amber-200 bg-amber-500/20 px-1.5 py-0.5 rounded">728x90 / 970x250</span>
                     </div>
-                    
-                    {/* Dashboard area */}
                     <div className="bg-gray-800 rounded-lg border border-gray-600 p-3 flex-1 flex flex-col">
                       <div className="flex gap-2 mb-2">
-                        <div className="flex-1 bg-gray-700 rounded h-12"></div>
-                        <div className="flex-1 bg-gray-700 rounded h-12"></div>
-                        <div className="flex-1 bg-gray-700 rounded h-12"></div>
+                        <div className="flex-1 bg-gray-700 rounded h-10"></div>
+                        <div className="flex-1 bg-gray-700 rounded h-10"></div>
+                        <div className="flex-1 bg-gray-700 rounded h-10"></div>
                       </div>
-                      
-                      {/* Dashboard ad */}
                       <div className="bg-emerald-600/20 border border-emerald-500 border-dashed rounded-lg p-2.5 text-center mb-2">
                         <span className="text-xs font-bold text-emerald-400">dashboard</span>
                         <span className="text-[9px] text-emerald-300 mx-2">— {t('ad_pos_dash', 'داخل لوحة التحكم')}</span>
                         <span className="text-[9px] text-emerald-200 bg-emerald-500/20 px-1.5 py-0.5 rounded">300x250 / 336x280</span>
                       </div>
-                      
-                      {/* Inline ad */}
                       <div className="bg-purple-600/20 border border-purple-500 border-dashed rounded-lg p-2.5 text-center mb-2">
                         <span className="text-xs font-bold text-purple-400">inline</span>
                         <span className="text-[9px] text-purple-300 mx-2">— {t('ad_pos_inline', 'بين المحتوى')}</span>
                         <span className="text-[9px] text-purple-200 bg-purple-500/20 px-1.5 py-0.5 rounded">728x90 / 320x50</span>
                       </div>
-                      
-                      <div className="flex gap-2">
-                        <div className="flex-1 bg-gray-700 rounded h-8"></div>
-                        <div className="flex-1 bg-gray-700 rounded h-8"></div>
+                      <div className="bg-teal-600/20 border border-teal-500 border-dashed rounded-lg p-2 text-center">
+                        <span className="text-[10px] font-bold text-teal-400">services_page</span>
+                        <span className="text-[9px] text-teal-300 mx-2">— {t('pos_desc_services', 'صفحة الخدمات')}</span>
+                        <span className="text-[9px] text-teal-200 bg-teal-500/20 px-1.5 py-0.5 rounded">728x90 / 300x250</span>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Placement Details Table */}
-              <table className="w-full text-sm">
+              {/* ===== SECTION 3: SPECIAL ===== */}
+              <h4 className="text-sm font-bold text-cyan-400 mb-3 mt-5 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
+                {t('ad_section_special', 'أنواع خاصة')}
+              </h4>
+              <div className="bg-gray-900 rounded-xl p-4 mb-4 border border-gray-700">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="bg-sky-600/20 border border-sky-500 border-dashed rounded-lg p-3 text-center">
+                    <span className="text-lg mb-1 block">🔑</span>
+                    <span className="text-[10px] font-bold text-sky-400 block">login_page</span>
+                    <span className="text-[8px] text-sky-300 block mt-0.5">{t('pos_desc_login', 'صفحة تسجيل الدخول')}</span>
+                    <span className="text-[8px] text-sky-200 bg-sky-500/20 px-1.5 py-0.5 rounded mt-1 inline-block">728x90 / 300x250</span>
+                  </div>
+                  <div className="bg-orange-600/20 border border-orange-500 border-dashed rounded-lg p-3 text-center">
+                    <span className="text-lg mb-1 block">💬</span>
+                    <span className="text-[10px] font-bold text-orange-400 block">popup</span>
+                    <span className="text-[8px] text-orange-300 block mt-0.5">{t('pos_desc_popup', 'نافذة منبثقة')}</span>
+                    <span className="text-[8px] text-orange-200 bg-orange-500/20 px-1.5 py-0.5 rounded mt-1 inline-block">400x300 / 300x250</span>
+                  </div>
+                  <div className="bg-cyan-600/20 border border-cyan-500 border-dashed rounded-lg p-3 text-center">
+                    <span className="text-lg mb-1 block">⏳</span>
+                    <span className="text-[10px] font-bold text-cyan-400 block">splash</span>
+                    <span className="text-[8px] text-cyan-300 block mt-0.5">{t('pos_desc_splash', 'شاشة التحميل')}</span>
+                    <span className="text-[8px] text-cyan-200 bg-cyan-500/20 px-1.5 py-0.5 rounded mt-1 inline-block">320x480 / 300x250</span>
+                  </div>
+                  <div className="bg-pink-600/20 border border-pink-500 border-dashed rounded-lg p-3 text-center">
+                    <span className="text-lg mb-1 block">🔔</span>
+                    <span className="text-[10px] font-bold text-pink-400 block">notification</span>
+                    <span className="text-[8px] text-pink-300 block mt-0.5">{t('pos_desc_notification', 'صفحة الإشعارات')}</span>
+                    <span className="text-[8px] text-pink-200 bg-pink-500/20 px-1.5 py-0.5 rounded mt-1 inline-block">728x90 / 320x50</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ===== FULL PLACEMENT TABLE ===== */}
+              <table className="w-full text-sm" data-testid="ad-placement-table">
                 <thead>
                   <tr className="border-b border-gray-700">
                     <th className="px-3 py-2 text-right text-gray-400 font-medium">{t('ad_place', 'الموقع')}</th>
@@ -888,34 +956,28 @@ const SuperAdminPanel = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700/50">
-                  <tr>
-                    <td className="px-3 py-2.5"><span className="bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded text-xs font-bold">banner</span></td>
-                    <td className="px-3 py-2.5 text-gray-300 text-xs text-center">{t('ad_desc_banner', 'بانر أعلى صفحات المحتوى')}</td>
-                    <td className="px-3 py-2.5 text-center"><span className="text-xs text-gray-400">728x90 · 970x250 · 320x50</span></td>
-                    <td className="px-3 py-2.5 text-center text-xs text-gray-300">{t('ad_see_residents', 'السكان فقط')}</td>
-                    <td className="px-3 py-2.5 text-center text-xs font-bold text-gray-300">1</td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2.5"><span className="bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded text-xs font-bold">sidebar</span></td>
-                    <td className="px-3 py-2.5 text-gray-300 text-xs text-center">{t('ad_desc_sidebar', 'أسفل قائمة التنقل الجانبية')}</td>
-                    <td className="px-3 py-2.5 text-center"><span className="text-xs text-gray-400">160x600 · 300x250</span></td>
-                    <td className="px-3 py-2.5 text-center text-xs text-gray-300">{t('ad_see_all', 'الكل (ما عدا المالك)')}</td>
-                    <td className="px-3 py-2.5 text-center text-xs font-bold text-gray-300">1</td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2.5"><span className="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-xs font-bold">dashboard</span></td>
-                    <td className="px-3 py-2.5 text-gray-300 text-xs text-center">{t('ad_desc_dashboard', 'داخل لوحة التحكم الرئيسية')}</td>
-                    <td className="px-3 py-2.5 text-center"><span className="text-xs text-gray-400">300x250 · 336x280 · 728x90</span></td>
-                    <td className="px-3 py-2.5 text-center text-xs text-gray-300">{t('ad_see_residents_admins', 'السكان والمديرين')}</td>
-                    <td className="px-3 py-2.5 text-center text-xs font-bold text-gray-300">2</td>
-                  </tr>
-                  <tr>
-                    <td className="px-3 py-2.5"><span className="bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded text-xs font-bold">inline</span></td>
-                    <td className="px-3 py-2.5 text-gray-300 text-xs text-center">{t('ad_desc_inline', 'بين أقسام المحتوى في الداشبورد')}</td>
-                    <td className="px-3 py-2.5 text-center"><span className="text-xs text-gray-400">728x90 · 320x50</span></td>
-                    <td className="px-3 py-2.5 text-center text-xs text-gray-300">{t('ad_see_residents', 'السكان فقط')}</td>
-                    <td className="px-3 py-2.5 text-center text-xs font-bold text-gray-300">1</td>
-                  </tr>
+                  {[
+                    { name: 'homepage_hero', color: 'rose', desc: t('pos_desc_homepage_hero','بانر كبير أعلى الصفحة الرئيسية'), sizes: '970x250 · 728x90 · 320x100', who: t('ad_see_public','الجميع (عام)'), max: 3 },
+                    { name: 'homepage_mid', color: 'pink', desc: t('pos_desc_homepage_mid','وسط محتوى الصفحة الرئيسية'), sizes: '728x90 · 468x60', who: t('ad_see_public','الجميع (عام)'), max: 2 },
+                    { name: 'homepage_footer', color: 'red', desc: t('pos_desc_homepage_footer','أسفل الصفحة الرئيسية'), sizes: '728x90 · 320x50', who: t('ad_see_public','الجميع (عام)'), max: 2 },
+                    { name: 'banner', color: 'amber', desc: t('ad_desc_banner','بانر أعلى صفحات المحتوى'), sizes: '728x90 · 970x250 · 320x50', who: t('ad_see_residents','السكان فقط'), max: 5 },
+                    { name: 'sidebar', color: 'indigo', desc: t('ad_desc_sidebar','أسفل قائمة التنقل الجانبية'), sizes: '160x600 · 300x250', who: t('ad_see_all','الكل (ما عدا المالك)'), max: 3 },
+                    { name: 'dashboard', color: 'emerald', desc: t('ad_desc_dashboard','داخل لوحة التحكم الرئيسية'), sizes: '300x250 · 336x280 · 728x90', who: t('ad_see_residents_admins','السكان والمديرين'), max: 2 },
+                    { name: 'inline', color: 'purple', desc: t('ad_desc_inline','بين أقسام المحتوى في الداشبورد'), sizes: '728x90 · 320x50', who: t('ad_see_residents','السكان فقط'), max: 4 },
+                    { name: 'services_page', color: 'teal', desc: t('pos_desc_services','صفحة الخدمات والعروض'), sizes: '728x90 · 300x250', who: t('ad_see_residents','السكان فقط'), max: 3 },
+                    { name: 'login_page', color: 'sky', desc: t('pos_desc_login','صفحة تسجيل الدخول'), sizes: '728x90 · 300x250', who: t('ad_see_public','الجميع (عام)'), max: 2 },
+                    { name: 'popup', color: 'orange', desc: t('pos_desc_popup','نافذة منبثقة عند فتح التطبيق'), sizes: '400x300 · 300x250', who: t('ad_see_residents_admins','السكان والمديرين'), max: 1 },
+                    { name: 'splash', color: 'cyan', desc: t('pos_desc_splash','شاشة التحميل'), sizes: '320x480 · 300x250', who: t('ad_see_residents','السكان فقط'), max: 1 },
+                    { name: 'notification', color: 'pink', desc: t('pos_desc_notification','صفحة الإشعارات'), sizes: '728x90 · 320x50', who: t('ad_see_residents','السكان فقط'), max: 2 },
+                  ].map((p, i) => (
+                    <tr key={i}>
+                      <td className="px-3 py-2.5"><span className={`bg-${p.color}-500/20 text-${p.color}-400 px-2 py-0.5 rounded text-xs font-bold`}>{p.name}</span></td>
+                      <td className="px-3 py-2.5 text-gray-300 text-xs text-center">{p.desc}</td>
+                      <td className="px-3 py-2.5 text-center"><span className="text-xs text-gray-400">{p.sizes}</span></td>
+                      <td className="px-3 py-2.5 text-center text-xs text-gray-300">{p.who}</td>
+                      <td className="px-3 py-2.5 text-center text-xs font-bold text-gray-300">{p.max}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

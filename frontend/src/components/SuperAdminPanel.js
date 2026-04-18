@@ -260,6 +260,7 @@ const SuperAdminPanel = () => {
       const payload = {
         title: editAd.title,
         image_url: editAd.image_url || '',
+        media_type: editAd.media_type || 'image',
         link_url: editAd.link_url || '',
         description: editAd.description || '',
         position: editAd.position,

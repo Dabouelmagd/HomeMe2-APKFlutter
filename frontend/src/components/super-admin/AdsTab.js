@@ -897,7 +897,30 @@ const AdsTab = ({
                 <input type="text" value={editAd.description || ''} onChange={e => setEditAd({ ...editAd, description: e.target.value })} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_replace', 'تغيير الصورة/الفيديو')}</label>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_current_media', 'الصورة/الفيديو الحالي')}</label>
+                {editAd.image_url ? (
+                  <div className="bg-gray-900 border border-gray-700 rounded-lg p-2 flex items-center gap-2" data-testid="edit-ad-current-media">
+                    {(editAd.media_type === 'video') || /\.(mp4|webm|mov)(\?|$)/i.test(editAd.image_url) ? (
+                      <video src={editAd.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${editAd.image_url}` : editAd.image_url} className="h-14 w-24 object-cover rounded flex-shrink-0" muted />
+                    ) : (
+                      <img src={editAd.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${editAd.image_url}` : editAd.image_url} alt="current" className="h-14 w-24 object-cover rounded flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] text-green-400 truncate">✓ {t('sa_media_kept', 'سيتم الاحتفاظ بالوسائط الحالية')}</p>
+                      <p className="text-[9px] text-gray-500 truncate font-mono" dir="ltr">{editAd.image_url}</p>
+                    </div>
+                    <button type="button" onClick={() => setEditAd({ ...editAd, image_url: '', media_type: undefined })} className="text-[10px] text-red-400 hover:text-red-300 flex-shrink-0 px-2 py-1" title={t('sa_remove_media', 'إزالة')} data-testid="edit-ad-remove-media">
+                      🗑️ {t('sa_remove', 'إزالة')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="bg-gray-900/50 border border-dashed border-gray-700 rounded-lg p-3 text-center text-[10px] text-gray-500">
+                    {t('sa_no_current_media', 'لا توجد صورة حالياً — ارفعي واحدة بالأسفل')}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_replace', 'تغيير الصورة/الفيديو (اختياري)')}</label>
                 <input type="file" accept="image/*,video/mp4,video/webm" onChange={async (e) => {
                   const file = e.target.files[0];
                   if (!file) return;
@@ -905,11 +928,11 @@ const AdsTab = ({
                   formData.append('file', file);
                   try {
                     const res = await axios.post(`${API}/ads/upload-media`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
-                    setEditAd({ ...editAd, image_url: res.data.url });
+                    setEditAd({ ...editAd, image_url: res.data.url, media_type: res.data.type });
                     toast.success(t('sa_uploaded', 'تم الرفع'));
                   } catch { toast.error(t('sa_upload_failed', 'فشل الرفع')); }
                 }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-blue-600 file:text-white" />
-                {editAd.image_url && <p className="text-[10px] text-green-400 mt-1 truncate">✓ {editAd.image_url}</p>}
+                <p className="text-[9px] text-amber-400/80 mt-1">💡 {t('sa_upload_optional', 'اتركي هذا الحقل فارغاً إذا لم تريدي تغيير الصورة الحالية')}</p>
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_value', 'القيمة (ج.م)')}</label>

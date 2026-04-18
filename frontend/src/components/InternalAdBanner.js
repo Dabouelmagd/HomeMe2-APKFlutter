@@ -111,16 +111,20 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
           <div key={ad.id} className="relative group rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl hover:scale-[1.01] transition-all" onClick={() => handleClick(ad)} title={ad.link_url ? ad.link_url : ''}>
             {ad.image_url ? (
               // صورة نظيفة بدون أي نص فوقها
-              <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} alt={ad.title} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} />
+              (ad.media_type === 'video') || /\.(mp4|webm|mov)(\?|$)/i.test(ad.image_url) ? (
+                <video src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} muted loop autoPlay playsInline />
+              ) : (
+                <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} alt={ad.title} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} />
+              )
             ) : (
-              // بدون صورة: نعرض العنوان كـ fallback فقط
-              <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4">
-                <div className="flex items-center gap-3">
+              // بدون صورة: نعرض العنوان كـ fallback واضح ومميز
+              <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-5 min-h-[80px] flex items-center">
+                <div className="flex items-center gap-3 w-full">
                   <div className="flex-1 text-white">
-                    <h3 className="font-bold text-sm">{ad.title}</h3>
-                    {ad.description && <p className="text-xs text-white/70 mt-0.5">{ad.description}</p>}
+                    <h3 className="font-bold text-base">{ad.title}</h3>
+                    {ad.description && <p className="text-sm text-white/80 mt-1">{ad.description}</p>}
                   </div>
-                  {ad.link_url && <span className="text-xs bg-white/20 px-3 py-1 rounded-full text-white whitespace-nowrap">{t('ad_learn_more', 'اعرف أكثر')}</span>}
+                  {ad.link_url && <span className="text-xs bg-white/25 hover:bg-white/40 transition-colors px-4 py-2 rounded-full text-white whitespace-nowrap font-semibold">{t('ad_learn_more', 'اعرف أكثر')} ←</span>}
                 </div>
               </div>
             )}

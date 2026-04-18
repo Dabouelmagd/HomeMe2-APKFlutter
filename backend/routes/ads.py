@@ -20,6 +20,7 @@ router = APIRouter(prefix="/api")
 class AdCreate(BaseModel):
     title: str
     image_url: str = ""
+    media_type: str = "image"  # image | video
     link_url: str = ""
     description: str = ""
     position: str = "sidebar"  # sidebar, banner, inline, dashboard, homepage_hero, homepage_mid, homepage_footer, login_page, popup, notification, splash, services_page
@@ -36,6 +37,7 @@ class AdCreate(BaseModel):
 class AdUpdate(BaseModel):
     title: Optional[str] = None
     image_url: Optional[str] = None
+    media_type: Optional[str] = None
     link_url: Optional[str] = None
     description: Optional[str] = None
     position: Optional[str] = None
@@ -217,6 +219,7 @@ async def create_ad(data: AdCreate, current_user: dict = Depends(require_super_a
         "id": str(uuid.uuid4()),
         "title": data.title,
         "image_url": data.image_url,
+        "media_type": data.media_type or "image",
         "link_url": data.link_url,
         "description": data.description,
         "position": data.position,

@@ -14,6 +14,7 @@ from database import get_db
 from auth_deps import get_current_user, require_admin, require_super_admin
 from helpers import serialize_datetime
 from shared_models import *
+from push_notification_service import PushNotificationService
 
 
 router = APIRouter(prefix="/api")
@@ -215,6 +216,39 @@ async def create_security_incident(
         }
         await db.security_incidents.insert_one(incident)
         incident.pop("_id", None)
+
+        # إشعار فوري للمديرين إذا كانت الخطورة high أو critical
+        if payload.severity in ["high", "critical"]:
+            try:
+                admin_roles = ["admin", "super_admin", "company_admin", "app_owner", "manager"]
+                admin_query = {"role": {"$in": admin_roles}, "is_active": {"$ne": False}}
+                if incident["compound_id"]:
+                    admin_query["compound_id"] = incident["compound_id"]
+                admin_users = await db.users.find(admin_query, {"_id": 0, "id": 1}).to_list(None)
+                admin_ids = [u["id"] for u in admin_users]
+
+                if admin_ids:
+                    sev_emoji = "🚨" if payload.severity == "critical" else "⚠️"
+                    sev_label = "حرج" if payload.severity == "critical" else "عالي الخطورة"
+                    title = f"{sev_emoji} حادث أمني {sev_label}"
+                    body = f"{payload.title}"
+                    if payload.location:
+                        body += f" — {payload.location}"
+                    body += f"\nأبلغ عنه: {incident['reported_by_name']}"
+
+                    push_result = await PushNotificationService.send_broadcast_notification(
+                        db=db,
+                        title=title,
+                        body=body,
+                        url="/app/security",
+                        target_user_ids=admin_ids,
+                    )
+                    incident["push_result"] = push_result
+                    logging.info(f"Critical incident push: {push_result}")
+            except Exception as pe:
+                logging.error(f"Push notification for critical incident failed: {pe}")
+                # لا نُفشل الـ API إذا فشل الإشعار
+
         return {"success": True, "incident": serialize_datetime(incident)}
     except HTTPException:
         raise

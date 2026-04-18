@@ -261,6 +261,7 @@ const SuperAdminPanel = () => {
         title: editAd.title,
         image_url: editAd.image_url || '',
         media_type: editAd.media_type || 'image',
+        template_style: editAd.template_style || 'purple_dream',
         link_url: editAd.link_url || '',
         description: editAd.description || '',
         position: editAd.position,

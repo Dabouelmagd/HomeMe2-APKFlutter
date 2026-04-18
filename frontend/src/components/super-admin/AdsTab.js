@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { AD_TEMPLATES, renderTemplateStyles, DEFAULT_TEMPLATE } from '../../utils/adTemplates';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -156,6 +157,47 @@ const AdHealthChecker = ({ ad, t }) => {
   );
 };
 
+const DEFAULT_TEMPLATE_KEY = DEFAULT_TEMPLATE;
+
+/**
+ * TemplatePicker — يظهر فقط عندما لا يوجد صورة مرفوعة
+ */
+const TemplatePicker = ({ ad, onChange, t }) => {
+  if (ad?.image_url) return null; // الصورة لها الأولوية
+  const current = ad?.template_style || DEFAULT_TEMPLATE_KEY;
+  return (
+    <div className="col-span-1 md:col-span-2 bg-gray-900/50 border border-indigo-500/30 rounded-xl p-3" data-testid="template-picker">
+      <div className="flex items-center justify-between mb-2">
+        <label className="text-xs text-gray-300 font-bold flex items-center gap-1.5">
+          🎨 {t('sa_template_style', 'قالب التصميم (بدون صورة)')}
+        </label>
+        <span className="text-[9px] text-gray-500">{t('sa_template_hint', 'اختاري شكلاً جاهزاً عندما لا يكون هناك صورة')}</span>
+      </div>
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+        {Object.entries(AD_TEMPLATES).map(([key, tpl]) => {
+          const isSelected = current === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => onChange(key)}
+              className={`relative rounded-lg p-2 transition-all ${isSelected ? 'ring-2 ring-indigo-400 ring-offset-2 ring-offset-gray-900 scale-105' : 'hover:scale-105 opacity-80 hover:opacity-100'}`}
+              data-testid={`template-${key}`}
+              title={tpl.name}
+            >
+              <div className={`${tpl.bg} h-10 rounded flex items-center justify-center text-lg relative overflow-hidden`}>
+                <span className="opacity-60">{tpl.emoji}</span>
+                {isSelected && <span className="absolute top-0.5 end-0.5 bg-white text-indigo-600 text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center">✓</span>}
+              </div>
+              <p className={`text-[9px] mt-1 text-center truncate ${isSelected ? 'text-indigo-300 font-bold' : 'text-gray-400'}`}>{tpl.name}</p>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const AdPreview = ({ ad, t }) => {
   const resolvedSrc = ad?.image_url
     ? (ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url)
@@ -198,17 +240,22 @@ const AdPreview = ({ ad, t }) => {
             ) : (
               <img src={resolvedSrc} alt={ad.title} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} />
             )
-          ) : (
-            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex-1 text-white">
-                  <h3 className="font-bold text-sm">{ad.title || t('ad_preview_title_ph', 'عنوان الإعلان')}</h3>
-                  {ad.description && <p className="text-xs text-white/70 mt-0.5">{ad.description}</p>}
+          ) : (() => {
+            const tpl = renderTemplateStyles(ad?.template_style);
+            return (
+              <div className={`${tpl.bg} p-5 min-h-[80px] flex items-center relative overflow-hidden`}>
+                <div className="absolute -top-4 -start-4 text-7xl opacity-10 pointer-events-none select-none">{tpl.emoji}</div>
+                <div className="absolute -bottom-4 -end-4 text-7xl opacity-10 pointer-events-none select-none">{tpl.emoji}</div>
+                <div className="flex items-center gap-3 w-full relative z-10">
+                  <div className={`flex-1 ${tpl.text}`}>
+                    <h3 className="font-bold text-base">{ad.title || t('ad_preview_title_ph', 'عنوان الإعلان')}</h3>
+                    {ad.description && <p className="text-sm opacity-80 mt-1">{ad.description}</p>}
+                  </div>
+                  {ad.link_url && <span className={`text-xs ${tpl.accent} px-4 py-2 rounded-full whitespace-nowrap font-semibold`}>{t('ad_learn_more', 'اعرف أكثر')} ←</span>}
                 </div>
-                {ad.link_url && <span className="text-xs bg-white/20 px-3 py-1 rounded-full text-white whitespace-nowrap">{t('ad_learn_more', 'اعرف أكثر')}</span>}
               </div>
-            </div>
-          )}
+            );
+          })()}
           {adLabel}
         </div>
       ) : variant === 'card' ? (
@@ -618,6 +665,10 @@ const AdsTab = ({
               </label>
             </div>
           </div>
+          {/* Template picker للإنشاء (عند عدم وجود صورة) */}
+          <div className="mb-3">
+            <TemplatePicker ad={newAd} onChange={(key) => setNewAd({ ...newAd, template_style: key })} t={t} />
+          </div>
           {/* Live Preview للإنشاء */}
           <div className="mb-4">
             <AdPreview ad={newAd} t={t} />
@@ -956,6 +1007,10 @@ const AdsTab = ({
                 <input type="checkbox" checked={editAd.is_active !== false} onChange={e => setEditAd({ ...editAd, is_active: e.target.checked })} className="w-4 h-4 rounded bg-gray-800 border-gray-600 text-green-500" />
                 <span className="text-xs text-gray-300">{t('sp_active', 'نشط')}</span>
               </label>
+            </div>
+            {/* Template picker للتعديل */}
+            <div className="mb-3">
+              <TemplatePicker ad={editAd} onChange={(key) => setEditAd({ ...editAd, template_style: key })} t={t} />
             </div>
             {/* Live Preview للتعديل */}
             <div className="mb-4">

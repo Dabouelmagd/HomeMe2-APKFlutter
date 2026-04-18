@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { renderTemplateStyles } from '../utils/adTemplates';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -116,18 +117,24 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
               ) : (
                 <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} alt={ad.title} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} />
               )
-            ) : (
-              // بدون صورة: نعرض العنوان كـ fallback واضح ومميز
-              <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-5 min-h-[80px] flex items-center">
-                <div className="flex items-center gap-3 w-full">
-                  <div className="flex-1 text-white">
-                    <h3 className="font-bold text-base">{ad.title}</h3>
-                    {ad.description && <p className="text-sm text-white/80 mt-1">{ad.description}</p>}
+            ) : (() => {
+              // بدون صورة: نعرض القالب المُختار (أو القالب الافتراضي)
+              const tpl = renderTemplateStyles(ad.template_style);
+              return (
+                <div className={`${tpl.bg} p-5 min-h-[80px] flex items-center relative overflow-hidden`}>
+                  {/* نمط زخرفي خفيف */}
+                  <div className="absolute -top-4 -start-4 text-7xl opacity-10 pointer-events-none select-none">{tpl.emoji}</div>
+                  <div className="absolute -bottom-4 -end-4 text-7xl opacity-10 pointer-events-none select-none">{tpl.emoji}</div>
+                  <div className="flex items-center gap-3 w-full relative z-10">
+                    <div className={`flex-1 ${tpl.text}`}>
+                      <h3 className="font-bold text-base">{ad.title}</h3>
+                      {ad.description && <p className="text-sm opacity-80 mt-1">{ad.description}</p>}
+                    </div>
+                    {ad.link_url && <span className={`text-xs ${tpl.accent} hover:opacity-80 transition-opacity px-4 py-2 rounded-full whitespace-nowrap font-semibold`}>{t('ad_learn_more', 'اعرف أكثر')} ←</span>}
                   </div>
-                  {ad.link_url && <span className="text-xs bg-white/25 hover:bg-white/40 transition-colors px-4 py-2 rounded-full text-white whitespace-nowrap font-semibold">{t('ad_learn_more', 'اعرف أكثر')} ←</span>}
                 </div>
-              </div>
-            )}
+              );
+            })()}
             <span className="absolute top-2 end-2 text-[9px] bg-black/50 text-white/80 px-1.5 py-0.5 rounded pointer-events-none">{t('ad_label', 'إعلان')}</span>
             <button onClick={(e) => { e.stopPropagation(); handleDismiss(ad.id); }} className="absolute top-2 start-2 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <XMarkIcon className="w-3 h-3 text-white" />

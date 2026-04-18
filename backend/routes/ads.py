@@ -48,6 +48,167 @@ class AdUpdate(BaseModel):
     priority: Optional[int] = None
 
 
+# ==================== Ad Campaigns ====================
+
+class CampaignCreate(BaseModel):
+    name: str
+    description: str = ""
+    start_date: str
+    end_date: str
+    budget: float = 0
+    status: str = "draft"  # draft, active, paused, completed, cancelled
+    ad_ids: list = []
+    positions: list = []
+    auto_renew: bool = False
+    free_trial_days: int = 0
+    target_compounds: list = []
+
+class CampaignUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    budget: Optional[float] = None
+    status: Optional[str] = None
+    ad_ids: Optional[list] = None
+    positions: Optional[list] = None
+    auto_renew: Optional[bool] = None
+    free_trial_days: Optional[int] = None
+    target_compounds: Optional[list] = None
+
+
+@router.get("/ads/campaigns")
+async def get_campaigns(current_user: dict = Depends(require_super_admin)):
+    db = get_db()
+    campaigns = await db.ad_campaigns.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    # Enrich with ad details
+    for c in campaigns:
+        ad_ids = c.get("ad_ids", [])
+        if ad_ids:
+            c_ads = await db.internal_ads.find({"id": {"$in": ad_ids}}, {"_id": 0, "id": 1, "title": 1, "position": 1, "is_active": 1, "views": 1, "clicks": 1}).to_list(50)
+            c["ads"] = c_ads
+            c["total_views"] = sum(a.get("views", 0) for a in c_ads)
+            c["total_clicks"] = sum(a.get("clicks", 0) for a in c_ads)
+        else:
+            c["ads"] = []
+            c["total_views"] = 0
+            c["total_clicks"] = 0
+    
+    stats = {
+        "total": len(campaigns),
+        "active": len([c for c in campaigns if c.get("status") == "active"]),
+        "draft": len([c for c in campaigns if c.get("status") == "draft"]),
+        "completed": len([c for c in campaigns if c.get("status") == "completed"]),
+        "total_budget": sum(c.get("budget", 0) for c in campaigns),
+    }
+    return {"campaigns": campaigns, "stats": stats}
+
+
+@router.post("/ads/campaigns")
+async def create_campaign(data: CampaignCreate, current_user: dict = Depends(require_super_admin)):
+    db = get_db()
+    campaign = {
+        "id": str(uuid.uuid4()),
+        "name": data.name,
+        "description": data.description,
+        "start_date": data.start_date,
+        "end_date": data.end_date,
+        "budget": data.budget,
+        "status": data.status,
+        "ad_ids": data.ad_ids,
+        "positions": data.positions,
+        "auto_renew": data.auto_renew,
+        "free_trial_days": data.free_trial_days,
+        "target_compounds": data.target_compounds,
+        "created_by": current_user.get("username", ""),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.ad_campaigns.insert_one(campaign)
+    del campaign["_id"]
+    
+    # Activate ads in this campaign if status is active
+    if data.status == "active" and data.ad_ids:
+        await db.internal_ads.update_many(
+            {"id": {"$in": data.ad_ids}},
+            {"$set": {"is_active": True, "start_date": data.start_date, "end_date": data.end_date}}
+        )
+    
+    return {"message": "تم إنشاء الحملة الإعلانية", "campaign": campaign}
+
+
+@router.put("/ads/campaigns/{campaign_id}")
+async def update_campaign(campaign_id: str, data: CampaignUpdate, current_user: dict = Depends(require_super_admin)):
+    db = get_db()
+    update = {"updated_at": datetime.now(timezone.utc).isoformat()}
+    for field in ["name", "description", "start_date", "end_date", "budget", "status", "ad_ids", "positions", "auto_renew", "free_trial_days", "target_compounds"]:
+        val = getattr(data, field, None)
+        if val is not None:
+            update[field] = val
+    
+    await db.ad_campaigns.update_one({"id": campaign_id}, {"$set": update})
+    
+    # Handle status changes
+    if data.status == "active" and data.ad_ids:
+        await db.internal_ads.update_many({"id": {"$in": data.ad_ids}}, {"$set": {"is_active": True}})
+    elif data.status == "paused" and data.ad_ids:
+        await db.internal_ads.update_many({"id": {"$in": data.ad_ids}}, {"$set": {"is_active": False}})
+    elif data.status == "cancelled":
+        campaign = await db.ad_campaigns.find_one({"id": campaign_id})
+        if campaign and campaign.get("ad_ids"):
+            await db.internal_ads.update_many({"id": {"$in": campaign["ad_ids"]}}, {"$set": {"is_active": False}})
+    
+    return {"message": "تم تحديث الحملة"}
+
+
+@router.post("/ads/campaigns/{campaign_id}/renew")
+async def renew_campaign(campaign_id: str, body: dict, current_user: dict = Depends(require_super_admin)):
+    db = get_db()
+    campaign = await db.ad_campaigns.find_one({"id": campaign_id}, {"_id": 0})
+    if not campaign:
+        raise HTTPException(status_code=404, detail="الحملة غير موجودة")
+    
+    new_start = body.get("new_start_date", campaign.get("end_date", ""))
+    new_end = body.get("new_end_date", "")
+    if not new_end:
+        # Default: same duration
+        from datetime import datetime as dt
+        try:
+            s = dt.fromisoformat(campaign["start_date"])
+            e = dt.fromisoformat(campaign["end_date"])
+            duration = (e - s).days
+            ns = dt.fromisoformat(new_start)
+            new_end = (ns + timedelta(days=duration)).strftime("%Y-%m-%d")
+        except:
+            new_end = new_start
+    
+    await db.ad_campaigns.update_one({"id": campaign_id}, {"$set": {
+        "start_date": new_start,
+        "end_date": new_end,
+        "status": "active",
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }})
+    
+    # Reactivate ads
+    if campaign.get("ad_ids"):
+        await db.internal_ads.update_many(
+            {"id": {"$in": campaign["ad_ids"]}},
+            {"$set": {"is_active": True, "start_date": new_start, "end_date": new_end}}
+        )
+    
+    return {"message": "تم تجديد الحملة", "new_start": new_start, "new_end": new_end}
+
+
+@router.delete("/ads/campaigns/{campaign_id}")
+async def delete_campaign(campaign_id: str, current_user: dict = Depends(require_super_admin)):
+    db = get_db()
+    campaign = await db.ad_campaigns.find_one({"id": campaign_id}, {"_id": 0})
+    if campaign and campaign.get("ad_ids"):
+        await db.internal_ads.update_many({"id": {"$in": campaign["ad_ids"]}}, {"$set": {"is_active": False}})
+    await db.ad_campaigns.delete_one({"id": campaign_id})
+    return {"message": "تم حذف الحملة"}
+
+
 @router.post("/ads")
 async def create_ad(data: AdCreate, current_user: dict = Depends(require_super_admin)):
     db = get_db()

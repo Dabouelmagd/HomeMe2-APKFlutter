@@ -54,11 +54,21 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
   useEffect(() => { fetchAds(); }, [fetchAds]);
 
   const handleClick = async (ad) => {
+    // إذا لم يكن هناك رابط، لا تفعل شيئاً
+    if (!ad.link_url || !ad.link_url.trim()) return;
+
+    // سجّل النقرة (لا تنتظر النتيجة حتى لا تؤخر فتح الرابط)
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${API}/ads/${ad.id}/click`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      axios.post(`${API}/ads/${ad.id}/click`, {}, token ? { headers: { Authorization: `Bearer ${token}` } } : {}).catch(() => {});
     } catch { /* silent */ }
-    if (ad.link_url) window.open(ad.link_url, '_blank');
+
+    // افتح الرابط في تبويب جديد — تأكدي أنه يبدأ بـ http
+    let url = ad.link_url.trim();
+    if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+      url = 'https://' + url;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const handleDismiss = (adId) => setDismissed(prev => [...prev, adId]);
@@ -98,17 +108,12 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
     return (
       <div className={`space-y-3 ${className}`} dir={isRTL ? 'rtl' : 'ltr'} data-testid={`ad-banner-${position}`}>
         {visibleAds.map(ad => (
-          <div key={ad.id} className="relative group rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-lg transition-all" onClick={() => handleClick(ad)}>
+          <div key={ad.id} className="relative group rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl hover:scale-[1.01] transition-all" onClick={() => handleClick(ad)} title={ad.link_url ? ad.link_url : ''}>
             {ad.image_url ? (
-              <div className="relative">
-                <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} alt={ad.title} className="w-full h-auto object-cover" style={{ maxHeight: '200px' }} />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-0 start-0 end-0 p-4 text-white">
-                  <h3 className="font-bold text-sm">{ad.title}</h3>
-                  {ad.description && <p className="text-xs text-white/80 mt-0.5">{ad.description}</p>}
-                </div>
-              </div>
+              // صورة نظيفة بدون أي نص فوقها
+              <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} alt={ad.title} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} />
             ) : (
+              // بدون صورة: نعرض العنوان كـ fallback فقط
               <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-4">
                 <div className="flex items-center gap-3">
                   <div className="flex-1 text-white">
@@ -119,8 +124,8 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
                 </div>
               </div>
             )}
-            <span className="absolute top-2 end-2 text-[9px] bg-black/40 text-white/70 px-1.5 py-0.5 rounded">{t('ad_label', 'إعلان')}</span>
-            <button onClick={(e) => { e.stopPropagation(); handleDismiss(ad.id); }} className="absolute top-2 start-2 w-5 h-5 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="absolute top-2 end-2 text-[9px] bg-black/50 text-white/80 px-1.5 py-0.5 rounded pointer-events-none">{t('ad_label', 'إعلان')}</span>
+            <button onClick={(e) => { e.stopPropagation(); handleDismiss(ad.id); }} className="absolute top-2 start-2 w-5 h-5 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <XMarkIcon className="w-3 h-3 text-white" />
             </button>
           </div>

@@ -206,7 +206,7 @@ async def create_security_incident(
             "visitor_name": payload.visitor_name,
             "unit_number": payload.unit_number,
             "reported_by": current_user.id,
-            "reported_by_name": current_user.get("full_name") or current_user.get("username"),
+            "reported_by_name": getattr(current_user, "full_name", None) or getattr(current_user, "username", ""),
             "status": "open",  # open | in_progress | resolved
             "resolved_at": None,
             "resolved_by": None,

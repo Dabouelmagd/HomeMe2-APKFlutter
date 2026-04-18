@@ -29,6 +29,7 @@ const SecurityDashboard = () => {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const isAdmin = ['admin', 'super_admin', 'company_admin', 'app_owner', 'manager'].includes(user?.role);
 
   const [activeTab, setActiveTab] = useState('visitors');
   const [securityLogs, setSecurityLogs] = useState([]);
@@ -465,9 +466,11 @@ const SecurityDashboard = () => {
                         </button>
                       </>
                     )}
-                    <button onClick={() => deleteIncident(inc.id)} className="px-2 py-1 bg-red-50 text-red-500 rounded text-[10px] hover:bg-red-100" data-testid={`inc-delete-${inc.id}`}>
-                      {t('sec_delete', 'حذف')}
-                    </button>
+                    {isAdmin && (
+                      <button onClick={() => deleteIncident(inc.id)} className="px-2 py-1 bg-red-50 text-red-500 rounded text-[10px] hover:bg-red-100" data-testid={`inc-delete-${inc.id}`}>
+                        {t('sec_delete', 'حذف')}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -513,7 +516,13 @@ const SecurityDashboard = () => {
                     {t('sec_trend_title', 'اتجاه الزوار - آخر 7 أيام')}
                   </h3>
                 </div>
-                <div className="flex items-end gap-2 h-40" data-testid="sec-trend-chart">
+                {analytics.total_visits === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+                    <ChartBarIcon className="w-10 h-10 mb-2" />
+                    <p className="text-xs">{t('sec_no_trend_data', 'لا توجد بيانات زيارات في آخر 7 أيام')}</p>
+                  </div>
+                ) : (
+                  <div className="flex items-end gap-2 h-40" data-testid="sec-trend-chart">
                   {(analytics.trend || []).map((d, i) => {
                     const maxVal = Math.max(1, ...analytics.trend.map(x => x.total));
                     const pct = (d.total / maxVal) * 100;
@@ -529,6 +538,7 @@ const SecurityDashboard = () => {
                     );
                   })}
                 </div>
+                )}
               </div>
 
               {/* Peak hours */}

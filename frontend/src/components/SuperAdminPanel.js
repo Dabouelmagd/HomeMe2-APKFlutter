@@ -734,15 +734,16 @@ const SuperAdminPanel = () => {
                   { key: 'services_page', label: t('pos_services', 'صفحة الخدمات'), desc: t('pos_desc_services', 'داخل صفحة الخدمات والعروض'), color: 'border-teal-500/30', icon: '⭐', maxSlots: 3 },
                 ];
 
-                // Count booked ads per position
-                const bookedByPos = {};
+                // Group ads by position with details
+                const adsByPos = {};
                 (ads || []).forEach(a => {
                   const p = a.position || 'unknown';
-                  bookedByPos[p] = (bookedByPos[p] || 0) + 1;
+                  if (!adsByPos[p]) adsByPos[p] = [];
+                  adsByPos[p].push(a);
                 });
 
                 const totalSlots = ALL_POSITIONS.reduce((s, p) => s + p.maxSlots, 0);
-                const totalBooked = Object.values(bookedByPos).reduce((s, v) => s + v, 0);
+                const totalBooked = Object.values(adsByPos).reduce((s, v) => s + v.length, 0);
 
                 return (
                   <>
@@ -750,40 +751,75 @@ const SuperAdminPanel = () => {
                     <div className="grid grid-cols-3 gap-3 mb-5">
                       <div className="bg-gray-900 rounded-xl p-4 text-center border border-gray-700">
                         <p className="text-2xl font-black text-blue-400">{totalSlots}</p>
-                        <p className="text-[10px] text-gray-500">{t('ad_total_slots', 'إجمالي الأماكن المتاحة')}</p>
+                        <p className="text-[10px] text-gray-500">{t('ad_total_slots', 'إجمالي الأماكن')}</p>
                       </div>
                       <div className="bg-gray-900 rounded-xl p-4 text-center border border-green-800">
                         <p className="text-2xl font-black text-green-400">{totalBooked}</p>
-                        <p className="text-[10px] text-gray-500">{t('ad_booked_slots', 'أماكن محجوزة')}</p>
+                        <p className="text-[10px] text-gray-500">{t('ad_booked_slots', 'محجوزة')}</p>
                       </div>
                       <div className="bg-gray-900 rounded-xl p-4 text-center border border-amber-800">
                         <p className="text-2xl font-black text-amber-400">{totalSlots - totalBooked}</p>
-                        <p className="text-[10px] text-gray-500">{t('ad_available_slots', 'أماكن متاحة')}</p>
+                        <p className="text-[10px] text-gray-500">{t('ad_available_slots', 'متاحة')}</p>
                       </div>
                     </div>
 
-                    {/* Position Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    {/* Position Cards with Slot Details */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {ALL_POSITIONS.map(pos => {
-                        const booked = bookedByPos[pos.key] || 0;
+                        const posAds = adsByPos[pos.key] || [];
+                        const booked = posAds.length;
                         const available = pos.maxSlots - booked;
                         const pct = Math.round((booked / pos.maxSlots) * 100);
                         return (
-                          <div key={pos.key} className={`bg-gray-900 rounded-xl p-4 border ${pos.color} hover:bg-gray-800/80 transition-colors`}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-lg">{pos.icon}</span>
-                              <h4 className="font-bold text-white text-xs">{pos.label}</h4>
+                          <div key={pos.key} className={`bg-gray-900 rounded-xl border ${pos.color} hover:bg-gray-800/80 transition-colors overflow-hidden`}>
+                            <div className="p-3">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm">{pos.icon}</span>
+                                  <h4 className="font-bold text-white text-xs">{pos.label}</h4>
+                                </div>
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${pct >= 100 ? 'bg-red-500/20 text-red-400' : pct > 0 ? 'bg-amber-500/20 text-amber-400' : 'bg-gray-700 text-gray-500'}`}>
+                                  {booked}/{pos.maxSlots}
+                                </span>
+                              </div>
+                              <p className="text-[8px] text-gray-500 mb-2">{pos.desc}</p>
+                              {/* Progress bar */}
+                              <div className="bg-gray-800 rounded-full h-1.5 mb-2">
+                                <div className={`h-1.5 rounded-full transition-all ${pct >= 100 ? 'bg-red-500' : pct >= 50 ? 'bg-amber-500' : 'bg-green-500'}`} style={{ width: `${Math.min(pct, 100)}%` }}></div>
+                              </div>
                             </div>
-                            <p className="text-[9px] text-gray-500 mb-3 leading-relaxed">{pos.desc}</p>
-                            {/* Progress bar */}
-                            <div className="bg-gray-800 rounded-full h-2 mb-2">
-                              <div className={`h-2 rounded-full transition-all ${pct >= 100 ? 'bg-red-500' : pct >= 50 ? 'bg-amber-500' : 'bg-green-500'}`} style={{ width: `${Math.min(pct, 100)}%` }}></div>
+                            {/* Individual Slots */}
+                            <div className="border-t border-gray-800 px-3 py-2 space-y-1">
+                              {Array.from({ length: pos.maxSlots }).map((_, slotIdx) => {
+                                const ad = posAds[slotIdx];
+                                return (
+                                  <div key={slotIdx} className={`flex items-center gap-2 rounded-lg px-2 py-1.5 ${ad ? 'bg-gray-800' : 'bg-gray-800/40 border border-dashed border-gray-700'}`}>
+                                    <span className="text-[9px] text-gray-600 font-mono w-4 flex-shrink-0">#{slotIdx + 1}</span>
+                                    {ad ? (
+                                      <>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-[10px] font-bold text-white truncate">{ad.title}</p>
+                                          <div className="flex items-center gap-1.5 mt-0.5">
+                                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${ad.is_active ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                                            <span className="text-[8px] text-gray-500">{ad.is_active ? t('sp_active','نشط') : t('sp_disabled','معطل')}</span>
+                                            {ad.views > 0 && <span className="text-[8px] text-purple-400">{ad.views} {t('ad_views_short','مشاهدة')}</span>}
+                                            {ad.clicks > 0 && <span className="text-[8px] text-amber-400">{ad.clicks} {t('ad_clicks_short','نقرة')}</span>}
+                                          </div>
+                                        </div>
+                                        {!isSuperAdminOnly && ad.ad_value > 0 && !ad.is_gift && (
+                                          <span className="text-[8px] text-emerald-400 font-bold flex-shrink-0">{ad.ad_value}{t('sm_egp','ج.م')}</span>
+                                        )}
+                                        {ad.is_gift && <span className="text-[8px] text-pink-400 flex-shrink-0">{t('ad_gift','هدية')}</span>}
+                                      </>
+                                    ) : (
+                                      <span className="text-[9px] text-gray-600 italic">{t('ad_slot_empty', 'فارغ - متاح للحجز')}</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
-                            <div className="flex items-center justify-between text-[10px]">
-                              <span className="text-green-400">{available > 0 ? `${available} ${t('ad_available', 'متاح')}` : t('ad_full', 'مكتمل')}</span>
-                              <span className="text-gray-500">{booked}/{pos.maxSlots}</span>
-                            </div>
-                            <div className="flex items-center gap-2 mt-2">
+                            {/* Settings */}
+                            <div className="border-t border-gray-800 px-3 py-2 flex items-center gap-2">
                               <label className="flex items-center gap-1 cursor-pointer">
                                 <input type="checkbox" checked={adSettings?.positions?.[pos.key]?.internal_enabled !== false} onChange={(e) => {
                                   setAdSettings(prev => ({...prev, positions: {...(prev.positions || {}), [pos.key]: {...(prev.positions?.[pos.key] || {}), internal_enabled: e.target.checked}}}));

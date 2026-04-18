@@ -1,19 +1,20 @@
 # HomeMe PRD
 
-## Architecture
-- Frontend: React + Tailwind + Recharts + i18next
-- Backend: FastAPI + MongoDB
-
-## Ad Positions (12 positions, 30 total slots)
-- homepage_hero (3), homepage_mid (2), homepage_footer (2)
-- banner (5), sidebar (3), dashboard (2), inline (4)
-- login_page (2), popup (1), notification (2), splash (1), services_page (3)
-
-## Role Restrictions (Super Admin)
-Hidden from SuperAdminPanel: revenue/expenses/net stats, ad revenue, subscription codes/coupons/user_subs/referrals/analytics tabs
-Hidden from AdvancedAnalytics: revenue card, financial tab, revenue chart
-Hidden from AdRealtimeDashboard: financial tab, export buttons, revenue in compare
-Hidden from CompanySubscriptions: monthly revenue card
+## Ad Positions Integration (30 total slots)
+| Position | Max | Component | File |
+|---|---|---|---|
+| homepage_hero | 3 | - | To be added in landing page |
+| homepage_mid | 2 | - | To be added in landing page |
+| homepage_footer | 2 | - | To be added in landing page |
+| banner | 5 | InternalAdBanner | Layout.js line 832 |
+| sidebar | 3 | InternalAdBanner | Layout.js line 609 |
+| dashboard | 2 | InternalAdBanner | ResidentDashboard.js |
+| inline | 4 | InternalAdBanner | ResidentDashboard.js |
+| login_page | 2 | InternalAdBanner | Login.js line 331 |
+| popup | 1 | PopupAdOverlay | Layout.js line 886 |
+| notification | 2 | InternalAdBanner | NotificationCenter.js |
+| splash | 1 | InternalAdBanner | App.js line 338 |
+| services_page | 3 | InternalAdBanner | ServicesManagement.js |
 
 ## Backlog
 - P2: Bank transfer API

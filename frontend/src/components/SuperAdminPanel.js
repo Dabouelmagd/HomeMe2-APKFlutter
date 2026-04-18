@@ -221,6 +221,7 @@ const SuperAdminPanel = () => {
       setAdSettings(settingsRes.data || {});
     } catch { /* */ }
   };
+  const [editAd, setEditAd] = useState(null);
   const handleCreateAd = async () => {
     if (!newAd.title || !newAd.title.trim()) {
       toast.error(t('sa_title_required', 'العنوان مطلوب'));
@@ -248,6 +249,36 @@ const SuperAdminPanel = () => {
   const handleDeleteAd = async (id) => {
     if (!window.confirm(t('sa_confirm_delete_ad', 'حذف الإعلان؟'))) return;
     try { await axios.delete(`${API}/ads/${id}`, getToken()); toast.success(t('sa_deleted', 'تم الحذف')); fetchAds(); } catch { toast.error(t('sa_failed', 'فشل')); }
+  };
+  const handleUpdateAd = async () => {
+    if (!editAd) return;
+    if (!editAd.title || !editAd.title.trim()) {
+      toast.error(t('sa_title_required', 'العنوان مطلوب'));
+      return;
+    }
+    try {
+      const payload = {
+        title: editAd.title,
+        image_url: editAd.image_url || '',
+        link_url: editAd.link_url || '',
+        description: editAd.description || '',
+        position: editAd.position,
+        dimensions: editAd.dimensions || '',
+        is_active: editAd.is_active,
+        is_gift: editAd.is_gift,
+        ad_value: editAd.ad_value || 0,
+        start_date: editAd.start_date || null,
+        end_date: editAd.end_date || null,
+        priority: editAd.priority || 0,
+      };
+      await axios.put(`${API}/ads/${editAd.id}`, payload, getToken());
+      toast.success(t('sa_ad_updated', 'تم تحديث الإعلان'));
+      setEditAd(null);
+      fetchAds();
+    } catch (err) {
+      console.error('Update ad error:', err);
+      toast.error(err.response?.data?.detail || t('sa_failed', 'فشل'));
+    }
   };
   useEffect(() => { if (activeTab === 'ads') { fetchAds(); fetchCampaigns(); } }, [activeTab]);
 
@@ -509,6 +540,9 @@ const SuperAdminPanel = () => {
             handleCreateAd={handleCreateAd}
             handleToggleAd={handleToggleAd}
             handleDeleteAd={handleDeleteAd}
+            editAd={editAd}
+            setEditAd={setEditAd}
+            handleUpdateAd={handleUpdateAd}
             campaigns={campaigns}
             campaignStats={campaignStats}
             showCreateCampaign={showCreateCampaign}

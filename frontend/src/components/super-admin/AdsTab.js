@@ -23,6 +23,9 @@ const AdsTab = ({
   handleCreateAd,
   handleToggleAd,
   handleDeleteAd,
+  editAd,
+  setEditAd,
+  handleUpdateAd,
   campaigns,
   campaignStats,
   showCreateCampaign,
@@ -490,6 +493,7 @@ const AdsTab = ({
                 </td>
                 <td className="px-4 py-3 text-center">
                   <div className="flex gap-1 justify-center">
+                    <button onClick={() => setEditAd({ ...a, start_date: a.start_date || '', end_date: a.end_date || '' })} className="px-2 py-1 text-xs bg-blue-600/20 text-blue-400 rounded hover:bg-blue-600/30" data-testid={`edit-ad-${a.id}`}>{t('sa_edit', 'تعديل')}</button>
                     <button onClick={() => handleToggleAd(a.id)} className={`px-2 py-1 text-xs rounded ${a.is_active ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'}`}>
                       {a.is_active ? t('sp_deactivate','تعطيل') : t('sp_activate','تفعيل')}
                     </button>
@@ -504,6 +508,96 @@ const AdsTab = ({
           </tbody>
         </table>
       </div>
+
+      {/* Edit Ad Modal */}
+      {editAd && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50" onClick={() => setEditAd(null)} data-testid="edit-ad-modal">
+          <div className="bg-gray-800 rounded-xl border border-blue-500/30 p-5 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-white">{t('sa_edit_ad', 'تعديل الإعلان')}</h3>
+              <button onClick={() => setEditAd(null)} className="text-gray-400 hover:text-white text-xl">×</button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_title', 'عنوان الإعلان')} <span className="text-red-400">*</span></label>
+                <input type="text" value={editAd.title || ''} onChange={e => setEditAd({ ...editAd, title: e.target.value })} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="edit-ad-title" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_position', 'الموقع')}</label>
+                <select value={editAd.position} onChange={e => setEditAd({ ...editAd, position: e.target.value })} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="edit-ad-position">
+                  <optgroup label={t('pos_group_website', '--- الموقع الإلكتروني ---')}>
+                    <option value="homepage_hero">{t('pos_homepage_hero', 'الصفحة الرئيسية - هيرو')}</option>
+                    <option value="homepage_mid">{t('pos_homepage_mid', 'الصفحة الرئيسية - وسط')}</option>
+                    <option value="homepage_footer">{t('pos_homepage_footer', 'الصفحة الرئيسية - أسفل')}</option>
+                    <option value="login_page">{t('pos_login', 'صفحة تسجيل الدخول')}</option>
+                  </optgroup>
+                  <optgroup label={t('pos_group_app', '--- التطبيق ---')}>
+                    <option value="banner">{t('sa_pos_banner', 'بانر أعلى التطبيق')}</option>
+                    <option value="sidebar">{t('sa_pos_sidebar', 'الشريط الجانبي')}</option>
+                    <option value="inline">{t('sa_pos_inline', 'داخل المحتوى')}</option>
+                    <option value="dashboard">{t('sa_pos_dashboard', 'لوحة تحكم المقيمين')}</option>
+                    <option value="services_page">{t('pos_services', 'صفحة الخدمات')}</option>
+                  </optgroup>
+                  <optgroup label={t('pos_group_special', '--- أنواع خاصة ---')}>
+                    <option value="popup">{t('pos_popup', 'إعلان منبثق (Popup)')}</option>
+                    <option value="notification">{t('pos_notification', 'إعلان إشعارات')}</option>
+                    <option value="splash">{t('pos_splash', 'شاشة التحميل')}</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_link_url', 'رابط الإعلان')}</label>
+                <input type="text" value={editAd.link_url || ''} onChange={e => setEditAd({ ...editAd, link_url: e.target.value })} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder="https://..." />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_description', 'الوصف')}</label>
+                <input type="text" value={editAd.description || ''} onChange={e => setEditAd({ ...editAd, description: e.target.value })} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_replace', 'تغيير الصورة/الفيديو')}</label>
+                <input type="file" accept="image/*,video/mp4,video/webm" onChange={async (e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  try {
+                    const res = await axios.post(`${API}/ads/upload`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
+                    setEditAd({ ...editAd, image_url: res.data.url });
+                    toast.success(t('sa_uploaded', 'تم الرفع'));
+                  } catch { toast.error(t('sa_upload_failed', 'فشل الرفع')); }
+                }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-blue-600 file:text-white" />
+                {editAd.image_url && <p className="text-[10px] text-green-400 mt-1 truncate">✓ {editAd.image_url}</p>}
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_value', 'القيمة (ج.م)')}</label>
+                <input type="number" value={editAd.ad_value || 0} onChange={e => setEditAd({ ...editAd, ad_value: parseFloat(e.target.value) || 0 })} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_start_date', 'تاريخ البداية')}</label>
+                <input type="date" value={editAd.start_date || ''} onChange={e => setEditAd({ ...editAd, start_date: e.target.value })} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_end_date', 'تاريخ النهاية')}</label>
+                <input type="date" value={editAd.end_date || ''} onChange={e => setEditAd({ ...editAd, end_date: e.target.value })} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+              </div>
+            </div>
+            <div className="flex items-center gap-4 mb-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={editAd.is_gift || false} onChange={e => setEditAd({ ...editAd, is_gift: e.target.checked })} className="w-4 h-4 rounded bg-gray-800 border-gray-600 text-pink-500" />
+                <span className="text-xs text-gray-300">{t('sa_gift', 'هدية')}</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" checked={editAd.is_active !== false} onChange={e => setEditAd({ ...editAd, is_active: e.target.checked })} className="w-4 h-4 rounded bg-gray-800 border-gray-600 text-green-500" />
+                <span className="text-xs text-gray-300">{t('sp_active', 'نشط')}</span>
+              </label>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={handleUpdateAd} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500" data-testid="save-edit-ad">{t('sa_save_changes', 'حفظ التغييرات')}</button>
+              <button onClick={() => setEditAd(null)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CAMPAIGNS SECTION */}
       <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mt-6">

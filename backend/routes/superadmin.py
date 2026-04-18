@@ -84,6 +84,84 @@ async def super_admin_get_compounds(current_user: dict = Depends(require_super_a
         raise HTTPException(status_code=500, detail="Failed")
 
 
+@router.get("/super-admin/compounds/{compound_id}/full-details")
+async def super_admin_compound_full_details(compound_id: str, current_user: dict = Depends(require_super_admin)):
+    """تفاصيل شاملة لمجتمع: سكان + مديرون + أمن + خدمات + ميزانية + إعلانات + شكاوى + اشتراكات"""
+    db = get_db()
+    try:
+        compound = await db.compounds.find_one({"id": compound_id}, {"_id": 0})
+        if not compound:
+            raise HTTPException(status_code=404, detail="Compound not found")
+
+        # السكان والأدوار
+        users = await db.users.find({"compound_id": compound_id}, {"_id": 0, "password_hash": 0}).to_list(1000)
+        by_role = {}
+        for u in users:
+            role = u.get("role", "resident")
+            by_role.setdefault(role, []).append(u)
+
+        # العائلات
+        families = await db.families.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+
+        # الشكاوى
+        complaints_total = await db.complaints.count_documents({"compound_id": compound_id})
+        complaints_open = await db.complaints.count_documents({"compound_id": compound_id, "status": "open"})
+        complaints_resolved = await db.complaints.count_documents({"compound_id": compound_id, "status": "resolved"})
+        recent_complaints = await db.complaints.find({"compound_id": compound_id}, {"_id": 0}).sort("created_at", -1).limit(5).to_list(5)
+
+        # الخدمات
+        services = await db.compound_services.find({"compound_id": compound_id}, {"_id": 0}).to_list(100)
+
+        # الميزانية
+        budget = await db.budgets.find_one({"compound_id": compound_id}, {"_id": 0})
+
+        # الإعلانات
+        ads = await db.internal_ads.find({
+            "$or": [{"target_compounds": compound_id}, {"target_compounds": []}, {"target_compounds": {"$exists": False}}]
+        }, {"_id": 0}).to_list(100)
+
+        # الحوادث الأمنية (إن وجدت)
+        incidents_open = await db.security_incidents.count_documents({"compound_id": compound_id, "status": {"$ne": "resolved"}})
+
+        # الاشتراك
+        subscription = await db.subscriptions.find_one({"compound_id": compound_id}, {"_id": 0}) or \
+                       await db.subscriptions.find_one({"user_id": {"$in": [u.get("id") for u in users if u.get("role") in ["company_admin", "manager", "app_owner"]]}}, {"_id": 0})
+
+        # إحصائيات
+        stats = {
+            "total_users": len(users),
+            "residents": len(by_role.get("resident", [])),
+            "managers": len(by_role.get("manager", [])) + len(by_role.get("company_admin", [])),
+            "security": len(by_role.get("security", [])),
+            "family_heads": len(by_role.get("family_head", [])),
+            "family_members": len(by_role.get("family_member", [])),
+            "families": len(families),
+            "complaints_total": complaints_total,
+            "complaints_open": complaints_open,
+            "complaints_resolved": complaints_resolved,
+            "services_count": len(services),
+            "ads_count": len(ads),
+            "incidents_open": incidents_open,
+        }
+
+        return {
+            "compound": serialize_datetime(compound),
+            "stats": stats,
+            "users_by_role": {k: serialize_datetime(v) for k, v in by_role.items()},
+            "families": serialize_datetime(families),
+            "recent_complaints": serialize_datetime(recent_complaints),
+            "services": serialize_datetime(services),
+            "budget": serialize_datetime(budget) if budget else None,
+            "ads": serialize_datetime(ads),
+            "subscription": serialize_datetime(subscription) if subscription else None,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Compound full details error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed: {str(e)[:80]}")
+
+
 @router.get("/super-admin/users")
 async def super_admin_get_users(
     role: Optional[str] = None,

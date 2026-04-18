@@ -19,6 +19,7 @@ import AdsTab from './super-admin/AdsTab';
 import UsersTab from './super-admin/UsersTab';
 import CodesTab from './super-admin/CodesTab';
 import CouponsTab from './super-admin/CouponsTab';
+import CompoundDetailModal from './super-admin/CompoundDetailModal';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -84,6 +85,7 @@ const SuperAdminPanel = () => {
   const [editCode, setEditCode] = useState(null);
   const [editCoupon, setEditCoupon] = useState(null);
   const [editUser, setEditUser] = useState(null);
+  const [selectedCompound, setSelectedCompound] = useState(null);
   // User subscriptions
   const [userSubs, setUserSubs] = useState([]);
   const [userSubStats, setUserSubStats] = useState({});
@@ -447,10 +449,11 @@ const SuperAdminPanel = () => {
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {compounds.map(c => (
-              <div key={c.id} className="bg-gray-800 rounded-xl border border-gray-700 p-5 hover:border-purple-500 transition-colors" data-testid={`compound-${c.id}`}>
+              <button key={c.id} type="button" onClick={() => setSelectedCompound(c.id)} className="bg-gray-800 rounded-xl border border-gray-700 p-5 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/10 transition-all cursor-pointer text-right group" data-testid={`compound-${c.id}`}>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 rounded-lg bg-purple-600/20"><BuildingOfficeIcon className="h-5 w-5 text-purple-400" /></div>
-                  <h3 className="font-bold text-lg">{c.name}</h3>
+                  <div className="p-2 rounded-lg bg-purple-600/20 group-hover:bg-purple-500/30 transition-colors"><BuildingOfficeIcon className="h-5 w-5 text-purple-400" /></div>
+                  <h3 className="font-bold text-lg flex-1">{c.name}</h3>
+                  <span className="text-[10px] text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">{t('sa_view_details', 'عرض التفاصيل ←')}</span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="bg-gray-900 rounded-lg p-2 text-center">
@@ -462,7 +465,7 @@ const SuperAdminPanel = () => {
                     <p className="text-xs text-gray-500">{t("sp_family", "عائلة")}</p>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
             {compounds.length === 0 && (
               <div className="col-span-3 text-center py-12 text-gray-500">{t("sp_no_compounds", "لا توجد مجتمعات سكنية")}</div>
@@ -1116,6 +1119,11 @@ const SuperAdminPanel = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Compound Detail Modal */}
+      {selectedCompound && (
+        <CompoundDetailModal compoundId={selectedCompound} onClose={() => setSelectedCompound(null)} t={t} isSuperAdminOnly={isSuperAdminOnly} />
       )}
     </div>
   );

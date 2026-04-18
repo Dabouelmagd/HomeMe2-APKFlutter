@@ -1,43 +1,46 @@
 # HomeMe PRD
 
 ## Product
-Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards (Resident, Admin, Super Admin, App Owner, Security), monetization (Ads + Campaigns + AdSense), and multi-session browser-tab architecture.
+Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards (Resident, Admin, Super Admin, App Owner, Security), monetization (Ads + Campaigns + AdSense), multi-session browser-tab architecture, and real-time push notifications.
 
-## Latest Fixes (Feb 2026 — iterations 26 & 27)
+## Latest Fixes (Feb 2026 — iterations 26-28)
 
-### P0: Delete User bug ✅
-- Root cause: `handleDelete` called undefined `fetchUsers()` → ReferenceError caught → users saw "فشل" toast even though backend succeeded.
-- Fix: renamed to `fetchDashboard()`, added optimistic `setUsers` filter, surfaced server error message, added `data-testid`. Verified 100% (iteration_26).
+### Iter 28: Refactor Round 2 + Push Notifications ✅
+- Extracted **UsersTab, CodesTab, CouponsTab** into `/components/super-admin/` (now 4 sub-components alongside AdsTab)
+- SuperAdminPanel.js: **1977 → 1017 lines** (-49% total reduction across iterations)
+- **Critical Incident Push Notifications**: POST /api/security/incidents with severity='high'|'critical' auto-broadcasts web push to all admin-role users in the same compound. Uses existing VAPID infrastructure (PushNotificationService.send_broadcast_notification). Response includes `push_result: {total, sent, failed}` when triggered, absent otherwise.
+- Bonus fix: `/api/search` 500 KeyError (family_id AttributeError + duplicate $or query) → now returns 200
 
-### P1: SuperAdminPanel refactor ✅
-- Extracted Ads + Campaigns tab (~700 lines) → `/app/frontend/src/components/super-admin/AdsTab.js`.
-- SuperAdminPanel.js shrunk from 1977 → 1290 lines (-35%).
-- No regression: all other tabs load, delete user still works (iteration_27).
+### Iter 27: Security Dashboard + AdsTab Extraction ✅
+- AdsTab.js extracted (~688 lines moved out of SuperAdminPanel)
+- Security Dashboard: analytics tab (7-day trends + 24h heatmap + peak hours), incidents CRUD (4 severity levels + 3 status states), CSV export, role-aware delete button
+- New endpoints: GET /api/security/analytics, POST/GET/PATCH/DELETE /api/security/incidents
 
-### P2: Security Dashboard Enhancements ✅
-- New analytics tab: 7-day visitor trend bar chart, 24h hourly heatmap, top-3 peak hours, summary cards (total visits / check-ins / check-outs / ID verification ratio).
-- New incidents CRUD: create/list/update-status/delete; severity levels (low/medium/high/critical); status flow (open → in_progress → resolved).
-- CSV export for visitor logs (Arabic-safe BOM + date-named file).
-- Role-aware UI: delete button hidden for non-admin roles.
-- Backend endpoints: `GET /api/security/analytics`, `POST/GET/PATCH/DELETE /api/security/incidents`.
-- 13/13 backend pytest pass; frontend flows verified end-to-end.
+### Iter 26: Delete User Bug ✅
+- Root cause: undefined `fetchUsers()` threw ReferenceError caught by try/catch
+- Fix: renamed to fetchDashboard + optimistic setUsers filter + proper error surfacing
 
-## Recent Completed (Feb 2026)
-- Multi-Session architecture (sessionStorage per tab + session registry + SessionSwitcher UI + colored role badges)
-- Full Ad Campaign CRUD (budget, dates, auto-renew, free-trial days, status)
-- 12 Ad positions + AdSense fallback
-- Real-Time Ad Analytics + CSV/Excel/Arabic-PDF exports + weekly email reports
-- Resident Satisfaction Dashboard + Service Rating Widget
+## Recent Completed
+- Multi-Session architecture (sessionStorage + SessionSwitcher UI)
+- Full Ad Campaign CRUD + 12 Ad positions + AdSense fallback
+- Real-Time Ad Analytics + CSV/Excel/Arabic-PDF + weekly email reports
+- Resident Satisfaction Dashboard
 - Super Admin hidden-financials
-- i18n auto-translation + localStorage language persistence
+- i18n auto-translation
 
 ## Backlog
-- P1: Further split SuperAdminPanel (UsersTab, CodesTab, CouponsTab, UserSubsTab) — optional, AdsTab was the biggest win
 - P2: Bank transfer API (blocked on user credentials)
-- P2: Smart Devices & Automation (deferred) — still MOCKED
-- P3: Advertiser Self-Service Portal (revenue enhancement — awaiting decision)
+- P2: Smart Devices & Automation (deferred) — still **MOCKED**
+- P3: Advertiser Self-Service Portal (revenue enhancement)
+- P3: FCM mobile push for critical incidents (current web-push works; mobile FCM would extend reach off-browser)
+
+## Architecture
+- Frontend: React (CRA) + Tailwind + Shadcn — sub-components organized in `/components/super-admin/` + `/components/` for main screens
+- Backend: FastAPI modular routes in `/backend/routes/`
+- DB: MongoDB via Motor (async)
+- Push: pywebpush + VAPID keys in backend/.env
 
 ## Health
 - Broken: none
 - MOCKED: Smart Devices module
-- Test users: superadmin / Owner_homeme / security (see /app/memory/test_credentials.md)
+- Test users: superadmin / Owner_homeme / security (see `/app/memory/test_credentials.md`)

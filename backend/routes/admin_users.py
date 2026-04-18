@@ -285,13 +285,15 @@ async def global_search(
         
         # Search Messages (own messages only)
         messages = await db.messages.find({
-            "$or": [
-                {"content": {"$regex": search_term, "$options": "i"}},
-                {"subject": {"$regex": search_term, "$options": "i"}}
-            ],
-            "$or": [
-                {"sender_id": current_user.id},
-                {"receiver_id": current_user.id}
+            "$and": [
+                {"$or": [
+                    {"content": {"$regex": search_term, "$options": "i"}},
+                    {"subject": {"$regex": search_term, "$options": "i"}}
+                ]},
+                {"$or": [
+                    {"sender_id": current_user.id},
+                    {"receiver_id": current_user.id}
+                ]}
             ]
         }).to_list(5)
         
@@ -305,8 +307,9 @@ async def global_search(
             })
         
         # Search Family Members (own family only)
-        if current_user.family_id:
-            family = await db.families.find_one({"id": current_user.family_id})
+        family_id = getattr(current_user, "family_id", None)
+        if family_id:
+            family = await db.families.find_one({"id": family_id})
             if family and "members" in family:
                 for member in family["members"]:
                     if (search_term in member.get("full_name", "").lower() or 

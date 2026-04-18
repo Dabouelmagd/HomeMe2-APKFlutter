@@ -222,13 +222,25 @@ const SuperAdminPanel = () => {
     } catch { /* */ }
   };
   const handleCreateAd = async () => {
+    if (!newAd.title || !newAd.title.trim()) {
+      toast.error(t('sa_title_required', 'العنوان مطلوب'));
+      return;
+    }
+    if (!newAd.position) {
+      toast.error(t('sa_position_required', 'اختاري الموقع أولاً'));
+      return;
+    }
     try {
       await axios.post(`${API}/ads`, newAd, getToken());
       toast.success(t('sa_ad_created', 'تم إنشاء الإعلان'));
       setShowCreateAd(false);
       setNewAd({ title: '', image_url: '', link_url: '', description: '', position: 'banner', dimensions: '', ad_value: 0, is_gift: false, start_date: '', end_date: '', target_compounds: [] });
       fetchAds();
-    } catch (err) { toast.error(err.response?.data?.detail || t('sa_failed', 'فشل')); }
+    } catch (err) {
+      console.error('Create ad error:', err);
+      const msg = err.response?.data?.detail || err.message || t('sa_failed', 'فشل');
+      toast.error(typeof msg === 'string' ? msg : t('sa_failed', 'فشل'));
+    }
   };
   const handleToggleAd = async (id) => {
     try { await axios.put(`${API}/ads/${id}/toggle`, {}, getToken()); toast.success(t('sa_updated', 'تم التحديث')); fetchAds(); } catch { toast.error(t('sa_failed', 'فشل')); }

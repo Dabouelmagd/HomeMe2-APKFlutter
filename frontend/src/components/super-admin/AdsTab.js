@@ -205,8 +205,8 @@ const AdsTab = ({
           <h3 className="text-lg font-bold mb-4">{t('sa_create_ad', 'إنشاء إعلان داخلي')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_title', 'عنوان الإعلان')}</label>
-              <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t("sp_ad_title", "عنوان الإعلان")} />
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_title', 'عنوان الإعلان')} <span className="text-red-400">*</span></label>
+              <input type="text" value={newAd.title} onChange={e => setNewAd({...newAd, title: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" placeholder={t("sp_ad_title", "عنوان الإعلان")} required />
             </div>
             <div>
               <label className="block text-xs text-gray-400 mb-1">{t('sa_position', 'الموقع')}</label>

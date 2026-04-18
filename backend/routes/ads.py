@@ -21,7 +21,7 @@ class AdCreate(BaseModel):
     image_url: str = ""
     link_url: str = ""
     description: str = ""
-    position: str = "sidebar"  # sidebar, banner, inline, popup
+    position: str = "sidebar"  # sidebar, banner, inline, dashboard, homepage_hero, homepage_mid, homepage_footer, login_page, popup, notification, splash, services_page
     dimensions: str = ""  # e.g. "728x90", "300x250"
     target_compounds: list = []  # empty = all compounds
     is_active: bool = True
@@ -81,6 +81,21 @@ async def create_ad(data: AdCreate, current_user: dict = Depends(require_super_a
 async def get_all_ads(current_user: dict = Depends(require_super_admin)):
     db = get_db()
     ads = await db.internal_ads.find({}, {"_id": 0}).sort("priority", -1).to_list(200)
+    MAX_SLOTS = {
+        "homepage_hero": 3, "homepage_mid": 2, "homepage_footer": 2,
+        "banner": 5, "sidebar": 3, "dashboard": 2, "inline": 4,
+        "login_page": 2, "popup": 1, "notification": 2, "splash": 1, "services_page": 3,
+    }
+    booked_by_pos = {}
+    for a in ads:
+        p = a.get("position", "unknown")
+        booked_by_pos[p] = booked_by_pos.get(p, 0) + 1
+
+    slot_stats = {}
+    for pos, max_s in MAX_SLOTS.items():
+        booked = booked_by_pos.get(pos, 0)
+        slot_stats[pos] = {"max_slots": max_s, "booked": booked, "available": max_s - booked}
+
     stats = {
         "total": len(ads),
         "active": len([a for a in ads if a.get("is_active")]),
@@ -88,6 +103,10 @@ async def get_all_ads(current_user: dict = Depends(require_super_admin)):
         "total_views": sum(a.get("views", 0) for a in ads),
         "total_revenue": sum(a.get("ad_value", 0) for a in ads if not a.get("is_gift")),
         "gift_ads": len([a for a in ads if a.get("is_gift")]),
+        "total_slots": sum(MAX_SLOTS.values()),
+        "total_booked": sum(booked_by_pos.values()),
+        "total_available": sum(MAX_SLOTS.values()) - sum(booked_by_pos.values()),
+        "slot_stats": slot_stats,
     }
     return {"ads": ads, "stats": stats}
 

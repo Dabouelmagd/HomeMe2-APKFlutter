@@ -22,6 +22,8 @@ const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getIt
 const SuperAdminPanel = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const activeRole = user?.active_role || user?.role || '';
+  const isSuperAdminOnly = activeRole === 'super_admin';
   const [searchParams, setSearchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') || 'overview';
 
@@ -305,9 +307,11 @@ const SuperAdminPanel = () => {
             { label: t('sa_users', 'المستخدمين'), value: stats.total_users, color: 'from-blue-500 to-cyan-600', icon: UsersIcon },
             { label: t('sa_residents', 'المقيمين'), value: stats.total_residents, color: 'from-emerald-500 to-green-600', icon: UserGroupIcon },
             { label: t('sa_admins', 'المدراء'), value: stats.total_admins, color: 'from-amber-500 to-orange-600', icon: ShieldCheckIcon },
-            { label: t('sa_revenue', 'الإيرادات'), value: (stats.total_revenue || 0).toLocaleString(), color: 'from-green-500 to-emerald-600', icon: BanknotesIcon },
-            { label: t('sa_expenses', 'المصروفات'), value: (stats.total_expenses || 0).toLocaleString(), color: 'from-red-500 to-pink-600', icon: BanknotesIcon },
-            { label: t('sa_net', 'صافي'), value: (stats.net_balance || 0).toLocaleString(), color: 'from-indigo-500 to-purple-600', icon: GlobeAltIcon },
+            ...(!isSuperAdminOnly ? [
+              { label: t('sa_revenue', 'الإيرادات'), value: (stats.total_revenue || 0).toLocaleString(), color: 'from-green-500 to-emerald-600', icon: BanknotesIcon },
+              { label: t('sa_expenses', 'المصروفات'), value: (stats.total_expenses || 0).toLocaleString(), color: 'from-red-500 to-pink-600', icon: BanknotesIcon },
+              { label: t('sa_net', 'صافي'), value: (stats.net_balance || 0).toLocaleString(), color: 'from-indigo-500 to-purple-600', icon: GlobeAltIcon },
+            ] : []),
           ].map((s, i) => {
             const Icon = s.icon;
             return (
@@ -321,16 +325,20 @@ const SuperAdminPanel = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           {[
             { id: 'overview', label: t('sa_compounds') },
             { id: 'users', label: t('sa_users') },
-            { id: 'codes', label: t('sa_sub_codes', 'أكواد الاشتراك') },
-            { id: 'coupons', label: t('sa_coupons', 'كوبونات الخصم') },
-            { id: 'user_subs', label: t('sa_user_subs', 'اشتراكات المستخدمين') },
-            { id: 'ads', label: t('sa_ads', 'الإعلانات') },
-            { id: 'referrals', label: t('sa_referrals', 'الإحالات') },
-            { id: 'analytics', label: t('sa_analytics', 'تحليلات الاشتراكات') },
+            ...(!isSuperAdminOnly ? [
+              { id: 'codes', label: t('sa_sub_codes', 'أكواد الاشتراك') },
+              { id: 'coupons', label: t('sa_coupons', 'كوبونات الخصم') },
+              { id: 'user_subs', label: t('sa_user_subs', 'اشتراكات المستخدمين') },
+            ] : []),
+            { id: 'ads', label: t('sa_ads_management', 'إدارة الإعلانات') },
+            ...(!isSuperAdminOnly ? [
+              { id: 'referrals', label: t('sa_referrals', 'الإحالات') },
+              { id: 'analytics', label: t('sa_analytics', 'تحليلات الاشتراكات') },
+            ] : []),
             { id: 'translations', label: t('sa_translations', 'إدارة الترجمات') },
           ].map(tab => (
             <button key={tab.id} onClick={() => handleTabChange(tab.id)}
@@ -673,7 +681,7 @@ const SuperAdminPanel = () => {
                 { label: t('sa_active_count', 'نشطة'), value: adStats.active || 0, color: 'text-green-400' },
                 { label: t('sa_total_clicks', 'إجمالي النقرات'), value: adStats.total_clicks || 0, color: 'text-amber-400' },
                 { label: t('sa_total_views', 'إجمالي المشاهدات'), value: adStats.total_views || 0, color: 'text-purple-400' },
-                { label: t('ad_total_revenue', 'إيرادات الإعلانات'), value: `${(adStats.total_revenue || 0).toLocaleString()} ${t('sm_egp','ج.م')}`, color: 'text-emerald-400' },
+                ...(!isSuperAdminOnly ? [{ label: t('ad_total_revenue', 'إيرادات الإعلانات'), value: `${(adStats.total_revenue || 0).toLocaleString()} ${t('sm_egp','ج.م')}`, color: 'text-emerald-400' }] : []),
                 { label: t('ad_gift_count', 'إعلانات هدية'), value: adStats.gift_ads || 0, color: 'text-pink-400' },
               ].map((s, i) => (
                 <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
@@ -691,7 +699,6 @@ const SuperAdminPanel = () => {
                   try {
                     const res = await axios.get(`${API}/ads/ad-settings`, getToken());
                     const s = res.data;
-                    // Toggle global adsense
                     await axios.put(`${API}/ads/ad-settings`, { adsense_global_enabled: !s.adsense_global_enabled }, getToken());
                     toast.success(!s.adsense_global_enabled ? t('ad_adsense_on', 'AdSense مفعّل') : t('ad_adsense_off', 'AdSense متوقف'));
                   } catch { toast.error(t('sa_failed', 'فشل')); }
@@ -700,32 +707,93 @@ const SuperAdminPanel = () => {
                 </button>
               </div>
               <p className="text-xs text-gray-400 mb-4">{t('ad_hybrid_desc', 'الإعلانات الداخلية تظهر أولاً. لو مفيش إعلان داخلي، يظهر AdSense تلقائياً (لو مفعّل).')}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {[
-                  { key: 'banner', label: t('sa_pos_banner', 'بانر أعلى'), desc: t('ad_desc_banner', 'أعلى صفحات المحتوى'), color: 'border-amber-500/30' },
-                  { key: 'sidebar', label: t('sa_pos_sidebar', 'شريط جانبي'), desc: t('ad_desc_sidebar', 'القائمة الجانبية'), color: 'border-indigo-500/30' },
-                  { key: 'dashboard', label: t('sa_pos_dashboard', 'لوحة التحكم'), desc: t('ad_desc_dashboard', 'داخل الداشبورد'), color: 'border-emerald-500/30' },
-                  { key: 'inline', label: t('sa_pos_inline', 'داخل المحتوى'), desc: t('ad_desc_inline', 'بين أقسام المحتوى'), color: 'border-purple-500/30' },
-                ].map(pos => (
-                  <div key={pos.key} className={`bg-gray-900 rounded-xl p-4 border ${pos.color}`}>
-                    <h4 className="font-bold text-white text-sm mb-1">{pos.label}</h4>
-                    <p className="text-[10px] text-gray-500 mb-3">{pos.desc}</p>
-                    <div className="space-y-2">
-                      <label className="flex items-center justify-between cursor-pointer">
-                        <span className="text-xs text-gray-300">{t('ad_internal', 'إعلانات داخلية')}</span>
-                        <input type="checkbox" defaultChecked id={`internal-${pos.key}`} className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-green-500 focus:ring-green-500" />
-                      </label>
-                      <label className="flex items-center justify-between cursor-pointer">
-                        <span className="text-xs text-gray-300">AdSense</span>
-                        <input type="checkbox" defaultChecked={pos.key !== 'dashboard' && pos.key !== 'sidebar'} id={`adsense-${pos.key}`} className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500" />
-                      </label>
+
+              {/* Ad Slots Overview */}
+              {(() => {
+                const ALL_POSITIONS = [
+                  { key: 'homepage_hero', label: t('pos_homepage_hero', 'الصفحة الرئيسية - هيرو'), desc: t('pos_desc_homepage_hero', 'بانر كبير أعلى الصفحة الرئيسية للويب'), color: 'border-rose-500/30', icon: '🏠', maxSlots: 3 },
+                  { key: 'homepage_mid', label: t('pos_homepage_mid', 'الصفحة الرئيسية - وسط'), desc: t('pos_desc_homepage_mid', 'إعلان وسط محتوى الصفحة الرئيسية'), color: 'border-rose-400/30', icon: '📄', maxSlots: 2 },
+                  { key: 'homepage_footer', label: t('pos_homepage_footer', 'الصفحة الرئيسية - أسفل'), desc: t('pos_desc_homepage_footer', 'بانر أسفل الصفحة الرئيسية'), color: 'border-rose-300/30', icon: '⬇️', maxSlots: 2 },
+                  { key: 'banner', label: t('sa_pos_banner', 'بانر أعلى التطبيق'), desc: t('ad_desc_banner', 'أعلى صفحات التطبيق الداخلية'), color: 'border-amber-500/30', icon: '📢', maxSlots: 5 },
+                  { key: 'sidebar', label: t('sa_pos_sidebar', 'الشريط الجانبي'), desc: t('ad_desc_sidebar', 'القائمة الجانبية للتطبيق'), color: 'border-indigo-500/30', icon: '📌', maxSlots: 3 },
+                  { key: 'dashboard', label: t('sa_pos_dashboard', 'لوحة تحكم المقيمين'), desc: t('ad_desc_dashboard', 'داخل داشبورد المقيمين'), color: 'border-emerald-500/30', icon: '📊', maxSlots: 2 },
+                  { key: 'inline', label: t('sa_pos_inline', 'داخل المحتوى'), desc: t('ad_desc_inline', 'بين أقسام المحتوى'), color: 'border-purple-500/30', icon: '📰', maxSlots: 4 },
+                  { key: 'login_page', label: t('pos_login', 'صفحة تسجيل الدخول'), desc: t('pos_desc_login', 'إعلان في صفحة الدخول'), color: 'border-sky-500/30', icon: '🔑', maxSlots: 2 },
+                  { key: 'popup', label: t('pos_popup', 'إعلان منبثق (Popup)'), desc: t('pos_desc_popup', 'نافذة منبثقة عند فتح التطبيق'), color: 'border-orange-500/30', icon: '💬', maxSlots: 1 },
+                  { key: 'notification', label: t('pos_notification', 'إعلان إشعارات'), desc: t('pos_desc_notification', 'داخل قائمة الإشعارات'), color: 'border-pink-500/30', icon: '🔔', maxSlots: 2 },
+                  { key: 'splash', label: t('pos_splash', 'شاشة التحميل'), desc: t('pos_desc_splash', 'أثناء تحميل التطبيق'), color: 'border-cyan-500/30', icon: '⏳', maxSlots: 1 },
+                  { key: 'services_page', label: t('pos_services', 'صفحة الخدمات'), desc: t('pos_desc_services', 'داخل صفحة الخدمات والعروض'), color: 'border-teal-500/30', icon: '⭐', maxSlots: 3 },
+                ];
+
+                // Count booked ads per position
+                const bookedByPos = {};
+                (ads || []).forEach(a => {
+                  const p = a.position || 'unknown';
+                  bookedByPos[p] = (bookedByPos[p] || 0) + 1;
+                });
+
+                const totalSlots = ALL_POSITIONS.reduce((s, p) => s + p.maxSlots, 0);
+                const totalBooked = Object.values(bookedByPos).reduce((s, v) => s + v, 0);
+
+                return (
+                  <>
+                    {/* Summary */}
+                    <div className="grid grid-cols-3 gap-3 mb-5">
+                      <div className="bg-gray-900 rounded-xl p-4 text-center border border-gray-700">
+                        <p className="text-2xl font-black text-blue-400">{totalSlots}</p>
+                        <p className="text-[10px] text-gray-500">{t('ad_total_slots', 'إجمالي الأماكن المتاحة')}</p>
+                      </div>
+                      <div className="bg-gray-900 rounded-xl p-4 text-center border border-green-800">
+                        <p className="text-2xl font-black text-green-400">{totalBooked}</p>
+                        <p className="text-[10px] text-gray-500">{t('ad_booked_slots', 'أماكن محجوزة')}</p>
+                      </div>
+                      <div className="bg-gray-900 rounded-xl p-4 text-center border border-amber-800">
+                        <p className="text-2xl font-black text-amber-400">{totalSlots - totalBooked}</p>
+                        <p className="text-[10px] text-gray-500">{t('ad_available_slots', 'أماكن متاحة')}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+
+                    {/* Position Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                      {ALL_POSITIONS.map(pos => {
+                        const booked = bookedByPos[pos.key] || 0;
+                        const available = pos.maxSlots - booked;
+                        const pct = Math.round((booked / pos.maxSlots) * 100);
+                        return (
+                          <div key={pos.key} className={`bg-gray-900 rounded-xl p-4 border ${pos.color} hover:bg-gray-800/80 transition-colors`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-lg">{pos.icon}</span>
+                              <h4 className="font-bold text-white text-xs">{pos.label}</h4>
+                            </div>
+                            <p className="text-[9px] text-gray-500 mb-3 leading-relaxed">{pos.desc}</p>
+                            {/* Progress bar */}
+                            <div className="bg-gray-800 rounded-full h-2 mb-2">
+                              <div className={`h-2 rounded-full transition-all ${pct >= 100 ? 'bg-red-500' : pct >= 50 ? 'bg-amber-500' : 'bg-green-500'}`} style={{ width: `${Math.min(pct, 100)}%` }}></div>
+                            </div>
+                            <div className="flex items-center justify-between text-[10px]">
+                              <span className="text-green-400">{available > 0 ? `${available} ${t('ad_available', 'متاح')}` : t('ad_full', 'مكتمل')}</span>
+                              <span className="text-gray-500">{booked}/{pos.maxSlots}</span>
+                            </div>
+                            <div className="flex items-center gap-2 mt-2">
+                              <label className="flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" defaultChecked id={`internal-${pos.key}`} className="w-3 h-3 rounded border-gray-600 bg-gray-800 text-green-500 focus:ring-green-500" />
+                                <span className="text-[9px] text-gray-400">{t('ad_internal', 'داخلي')}</span>
+                              </label>
+                              <label className="flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" defaultChecked={!['dashboard','sidebar','popup','splash','notification'].includes(pos.key)} id={`adsense-${pos.key}`} className="w-3 h-3 rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500" />
+                                <span className="text-[9px] text-gray-400">AdSense</span>
+                              </label>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                );
+              })()}
               <button onClick={async () => {
                 const positions = {};
-                ['banner', 'sidebar', 'dashboard', 'inline'].forEach(k => {
+                ['homepage_hero','homepage_mid','homepage_footer','banner','sidebar','dashboard','inline','login_page','popup','notification','splash','services_page'].forEach(k => {
                   const internal = document.getElementById(`internal-${k}`)?.checked ?? true;
                   const adsense = document.getElementById(`adsense-${k}`)?.checked ?? false;
                   positions[k] = { internal_enabled: internal, adsense_enabled: adsense, mode: internal ? (adsense ? 'internal_first' : 'internal_only') : (adsense ? 'adsense_only' : 'disabled') };
@@ -890,10 +958,24 @@ const SuperAdminPanel = () => {
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">{t('sa_position', 'الموقع')}</label>
                     <select value={newAd.position} onChange={e => setNewAd({...newAd, position: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
-                      <option value="banner">{t('sa_pos_banner', 'بانر أعلى')}</option>
-                      <option value="sidebar">{t('sa_pos_sidebar', 'شريط جانبي')}</option>
-                      <option value="inline">{t('sa_pos_inline', 'داخل المحتوى')}</option>
-                      <option value="dashboard">{t('sa_pos_dashboard', 'لوحة التحكم')}</option>
+                      <optgroup label={t('pos_group_website', '--- الموقع الإلكتروني ---')}>
+                        <option value="homepage_hero">{t('pos_homepage_hero', 'الصفحة الرئيسية - هيرو')}</option>
+                        <option value="homepage_mid">{t('pos_homepage_mid', 'الصفحة الرئيسية - وسط')}</option>
+                        <option value="homepage_footer">{t('pos_homepage_footer', 'الصفحة الرئيسية - أسفل')}</option>
+                        <option value="login_page">{t('pos_login', 'صفحة تسجيل الدخول')}</option>
+                      </optgroup>
+                      <optgroup label={t('pos_group_app', '--- التطبيق ---')}>
+                        <option value="banner">{t('sa_pos_banner', 'بانر أعلى التطبيق')}</option>
+                        <option value="sidebar">{t('sa_pos_sidebar', 'الشريط الجانبي')}</option>
+                        <option value="inline">{t('sa_pos_inline', 'داخل المحتوى')}</option>
+                        <option value="dashboard">{t('sa_pos_dashboard', 'لوحة تحكم المقيمين')}</option>
+                        <option value="services_page">{t('pos_services', 'صفحة الخدمات')}</option>
+                      </optgroup>
+                      <optgroup label={t('pos_group_special', '--- أنواع خاصة ---')}>
+                        <option value="popup">{t('pos_popup', 'إعلان منبثق (Popup)')}</option>
+                        <option value="notification">{t('pos_notification', 'إعلان إشعارات')}</option>
+                        <option value="splash">{t('pos_splash', 'شاشة التحميل')}</option>
+                      </optgroup>
                     </select>
                   </div>
                 </div>
@@ -977,7 +1059,11 @@ const SuperAdminPanel = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-700">
                   {ads.map(a => {
-                    const posLabels = { banner: t('sp_pos_banner','بانر'), sidebar: t('sp_pos_sidebar','جانبي'), inline: t('sp_pos_inline','داخلي'), dashboard: t('sp_pos_dashboard','لوحة التحكم') };
+                    const posLabels = { 
+                      banner: t('sa_pos_banner','بانر أعلى'), sidebar: t('sa_pos_sidebar','جانبي'), inline: t('sa_pos_inline','داخلي'), dashboard: t('sa_pos_dashboard','لوحة التحكم'),
+                      homepage_hero: t('pos_homepage_hero','الرئيسية-هيرو'), homepage_mid: t('pos_homepage_mid','الرئيسية-وسط'), homepage_footer: t('pos_homepage_footer','الرئيسية-أسفل'),
+                      login_page: t('pos_login','صفحة الدخول'), popup: t('pos_popup','منبثق'), notification: t('pos_notification','إشعارات'), splash: t('pos_splash','شاشة التحميل'), services_page: t('pos_services','الخدمات'),
+                    };
                     return (
                       <tr key={a.id} className="hover:bg-gray-750">
                         <td className="px-4 py-3">

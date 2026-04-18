@@ -4,18 +4,17 @@
 - Frontend: React + Tailwind + Recharts + i18next
 - Backend: FastAPI + MongoDB
 
-## Role Hierarchy
-- **App Owner**: Full access - all financial data, subscriptions, settings
-- **Super Admin**: Operations only - compounds, users, companies, ads, translations. NO financial data (revenue, budget, subscriptions mgmt, referrals)
+## Ad Positions (12 positions, 30 total slots)
+- homepage_hero (3), homepage_mid (2), homepage_footer (2)
+- banner (5), sidebar (3), dashboard (2), inline (4)
+- login_page (2), popup (1), notification (2), splash (1), services_page (3)
 
-## Latest Fixes
-- Added 40+ missing Arabic translations
-- Fixed language persistence on refresh
-- Added شركات الإدارة to Super Admin sidebar
-- Hidden revenue data from Super Admin across: analytics, ad-analytics, company-subscriptions
-- Auto-translated remaining EN/FR keys via LLM
-- Company page shows operational data without revenue for Super Admin
+## Role Restrictions (Super Admin)
+Hidden from SuperAdminPanel: revenue/expenses/net stats, ad revenue, subscription codes/coupons/user_subs/referrals/analytics tabs
+Hidden from AdvancedAnalytics: revenue card, financial tab, revenue chart
+Hidden from AdRealtimeDashboard: financial tab, export buttons, revenue in compare
+Hidden from CompanySubscriptions: monthly revenue card
 
 ## Backlog
-- P2: Bank transfer API (pending user credentials)
-- P2: Smart Devices & Automation (deferred)
+- P2: Bank transfer API
+- P2: Smart Devices

@@ -88,20 +88,41 @@ const AdsTab = ({
       <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-bold text-white">{t('ad_hybrid_control', 'تحكم في الإعلانات (داخلي + AdSense)')}</h3>
-          <button onClick={async () => {
-            try {
-              const current = adSettings?.adsense_global_enabled !== false;
-              const next = !current;
-              await axios.put(`${API}/ads/ad-settings`, { adsense_global_enabled: next }, getToken());
-              setAdSettings(prev => ({ ...(prev || {}), adsense_global_enabled: next }));
-              toast.success(next ? t('ad_adsense_on', 'AdSense مفعّل') : t('ad_adsense_off', 'AdSense متوقف'));
-            } catch (err) {
-              console.error('Toggle AdSense error:', err);
-              toast.error(err.response?.data?.detail || t('sa_failed', 'فشل'));
-            }
-          }} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${adSettings?.adsense_global_enabled !== false ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-gray-600 hover:bg-gray-500 text-gray-200'}`} data-testid="toggle-adsense-global">
-            {adSettings?.adsense_global_enabled !== false ? `✓ ${t('ad_adsense_on_label', 'AdSense مفعّل')}` : `○ ${t('ad_adsense_off_label', 'AdSense متوقف')}`}
-          </button>
+          <div className="flex gap-2 flex-wrap">
+            <button onClick={() => {
+              const data = {
+                exported_at: new Date().toISOString(),
+                ads_count: ads.length,
+                settings: adSettings,
+                ads: ads,
+                campaigns: campaigns,
+              };
+              const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `homeme_ads_backup_${new Date().toISOString().slice(0, 10)}.json`;
+              a.click();
+              URL.revokeObjectURL(url);
+              toast.success(t('ad_backup_done', `تم تصدير ${ads.length} إعلان`));
+            }} className="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-500 transition-all flex items-center gap-1.5" data-testid="export-ads-json">
+              💾 {t('ad_backup_btn', 'نسخة احتياطية (JSON)')}
+            </button>
+            <button onClick={async () => {
+              try {
+                const current = adSettings?.adsense_global_enabled !== false;
+                const next = !current;
+                await axios.put(`${API}/ads/ad-settings`, { adsense_global_enabled: next }, getToken());
+                setAdSettings(prev => ({ ...(prev || {}), adsense_global_enabled: next }));
+                toast.success(next ? t('ad_adsense_on', 'AdSense مفعّل') : t('ad_adsense_off', 'AdSense متوقف'));
+              } catch (err) {
+                console.error('Toggle AdSense error:', err);
+                toast.error(err.response?.data?.detail || t('sa_failed', 'فشل'));
+              }
+            }} className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${adSettings?.adsense_global_enabled !== false ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-gray-600 hover:bg-gray-500 text-gray-200'}`} data-testid="toggle-adsense-global">
+              {adSettings?.adsense_global_enabled !== false ? `✓ ${t('ad_adsense_on_label', 'AdSense مفعّل')}` : `○ ${t('ad_adsense_off_label', 'AdSense متوقف')}`}
+            </button>
+          </div>
         </div>
         <p className="text-xs text-gray-400 mb-4">{t('ad_hybrid_desc', 'الإعلانات الداخلية تظهر أولاً. لو مفيش إعلان داخلي، يظهر AdSense تلقائياً (لو مفعّل).')}</p>
 
@@ -119,6 +140,61 @@ const AdsTab = ({
             <p className="text-2xl font-black text-amber-400">{totalSlots - totalBooked}</p>
             <p className="text-[10px] text-gray-500">{t('ad_available_slots', 'متاحة')}</p>
           </div>
+        </div>
+
+        {/* Bulk toggle buttons */}
+        <div className="flex flex-wrap gap-2 mb-3 p-3 bg-gray-900/50 rounded-xl border border-gray-700/50">
+          <span className="text-xs text-gray-400 self-center font-bold">{t('ad_bulk_actions', 'إجراءات جماعية:')}</span>
+          <button onClick={() => {
+            setAdSettings(prev => {
+              const positions = { ...(prev?.positions || {}) };
+              ALL_POSITIONS.forEach(p => {
+                positions[p.key] = { ...(positions[p.key] || {}), internal_enabled: true };
+              });
+              return { ...(prev || {}), positions };
+            });
+            toast.success(t('ad_all_internal_on', 'تم تحديد كل الإعلانات الداخلية'));
+          }} className="px-3 py-1.5 bg-green-600/20 text-green-300 border border-green-700/40 rounded-lg text-xs font-bold hover:bg-green-600/30" data-testid="bulk-enable-internal">
+            ✓ {t('ad_select_all_internal', 'تحديد الكل - إعلانات الموقع')}
+          </button>
+          <button onClick={() => {
+            setAdSettings(prev => {
+              const positions = { ...(prev?.positions || {}) };
+              ALL_POSITIONS.forEach(p => {
+                positions[p.key] = { ...(positions[p.key] || {}), internal_enabled: false };
+              });
+              return { ...(prev || {}), positions };
+            });
+            toast.success(t('ad_all_internal_off', 'تم إلغاء كل الإعلانات الداخلية'));
+          }} className="px-3 py-1.5 bg-gray-700 text-gray-300 rounded-lg text-xs hover:bg-gray-600" data-testid="bulk-disable-internal">
+            {t('ad_deselect_all_internal', 'إلغاء الكل - داخلي')}
+          </button>
+          <div className="w-px h-7 bg-gray-700 mx-1 self-center"></div>
+          <button onClick={() => {
+            setAdSettings(prev => {
+              const positions = { ...(prev?.positions || {}) };
+              ALL_POSITIONS.forEach(p => {
+                positions[p.key] = { ...(positions[p.key] || {}), adsense_enabled: true };
+              });
+              return { ...(prev || {}), positions };
+            });
+            toast.success(t('ad_all_adsense_on', 'تم تحديد كل مواقع AdSense'));
+          }} className="px-3 py-1.5 bg-blue-600/20 text-blue-300 border border-blue-700/40 rounded-lg text-xs font-bold hover:bg-blue-600/30" data-testid="bulk-enable-adsense">
+            ✓ {t('ad_select_all_adsense', 'تحديد الكل - AdSense')}
+          </button>
+          <button onClick={() => {
+            setAdSettings(prev => {
+              const positions = { ...(prev?.positions || {}) };
+              ALL_POSITIONS.forEach(p => {
+                positions[p.key] = { ...(positions[p.key] || {}), adsense_enabled: false };
+              });
+              return { ...(prev || {}), positions };
+            });
+            toast.success(t('ad_all_adsense_off', 'تم إلغاء كل مواقع AdSense'));
+          }} className="px-3 py-1.5 bg-gray-700 text-gray-300 rounded-lg text-xs hover:bg-gray-600" data-testid="bulk-disable-adsense">
+            {t('ad_deselect_all_adsense', 'إلغاء الكل - AdSense')}
+          </button>
+          <span className="text-[10px] text-amber-400 self-center ms-2">⚠️ {t('ad_remember_save', 'تذكّري الضغط على "حفظ التغييرات" أسفل البطاقات')}</span>
         </div>
 
         {/* Position Cards with Slot Details */}

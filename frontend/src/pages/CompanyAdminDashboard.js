@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
+import InviteLinkModal from '../components/shared/InviteLinkModal';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -24,6 +25,7 @@ const CompanyAdminDashboard = () => {
   const [createOpen, setCreateOpen] = useState(false);
   const [editFor, setEditFor] = useState(null);
   const [addUserFor, setAddUserFor] = useState(null);
+  const [inviteFor, setInviteFor] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -183,8 +185,9 @@ const CompanyAdminDashboard = () => {
 
                 {c.address && <div className="text-[11px] text-gray-500 border-t border-gray-700/50 pt-2">📍 {c.address}</div>}
 
-                <div className="grid grid-cols-3 gap-2 pt-2">
+                <div className="grid grid-cols-4 gap-2 pt-2">
                   <button onClick={() => setAddUserFor(c)} className="bg-green-600/30 hover:bg-green-600/50 text-green-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-add-user-${c.id}`}>➕ ساكن</button>
+                  <button onClick={() => setInviteFor(c)} className="bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-invite-${c.id}`}>🔗 دعوة</button>
                   <button onClick={() => setEditFor({ ...c })} className="bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-edit-${c.id}`}>✏️ تعديل</button>
                   <button onClick={() => removeCompound(c)} className="bg-red-600/30 hover:bg-red-600/50 text-red-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-delete-${c.id}`}>🗑 حذف</button>
                 </div>
@@ -197,6 +200,7 @@ const CompanyAdminDashboard = () => {
       {createOpen && <CompoundFormModal title="➕ إضافة مجمع جديد" initial={{}} onClose={() => setCreateOpen(false)} onSave={createCompound} saveLabel="إضافة" />}
       {editFor && <CompoundFormModal title="✏️ تعديل المجمع" initial={editFor} onClose={() => setEditFor(null)} onSave={async (f) => { setEditFor({...editFor, ...f}); setTimeout(saveEdit, 0); }} saveLabel="حفظ" />}
       {addUserFor && <AddUserModal compound={addUserFor} onClose={() => setAddUserFor(null)} onSave={addUser} />}
+      {inviteFor && <InviteLinkModal compound={inviteFor} onClose={() => setInviteFor(null)} />}
     </div>
   );
 };

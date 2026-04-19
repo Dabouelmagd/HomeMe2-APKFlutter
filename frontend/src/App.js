@@ -55,6 +55,7 @@ import SuperAdminPanel from './components/SuperAdminPanel';
 import AdvertiserPortal from './pages/AdvertiserPortal';
 import AdvertiserRegister from './pages/AdvertiserRegister';
 import CompanyAdminDashboard from './pages/CompanyAdminDashboard';
+import JoinViaInvite from './pages/JoinViaInvite';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
 import SubscriptionManagement from './components/SubscriptionManagement';
@@ -493,6 +494,7 @@ function App() {
           <Route path="/legal" element={<TermsPrivacy />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/advertiser-register" element={<AdvertiserRegister />} />
+                <Route path="/join/:token" element={<JoinViaInvite />} />
                 <Route path="/debug-login" element={<DebugLogin />} />
                 <Route path="/select-account" element={
                   <ProtectedRoute>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import ContractModal from './companies/ContractModal';
 import CompoundsGridView from './companies/CompoundsGridView';
+import InviteLinkModal from '../shared/InviteLinkModal';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -29,6 +30,7 @@ const CompaniesTab = ({ t }) => {
   const [addUserFor, setAddUserFor] = useState(null); // { compound_id, compound_name }
   const [contractFor, setContractFor] = useState(null); // { company_id, company_name, compound_id, compound_name }
   const [editCompoundState, setEditCompoundState] = useState(null); // full compound object being edited
+  const [inviteFor, setInviteFor] = useState(null);
   const [viewMode, setViewMode] = useState('nested'); // 'nested' | 'grid'
   const [gridFilter, setGridFilter] = useState({ company_id: '', min_users: 0, sub_status: 'all', search: '' });
 
@@ -321,6 +323,7 @@ const CompaniesTab = ({ t }) => {
                             </div>
                           </div>
                           <button onClick={() => setAddUserFor({ compound_id: cpd.id, compound_name: cpd.name })} className="px-2 py-1 text-[11px] bg-green-600/30 hover:bg-green-600/50 text-green-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-add-user-${cpd.id}`}>➕ {t('ct_add_user','إضافة ساكن')}</button>
+                          <button onClick={() => setInviteFor({ id: cpd.id, name: cpd.name })} title={t('ct_invite','رابط دعوة')} className="px-2 py-1 text-[11px] bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-invite-${cpd.id}`}>🔗</button>
                           <button onClick={() => setContractFor({ company_id: co.id, company_name: co.name, compound_id: cpd.id, compound_name: cpd.name })} className="px-2 py-1 text-[11px] bg-amber-600/30 hover:bg-amber-600/50 text-amber-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-contract-${cpd.id}`}>📋 {t('ct_contract','العقد')}</button>
                           <button onClick={() => setEditCompoundState({ ...cpd, company_id: co.id })} title={t('ct_edit','تعديل')} className="px-2 py-1 text-[11px] bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-cpd-edit-${cpd.id}`}>✏️</button>
                           <button onClick={() => exportCompound(cpd)} title={t('ct_export','تصدير')} className="px-2 py-1 text-[11px] bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-cpd-export-${cpd.id}`}>📑</button>
@@ -392,6 +395,9 @@ const CompaniesTab = ({ t }) => {
 
       {/* Edit Compound modal */}
       {editCompoundState && <EditCompoundModal cpd={editCompoundState} setCpd={setEditCompoundState} onClose={() => setEditCompoundState(null)} onSave={saveEditCompound} companies={data?.companies || []} t={t} />}
+
+      {/* Invite Link modal */}
+      {inviteFor && <InviteLinkModal compound={inviteFor} onClose={() => setInviteFor(null)} />}
     </div>
   );
 };

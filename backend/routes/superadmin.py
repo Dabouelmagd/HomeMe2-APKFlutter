@@ -790,3 +790,247 @@ async def subscription_analytics(current_user: dict = Depends(require_super_admi
     except Exception as e:
         logging.error(f"Subscription analytics error: {e}")
         raise HTTPException(status_code=500, detail="Failed")
+
+
+# ==================== Management Companies CRUD (Super Admin) ====================
+
+@router.put("/super-admin/companies/{company_id}")
+async def update_management_company(company_id: str, payload: dict, current_user: dict = Depends(require_super_admin)):
+    """تعديل بيانات شركة إدارة"""
+    db = get_db()
+    company = await db.management_companies.find_one({"id": company_id}, {"_id": 0})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    allowed = {"name", "email", "phone", "address", "website", "description", "company_name"}
+    update = {k: v for k, v in payload.items() if k in allowed}
+    if not update:
+        raise HTTPException(status_code=400, detail="لا توجد حقول صالحة للتحديث")
+    update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.management_companies.update_one({"id": company_id}, {"$set": update})
+    return {"success": True, "updated": list(update.keys())}
+
+
+@router.post("/super-admin/companies/{company_id}/compounds")
+async def add_compound_to_company(company_id: str, payload: dict, current_user: dict = Depends(require_super_admin)):
+    """إضافة مجمع جديد تحت شركة إدارة محددة"""
+    db = get_db()
+    company = await db.management_companies.find_one({"id": company_id}, {"_id": 0})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    name = (payload.get("name") or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="اسم المجمع مطلوب")
+    compound_doc = {
+        "id": str(uuid.uuid4()),
+        "name": name,
+        "location": payload.get("location") or payload.get("address") or "",
+        "address": payload.get("address") or payload.get("location") or "",
+        "description": payload.get("description", ""),
+        "company_id": company_id,
+        "management_company_id": company_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": current_user.get("id"),
+    }
+    await db.compounds.insert_one(compound_doc)
+    compound_doc.pop("_id", None)
+    return {"success": True, "compound": serialize_datetime(compound_doc)}
+
+
+# ==================== Bulk Campaigns Stats & Helpers ====================
+
+@router.get("/super-admin/bulk-campaigns")
+async def list_bulk_campaigns(current_user: dict = Depends(require_super_admin)):
+    """قائمة حملات العروض الجماعية مع معدل الاستخدام لكل كود"""
+    db = get_db()
+    campaigns = await db.bulk_campaigns.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    enriched = []
+    total_sent = 0
+    total_used = 0
+    total_revenue_saved = 0
+    for c in campaigns:
+        coupons = await db.coupons.find(
+            {"campaign": "bulk_renewal", "created_at": {"$gte": c.get("created_at")}},
+            {"_id": 0, "times_used": 1, "discount_value": 1}
+        ).to_list(2000)
+        # limit coupons to those created close to this campaign timestamp (simple heuristic: within 60s)
+        used = sum(1 for x in coupons[:c.get("sent", 0) or 500] if (x.get("times_used") or 0) > 0)
+        total_sent += c.get("sent", 0) or 0
+        total_used += used
+        enriched.append({
+            **c,
+            "used": used,
+            "conversion_rate": round(100 * used / c["sent"], 1) if c.get("sent") else 0,
+        })
+    return {
+        "campaigns": serialize_datetime(enriched),
+        "summary": {
+            "total_campaigns": len(campaigns),
+            "total_sent": total_sent,
+            "total_used": total_used,
+            "overall_conversion_rate": round(100 * total_used / total_sent, 1) if total_sent else 0,
+        }
+    }
+
+
+@router.get("/super-admin/expiring-soon-count")
+async def expiring_soon_count(days: int = 7, current_user: dict = Depends(require_super_admin)):
+    """عدد المستخدمين الذين تنتهي اشتراكاتهم خلال N يومًا — للـ badge في الواجهة"""
+    db = get_db()
+    now = datetime.now(timezone.utc)
+    cutoff = now + timedelta(days=max(1, days))
+    count = 0
+    users = await db.users.find({"subscription_active": True}, {"_id": 0, "subscription_end": 1}).to_list(5000)
+    for u in users:
+        end_str = u.get("subscription_end")
+        if not end_str:
+            continue
+        try:
+            end = datetime.fromisoformat(str(end_str).replace("Z", "+00:00"))
+            if end.tzinfo is None:
+                end = end.replace(tzinfo=timezone.utc)
+            if now <= end <= cutoff:
+                count += 1
+        except Exception:
+            continue
+    return {"count": count, "days": days}
+
+
+# ==================== Scheduler Config ====================
+
+@router.get("/super-admin/auto-renewal-config")
+async def get_auto_renewal_config(current_user: dict = Depends(require_super_admin)):
+    """إعدادات التجديد التلقائي الجماعي"""
+    db = get_db()
+    cfg = await db.auto_renewal_config.find_one({"id": "default"}, {"_id": 0})
+    if not cfg:
+        cfg = {
+            "id": "default",
+            "enabled": False,
+            "day_of_month": 1,
+            "days_before_expiry": 7,
+            "discount": 20,
+            "message": "",
+            "last_run": None,
+        }
+    return serialize_datetime(cfg)
+
+
+@router.put("/super-admin/auto-renewal-config")
+async def update_auto_renewal_config(payload: dict, current_user: dict = Depends(require_super_admin)):
+    """تحديث إعدادات التجديد التلقائي"""
+    db = get_db()
+    update = {
+        "id": "default",
+        "enabled": bool(payload.get("enabled", False)),
+        "day_of_month": max(1, min(28, int(payload.get("day_of_month", 1)))),
+        "days_before_expiry": max(1, min(90, int(payload.get("days_before_expiry", 7)))),
+        "discount": max(1, min(90, int(payload.get("discount", 20)))),
+        "message": payload.get("message", ""),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.auto_renewal_config.update_one({"id": "default"}, {"$set": update}, upsert=True)
+    return {"success": True, "config": serialize_datetime(update)}
+
+
+async def run_auto_renewal_if_due():
+    """يستدعى من الـ scheduler يوميًا. يُرسل عرض التجديد الجماعي إذا تطابق اليوم مع day_of_month."""
+    db = get_db()
+    cfg = await db.auto_renewal_config.find_one({"id": "default"}, {"_id": 0})
+    if not cfg or not cfg.get("enabled"):
+        return {"skipped": True, "reason": "disabled"}
+    today = datetime.now(timezone.utc)
+    if today.day != cfg.get("day_of_month", 1):
+        return {"skipped": True, "reason": "not_day_of_month"}
+    # منع التكرار في نفس اليوم
+    last = cfg.get("last_run")
+    if last:
+        try:
+            last_dt = datetime.fromisoformat(str(last).replace("Z", "+00:00"))
+            if last_dt.date() == today.date():
+                return {"skipped": True, "reason": "already_ran_today"}
+        except Exception:
+            pass
+    # بناء القائمة وإرسالها
+    days_before = cfg.get("days_before_expiry", 7)
+    discount = cfg.get("discount", 20)
+    message = cfg.get("message", "")
+    now = today
+    cutoff = now + timedelta(days=days_before)
+    user_ids = []
+    users_all = await db.users.find({"subscription_active": True}, {"_id": 0}).to_list(10000)
+    for u in users_all:
+        end_str = u.get("subscription_end")
+        if not end_str:
+            continue
+        try:
+            end = datetime.fromisoformat(str(end_str).replace("Z", "+00:00"))
+            if end.tzinfo is None:
+                end = end.replace(tzinfo=timezone.utc)
+            if now <= end <= cutoff:
+                user_ids.append(u.get("id"))
+        except Exception:
+            continue
+
+    sent = 0
+    emails_sent = 0
+    for uid in user_ids:
+        try:
+            user = await db.users.find_one({"id": uid}, {"_id": 0, "password_hash": 0})
+            if not user:
+                continue
+            code = f"RENEW-{uuid.uuid4().hex[:6].upper()}"
+            await db.coupons.insert_one({
+                "id": str(uuid.uuid4()),
+                "code": code,
+                "discount_type": "percentage",
+                "discount_value": discount,
+                "max_uses": 1,
+                "times_used": 0,
+                "is_active": True,
+                "assigned_to": uid,
+                "notes": f"Auto monthly renewal - {message}",
+                "campaign": "bulk_renewal_auto",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+            await db.notifications.insert_one({
+                "id": str(uuid.uuid4()),
+                "user_id": uid,
+                "title": f"🎯 خصم {discount}% على تجديد اشتراكك",
+                "body": message or f"استخدم الكود {code} للحصول على خصم {discount}% عند التجديد.",
+                "type": "bulk_offer_auto",
+                "read": False,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+            sent += 1
+            if user.get("email"):
+                try:
+                    from email_service import email_service
+                    subject, html, text = _build_gift_email(
+                        user.get("full_name") or user.get("username") or "",
+                        "discount_coupon", {"discount": discount}, message, code,
+                    )
+                    ok = await email_service.send_email(user["email"], subject, html, text)
+                    if ok:
+                        emails_sent += 1
+                except Exception as e:
+                    logging.error(f"Auto-renewal email error: {e}")
+        except Exception as e:
+            logging.error(f"Auto-renewal send error for {uid}: {e}")
+
+    await db.bulk_campaigns.insert_one({
+        "id": str(uuid.uuid4()),
+        "type": "bulk_renewal_auto",
+        "discount": discount,
+        "days_before_expiry": days_before,
+        "message": message,
+        "sent": sent,
+        "emails_sent": emails_sent,
+        "failed": 0,
+        "auto": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    await db.auto_renewal_config.update_one(
+        {"id": "default"},
+        {"$set": {"last_run": now.isoformat(), "last_sent": sent}},
+    )
+    return {"sent": sent, "emails_sent": emails_sent, "targets": len(user_ids)}

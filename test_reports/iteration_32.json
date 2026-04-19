@@ -1,0 +1,73 @@
+{
+  "summary": "Iteration 32: Validated 5 new HierarchicalSubs features end-to-end. Backend 18/18 pytest pass covering: PUT /api/super-admin/companies/{id} (200 success, 404 not found, 403 admin); POST /api/super-admin/companies/{id}/compounds (200 create with company_id persisted, 400 missing name, 404 not found, 403 admin); GET /api/super-admin/expiring-soon-count for days=7 and days=30 with 403 admin guard; GET /api/super-admin/bulk-campaigns returning campaigns[] + summary{total_campaigns,total_sent,total_used,overall_conversion_rate} with per-campaign id/created_at/sent/used/conversion_rate keys, 403 admin; GET/PUT /api/super-admin/auto-renewal-config (defaults auto-created, update persisted, 403 admin on both verbs). The run_auto_renewal_if_due() helper was invoked directly and correctly returned: {skipped:true,reason:'disabled'} when enabled=False, {skipped:true,reason:'not_day_of_month'} on mismatched day, {sent:N,emails_sent,targets} on matching day, and {skipped:true,reason:'already_ran_today'} on re-invocation — idempotency via last_run works. server.py scheduler hooks run_auto_renewal_if_due inside the daily 7AM loop (line 2465-2466). UI: all 4 action-bar buttons render (hs-bulk-offer-btn, hs-campaigns-btn, hs-auto-config-btn, hs-export-all-btn); hs-expiring-badge correctly absent (count=0). hs-campaigns-dashboard opens with hs-campaigns-summary. hs-auto-config-modal opens with all 6 fields (hs-auto-toggle/day/days-before/discount/message/save-btn); saving fires success toast. Company card (1 seeded for test) shows hs-edit-company-{id} + hs-add-compound-{id}; hs-edit-company-modal opens with name/email fields; hs-add-compound-modal opens with name/location fields and successfully creates a new compound ('تم إنشاء المجمع' toast). iter31 regression OK (hs-bulk-offer-btn, hs-export-all-btn, hs-totals-section still render). Test users cleanup: 0 testnew_ and 0 @example.com users remained (only the in-test seeded company TEST_iter32 exists).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter32_company_crud_campaigns.py",
+    "/app/test_reports/pytest/iter32_new_features.xml"
+  ],
+  "test_cases_executed": [
+    {"case": "PUT /super-admin/companies/{id} 200 with valid payload", "result": "PASS"},
+    {"case": "PUT /super-admin/companies/{invalid} 404", "result": "PASS"},
+    {"case": "PUT /super-admin/companies/{id} as admin 403", "result": "PASS"},
+    {"case": "POST /super-admin/companies/{id}/compounds 200, returns compound with company_id", "result": "PASS"},
+    {"case": "POST /super-admin/companies/{id}/compounds missing name 400", "result": "PASS"},
+    {"case": "POST /super-admin/companies/{invalid}/compounds 404", "result": "PASS"},
+    {"case": "POST /super-admin/companies/{id}/compounds as admin 403", "result": "PASS"},
+    {"case": "GET /super-admin/expiring-soon-count?days=7 200 {count:int, days:7}", "result": "PASS"},
+    {"case": "GET /super-admin/expiring-soon-count?days=30 200 days=30", "result": "PASS"},
+    {"case": "GET /super-admin/expiring-soon-count as admin 403", "result": "PASS"},
+    {"case": "GET /super-admin/bulk-campaigns 200 {campaigns, summary with 4 keys}", "result": "PASS"},
+    {"case": "GET /super-admin/bulk-campaigns as admin 403", "result": "PASS"},
+    {"case": "GET /super-admin/auto-renewal-config defaults returned", "result": "PASS"},
+    {"case": "PUT /super-admin/auto-renewal-config persists enabled/day/discount", "result": "PASS"},
+    {"case": "PUT /super-admin/auto-renewal-config disable (cleanup)", "result": "PASS"},
+    {"case": "GET /super-admin/auto-renewal-config as admin 403", "result": "PASS"},
+    {"case": "PUT /super-admin/auto-renewal-config as admin 403", "result": "PASS"},
+    {"case": "run_auto_renewal_if_due disabled → {skipped, disabled}", "result": "PASS"},
+    {"case": "run_auto_renewal_if_due wrong day → {skipped, not_day_of_month}", "result": "PASS"},
+    {"case": "run_auto_renewal_if_due matching day → {sent,emails_sent,targets}", "result": "PASS"},
+    {"case": "run_auto_renewal_if_due already-ran-today → {skipped, already_ran_today}", "result": "PASS"},
+    {"case": "server.py daily_report_scheduler invokes run_auto_renewal_if_due", "result": "PASS (verified in code)"},
+    {"case": "UI: 4 action-bar buttons render + badge absent when count=0", "result": "PASS"},
+    {"case": "UI: hs-campaigns-btn opens hs-campaigns-dashboard with summary", "result": "PASS"},
+    {"case": "UI: hs-auto-config-btn opens modal with all 6 testids, save fires toast", "result": "PASS"},
+    {"case": "UI: hs-edit-company-{id} opens modal with name/email/save-btn", "result": "PASS"},
+    {"case": "UI: hs-add-compound-{id} opens modal, saves, shows success toast", "result": "PASS"},
+    {"case": "UI regression: hs-bulk-offer-btn, hs-export-all-btn, hs-totals-section render", "result": "PASS"},
+    {"case": "Cleanup: 0 testnew_ users, 0 @example.com users left (verified via /api/super-admin/users)", "result": "PASS"}
+  ],
+  "action_items": [
+    "(Cleanup) Remove TEST_iter32_co_8f7901 management_company and its TEST_iter32 compounds from db after iteration is complete: db.management_companies.delete_many({id: /^TEST_iter32/}); db.compounds.delete_many({name: /^TEST_iter32/}). The tests also left TEST_iter32 rename on this company ('TEST_iter32 Updated Co' name, updated32@example.com email).",
+    "(Cleanup) auto_renewal_config was re-disabled at test end (enabled:false) to avoid scheduler side-effects. Confirm before deploy that enabled=false or intended day is correctly set for production.",
+    "(Code quality, low priority) /api/super-admin/bulk-campaigns conversion heuristic is crude: filters coupons by campaign:'bulk_renewal' with created_at>=campaign.created_at then slices by sent count. This can over-count if multiple campaigns run within a short window. Consider tagging coupons with campaign_id FK for accurate per-campaign used counts.",
+    "(Code quality) run_auto_renewal_if_due should probably only return 'success': true and include campaign_id in the response for traceability; currently returns plain dict. Low priority.",
+    "(UX) hs-expiring-badge only appears when count>0 — per spec. Verified absent at count=0.",
+    "(Cosmetic, pre-existing) The 'already_ran_today' guard is based on UTC date; for a 7AM-scheduled Egyptian server this should be fine but worth an FYI."
+  ],
+  "critical_code_review_comments": [
+    "bulk_campaigns heuristic for 'used' count is unreliable when >1 campaign exists per day — use coupons.campaign_id FK instead of timestamp proximity.",
+    "run_auto_renewal_if_due does not set last_run when it finds 0 targets but should still update last_run to prevent spamming if it's called multiple times per day from other code paths. Currently it does update last_run ALWAYS when it reaches the insert_one step — OK. But if user_ids is empty, the bulk_campaigns row still inserts with sent:0 — consider skipping the bulk_campaigns insert when sent==0 to avoid log noise.",
+    "update_management_company allowed set = {name,email,phone,address,website,description,company_name}: no validation on email format or phone. Minor risk of bad data.",
+    "add_compound_to_company does not check for duplicate compound names under same company. Minor.",
+    "auto_renewal_config PUT coerces day_of_month into [1,28] — good for month-end safety. days_before_expiry clamped [1,90] and discount [1,90] — good.",
+    "Scheduler wiring in server.py wraps run_auto_renewal_if_due in try/except — good; failure won't crash the daily report scheduler."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter32_company_crud_campaigns.py (new, 18 pytest cases)"
+  ],
+  "success_rate": {"backend": "100% (18/18)", "frontend": "100% on all directly tested interactions (after isolating test flows — first combined run had timing issues, not product bugs)"},
+  "test_credentials": "Owner_homeme/Dalia1234@ ✓, admin/admin123 ✓ (403 checks).",
+  "seed_data_creation": "Since seed had 0 management_companies (as expected per task note), I inserted 1 seed company 'TEST_iter32_co_8f7901' via motor script so company CRUD tests could exercise 200-path. After tests ran: company was renamed to 'TEST_iter32 Updated Co' with email updated32@example.com, and now has 2 compounds (1 from pytest, 1 from UI test — both TEST_iter32* prefixed). Safe to purge: db.management_companies.delete_many({id:/^TEST_iter32/}); db.compounds.delete_many({name:/^TEST_iter32/}).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All iter32 endpoints + helper validated. Test seed company id prefix: TEST_iter32_co_. auto_renewal_config currently enabled=false. When calling run_auto_renewal_if_due directly from python, use init_db() first (not connect_to_mongo — doesn't exist in database.py). The test file is at /app/backend/tests/test_iter32_company_crud_campaigns.py. For future UI tests on multiple modals in same script, ALWAYS reload the page between modal tests or wait 2s+ for backdrop fade rather than relying on Escape key — overlays may intercept the next click otherwise. Iter31 bug (DELETE /database/users 500) remains fixed. The campaigns conversion heuristic issue is worth tracking as tech debt.",
+  "rca of the issue": "N/A — no bugs found in iter32. Initial UI script failures on auto-config + add-compound modals were test-script timing issues: after closing a previous modal via Escape, the backdrop fade-out left the overlay pointer-events for ~300ms, intercepting the next button click. Resolved by hard-reloading the page between modal tests. Not a product bug."
+}

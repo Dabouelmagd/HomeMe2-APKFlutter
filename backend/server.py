@@ -2461,6 +2461,12 @@ async def start_daily_report_scheduler():
                 logging.info("Subscription expiry check completed")
             except Exception as e:
                 logging.error(f"Subscription check error: {e}")
+            try:
+                from routes.superadmin import run_auto_renewal_if_due
+                res = await run_auto_renewal_if_due()
+                logging.info(f"Auto renewal check completed: {res}")
+            except Exception as e:
+                logging.error(f"Auto renewal error: {e}")
 
     _daily_report_task = asyncio.create_task(daily_report_scheduler())
     logging.info("Daily report scheduler started (7:00 AM daily)")

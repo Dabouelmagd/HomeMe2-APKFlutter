@@ -27,6 +27,17 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
   const [editUser, setEditUser] = useState(null);
   const [addUserCompound, setAddUserCompound] = useState(null); // holds compound object
   const [editCompound, setEditCompound] = useState(null);
+  const [editCompany, setEditCompany] = useState(null);
+  const [addCompoundToCompany, setAddCompoundToCompany] = useState(null); // holds company
+  const [expiringCount, setExpiringCount] = useState(0);
+  const [campaignsOpen, setCampaignsOpen] = useState(false);
+  const [autoConfigOpen, setAutoConfigOpen] = useState(false);
+
+  useEffect(() => {
+    axios.get(`${API}/super-admin/expiring-soon-count?days=7`, getToken())
+      .then(res => setExpiringCount(res.data?.count || 0))
+      .catch(() => {});
+  }, [refreshKey]);
 
   useEffect(() => {
     let alive = true;
@@ -250,6 +261,38 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
     }
   };
 
+  // ------- Save company edit -------
+  const saveCompanyEdit = async () => {
+    if (!editCompany?.id) return;
+    try {
+      const payload = {
+        name: editCompany.name || '',
+        email: editCompany.email || '',
+        phone: editCompany.phone || '',
+        address: editCompany.address || '',
+        description: editCompany.description || '',
+      };
+      await axios.put(`${API}/super-admin/companies/${editCompany.id}`, payload, getToken());
+      toast.success(t('hs_company_updated','تم تحديث الشركة'));
+      setEditCompany(null);
+      reload();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('hs_update_failed','فشل التحديث'));
+    }
+  };
+
+  // ------- Add compound to company -------
+  const saveNewCompound = async (form) => {
+    try {
+      await axios.post(`${API}/super-admin/companies/${addCompoundToCompany?.id}/compounds`, form, getToken());
+      toast.success(t('hs_compound_created','تم إنشاء المجمع'));
+      setAddCompoundToCompany(null);
+      reload();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('hs_create_failed','فشل الإنشاء'));
+    }
+  };
+
   // ------- Bulk renewal offer -------
   const openBulkOffer = async () => {
     setBulkOfferOpen(true);
@@ -313,8 +356,15 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
             <option value="family_head">{roleLabel('family_head')}</option>
           </select>
         </div>
-        <div className="flex gap-2">
-          <button onClick={openBulkOffer} className="px-3 py-1.5 text-xs bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-400 hover:to-pink-400 text-white rounded-lg font-semibold shadow-lg shadow-pink-500/20" data-testid="hs-bulk-offer-btn">🎯 {t('hs_bulk_renewal','عرض تجديد جماعي')}</button>
+        <div className="flex gap-2 items-center flex-wrap">
+          <button onClick={openBulkOffer} className="relative px-3 py-1.5 text-xs bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-400 hover:to-pink-400 text-white rounded-lg font-semibold shadow-lg shadow-pink-500/20" data-testid="hs-bulk-offer-btn">
+            🎯 {t('hs_bulk_renewal','عرض تجديد جماعي')}
+            {expiringCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 px-1 flex items-center justify-center border-2 border-gray-900 animate-pulse" data-testid="hs-expiring-badge">{expiringCount}</span>
+            )}
+          </button>
+          <button onClick={() => setCampaignsOpen(true)} className="px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold" data-testid="hs-campaigns-btn">📈 {t('hs_campaigns','الحملات')}</button>
+          <button onClick={() => setAutoConfigOpen(true)} className="px-3 py-1.5 text-xs bg-violet-600 hover:bg-violet-500 text-white rounded-lg font-semibold" data-testid="hs-auto-config-btn">⚙️ {t('hs_auto','تلقائي')}</button>
           <button onClick={exportAll} className="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold" data-testid="hs-export-all-btn">⬇ {t('hs_export_all','تصدير الكل')}</button>
           <button onClick={reload} className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded-lg" data-testid="hs-reload-btn">↻</button>
         </div>
@@ -353,6 +403,8 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
                   </div>
                 </div>
                 <div className="flex gap-2 items-center" onClick={e => e.stopPropagation()}>
+                  <button title={t('hs_edit','تعديل')} onClick={() => setEditCompany(co)} className="px-2 py-1 text-[11px] bg-amber-600/20 text-amber-300 rounded hover:bg-amber-600/30" data-testid={`hs-edit-company-${co.id}`}>✏️</button>
+                  <button title={t('hs_add_compound','إضافة مجمع')} onClick={() => setAddCompoundToCompany(co)} className="px-2 py-1 text-[11px] bg-green-600/20 text-green-300 rounded hover:bg-green-600/30" data-testid={`hs-add-compound-${co.id}`}>➕</button>
                   <button onClick={() => openGiftForCompany(co)} className="px-2 py-1 text-[11px] bg-pink-600/20 text-pink-300 rounded hover:bg-pink-600/30" data-testid={`hs-gift-company-${co.id}`}>🎁 {t('hs_send_gift','هدية')}</button>
                   <button onClick={() => exportCompany(co)} className="px-2 py-1 text-[11px] bg-emerald-600/20 text-emerald-300 rounded hover:bg-emerald-600/30">⬇ CSV</button>
                   <span className="text-blue-400 text-xl">{expandedCompanies[co.id] ? '▾' : '▸'}</span>
@@ -425,6 +477,26 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
       {/* Edit compound modal */}
       {editCompound && (
         <EditCompoundModal compound={editCompound} setCompound={setEditCompound} onClose={() => setEditCompound(null)} onSave={saveCompoundEdit} t={t} />
+      )}
+
+      {/* Edit company modal */}
+      {editCompany && (
+        <EditCompanyModal company={editCompany} setCompany={setEditCompany} onClose={() => setEditCompany(null)} onSave={saveCompanyEdit} t={t} />
+      )}
+
+      {/* Add compound to company modal */}
+      {addCompoundToCompany && (
+        <AddCompoundModal company={addCompoundToCompany} onClose={() => setAddCompoundToCompany(null)} onSave={saveNewCompound} t={t} />
+      )}
+
+      {/* Campaigns dashboard */}
+      {campaignsOpen && (
+        <CampaignsDashboard onClose={() => setCampaignsOpen(false)} t={t} />
+      )}
+
+      {/* Auto-renewal config */}
+      {autoConfigOpen && (
+        <AutoRenewalConfigModal onClose={() => setAutoConfigOpen(false)} t={t} />
       )}
     </div>
   );
@@ -734,5 +806,228 @@ const EditCompoundModal = ({ compound, setCompound, onClose, onSave, t }) => (
     </div>
   </div>
 );
+
+// ==================== EditCompanyModal ====================
+const EditCompanyModal = ({ company, setCompany, onClose, onSave, t }) => (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-blue-500/30" onClick={e => e.stopPropagation()} data-testid="hs-edit-company-modal">
+      <h3 className="text-lg font-bold text-white">✏️ {t('hs_edit_company','تعديل شركة الإدارة')}</h3>
+      <div className="space-y-3">
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('hs_company_name','اسم الشركة')}</label>
+          <input value={company.name || ''} onChange={e => setCompany({...company, name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-edit-company-name" />
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('hs_email','البريد')}</label>
+            <input type="email" value={company.email || ''} onChange={e => setCompany({...company, email: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-edit-company-email" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('hs_phone','الهاتف')}</label>
+            <input value={company.phone || ''} onChange={e => setCompany({...company, phone: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('hs_address','العنوان')}</label>
+          <input value={company.address || ''} onChange={e => setCompany({...company, address: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('hs_description','الوصف')}</label>
+          <textarea rows="2" value={company.description || ''} onChange={e => setCompany({...company, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+        </div>
+      </div>
+      <div className="flex gap-2 pt-2">
+        <button onClick={onSave} className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold" data-testid="hs-edit-company-save-btn">{t('hs_save','حفظ')}</button>
+        <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('hs_cancel','إلغاء')}</button>
+      </div>
+    </div>
+  </div>
+);
+
+// ==================== AddCompoundModal ====================
+const AddCompoundModal = ({ company, onClose, onSave, t }) => {
+  const [form, setForm] = useState({ name: '', location: '', description: '' });
+  const submit = () => {
+    if (!form.name.trim()) { toast.error(t('hs_name_required','اسم المجمع مطلوب')); return; }
+    onSave(form);
+  };
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-green-500/30" onClick={e => e.stopPropagation()} data-testid="hs-add-compound-modal">
+        <div>
+          <h3 className="text-lg font-bold text-white">➕ {t('hs_add_compound_title','إضافة مجمع جديد')}</h3>
+          <p className="text-xs text-gray-400 mt-1">{t('hs_under_company','تحت شركة')}: <span className="text-green-400">{company.name}</span></p>
+        </div>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('hs_compound_name','اسم المجمع')} *</label>
+            <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-add-compound-name" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('hs_location','الموقع / العنوان')}</label>
+            <input value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-add-compound-location" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('hs_description','الوصف')}</label>
+            <textarea rows="2" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+        </div>
+        <div className="flex gap-2 pt-2">
+          <button onClick={submit} className="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-bold" data-testid="hs-add-compound-save-btn">{t('hs_create','إنشاء')}</button>
+          <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('hs_cancel','إلغاء')}</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==================== CampaignsDashboard ====================
+const CampaignsDashboard = ({ onClose, t }) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    axios.get(`${API}/super-admin/bulk-campaigns`, getToken())
+      .then(res => setData(res.data))
+      .catch(err => toast.error(err.response?.data?.detail || t('hs_load_failed','فشل التحميل')))
+      .finally(() => setLoading(false));
+  }, [t]);
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-4xl p-6 space-y-4 border border-indigo-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="hs-campaigns-dashboard">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold text-white">📈 {t('hs_campaigns_title','لوحة حملات العروض الجماعية')}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-white text-xl">✕</button>
+        </div>
+        {loading ? <div className="text-center text-gray-400 py-8">{t('hs_loading','جاري التحميل...')}</div>
+          : data ? (
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3" data-testid="hs-campaigns-summary">
+              {[
+                { label: t('hs_total_campaigns','إجمالي الحملات'), value: data.summary.total_campaigns, icon: '📣', color: 'border-indigo-600/40 from-indigo-600/25 to-indigo-800/10' },
+                { label: t('hs_total_sent','إجمالي المرسل'), value: data.summary.total_sent, icon: '📨', color: 'border-blue-600/40 from-blue-600/25 to-blue-800/10' },
+                { label: t('hs_total_used','المستخدَمة'), value: data.summary.total_used, icon: '✅', color: 'border-emerald-600/40 from-emerald-600/25 to-emerald-800/10' },
+                { label: t('hs_conversion','معدل التحويل'), value: `${data.summary.overall_conversion_rate}%`, icon: '🎯', color: 'border-pink-600/40 from-pink-600/25 to-pink-800/10' },
+              ].map((s,i) => (
+                <div key={i} className={`bg-gradient-to-br ${s.color} border rounded-xl p-3 text-center`}>
+                  <div className="text-2xl mb-0.5">{s.icon}</div>
+                  <div className="text-xl font-bold text-white">{s.value}</div>
+                  <div className="text-[11px] text-gray-400">{s.label}</div>
+                </div>
+              ))}
+            </div>
+            <div className="bg-gray-900/60 rounded-lg border border-gray-700 overflow-hidden">
+              <table className="w-full text-xs">
+                <thead className="bg-gray-900">
+                  <tr>
+                    <th className="px-3 py-2 text-right text-gray-400">{t('hs_date','التاريخ')}</th>
+                    <th className="px-3 py-2 text-center text-gray-400">{t('hs_type','النوع')}</th>
+                    <th className="px-3 py-2 text-center text-gray-400">{t('hs_discount_pct','الخصم')}</th>
+                    <th className="px-3 py-2 text-center text-gray-400">{t('hs_sent','مرسل')}</th>
+                    <th className="px-3 py-2 text-center text-gray-400">{t('hs_used','مستخدم')}</th>
+                    <th className="px-3 py-2 text-center text-gray-400">{t('hs_conversion','تحويل')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-700">
+                  {(data.campaigns || []).map(c => (
+                    <tr key={c.id} className="hover:bg-gray-800" data-testid={`hs-campaign-${c.id}`}>
+                      <td className="px-3 py-2 text-gray-300">{(c.created_at || '').substring(0,10)}</td>
+                      <td className="px-3 py-2 text-center">
+                        {c.auto ? <span className="text-[10px] bg-violet-600/20 text-violet-300 px-1.5 py-0.5 rounded">{t('hs_auto_tag','تلقائي')}</span>
+                                : <span className="text-[10px] bg-blue-600/20 text-blue-300 px-1.5 py-0.5 rounded">{t('hs_manual_tag','يدوي')}</span>}
+                      </td>
+                      <td className="px-3 py-2 text-center text-amber-300 font-bold">{c.discount}%</td>
+                      <td className="px-3 py-2 text-center text-blue-300">{c.sent}</td>
+                      <td className="px-3 py-2 text-center text-emerald-300">{c.used}</td>
+                      <td className="px-3 py-2 text-center">
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] ${c.conversion_rate >= 30 ? 'bg-emerald-600/20 text-emerald-300' : c.conversion_rate >= 10 ? 'bg-amber-600/20 text-amber-300' : 'bg-gray-600/20 text-gray-300'}`}>
+                          {c.conversion_rate}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {(!data.campaigns || data.campaigns.length === 0) && (
+                    <tr><td colSpan="6" className="px-3 py-6 text-center text-gray-500">{t('hs_no_campaigns','لا توجد حملات بعد.')}</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+};
+
+// ==================== AutoRenewalConfigModal ====================
+const AutoRenewalConfigModal = ({ onClose, t }) => {
+  const [cfg, setCfg] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    axios.get(`${API}/super-admin/auto-renewal-config`, getToken())
+      .then(res => setCfg(res.data))
+      .catch(err => toast.error(err.response?.data?.detail || t('hs_load_failed','فشل التحميل')))
+      .finally(() => setLoading(false));
+  }, [t]);
+  const save = async () => {
+    try {
+      await axios.put(`${API}/super-admin/auto-renewal-config`, cfg, getToken());
+      toast.success(t('hs_saved','تم الحفظ'));
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('hs_save_failed','فشل الحفظ'));
+    }
+  };
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-violet-500/30" onClick={e => e.stopPropagation()} data-testid="hs-auto-config-modal">
+        <div>
+          <h3 className="text-lg font-bold text-white">⚙️ {t('hs_auto_title','التجديد التلقائي الشهري')}</h3>
+          <p className="text-xs text-gray-400 mt-1">{t('hs_auto_desc','يُرسل عرض التجديد الجماعي تلقائيًا في يوم محدد من كل شهر.')}</p>
+        </div>
+        {loading ? <div className="text-center text-gray-400 py-6">{t('hs_loading','جاري التحميل...')}</div>
+          : cfg ? (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between bg-gray-900/60 rounded-lg p-3 border border-gray-700">
+              <div>
+                <div className="text-sm font-bold text-white">{t('hs_enabled','التفعيل')}</div>
+                <div className="text-[11px] text-gray-400">{cfg.enabled ? t('hs_active_scheduler','مفعّل — سيعمل شهريًا') : t('hs_inactive_scheduler','غير مفعّل')}</div>
+              </div>
+              <label className="relative inline-block w-11 h-6 cursor-pointer">
+                <input type="checkbox" checked={!!cfg.enabled} onChange={e => setCfg({...cfg, enabled: e.target.checked})} className="sr-only peer" data-testid="hs-auto-toggle" />
+                <span className="block bg-gray-600 peer-checked:bg-violet-500 rounded-full w-11 h-6 transition"></span>
+                <span className="absolute top-0.5 left-0.5 bg-white rounded-full w-5 h-5 transition peer-checked:translate-x-5"></span>
+              </label>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('hs_day_of_month','يوم الشهر')}</label>
+                <input type="number" min="1" max="28" value={cfg.day_of_month} onChange={e => setCfg({...cfg, day_of_month: parseInt(e.target.value)||1})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-auto-day" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('hs_days_before','قبل انتهاء')}</label>
+                <input type="number" min="1" max="90" value={cfg.days_before_expiry} onChange={e => setCfg({...cfg, days_before_expiry: parseInt(e.target.value)||7})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-auto-days-before" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('hs_discount_pct','خصم %')}</label>
+                <input type="number" min="1" max="90" value={cfg.discount} onChange={e => setCfg({...cfg, discount: parseInt(e.target.value)||20})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-auto-discount" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('hs_message','رسالة (اختياري)')}</label>
+              <textarea rows="2" value={cfg.message || ''} onChange={e => setCfg({...cfg, message: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-auto-message" />
+            </div>
+            {cfg.last_run && (
+              <div className="text-[11px] text-gray-500 text-center">{t('hs_last_run','آخر تشغيل')}: {cfg.last_run.substring(0,16).replace('T',' ')}</div>
+            )}
+          </div>
+        ) : null}
+        <div className="flex gap-2 pt-2">
+          <button onClick={save} disabled={!cfg} className="flex-1 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:bg-gray-600 text-white rounded-lg text-sm font-bold" data-testid="hs-auto-save-btn">{t('hs_save','حفظ')}</button>
+          <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('hs_cancel','إلغاء')}</button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default HierarchicalSubs;

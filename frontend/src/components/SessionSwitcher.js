@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
-import { getActiveSessions } from '../utils/sessionManager';
+import { getActiveSessions, dedupeSessionsByUser } from '../utils/sessionManager';
 import { UsersIcon, ArrowsRightLeftIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,6 +13,11 @@ const SessionSwitcher = () => {
   const [open, setOpen] = useState(false);
   const [sessions, setSessions] = useState([]);
   const ref = useRef(null);
+
+  useEffect(() => {
+    // Run once on mount to purge stale duplicate sessions that accumulated before the dedupe fix
+    dedupeSessionsByUser();
+  }, []);
 
   useEffect(() => {
     if (open) {

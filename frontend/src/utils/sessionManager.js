@@ -38,10 +38,21 @@ const getCurrentSession = () => {
   return sessions[sid] || null;
 };
 
-// Save/update current tab's session
+// Save/update current tab's session — de-duplicates by user id/username
 const saveCurrentSession = (token, user, extras = {}) => {
   const sid = getOrCreateTabSessionId();
   const sessions = getAllSessions();
+  const identityKey = user?.id || user?.username || user?.email;
+  // Remove any OTHER sessions that belong to the same user to prevent duplicates
+  if (identityKey) {
+    for (const [existingSid, data] of Object.entries(sessions)) {
+      if (existingSid === sid) continue;
+      const existingKey = data?.user?.id || data?.user?.username || data?.user?.email;
+      if (existingKey === identityKey) {
+        delete sessions[existingSid];
+      }
+    }
+  }
   sessions[sid] = {
     token,
     user,
@@ -50,6 +61,33 @@ const saveCurrentSession = (token, user, extras = {}) => {
     lastActive: Date.now(),
   };
   saveAllSessions(sessions);
+};
+
+// One-shot: de-duplicate existing sessions keeping the most recent per user identity
+const dedupeSessionsByUser = () => {
+  const sessions = getAllSessions();
+  const byKey = {}; // identity -> {sid, lastActive}
+  for (const [sid, data] of Object.entries(sessions)) {
+    const key = data?.user?.id || data?.user?.username || data?.user?.email;
+    if (!key) continue;
+    const current = byKey[key];
+    if (!current || (data.lastActive || 0) > (current.lastActive || 0)) {
+      byKey[key] = { sid, lastActive: data.lastActive || 0 };
+    }
+  }
+  const keepSids = new Set(Object.values(byKey).map(x => x.sid));
+  // Also keep the current tab sid even if empty
+  const currentSid = sessionStorage.getItem('tab_session_id');
+  if (currentSid) keepSids.add(currentSid);
+  let changed = false;
+  for (const sid of Object.keys(sessions)) {
+    if (!keepSids.has(sid)) {
+      delete sessions[sid];
+      changed = true;
+    }
+  }
+  if (changed) saveAllSessions(sessions);
+  return Object.keys(sessions).length;
 };
 
 // Remove current tab's session
@@ -61,15 +99,27 @@ const removeCurrentSession = () => {
   sessionStorage.removeItem('tab_session_id');
 };
 
-// Get all active sessions (for session switcher)
+// Get all active sessions (for session switcher) — de-duplicates by user identity at read time
 const getActiveSessions = () => {
   const sessions = getAllSessions();
-  return Object.entries(sessions).map(([sid, data]) => ({
+  const currentSid = sessionStorage.getItem('tab_session_id');
+  // Keep only the most-recent session per user identity
+  const byKey = {};
+  for (const [sid, data] of Object.entries(sessions)) {
+    const key = data?.user?.id || data?.user?.username || data?.user?.email || sid;
+    const existing = byKey[key];
+    // Prefer the current tab's session if it matches, otherwise most-recent
+    const shouldReplace = !existing
+      || sid === currentSid
+      || (existing.sid !== currentSid && (data.lastActive || 0) > (existing.lastActive || 0));
+    if (shouldReplace) byKey[key] = { sid, data };
+  }
+  return Object.values(byKey).map(({ sid, data }) => ({
     sessionId: sid,
     user: data.user,
     token: data.token,
     lastActive: data.lastActive,
-    isCurrent: sid === sessionStorage.getItem('tab_session_id'),
+    isCurrent: sid === currentSid,
   }));
 };
 
@@ -131,4 +181,5 @@ export {
   switchToSession,
   cleanupStaleSessions,
   migrateFromLegacy,
+  dedupeSessionsByUser,
 };

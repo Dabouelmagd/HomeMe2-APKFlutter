@@ -26,6 +26,7 @@ const CompaniesTab = ({ t }) => {
   const [addCompoundFor, setAddCompoundFor] = useState(null); // { id, name }
   const [addUserFor, setAddUserFor] = useState(null); // { compound_id, compound_name }
   const [contractFor, setContractFor] = useState(null); // { company_id, company_name, compound_id, compound_name }
+  const [editCompoundState, setEditCompoundState] = useState(null); // full compound object being edited
 
   const reload = () => setRefreshKey(k => k + 1);
 
@@ -114,6 +115,51 @@ const CompaniesTab = ({ t }) => {
       toast.error(err.response?.data?.detail || t('ct_bulk_error','فشل الاستيراد'));
       return null;
     }
+  };
+
+  const deleteCompound = async (cpd) => {
+    const usersCount = cpd.users_count || 0;
+    const msg = usersCount > 0
+      ? `${t('ct_cpd_has_users','هذا المجمع به')} ${usersCount} ${t('ct_users','مستخدم')}. ${t('ct_cpd_del_force','هل تريد الحذف مع إلغاء ربط المستخدمين؟')}`
+      : `${t('ct_cpd_confirm_del','تأكيد حذف المجمع')} "${cpd.name}"?`;
+    if (!window.confirm(msg)) return;
+    try {
+      const url = `${API}/super-admin/compounds/${cpd.id}${usersCount > 0 ? '?force=true' : ''}`;
+      await axios.delete(url, getToken());
+      toast.success(t('ct_cpd_deleted','تم حذف المجمع'));
+      reload();
+    } catch (err) { toast.error(err.response?.data?.detail || t('ct_cpd_del_failed','فشل الحذف')); }
+  };
+
+  const exportCompound = async (cpd) => {
+    try {
+      const res = await axios.get(`${API}/super-admin/compounds/${cpd.id}/export`, {
+        ...getToken(), responseType: 'blob',
+      });
+      const url = URL.createObjectURL(res.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `compound-${cpd.name || cpd.id}-${new Date().toISOString().slice(0,10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success(t('ct_cpd_exported','تم تصدير المجمع'));
+    } catch (err) { toast.error(err.response?.data?.detail || t('ct_cpd_exp_failed','فشل التصدير')); }
+  };
+
+  const saveEditCompound = async () => {
+    if (!editCompoundState?.id) return;
+    try {
+      await axios.put(`${API}/super-admin/compounds/${editCompoundState.id}`, {
+        name: editCompoundState.name,
+        location: editCompoundState.location,
+        address: editCompoundState.address,
+        description: editCompoundState.description,
+        company_id: editCompoundState.company_id || null,
+      }, getToken());
+      toast.success(t('ct_cpd_updated','تم تحديث المجمع'));
+      setEditCompoundState(null);
+      reload();
+    } catch (err) { toast.error(err.response?.data?.detail || t('ct_cpd_upd_failed','فشل التحديث')); }
   };
 
   const importStructure = async (file, mergeMode) => {
@@ -260,6 +306,9 @@ const CompaniesTab = ({ t }) => {
                           </div>
                           <button onClick={() => setAddUserFor({ compound_id: cpd.id, compound_name: cpd.name })} className="px-2 py-1 text-[11px] bg-green-600/30 hover:bg-green-600/50 text-green-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-add-user-${cpd.id}`}>➕ {t('ct_add_user','إضافة ساكن')}</button>
                           <button onClick={() => setContractFor({ company_id: co.id, company_name: co.name, compound_id: cpd.id, compound_name: cpd.name })} className="px-2 py-1 text-[11px] bg-amber-600/30 hover:bg-amber-600/50 text-amber-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-contract-${cpd.id}`}>📋 {t('ct_contract','العقد')}</button>
+                          <button onClick={() => setEditCompoundState({ ...cpd, company_id: co.id })} title={t('ct_edit','تعديل')} className="px-2 py-1 text-[11px] bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-cpd-edit-${cpd.id}`}>✏️</button>
+                          <button onClick={() => exportCompound(cpd)} title={t('ct_export','تصدير')} className="px-2 py-1 text-[11px] bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-cpd-export-${cpd.id}`}>📑</button>
+                          <button onClick={() => deleteCompound(cpd)} title={t('ct_delete','حذف')} className="px-2 py-1 text-[11px] bg-red-600/30 hover:bg-red-600/50 text-red-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-cpd-delete-${cpd.id}`}>🗑</button>
                         </div>
                         {/* Users grouped by role */}
                         {Object.keys(cpd.users_by_role || {}).length > 0 && (
@@ -308,6 +357,9 @@ const CompaniesTab = ({ t }) => {
 
       {/* Management Contract modal */}
       {contractFor && <ContractModal ctx={contractFor} onClose={() => setContractFor(null)} t={t} />}
+
+      {/* Edit Compound modal */}
+      {editCompoundState && <EditCompoundModal cpd={editCompoundState} setCpd={setEditCompoundState} onClose={() => setEditCompoundState(null)} onSave={saveEditCompound} companies={data?.companies || []} t={t} />}
     </div>
   );
 };
@@ -994,5 +1046,46 @@ const ContractModal = ({ ctx, onClose, t }) => {
     </div>
   );
 };
+
+// ==================== EditCompoundModal ====================
+const EditCompoundModal = ({ cpd, setCpd, onClose, onSave, companies, t }) => (
+  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-blue-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="ct-edit-compound-modal">
+      <h3 className="text-lg font-bold text-white">✏️ {t('ct_edit_compound_title','تعديل المجمع')}</h3>
+      <div className="space-y-3">
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('ct_compound_name','اسم المجمع')} *</label>
+          <input value={cpd.name || ''} onChange={e => setCpd({...cpd, name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-edit-cpd-name" />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('ct_location','الموقع')}</label>
+          <input value={cpd.location || ''} onChange={e => setCpd({...cpd, location: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-edit-cpd-location" />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('ct_address','العنوان التفصيلي')}</label>
+          <input value={cpd.address || ''} onChange={e => setCpd({...cpd, address: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('ct_description','الوصف')}</label>
+          <textarea rows="2" value={cpd.description || ''} onChange={e => setCpd({...cpd, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('ct_parent_company','الشركة الأم')}</label>
+          <select value={cpd.company_id || ''} onChange={e => setCpd({...cpd, company_id: e.target.value || null})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-edit-cpd-company">
+            <option value="">{t('ct_independent','مستقل (بدون شركة)')}</option>
+            {companies.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+          <p className="text-[10px] text-gray-500 mt-1">{t('ct_move_hint','يمكنك نقل المجمع إلى شركة أخرى من هنا.')}</p>
+        </div>
+      </div>
+      <div className="flex gap-2 pt-2">
+        <button onClick={onSave} className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-bold" data-testid="ct-edit-cpd-save">💾 {t('ct_save','حفظ')}</button>
+        <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('ct_cancel','إلغاء')}</button>
+      </div>
+    </div>
+  </div>
+);
 
 export default CompaniesTab;

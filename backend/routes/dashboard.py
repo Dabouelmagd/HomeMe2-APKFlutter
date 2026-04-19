@@ -159,7 +159,7 @@ async def get_resident_dashboard(current_user: dict = Depends(get_current_user))
                 family_members = await db.users.find(
                     {"id": {"$in": family.get("members", [])}},
                     {"password_hash": 0}
-                ).to_list(None)
+                ).to_list(length=10000)
                 # Serialize family members
                 family_members = [serialize_datetime(member) for member in family_members]
         
@@ -169,7 +169,7 @@ async def get_resident_dashboard(current_user: dict = Depends(get_current_user))
             pending_invoices = await db.invoices.find({
                 "family_id": current_user.family_id,
                 "status": "pending"
-            }).to_list(None)
+            }).to_list(length=10000)
             pending_invoices = [serialize_datetime(inv) for inv in pending_invoices]
         
         # Get recent notifications
@@ -179,13 +179,13 @@ async def get_resident_dashboard(current_user: dict = Depends(get_current_user))
                 {"recipient_ids": {"$size": 0}},
                 {"recipient_ids": current_user["id"]}
             ]
-        }).sort("created_at", -1).limit(5).to_list(None)
+        }).sort("created_at", -1).limit(5).to_list(length=10000)
         recent_notifications = [serialize_datetime(notif) for notif in recent_notifications]
         
         # Get my messages
         my_messages = await db.messages.find({
             "sender_id": current_user["id"]
-        }).sort("created_at", -1).limit(5).to_list(None)
+        }).sort("created_at", -1).limit(5).to_list(length=10000)
         my_messages = [serialize_datetime(msg) for msg in my_messages]
         
         return {

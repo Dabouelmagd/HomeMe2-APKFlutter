@@ -223,7 +223,7 @@ class SubscriptionCodeManager:
         """Get all subscription codes"""
         try:
             query = {} if include_inactive else {"is_active": True}
-            codes = await _get_db().subscription_codes.find(query).sort("created_at", -1).to_list(length=None)
+            codes = await _get_db().subscription_codes.find(query).sort("created_at", -1).to_list(length=10000)
             
             # Convert ObjectId to string
             for code in codes:

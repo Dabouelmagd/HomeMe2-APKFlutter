@@ -461,7 +461,7 @@ async def get_gate_access_history(
             # Admin can see all gate access in the compound
             access_history = await db.gate_access.find({
                 "compound_id": current_user.compound_id
-            }).sort("access_time", -1).limit(limit).to_list(length=None)
+            }).sort("access_time", -1).limit(limit).to_list(length=10000)
         else:
             # Residents can only see their family's access history
             family_member_ids = await db.family_members.find({
@@ -470,7 +470,7 @@ async def get_gate_access_history(
             
             access_history = await db.gate_access.find({
                 "family_member_id": {"$in": family_member_ids}
-            }).sort("access_time", -1).limit(limit).to_list(length=None)
+            }).sort("access_time", -1).limit(limit).to_list(length=10000)
         
         # Enhance with family member details
         enhanced_history = []

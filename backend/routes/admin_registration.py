@@ -99,7 +99,7 @@ async def get_registration_links(
         db = get_db()
         links = await db.registration_links.find({
             "compound_id": current_user.compound_id
-        }).sort("created_at", -1).to_list(length=None)
+        }).sort("created_at", -1).to_list(length=10000)
         
         # Serialize datetime objects
         serialized_links = [serialize_datetime(link) for link in links]

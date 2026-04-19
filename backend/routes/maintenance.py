@@ -81,7 +81,7 @@ async def get_maintenance_requests(status: Optional[str] = None, category: Optio
             query["category"] = category
         if priority:
             query["priority"] = priority
-        requests = await db.maintenance_requests.find(query).sort("created_at", -1).to_list(None)
+        requests = await db.maintenance_requests.find(query).sort("created_at", -1).to_list(length=10000)
         return {"requests": serialize_datetime(requests)}
     except Exception as e:
         logging.error(f"Error fetching maintenance requests: {e}")
@@ -95,7 +95,7 @@ async def get_maintenance_stats(current_user: dict = Depends(get_current_user)):
         query = {"compound_id": current_user["compound_id"]}
         if current_user.get("role") != "admin":
             query["requester_id"] = current_user["id"]
-        all_requests = await db.maintenance_requests.find(query).to_list(None)
+        all_requests = await db.maintenance_requests.find(query).to_list(length=10000)
         stats = {"total": len(all_requests), "pending": 0, "assigned": 0, "in_progress": 0, "completed": 0, "cancelled": 0,
                  "low_priority": 0, "normal_priority": 0, "high_priority": 0, "urgent_priority": 0,
                  "plumbing": 0, "electrical": 0, "hvac": 0, "appliance": 0, "general": 0, "cleaning": 0, "landscaping": 0, "security": 0}

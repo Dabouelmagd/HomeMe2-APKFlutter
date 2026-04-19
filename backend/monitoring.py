@@ -114,7 +114,7 @@ class MonitoringService:
             # Get users created in the date range
             users = await db.users.find({
                 "created_at": {"$gte": start_date.isoformat()}
-            }).to_list(length=None)
+            }).to_list(length=10000)
             
             # Group by date
             growth_by_date = {}
@@ -142,7 +142,7 @@ class MonitoringService:
                 "action_type": "login",
                 "status": "success",
                 "timestamp": {"$gte": start_date.isoformat()}
-            }).to_list(length=None)
+            }).to_list(length=10000)
             
             # Group by date
             logins_by_date = {}
@@ -166,7 +166,7 @@ class MonitoringService:
             
             errors = await db.error_logs.find({
                 "timestamp": {"$gte": start_date.isoformat()}
-            }).to_list(length=None)
+            }).to_list(length=10000)
             
             # Group by date and severity
             errors_by_date = {}

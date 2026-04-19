@@ -45,7 +45,7 @@ async def get_all_platform_accounts(
             if status:
                 individual_query["status"] = status
                 
-            individual_compounds = await db.individual_compounds.find(individual_query).to_list(None)
+            individual_compounds = await db.individual_compounds.find(individual_query).to_list(length=10000)
             
             for compound in individual_compounds:
                 # Get subscription info
@@ -75,7 +75,7 @@ async def get_all_platform_accounts(
             if status:
                 enterprise_query["is_active"] = (status == "active")
                 
-            companies = await db.companies.find(enterprise_query).to_list(None)
+            companies = await db.companies.find(enterprise_query).to_list(length=10000)
             
             for company in companies:
                 # Get compounds count
@@ -88,7 +88,7 @@ async def get_all_platform_accounts(
                 compounds = await db.compound_companies.find({
                     "company_id": company["id"],
                     "status": "active"
-                }).to_list(None)
+                }).to_list(length=10000)
                 
                 total_units = sum(c.get("total_units") or 0 for c in compounds if c)
                 

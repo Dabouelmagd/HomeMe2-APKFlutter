@@ -72,7 +72,7 @@ async def get_expenses(compound_id: Optional[str] = None, start_date: Optional[s
             query["category"] = category
         if start_date and end_date:
             query["date"] = {"$gte": start_date, "$lte": end_date}
-        expenses = await db.expenses.find(query).sort("date", -1).to_list(None)
+        expenses = await db.expenses.find(query).sort("date", -1).to_list(length=10000)
         return {"expenses": expenses}
     except Exception as e:
         logging.error(f"Error fetching expenses: {e}")
@@ -129,7 +129,7 @@ async def get_revenue(compound_id: Optional[str] = None, start_date: Optional[st
             query["source"] = source
         if start_date and end_date:
             query["date"] = {"$gte": start_date, "$lte": end_date}
-        revenue = await db.revenue.find(query).sort("date", -1).to_list(None)
+        revenue = await db.revenue.find(query).sort("date", -1).to_list(length=10000)
         return {"revenue": revenue}
     except Exception as e:
         logging.error(f"Error fetching revenue: {e}")
@@ -142,8 +142,8 @@ async def get_financial_summary(compound_id: str, start_date: str, end_date: str
     if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
     try:
-        expenses = await db.expenses.find({"compound_id": compound_id, "date": {"$gte": start_date, "$lte": end_date}}).to_list(None)
-        revenue = await db.revenue.find({"compound_id": compound_id, "date": {"$gte": start_date, "$lte": end_date}}).to_list(None)
+        expenses = await db.expenses.find({"compound_id": compound_id, "date": {"$gte": start_date, "$lte": end_date}}).to_list(length=10000)
+        revenue = await db.revenue.find({"compound_id": compound_id, "date": {"$gte": start_date, "$lte": end_date}}).to_list(length=10000)
         total_expenses = sum(e["amount"] for e in expenses)
         total_revenue = sum(r["amount"] for r in revenue)
         net_profit = total_revenue - total_expenses
@@ -442,8 +442,8 @@ async def get_resident_account(resident_id: str, current_user: dict = Depends(ge
         resident = await db.users.find_one({"id": resident_id})
         if not resident:
             raise HTTPException(status_code=404, detail="Resident not found")
-        charges = await db.resident_charges.find({"resident_id": resident_id}).to_list(None)
-        payments = await db.resident_payments.find({"resident_id": resident_id}).sort("payment_date", -1).to_list(None)
+        charges = await db.resident_charges.find({"resident_id": resident_id}).to_list(length=10000)
+        payments = await db.resident_payments.find({"resident_id": resident_id}).sort("payment_date", -1).to_list(length=10000)
         total_charges = sum(c["amount"] for c in charges)
         total_payments = sum(p["amount"] for p in payments)
         pending_charges = [c for c in charges if c.get("status") == "pending"]

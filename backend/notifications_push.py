@@ -127,7 +127,7 @@ async def send_push_notification(
             {"id": {"$in": notification_request.recipients}},
             {"id": 1, "full_name": 1, "email": 1}
         )
-        valid_recipients = await recipients_cursor.to_list(length=None)
+        valid_recipients = await recipients_cursor.to_list(length=10000)
         valid_recipient_ids = [r["id"] for r in valid_recipients]
         
         if not valid_recipient_ids:
@@ -197,7 +197,7 @@ async def broadcast_notification(
         # Get all users if no specific recipients
         if not notification_request.recipients:
             users_cursor = db.users.find({}, {"id": 1})
-            all_users = await users_cursor.to_list(length=None)
+            all_users = await users_cursor.to_list(length=10000)
             notification_request.recipients = [user["id"] for user in all_users]
         
         # Use the regular send function
@@ -229,7 +229,7 @@ async def get_user_notifications(
             {"_id": 0}
         ).sort("created_at", -1).skip(skip).limit(limit)
         
-        notifications = await notifications_cursor.to_list(length=None)
+        notifications = await notifications_cursor.to_list(length=10000)
         
         # Get total count
         total_count = await db.user_notifications.count_documents(query_filter)
@@ -359,7 +359,7 @@ async def get_all_notifications(
             {"_id": 0}
         ).sort("created_at", -1).skip(skip).limit(limit)
         
-        notifications = await notifications_cursor.to_list(length=None)
+        notifications = await notifications_cursor.to_list(length=10000)
         
         # Get total count
         total_count = await db.push_notifications.count_documents({})

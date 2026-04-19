@@ -75,7 +75,7 @@ class ActivityLogger:
             # Query activities
             activities = await db.activity_logs.find({
                 "timestamp": {"$gte": start_date.isoformat()}
-            }).to_list(length=None)
+            }).to_list(length=10000)
             
             # Group by date
             activities_by_date = {}
@@ -172,7 +172,7 @@ class ErrorLogger:
             
             errors = await db.error_logs.find({
                 "timestamp": {"$gte": start_date.isoformat()}
-            }).to_list(length=None)
+            }).to_list(length=10000)
             
             # Group by date
             errors_by_date = {}

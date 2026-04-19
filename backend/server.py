@@ -1443,7 +1443,7 @@ async def search_messages(
         
         cursor = cursor.skip(search_request.skip).limit(search_request.limit)
         
-        messages = await cursor.to_list(None)
+        messages = await cursor.to_list(length=10000)
         
         # Get total count for pagination
         total_count = await db.chat_messages.count_documents(query)
@@ -1453,7 +1453,7 @@ async def search_messages(
         senders = await db.users.find(
             {"id": {"$in": sender_ids}},
             {"id": 1, "full_name": 1, "username": 1}
-        ).to_list(None)
+        ).to_list(length=10000)
         senders_dict = {sender["id"]: sender for sender in senders}
         
         # Get chat details
@@ -1461,7 +1461,7 @@ async def search_messages(
         chats = await db.chats.find(
             {"id": {"$in": chat_ids}},
             {"id": 1, "name": 1, "chat_type": 1, "participants": 1}
-        ).to_list(None)
+        ).to_list(length=10000)
         chats_dict = {chat["id"]: chat for chat in chats}
         
         # Enhance messages with sender and chat info
@@ -1511,7 +1511,7 @@ async def get_search_suggestions(
             "compound_id": compound_id,
             "participants": user_id,
             "is_active": True
-        }).to_list(None)
+        }).to_list(length=10000)
         
         user_chat_ids = [chat["id"] for chat in user_chats]
         
@@ -1519,7 +1519,7 @@ async def get_search_suggestions(
         recent_searches = await db.search_history.find({
             "user_id": user_id,
             "query": {"$regex": query, "$options": "i"}
-        }).sort("created_at", -1).limit(5).to_list(None)
+        }).sort("created_at", -1).limit(5).to_list(length=10000)
         
         suggestions.extend([search["query"] for search in recent_searches])
         
@@ -1529,7 +1529,7 @@ async def get_search_suggestions(
                 "chat_id": {"$in": user_chat_ids},
                 "content": {"$regex": query, "$options": "i"},
                 "is_deleted": False
-            }).sort("created_at", -1).limit(20).to_list(None)
+            }).sort("created_at", -1).limit(20).to_list(length=10000)
             
             # Extract words that contain the query
             for message in recent_messages:
@@ -1557,7 +1557,7 @@ async def get_file_gallery(
             "compound_id": compound_id,
             "participants": user_id,
             "is_active": True
-        }).to_list(None)
+        }).to_list(length=10000)
         
         user_chat_ids = [chat["id"] for chat in user_chats]
         
@@ -1600,7 +1600,7 @@ async def get_file_gallery(
         cursor = db.chat_messages.find(query).sort(sort_criteria)
         cursor = cursor.skip(gallery_filter.skip).limit(gallery_filter.limit)
         
-        messages = await cursor.to_list(None)
+        messages = await cursor.to_list(length=10000)
         
         # Extract files with metadata
         files = []
@@ -1624,7 +1624,7 @@ async def get_file_gallery(
         senders = await db.users.find(
             {"id": {"$in": sender_ids}},
             {"id": 1, "full_name": 1, "username": 1}
-        ).to_list(None)
+        ).to_list(length=10000)
         senders_dict = {sender["id"]: sender for sender in senders}
         
         # Get chat details
@@ -1632,7 +1632,7 @@ async def get_file_gallery(
         chats = await db.chats.find(
             {"id": {"$in": chat_ids}},
             {"id": 1, "name": 1, "chat_type": 1}
-        ).to_list(None)
+        ).to_list(length=10000)
         chats_dict = {chat["id"]: chat for chat in chats}
         
         # Enhance files with sender and chat info
@@ -1678,7 +1678,7 @@ async def get_file_stats(chat_ids: List[str]) -> Dict[str, Any]:
             }
         ]
         
-        stats = await db.chat_messages.aggregate(pipeline).to_list(None)
+        stats = await db.chat_messages.aggregate(pipeline).to_list(length=10000)
         
         # Format statistics
         file_stats = {}
@@ -1719,7 +1719,7 @@ async def process_scheduled_messages():
         due_messages = await db.scheduled_messages.find({
             "status": "pending",
             "scheduled_for": {"$lte": now}
-        }).to_list(None)
+        }).to_list(length=10000)
         
         for scheduled_msg in due_messages:
             try:
@@ -2016,7 +2016,7 @@ async def get_user_trial_status(user_id: str, compound_id: str) -> Dict[str, Any
 
 async def get_compound_chat_ids(compound_id: str) -> List[str]:
     """Get all chat IDs for a compound"""
-    chats = await db.chats.find({"compound_id": compound_id}).limit(500).to_list(None)
+    chats = await db.chats.find({"compound_id": compound_id}).limit(500).to_list(length=10000)
     return [chat["id"] for chat in chats]
 
 async def calculate_storage_usage(compound_id: str) -> int:
@@ -2029,7 +2029,7 @@ async def calculate_storage_usage(compound_id: str) -> int:
         messages = await db.chat_messages.find({
             "chat_id": {"$in": chat_ids},
             "attachments": {"$exists": True, "$not": {"$size": 0}}
-        }).to_list(None)
+        }).to_list(length=10000)
         
         total_size = 0
         for message in messages:

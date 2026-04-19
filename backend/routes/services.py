@@ -70,7 +70,7 @@ async def get_service_providers(
         if specialty:
             query["specialties"] = {"$in": [specialty]}
         
-        providers = await db.service_providers.find(query).to_list(length=None)
+        providers = await db.service_providers.find(query).to_list(length=10000)
         
         # Enhance with availability if date specified
         if available_date:
@@ -188,7 +188,7 @@ async def get_service_bookings(
         if status:
             query["status"] = status
         
-        bookings = await db.service_bookings.find(query).sort("created_at", -1).to_list(length=None)
+        bookings = await db.service_bookings.find(query).sort("created_at", -1).to_list(length=10000)
         
         # Enhance with provider and resident details
         enhanced_bookings = []
@@ -304,7 +304,7 @@ async def create_service_review(
         await db.service_reviews.insert_one(serialize_datetime(review.dict()))
         
         # Update provider's average rating
-        provider_reviews = await db.service_reviews.find({"provider_id": booking["provider_id"]}).to_list(length=None)
+        provider_reviews = await db.service_reviews.find({"provider_id": booking["provider_id"]}).to_list(length=10000)
         total_reviews = len(provider_reviews)
         avg_rating = sum(r["overall_rating"] for r in provider_reviews) / total_reviews
         
@@ -347,7 +347,7 @@ async def get_provider_reviews(
             "provider_id": provider_id,
             "compound_id": current_user.compound_id,
             "is_public": True
-        }).sort("created_at", -1).to_list(length=None)
+        }).sort("created_at", -1).to_list(length=10000)
         
         # Enhance with resident names
         enhanced_reviews = []
@@ -467,7 +467,7 @@ async def get_service_analytics(
         booking_stats = await db.service_bookings.aggregate([
             {"$match": {"compound_id": current_user.compound_id}},
             {"$group": {"_id": "$status", "count": {"$sum": 1}}}
-        ]).to_list(length=None)
+        ]).to_list(length=10000)
         
         # Revenue by payment method
         revenue_stats = await db.payment_transactions.aggregate([
@@ -484,13 +484,13 @@ async def get_service_analytics(
                     "count": {"$sum": 1}
                 }
             }
-        ]).to_list(length=None)
+        ]).to_list(length=10000)
         
         # Top rated providers
         top_providers = await db.service_providers.find({
             "compound_id": current_user.compound_id,
             "is_active": True
-        }).sort("average_rating", -1).limit(5).to_list(length=None)
+        }).sort("average_rating", -1).limit(5).to_list(length=10000)
         
         return {
             "analytics": {

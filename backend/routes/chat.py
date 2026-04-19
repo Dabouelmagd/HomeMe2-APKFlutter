@@ -53,7 +53,7 @@ async def get_user_chats(current_user: dict = Depends(get_current_user)):
         "compound_id": current_user.compound_id,
         "participants": current_user.id,
         "is_active": True
-    }).sort("last_message_at", -1).limit(100).to_list(None)
+    }).sort("last_message_at", -1).limit(100).to_list(length=10000)
     
     # Get participant details for each chat
     for chat in chats:
@@ -61,7 +61,7 @@ async def get_user_chats(current_user: dict = Depends(get_current_user)):
         participants = await db.users.find(
             {"id": {"$in": chat["participants"]}},
             {"password_hash": 0}
-        ).to_list(None)
+        ).to_list(length=10000)
         chat["participant_details"] = participants
         
         # Get unread count for current user
@@ -93,7 +93,7 @@ async def create_chat(
         participants = await db.users.find({
             "id": {"$in": chat_data.participant_ids},
             "compound_id": current_user.compound_id
-        }).to_list(None)
+        }).to_list(length=10000)
         
         if len(participants) != len(chat_data.participant_ids):
             raise HTTPException(status_code=400, detail="Some participants not found in compound")
@@ -172,7 +172,7 @@ async def get_chat_details(
     participants = await db.users.find(
         {"id": {"$in": chat["participants"]}},
         {"password_hash": 0}
-    ).to_list(None)
+    ).to_list(length=10000)
     
     chat["participant_details"] = participants
     
@@ -204,7 +204,7 @@ async def get_chat_messages(
     messages = await db.chat_messages.find({
         "chat_id": chat_id,
         "is_deleted": False
-    }).sort("created_at", -1).skip(skip).limit(limit).to_list(None)
+    }).sort("created_at", -1).skip(skip).limit(limit).to_list(length=10000)
     
     # Reverse to show oldest first
     messages.reverse()
@@ -214,7 +214,7 @@ async def get_chat_messages(
     senders = await db.users.find(
         {"id": {"$in": sender_ids}},
         {"id": 1, "full_name": 1, "username": 1}
-    ).to_list(None)
+    ).to_list(length=10000)
     senders_dict = {sender["id"]: sender for sender in senders}
     
     for message in messages:
@@ -678,7 +678,7 @@ async def add_participants(
     new_participants = await db.users.find({
         "id": {"$in": participants_data.participant_ids},
         "compound_id": current_user.compound_id
-    }).to_list(None)
+    }).to_list(length=10000)
     
     if len(new_participants) != len(participants_data.participant_ids):
         raise HTTPException(status_code=400, detail="Some participants not found in compound")

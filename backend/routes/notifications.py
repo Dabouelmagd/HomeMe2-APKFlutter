@@ -19,7 +19,7 @@ async def get_notifications(limit: int = 50, offset: int = 0, unread_only: bool 
         query = {"$or": [{"recipient_id": current_user["id"]}, {"recipient_id": None, "compound_id": current_user["compound_id"]}]}
         if unread_only:
             query["is_read"] = False
-        notifications = await db.notifications.find(query).sort("created_at", -1).skip(offset).limit(limit).to_list(None)
+        notifications = await db.notifications.find(query).sort("created_at", -1).skip(offset).limit(limit).to_list(length=10000)
         return {"notifications": serialize_datetime(notifications)}
     except Exception as e:
         logging.error(f"Error fetching notifications: {e}")

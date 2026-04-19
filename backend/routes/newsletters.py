@@ -41,7 +41,7 @@ async def get_newsletters(
             query["status"] = status.value
         
         # Get newsletters with pagination
-        newsletters = await db.newsletters.find(query).sort("created_date", -1).skip(skip).limit(page_size).to_list(None)
+        newsletters = await db.newsletters.find(query).sort("created_date", -1).skip(skip).limit(page_size).to_list(length=10000)
         total_count = await db.newsletters.count_documents(query)
         total_pages = (total_count + page_size - 1) // page_size
         
@@ -109,13 +109,13 @@ async def get_newsletter_stats(
             {"$match": {"compound_id": compound_id}},
             {"$group": {"_id": None, "total_views": {"$sum": "$views_count"}}}
         ]
-        views_result = await db.newsletters.aggregate(pipeline).to_list(None)
+        views_result = await db.newsletters.aggregate(pipeline).to_list(length=10000)
         total_views = views_result[0]["total_views"] if views_result else 0
         
         # Get recent newsletters
         recent_newsletters = await db.newsletters.find({
             "compound_id": compound_id
-        }).sort("created_date", -1).limit(5).to_list(None)
+        }).sort("created_date", -1).limit(5).to_list(length=10000)
         
         # Get popular categories
         category_pipeline = [
@@ -123,7 +123,7 @@ async def get_newsletter_stats(
             {"$group": {"_id": "$category", "count": {"$sum": 1}}},
             {"$sort": {"count": -1}}
         ]
-        category_result = await db.newsletters.aggregate(category_pipeline).to_list(None)
+        category_result = await db.newsletters.aggregate(category_pipeline).to_list(length=10000)
         popular_categories = {item["_id"]: item["count"] for item in category_result}
         
         return NewsletterStats(

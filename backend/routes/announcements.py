@@ -142,7 +142,7 @@ async def get_announcements(current_user: dict = Depends(get_current_user)):
         db = get_db()
         query = {"compound_id": current_user.compound_id, "is_published": True}
         
-        announcements = await db.announcements.find(query).sort("created_at", -1).to_list(None)
+        announcements = await db.announcements.find(query).sort("created_at", -1).to_list(length=10000)
         return {"announcements": serialize_datetime(announcements)}
         
     except Exception as e:
@@ -157,7 +157,7 @@ async def get_events(current_user: dict = Depends(get_current_user)):
         db = get_db()
         query = {"compound_id": current_user.compound_id, "is_published": True}
         
-        events = await db.events.find(query).sort("event_date", 1).to_list(None)
+        events = await db.events.find(query).sort("event_date", 1).to_list(length=10000)
         return {"events": serialize_datetime(events)}
         
     except Exception as e:
@@ -172,8 +172,8 @@ async def get_events_stats(current_user: dict = Depends(get_current_user)):
         db = get_db()
         query = {"compound_id": current_user.compound_id}
         
-        announcements = await db.announcements.find(query).to_list(None)
-        events = await db.events.find(query).to_list(None)
+        announcements = await db.announcements.find(query).to_list(length=10000)
+        events = await db.events.find(query).to_list(length=10000)
         
         stats = {
             "total_announcements": len(announcements),

@@ -49,7 +49,7 @@ async def get_gallery_stats(current_user: dict = Depends(get_current_user)):
             "compound_id": current_user.get('compound_id',''),
             "participants": current_user['id'],
             "is_active": True
-        }).to_list(None)
+        }).to_list(length=10000)
         
         user_chat_ids = [chat["id"] for chat in user_chats]
         stats = await get_file_stats(user_chat_ids)
@@ -85,7 +85,7 @@ async def initialize_default_services(
             raise HTTPException(status_code=400, detail="compound_id is required")
         
         # Check if services already exist
-        existing_services = await db.services.find({"compound_id": compound_id}).to_list(None)
+        existing_services = await db.services.find({"compound_id": compound_id}).to_list(length=10000)
         if existing_services:
             return {"success": False, "message": "Services already exist", "added_count": 0}
         

@@ -94,7 +94,7 @@ async def get_scheduled_messages(
                 "compound_id": current_user.compound_id,
                 "participants": current_user.id,
                 "is_active": True
-            }).to_list(None)
+            }).to_list(length=10000)
             user_chat_ids = [chat["id"] for chat in user_chats]
             query["chat_id"] = {"$in": user_chat_ids}
         
@@ -102,7 +102,7 @@ async def get_scheduled_messages(
             query["status"] = status
         
         # Get scheduled messages
-        scheduled_messages = await db.scheduled_messages.find(query).sort("scheduled_for", 1).skip(skip).limit(limit).to_list(None)
+        scheduled_messages = await db.scheduled_messages.find(query).sort("scheduled_for", 1).skip(skip).limit(limit).to_list(length=10000)
         
         # Get total count
         total_count = await db.scheduled_messages.count_documents(query)
@@ -112,7 +112,7 @@ async def get_scheduled_messages(
         chats = await db.chats.find(
             {"id": {"$in": chat_ids}},
             {"id": 1, "name": 1, "chat_type": 1}
-        ).to_list(None)
+        ).to_list(length=10000)
         chats_dict = {chat["id"]: chat for chat in chats}
         
         # Enhance messages with chat info
@@ -245,7 +245,7 @@ async def schedule_message_enhanced(
             
             if not compound_chat:
                 # Create compound-wide chat
-                compound_users = await db.users.find({"compound_id": current_user.compound_id}).to_list(length=None)
+                compound_users = await db.users.find({"compound_id": current_user.compound_id}).to_list(length=10000)
                 participant_ids = [user["id"] for user in compound_users]
                 
                 compound_chat = Chat(
@@ -338,7 +338,7 @@ async def get_scheduled_messages_enhanced(
             "compound_id": current_user.compound_id,
             "participants": current_user.id,
             "is_active": True
-        }).to_list(length=None)
+        }).to_list(length=10000)
         
         user_chat_ids = [chat["id"] for chat in user_chats]
         
@@ -346,7 +346,7 @@ async def get_scheduled_messages_enhanced(
         scheduled_messages = await db.scheduled_messages.find({
             "chat_id": {"$in": user_chat_ids},
             "sender_id": current_user.id
-        }).to_list(length=None)
+        }).to_list(length=10000)
         
         # Enhance with recipient information
         enhanced_messages = []

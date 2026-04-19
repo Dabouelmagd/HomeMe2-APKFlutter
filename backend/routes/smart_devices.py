@@ -41,7 +41,7 @@ async def get_smart_devices(
         if location:
             query["location"] = {"$regex": location, "$options": "i"}
         
-        devices = await db.smart_devices.find(query).sort("location", 1).to_list(length=None)
+        devices = await db.smart_devices.find(query).sort("location", 1).to_list(length=10000)
         
         return {"devices": [serialize_datetime(device) for device in devices]}
         
@@ -183,7 +183,7 @@ async def get_device_logs(
         
         logs = await db.device_logs.find({
             "device_id": device_id
-        }).sort("timestamp", -1).limit(limit).to_list(length=None)
+        }).sort("timestamp", -1).limit(limit).to_list(length=10000)
         
         return {"logs": [serialize_datetime(log) for log in logs]}
         
@@ -208,7 +208,7 @@ async def get_automations(current_user: dict = Depends(get_current_user)):
                 {"family_id": None}  # Common automations
             ]
         
-        automations = await db.device_automations.find(query).sort("created_at", -1).to_list(length=None)
+        automations = await db.device_automations.find(query).sort("created_at", -1).to_list(length=10000)
         
         return {"automations": [serialize_datetime(automation) for automation in automations]}
         
@@ -378,7 +378,7 @@ async def process_natural_language_command(
                 {"family_id": None}
             ]
         
-        devices = await db.smart_devices.find(query).to_list(length=None)
+        devices = await db.smart_devices.find(query).to_list(length=10000)
         
         # Create device context for LLM
         device_context = []

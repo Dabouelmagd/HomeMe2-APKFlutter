@@ -29,7 +29,7 @@ async def get_polls(
         if status:
             query["status"] = status
         
-        polls = await db.polls.find(query).sort("created_at", -1).to_list(length=None)
+        polls = await db.polls.find(query).sort("created_at", -1).to_list(length=10000)
         
         # Check user voting eligibility and status for each poll
         enhanced_polls = []
@@ -225,7 +225,7 @@ async def get_poll_results(
                 raise HTTPException(status_code=403, detail="Results not yet available")
         
         # Get vote statistics
-        votes = await db.votes.find({"poll_id": poll_id}).to_list(length=None)
+        votes = await db.votes.find({"poll_id": poll_id}).to_list(length=10000)
         
         # Calculate participation rate
         participation_rate = (len(votes) / poll["total_eligible_voters"]) * 100 if poll["total_eligible_voters"] > 0 else 0
@@ -263,7 +263,7 @@ async def get_polls_stats(
         cancelled_polls = await db.polls.count_documents({**compound_filter, "status": "cancelled"})
         
         # Get all votes for compound polls
-        compound_polls = await db.polls.find(compound_filter).to_list(length=None)
+        compound_polls = await db.polls.find(compound_filter).to_list(length=10000)
         poll_ids = [poll["id"] for poll in compound_polls]
         
         total_votes = await db.votes.count_documents({"poll_id": {"$in": poll_ids}}) if poll_ids else 0

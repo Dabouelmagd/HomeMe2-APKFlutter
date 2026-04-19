@@ -99,7 +99,7 @@ async def get_company_dashboard(
         compounds = await db.compound_companies.find({
             "company_id": company["id"],
             "status": "active"
-        }).to_list(None)
+        }).to_list(length=10000)
         
         # Calculate statistics
         total_compounds = len(compounds)
@@ -227,7 +227,7 @@ async def list_company_compounds(
                     {"managers": current_user.id}
                 ]
         
-        compounds = await db.compound_companies.find(query).to_list(None)
+        compounds = await db.compound_companies.find(query).to_list(length=10000)
         
         # Get statistics for each compound
         for compound in compounds:
@@ -324,7 +324,7 @@ async def calculate_company_pricing(
         compounds = await db.compound_companies.find({
             "company_id": company_user["company_id"],
             "status": "active"
-        }).to_list(None)
+        }).to_list(length=10000)
         
         # Calculate pricing
         pricing = calculate_enterprise_pricing(
@@ -434,7 +434,7 @@ async def get_company_analytics(
         compounds = await db.compound_companies.find({
             "company_id": company_id,
             "status": "active"
-        }).to_list(None)
+        }).to_list(length=10000)
         
         compound_ids = [c["id"] for c in compounds]
         

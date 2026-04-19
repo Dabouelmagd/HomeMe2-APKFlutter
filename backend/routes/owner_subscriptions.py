@@ -84,7 +84,7 @@ async def get_company_subscriptions(
             {"contact_email": {"$regex": search, "$options": "i"}},
         ]
 
-    companies = await db.companies.find(query, {"_id": 0}).to_list(None)
+    companies = await db.companies.find(query, {"_id": 0}).to_list(length=10000)
 
     # Enrich with subscription and compound data
     results = []
@@ -103,7 +103,7 @@ async def get_company_subscriptions(
         # Get compounds
         compounds = await db.compound_companies.find(
             {"company_id": cid, "status": "active"}, {"_id": 0}
-        ).to_list(None)
+        ).to_list(length=10000)
 
         # Count residents across all compounds
         compound_ids = [c.get("id", c.get("compound_id", "")) for c in compounds]

@@ -63,7 +63,7 @@ async def get_my_family(current_user: dict = Depends(get_current_user)):
     members = await db.users.find(
         {"id": {"$in": family["members"]}},
         {"password_hash": 0}  # Exclude password
-    ).to_list(None)
+    ).to_list(length=100)
     
     return {"family": serialize_datetime(family), "members": serialize_datetime(members)}
 
@@ -109,7 +109,7 @@ async def get_my_invoices(current_user: dict = Depends(get_current_user)):
     # Admin users can see all invoices in their compound
     db = get_db()
     if current_user.get('role','') == "admin":
-        invoices = await db.invoices.find({"compound_id": current_user.get('compound_id','')}).to_list(None)
+        invoices = await db.invoices.find({"compound_id": current_user.get('compound_id','')}).to_list(length=1000)
         return serialize_datetime(invoices)
     
     # Regular users see only invoices for units they own
@@ -120,7 +120,7 @@ async def get_my_invoices(current_user: dict = Depends(get_current_user)):
             {"members": current_user['id']}
         ],
         "compound_id": current_user.get('compound_id','')
-    }).to_list(None)
+    }).to_list(length=50)
     
     if not families:
         return []
@@ -132,7 +132,7 @@ async def get_my_invoices(current_user: dict = Depends(get_current_user)):
     invoices = await db.invoices.find({
         "family_id": {"$in": family_ids},
         "compound_id": current_user.get('compound_id','')
-    }).to_list(None)
+    }).to_list(length=500)
     
     return serialize_datetime(invoices)
 
@@ -204,7 +204,7 @@ async def create_message(
     # Get admin IDs
     admins = await db.users.find(
         {"compound_id": current_user.get('compound_id',''), "role": "admin"}
-    ).to_list(None)
+    ).to_list(length=100)
     admin_ids = [admin["id"] for admin in admins]
     notification.recipient_ids = admin_ids
     
@@ -226,9 +226,9 @@ async def create_message(
 @router.get("/messages")
 async def get_messages(current_user: dict = Depends(get_current_user)):
     if current_user.get('role','') == "admin":
-        messages = await db.messages.find({"compound_id": current_user.get('compound_id','')}).sort("created_at", -1).limit(200).to_list(None)
+        messages = await db.messages.find({"compound_id": current_user.get('compound_id','')}).sort("created_at", -1).limit(200).to_list(200)
     else:
-        messages = await db.messages.find({"sender_id": current_user['id']}).sort("created_at", -1).limit(200).to_list(None)
+        messages = await db.messages.find({"sender_id": current_user['id']}).sort("created_at", -1).limit(200).to_list(200)
     
     return messages
 
@@ -276,7 +276,7 @@ async def get_my_notifications(current_user: dict = Depends(get_current_user)):
             {"recipient_ids": {"$size": 0}},  # Broadcast notifications
             {"recipient_ids": current_user['id']}  # Direct notifications
         ]
-    }, {"_id": 0}).sort("created_at", -1).limit(100).to_list(None)
+    }, {"_id": 0}).sort("created_at", -1).limit(100).to_list(100)
     
     return serialize_datetime(notifications)
 
@@ -299,13 +299,13 @@ async def get_compound_residences(compound_id: str, current_user: dict = Depends
         raise HTTPException(status_code=403, detail="Access denied")
     
     # Get all families in the compound
-    families = await db.families.find({"compound_id": compound_id}).to_list(None)
+    families = await db.families.find({"compound_id": compound_id}).to_list(length=500)
     
     # Get all residents
     residents = await db.users.find({
         "compound_id": compound_id,
         "role": "resident"
-    }, {"password_hash": 0}).to_list(None)
+    }, {"password_hash": 0}).to_list(length=2000)
     
     # Create residence list with occupancy information
     residences = []
@@ -372,7 +372,7 @@ async def get_compound_residents(compound_id: str, current_user: dict = Depends(
     residents = await db.users.find({
         "compound_id": compound_id,
         "role": "resident"
-    }, {"password_hash": 0}).to_list(None)
+    }, {"password_hash": 0}).to_list(length=2000)
     
     return {
         "residents": residents,

@@ -83,7 +83,7 @@ async def get_security_visitor_logs(current_user: dict = Depends(get_current_use
         if current_user.compound_id and current_user.compound_id != "super_admin":
             query["compound_id"] = current_user.compound_id
         
-        logs = await db.security_logs.find(query, {"_id": 0}).sort("created_at", -1).limit(100).to_list(None)
+        logs = await db.security_logs.find(query, {"_id": 0}).sort("created_at", -1).limit(100).to_list(length=10000)
         
         return {
             "success": True,
@@ -111,7 +111,7 @@ async def get_security_analytics(
         if current_user.compound_id and current_user.compound_id != "super_admin":
             query["compound_id"] = current_user.compound_id
 
-        logs = await db.security_logs.find(query, {"_id": 0}).to_list(None)
+        logs = await db.security_logs.find(query, {"_id": 0}).to_list(length=10000)
 
         # اتجاه يومي
         daily = {}
@@ -224,7 +224,7 @@ async def create_security_incident(
                 admin_query = {"role": {"$in": admin_roles}, "is_active": {"$ne": False}}
                 if incident["compound_id"]:
                     admin_query["compound_id"] = incident["compound_id"]
-                admin_users = await db.users.find(admin_query, {"_id": 0, "id": 1}).to_list(None)
+                admin_users = await db.users.find(admin_query, {"_id": 0, "id": 1}).to_list(length=10000)
                 admin_ids = [u["id"] for u in admin_users]
 
                 if admin_ids:
@@ -273,7 +273,7 @@ async def list_security_incidents(
             query["status"] = status
         if severity:
             query["severity"] = severity
-        incidents = await db.security_incidents.find(query, {"_id": 0}).sort("created_at", -1).limit(200).to_list(None)
+        incidents = await db.security_incidents.find(query, {"_id": 0}).sort("created_at", -1).limit(200).to_list(length=10000)
         open_count = sum(1 for i in incidents if i.get("status") != "resolved")
         critical_open = sum(1 for i in incidents if i.get("status") != "resolved" and i.get("severity") == "critical")
         return {
@@ -349,7 +349,7 @@ async def get_security_messages(current_user: dict = Depends(get_current_user)):
             "compound_id": current_user.compound_id
         }
         
-        messages = await db.messages.find(query).sort("created_at", -1).limit(50).to_list(None)
+        messages = await db.messages.find(query).sort("created_at", -1).limit(50).to_list(length=10000)
         
         return {
             "success": True,

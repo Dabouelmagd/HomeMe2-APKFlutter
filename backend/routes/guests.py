@@ -58,7 +58,7 @@ async def get_visit_requests(current_user: dict = Depends(get_current_user)):
         query = {"compound_id": current_user["compound_id"]}
         if current_user.get("role") != "admin":
             query["requested_by"] = current_user["id"]
-        requests = await db.visit_requests.find(query).sort("created_at", -1).to_list(None)
+        requests = await db.visit_requests.find(query).sort("created_at", -1).to_list(length=10000)
         return {"requests": serialize_datetime(requests)}
     except Exception as e:
         logging.error(f"Error fetching visit requests: {e}")
@@ -70,7 +70,7 @@ async def get_guests(current_user: dict = Depends(get_current_user)):
     db = get_db()
     try:
         query = {"compound_id": current_user["compound_id"], "status": {"$in": ["approved", "checked_in", "checked_out"]}}
-        guests = await db.visit_requests.find(query).sort("created_at", -1).to_list(None)
+        guests = await db.visit_requests.find(query).sort("created_at", -1).to_list(length=10000)
         return {"guests": serialize_datetime(guests)}
     except Exception as e:
         logging.error(f"Error fetching guests: {e}")
@@ -82,7 +82,7 @@ async def get_guest_stats(current_user: dict = Depends(get_current_user)):
     db = get_db()
     try:
         query = {"compound_id": current_user["compound_id"]}
-        all_requests = await db.visit_requests.find(query).to_list(None)
+        all_requests = await db.visit_requests.find(query).to_list(length=10000)
         stats = {
             "total_visitors": len(all_requests),
             "pending_approvals": len([r for r in all_requests if r["status"] == "pending"]),

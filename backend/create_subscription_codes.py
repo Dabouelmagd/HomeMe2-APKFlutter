@@ -118,7 +118,7 @@ async def create_subscription_codes():
     print("=" * 60)
     
     # Get all codes from database
-    all_codes = await db.subscription_codes.find().to_list(length=None)
+    all_codes = await db.subscription_codes.find().to_list(length=10000)
     
     print(f"Total codes in database: {len(all_codes)}")
     print()

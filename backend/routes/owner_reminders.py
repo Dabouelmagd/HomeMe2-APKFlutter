@@ -28,8 +28,8 @@ async def get_subscription_reminders(
     cutoff = now + timedelta(days=days_ahead)
 
     # Get all company subscriptions
-    subs = await db.company_subscriptions.find({}, {"_id": 0}).to_list(None)
-    companies = {c["id"]: c for c in await db.companies.find({}, {"_id": 0}).to_list(None)}
+    subs = await db.company_subscriptions.find({}, {"_id": 0}).to_list(length=10000)
+    companies = {c["id"]: c for c in await db.companies.find({}, {"_id": 0}).to_list(length=10000)}
 
     reminders = []
     expiring_soon = 0

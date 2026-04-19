@@ -83,7 +83,7 @@ async def get_search_history(
         db = get_db()
         history = await db.search_history.find({
             "user_id": current_user.id
-        }).sort("created_at", -1).limit(limit).to_list(None)
+        }).sort("created_at", -1).limit(limit).to_list(length=10000)
         
         return {"history": serialize_datetime(history)}
         
@@ -134,7 +134,7 @@ async def get_saved_searches(current_user: dict = Depends(get_current_user)):
         db = get_db()
         saved_searches = await db.saved_searches.find({
             "user_id": current_user.id
-        }).sort("updated_at", -1).to_list(None)
+        }).sort("updated_at", -1).to_list(length=10000)
         
         return {"saved_searches": serialize_datetime(saved_searches)}
         

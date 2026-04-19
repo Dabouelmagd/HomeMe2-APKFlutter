@@ -102,7 +102,7 @@ async def get_all_users(current_user: dict = Depends(require_admin)):
     try:
         db = get_db()
         # Filter users by compound_id for multi-tenant support
-        users = await db.users.find({"compound_id": current_user.compound_id}).to_list(None)
+        users = await db.users.find({"compound_id": current_user.compound_id}).to_list(length=10000)
         
         # Serialize datetime objects and remove sensitive data
         safe_users = []

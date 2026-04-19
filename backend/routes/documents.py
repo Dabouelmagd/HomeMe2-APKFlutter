@@ -90,7 +90,7 @@ async def get_documents(
             query["$and"].append({"$or": access_filter})
         
         # Get documents with pagination
-        documents = await db.documents.find(query).sort("updated_at", -1).skip(skip).limit(limit).to_list(length=None)
+        documents = await db.documents.find(query).sort("updated_at", -1).skip(skip).limit(limit).to_list(length=10000)
         total_count = await db.documents.count_documents(query)
         
         return {
@@ -260,7 +260,7 @@ async def get_document_folders(current_user: dict = Depends(get_current_user)):
         folders = await db.document_folders.find({
             "compound_id": current_user.compound_id,
             "is_active": True
-        }).sort("path", 1).to_list(length=None)
+        }).sort("path", 1).to_list(length=10000)
         
         return {"folders": [serialize_datetime(folder) for folder in folders]}
         

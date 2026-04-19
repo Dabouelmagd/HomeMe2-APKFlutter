@@ -137,7 +137,7 @@ async def get_category_reviews(
             {"_id": 0}
         ).sort(sort_by, sort_direction).skip(skip).limit(limit)
         
-        reviews = await reviews_cursor.to_list(length=None)
+        reviews = await reviews_cursor.to_list(length=10000)
         
         # Get total count
         total_count = await db.ratings_reviews.count_documents({
@@ -171,7 +171,7 @@ async def get_ratings_summary():
             }}
         ]
         
-        results = await db.ratings_reviews.aggregate(pipeline).to_list(length=None)
+        results = await db.ratings_reviews.aggregate(pipeline).to_list(length=10000)
         
         summaries = []
         for result in results:
@@ -206,7 +206,7 @@ async def get_user_reviews(
             {"_id": 0}
         ).sort("created_at", -1)
         
-        reviews = await reviews_cursor.to_list(length=None)
+        reviews = await reviews_cursor.to_list(length=10000)
         
         return {"reviews": reviews}
         
@@ -343,7 +343,7 @@ async def get_reported_reviews(
             {"$sort": {"reported_count": -1, "created_at": -1}}
         ]
         
-        reported_reviews = await db.ratings_reviews.aggregate(pipeline).to_list(length=None)
+        reported_reviews = await db.ratings_reviews.aggregate(pipeline).to_list(length=10000)
         
         # Get report details for each review
         for review in reported_reviews:
@@ -351,7 +351,7 @@ async def get_reported_reviews(
                 {"review_id": review["id"]},
                 {"_id": 0}
             )
-            review["reports"] = await reports_cursor.to_list(length=None)
+            review["reports"] = await reports_cursor.to_list(length=10000)
         
         return {"reported_reviews": reported_reviews}
         

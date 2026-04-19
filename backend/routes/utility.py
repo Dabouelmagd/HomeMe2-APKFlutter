@@ -20,12 +20,12 @@ async def get_utility_connections(compound_id: str, current_user: dict = Depends
     
     # Get connections for current family or all if admin
     if current_user.get('role','') == UserRole.ADMIN:
-        connections = await db.utility_connections.find({"compound_id": compound_id}).to_list(None)
+        connections = await db.utility_connections.find({"compound_id": compound_id}).to_list(length=10000)
     else:
         connections = await db.utility_connections.find({
             "compound_id": compound_id,
             "family_id": current_user.family_id
-        }).to_list(None)
+        }).to_list(length=10000)
     
     # Clean connections data
     clean_connections = []
@@ -76,7 +76,7 @@ async def get_my_utility_bills(current_user: dict = Depends(get_current_user)):
     if not current_user.family_id:
         return {"bills": []}
     
-    bills = await db.utility_bills.find({"family_id": current_user.family_id}).to_list(None)
+    bills = await db.utility_bills.find({"family_id": current_user.family_id}).to_list(length=10000)
     
     # Clean bills data
     clean_bills = []
@@ -105,7 +105,7 @@ async def get_compound_utility_bills(compound_id: str, current_user: dict = Depe
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
-    bills = await db.utility_bills.find({"compound_id": compound_id}).to_list(None)
+    bills = await db.utility_bills.find({"compound_id": compound_id}).to_list(length=10000)
     
     # Get family details for each bill
     clean_bills = []
@@ -216,7 +216,7 @@ async def pay_utility_bill(
     # Get admin IDs
     admins = await db.users.find(
         {"compound_id": current_user.get('compound_id',''), "role": UserRole.ADMIN}
-    ).to_list(None)
+    ).to_list(length=10000)
     admin_ids = [admin["id"] for admin in admins]
     notification.recipient_ids = admin_ids
     

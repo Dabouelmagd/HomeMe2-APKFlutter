@@ -22,7 +22,7 @@ async def get_all_users(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Super admin access required")
     
     # Get all users from database
-    users = await db.users.find({}, {"password_hash": 0}).to_list(None)
+    users = await db.users.find({}, {"password_hash": 0}).to_list(length=10000)
     
     # Get additional statistics for each user
     user_data = []
@@ -72,7 +72,7 @@ async def get_available_compounds(current_user: dict = Depends(get_current_user)
     """Get all available compounds for compound selection"""
     try:
         db = get_db()
-        compounds = await db.compounds.find({}).to_list(None)
+        compounds = await db.compounds.find({}).to_list(length=10000)
         
         # Serialize datetime objects
         serialized_compounds = [serialize_datetime(compound) for compound in compounds]
@@ -107,7 +107,7 @@ async def get_all_compounds(current_user: dict = Depends(get_current_user)):
                 "_id": {"compound_id": "$compound_id", "role": "$role"},
                 "count": {"$sum": 1}
             }}
-        ]).to_list(None)
+        ]).to_list(length=10000)
         
         for item in user_agg:
             cid = item["_id"]["compound_id"]
@@ -123,7 +123,7 @@ async def get_all_compounds(current_user: dict = Depends(get_current_user)):
         family_agg = await db.families.aggregate([
             {"$match": {"compound_id": {"$in": compound_ids}}},
             {"$group": {"_id": "$compound_id", "count": {"$sum": 1}}}
-        ]).to_list(None)
+        ]).to_list(length=10000)
         
         for item in family_agg:
             family_counts[item["_id"]] = item["count"]
@@ -168,9 +168,9 @@ async def get_system_statistics(current_user: dict = Depends(get_current_user)):
     total_notifications = await db.notifications.count_documents({})
     
     # Recent activity
-    recent_users = await db.users.find({}, {"password_hash": 0}).sort("created_at", -1).limit(5).to_list(None)
-    recent_messages = await db.messages.find({}).sort("created_at", -1).limit(5).to_list(None)
-    recent_bookings = await db.service_bookings.find({}).sort("created_at", -1).limit(5).to_list(None)
+    recent_users = await db.users.find({}, {"password_hash": 0}).sort("created_at", -1).limit(5).to_list(length=10000)
+    recent_messages = await db.messages.find({}).sort("created_at", -1).limit(5).to_list(length=10000)
+    recent_bookings = await db.service_bookings.find({}).sort("created_at", -1).limit(5).to_list(length=10000)
     
     # Clean recent data
     clean_recent_users = []

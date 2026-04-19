@@ -18,7 +18,7 @@ async def get_compound_services(compound_id: str, current_user: dict = Depends(g
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
-    services = await db.services.find({"compound_id": compound_id}).to_list(None)
+    services = await db.services.find({"compound_id": compound_id}).to_list(length=10000)
     
     # Clean services data for JSON serialization
     clean_services = []
@@ -147,7 +147,7 @@ async def create_booking(
     # Get admin IDs
     admins = await db.users.find(
         {"compound_id": current_user.get('compound_id',''), "role": UserRole.ADMIN}
-    ).to_list(None)
+    ).to_list(length=10000)
     admin_ids = [admin["id"] for admin in admins]
     notification.recipient_ids = admin_ids
     
@@ -158,7 +158,7 @@ async def create_booking(
 @router.get("/bookings/my")
 async def get_my_bookings(current_user: dict = Depends(get_current_user)):
     db = get_db()
-    bookings = await db.service_bookings.find({"resident_id": current_user["id"]}).to_list(None)
+    bookings = await db.service_bookings.find({"resident_id": current_user["id"]}).to_list(length=10000)
     
     # Get service details for each booking
     booking_list = []
@@ -184,7 +184,7 @@ async def get_compound_bookings(compound_id: str, current_user: dict = Depends(r
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
-    bookings = await db.service_bookings.find({"compound_id": compound_id}).to_list(None)
+    bookings = await db.service_bookings.find({"compound_id": compound_id}).to_list(length=10000)
     
     # Get detailed information for each booking
     booking_list = []

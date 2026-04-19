@@ -278,6 +278,7 @@ async def send_user_gift(user_id: str, gift: dict, current_user: dict = Depends(
 
 
 @router.get("/super-admin/compounds/{compound_id}/full-details")
+async def get_compound_full_details(compound_id: str, current_user: dict = Depends(require_super_admin)):
     """تفاصيل شاملة لمجتمع: سكان + مديرون + أمن + خدمات + ميزانية + إعلانات + شكاوى + اشتراكات"""
     db = get_db()
     try:

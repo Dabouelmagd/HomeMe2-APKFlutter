@@ -1,0 +1,60 @@
+{
+  "summary": "Iteration 29: Full validation of new Hierarchical User Subscriptions dashboard (Super Admin). Backend: 10/10 pytest passed — GET /api/super-admin/hierarchical-subs (200 for app_owner & super_admin, 403 for admin), POST /api/super-admin/users/{id}/send-gift all 3 types (extend_trial, free_subscription, discount_coupon — coupon persisted in /api/coupons with GIFT-XXXXXX code), error cases (400 invalid type, 404 nonexistent user), and GET /api/super-admin/compounds/{id}/full-details (200 with all 9 keys, 404 for nonexistent). Frontend: 16/16 UI assertions passed — hs-totals-bar + hs-summary-cards render, 2 independent compounds visible, expanding reveals 8 users with hs-user-* testids, gift modal opens, discount_coupon form submits successfully (success toast + modal closes), search input and role-filter functional, hs-export-all-btn triggers CSV download (hierarchical-subscriptions.csv), and 5 other super-admin tabs (overview/users/codes/coupons/ads) still load without regression.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "HierarchicalSubs gift flow", "issue": "Success toast appeared twice for a single gift send (duplicate 'تم إرسال الهدية إلى 1 مستخدم' in Sonner). Likely a re-render or useEffect firing twice / double dispatch of toast.success. Cosmetic, not a blocker.", "selector": "[data-sonner-toast]", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter29_hierarchical_subs.py",
+    "/app/test_reports/pytest/iter29_hierarchical.xml"
+  ],
+  "test_cases_executed": [
+    {"case": "GET /api/super-admin/hierarchical-subs as app_owner → 200 with companies/independent_compounds/totals and all 8 totals keys present as ints", "result": "PASS"},
+    {"case": "GET /api/super-admin/hierarchical-subs as super_admin → 200", "result": "PASS"},
+    {"case": "GET /api/super-admin/hierarchical-subs as admin (regular) → 403", "result": "PASS"},
+    {"case": "POST send-gift type=extend_trial days=7 → success:true, gift.type=extend_trial (upserts user_subscriptions end_date)", "result": "PASS"},
+    {"case": "POST send-gift type=free_subscription days=30 plan=basic → success, plan=basic (is_gift=true, amount=0)", "result": "PASS"},
+    {"case": "POST send-gift type=discount_coupon discount=25 → GIFT-XXXXXX code created and persisted in /api/coupons", "result": "PASS"},
+    {"case": "POST send-gift type=invalid → 400", "result": "PASS"},
+    {"case": "POST send-gift on nonexistent user → 404", "result": "PASS"},
+    {"case": "GET compounds/{id}/full-details → 200 with keys compound/stats/users_by_role/families/recent_complaints/services/budget/ads/subscription", "result": "PASS"},
+    {"case": "GET compounds/nonexistent/full-details → 404", "result": "PASS"},
+    {"case": "UI: Owner_homeme login + navigate /app/super-admin?tab=user_subs → hs-totals-bar + hs-summary-cards visible", "result": "PASS"},
+    {"case": "UI: 2 hs-compound-* cards rendered (independent compounds)", "result": "PASS"},
+    {"case": "UI: Click compound → expands to show 8 hs-user-* rows", "result": "PASS"},
+    {"case": "UI: Click hs-gift-user-* → hs-gift-modal opens; change type to discount_coupon; fill discount=15; click hs-gift-send-btn → success toast + modal closes", "result": "PASS"},
+    {"case": "UI: hs-search-input accepts input; hs-role-filter selects resident", "result": "PASS"},
+    {"case": "UI: Click hs-export-all-btn → CSV download triggered (hierarchical-subscriptions.csv)", "result": "PASS"},
+    {"case": "UI regression: tabs overview/users/codes/coupons/ads load with body content and no hard errors", "result": "PASS"}
+  ],
+  "action_items": [
+    "(Optional low-prio) De-duplicate the success toast in HierarchicalSubs.submitGift — the same 'تم إرسال الهدية إلى 1 مستخدم' fires twice. Likely caused by the per-user loop calling toast.success inside .map and an aggregate toast afterwards, or React StrictMode double-invocation in dev. Consider single aggregated toast after Promise.all.",
+    "(Optional, from iter28) /api/search 500 'Search error: family_id' still unaddressed — unrelated to this iteration."
+  ],
+  "critical_code_review_comments": [
+    "superadmin.py::send_user_gift correctly uses upsert on user_subscriptions for extend_trial & free_subscription. extend_trial sets end_date from `now + days` — NOTE: this OVERWRITES any existing longer end_date instead of extending forward from the existing end_date when current sub is still active. If user already has 60 days left and admin gifts 7 days, they lose 53 days. Recommend: compute new_end = max(existing.end_date, now) + days. (Behavioural — confirm product intent with user.)",
+    "superadmin.py::get_hierarchical_subscriptions — builds users_by_compound in memory for 5000 users max; O(N) scans but acceptable at this scale. totals.managers counts 'manager' + 'company_admin' (good) but totals.family_heads is returned while UI sticky bar doesn't display it — harmless extra.",
+    "superadmin.py::get_compound_full_details — ads query uses `$or` with `target_compounds: []` and missing field — this may return ALL global ads not targeted at this compound, including those targeted exclusively at OTHER compounds when the field is missing; confirm intent. Also subscription fallback uses $in on ALL manager/company_admin/app_owner users in the compound — may pick an unrelated sub.",
+    "HierarchicalSubs.js — gift modal closes via setGiftTarget(null) only on success loop completion; if one user fails in a batch, the modal stays open but a partial success toast already fired — OK UX.",
+    "HierarchicalSubs.js exportCsv — does NOT escape CR/LF inside cell values; an 'address' field with newline could break the CSV. Low risk since backend data is normalized, but consider .replace(/[\\r\\n]+/g, ' ').",
+    "HierarchicalSubs.js — `filteredData` useMemo rebuilds full tree on every keystroke of search; for large datasets (>2000 users) could lag. Fine at current scale.",
+    "auth_deps.require_super_admin correctly allows only super_admin & app_owner roles — verified by the 403 test for regular admin."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter29_hierarchical_subs.py (new)"
+  ],
+  "success_rate": {"backend": "100% (10/10)", "frontend": "100% (16/16)"},
+  "test_credentials": "Owner_homeme/Dalia1234@ ✓, superadmin/SuperAdmin2024! ✓, admin/admin123 ✓ (returns JWT, used for 403 test).",
+  "seed_data_creation": "Pytest created: 1 TEST_iter29 gift (extend_trial), 1 free_subscription gift, 1 discount_coupon (GIFT-XXXXXX code in db.coupons). UI scripting created: 1 additional discount_coupon gift via modal. These are test gifts on real users — main agent may want to clean db.coupons (WHERE notes LIKE '%TEST_iter29%') and db.user_gifts after verification.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Hierarchical subs tab (/app/super-admin?tab=user_subs) is fully functional: testids hs-totals-bar, hs-summary-cards, hs-company-{id}, hs-compound-{id}, hs-user-{id}, hs-gift-user-{id}, hs-gift-company-{id}, hs-gift-compound-{id}, hs-gift-modal, hs-gift-type, hs-gift-days, hs-gift-discount, hs-gift-message, hs-gift-send-btn, hs-search-input, hs-role-filter, hs-export-all-btn, hs-reload-btn, hs-view-compound-{id}, hs-delete-user-{id}. Backend endpoints: /api/super-admin/hierarchical-subs (GET), /api/super-admin/users/{id}/send-gift (POST), /api/super-admin/compounds/{id}/full-details (GET). Current seed data: 0 management_companies, 2 independent compounds, 15 users. Login requires 'متابعة' continue step on account selector for Owner_homeme.",
+  "rca of the issue": "No new issues. The only minor finding is a duplicate success toast on gift send; harmless. The previously-reported syntax error on full-details endpoint is confirmed fixed."
+}

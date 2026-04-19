@@ -20,6 +20,7 @@ import UsersTab from './super-admin/UsersTab';
 import CodesTab from './super-admin/CodesTab';
 import CouponsTab from './super-admin/CouponsTab';
 import CompoundDetailModal from './super-admin/CompoundDetailModal';
+import HierarchicalSubs from './super-admin/HierarchicalSubs';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -869,82 +870,9 @@ const SuperAdminPanel = () => {
           <TranslationManager />
         )}
 
-        {/* User Subscriptions Tab */}
+        {/* User Subscriptions Tab — Hierarchical */}
         {activeTab === 'user_subs' && (
-          <div data-testid="user-subs-tab">
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              {[
-                { label: t('sa_total_users', 'إجمالي المستخدمين'), value: userSubStats.total || 0, color: 'text-blue-400' },
-                { label: t('sa_active_subs', 'اشتراكات نشطة'), value: userSubStats.active || 0, color: 'text-green-400' },
-                { label: t('sa_expired_subs', 'منتهية'), value: userSubStats.expired || 0, color: 'text-red-400' },
-              ].map((s, i) => (
-                <div key={i} className="bg-gray-800 rounded-xl p-4 border border-gray-700 text-center">
-                  <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-                  <p className="text-xs text-gray-400">{s.label}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex gap-3 mb-4">
-              <input value={userSubSearch} onChange={e => setUserSubSearch(e.target.value)} placeholder={t('sa_search_user', 'بحث بالاسم أو الإيميل...')} className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
-              <select value={userSubFilter} onChange={e => setUserSubFilter(e.target.value)} className="bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white">
-                <option value="">{t('cs_all', 'الكل')}</option>
-                <option value="active">{t('cs_active', 'نشطة')}</option>
-                <option value="expired">{t('cs_expired', 'منتهية')}</option>
-              </select>
-            </div>
-
-            <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-900/50">
-                  <tr>
-                    <th className="px-4 py-3 text-right text-gray-400">{t('sa_user', 'المستخدم')}</th>
-                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_plan', 'الخطة')}</th>
-                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_sub_end', 'تاريخ الانتهاء')}</th>
-                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_status', 'الحالة')}</th>
-                    <th className="px-4 py-3 text-center text-gray-400">{t('sa_actions', 'إجراءات')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-700">
-                  {userSubs.map(u => (
-                    <tr key={u.id} className="hover:bg-gray-750">
-                      <td className="px-4 py-3">
-                        <div className="font-bold text-white text-xs">{u.full_name || u.username}</div>
-                        <div className="text-[10px] text-gray-500">{u.email}</div>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-blue-500/20 text-blue-300">{u.subscription_plan || '-'}</span>
-                      </td>
-                      <td className="px-4 py-3 text-center text-xs text-gray-300">
-                        {u.subscription_end ? new Date(u.subscription_end).toLocaleDateString('ar-EG') : '-'}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${u.subscription_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                          {u.subscription_active ? t('sp_active','نشط') : t('sp_expired_label','منتهي')}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <div className="flex gap-1 justify-center flex-wrap">
-                          {u.subscription_active ? (
-                            <>
-                              <button onClick={() => handleUserSubAction(u.id, 'extend', { days: 30 })} className="px-2 py-1 text-xs bg-blue-600/20 text-blue-400 rounded">+30 {t('sp_day','يوم')}</button>
-                              <button onClick={() => setUserSubAction({ userId: u.id, name: u.full_name || u.username, type: 'change_plan', plan: u.subscription_plan || 'basic' })} className="px-2 py-1 text-xs bg-purple-600/20 text-purple-400 rounded">{t('cs_change_plan','تغيير')}</button>
-                              <button onClick={() => handleUserSubAction(u.id, 'deactivate')} className="px-2 py-1 text-xs bg-red-600/20 text-red-400 rounded">{t('sp_deactivate','إلغاء')}</button>
-                            </>
-                          ) : (
-                            <>
-                              <button onClick={() => setUserSubAction({ userId: u.id, name: u.full_name || u.username, type: 'activate', plan: 'basic', days: 365 })} className="px-2 py-1 text-xs bg-green-600/20 text-green-400 rounded">{t('sp_activate','تفعيل')}</button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                  {userSubs.length === 0 && <tr><td colSpan="5" className="px-4 py-8 text-center text-gray-500">{t('sa_no_users', 'لا يوجد مستخدمين')}</td></tr>}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <HierarchicalSubs t={t} onOpenCompound={(id) => setSelectedCompound(id)} />
         )}
 
       </div>

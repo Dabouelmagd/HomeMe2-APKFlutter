@@ -2,9 +2,10 @@
 Super Admin Panel & Role Management routes
 """
 from fastapi import APIRouter, HTTPException, Depends
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 import logging
+import uuid
 
 from database import get_db
 from auth_deps import get_current_user, require_admin, require_super_admin
@@ -84,8 +85,199 @@ async def super_admin_get_compounds(current_user: dict = Depends(require_super_a
         raise HTTPException(status_code=500, detail="Failed")
 
 
+@router.get("/super-admin/hierarchical-subs")
+async def get_hierarchical_subscriptions(current_user: dict = Depends(require_super_admin)):
+    """عرض هرمي: شركات الإدارة > المجمعات > المستخدمون + اشتراكاتهم + إجمالي"""
+    db = get_db()
+    try:
+        # 1) Fetch all companies, compounds, users, subscriptions
+        companies = await db.management_companies.find({}, {"_id": 0}).to_list(200)
+        compounds = await db.compounds.find({}, {"_id": 0}).to_list(500)
+        users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(5000)
+        user_subs = await db.user_subscriptions.find({}, {"_id": 0}).to_list(5000)
+
+        subs_by_user = {s.get("user_id"): s for s in user_subs}
+
+        # 2) Index users by compound
+        users_by_compound = {}
+        for u in users:
+            cid = u.get("compound_id") or "_unassigned"
+            users_by_compound.setdefault(cid, []).append(u)
+
+        # 3) Build compound nodes with users grouped by role + sub status
+        def build_compound_node(compound):
+            cid = compound.get("id")
+            c_users = users_by_compound.get(cid, [])
+            by_role = {}
+            active_subs = 0
+            expired_subs = 0
+            for u in c_users:
+                role = u.get("role", "resident")
+                sub = subs_by_user.get(u.get("id"))
+                if sub:
+                    if sub.get("status") == "active":
+                        active_subs += 1
+                    elif sub.get("status") == "expired":
+                        expired_subs += 1
+                u_copy = {**u, "subscription": serialize_datetime(sub) if sub else None}
+                by_role.setdefault(role, []).append(u_copy)
+            return {
+                "id": cid,
+                "name": compound.get("name"),
+                "location": compound.get("location") or compound.get("address"),
+                "users_by_role": serialize_datetime(by_role),
+                "stats": {
+                    "total_users": len(c_users),
+                    "residents": len(by_role.get("resident", [])),
+                    "managers": len(by_role.get("manager", [])) + len(by_role.get("company_admin", [])),
+                    "security": len(by_role.get("security", [])),
+                    "active_subs": active_subs,
+                    "expired_subs": expired_subs,
+                },
+            }
+
+        # 4) Group compounds by company (or _independent)
+        companies_nodes = []
+        unassigned_compounds = []
+        company_by_id = {c.get("id"): c for c in companies}
+        compound_by_company = {}
+        for c in compounds:
+            company_id = c.get("company_id") or c.get("management_company_id")
+            if company_id and company_id in company_by_id:
+                compound_by_company.setdefault(company_id, []).append(c)
+            else:
+                unassigned_compounds.append(c)
+
+        for company in companies:
+            comp_list = compound_by_company.get(company.get("id"), [])
+            companies_nodes.append({
+                "id": company.get("id"),
+                "name": company.get("name") or company.get("company_name") or "Unnamed",
+                "email": company.get("email"),
+                "phone": company.get("phone"),
+                "compounds": [build_compound_node(c) for c in comp_list],
+                "compounds_count": len(comp_list),
+            })
+
+        independent_nodes = [build_compound_node(c) for c in unassigned_compounds]
+
+        # 5) Totals
+        total_users = len(users)
+        total_subs_active = sum(1 for s in user_subs if s.get("status") == "active")
+        total_subs_expired = sum(1 for s in user_subs if s.get("status") == "expired")
+        totals = {
+            "companies": len(companies),
+            "compounds": len(compounds),
+            "total_users": total_users,
+            "residents": sum(1 for u in users if u.get("role") == "resident"),
+            "managers": sum(1 for u in users if u.get("role") in ["manager", "company_admin"]),
+            "security": sum(1 for u in users if u.get("role") == "security"),
+            "family_heads": sum(1 for u in users if u.get("role") == "family_head"),
+            "active_subs": total_subs_active,
+            "expired_subs": total_subs_expired,
+        }
+
+        return {
+            "companies": companies_nodes,
+            "independent_compounds": independent_nodes,
+            "totals": totals,
+        }
+    except Exception as e:
+        logging.error(f"Hierarchical subs error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed: {str(e)[:80]}")
+
+
+@router.post("/super-admin/users/{user_id}/send-gift")
+async def send_user_gift(user_id: str, gift: dict, current_user: dict = Depends(require_super_admin)):
+    """إرسال عرض/هدية لمستخدم: extend_trial | discount_coupon | free_subscription"""
+    db = get_db()
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    gift_type = gift.get("type")  # extend_trial / free_subscription / discount_coupon
+    if gift_type not in ["extend_trial", "free_subscription", "discount_coupon"]:
+        raise HTTPException(status_code=400, detail="Invalid gift type")
+
+    gift_record = {
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "user_name": user.get("full_name") or user.get("username"),
+        "compound_id": user.get("compound_id"),
+        "type": gift_type,
+        "details": gift.get("details", {}),
+        "message": gift.get("message", ""),
+        "sent_by": current_user.id,
+        "sent_by_name": getattr(current_user, "full_name", None) or getattr(current_user, "username", ""),
+        "status": "sent",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+    # تطبيق الهدية حسب النوع
+    if gift_type == "extend_trial":
+        days = int(gift.get("details", {}).get("days", 7))
+        new_end = datetime.now(timezone.utc) + timedelta(days=days)
+        await db.user_subscriptions.update_one(
+            {"user_id": user_id},
+            {"$set": {"end_date": new_end.isoformat(), "status": "active", "gift_extended": True}},
+            upsert=True,
+        )
+    elif gift_type == "free_subscription":
+        days = int(gift.get("details", {}).get("days", 30))
+        plan = gift.get("details", {}).get("plan", "basic")
+        new_end = datetime.now(timezone.utc) + timedelta(days=days)
+        await db.user_subscriptions.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "user_id": user_id,
+                "plan": plan,
+                "start_date": datetime.now(timezone.utc).isoformat(),
+                "end_date": new_end.isoformat(),
+                "status": "active",
+                "is_gift": True,
+                "amount": 0,
+            }},
+            upsert=True,
+        )
+    elif gift_type == "discount_coupon":
+        discount = gift.get("details", {}).get("discount", 20)
+        code = f"GIFT-{uuid.uuid4().hex[:6].upper()}"
+        await db.coupons.insert_one({
+            "id": str(uuid.uuid4()),
+            "code": code,
+            "discount_type": "percentage",
+            "discount_value": discount,
+            "max_uses": 1,
+            "times_used": 0,
+            "is_active": True,
+            "assigned_to": user_id,
+            "notes": f"هدية من مالك التطبيق - {gift.get('message', '')}",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+        gift_record["details"]["coupon_code"] = code
+
+    # حفظ سجل الهدية
+    await db.user_gifts.insert_one(gift_record)
+
+    # إشعار الداخلي للمستخدم
+    try:
+        await db.notifications.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "title": "🎁 هدية خاصة من مالك التطبيق",
+            "body": gift.get("message") or "تم إضافة هدية إلى حسابك",
+            "type": "gift",
+            "read": False,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+    except Exception:
+        pass
+
+    gift_record.pop("_id", None)
+    return {"success": True, "gift": serialize_datetime(gift_record)}
+
+
 @router.get("/super-admin/compounds/{compound_id}/full-details")
-async def super_admin_compound_full_details(compound_id: str, current_user: dict = Depends(require_super_admin)):
     """تفاصيل شاملة لمجتمع: سكان + مديرون + أمن + خدمات + ميزانية + إعلانات + شكاوى + اشتراكات"""
     db = get_db()
     try:

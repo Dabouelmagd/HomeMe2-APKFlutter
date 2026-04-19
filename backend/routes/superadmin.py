@@ -10,6 +10,9 @@ import uuid
 from database import get_db
 from auth_deps import get_current_user, require_admin, require_super_admin
 from helpers import serialize_datetime
+import os
+
+APP_URL = os.environ.get('APP_URL', os.environ.get('REACT_APP_BACKEND_URL', 'https://homemeapp.net')).rstrip('/')
 
 router = APIRouter(prefix="/api")
 
@@ -286,8 +289,213 @@ async def send_user_gift(user_id: str, gift: dict, current_user: dict = Depends(
     except Exception:
         pass
 
+    # إرسال بريد إلكتروني للمستخدم (إن وجد)
+    email_result = {"sent": False, "reason": "no_email"}
+    to_email = user.get("email")
+    if to_email:
+        try:
+            from email_service import email_service
+            subject, html_body, text_body = _build_gift_email(
+                user.get("full_name") or user.get("username") or "",
+                gift_type,
+                gift.get("details", {}),
+                gift.get("message", ""),
+                gift_record["details"].get("coupon_code"),
+            )
+            ok = await email_service.send_email(to_email, subject, html_body, text_body)
+            email_result = {"sent": ok, "to": to_email}
+        except Exception as e:
+            logging.error(f"Gift email error: {e}")
+            email_result = {"sent": False, "error": str(e)[:100]}
+
     gift_record.pop("_id", None)
-    return {"success": True, "gift": serialize_datetime(gift_record)}
+    return {"success": True, "gift": serialize_datetime(gift_record), "email": email_result}
+
+
+def _build_gift_email(name: str, gift_type: str, details: dict, message: str, coupon_code: Optional[str] = None):
+    """Build HTML + text email for a gift notification."""
+    type_labels = {
+        "extend_trial": "تمديد مجاني لاشتراكك",
+        "free_subscription": "اشتراك مجاني كامل",
+        "discount_coupon": "كود خصم خاص",
+    }
+    title = type_labels.get(gift_type, "هدية خاصة")
+    details_html = ""
+    details_text = ""
+    if gift_type == "extend_trial":
+        days = details.get("days", 7)
+        details_html = f"<p style='font-size:18px;margin:10px 0'>تم إضافة <b style='color:#667eea'>{days} يومًا</b> إلى مدة اشتراكك.</p>"
+        details_text = f"تم إضافة {days} يومًا إلى مدة اشتراكك."
+    elif gift_type == "free_subscription":
+        days = details.get("days", 30)
+        plan = details.get("plan", "basic")
+        details_html = f"<p style='font-size:18px;margin:10px 0'>تم منحك اشتراك <b style='color:#667eea'>{plan}</b> مجانيًا لمدة <b>{days} يومًا</b>.</p>"
+        details_text = f"تم منحك اشتراك {plan} مجانيًا لمدة {days} يومًا."
+    elif gift_type == "discount_coupon":
+        discount = details.get("discount", 0)
+        code = coupon_code or details.get("coupon_code", "")
+        details_html = f"""<p style='font-size:18px;margin:10px 0'>خصم <b style='color:#667eea'>{discount}%</b> على تجديد اشتراكك.</p>
+        <div style='background:#f0f4ff;border:2px dashed #667eea;border-radius:10px;padding:16px;text-align:center;margin:16px 0'>
+          <div style='font-size:12px;color:#666;margin-bottom:4px'>الكود الخاص بك</div>
+          <div style='font-family:monospace;font-size:24px;font-weight:bold;color:#764ba2;letter-spacing:2px'>{code}</div>
+        </div>"""
+        details_text = f"خصم {discount}% — كود: {code}"
+
+    user_message_html = f"<div style='background:#fff8e1;border-right:4px solid #ffa726;padding:12px;margin:16px 0;border-radius:6px'><em>{message}</em></div>" if message else ""
+    user_message_text = f"\n\n{message}" if message else ""
+
+    subject = f"🎁 هدية خاصة لك — {title} من HomeMe"
+    html = f"""<!DOCTYPE html>
+<html dir="rtl">
+<head><meta charset="UTF-8"></head>
+<body style="font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#f5f5f5;margin:0;padding:20px">
+  <div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.1)">
+    <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:30px;text-align:center">
+      <div style="font-size:48px;margin-bottom:8px">🎁</div>
+      <h1 style="margin:0;font-size:26px">{title}</h1>
+      <p style="margin:8px 0 0;opacity:0.9">هدية خاصة من HomeMe</p>
+    </div>
+    <div style="padding:28px">
+      <p style="font-size:16px">مرحبًا <b>{name}</b>،</p>
+      <p>نسعد بإخبارك أن مالك التطبيق أرسل لك هدية خاصة تقديرًا لولائك 💜</p>
+      {details_html}
+      {user_message_html}
+      <div style="text-align:center;margin-top:24px">
+        <a href="{APP_URL}/app/dashboard" style="display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:12px 30px;text-decoration:none;border-radius:25px;font-weight:bold">عرض حسابي</a>
+      </div>
+    </div>
+    <div style="background:#f8f9fa;padding:16px;text-align:center;color:#666;font-size:12px">
+      HomeMe — نظام إدارة المجمعات السكنية
+    </div>
+  </div>
+</body>
+</html>"""
+    text = f"""مرحبًا {name}،
+
+تم إرسال {title} إلى حسابك.
+{details_text}{user_message_text}
+
+افتح تطبيق HomeMe لعرض الهدية: {APP_URL}/app/dashboard
+
+— HomeMe"""
+    return subject, html, text
+
+
+@router.post("/super-admin/bulk-renewal-offer/preview")
+async def preview_bulk_renewal(
+    days_before_expiry: int = 7,
+    current_user: dict = Depends(require_super_admin)
+):
+    """معاينة قائمة المستخدمين الذين تنتهي اشتراكاتهم خلال N يومًا."""
+    db = get_db()
+    now = datetime.now(timezone.utc)
+    cutoff = now + timedelta(days=max(1, days_before_expiry))
+    targets = []
+    subs = await db.user_subscriptions.find({"status": "active"}, {"_id": 0}).to_list(5000)
+    for s in subs:
+        end_str = s.get("end_date")
+        if not end_str:
+            continue
+        try:
+            end = datetime.fromisoformat(str(end_str).replace("Z", "+00:00"))
+            if end.tzinfo is None:
+                end = end.replace(tzinfo=timezone.utc)
+            if now <= end <= cutoff:
+                u = await db.users.find_one({"id": s.get("user_id")}, {"_id": 0, "password_hash": 0})
+                if u:
+                    targets.append({
+                        "user_id": u.get("id"),
+                        "full_name": u.get("full_name") or u.get("username"),
+                        "email": u.get("email"),
+                        "plan": s.get("plan"),
+                        "days_left": (end - now).days,
+                        "end_date": str(end_str)[:10],
+                    })
+        except Exception:
+            continue
+    targets.sort(key=lambda x: x.get("days_left", 999))
+    return {"targets": targets, "count": len(targets), "days_before_expiry": days_before_expiry}
+
+
+@router.post("/super-admin/bulk-renewal-offer/send")
+async def send_bulk_renewal(payload: dict, current_user: dict = Depends(require_super_admin)):
+    """إرسال كود خصم تجديد جماعي لجميع المستخدمين الذين تنتهي اشتراكاتهم قريبًا."""
+    db = get_db()
+    days_before = int(payload.get("days_before_expiry", 7))
+    discount = max(1, min(90, int(payload.get("discount", 20))))
+    message = payload.get("message", "")
+    user_ids = payload.get("user_ids") or []
+
+    # إن لم تُرسل قائمة، استعلم تلقائيًا
+    if not user_ids:
+        preview = await preview_bulk_renewal(days_before, current_user)
+        user_ids = [t["user_id"] for t in preview.get("targets", [])]
+
+    sent, emails_sent, failed = 0, 0, 0
+    for uid in user_ids:
+        try:
+            user = await db.users.find_one({"id": uid}, {"_id": 0, "password_hash": 0})
+            if not user:
+                failed += 1
+                continue
+            code = f"RENEW-{uuid.uuid4().hex[:6].upper()}"
+            await db.coupons.insert_one({
+                "id": str(uuid.uuid4()),
+                "code": code,
+                "discount_type": "percentage",
+                "discount_value": discount,
+                "max_uses": 1,
+                "times_used": 0,
+                "is_active": True,
+                "assigned_to": uid,
+                "notes": f"عرض تجديد جماعي - {message}",
+                "campaign": "bulk_renewal",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+            await db.notifications.insert_one({
+                "id": str(uuid.uuid4()),
+                "user_id": uid,
+                "title": f"🎯 خصم {discount}% على تجديد اشتراكك",
+                "body": message or f"استخدم الكود {code} للحصول على خصم {discount}% عند التجديد.",
+                "type": "bulk_offer",
+                "read": False,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+            sent += 1
+            if user.get("email"):
+                try:
+                    from email_service import email_service
+                    subject, html, text = _build_gift_email(
+                        user.get("full_name") or user.get("username") or "",
+                        "discount_coupon",
+                        {"discount": discount},
+                        message,
+                        code,
+                    )
+                    ok = await email_service.send_email(user["email"], subject, html, text)
+                    if ok:
+                        emails_sent += 1
+                except Exception as e:
+                    logging.error(f"Bulk renewal email error: {e}")
+        except Exception as e:
+            logging.error(f"Bulk renewal send error for {uid}: {e}")
+            failed += 1
+
+    # سجل الحملة
+    await db.bulk_campaigns.insert_one({
+        "id": str(uuid.uuid4()),
+        "type": "bulk_renewal",
+        "discount": discount,
+        "days_before_expiry": days_before,
+        "message": message,
+        "sent": sent,
+        "emails_sent": emails_sent,
+        "failed": failed,
+        "sent_by": current_user.get("id"),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {"success": True, "sent": sent, "emails_sent": emails_sent, "failed": failed, "discount": discount}
 
 
 @router.get("/super-admin/compounds/{compound_id}/full-details")
@@ -321,17 +529,44 @@ async def get_compound_full_details(compound_id: str, current_user: dict = Depen
         # الميزانية
         budget = await db.budgets.find_one({"compound_id": compound_id}, {"_id": 0})
 
-        # الإعلانات
-        ads = await db.internal_ads.find({
-            "$or": [{"target_compounds": compound_id}, {"target_compounds": []}, {"target_compounds": {"$exists": False}}]
+        # الإعلانات — فصل المستهدف فعليًا لهذا المجتمع عن العام
+        compound_ads = await db.internal_ads.find({"target_compounds": compound_id}, {"_id": 0}).to_list(100)
+        global_ads = await db.internal_ads.find({
+            "$or": [
+                {"target_compounds": {"$exists": False}},
+                {"target_compounds": None},
+                {"target_compounds": []},
+            ]
         }, {"_id": 0}).to_list(100)
+        # للتوافق الخلفي، ads = المستهدف + العام (بلا تكرار)
+        seen_ids = set()
+        ads = []
+        for ad in compound_ads + global_ads:
+            aid = ad.get("id")
+            if aid not in seen_ids:
+                seen_ids.add(aid)
+                ads.append(ad)
 
         # الحوادث الأمنية (إن وجدت)
         incidents_open = await db.security_incidents.count_documents({"compound_id": compound_id, "status": {"$ne": "resolved"}})
 
-        # الاشتراك
-        subscription = await db.subscriptions.find_one({"compound_id": compound_id}, {"_id": 0}) or \
-                       await db.subscriptions.find_one({"user_id": {"$in": [u.get("id") for u in users if u.get("role") in ["company_admin", "manager", "app_owner"]]}}, {"_id": 0})
+        # الاشتراك — نفضّل اشتراك شركة الإدارة إن وجدت، ثم company_admin، ثم manager
+        company_id = compound.get("company_id") or compound.get("management_company_id")
+        subscription = None
+        if company_id:
+            subscription = await db.company_subscriptions.find_one({"company_id": company_id}, {"_id": 0})
+        if not subscription:
+            subscription = await db.subscriptions.find_one({"compound_id": compound_id}, {"_id": 0})
+        if not subscription:
+            # أولوية للأدوار القيادية
+            for preferred_role in ["company_admin", "manager", "admin"]:
+                admin_ids = [u.get("id") for u in by_role.get(preferred_role, []) if u.get("id")]
+                if admin_ids:
+                    subscription = await db.user_subscriptions.find_one(
+                        {"user_id": {"$in": admin_ids}, "status": "active"}, {"_id": 0}
+                    )
+                    if subscription:
+                        break
 
         # إحصائيات
         stats = {
@@ -347,6 +582,8 @@ async def get_compound_full_details(compound_id: str, current_user: dict = Depen
             "complaints_resolved": complaints_resolved,
             "services_count": len(services),
             "ads_count": len(ads),
+            "ads_targeted_count": len(compound_ads),
+            "ads_global_count": len(global_ads),
             "incidents_open": incidents_open,
         }
 
@@ -359,6 +596,8 @@ async def get_compound_full_details(compound_id: str, current_user: dict = Depen
             "services": serialize_datetime(services),
             "budget": serialize_datetime(budget) if budget else None,
             "ads": serialize_datetime(ads),
+            "ads_targeted": serialize_datetime(compound_ads),
+            "ads_global": serialize_datetime(global_ads),
             "subscription": serialize_datetime(subscription) if subscription else None,
         }
     except HTTPException:

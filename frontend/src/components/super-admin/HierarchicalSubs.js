@@ -17,6 +17,10 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('');
   const [giftTarget, setGiftTarget] = useState(null); // {scope, ids, name}
+  const [bulkOfferOpen, setBulkOfferOpen] = useState(false);
+  const [bulkForm, setBulkForm] = useState({ days_before_expiry: 7, discount: 20, message: '' });
+  const [bulkPreview, setBulkPreview] = useState(null); // {targets, count}
+  const [bulkLoading, setBulkLoading] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -194,6 +198,51 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
     }
   };
 
+  // ------- Bulk renewal offer -------
+  const openBulkOffer = async () => {
+    setBulkOfferOpen(true);
+    setBulkLoading(true);
+    try {
+      const res = await axios.post(`${API}/super-admin/bulk-renewal-offer/preview?days_before_expiry=${bulkForm.days_before_expiry}`, {}, getToken());
+      setBulkPreview(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('hs_preview_failed','فشل جلب القائمة'));
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const refreshBulkPreview = async (days) => {
+    setBulkLoading(true);
+    try {
+      const res = await axios.post(`${API}/super-admin/bulk-renewal-offer/preview?days_before_expiry=${days}`, {}, getToken());
+      setBulkPreview(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('hs_preview_failed','فشل'));
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const submitBulkOffer = async () => {
+    try {
+      const user_ids = (bulkPreview?.targets || []).map(x => x.user_id);
+      const res = await axios.post(`${API}/super-admin/bulk-renewal-offer/send`, {
+        days_before_expiry: parseInt(bulkForm.days_before_expiry) || 7,
+        discount: parseInt(bulkForm.discount) || 20,
+        message: bulkForm.message || '',
+        user_ids,
+      }, getToken());
+      const d = res.data || {};
+      toast.success(`${t('hs_bulk_sent','تم إرسال')} ${d.sent || 0} ${t('hs_offers','عرض')} (${d.emails_sent || 0} ${t('hs_emails','بريد')})`, { id: 'hs-bulk-sent' });
+      setBulkOfferOpen(false);
+      setBulkPreview(null);
+      setBulkForm({ days_before_expiry: 7, discount: 20, message: '' });
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('hs_bulk_failed','فشل الإرسال'));
+    }
+  };
+
   // ------- Render -------
   if (loading) return <div className="text-center text-gray-400 py-12">{t('hs_loading','جاري التحميل...')}</div>;
   if (!filteredData) return <div className="text-center text-gray-400 py-12">{t('hs_no_data','لا توجد بيانات')}</div>;
@@ -215,6 +264,7 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
           <span className="text-gray-400">{t('hs_expired','منتهي')}: <b className="text-red-400 text-sm">{totals.expired_subs||0}</b></span>
         </div>
         <div className="flex gap-2">
+          <button onClick={openBulkOffer} className="px-3 py-1.5 text-xs bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-400 hover:to-pink-400 text-white rounded-lg font-semibold shadow-lg shadow-pink-500/20" data-testid="hs-bulk-offer-btn">🎯 {t('hs_bulk_renewal','عرض تجديد جماعي')}</button>
           <button onClick={exportAll} className="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold" data-testid="hs-export-all-btn">⬇ {t('hs_export_all','تصدير الكل')}</button>
           <button onClick={reload} className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded-lg" data-testid="hs-reload-btn">↻</button>
         </div>
@@ -352,6 +402,75 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
             <div className="flex gap-2 pt-2">
               <button onClick={submitGift} className="flex-1 px-4 py-2.5 bg-pink-600 hover:bg-pink-500 text-white rounded-lg text-sm font-bold" data-testid="hs-gift-send-btn">{t('hs_send','إرسال')}</button>
               <button onClick={() => setGiftTarget(null)} className="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg text-sm">{t('hs_cancel','إلغاء')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Bulk Renewal Offer modal */}
+      {bulkOfferOpen && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setBulkOfferOpen(false)}>
+          <div className="bg-gray-800 rounded-2xl w-full max-w-2xl p-6 space-y-4 border border-orange-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="hs-bulk-offer-modal">
+            <div>
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">🎯 {t('hs_bulk_renewal','عرض تجديد جماعي')}</h3>
+              <p className="text-xs text-gray-400 mt-1">{t('hs_bulk_desc','إرسال كود خصم تلقائي لجميع المستخدمين الذين تنتهي اشتراكاتهم قريبًا.')}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('hs_days_before','الأيام قبل انتهاء الاشتراك')}</label>
+                <input type="number" min="1" max="90" value={bulkForm.days_before_expiry}
+                  onChange={e => { const v = e.target.value; setBulkForm({...bulkForm, days_before_expiry: v}); refreshBulkPreview(parseInt(v)||7); }}
+                  className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-bulk-days" />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('hs_discount_pct','نسبة الخصم (%)')}</label>
+                <input type="number" min="1" max="90" value={bulkForm.discount}
+                  onChange={e => setBulkForm({...bulkForm, discount: e.target.value})}
+                  className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-bulk-discount" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('hs_message','رسالة (اختياري)')}</label>
+              <textarea rows="2" value={bulkForm.message} onChange={e => setBulkForm({...bulkForm, message: e.target.value})}
+                className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white"
+                placeholder={t('hs_bulk_msg_placeholder','مثال: خصم خاص لعملائنا الأوفياء...')} data-testid="hs-bulk-message" />
+            </div>
+
+            <div className="bg-gray-900/60 rounded-lg border border-gray-700 p-3">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-semibold text-gray-300">{t('hs_target_list','قائمة المستخدمين المستهدفين')}</span>
+                <span className="text-xs text-orange-400 font-bold" data-testid="hs-bulk-count">{bulkLoading ? '...' : `${bulkPreview?.count || 0} ${t('hs_users','مستخدم')}`}</span>
+              </div>
+              {bulkLoading ? (
+                <div className="text-center text-gray-500 py-4 text-xs">{t('hs_loading','جاري التحميل...')}</div>
+              ) : bulkPreview?.targets?.length > 0 ? (
+                <div className="max-h-56 overflow-y-auto space-y-1" data-testid="hs-bulk-preview-list">
+                  {bulkPreview.targets.map(t2 => (
+                    <div key={t2.user_id} className="flex justify-between items-center bg-gray-800 rounded px-2 py-1.5 text-xs">
+                      <div className="flex-1 min-w-0">
+                        <span className="text-white font-medium">{t2.full_name}</span>
+                        <span className="text-gray-500 mx-2">•</span>
+                        <span className="text-gray-400">{t2.email || '-'}</span>
+                      </div>
+                      <div className="flex gap-2 items-center">
+                        <span className="text-[10px] bg-blue-600/20 text-blue-300 px-1.5 py-0.5 rounded">{t2.plan || '-'}</span>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded ${t2.days_left <= 2 ? 'bg-red-600/20 text-red-300' : 'bg-amber-600/20 text-amber-300'}`}>{t2.days_left}{t('hs_d','ي')}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center text-gray-500 py-4 text-xs">{t('hs_no_targets','لا يوجد مستخدمون تنتهي اشتراكاتهم خلال المدة المحددة.')}</div>
+              )}
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button onClick={submitBulkOffer}
+                disabled={!bulkPreview?.count}
+                className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-bold ${bulkPreview?.count ? 'bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-400 hover:to-pink-400 text-white' : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`}
+                data-testid="hs-bulk-send-btn">{t('hs_send_to_all','إرسال للكل')} ({bulkPreview?.count || 0})</button>
+              <button onClick={() => { setBulkOfferOpen(false); setBulkPreview(null); }} className="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg text-sm">{t('hs_cancel','إلغاء')}</button>
             </div>
           </div>
         </div>

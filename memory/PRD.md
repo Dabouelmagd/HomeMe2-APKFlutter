@@ -3,7 +3,13 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-36)
+## Latest Fixes (Feb 2026 — iterations 26-37)
+
+### Iter 37: Inline Add Compound + Add Resident buttons ✅
+- **➕ Add Compound button** inside each company's expanded view (purple) — opens modal with name/location/address/description; uses existing `POST /super-admin/companies/{company_id}/compounds`.
+- **➕ Add Resident/User button** on every compound card (green) — opens modal with full_name/username/email/password/phone/unit + role picker (resident/family_head/manager/security/admin); uses existing `POST /super-admin/users` with compound_id auto-injected.
+- Backend verified via curl (compound create + user create roundtrip, both return 200 with expected payload).
+- UI verified via Playwright screenshot — both buttons render correctly inside CompaniesTab after expanding a company.
 
 ### Iter 36: Companies Tab — Import JSON + Top 10 + Removed Link UI ✅
 - **🏆 Top 10 Companies dashboard** (new endpoint `GET /super-admin/companies/top10?metric=compounds|users|revenue|active_subs`): ranked table with 🥇🥈🥉 medals, metric toggle buttons, highlight column for selected metric, summary footer

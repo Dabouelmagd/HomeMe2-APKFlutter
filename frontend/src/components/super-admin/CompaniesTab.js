@@ -23,6 +23,8 @@ const CompaniesTab = ({ t }) => {
   const [editCompany, setEditCompany] = useState(null);
   const [importOpen, setImportOpen] = useState(false);
   const [topOpen, setTopOpen] = useState(false);
+  const [addCompoundFor, setAddCompoundFor] = useState(null); // { id, name }
+  const [addUserFor, setAddUserFor] = useState(null); // { compound_id, compound_name }
 
   const reload = () => setRefreshKey(k => k + 1);
 
@@ -73,6 +75,27 @@ const CompaniesTab = ({ t }) => {
 
   const linkCompound = null;
   const unlinkCompound = null;
+
+  const addCompound = async (form) => {
+    if (!addCompoundFor?.id) return;
+    try {
+      await axios.post(`${API}/super-admin/companies/${addCompoundFor.id}/compounds`, form, getToken());
+      toast.success(t('ct_compound_added','تمت إضافة المجمع'));
+      setAddCompoundFor(null);
+      setExpanded(p => ({...p, [addCompoundFor.id]: true}));
+      reload();
+    } catch (err) { toast.error(err.response?.data?.detail || t('ct_compound_add_failed','فشل إضافة المجمع')); }
+  };
+
+  const addUser = async (form) => {
+    if (!addUserFor?.compound_id) return;
+    try {
+      await axios.post(`${API}/super-admin/users`, { ...form, compound_id: addUserFor.compound_id }, getToken());
+      toast.success(t('ct_user_added','تمت إضافة المستخدم'));
+      setAddUserFor(null);
+      reload();
+    } catch (err) { toast.error(err.response?.data?.detail || t('ct_user_add_failed','فشل إضافة المستخدم')); }
+  };
 
   const importStructure = async (file, mergeMode) => {
     try {
@@ -194,10 +217,15 @@ const CompaniesTab = ({ t }) => {
                 {co.compounds.length === 0 ? (
                   <div className="text-center text-gray-500 text-xs py-4">
                     {t('ct_no_compounds','لا توجد مجمعات مرتبطة بهذه الشركة بعد.')}
-                    <p className="text-[10px] text-gray-600 mt-1">{t('ct_company_adds_own','الشركة نفسها ستضيف مجمعاتها من لوحتها الخاصة.')}</p>
+                    <div className="mt-3">
+                      <button onClick={() => setAddCompoundFor({ id: co.id, name: co.name })} className="px-3 py-1.5 text-xs bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-semibold" data-testid={`ct-add-compound-empty-${co.id}`}>➕ {t('ct_add_compound','إضافة مجمع')}</button>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-2">
+                    <div className="flex justify-end">
+                      <button onClick={() => setAddCompoundFor({ id: co.id, name: co.name })} className="px-3 py-1.5 text-xs bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-semibold" data-testid={`ct-add-compound-${co.id}`}>➕ {t('ct_add_compound','إضافة مجمع')}</button>
+                    </div>
                     {co.compounds.map(cpd => (
                       <div key={cpd.id} className="bg-gray-800/60 rounded-lg p-3 border border-gray-700/50" data-testid={`ct-compound-${cpd.id}`}>
                         <div className="flex items-center gap-2 mb-2">
@@ -211,6 +239,7 @@ const CompaniesTab = ({ t }) => {
                               {cpd.security ? ` • 🛡 ${cpd.security}` : ''}
                             </div>
                           </div>
+                          <button onClick={() => setAddUserFor({ compound_id: cpd.id, compound_name: cpd.name })} className="px-2 py-1 text-[11px] bg-green-600/30 hover:bg-green-600/50 text-green-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-add-user-${cpd.id}`}>➕ {t('ct_add_user','إضافة ساكن')}</button>
                         </div>
                         {/* Users grouped by role */}
                         {Object.keys(cpd.users_by_role || {}).length > 0 && (
@@ -250,6 +279,12 @@ const CompaniesTab = ({ t }) => {
 
       {/* Top 10 modal */}
       {topOpen && <Top10Modal onClose={() => setTopOpen(false)} t={t} />}
+
+      {/* Add Compound modal */}
+      {addCompoundFor && <AddCompoundModal companyName={addCompoundFor.name} onClose={() => setAddCompoundFor(null)} onSave={addCompound} t={t} />}
+
+      {/* Add User (resident) modal */}
+      {addUserFor && <AddUserModal compoundName={addUserFor.compound_name} onClose={() => setAddUserFor(null)} onSave={addUser} t={t} />}
     </div>
   );
 };
@@ -454,6 +489,121 @@ const Top10Modal = ({ onClose, t }) => {
             {t('ct_summary_total','الإجمالي')}: {data.summary.total_companies} {t('ct_companies','شركة')} • {data.summary.total_compounds} {t('ct_compounds','مجمع')} • {data.summary.total_users} {t('ct_users','مستخدم')}
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+// ==================== AddCompoundModal ====================
+const AddCompoundModal = ({ companyName, onClose, onSave, t }) => {
+  const [form, setForm] = useState({ name: '', location: '', address: '', description: '' });
+  const submit = () => {
+    if (!form.name.trim()) { toast.error(t('ct_compound_name_required','اسم المجمع مطلوب')); return; }
+    onSave(form);
+  };
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-purple-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="ct-add-compound-modal">
+        <h3 className="text-lg font-bold text-white">🏘️ {t('ct_add_compound_title','إضافة مجمع جديد')} — <span className="text-purple-300">{companyName}</span></h3>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('ct_compound_name','اسم المجمع')} *</label>
+            <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-add-compound-name" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('ct_location','الموقع')}</label>
+            <input value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-add-compound-location" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('ct_address','العنوان التفصيلي')}</label>
+            <input value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('ct_description','الوصف')}</label>
+            <textarea rows="2" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+        </div>
+        <div className="flex gap-2 pt-2">
+          <button onClick={submit} className="flex-1 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-bold" data-testid="ct-add-compound-save-btn">{t('ct_add','إضافة')}</button>
+          <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('ct_cancel','إلغاء')}</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==================== AddUserModal ====================
+const AddUserModal = ({ compoundName, onClose, onSave, t }) => {
+  const [form, setForm] = useState({
+    full_name: '', username: '', email: '', password: '',
+    role: 'resident', phone: '', unit_number: '',
+  });
+  const submit = () => {
+    if (!form.full_name.trim() || !form.username.trim() || !form.email.trim() || !form.password) {
+      toast.error(t('ct_user_required','الاسم واسم المستخدم والبريد وكلمة المرور مطلوبة'));
+      return;
+    }
+    if (form.password.length < 6) { toast.error(t('ct_password_short','كلمة المرور يجب ألا تقل عن 6 أحرف')); return; }
+    onSave(form);
+  };
+  const roles = [
+    { v: 'resident', l: t('role_resident','مقيم'), emoji: '🏠' },
+    { v: 'family_head', l: t('role_family_head','رب أسرة'), emoji: '👨‍👩‍👧' },
+    { v: 'manager', l: t('role_manager','إداري'), emoji: '👔' },
+    { v: 'security', l: t('role_security','أمن'), emoji: '🛡' },
+    { v: 'admin', l: t('role_admin','أدمن المجمع'), emoji: '⚙️' },
+  ];
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-green-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="ct-add-user-modal">
+        <h3 className="text-lg font-bold text-white">👤 {t('ct_add_user_title','إضافة ساكن / مستخدم')} — <span className="text-green-300">{compoundName}</span></h3>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('ct_full_name','الاسم الكامل')} *</label>
+            <input value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-fullname" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('ct_username','اسم المستخدم')} *</label>
+              <input value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-username" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('ct_password','كلمة المرور')} *</label>
+              <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-password" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('ct_email','البريد')} *</label>
+            <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-email" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('ct_phone','الهاتف')}</label>
+              <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">{t('ct_unit','رقم الوحدة')}</label>
+              <input value={form.unit_number} onChange={e => setForm({...form, unit_number: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-unit" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">{t('ct_role','الدور')}</label>
+            <div className="grid grid-cols-5 gap-1">
+              {roles.map(r => (
+                <button key={r.v} type="button" onClick={() => setForm({...form, role: r.v})}
+                  className={`px-1 py-1.5 rounded-lg text-[10px] font-semibold border ${form.role === r.v ? 'bg-green-600 border-green-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800'}`}
+                  data-testid={`ct-user-role-${r.v}`}>
+                  <div className="text-base">{r.emoji}</div>
+                  <div>{r.l}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2 pt-2">
+          <button onClick={submit} className="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-bold" data-testid="ct-add-user-save-btn">{t('ct_add','إضافة')}</button>
+          <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('ct_cancel','إلغاء')}</button>
+        </div>
       </div>
     </div>
   );

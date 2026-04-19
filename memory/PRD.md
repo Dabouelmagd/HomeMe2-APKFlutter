@@ -1,27 +1,28 @@
 # HomeMe PRD
 
 ## Product
-Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards (Resident, Admin, Super Admin, App Owner, Security), monetization (Ads + Campaigns + AdSense + Gifts + Bulk Renewal Offers), multi-session browser-tab architecture, and real-time push notifications.
+Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards (Resident, Admin, Super Admin, App Owner, Security), monetization (Ads + Campaigns + AdSense + Gifts + Bulk Renewal Offers), multi-session browser-tab architecture, real-time push notifications, and a hierarchical user-subscriptions dashboard with full inline CRUD.
 
-## Latest Fixes (Feb 2026 — iterations 26-30)
+## Latest Fixes (Feb 2026 — iterations 26-31)
+
+### Iter 31: HierarchicalSubs v2 — Reordered Layout + Full CRUD ✅ 100%
+- **Layout reversal per user request**: Independent compounds now render FIRST, then Management Companies SECOND, then unified totals dashboard at the BOTTOM (8 stat cards)
+- **Full CRUD per compound**: view 👁, edit ✏️, add-user ➕, gift 🎁, export ⬇, expand ▸
+- **Full CRUD per user**: edit ✏️ (name/email/phone/role), activate/deactivate ⏸/▶, gift 🎁, delete 🗑
+- **New endpoint**: `POST /api/super-admin/users` — creates user in any compound (accepts compound_id, bypassing admin's compound_id isolation)
+- **Critical bug fix** (discovered during testing): `DELETE /api/database/users/{id}` was raising 500 due to missing `db = get_db()` — now resolved
+- **Test results**: 17/17 backend + all frontend interactions — no regressions
 
 ### Iter 30: Pack 1 — Email Gifts + Bulk Renewal + Full-Details Polish ✅ 100%
-- **Email delivery for gifts**: send-gift now emails the recipient a branded HTML + text fallback (extend_trial / free_subscription / discount_coupon). Response includes `email: {sent: bool}`.
-- **Bulk Renewal Offer (retention booster)**: new endpoints
-  - `POST /api/super-admin/bulk-renewal-offer/preview?days_before_expiry=N` → lists users expiring within N days
-  - `POST /api/super-admin/bulk-renewal-offer/send` → creates RENEW-XXXXXX coupon per user, sends email + in-app notification, logs to `db.bulk_campaigns`
-- **Full-details improvements**:
-  - Separates `ads_targeted` (for this compound) vs `ads_global` (default)
-  - Smarter subscription lookup: company_subscriptions → compound subscription → active user_subscriptions of privileged admins
-- **Frontend**: new orange/pink "عرض تجديد جماعي" button with live preview modal (user list, days/discount inputs, message textarea, confirmation counter)
-- Test: 10/10 backend + 6/6 frontend — no regressions
+- Email delivery for all 3 gift types (HTML + text fallback)
+- Bulk Renewal Offer: preview + send endpoints, RENEW-XXXXXX coupons, logged in `db.bulk_campaigns`
+- Full-details: separates `ads_targeted` vs `ads_global`, smarter subscription lookup
+- Frontend: orange/pink gradient "عرض تجديد جماعي" button + live preview modal
 
 ### Iter 29: Hierarchical User Subscriptions Dashboard ✅
-- Critical fix: restored missing `async def` signature on full-details endpoint (backend was down)
-- Hierarchical tree: Management Companies → Compounds → Users (by role)
-- Sticky totals bar + 4 summary cards + per-level CSV export
-- Send Gift flow (3 types) targetable at user/compound/company level
-- Test: 10/10 backend + 16/16 frontend
+- Critical fix: restored missing `async def` signature on full-details endpoint
+- Hierarchical tree (v1): Management Companies → Compounds → Users (by role)
+- Sticky totals bar + summary cards + per-level CSV export + send gift flow
 
 ### Iter 28: Refactor Round 2 + Push Notifications ✅
 ### Iter 27: Security Dashboard + AdsTab Extraction ✅
@@ -36,20 +37,20 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - i18n auto-translation
 - 8-tab CompoundDetailModal + inline user CRUD
 - Homepage Resident Portal + improved Trial Status Bar
-- **Hierarchical Subscriptions Dashboard with Gifts + Bulk Renewal Offers (iter 29-30)**
+- **Hierarchical Subscriptions Dashboard v2 with full CRUD + Gifts + Bulk Renewal (iter 29-31)**
 
 ## Backlog
 - P2: Bank transfer API (blocked on user credentials)
 - P2: Smart Devices & Automation (deferred) — still **MOCKED**
-- P3: FCM mobile push for critical incidents (requires Firebase project + credentials)
-- P3: Advertiser Self-Service Portal (multi-sprint feature: register, create ad, pay, admin approval)
+- P3: Advertiser Self-Service Portal (multi-sprint feature)
+- Nice-to-have: scheduled monthly auto-bulk-renewal campaigns; de-dupe gift toast
 
 ## Architecture
-- Frontend: React (CRA) + Tailwind + Shadcn — `/components/super-admin/` sub-components (AdsTab, UsersTab, CodesTab, CouponsTab, CompoundDetailModal, HierarchicalSubs)
+- Frontend: React (CRA) + Tailwind + Shadcn — sub-components in `/components/super-admin/` (AdsTab, UsersTab, CodesTab, CouponsTab, CompoundDetailModal, HierarchicalSubs with 5 embedded modal components)
 - Backend: FastAPI modular routes in `/backend/routes/`
-- DB: MongoDB via Motor (async). New collections: `user_gifts`, `bulk_campaigns`
-- Email: shared `email_service` instance (SMTP via .env) — gifts + bulk renewal + reminders
-- Push: pywebpush + VAPID (web); FCM mobile pending
+- DB: MongoDB via Motor (async). Collections: users, compounds, management_companies, user_subscriptions, user_gifts, bulk_campaigns, coupons, subscription_codes, internal_ads, security_incidents, complaints, families, budgets, services
+- Email: shared `email_service` (SMTP via .env)
+- Push: pywebpush + VAPID (web only — FCM mobile cancelled by user)
 
 ## Health
 - Broken: none

@@ -13,6 +13,13 @@
 - Email: superadmin@homeme.app
 - Role: super_admin
 
+## Company Admin (مدير الشركة)
+- Username: testcompany2
+- Password: Company123!
+- Role: company_admin
+- company_id: ab8e7501-964c-4424-859f-af16ba8ad2e5 (شركة المعمار الحديث)
+- Dashboard: CompanyAdminDashboard (auto-routed on login)
+
 ## Test Admin (if created)
 - Username: admin
 - Password: admin123

@@ -3,7 +3,22 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-41)
+## Latest Fixes (Feb 2026 — iterations 26-42)
+
+### Iter 42: Owner Nav Fix + Company Admin Dashboard ✅
+- **🔗 Fixed Owner Quick Nav**: "شركات الإدارة" button now links to `/app/super-admin?tab=companies` (the full CRUD hierarchical CompaniesTab) instead of the narrow subscriptions page.
+- **🏢 New `CompanyAdminDashboard`** (`/app/frontend/src/pages/CompanyAdminDashboard.js`): Dedicated dashboard for `company_admin` role users. On login, they see:
+  - Their company header (name, code, email, phone) with stats (compounds count, total users, activity count)
+  - Grid of all compounds under their company with per-compound stats (residents/managers/security/total)
+  - **➕ Add Compound**, **✏️ Edit**, **🗑 Delete**, **➕ Add User** actions (scoped strictly to their own company)
+  - Graceful error screen if account isn't linked to a company
+- **🆕 Backend routes** (`/app/backend/routes/company_admin.py`): 7 endpoints scoped by `company_id` derived from logged-in user — ownership checks on every operation to prevent cross-company access.
+  - `GET /api/company-admin/me` • `GET /api/company-admin/compounds`
+  - `POST/PUT/DELETE /api/company-admin/compounds/{id}`
+  - `GET/POST /api/company-admin/compounds/{id}/users`
+- **🔗 Data migration**: Linked 3 existing `company_admin` users (testcompany2, testco3, companytest5) to companies for testing. Reset `testcompany2` password to `Company123!`.
+- **Routing**: `DashboardRouter` now sends `company_admin` → `CompanyAdminDashboard` (previously got generic AdminDashboard).
+- **Tested end-to-end**: curl + Playwright screenshot show the full Arabic dashboard with "شركة المعمار الحديث" loaded, 1 compound (رويال سيتي), 8 users, full CRUD buttons rendering correctly.
 
 ### Iter 41: Deployment Readiness Health Check — PASS ✅
 - **Deployment verdict: READY FOR PRODUCTION** (deployment agent returned `status: pass`, zero findings)

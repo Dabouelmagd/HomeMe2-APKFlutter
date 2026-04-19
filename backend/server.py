@@ -2372,6 +2372,7 @@ from routes.email_notifications import router as email_notif_router
 from routes.management_contracts import router as mgmt_contracts_router
 from routes.advertiser import router as advertiser_router
 from routes.compound_admin import router as compound_admin_router
+from routes.company_admin import router as company_admin_router
 
 app.include_router(monitoring_router)
 app.include_router(finance_router)
@@ -2382,6 +2383,7 @@ app.include_router(superadmin_router)
 app.include_router(mgmt_contracts_router)
 app.include_router(advertiser_router)
 app.include_router(compound_admin_router)
+app.include_router(company_admin_router)
 app.include_router(exports_router)
 app.include_router(facilities_router)
 app.include_router(maintenance_router)

@@ -278,7 +278,7 @@ const OwnerDashboard = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
             { name: t('owner_budget', 'الميزانية'), href: '/app/owner-budget', icon: CurrencyDollarIcon, bg: 'bg-gradient-to-br from-emerald-500 to-teal-600' },
-            { name: t('owner_company_subs', 'شركات الإدارة'), href: '/app/company-subscriptions', icon: BuildingOffice2Icon, bg: 'bg-gradient-to-br from-indigo-500 to-blue-600' },
+            { name: t('owner_company_subs', 'شركات الإدارة'), href: '/app/super-admin?tab=companies', icon: BuildingOffice2Icon, bg: 'bg-gradient-to-br from-indigo-500 to-blue-600' },
             { name: t('sa_ads', 'الإعلانات'), href: '/app/super-admin?tab=ads', icon: SpeakerWaveIcon, bg: 'bg-gradient-to-br from-amber-500 to-orange-600' },
             { name: t('owner_translations', 'الترجمات'), href: '/app/super-admin?tab=translations', icon: LanguageIcon, bg: 'bg-gradient-to-br from-rose-500 to-pink-600' },
           ].map((link, i) => (

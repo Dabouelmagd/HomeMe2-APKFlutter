@@ -54,6 +54,7 @@ import ComplaintsSystem from './components/ComplaintsSystem';
 import SuperAdminPanel from './components/SuperAdminPanel';
 import AdvertiserPortal from './pages/AdvertiserPortal';
 import AdvertiserRegister from './pages/AdvertiserRegister';
+import CompanyAdminDashboard from './pages/CompanyAdminDashboard';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
 import SubscriptionManagement from './components/SubscriptionManagement';
@@ -794,7 +795,9 @@ const DashboardRouter = () => {
   
   if (activeRole === 'app_owner') {
     return <OwnerDashboard />;
-  } else if (activeRole === 'super_admin' || activeRole === 'company_admin') {
+  } else if (activeRole === 'company_admin') {
+    return <CompanyAdminDashboard />;
+  } else if (activeRole === 'super_admin') {
     return <AdminDashboard />;
   } else if (activeRole === 'admin' || activeRole === 'manager') {
     return <AdminDashboard />;

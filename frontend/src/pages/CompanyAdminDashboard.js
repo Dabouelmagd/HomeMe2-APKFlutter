@@ -1,0 +1,333 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../App';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+
+/**
+ * CompanyAdminDashboard — لوحة تحكم مدير الشركة (role = company_admin)
+ * - يعرض بيانات الشركة + ملخص
+ * - يسرد كل المجمعات تحت الشركة
+ * - يسمح بإضافة/تعديل/حذف المجمعات
+ * - يسمح بإضافة سكان/إداريين/أمن لأي مجمع
+ */
+const CompanyAdminDashboard = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [me, setMe] = useState(null);
+  const [compounds, setCompounds] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editFor, setEditFor] = useState(null);
+  const [addUserFor, setAddUserFor] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    Promise.all([
+      axios.get(`${API}/company-admin/me`, getToken()),
+      axios.get(`${API}/company-admin/compounds`, getToken()),
+    ]).then(([m, c]) => {
+      if (!alive) return;
+      setMe(m.data);
+      setCompounds(c.data.compounds || []);
+      setError(null);
+    }).catch(err => {
+      if (!alive) return;
+      setError(err.response?.data?.detail || 'فشل التحميل');
+    }).finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [refreshKey]);
+
+  const reload = () => setRefreshKey(k => k + 1);
+
+  const createCompound = async (form) => {
+    try {
+      await axios.post(`${API}/company-admin/compounds`, form, getToken());
+      toast.success('تم إنشاء المجمع');
+      setCreateOpen(false);
+      reload();
+    } catch (err) { toast.error(err.response?.data?.detail || 'فشل الإنشاء'); }
+  };
+
+  const saveEdit = async () => {
+    if (!editFor?.id) return;
+    try {
+      await axios.put(`${API}/company-admin/compounds/${editFor.id}`, {
+        name: editFor.name, location: editFor.location, address: editFor.address, description: editFor.description,
+      }, getToken());
+      toast.success('تم التحديث');
+      setEditFor(null);
+      reload();
+    } catch (err) { toast.error(err.response?.data?.detail || 'فشل التحديث'); }
+  };
+
+  const removeCompound = async (c) => {
+    const usersCount = c.users_count || 0;
+    const msg = usersCount > 0
+      ? `هذا المجمع به ${usersCount} مستخدم. حذف مع إلغاء ربطهم؟`
+      : `تأكيد حذف "${c.name}"؟`;
+    if (!window.confirm(msg)) return;
+    try {
+      const url = `${API}/company-admin/compounds/${c.id}${usersCount > 0 ? '?force=true' : ''}`;
+      await axios.delete(url, getToken());
+      toast.success('تم الحذف');
+      reload();
+    } catch (err) { toast.error(err.response?.data?.detail || 'فشل الحذف'); }
+  };
+
+  const addUser = async (form) => {
+    if (!addUserFor?.id) return;
+    try {
+      await axios.post(`${API}/company-admin/compounds/${addUserFor.id}/users`, form, getToken());
+      toast.success('تمت إضافة المستخدم');
+      setAddUserFor(null);
+      reload();
+    } catch (err) { toast.error(err.response?.data?.detail || 'فشل الإضافة'); }
+  };
+
+  if (loading) return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center text-gray-400" dir="rtl">جاري التحميل...</div>
+  );
+
+  if (error) return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center p-6" dir="rtl">
+      <div className="bg-red-900/30 border border-red-700 rounded-2xl p-6 max-w-md text-center">
+        <div className="text-3xl mb-2">⚠️</div>
+        <h2 className="text-xl font-bold text-white mb-2">حسابك غير مرتبط بشركة</h2>
+        <p className="text-sm text-red-200 mb-4">{error}</p>
+        <p className="text-xs text-gray-400">تواصل مع مالك التطبيق لربط حسابك بشركة إدارة.</p>
+        <button onClick={() => navigate('/login')} className="mt-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm">تسجيل الخروج</button>
+      </div>
+    </div>
+  );
+
+  const company = me?.company || {};
+  const stats = me?.stats || {};
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-blue-950 p-6" dir="rtl" data-testid="company-admin-dashboard">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-indigo-900/60 to-purple-900/60 backdrop-blur border border-indigo-500/30 rounded-2xl p-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-[10px] text-indigo-300 uppercase tracking-wider mb-1">شركة إدارة</div>
+              <h1 className="text-3xl font-bold text-white">🏢 {company.name}</h1>
+              <p className="text-xs text-gray-400 mt-2">{company.description || '—'}</p>
+              <div className="flex flex-wrap gap-3 text-[11px] text-gray-400 mt-3">
+                {company.contact_email && <span>📧 {company.contact_email}</span>}
+                {company.contact_phone && <span>📱 {company.contact_phone}</span>}
+                {company.company_code && <span className="bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">#{company.company_code}</span>}
+              </div>
+            </div>
+            <div className="text-[11px] text-gray-400 text-end">
+              <div>مرحباً</div>
+              <div className="text-white font-semibold text-sm">{user?.full_name || user?.username}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <StatCard icon="🏘️" label="المجمعات" value={stats.compounds_count || 0} color="blue" />
+          <StatCard icon="👥" label="إجمالي المستخدمين" value={stats.total_users || 0} color="emerald" />
+          <StatCard icon="🎯" label="نشاط" value={compounds.filter(c => (c.users_count || 0) > 0).length} color="amber" />
+        </div>
+
+        {/* Action bar */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-white">🏘️ مجمعاتي</h2>
+          <button onClick={() => setCreateOpen(true)} className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold shadow-lg" data-testid="cad-create-compound-btn">
+            ➕ إضافة مجمع
+          </button>
+        </div>
+
+        {/* Compounds grid */}
+        {compounds.length === 0 ? (
+          <div className="text-center py-16 bg-gray-800/40 rounded-2xl border-2 border-dashed border-gray-700">
+            <div className="text-5xl mb-3">🏗️</div>
+            <h3 className="text-lg text-white mb-2">لا توجد مجمعات بعد</h3>
+            <p className="text-sm text-gray-400 mb-4">ابدأ بإضافة أول مجمع تحت إدارة شركتك</p>
+            <button onClick={() => setCreateOpen(true)} className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold" data-testid="cad-create-first-btn">
+              ➕ أنشئ أول مجمع
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {compounds.map(c => (
+              <div key={c.id} className="bg-gray-800/70 border border-gray-700 rounded-xl p-5 space-y-3 hover:border-indigo-500/50 transition" data-testid={`cad-compound-${c.id}`}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-3xl">🏘️</span>
+                      <div className="min-w-0">
+                        <h3 className="text-lg font-bold text-white truncate">{c.name}</h3>
+                        <p className="text-[11px] text-gray-400 truncate">{c.location || 'بدون موقع'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-4 gap-1 text-center">
+                  <MiniStat label="سكان" val={c.residents || 0} color="blue" />
+                  <MiniStat label="إدارة" val={c.managers || 0} color="purple" />
+                  <MiniStat label="أمن" val={c.security || 0} color="amber" />
+                  <MiniStat label="الإجمالي" val={c.users_count || 0} color="emerald" />
+                </div>
+
+                {c.address && <div className="text-[11px] text-gray-500 border-t border-gray-700/50 pt-2">📍 {c.address}</div>}
+
+                <div className="grid grid-cols-3 gap-2 pt-2">
+                  <button onClick={() => setAddUserFor(c)} className="bg-green-600/30 hover:bg-green-600/50 text-green-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-add-user-${c.id}`}>➕ ساكن</button>
+                  <button onClick={() => setEditFor({ ...c })} className="bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-edit-${c.id}`}>✏️ تعديل</button>
+                  <button onClick={() => removeCompound(c)} className="bg-red-600/30 hover:bg-red-600/50 text-red-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-delete-${c.id}`}>🗑 حذف</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {createOpen && <CompoundFormModal title="➕ إضافة مجمع جديد" initial={{}} onClose={() => setCreateOpen(false)} onSave={createCompound} saveLabel="إضافة" />}
+      {editFor && <CompoundFormModal title="✏️ تعديل المجمع" initial={editFor} onClose={() => setEditFor(null)} onSave={async (f) => { setEditFor({...editFor, ...f}); setTimeout(saveEdit, 0); }} saveLabel="حفظ" />}
+      {addUserFor && <AddUserModal compound={addUserFor} onClose={() => setAddUserFor(null)} onSave={addUser} />}
+    </div>
+  );
+};
+
+const StatCard = ({ icon, label, value, color }) => (
+  <div className={`bg-gradient-to-br from-${color}-600/25 to-${color}-800/10 border border-${color}-600/40 rounded-xl p-5 text-center`}>
+    <div className="text-3xl mb-1">{icon}</div>
+    <div className="text-3xl font-bold text-white">{value}</div>
+    <div className="text-xs text-gray-400 mt-1">{label}</div>
+  </div>
+);
+
+const MiniStat = ({ label, val, color }) => (
+  <div className={`bg-${color}-900/30 border border-${color}-700/40 rounded p-1.5`}>
+    <div className={`text-sm font-bold text-${color}-300`}>{val}</div>
+    <div className="text-[9px] text-gray-400">{label}</div>
+  </div>
+);
+
+const CompoundFormModal = ({ title, initial, onClose, onSave, saveLabel }) => {
+  const [form, setForm] = useState({
+    name: initial.name || '', location: initial.location || '',
+    address: initial.address || '', description: initial.description || '',
+  });
+  const submit = () => {
+    if (!form.name.trim()) { toast.error('اسم المجمع مطلوب'); return; }
+    onSave(form);
+  };
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-indigo-500/30" onClick={e => e.stopPropagation()} data-testid="cad-compound-form-modal">
+        <h3 className="text-lg font-bold text-white">{title}</h3>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">اسم المجمع *</label>
+            <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="cad-cpd-name" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">الموقع</label>
+            <input value={form.location} onChange={e => setForm({...form, location: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="cad-cpd-location" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">العنوان التفصيلي</label>
+            <input value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">الوصف</label>
+            <textarea rows="2" value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={submit} className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-bold" data-testid="cad-cpd-save">{saveLabel}</button>
+          <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AddUserModal = ({ compound, onClose, onSave }) => {
+  const [form, setForm] = useState({
+    full_name: '', username: '', email: '', password: '', role: 'resident', phone: '', unit_number: '',
+  });
+  const roles = [
+    { v: 'resident', l: 'ساكن', emoji: '🏠' },
+    { v: 'family_head', l: 'رب أسرة', emoji: '👨‍👩‍👧' },
+    { v: 'manager', l: 'إداري', emoji: '👔' },
+    { v: 'security', l: 'أمن', emoji: '🛡' },
+    { v: 'admin', l: 'أدمن', emoji: '⚙️' },
+  ];
+  const submit = () => {
+    if (!form.full_name.trim() || !form.username.trim() || !form.email.trim() || !form.password) {
+      toast.error('كل الحقول المميّزة بنجمة مطلوبة'); return;
+    }
+    if (form.password.length < 6) { toast.error('كلمة المرور 6 أحرف على الأقل'); return; }
+    onSave(form);
+  };
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-green-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="cad-add-user-modal">
+        <h3 className="text-lg font-bold text-white">👤 إضافة مستخدم — <span className="text-green-300">{compound.name}</span></h3>
+        <div className="space-y-3">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">الاسم الكامل *</label>
+            <input value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="cad-user-fullname" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">اسم المستخدم *</label>
+              <input value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="cad-user-username" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">كلمة المرور *</label>
+              <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="cad-user-password" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">البريد الإلكتروني *</label>
+            <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="cad-user-email" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">الهاتف</label>
+              <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-400 mb-1">رقم الوحدة</label>
+              <input value={form.unit_number} onChange={e => setForm({...form, unit_number: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="cad-user-unit" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">الدور</label>
+            <div className="grid grid-cols-5 gap-1">
+              {roles.map(r => (
+                <button key={r.v} type="button" onClick={() => setForm({...form, role: r.v})}
+                  className={`px-1 py-1.5 rounded-lg text-[10px] font-semibold border ${form.role === r.v ? 'bg-green-600 border-green-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800'}`}
+                  data-testid={`cad-user-role-${r.v}`}>
+                  <div className="text-base">{r.emoji}</div>
+                  <div>{r.l}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={submit} className="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-bold" data-testid="cad-user-save">💾 إضافة</button>
+          <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">إلغاء</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CompanyAdminDashboard;

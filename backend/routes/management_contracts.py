@@ -5,6 +5,7 @@ auto-renewal, and 30-day expiry alerts. Used by Super Admin/Owner for monetizati
 """
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from datetime import datetime, timezone, timedelta
+from dateutil.relativedelta import relativedelta
 from typing import Optional
 import logging
 import uuid
@@ -241,7 +242,7 @@ async def process_auto_renew_contracts(current_user: dict = Depends(require_supe
         if end_dt > now:
             continue
         months = int(c.get("renewal_period_months") or 12)
-        new_end = (end_dt + timedelta(days=30 * months)).isoformat()
+        new_end = (end_dt + relativedelta(months=+months)).isoformat()
         await db.management_contracts.update_one(
             {"id": c["id"]},
             {"$set": {"end_date": new_end, "status": "active", "last_renewed_at": now.isoformat()}}

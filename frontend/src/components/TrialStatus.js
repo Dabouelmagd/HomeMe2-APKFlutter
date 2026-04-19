@@ -24,10 +24,44 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
   const { t } = useTranslation();
   const [trialData, setTrialData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [countdown, setCountdown] = useState(null);
+
+  // الأدوار التي لا يظهر لها البار إطلاقاً (هم مديرو الابلكيشن)
+  const APP_ADMIN_ROLES = ['super_admin', 'app_owner'];
+  const activeRole = user?.active_role || user?.role;
+  const isAppAdmin = APP_ADMIN_ROLES.includes(activeRole);
+  // إذا كان المجتمع مشترك فعلاً (paid) — لا نعرض بار التجربة
+  const hasPaidSubscription = user?.subscription_type === 'paid' || user?.subscription_status === 'active_paid';
 
   useEffect(() => {
+    if (isAppAdmin || hasPaidSubscription) {
+      setLoading(false);
+      return;
+    }
     fetchTrialStatus();
-  }, []);
+  }, [isAppAdmin, hasPaidSubscription]);
+
+  // ساعة تنازلية تحدّث كل ثانية أثناء التجربة النشطة
+  useEffect(() => {
+    if (!trialData?.trial_active || !trialData?.end_date) return;
+    const tick = () => {
+      const end = new Date(trialData.end_date);
+      const now = new Date();
+      const diff = end - now;
+      if (diff <= 0) { setCountdown({ expired: true }); return; }
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      setCountdown({ days, hours, minutes, seconds, expired: false });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [trialData?.trial_active, trialData?.end_date]);
+
+  // إخفاء كامل للأدوار الإدارية أو المشتركين المدفوعين
+  if (isAppAdmin || hasPaidSubscription) return null;
 
   const fetchTrialStatus = async () => {
     try {
@@ -196,56 +230,65 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
   }
 
   // Full version for dashboard/dedicated page
+  const themeColor = isAlmostExpired
+    ? { bg: 'bg-gradient-to-r from-orange-50 to-amber-50', border: 'border-orange-300', icon: 'bg-orange-100', iconText: 'text-orange-600', title: 'text-orange-900', text: 'text-orange-700', btn: 'bg-orange-600 hover:bg-orange-700' }
+    : { bg: 'bg-gradient-to-r from-emerald-50 to-teal-50', border: 'border-emerald-300', icon: 'bg-emerald-100', iconText: 'text-emerald-600', title: 'text-emerald-900', text: 'text-emerald-700', btn: 'bg-emerald-600 hover:bg-emerald-700' };
+
   return (
     <div className="space-y-6">
       {/* Trial Status Header */}
-      <div className={`border rounded-xl p-6 ${
-        isAlmostExpired ? 'bg-orange-50 border-orange-200' : 'bg-blue-50 border-blue-200'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className={`p-3 rounded-full ${
-              isAlmostExpired ? 'bg-orange-100' : 'bg-blue-100'
-            }`}>
+      <div className={`border-2 rounded-xl p-5 ${themeColor.bg} ${themeColor.border}`} data-testid="trial-status-bar">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <div className={`p-3 rounded-full ${themeColor.icon}`}>
               {isAlmostExpired ? (
-                <ExclamationTriangleIcon className={`h-6 w-6 ${
-                  isAlmostExpired ? 'text-orange-600' : 'text-blue-600'
-                }`} />
+                <ExclamationTriangleIcon className={`h-6 w-6 ${themeColor.iconText}`} />
               ) : (
-                <ClockIcon className="h-6 w-6 text-blue-600" />
+                <ClockIcon className={`h-6 w-6 ${themeColor.iconText}`} />
               )}
             </div>
             <div>
-              <h3 className={`text-lg font-semibold text-center ${
-                isAlmostExpired ? 'text-orange-900' : 'text-blue-900'
-              }`}>
-                {isAlmostExpired ? t('trial_ending_soon') : t('free_trial_active')}
+              <h3 className={`text-base font-bold ${themeColor.title}`}>
+                {isAlmostExpired ? t('trial_ending_soon', 'التجربة تنتهي قريباً!') : t('free_trial_active', '✨ النسخة التجريبية نشطة')}
               </h3>
-              <p className={`text-sm ${
-                isAlmostExpired ? 'text-orange-700' : 'text-blue-700'
-              }`}>
-                {daysRemaining} {daysRemaining === 1 ? t('days_left') : t('days_left_plural')}
-                {isAlmostExpired && ' - ' + t('upgrade_soon_avoid_interruption')}
-              </p>
+              {/* ساعة تنازلية */}
+              {countdown && !countdown.expired ? (
+                <div className="flex items-center gap-1.5 mt-1.5" data-testid="trial-countdown">
+                  {[
+                    { label: t('days', 'يوم'), val: countdown.days },
+                    { label: t('hours', 'ساعة'), val: countdown.hours },
+                    { label: t('minutes', 'دقيقة'), val: countdown.minutes },
+                    { label: t('seconds', 'ثانية'), val: countdown.seconds },
+                  ].map((u, i) => (
+                    <div key={i} className={`flex items-center gap-1 ${themeColor.text}`}>
+                      <span className={`font-mono font-black text-lg ${themeColor.title}`}>{String(u.val).padStart(2, '0')}</span>
+                      <span className="text-[10px] opacity-70">{u.label}</span>
+                      {i < 3 && <span className="opacity-30 mx-0.5">:</span>}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={`text-sm ${themeColor.text}`}>
+                  {daysRemaining} {daysRemaining === 1 ? t('days_left', 'يوم متبقي') : t('days_left_plural', 'أيام متبقية')}
+                  {isAlmostExpired && ' - ' + t('upgrade_soon_avoid_interruption', 'جددي الاشتراك لتجنب انقطاع الخدمة')}
+                </p>
+              )}
             </div>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={onUpgradeClick || upgradeToPaid}
-              className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white transition-colors ${
-                isAlmostExpired 
-                  ? 'bg-orange-600 hover:bg-orange-700'
-                  : 'bg-blue-600 hover:bg-blue-700'
-              }`}
+              className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-lg text-white transition-colors shadow-lg ${themeColor.btn}`}
+              data-testid="trial-upgrade-btn"
             >
-              <ArrowUpIcon className="h-4 w-4 mr-2" />
-              {t('upgrade_now')}
+              <ArrowUpIcon className="h-4 w-4" />
+              {isAlmostExpired ? t('subscribe_now', 'اشتركي الآن') : t('upgrade_now', 'ترقية')}
             </button>
             <button
               onClick={() => navigate('/app/pricing')}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors"
             >
-              {t('view_plans')}
+              {t('view_plans', 'عرض الباقات')}
             </button>
           </div>
         </div>

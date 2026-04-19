@@ -420,27 +420,49 @@ async def preview_bulk_renewal(
 
 @router.post("/super-admin/bulk-renewal-offer/send")
 async def send_bulk_renewal(payload: dict, current_user: dict = Depends(require_super_admin)):
-    """إرسال كود خصم تجديد جماعي لجميع المستخدمين الذين تنتهي اشتراكاتهم قريبًا."""
+    """إرسال كود خصم تجديد جماعي لجميع المستخدمين الذين تنتهي اشتراكاتهم قريبًا.
+    يدعم A/B Testing: مرر `variant_a_message` + `variant_b_message` لتقسيم المستلمين 50/50."""
     db = get_db()
     days_before = int(payload.get("days_before_expiry", 7))
     discount = max(1, min(90, int(payload.get("discount", 20))))
     message = payload.get("message", "")
     user_ids = payload.get("user_ids") or []
 
-    # إن لم تُرسل قائمة، استعلم تلقائيًا
+    # A/B testing: إن وُجدت كلا الرسالتين، قسّم المستلمين لمجموعتين متساويتين
+    ab_enabled = bool(payload.get("ab_test"))
+    variant_a_msg = (payload.get("variant_a_message") or message or "").strip()
+    variant_b_msg = (payload.get("variant_b_message") or "").strip()
+    if ab_enabled and not variant_b_msg:
+        ab_enabled = False
+
     if not user_ids:
         preview = await preview_bulk_renewal(days_before, current_user)
         user_ids = [t["user_id"] for t in preview.get("targets", [])]
 
+    # campaign_id موحد لكل الكوبونات المُصدرة
+    campaign_id = str(uuid.uuid4())
+    now_iso = datetime.now(timezone.utc).isoformat()
+
     sent, emails_sent, failed = 0, 0, 0
-    for uid in user_ids:
+    sent_a, sent_b, used_a, used_b = 0, 0, 0, 0
+
+    for idx, uid in enumerate(user_ids):
         try:
             user = await db.users.find_one({"id": uid}, {"_id": 0, "password_hash": 0})
             if not user:
                 failed += 1
                 continue
+            # تعيين variant
+            variant = None
+            user_message = message
+            if ab_enabled:
+                variant = "a" if idx % 2 == 0 else "b"
+                user_message = variant_a_msg if variant == "a" else variant_b_msg
+                if variant == "a": sent_a += 1
+                else: sent_b += 1
+
             code = f"RENEW-{uuid.uuid4().hex[:6].upper()}"
-            await db.coupons.insert_one({
+            coupon_doc = {
                 "id": str(uuid.uuid4()),
                 "code": code,
                 "discount_type": "percentage",
@@ -449,18 +471,21 @@ async def send_bulk_renewal(payload: dict, current_user: dict = Depends(require_
                 "times_used": 0,
                 "is_active": True,
                 "assigned_to": uid,
-                "notes": f"عرض تجديد جماعي - {message}",
+                "notes": f"عرض تجديد جماعي - {user_message}",
                 "campaign": "bulk_renewal",
-                "created_at": datetime.now(timezone.utc).isoformat(),
-            })
+                "campaign_id": campaign_id,
+                "variant": variant,
+                "created_at": now_iso,
+            }
+            await db.coupons.insert_one(coupon_doc)
             await db.notifications.insert_one({
                 "id": str(uuid.uuid4()),
                 "user_id": uid,
                 "title": f"🎯 خصم {discount}% على تجديد اشتراكك",
-                "body": message or f"استخدم الكود {code} للحصول على خصم {discount}% عند التجديد.",
+                "body": user_message or f"استخدم الكود {code} للحصول على خصم {discount}% عند التجديد.",
                 "type": "bulk_offer",
                 "read": False,
-                "created_at": datetime.now(timezone.utc).isoformat(),
+                "created_at": now_iso,
             })
             sent += 1
             if user.get("email"):
@@ -470,7 +495,7 @@ async def send_bulk_renewal(payload: dict, current_user: dict = Depends(require_
                         user.get("full_name") or user.get("username") or "",
                         "discount_coupon",
                         {"discount": discount},
-                        message,
+                        user_message,
                         code,
                     )
                     ok = await email_service.send_email(user["email"], subject, html, text)
@@ -482,21 +507,29 @@ async def send_bulk_renewal(payload: dict, current_user: dict = Depends(require_
             logging.error(f"Bulk renewal send error for {uid}: {e}")
             failed += 1
 
-    # سجل الحملة
     await db.bulk_campaigns.insert_one({
-        "id": str(uuid.uuid4()),
+        "id": campaign_id,
         "type": "bulk_renewal",
         "discount": discount,
         "days_before_expiry": days_before,
         "message": message,
+        "ab_test": ab_enabled,
+        "variant_a_message": variant_a_msg if ab_enabled else None,
+        "variant_b_message": variant_b_msg if ab_enabled else None,
+        "sent_a": sent_a, "sent_b": sent_b,
         "sent": sent,
         "emails_sent": emails_sent,
         "failed": failed,
         "sent_by": current_user.get("id"),
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": now_iso,
     })
 
-    return {"success": True, "sent": sent, "emails_sent": emails_sent, "failed": failed, "discount": discount}
+    return {
+        "success": True, "campaign_id": campaign_id,
+        "sent": sent, "emails_sent": emails_sent, "failed": failed,
+        "discount": discount, "ab_test": ab_enabled,
+        "sent_a": sent_a, "sent_b": sent_b,
+    }
 
 
 @router.get("/super-admin/compounds/{compound_id}/full-details")
@@ -840,26 +873,48 @@ async def add_compound_to_company(company_id: str, payload: dict, current_user: 
 
 @router.get("/super-admin/bulk-campaigns")
 async def list_bulk_campaigns(current_user: dict = Depends(require_super_admin)):
-    """قائمة حملات العروض الجماعية مع معدل الاستخدام لكل كود"""
+    """قائمة حملات العروض الجماعية مع معدل الاستخدام (عبر campaign_id FK) و A/B stats"""
     db = get_db()
     campaigns = await db.bulk_campaigns.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
     enriched = []
     total_sent = 0
     total_used = 0
-    total_revenue_saved = 0
     for c in campaigns:
+        cid = c.get("id")
+        # Exact match via campaign_id FK
         coupons = await db.coupons.find(
-            {"campaign": "bulk_renewal", "created_at": {"$gte": c.get("created_at")}},
-            {"_id": 0, "times_used": 1, "discount_value": 1}
-        ).to_list(2000)
-        # limit coupons to those created close to this campaign timestamp (simple heuristic: within 60s)
-        used = sum(1 for x in coupons[:c.get("sent", 0) or 500] if (x.get("times_used") or 0) > 0)
+            {"campaign_id": cid},
+            {"_id": 0, "times_used": 1, "variant": 1}
+        ).to_list(5000)
+        used = sum(1 for x in coupons if (x.get("times_used") or 0) > 0)
+        # Fallback للحملات القديمة التي لا تحمل campaign_id
+        if not coupons and c.get("sent"):
+            legacy_coupons = await db.coupons.find(
+                {"campaign": "bulk_renewal", "created_at": {"$gte": c.get("created_at")}},
+                {"_id": 0, "times_used": 1}
+            ).to_list(c.get("sent", 500) or 500)
+            used = sum(1 for x in legacy_coupons[:c.get("sent", 0) or 500] if (x.get("times_used") or 0) > 0)
+
+        # A/B breakdown
+        used_a = sum(1 for x in coupons if x.get("variant") == "a" and (x.get("times_used") or 0) > 0)
+        used_b = sum(1 for x in coupons if x.get("variant") == "b" and (x.get("times_used") or 0) > 0)
+        sent_a = c.get("sent_a") or sum(1 for x in coupons if x.get("variant") == "a")
+        sent_b = c.get("sent_b") or sum(1 for x in coupons if x.get("variant") == "b")
+
         total_sent += c.get("sent", 0) or 0
         total_used += used
         enriched.append({
             **c,
             "used": used,
             "conversion_rate": round(100 * used / c["sent"], 1) if c.get("sent") else 0,
+            "variant_a": {
+                "sent": sent_a, "used": used_a,
+                "conversion_rate": round(100 * used_a / sent_a, 1) if sent_a else 0,
+            },
+            "variant_b": {
+                "sent": sent_b, "used": used_b,
+                "conversion_rate": round(100 * used_b / sent_b, 1) if sent_b else 0,
+            },
         })
     return {
         "campaigns": serialize_datetime(enriched),
@@ -973,6 +1028,8 @@ async def run_auto_renewal_if_due():
 
     sent = 0
     emails_sent = 0
+    campaign_id = str(uuid.uuid4())
+    now_iso = datetime.now(timezone.utc).isoformat()
     for uid in user_ids:
         try:
             user = await db.users.find_one({"id": uid}, {"_id": 0, "password_hash": 0})
@@ -990,7 +1047,9 @@ async def run_auto_renewal_if_due():
                 "assigned_to": uid,
                 "notes": f"Auto monthly renewal - {message}",
                 "campaign": "bulk_renewal_auto",
-                "created_at": datetime.now(timezone.utc).isoformat(),
+                "campaign_id": campaign_id,
+                "variant": None,
+                "created_at": now_iso,
             })
             await db.notifications.insert_one({
                 "id": str(uuid.uuid4()),
@@ -999,7 +1058,7 @@ async def run_auto_renewal_if_due():
                 "body": message or f"استخدم الكود {code} للحصول على خصم {discount}% عند التجديد.",
                 "type": "bulk_offer_auto",
                 "read": False,
-                "created_at": datetime.now(timezone.utc).isoformat(),
+                "created_at": now_iso,
             })
             sent += 1
             if user.get("email"):
@@ -1018,7 +1077,7 @@ async def run_auto_renewal_if_due():
             logging.error(f"Auto-renewal send error for {uid}: {e}")
 
     await db.bulk_campaigns.insert_one({
-        "id": str(uuid.uuid4()),
+        "id": campaign_id,
         "type": "bulk_renewal_auto",
         "discount": discount,
         "days_before_expiry": days_before,
@@ -1027,10 +1086,52 @@ async def run_auto_renewal_if_due():
         "emails_sent": emails_sent,
         "failed": 0,
         "auto": True,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": now_iso,
     })
     await db.auto_renewal_config.update_one(
         {"id": "default"},
         {"$set": {"last_run": now.isoformat(), "last_sent": sent}},
     )
-    return {"sent": sent, "emails_sent": emails_sent, "targets": len(user_ids)}
+
+    # إرسال بريد ملخّص لمالك التطبيق
+    try:
+        owners = await db.users.find(
+            {"role": {"$in": ["app_owner", "super_admin"]}, "email": {"$exists": True, "$ne": ""}},
+            {"_id": 0, "email": 1, "full_name": 1, "username": 1}
+        ).to_list(20)
+        if owners:
+            from email_service import email_service
+            subject = f"📊 تقرير التجديد التلقائي — {now.strftime('%Y-%m-%d')}"
+            html = f"""<!DOCTYPE html><html dir="rtl"><body style="font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#f5f5f5;margin:0;padding:20px">
+<div style="max-width:600px;margin:0 auto;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,.1)">
+  <div style="background:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);color:white;padding:24px;text-align:center">
+    <div style="font-size:44px">🎯</div><h1 style="margin:8px 0 0;font-size:22px">تقرير التجديد التلقائي الشهري</h1>
+    <p style="margin:4px 0 0;opacity:.9">{now.strftime('%Y-%m-%d %H:%M UTC')}</p>
+  </div>
+  <div style="padding:28px">
+    <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+      <tr><td style="padding:10px;border-bottom:1px solid #eee">📋 المستهدفون</td><td style="padding:10px;border-bottom:1px solid #eee;text-align:left;font-weight:bold;color:#7c3aed">{len(user_ids)}</td></tr>
+      <tr><td style="padding:10px;border-bottom:1px solid #eee">✉️ الكوبونات المُرسلة</td><td style="padding:10px;border-bottom:1px solid #eee;text-align:left;font-weight:bold;color:#059669">{sent}</td></tr>
+      <tr><td style="padding:10px;border-bottom:1px solid #eee">📧 إيميلات ناجحة</td><td style="padding:10px;border-bottom:1px solid #eee;text-align:left;font-weight:bold;color:#2563eb">{emails_sent}</td></tr>
+      <tr><td style="padding:10px">💰 نسبة الخصم المُطبَّقة</td><td style="padding:10px;text-align:left;font-weight:bold;color:#d97706">{discount}%</td></tr>
+    </table>
+    <div style="background:#faf5ff;border-right:4px solid #7c3aed;padding:12px;border-radius:6px;font-size:13px;color:#444">
+      معرّف الحملة: <code style="background:#ede9fe;padding:2px 6px;border-radius:4px">{campaign_id[:8]}</code><br>
+      راقب معدل استخدام هذه الكوبونات في لوحة الحملات (📈) خلال الأسبوع القادم.
+    </div>
+    <div style="text-align:center;margin-top:24px">
+      <a href="{APP_URL}/app/super-admin?tab=user_subs" style="display:inline-block;background:linear-gradient(135deg,#7c3aed 0%,#ec4899 100%);color:white;padding:12px 28px;text-decoration:none;border-radius:25px;font-weight:bold">عرض لوحة الحملات</a>
+    </div>
+  </div>
+  <div style="background:#f8f9fa;padding:14px;text-align:center;color:#666;font-size:12px">HomeMe — نظام التجديد التلقائي</div>
+</div></body></html>"""
+            text = f"تقرير التجديد التلقائي الشهري\n\nالمستهدفون: {len(user_ids)}\nالمُرسل: {sent}\nإيميلات ناجحة: {emails_sent}\nالخصم: {discount}%\nمعرّف الحملة: {campaign_id}\n\n{APP_URL}/app/super-admin?tab=user_subs"
+            for o in owners:
+                try:
+                    await email_service.send_email(o["email"], subject, html, text)
+                except Exception as e:
+                    logging.error(f"Owner summary email error for {o.get('email')}: {e}")
+    except Exception as e:
+        logging.error(f"Owner summary dispatch error: {e}")
+
+    return {"sent": sent, "emails_sent": emails_sent, "targets": len(user_ids), "campaign_id": campaign_id}

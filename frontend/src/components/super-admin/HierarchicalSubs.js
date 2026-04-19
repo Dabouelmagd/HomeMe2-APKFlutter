@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -21,7 +21,7 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
   // Modals
   const [giftTarget, setGiftTarget] = useState(null);
   const [bulkOfferOpen, setBulkOfferOpen] = useState(false);
-  const [bulkForm, setBulkForm] = useState({ days_before_expiry: 7, discount: 20, message: '' });
+  const [bulkForm, setBulkForm] = useState({ days_before_expiry: 7, discount: 20, message: '', ab_test: false, variant_a_message: '', variant_b_message: '' });
   const [bulkPreview, setBulkPreview] = useState(null);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [editUser, setEditUser] = useState(null);
@@ -156,9 +156,11 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
 
   // ------- Gift sending -------
   const [giftForm, setGiftForm] = useState({ type: 'extend_trial', days: 7, discount: 20, plan: 'basic', message: '' });
+  const submittingGiftRef = useRef(false);
 
   const submitGift = async () => {
-    if (!giftTarget) return;
+    if (!giftTarget || submittingGiftRef.current) return;
+    submittingGiftRef.current = true;
     const details = {};
     if (giftForm.type === 'extend_trial') details.days = parseInt(giftForm.days) || 7;
     else if (giftForm.type === 'free_subscription') { details.days = parseInt(giftForm.days) || 30; details.plan = giftForm.plan; }
@@ -176,6 +178,8 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
       reload();
     } catch (err) {
       toast.error(err.response?.data?.detail || t('hs_gift_failed','فشل الإرسال'));
+    } finally {
+      setTimeout(() => { submittingGiftRef.current = false; }, 500);
     }
   };
 
@@ -315,15 +319,22 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
   const submitBulkOffer = async () => {
     try {
       const user_ids = (bulkPreview?.targets || []).map(x => x.user_id);
-      const res = await axios.post(`${API}/super-admin/bulk-renewal-offer/send`, {
+      const payload = {
         days_before_expiry: parseInt(bulkForm.days_before_expiry) || 7,
         discount: parseInt(bulkForm.discount) || 20,
         message: bulkForm.message || '', user_ids,
-      }, getToken());
+      };
+      if (bulkForm.ab_test && bulkForm.variant_a_message && bulkForm.variant_b_message) {
+        payload.ab_test = true;
+        payload.variant_a_message = bulkForm.variant_a_message;
+        payload.variant_b_message = bulkForm.variant_b_message;
+      }
+      const res = await axios.post(`${API}/super-admin/bulk-renewal-offer/send`, payload, getToken());
       const d = res.data || {};
-      toast.success(`${t('hs_bulk_sent','تم إرسال')} ${d.sent || 0} ${t('hs_offers','عرض')} (${d.emails_sent || 0} ${t('hs_emails','بريد')})`, { id: 'hs-bulk-sent' });
+      const abInfo = d.ab_test ? ` • A: ${d.sent_a} / B: ${d.sent_b}` : '';
+      toast.success(`${t('hs_bulk_sent','تم إرسال')} ${d.sent || 0} ${t('hs_offers','عرض')} (${d.emails_sent || 0} ${t('hs_emails','بريد')})${abInfo}`, { id: 'hs-bulk-sent' });
       setBulkOfferOpen(false); setBulkPreview(null);
-      setBulkForm({ days_before_expiry: 7, discount: 20, message: '' });
+      setBulkForm({ days_before_expiry: 7, discount: 20, message: '', ab_test: false, variant_a_message: '', variant_b_message: '' });
     } catch (err) {
       toast.error(err.response?.data?.detail || t('hs_bulk_failed','فشل الإرسال'));
     }
@@ -654,7 +665,35 @@ const BulkOfferModal = ({ form, setForm, preview, loading, onRefresh, onClose, o
       </div>
       <div>
         <label className="block text-xs text-gray-400 mb-1">{t('hs_message','رسالة (اختياري)')}</label>
-        <textarea rows="2" value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-bulk-message" />
+        <textarea rows="2" value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-bulk-message" disabled={form.ab_test} />
+        {form.ab_test && <p className="text-[10px] text-amber-400 mt-1">⚠ {t('hs_ab_overrides','يتم تجاهل هذا الحقل عند تفعيل A/B — استخدم الرسالتين أدناه.')}</p>}
+      </div>
+
+      {/* A/B Testing toggle + variants */}
+      <div className="bg-violet-900/20 border border-violet-600/30 rounded-lg p-3 space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm font-bold text-violet-200">🧪 {t('hs_ab_test','A/B Testing للرسائل')}</div>
+            <div className="text-[11px] text-gray-400">{t('hs_ab_desc','قسّم المستلمين 50/50 وقارن أيهما أعلى تحويلاً في لوحة الحملات.')}</div>
+          </div>
+          <label className="relative inline-block w-11 h-6 cursor-pointer">
+            <input type="checkbox" checked={!!form.ab_test} onChange={e => setForm({...form, ab_test: e.target.checked})} className="sr-only peer" data-testid="hs-bulk-ab-toggle" />
+            <span className="block bg-gray-600 peer-checked:bg-violet-500 rounded-full w-11 h-6 transition"></span>
+            <span className="absolute top-0.5 left-0.5 bg-white rounded-full w-5 h-5 transition peer-checked:translate-x-5"></span>
+          </label>
+        </div>
+        {form.ab_test && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-violet-300 mb-1 font-bold">✨ {t('hs_variant_a','النسخة A')}</label>
+              <textarea rows="2" value={form.variant_a_message} onChange={e => setForm({...form, variant_a_message: e.target.value})} className="w-full bg-gray-900 border border-violet-500/40 rounded-lg px-3 py-2 text-sm text-white" placeholder={t('hs_variant_a_ph','مثال: استعد الآن بخصم حصري — لا تفوّت الفرصة!')} data-testid="hs-bulk-variant-a" />
+            </div>
+            <div>
+              <label className="block text-xs text-violet-300 mb-1 font-bold">🌟 {t('hs_variant_b','النسخة B')}</label>
+              <textarea rows="2" value={form.variant_b_message} onChange={e => setForm({...form, variant_b_message: e.target.value})} className="w-full bg-gray-900 border border-violet-500/40 rounded-lg px-3 py-2 text-sm text-white" placeholder={t('hs_variant_b_ph','مثال: كعميل مميز، لدينا لك مفاجأة خاصة...')} data-testid="hs-bulk-variant-b" />
+            </div>
+          </div>
+        )}
       </div>
       <div className="bg-gray-900/60 rounded-lg border border-gray-700 p-3">
         <div className="flex justify-between items-center mb-2">
@@ -925,28 +964,43 @@ const CampaignsDashboard = ({ onClose, t }) => {
                     <th className="px-3 py-2 text-center text-gray-400">{t('hs_sent','مرسل')}</th>
                     <th className="px-3 py-2 text-center text-gray-400">{t('hs_used','مستخدم')}</th>
                     <th className="px-3 py-2 text-center text-gray-400">{t('hs_conversion','تحويل')}</th>
+                    <th className="px-3 py-2 text-center text-gray-400">A/B</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
-                  {(data.campaigns || []).map(c => (
-                    <tr key={c.id} className="hover:bg-gray-800" data-testid={`hs-campaign-${c.id}`}>
-                      <td className="px-3 py-2 text-gray-300">{(c.created_at || '').substring(0,10)}</td>
-                      <td className="px-3 py-2 text-center">
-                        {c.auto ? <span className="text-[10px] bg-violet-600/20 text-violet-300 px-1.5 py-0.5 rounded">{t('hs_auto_tag','تلقائي')}</span>
-                                : <span className="text-[10px] bg-blue-600/20 text-blue-300 px-1.5 py-0.5 rounded">{t('hs_manual_tag','يدوي')}</span>}
-                      </td>
-                      <td className="px-3 py-2 text-center text-amber-300 font-bold">{c.discount}%</td>
-                      <td className="px-3 py-2 text-center text-blue-300">{c.sent}</td>
-                      <td className="px-3 py-2 text-center text-emerald-300">{c.used}</td>
-                      <td className="px-3 py-2 text-center">
-                        <span className={`px-1.5 py-0.5 rounded text-[10px] ${c.conversion_rate >= 30 ? 'bg-emerald-600/20 text-emerald-300' : c.conversion_rate >= 10 ? 'bg-amber-600/20 text-amber-300' : 'bg-gray-600/20 text-gray-300'}`}>
-                          {c.conversion_rate}%
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {(data.campaigns || []).map(c => {
+                    const abWinner = c.ab_test
+                      ? (c.variant_a?.conversion_rate > c.variant_b?.conversion_rate ? 'a' :
+                         c.variant_b?.conversion_rate > c.variant_a?.conversion_rate ? 'b' : 'tie')
+                      : null;
+                    return (
+                      <tr key={c.id} className="hover:bg-gray-800" data-testid={`hs-campaign-${c.id}`}>
+                        <td className="px-3 py-2 text-gray-300">{(c.created_at || '').substring(0,10)}</td>
+                        <td className="px-3 py-2 text-center">
+                          {c.auto ? <span className="text-[10px] bg-violet-600/20 text-violet-300 px-1.5 py-0.5 rounded">{t('hs_auto_tag','تلقائي')}</span>
+                                  : <span className="text-[10px] bg-blue-600/20 text-blue-300 px-1.5 py-0.5 rounded">{t('hs_manual_tag','يدوي')}</span>}
+                        </td>
+                        <td className="px-3 py-2 text-center text-amber-300 font-bold">{c.discount}%</td>
+                        <td className="px-3 py-2 text-center text-blue-300">{c.sent}</td>
+                        <td className="px-3 py-2 text-center text-emerald-300">{c.used}</td>
+                        <td className="px-3 py-2 text-center">
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] ${c.conversion_rate >= 30 ? 'bg-emerald-600/20 text-emerald-300' : c.conversion_rate >= 10 ? 'bg-amber-600/20 text-amber-300' : 'bg-gray-600/20 text-gray-300'}`}>
+                            {c.conversion_rate}%
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-center">
+                          {c.ab_test ? (
+                            <div className="flex flex-col gap-0.5 text-[10px]" data-testid={`hs-campaign-ab-${c.id}`}>
+                              <span className={abWinner === 'a' ? 'text-emerald-300 font-bold' : 'text-gray-400'}>A: {c.variant_a?.used}/{c.variant_a?.sent} ({c.variant_a?.conversion_rate}%){abWinner === 'a' ? ' 🏆' : ''}</span>
+                              <span className={abWinner === 'b' ? 'text-emerald-300 font-bold' : 'text-gray-400'}>B: {c.variant_b?.used}/{c.variant_b?.sent} ({c.variant_b?.conversion_rate}%){abWinner === 'b' ? ' 🏆' : ''}</span>
+                            </div>
+                          ) : <span className="text-gray-600 text-[10px]">—</span>}
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {(!data.campaigns || data.campaigns.length === 0) && (
-                    <tr><td colSpan="6" className="px-3 py-6 text-center text-gray-500">{t('hs_no_campaigns','لا توجد حملات بعد.')}</td></tr>
+                    <tr><td colSpan="7" className="px-3 py-6 text-center text-gray-500">{t('hs_no_campaigns','لا توجد حملات بعد.')}</td></tr>
                   )}
                 </tbody>
               </table>

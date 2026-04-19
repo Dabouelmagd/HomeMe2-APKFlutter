@@ -453,10 +453,8 @@ const CompoundDetailModal = ({ compoundId, onClose, t, isSuperAdminOnly }) => {
                 <div className="text-center py-8" data-testid="cd-security-content">
                   <p className="text-4xl mb-2">🛡️</p>
                   <p className="text-lg font-bold text-white mb-1">{data.stats.incidents_open} {t('cd_open_incidents', 'حادث أمني مفتوح')}</p>
-                  <p className="text-xs text-gray-400 mb-4">{t('cd_sec_hint', 'اذهبي إلى لوحة الأمان لإدارة الحوادث التفصيلية')}</p>
-                  <button onClick={() => { window.location.href = '/app/security'; }} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-500">
-                    {t('cd_go_security', 'الذهاب للوحة الأمان ←')}
-                  </button>
+                  <p className="text-xs text-gray-400 mb-4">{t('cd_sec_hint', 'لإدارة الحوادث تفصيليًا، سجّل الدخول بحساب أمن مخصص لهذا المجمع.')}</p>
+                  <p className="text-[11px] text-gray-500">{t('cd_sec_info', 'حسابات الأمن تُنشأ من تبويب "إدارة المستخدمين" بدور security.')}</p>
                 </div>
               )}
             </div>

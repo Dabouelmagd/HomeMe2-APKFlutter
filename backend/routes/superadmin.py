@@ -95,7 +95,7 @@ async def get_hierarchical_subscriptions(current_user: dict = Depends(require_su
     db = get_db()
     try:
         # 1) Fetch all companies, compounds, users, subscriptions
-        companies = await db.management_companies.find({}, {"_id": 0}).to_list(200)
+        companies = await db.companies.find({}, {"_id": 0}).to_list(200)
         compounds = await db.compounds.find({}, {"_id": 0}).to_list(500)
         users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(5000)
         user_subs = await db.user_subscriptions.find({}, {"_id": 0}).to_list(5000)
@@ -140,15 +140,30 @@ async def get_hierarchical_subscriptions(current_user: dict = Depends(require_su
                 },
             }
 
-        # 4) Group compounds by company (or _independent)
+        # 4) Group compounds by company (or _independent) - supports both forward (compound.company_id) and reverse (company.compound_ids) linkage
         companies_nodes = []
         unassigned_compounds = []
         company_by_id = {c.get("id"): c for c in companies}
+        compound_by_id = {c.get("id"): c for c in compounds}
         compound_by_company = {}
+
+        # First pass: reverse linkage from company.compound_ids array
+        assigned_compound_ids = set()
+        for company in companies:
+            for cid in (company.get("compound_ids") or []):
+                cpd = compound_by_id.get(cid)
+                if cpd:
+                    compound_by_company.setdefault(company["id"], []).append(cpd)
+                    assigned_compound_ids.add(cid)
+
+        # Second pass: forward linkage from compound.company_id
         for c in compounds:
+            if c.get("id") in assigned_compound_ids:
+                continue
             company_id = c.get("company_id") or c.get("management_company_id")
             if company_id and company_id in company_by_id:
                 compound_by_company.setdefault(company_id, []).append(c)
+                assigned_compound_ids.add(c.get("id"))
             else:
                 unassigned_compounds.append(c)
 
@@ -831,7 +846,7 @@ async def subscription_analytics(current_user: dict = Depends(require_super_admi
 async def update_management_company(company_id: str, payload: dict, current_user: dict = Depends(require_super_admin)):
     """تعديل بيانات شركة إدارة"""
     db = get_db()
-    company = await db.management_companies.find_one({"id": company_id}, {"_id": 0})
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0})
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     allowed = {"name", "email", "phone", "address", "website", "description", "company_name"}
@@ -839,7 +854,7 @@ async def update_management_company(company_id: str, payload: dict, current_user
     if not update:
         raise HTTPException(status_code=400, detail="لا توجد حقول صالحة للتحديث")
     update["updated_at"] = datetime.now(timezone.utc).isoformat()
-    await db.management_companies.update_one({"id": company_id}, {"$set": update})
+    await db.companies.update_one({"id": company_id}, {"$set": update})
     return {"success": True, "updated": list(update.keys())}
 
 
@@ -847,7 +862,7 @@ async def update_management_company(company_id: str, payload: dict, current_user
 async def add_compound_to_company(company_id: str, payload: dict, current_user: dict = Depends(require_super_admin)):
     """إضافة مجمع جديد تحت شركة إدارة محددة"""
     db = get_db()
-    company = await db.management_companies.find_one({"id": company_id}, {"_id": 0})
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0})
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     name = (payload.get("name") or "").strip()
@@ -865,6 +880,11 @@ async def add_compound_to_company(company_id: str, payload: dict, current_user: 
         "created_by": current_user.get("id"),
     }
     await db.compounds.insert_one(compound_doc)
+    # Also register the compound_id in the company's compound_ids array for hierarchical linkage
+    await db.companies.update_one(
+        {"id": company_id},
+        {"$addToSet": {"compound_ids": compound_doc["id"]}}
+    )
     compound_doc.pop("_id", None)
     return {"success": True, "compound": serialize_datetime(compound_doc)}
 

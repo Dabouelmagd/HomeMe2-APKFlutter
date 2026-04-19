@@ -34,7 +34,8 @@ const SuperAdminPanel = () => {
   const initialTab = searchParams.get('tab') || 'overview';
 
   const roleLabels = {
-    super_admin: t('role_super_admin', 'مالك التطبيق'),
+    app_owner: t('role_owner', 'مالك التطبيق'),
+    super_admin: t('role_super_admin', 'سوبر أدمن'),
     company_admin: t('role_company_admin', 'إدارة شركة'),
     admin: t('role_admin', 'مدير مجتمع'),
     manager: t('role_manager', 'إداري'),
@@ -43,6 +44,7 @@ const SuperAdminPanel = () => {
   };
 
   const roleColors = {
+    app_owner: 'bg-rose-100 text-rose-700',
     super_admin: 'bg-purple-100 text-purple-700',
     company_admin: 'bg-indigo-100 text-indigo-700',
     admin: 'bg-blue-100 text-blue-700',

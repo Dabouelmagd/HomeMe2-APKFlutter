@@ -732,6 +732,104 @@ async def super_admin_create_user(user_data: dict, current_user: dict = Depends(
     return {"success": True, "user": serialize_datetime(user_doc)}
 
 
+@router.post("/super-admin/users/bulk")
+async def super_admin_bulk_create_users(payload: dict, current_user: dict = Depends(require_super_admin)):
+    """إنشاء متعدد للمستخدمين (CSV / Paste list).
+
+    payload = {
+        compound_id: str,
+        role: str,                 # default role for all rows
+        rows: [ { full_name, username, email, password, phone?, unit_number? }, ... ]
+    }
+    Returns: { created: [...], failed: [ {row_index, row, error} ] }
+    """
+    db = get_db()
+    compound_id = payload.get("compound_id")
+    default_role = payload.get("role") or "resident"
+    rows = payload.get("rows") or []
+
+    if not isinstance(rows, list) or len(rows) == 0:
+        raise HTTPException(status_code=400, detail="لا توجد صفوف لإنشائها")
+    if len(rows) > 500:
+        raise HTTPException(status_code=400, detail="الحد الأقصى 500 صف في الدفعة الواحدة")
+
+    valid_roles = ["super_admin", "company_admin", "admin", "manager", "security", "resident", "family_head", "family_member", "app_owner"]
+    if default_role not in valid_roles:
+        raise HTTPException(status_code=400, detail=f"دور غير صالح: {valid_roles}")
+
+    if compound_id:
+        compound = await db.compounds.find_one({"id": compound_id})
+        if not compound:
+            raise HTTPException(status_code=400, detail="المجمع غير موجود")
+
+    created = []
+    failed = []
+
+    # Pre-load existing usernames/emails to fail fast on duplicates (batch-scope)
+    all_usernames = [((r.get("username") or "").strip()) for r in rows]
+    all_emails = [((r.get("email") or "").strip().lower()) for r in rows]
+    existing = await db.users.find(
+        {"$or": [{"username": {"$in": [u for u in all_usernames if u]}},
+                 {"email": {"$in": [e for e in all_emails if e]}}]},
+        {"_id": 0, "username": 1, "email": 1},
+    ).to_list(1000)
+    taken_usernames = {u.get("username") for u in existing}
+    taken_emails = {(u.get("email") or "").lower() for u in existing}
+
+    batch_usernames = set()
+    batch_emails = set()
+
+    for idx, row in enumerate(rows):
+        try:
+            username = (row.get("username") or "").strip()
+            email = (row.get("email") or "").strip()
+            password = row.get("password") or ""
+            full_name = (row.get("full_name") or "").strip()
+            role = row.get("role") or default_role
+            phone = row.get("phone", "") or ""
+            unit_number = row.get("unit_number", "") or ""
+
+            if not username or not email or not password or not full_name:
+                raise ValueError("الحقول المطلوبة: full_name, username, email, password")
+            if len(password) < 6:
+                raise ValueError("كلمة المرور يجب ألا تقل عن 6 أحرف")
+            if role not in valid_roles:
+                raise ValueError(f"دور غير صالح: {role}")
+            if username in taken_usernames or username in batch_usernames:
+                raise ValueError("اسم المستخدم مستخدم بالفعل")
+            if email.lower() in taken_emails or email.lower() in batch_emails:
+                raise ValueError("البريد الإلكتروني مستخدم بالفعل")
+
+            password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+            user_doc = {
+                "id": str(uuid.uuid4()),
+                "username": username,
+                "email": email,
+                "password_hash": password_hash,
+                "role": role,
+                "compound_id": compound_id,
+                "family_id": None,
+                "full_name": full_name,
+                "phone": phone,
+                "unit_number": unit_number,
+                "is_family_head": False,
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "profile_picture_url": None,
+            }
+            await db.users.insert_one(user_doc)
+            batch_usernames.add(username)
+            batch_emails.add(email.lower())
+            user_doc.pop("_id", None)
+            user_doc.pop("password_hash", None)
+            created.append(serialize_datetime(user_doc))
+        except Exception as e:
+            failed.append({"row_index": idx, "row": row, "error": str(e)})
+
+    return {"success": True, "created_count": len(created), "failed_count": len(failed),
+            "created": created, "failed": failed}
+
+
 @router.put("/super-admin/users/{user_id}/role")
 async def super_admin_update_role(user_id: str, role: str, current_user: dict = Depends(require_super_admin)):
     db = get_db()

@@ -2369,6 +2369,8 @@ from routes.ads import router as ads_router
 from routes.referrals import router as referrals_router
 from routes.invoices import router as invoices_router
 from routes.email_notifications import router as email_notif_router
+from routes.management_contracts import router as mgmt_contracts_router
+from routes.advertiser import router as advertiser_router
 
 app.include_router(monitoring_router)
 app.include_router(finance_router)
@@ -2376,6 +2378,8 @@ app.include_router(ratings_router2)
 app.include_router(contracts_router)
 app.include_router(complaints_router)
 app.include_router(superadmin_router)
+app.include_router(mgmt_contracts_router)
+app.include_router(advertiser_router)
 app.include_router(exports_router)
 app.include_router(facilities_router)
 app.include_router(maintenance_router)

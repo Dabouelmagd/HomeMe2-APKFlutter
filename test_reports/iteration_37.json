@@ -1,0 +1,37 @@
+{
+  "summary": "Iteration 37 — tested Management Contracts, Bulk Users, and Advertiser Portal end-to-end. Created /app/backend/tests/test_iter37_contracts_bulk_advertiser.py with 29 pytest cases covering all new endpoints (contracts CRUD + PDF upload/download + auto-renew + validation, bulk users with mixed/valid/invalid/duplicates, advertiser register→login→create→pay(mock)→approve/reject→track impression/click→stats). All 29 tests PASSED on the first real run. Frontend Playwright tests confirm: /advertiser-register form submits and navigates to /login; /app/advertiser AdvertiserPortal loads with ad create modal (showing title/body/image/link/duration/live price EGP 350 for 7 days) opening via ad-create-btn; SuperAdmin → companies tab renders correctly with 📋 العقد (ct-contract-*) button on each compound opening ContractModal with every advertised field (start/end dates, commission %, fixed fee, currency, billing cycle, status, auto-renew toggle, renewal months, notes, PDF upload, save/cancel); advertiser-ads-tab visible via ?tab=advertiser_ads with filter pills + stats cards.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "SuperAdmin → Advertiser Ads tab — empty state", "issues": ["Filter pills and stats cards render but empty-state message 'لا توجد إعلانات' appears only after approving the single test ad. Consider showing pending ads count prominently."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter37_contracts_bulk_advertiser.py",
+    "/app/test_reports/pytest/iter37_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "routes/advertiser.py: `_require_advertiser` allows super_admin/app_owner but then uses `current_user.id` as advertiser_id on create — a super-admin creating an ad will own it under their user id, which may conflate roles. Consider blocking create for non-advertiser roles.",
+    "routes/management_contracts.py `process_auto_renew`: uses `timedelta(days=30 * months)` which is inaccurate for yearly renewals (lands ~5 days short per year). Use relativedelta(months=+N) for calendar-accurate renewal.",
+    "routes/management_contracts.py: list endpoint strips pdf_data_url for bandwidth, but get-by-id returns full base64 inline (could be multi-MB in JSON responses).",
+    "routes/advertiser.py mock-pay branch: sets payment_status='paid' and immediately flips status to 'pending_approval' regardless of whether Stripe was even attempted — fine for dev, but ensure production .env always has STRIPE_SECRET_KEY set to avoid free ads.",
+    "superadmin.py bulk endpoint: doesn't validate email format, allows any string; existing DB check queries users collection but skips checks on advertiser collection (if separate). Currently advertisers are in users collection so OK.",
+    "CompaniesTab.js (>700 lines): ContractModal + BulkUsersPanel + AddUserModal + CompanyModal are inline. Extract into separate files for maintainability."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter37_contracts_bulk_advertiser.py"
+  ],
+  "success_rate": {"backend": "100% (29/29)", "frontend": "100% of UI paths reached"},
+  "test_credentials": "Super Admin: superadmin / SuperAdmin2024!. Advertiser: registered dynamically via /advertiser-register with TEST_adv_* prefix. Mock Stripe active (STRIPE_SECRET_KEY empty) → /pay returns mock=true.",
+  "seed_data_creation": "Test created: multiple management contracts (all cleaned up via DELETE), 2 bulk users (TEST_u1_*, TEST_u2_*), 1 advertiser account (TEST_adv_*), 2 advertiser ads (1 approved, 1 rejected). TEST_ prefix used throughout for easy cleanup.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All iter37 features (management contracts CRUD+PDF+auto-renew, bulk users with dup detection, advertiser portal+mock Stripe+approval flow) working. Regression file: /app/backend/tests/test_iter37_contracts_bulk_advertiser.py. Login payload returns field 'access_token' (not 'token'). Compound creation uses POST /api/super-admin/companies/{company_id}/compounds (not POST /api/super-admin/compounds which is 405).",
+  "rca_of_the_issue": "N/A — no bugs found."
+}

@@ -52,6 +52,8 @@ import SatisfactionDashboard from './components/SatisfactionDashboard';
 import ContractsManagement from './components/ContractsManagement';
 import ComplaintsSystem from './components/ComplaintsSystem';
 import SuperAdminPanel from './components/SuperAdminPanel';
+import AdvertiserPortal from './pages/AdvertiserPortal';
+import AdvertiserRegister from './pages/AdvertiserRegister';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
 import SubscriptionManagement from './components/SubscriptionManagement';
@@ -489,6 +491,7 @@ function App() {
           <Route path="/terms-privacy" element={<TermsPrivacy />} />
           <Route path="/legal" element={<TermsPrivacy />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/advertiser-register" element={<AdvertiserRegister />} />
                 <Route path="/debug-login" element={<DebugLogin />} />
                 <Route path="/select-account" element={
                   <ProtectedRoute>
@@ -621,6 +624,12 @@ function App() {
                 <Route path="super-admin" element={
                   <ProtectedRoute>
                     <SuperAdminPanel />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="advertiser" element={
+                  <ProtectedRoute>
+                    <AdvertiserPortal />
                   </ProtectedRoute>
                 } />
                 

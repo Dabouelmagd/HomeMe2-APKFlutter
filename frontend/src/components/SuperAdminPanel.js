@@ -22,6 +22,7 @@ import CouponsTab from './super-admin/CouponsTab';
 import CompoundDetailModal from './super-admin/CompoundDetailModal';
 import HierarchicalSubs from './super-admin/HierarchicalSubs';
 import CompaniesTab from './super-admin/CompaniesTab';
+import AdvertiserAdsTab from './super-admin/AdvertiserAdsTab';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -438,6 +439,7 @@ const SuperAdminPanel = () => {
               { id: 'user_subs', label: t('sa_user_subs', 'اشتراكات المستخدمين') },
             ] : []),
             { id: 'ads', label: t('sa_ads_management', 'إدارة الإعلانات') },
+            { id: 'advertiser_ads', label: t('sa_advertiser_ads', 'إعلانات المعلنين') },
             ...(!isSuperAdminOnly ? [
               { id: 'referrals', label: t('sa_referrals', 'الإحالات') },
               { id: 'analytics', label: t('sa_analytics', 'تحليلات الاشتراكات') },
@@ -882,6 +884,10 @@ const SuperAdminPanel = () => {
         {/* Companies Tab */}
         {activeTab === 'companies' && (
           <CompaniesTab t={t} />
+        )}
+
+        {activeTab === 'advertiser_ads' && (
+          <AdvertiserAdsTab t={t} />
         )}
 
       </div>

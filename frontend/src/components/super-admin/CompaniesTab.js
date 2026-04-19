@@ -25,6 +25,7 @@ const CompaniesTab = ({ t }) => {
   const [topOpen, setTopOpen] = useState(false);
   const [addCompoundFor, setAddCompoundFor] = useState(null); // { id, name }
   const [addUserFor, setAddUserFor] = useState(null); // { compound_id, compound_name }
+  const [contractFor, setContractFor] = useState(null); // { company_id, company_name, compound_id, compound_name }
 
   const reload = () => setRefreshKey(k => k + 1);
 
@@ -95,6 +96,24 @@ const CompaniesTab = ({ t }) => {
       setAddUserFor(null);
       reload();
     } catch (err) { toast.error(err.response?.data?.detail || t('ct_user_add_failed','فشل إضافة المستخدم')); }
+  };
+
+  const bulkAddUsers = async (rows, role) => {
+    if (!addUserFor?.compound_id) return null;
+    try {
+      const res = await axios.post(`${API}/super-admin/users/bulk`, {
+        compound_id: addUserFor.compound_id, role, rows
+      }, getToken());
+      const { created_count, failed_count } = res.data;
+      if (created_count > 0) toast.success(`${t('ct_bulk_created','تم إنشاء')} ${created_count} ${t('ct_users','مستخدم')}`);
+      if (failed_count > 0) toast.warning(`${failed_count} ${t('ct_bulk_failed','فشل')} — ${t('ct_see_report','راجع التقرير أدناه')}`);
+      if (failed_count === 0) setAddUserFor(null);
+      reload();
+      return res.data;
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('ct_bulk_error','فشل الاستيراد'));
+      return null;
+    }
   };
 
   const importStructure = async (file, mergeMode) => {
@@ -240,6 +259,7 @@ const CompaniesTab = ({ t }) => {
                             </div>
                           </div>
                           <button onClick={() => setAddUserFor({ compound_id: cpd.id, compound_name: cpd.name })} className="px-2 py-1 text-[11px] bg-green-600/30 hover:bg-green-600/50 text-green-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-add-user-${cpd.id}`}>➕ {t('ct_add_user','إضافة ساكن')}</button>
+                          <button onClick={() => setContractFor({ company_id: co.id, company_name: co.name, compound_id: cpd.id, compound_name: cpd.name })} className="px-2 py-1 text-[11px] bg-amber-600/30 hover:bg-amber-600/50 text-amber-200 rounded font-semibold whitespace-nowrap" data-testid={`ct-contract-${cpd.id}`}>📋 {t('ct_contract','العقد')}</button>
                         </div>
                         {/* Users grouped by role */}
                         {Object.keys(cpd.users_by_role || {}).length > 0 && (
@@ -284,7 +304,10 @@ const CompaniesTab = ({ t }) => {
       {addCompoundFor && <AddCompoundModal companyName={addCompoundFor.name} onClose={() => setAddCompoundFor(null)} onSave={addCompound} t={t} />}
 
       {/* Add User (resident) modal */}
-      {addUserFor && <AddUserModal compoundName={addUserFor.compound_name} onClose={() => setAddUserFor(null)} onSave={addUser} t={t} />}
+      {addUserFor && <AddUserModal compoundName={addUserFor.compound_name} onClose={() => setAddUserFor(null)} onSave={addUser} onBulkSave={bulkAddUsers} t={t} />}
+
+      {/* Management Contract modal */}
+      {contractFor && <ContractModal ctx={contractFor} onClose={() => setContractFor(null)} t={t} />}
     </div>
   );
 };
@@ -532,8 +555,9 @@ const AddCompoundModal = ({ companyName, onClose, onSave, t }) => {
   );
 };
 
-// ==================== AddUserModal ====================
-const AddUserModal = ({ compoundName, onClose, onSave, t }) => {
+// ==================== AddUserModal (Single + Bulk CSV/Paste) ====================
+const AddUserModal = ({ compoundName, onClose, onSave, onBulkSave, t }) => {
+  const [mode, setMode] = useState('single'); // 'single' | 'bulk'
   const [form, setForm] = useState({
     full_name: '', username: '', email: '', password: '',
     role: 'resident', phone: '', unit_number: '',
@@ -555,55 +579,417 @@ const AddUserModal = ({ compoundName, onClose, onSave, t }) => {
   ];
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-green-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="ct-add-user-modal">
+      <div className="bg-gray-800 rounded-2xl w-full max-w-2xl p-6 space-y-4 border border-green-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="ct-add-user-modal">
         <h3 className="text-lg font-bold text-white">👤 {t('ct_add_user_title','إضافة ساكن / مستخدم')} — <span className="text-green-300">{compoundName}</span></h3>
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">{t('ct_full_name','الاسم الكامل')} *</label>
-            <input value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-fullname" />
+
+        {/* Mode tabs */}
+        <div className="flex gap-2 border-b border-gray-700 pb-2">
+          <button onClick={() => setMode('single')} className={`px-3 py-1.5 text-xs rounded-t font-semibold ${mode === 'single' ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`} data-testid="ct-user-tab-single">👤 {t('ct_single','مستخدم واحد')}</button>
+          <button onClick={() => setMode('bulk')} className={`px-3 py-1.5 text-xs rounded-t font-semibold ${mode === 'bulk' ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`} data-testid="ct-user-tab-bulk">📦 {t('ct_bulk','إنشاء متعدد (CSV/Paste)')}</button>
+        </div>
+
+        {/* Common role selector */}
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('ct_role','الدور')}</label>
+          <div className="grid grid-cols-5 gap-1">
+            {roles.map(r => (
+              <button key={r.v} type="button" onClick={() => setForm({...form, role: r.v})}
+                className={`px-1 py-1.5 rounded-lg text-[10px] font-semibold border ${form.role === r.v ? 'bg-green-600 border-green-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800'}`}
+                data-testid={`ct-user-role-${r.v}`}>
+                <div className="text-base">{r.emoji}</div>
+                <div>{r.l}</div>
+              </button>
+            ))}
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">{t('ct_username','اسم المستخدم')} *</label>
-              <input value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-username" />
+        </div>
+
+        {mode === 'single' ? (
+          <>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('ct_full_name','الاسم الكامل')} *</label>
+                <input value={form.full_name} onChange={e => setForm({...form, full_name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-fullname" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">{t('ct_username','اسم المستخدم')} *</label>
+                  <input value={form.username} onChange={e => setForm({...form, username: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-username" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">{t('ct_password','كلمة المرور')} *</label>
+                  <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-password" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1">{t('ct_email','البريد')} *</label>
+                <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-email" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">{t('ct_phone','الهاتف')}</label>
+                  <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-400 mb-1">{t('ct_unit','رقم الوحدة')}</label>
+                  <input value={form.unit_number} onChange={e => setForm({...form, unit_number: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-unit" />
+                </div>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">{t('ct_password','كلمة المرور')} *</label>
-              <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-password" />
+            <div className="flex gap-2 pt-2">
+              <button onClick={submit} className="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-bold" data-testid="ct-add-user-save-btn">{t('ct_add','إضافة')}</button>
+              <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('ct_cancel','إلغاء')}</button>
             </div>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">{t('ct_email','البريد')} *</label>
-            <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-email" />
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">{t('ct_phone','الهاتف')}</label>
-              <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-400 mb-1">{t('ct_unit','رقم الوحدة')}</label>
-              <input value={form.unit_number} onChange={e => setForm({...form, unit_number: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ct-user-unit" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">{t('ct_role','الدور')}</label>
-            <div className="grid grid-cols-5 gap-1">
-              {roles.map(r => (
-                <button key={r.v} type="button" onClick={() => setForm({...form, role: r.v})}
-                  className={`px-1 py-1.5 rounded-lg text-[10px] font-semibold border ${form.role === r.v ? 'bg-green-600 border-green-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800'}`}
-                  data-testid={`ct-user-role-${r.v}`}>
-                  <div className="text-base">{r.emoji}</div>
-                  <div>{r.l}</div>
-                </button>
+          </>
+        ) : (
+          <BulkUsersPanel role={form.role} onBulkSave={onBulkSave} onClose={onClose} t={t} />
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ==================== BulkUsersPanel ====================
+const BulkUsersPanel = ({ role, onBulkSave, onClose, t }) => {
+  const [text, setText] = useState('');
+  const [parsed, setParsed] = useState([]);
+  const [errors, setErrors] = useState([]);
+  const [result, setResult] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const sample = `full_name,username,email,password,phone,unit_number
+أحمد محمود,ahmed_m,ahmed@ex.com,pass1234,01012345678,A-101
+سارة عبدالله,sara_a,sara@ex.com,pass1234,01122334455,B-205`;
+
+  const parse = (raw) => {
+    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) return { rows: [], errors: [] };
+    // Detect header
+    const first = lines[0].toLowerCase();
+    const hasHeader = first.includes('full_name') || first.includes('username') || first.includes('email');
+    let headers = ['full_name','username','email','password','phone','unit_number'];
+    let start = 0;
+    if (hasHeader) {
+      headers = lines[0].split(/[,;\t]/).map(h => h.trim().toLowerCase());
+      start = 1;
+    }
+    const rows = []; const errs = [];
+    for (let i = start; i < lines.length; i++) {
+      const parts = lines[i].split(/[,;\t]/).map(p => p.trim());
+      const row = {};
+      headers.forEach((h, idx) => { row[h] = parts[idx] || ''; });
+      const missing = [];
+      if (!row.full_name) missing.push('full_name');
+      if (!row.username) missing.push('username');
+      if (!row.email) missing.push('email');
+      if (!row.password) missing.push('password');
+      if (missing.length) errs.push({ line: i + 1, error: `حقول ناقصة: ${missing.join(', ')}`, row });
+      else rows.push(row);
+    }
+    return { rows, errors: errs };
+  };
+
+  const handleParse = () => {
+    const { rows, errors } = parse(text);
+    setParsed(rows); setErrors(errors);
+    if (rows.length === 0) toast.error(t('ct_no_valid_rows','لا توجد صفوف صالحة'));
+    else toast.info(`${rows.length} ${t('ct_rows_ready','صف جاهز للإنشاء')}${errors.length ? ` • ${errors.length} ${t('ct_rows_invalid','صف غير صالح')}` : ''}`);
+  };
+
+  const handleFile = (f) => {
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = (e) => { setText(e.target.result || ''); };
+    reader.readAsText(f);
+  };
+
+  const submit = async () => {
+    if (parsed.length === 0) { toast.error(t('ct_parse_first','قم بالتحليل أولًا')); return; }
+    setSubmitting(true);
+    const res = await onBulkSave(parsed, role);
+    setSubmitting(false);
+    if (res) setResult(res);
+  };
+
+  return (
+    <div className="space-y-3" data-testid="ct-bulk-panel">
+      <div className="flex gap-2 items-center">
+        <label className="flex-1 bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-xs text-gray-300 cursor-pointer hover:border-green-500/60">
+          📄 <input type="file" accept=".csv,.txt,text/csv,text/plain" className="hidden" onChange={e => handleFile(e.target.files?.[0])} data-testid="ct-bulk-file" />
+          <span className="mr-1">{t('ct_pick_csv','اختر ملف CSV')}</span>
+        </label>
+        <button onClick={() => setText(sample)} className="px-2 py-1.5 text-[10px] bg-gray-700 hover:bg-gray-600 text-gray-200 rounded" data-testid="ct-bulk-sample">📋 {t('ct_sample','نموذج')}</button>
+      </div>
+      <div>
+        <label className="block text-xs text-gray-400 mb-1">{t('ct_paste_rows','أو الصق الصفوف (CSV / مفصولة بفاصلة/تاب)')}</label>
+        <textarea value={text} onChange={e => setText(e.target.value)} rows="7" placeholder={sample}
+          className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-xs text-white font-mono" data-testid="ct-bulk-textarea" />
+      </div>
+      <div className="flex gap-2">
+        <button onClick={handleParse} className="flex-1 px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold" data-testid="ct-bulk-parse-btn">🔎 {t('ct_parse','تحليل ومعاينة')}</button>
+      </div>
+
+      {parsed.length > 0 && (
+        <div className="bg-gray-900/60 rounded-lg border border-gray-700 p-2 max-h-52 overflow-auto" data-testid="ct-bulk-preview">
+          <div className="text-[11px] text-emerald-300 mb-1 font-semibold">✅ {parsed.length} {t('ct_ready','جاهز')}</div>
+          <table className="w-full text-[10px]">
+            <thead><tr className="text-gray-400">
+              <th className="text-right px-1">#</th>
+              <th className="text-right px-1">{t('ct_full_name','الاسم')}</th>
+              <th className="text-right px-1">{t('ct_username','المستخدم')}</th>
+              <th className="text-right px-1">{t('ct_email','البريد')}</th>
+              <th className="text-right px-1">{t('ct_unit','وحدة')}</th>
+            </tr></thead>
+            <tbody>
+              {parsed.slice(0, 20).map((r, i) => (
+                <tr key={i} className="border-t border-gray-800">
+                  <td className="px-1 text-gray-500">{i+1}</td>
+                  <td className="px-1 text-white">{r.full_name}</td>
+                  <td className="px-1 text-gray-300">{r.username}</td>
+                  <td className="px-1 text-gray-400">{r.email}</td>
+                  <td className="px-1 text-gray-400">{r.unit_number || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {parsed.length > 20 && <div className="text-[10px] text-gray-500 text-center mt-1">... +{parsed.length - 20} {t('ct_more','المزيد')}</div>}
+        </div>
+      )}
+
+      {errors.length > 0 && (
+        <div className="bg-red-900/30 border border-red-700 rounded-lg p-2 max-h-32 overflow-auto" data-testid="ct-bulk-errors">
+          <div className="text-[11px] text-red-300 font-semibold mb-1">⚠️ {errors.length} {t('ct_parse_errors','صف غير صالح')}</div>
+          {errors.slice(0, 10).map((e, i) => (
+            <div key={i} className="text-[10px] text-red-200">{t('ct_line','سطر')} {e.line}: {e.error}</div>
+          ))}
+        </div>
+      )}
+
+      {result && (
+        <div className="bg-gray-900/60 border border-emerald-700/40 rounded-lg p-3 space-y-1" data-testid="ct-bulk-result">
+          <div className="text-xs font-semibold text-emerald-300">📊 {t('ct_bulk_report','تقرير الدفعة')}</div>
+          <div className="text-[11px] text-gray-300">✅ {t('ct_created','مُنشأ')}: {result.created_count}</div>
+          {result.failed_count > 0 && <div className="text-[11px] text-red-300">❌ {t('ct_failed','فشل')}: {result.failed_count}</div>}
+          {result.failed?.length > 0 && (
+            <div className="max-h-24 overflow-auto mt-1">
+              {result.failed.slice(0, 10).map((f, i) => (
+                <div key={i} className="text-[10px] text-red-200">
+                  {t('ct_row','صف')} {f.row_index + 1} ({f.row.username || '—'}): {f.error}
+                </div>
               ))}
             </div>
+          )}
+        </div>
+      )}
+
+      <div className="flex gap-2 pt-2">
+        <button onClick={submit} disabled={submitting || parsed.length === 0}
+          className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-bold ${submitting || parsed.length === 0 ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500 text-white'}`}
+          data-testid="ct-bulk-save-btn">
+          {submitting ? '⏳ ...' : `➕ ${t('ct_create_all','إنشاء الكل')} (${parsed.length})`}
+        </button>
+        <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('ct_close','إغلاق')}</button>
+      </div>
+    </div>
+  );
+};
+
+// ==================== ContractModal (Company ↔ Compound Management Contract) ====================
+const ContractModal = ({ ctx, onClose, t }) => {
+  const [contract, setContract] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [mode, setMode] = useState('view'); // 'view' | 'edit' | 'create'
+  const [form, setForm] = useState({
+    start_date: '', end_date: '', commission_percent: 10, fixed_fee: 0,
+    billing_cycle: 'monthly', currency: 'EGP', auto_renew: false,
+    renewal_period_months: 12, status: 'active', notes: '',
+    pdf_data_url: null, pdf_filename: null,
+  });
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    axios.get(`${API}/super-admin/management-contracts?company_id=${ctx.company_id}&compound_id=${ctx.compound_id}`, getToken())
+      .then(res => {
+        if (!alive) return;
+        const c = (res.data?.contracts || [])[0] || null;
+        setContract(c);
+        if (c) {
+          setForm({
+            start_date: c.start_date?.slice(0,10) || '',
+            end_date: c.end_date?.slice(0,10) || '',
+            commission_percent: c.commission_percent || 0,
+            fixed_fee: c.fixed_fee || 0,
+            billing_cycle: c.billing_cycle || 'monthly',
+            currency: c.currency || 'EGP',
+            auto_renew: !!c.auto_renew,
+            renewal_period_months: c.renewal_period_months || 12,
+            status: c.status || 'active',
+            notes: c.notes || '',
+            pdf_data_url: c.pdf_data_url || null,
+            pdf_filename: c.pdf_filename || null,
+          });
+          setMode('view');
+        } else {
+          const today = new Date().toISOString().slice(0,10);
+          const nextYear = new Date(); nextYear.setFullYear(nextYear.getFullYear()+1);
+          setForm(f => ({...f, start_date: today, end_date: nextYear.toISOString().slice(0,10)}));
+          setMode('create');
+        }
+      })
+      .catch(err => toast.error(err.response?.data?.detail || t('ct_contract_load_failed','فشل تحميل العقد')))
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [ctx.company_id, ctx.compound_id, t]);
+
+  const handlePdf = (file) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error(t('ct_pdf_too_large','حجم الملف يتجاوز 5MB')); return; }
+    const reader = new FileReader();
+    reader.onload = () => setForm(f => ({...f, pdf_data_url: reader.result, pdf_filename: file.name}));
+    reader.readAsDataURL(file);
+  };
+
+  const save = async () => {
+    try {
+      if (mode === 'create') {
+        const res = await axios.post(`${API}/super-admin/management-contracts`, {
+          company_id: ctx.company_id, compound_id: ctx.compound_id, ...form,
+        }, getToken());
+        setContract(res.data.contract);
+        toast.success(t('ct_contract_created','تم إنشاء العقد'));
+        setMode('view');
+      } else {
+        const res = await axios.put(`${API}/super-admin/management-contracts/${contract.id}`, form, getToken());
+        setContract(res.data.contract);
+        toast.success(t('ct_contract_updated','تم تحديث العقد'));
+        setMode('view');
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('ct_contract_save_failed','فشل الحفظ'));
+    }
+  };
+
+  const remove = async () => {
+    if (!contract?.id) return;
+    if (!window.confirm(t('ct_contract_confirm_delete','تأكيد حذف العقد؟'))) return;
+    try {
+      await axios.delete(`${API}/super-admin/management-contracts/${contract.id}`, getToken());
+      toast.success(t('ct_contract_deleted','تم حذف العقد'));
+      onClose();
+    } catch (err) { toast.error(err.response?.data?.detail || t('ct_delete_failed','فشل الحذف')); }
+  };
+
+  const statusColor = { active: 'text-emerald-300 bg-emerald-900/30', expired: 'text-red-300 bg-red-900/30', cancelled: 'text-gray-400 bg-gray-800', pending: 'text-amber-300 bg-amber-900/30' };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-lg p-6 space-y-4 border border-amber-500/30 max-h-[92vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="ct-contract-modal">
+        <div className="flex justify-between items-start">
+          <div>
+            <h3 className="text-lg font-bold text-white">📋 {t('ct_contract_title','عقد الإدارة')}</h3>
+            <p className="text-[11px] text-gray-400 mt-1">{ctx.company_name} <span className="text-amber-400">↔</span> {ctx.compound_name}</p>
           </div>
+          {contract?.status && <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${statusColor[contract.status]}`}>{contract.status}</span>}
         </div>
-        <div className="flex gap-2 pt-2">
-          <button onClick={submit} className="flex-1 px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-bold" data-testid="ct-add-user-save-btn">{t('ct_add','إضافة')}</button>
-          <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('ct_cancel','إلغاء')}</button>
-        </div>
+
+        {loading ? <div className="text-center text-gray-400 py-6">{t('ct_loading','جاري التحميل...')}</div> : (
+          <>
+            {mode === 'view' && contract ? (
+              <div className="space-y-2 text-xs">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-gray-900/60 rounded-lg p-2"><div className="text-gray-500">{t('ct_start_date','بداية')}</div><div className="text-white font-semibold">{form.start_date || '—'}</div></div>
+                  <div className="bg-gray-900/60 rounded-lg p-2"><div className="text-gray-500">{t('ct_end_date','نهاية')}</div><div className="text-white font-semibold">{form.end_date || '—'}</div></div>
+                  <div className="bg-gray-900/60 rounded-lg p-2"><div className="text-gray-500">{t('ct_commission','عمولة %')}</div><div className="text-emerald-300 font-bold">{form.commission_percent}%</div></div>
+                  <div className="bg-gray-900/60 rounded-lg p-2"><div className="text-gray-500">{t('ct_fixed_fee','رسوم ثابتة')}</div><div className="text-amber-300 font-bold">{form.fixed_fee} {form.currency}</div></div>
+                  <div className="bg-gray-900/60 rounded-lg p-2"><div className="text-gray-500">{t('ct_billing','دورة الفوترة')}</div><div className="text-white">{form.billing_cycle}</div></div>
+                  <div className="bg-gray-900/60 rounded-lg p-2"><div className="text-gray-500">{t('ct_auto_renew','تجديد تلقائي')}</div><div className="text-white">{form.auto_renew ? `✓ كل ${form.renewal_period_months} شهر` : '✗'}</div></div>
+                </div>
+                {contract.days_until_expiry !== undefined && contract.days_until_expiry <= 30 && contract.status === 'active' && (
+                  <div className="bg-amber-900/30 border border-amber-700 rounded-lg p-2 text-[11px] text-amber-200">
+                    ⚠️ {t('ct_expiring','ينتهي خلال')} {contract.days_until_expiry} {t('ct_days','يوم')}
+                  </div>
+                )}
+                {form.notes && <div className="bg-gray-900/60 rounded-lg p-2 text-[11px] text-gray-300 italic">{form.notes}</div>}
+                {form.pdf_filename && (
+                  <a href={`${API}/super-admin/management-contracts/${contract.id}/pdf`}
+                     target="_blank" rel="noopener noreferrer"
+                     className="inline-block bg-blue-600 hover:bg-blue-500 text-white text-[11px] px-3 py-1.5 rounded-lg font-semibold"
+                     data-testid="ct-contract-download-pdf">📄 {form.pdf_filename}</a>
+                )}
+                <div className="flex gap-2 pt-2">
+                  <button onClick={() => setMode('edit')} className="flex-1 px-3 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold" data-testid="ct-contract-edit-btn">✏️ {t('ct_edit','تعديل')}</button>
+                  <button onClick={remove} className="px-3 py-2 bg-red-600/40 hover:bg-red-600/60 text-red-200 rounded-lg text-xs" data-testid="ct-contract-delete-btn">🗑</button>
+                  <button onClick={onClose} className="px-3 py-2 bg-gray-700 text-gray-200 rounded-lg text-xs">{t('ct_close','إغلاق')}</button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 text-xs">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-gray-400 mb-1">{t('ct_start_date','تاريخ البداية')}</label>
+                    <input type="date" value={form.start_date} onChange={e => setForm({...form, start_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1.5 text-white" data-testid="ct-contract-start" />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 mb-1">{t('ct_end_date','تاريخ النهاية')}</label>
+                    <input type="date" value={form.end_date} onChange={e => setForm({...form, end_date: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1.5 text-white" data-testid="ct-contract-end" />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 mb-1">{t('ct_commission','نسبة العمولة %')}</label>
+                    <input type="number" step="0.5" min="0" max="100" value={form.commission_percent} onChange={e => setForm({...form, commission_percent: parseFloat(e.target.value) || 0})} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1.5 text-white" data-testid="ct-contract-commission" />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 mb-1">{t('ct_fixed_fee','رسوم ثابتة')}</label>
+                    <input type="number" step="100" min="0" value={form.fixed_fee} onChange={e => setForm({...form, fixed_fee: parseFloat(e.target.value) || 0})} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1.5 text-white" data-testid="ct-contract-fee" />
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 mb-1">{t('ct_billing','دورة الفوترة')}</label>
+                    <select value={form.billing_cycle} onChange={e => setForm({...form, billing_cycle: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1.5 text-white" data-testid="ct-contract-billing">
+                      <option value="monthly">{t('ct_monthly','شهري')}</option>
+                      <option value="yearly">{t('ct_yearly','سنوي')}</option>
+                      <option value="per_unit">{t('ct_per_unit','لكل وحدة')}</option>
+                      <option value="one_time">{t('ct_one_time','دفعة واحدة')}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 mb-1">{t('ct_currency','العملة')}</label>
+                    <select value={form.currency} onChange={e => setForm({...form, currency: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1.5 text-white">
+                      <option value="EGP">EGP</option><option value="USD">USD</option><option value="SAR">SAR</option><option value="AED">AED</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 mb-1">{t('ct_status','الحالة')}</label>
+                    <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1.5 text-white" data-testid="ct-contract-status">
+                      <option value="active">{t('ct_st_active','نشط')}</option>
+                      <option value="pending">{t('ct_st_pending','معلّق')}</option>
+                      <option value="cancelled">{t('ct_st_cancelled','ملغى')}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-gray-400 mb-1">{t('ct_renew_months','دورة التجديد (شهور)')}</label>
+                    <input type="number" min="1" max="60" value={form.renewal_period_months} onChange={e => setForm({...form, renewal_period_months: parseInt(e.target.value) || 12})} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1.5 text-white" />
+                  </div>
+                </div>
+                <label className="flex items-center gap-2 bg-gray-900/60 rounded-lg p-2 cursor-pointer">
+                  <input type="checkbox" checked={form.auto_renew} onChange={e => setForm({...form, auto_renew: e.target.checked})} data-testid="ct-contract-auto-renew" />
+                  <span className="text-emerald-300 font-semibold">🔄 {t('ct_auto_renew_enable','تفعيل التجديد التلقائي')}</span>
+                </label>
+                <div>
+                  <label className="block text-gray-400 mb-1">{t('ct_notes','ملاحظات')}</label>
+                  <textarea rows="2" value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded px-2 py-1.5 text-white" />
+                </div>
+                <div>
+                  <label className="block text-gray-400 mb-1">📄 {t('ct_upload_pdf','ملف العقد PDF (اختياري، حتى 5MB)')}</label>
+                  <input type="file" accept="application/pdf" onChange={e => handlePdf(e.target.files?.[0])} className="w-full text-gray-300 file:mr-2 file:px-2 file:py-1 file:bg-blue-600 file:text-white file:rounded file:border-0" data-testid="ct-contract-pdf" />
+                  {form.pdf_filename && <div className="text-[11px] text-emerald-300 mt-1">📎 {form.pdf_filename}</div>}
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button onClick={save} className="flex-1 px-3 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg text-xs font-bold" data-testid="ct-contract-save-btn">💾 {mode === 'create' ? t('ct_create','إنشاء') : t('ct_save','حفظ')}</button>
+                  <button onClick={() => contract ? setMode('view') : onClose()} className="px-3 py-2 bg-gray-700 text-gray-200 rounded-lg text-xs">{t('ct_cancel','إلغاء')}</button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

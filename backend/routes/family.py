@@ -163,13 +163,13 @@ async def get_family_members(
             family_members = await db.family_members.find({
                 "compound_id": current_user.compound_id,
                 "is_active": True
-            }).to_list(length=None)
+            }).to_list(length=1000)
         else:
             # Residents can only see their own family members
             family_members = await db.family_members.find({
                 "primary_resident_id": current_user.id,
                 "is_active": True
-            }).to_list(length=None)
+            }).to_list(length=1000)
         
         # Serialize datetime objects
         serialized_members = [serialize_datetime(member) for member in family_members]

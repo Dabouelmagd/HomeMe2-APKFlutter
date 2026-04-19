@@ -50,7 +50,7 @@ async def get_admin_dashboard(current_user: dict = Depends(require_admin)):
     # Recent activity
     recent_messages = await db.messages.find({
         "compound_id": current_user.get('compound_id','')
-    }).sort("created_at", -1).limit(5).to_list(None)
+    }).sort("created_at", -1).limit(5).to_list(5)
     
     recent_payments = await db.payments.aggregate([
         {"$lookup": {
@@ -62,7 +62,7 @@ async def get_admin_dashboard(current_user: dict = Depends(require_admin)):
         {"$match": {"invoice.compound_id": current_user.get('compound_id','')}},
         {"$sort": {"paid_at": -1}},
         {"$limit": 5}
-    ]).to_list(None)
+    ]).to_list(5)
     
     # Additional stats for enhanced dashboard
     total_services = await db.service_providers.count_documents({
@@ -87,12 +87,12 @@ async def get_admin_dashboard(current_user: dict = Depends(require_admin)):
     # Recent notifications
     recent_notifications = await db.notifications.find({
         "compound_id": current_user.get('compound_id','')
-    }, {"_id": 0}).sort("created_at", -1).limit(5).to_list(None)
+    }, {"_id": 0}).sort("created_at", -1).limit(5).to_list(5)
     
     # Recent activity log
     recent_activities = await db.activity_logs.find({
         "compound_id": current_user.get('compound_id','')
-    }, {"_id": 0}).sort("timestamp", -1).limit(10).to_list(None)
+    }, {"_id": 0}).sort("timestamp", -1).limit(10).to_list(10)
     
     # Serialize compound data to avoid ObjectId issues
     compound_data = None

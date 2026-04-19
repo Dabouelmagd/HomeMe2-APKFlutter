@@ -21,6 +21,7 @@ import CodesTab from './super-admin/CodesTab';
 import CouponsTab from './super-admin/CouponsTab';
 import CompoundDetailModal from './super-admin/CompoundDetailModal';
 import HierarchicalSubs from './super-admin/HierarchicalSubs';
+import CompaniesTab from './super-admin/CompaniesTab';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -431,6 +432,7 @@ const SuperAdminPanel = () => {
             { id: 'overview', label: t('sa_compounds') },
             { id: 'users', label: t('sa_users') },
             ...(!isSuperAdminOnly ? [
+              { id: 'companies', label: t('sa_companies', 'إدارة الشركات') },
               { id: 'codes', label: t('sa_sub_codes', 'أكواد الاشتراك') },
               { id: 'coupons', label: t('sa_coupons', 'كوبونات الخصم') },
               { id: 'user_subs', label: t('sa_user_subs', 'اشتراكات المستخدمين') },
@@ -875,6 +877,11 @@ const SuperAdminPanel = () => {
         {/* User Subscriptions Tab — Hierarchical */}
         {activeTab === 'user_subs' && (
           <HierarchicalSubs t={t} onOpenCompound={(id) => setSelectedCompound(id)} />
+        )}
+
+        {/* Companies Tab */}
+        {activeTab === 'companies' && (
+          <CompaniesTab t={t} />
         )}
 
       </div>

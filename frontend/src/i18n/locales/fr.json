@@ -2248,7 +2248,7 @@
   "sa_ext_image": "Ou URL d'image externe",
   "sa_ad_link": "Lien de la pub",
   "sa_description": "Description",
-  "role_super_admin": "Propriétaire",
+  "role_super_admin": "Super Admin",
   "role_company_admin": "Admin société",
   "role_admin": "Gestionnaire",
   "role_manager": "Administrateur",

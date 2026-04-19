@@ -2469,7 +2469,7 @@
   "sa_ext_image": "Or external image URL",
   "sa_ad_link": "Ad Link",
   "sa_description": "Description",
-  "role_super_admin": "App Owner",
+  "role_super_admin": "Super Admin",
   "role_company_admin": "Company Admin",
   "role_admin": "Compound Manager",
   "role_manager": "Admin",

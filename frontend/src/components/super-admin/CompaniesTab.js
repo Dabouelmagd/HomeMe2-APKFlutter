@@ -15,33 +15,24 @@ const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getIt
 const CompaniesTab = ({ t }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [independentCompounds, setIndependentCompounds] = useState([]);
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState({});
   const [refreshKey, setRefreshKey] = useState(0);
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editCompany, setEditCompany] = useState(null);
-  const [linkTarget, setLinkTarget] = useState(null); // company to link compound to
+  const [importOpen, setImportOpen] = useState(false);
+  const [topOpen, setTopOpen] = useState(false);
 
   const reload = () => setRefreshKey(k => k + 1);
 
   useEffect(() => {
     let alive = true;
     setLoading(true);
-    Promise.all([
-      axios.get(`${API}/super-admin/companies`, getToken()),
-      axios.get(`${API}/super-admin/compounds`, getToken()),
-    ]).then(([res1, res2]) => {
-      if (!alive) return;
-      setData(res1.data);
-      const allCompounds = res2.data?.compounds || [];
-      const linkedIds = new Set();
-      (res1.data?.companies || []).forEach(co => (co.compounds || []).forEach(cpd => linkedIds.add(cpd.id)));
-      setIndependentCompounds(allCompounds.filter(c => !linkedIds.has(c.id)));
-    }).catch(err => {
-      toast.error(err.response?.data?.detail || t('ct_load_failed','فشل التحميل'));
-    }).finally(() => { if (alive) setLoading(false); });
+    axios.get(`${API}/super-admin/companies`, getToken())
+      .then(res => { if (alive) setData(res.data); })
+      .catch(err => { if (alive) toast.error(err.response?.data?.detail || t('ct_load_failed','فشل التحميل')); })
+      .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
   }, [refreshKey, t]);
 
@@ -80,22 +71,24 @@ const CompaniesTab = ({ t }) => {
     } catch (err) { toast.error(err.response?.data?.detail || t('ct_delete_failed','فشل الحذف')); }
   };
 
-  const linkCompound = async (coId, cpdId) => {
-    try {
-      await axios.post(`${API}/super-admin/companies/${coId}/link-compound`, { compound_id: cpdId }, getToken());
-      toast.success(t('ct_linked','تم الربط'));
-      setLinkTarget(null);
-      reload();
-    } catch (err) { toast.error(err.response?.data?.detail || t('ct_link_failed','فشل الربط')); }
-  };
+  const linkCompound = null;
+  const unlinkCompound = null;
 
-  const unlinkCompound = async (coId, cpdId, cpdName) => {
-    if (!window.confirm(`${t('ct_confirm_unlink','فك ربط المجمع')} "${cpdName}"?`)) return;
+  const importStructure = async (file, mergeMode) => {
     try {
-      await axios.post(`${API}/super-admin/companies/${coId}/unlink-compound`, { compound_id: cpdId }, getToken());
-      toast.success(t('ct_unlinked','تم فك الربط'));
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('mode', mergeMode);
+      const res = await axios.post(`${API}/super-admin/import-full-structure`, fd, {
+        ...getToken(),
+        headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' },
+      });
+      toast.success(`${t('ct_imported','تم الاستيراد')}: ${res.data?.imported_companies || 0} ${t('ct_companies','شركة')} / ${res.data?.imported_compounds || 0} ${t('ct_compounds','مجمع')}`);
+      setImportOpen(false);
       reload();
-    } catch (err) { toast.error(err.response?.data?.detail || t('ct_unlink_failed','فشل فك الربط')); }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('ct_import_failed','فشل الاستيراد'));
+    }
   };
 
   const exportStructure = async () => {
@@ -136,7 +129,9 @@ const CompaniesTab = ({ t }) => {
         </div>
         <div className="flex gap-2">
           <button onClick={() => setCreateOpen(true)} className="px-3 py-1.5 text-xs bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold shadow-lg shadow-green-500/20" data-testid="ct-create-btn">➕ {t('ct_new_company','شركة جديدة')}</button>
-          <button onClick={exportStructure} className="px-3 py-1.5 text-xs bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg font-semibold shadow-lg shadow-purple-500/20" data-testid="ct-export-structure-btn">📑 {t('ct_export_json','تصدير JSON')}</button>
+          <button onClick={() => setTopOpen(true)} className="px-3 py-1.5 text-xs bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg font-semibold shadow-lg shadow-orange-500/20" data-testid="ct-top10-btn">🏆 {t('ct_top10','أعلى 10')}</button>
+          <button onClick={exportStructure} className="px-3 py-1.5 text-xs bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg font-semibold shadow-lg shadow-purple-500/20" data-testid="ct-export-structure-btn">📑 {t('ct_export_json','تصدير')}</button>
+          <button onClick={() => setImportOpen(true)} className="px-3 py-1.5 text-xs bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-semibold shadow-lg shadow-blue-500/20" data-testid="ct-import-btn">📥 {t('ct_import_json','استيراد')}</button>
           <button onClick={reload} className="px-3 py-1.5 text-xs bg-gray-700 hover:bg-gray-600 text-white rounded-lg" data-testid="ct-reload-btn">↻</button>
         </div>
       </div>
@@ -179,7 +174,6 @@ const CompaniesTab = ({ t }) => {
                 </div>
               </div>
               <div className="flex gap-1 items-center flex-shrink-0" onClick={e => e.stopPropagation()}>
-                <button title={t('ct_link_compound','ربط مجمع')} onClick={() => setLinkTarget(co)} className="px-2 py-1 text-xs bg-green-600/20 text-green-300 rounded hover:bg-green-600/30" data-testid={`ct-link-${co.id}`}>🔗</button>
                 <button title={t('ct_edit','تعديل')} onClick={() => setEditCompany({...co})} className="px-2 py-1 text-xs bg-amber-600/20 text-amber-300 rounded hover:bg-amber-600/30" data-testid={`ct-edit-${co.id}`}>✏️</button>
                 <button title={t('ct_delete','حذف')} onClick={() => deleteCompany(co)} className="px-2 py-1 text-xs bg-red-600/20 text-red-300 rounded hover:bg-red-600/30" data-testid={`ct-delete-${co.id}`}>🗑</button>
                 <span className="text-blue-400 text-xl mr-1">{expanded[co.id] ? '▾' : '▸'}</span>
@@ -199,27 +193,24 @@ const CompaniesTab = ({ t }) => {
                 )}
                 {co.compounds.length === 0 ? (
                   <div className="text-center text-gray-500 text-xs py-4">
-                    {t('ct_no_compounds','لا توجد مجمعات مرتبطة بهذه الشركة.')}
-                    <button onClick={() => setLinkTarget(co)} className="ml-2 text-green-400 hover:underline">{t('ct_link_now','اربط مجمعًا الآن')}</button>
+                    {t('ct_no_compounds','لا توجد مجمعات مرتبطة بهذه الشركة بعد.')}
+                    <p className="text-[10px] text-gray-600 mt-1">{t('ct_company_adds_own','الشركة نفسها ستضيف مجمعاتها من لوحتها الخاصة.')}</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {co.compounds.map(cpd => (
                       <div key={cpd.id} className="bg-gray-800/60 rounded-lg p-3 border border-gray-700/50" data-testid={`ct-compound-${cpd.id}`}>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <span className="text-lg">🏘️</span>
-                            <div className="min-w-0">
-                              <div className="text-sm font-semibold text-white truncate">{cpd.name}</div>
-                              <div className="text-[11px] text-gray-400 truncate">
-                                {cpd.location || '—'} • 👥 {cpd.users_count}
-                                {cpd.residents ? ` • 🏠 ${cpd.residents}` : ''}
-                                {cpd.managers ? ` • 👔 ${cpd.managers}` : ''}
-                                {cpd.security ? ` • 🛡 ${cpd.security}` : ''}
-                              </div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">🏘️</span>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-semibold text-white truncate">{cpd.name}</div>
+                            <div className="text-[11px] text-gray-400 truncate">
+                              {cpd.location || '—'} • 👥 {cpd.users_count}
+                              {cpd.residents ? ` • 🏠 ${cpd.residents}` : ''}
+                              {cpd.managers ? ` • 👔 ${cpd.managers}` : ''}
+                              {cpd.security ? ` • 🛡 ${cpd.security}` : ''}
                             </div>
                           </div>
-                          <button onClick={() => unlinkCompound(co.id, cpd.id, cpd.name)} className="px-2 py-1 text-[10px] bg-red-600/20 text-red-300 rounded hover:bg-red-600/30" data-testid={`ct-unlink-${cpd.id}`}>❌ {t('ct_unlink','فك الربط')}</button>
                         </div>
                         {/* Users grouped by role */}
                         {Object.keys(cpd.users_by_role || {}).length > 0 && (
@@ -254,11 +245,11 @@ const CompaniesTab = ({ t }) => {
       {/* Edit modal */}
       {editCompany && <EditCompanyModal company={editCompany} setCompany={setEditCompany} onClose={() => setEditCompany(null)} onSave={saveEdit} t={t} />}
 
-      {/* Link compound modal */}
-      {linkTarget && (
-        <LinkCompoundModal company={linkTarget} availableCompounds={independentCompounds}
-          onClose={() => setLinkTarget(null)} onLink={(cpdId) => linkCompound(linkTarget.id, cpdId)} t={t} />
-      )}
+      {/* Import JSON modal */}
+      {importOpen && <ImportStructureModal onClose={() => setImportOpen(false)} onImport={importStructure} t={t} />}
+
+      {/* Top 10 modal */}
+      {topOpen && <Top10Modal onClose={() => setTopOpen(false)} t={t} />}
     </div>
   );
 };
@@ -349,40 +340,123 @@ const EditCompanyModal = ({ company, setCompany, onClose, onSave, t }) => (
   </div>
 );
 
-// ==================== LinkCompoundModal ====================
-const LinkCompoundModal = ({ company, availableCompounds, onClose, onLink, t }) => (
-  <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
-    <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-green-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="ct-link-modal">
-      <div>
-        <h3 className="text-lg font-bold text-white">🔗 {t('ct_link_title','ربط مجمع بالشركة')}</h3>
-        <p className="text-xs text-gray-400 mt-1">{t('ct_linking_to','ربط بـ')}: <span className="text-green-400 font-semibold">{company.name}</span></p>
-      </div>
-      {availableCompounds.length === 0 ? (
-        <div className="text-center text-gray-400 py-6 text-sm">
-          {t('ct_no_available','لا توجد مجمعات مستقلة لربطها.')}
-          <p className="text-[11px] text-gray-500 mt-2">{t('ct_no_available_hint','كل المجمعات مربوطة بشركات بالفعل أو لم تُنشأ بعد.')}</p>
+// ==================== ImportStructureModal ====================
+const ImportStructureModal = ({ onClose, onImport, t }) => {
+  const [file, setFile] = useState(null);
+  const [mode, setMode] = useState('merge'); // 'merge' | 'replace'
+  const submit = () => {
+    if (!file) { toast.error(t('ct_pick_file','اختر ملف JSON أولًا')); return; }
+    if (mode === 'replace' && !window.confirm(t('ct_confirm_replace','⚠️ وضع الاستبدال سيحذف البيانات الحالية ويستبدلها. هل أنت متأكد؟'))) return;
+    onImport(file, mode);
+  };
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-md p-6 space-y-4 border border-cyan-500/30" onClick={e => e.stopPropagation()} data-testid="ct-import-modal">
+        <h3 className="text-lg font-bold text-white">📥 {t('ct_import_title','استيراد بنية الإدارة')}</h3>
+        <p className="text-xs text-gray-400">{t('ct_import_desc','استعد نسخة احتياطية JSON (Companies + Compounds + Users).')}</p>
+        <div>
+          <label className="block text-xs text-gray-400 mb-1">{t('ct_json_file','ملف JSON')}</label>
+          <input type="file" accept=".json,application/json" onChange={e => setFile(e.target.files?.[0] || null)} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-2 file:px-2 file:py-1 file:bg-cyan-600 file:text-white file:rounded file:border-0" data-testid="ct-import-file" />
+          {file && <p className="text-[11px] text-cyan-300 mt-1">📄 {file.name} ({(file.size/1024).toFixed(1)} KB)</p>}
         </div>
-      ) : (
-        <div className="space-y-2 max-h-80 overflow-y-auto">
-          {availableCompounds.map(cpd => (
-            <button key={cpd.id} onClick={() => onLink(cpd.id)} className="w-full flex items-center justify-between bg-gray-900/60 hover:bg-green-600/20 border border-gray-700 hover:border-green-500/40 rounded-lg px-3 py-2 text-xs transition" data-testid={`ct-pick-compound-${cpd.id}`}>
-              <div className="flex items-center gap-2 text-right">
-                <span className="text-lg">🏘️</span>
-                <div>
-                  <div className="font-semibold text-white">{cpd.name}</div>
-                  <div className="text-[11px] text-gray-400">{cpd.location || cpd.address || '—'}</div>
-                </div>
-              </div>
-              <span className="text-green-400 text-lg">🔗</span>
-            </button>
-          ))}
+        <div className="space-y-2">
+          <label className="block text-xs text-gray-400">{t('ct_import_mode','وضع الاستيراد')}</label>
+          <label className="flex items-start gap-2 bg-gray-900/60 rounded-lg p-3 border border-gray-700 cursor-pointer hover:border-emerald-500/40">
+            <input type="radio" name="imp_mode" value="merge" checked={mode === 'merge'} onChange={() => setMode('merge')} className="mt-0.5" data-testid="ct-import-merge" />
+            <div>
+              <div className="text-xs font-semibold text-emerald-300">🔀 {t('ct_merge','دمج (الأكثر أمانًا)')}</div>
+              <div className="text-[10px] text-gray-400">{t('ct_merge_desc','يضيف الجديد ويحدّث الموجود دون حذف شيء.')}</div>
+            </div>
+          </label>
+          <label className="flex items-start gap-2 bg-gray-900/60 rounded-lg p-3 border border-red-700/40 cursor-pointer hover:border-red-500">
+            <input type="radio" name="imp_mode" value="replace" checked={mode === 'replace'} onChange={() => setMode('replace')} className="mt-0.5" data-testid="ct-import-replace" />
+            <div>
+              <div className="text-xs font-semibold text-red-300">⚠️ {t('ct_replace','استبدال كامل (خطر)')}</div>
+              <div className="text-[10px] text-gray-400">{t('ct_replace_desc','يحذف الشركات والمجمعات الحالية ويستبدلها. لا يمس المستخدمين.')}</div>
+            </div>
+          </label>
         </div>
-      )}
-      <div className="flex justify-end pt-2">
-        <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('ct_close','إغلاق')}</button>
+        <div className="flex gap-2 pt-2">
+          <button onClick={submit} disabled={!file} className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-bold ${file ? 'bg-cyan-600 hover:bg-cyan-500 text-white' : 'bg-gray-700 text-gray-500 cursor-not-allowed'}`} data-testid="ct-import-save-btn">{t('ct_import','استيراد')}</button>
+          <button onClick={onClose} className="px-4 py-2.5 bg-gray-700 text-gray-200 rounded-lg text-sm">{t('ct_cancel','إلغاء')}</button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
+
+// ==================== Top10Modal ====================
+const Top10Modal = ({ onClose, t }) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [metric, setMetric] = useState('compounds');
+  useEffect(() => {
+    axios.get(`${API}/super-admin/companies/top10?metric=${metric}`, getToken())
+      .then(res => setData(res.data))
+      .catch(err => toast.error(err.response?.data?.detail || t('ct_load_failed','فشل')))
+      .finally(() => setLoading(false));
+  }, [metric, t]);
+  const metricLabel = {
+    compounds: t('ct_by_compounds','الأكثر مجمعات'),
+    users: t('ct_by_users','الأكثر مستخدمين'),
+    revenue: t('ct_by_revenue','الأعلى إيرادات'),
+    active_subs: t('ct_by_active','الأكثر اشتراكات نشطة'),
+  };
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-3xl p-6 space-y-4 border border-amber-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="ct-top10-modal">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold text-white">🏆 {t('ct_top10_title','أعلى 10 شركات إدارة')}</h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-white text-xl">✕</button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(metricLabel).map(([k, v]) => (
+            <button key={k} onClick={() => { setLoading(true); setMetric(k); }}
+              className={`px-3 py-1.5 text-xs rounded-full border ${metric === k ? 'bg-amber-600 border-amber-500 text-white' : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'}`}
+              data-testid={`ct-top10-metric-${k}`}>{v}</button>
+          ))}
+        </div>
+        {loading ? <div className="text-center text-gray-400 py-8">{t('ct_loading','جاري التحميل...')}</div>
+          : data?.top?.length > 0 ? (
+          <div className="bg-gray-900/60 rounded-lg border border-gray-700 overflow-hidden">
+            <table className="w-full text-xs">
+              <thead className="bg-gray-900">
+                <tr>
+                  <th className="px-3 py-2 text-right text-gray-400 w-12">{t('ct_rank','الترتيب')}</th>
+                  <th className="px-3 py-2 text-right text-gray-400">{t('ct_company','الشركة')}</th>
+                  <th className="px-3 py-2 text-center text-gray-400">🏘️</th>
+                  <th className="px-3 py-2 text-center text-gray-400">👥</th>
+                  <th className="px-3 py-2 text-center text-gray-400">✅</th>
+                  <th className="px-3 py-2 text-center text-gray-400">💰</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-700">
+                {data.top.map((c, i) => (
+                  <tr key={c.id} className="hover:bg-gray-800" data-testid={`ct-top-row-${c.id}`}>
+                    <td className="px-3 py-2 text-center">
+                      <span className={`inline-block w-7 h-7 rounded-full text-xs font-bold leading-7 ${i === 0 ? 'bg-yellow-500 text-white' : i === 1 ? 'bg-gray-400 text-white' : i === 2 ? 'bg-amber-700 text-white' : 'bg-gray-700 text-gray-300'}`}>
+                        {i < 3 ? ['🥇','🥈','🥉'][i] : `#${i+1}`}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-white font-semibold">{c.name}</td>
+                    <td className={`px-3 py-2 text-center ${metric === 'compounds' ? 'text-purple-300 font-bold' : 'text-gray-400'}`}>{c.compounds_count}</td>
+                    <td className={`px-3 py-2 text-center ${metric === 'users' ? 'text-green-300 font-bold' : 'text-gray-400'}`}>{c.total_users}</td>
+                    <td className={`px-3 py-2 text-center ${metric === 'active_subs' ? 'text-emerald-300 font-bold' : 'text-gray-400'}`}>{c.active_subs}</td>
+                    <td className={`px-3 py-2 text-center ${metric === 'revenue' ? 'text-amber-300 font-bold' : 'text-gray-400'}`}>{c.revenue ? `${c.revenue.toFixed(0)}` : '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : <div className="text-center text-gray-500 py-8">{t('ct_no_top','لا توجد بيانات كافية.')}</div>}
+        {data?.summary && (
+          <div className="text-[11px] text-gray-500 text-center">
+            {t('ct_summary_total','الإجمالي')}: {data.summary.total_companies} {t('ct_companies','شركة')} • {data.summary.total_compounds} {t('ct_compounds','مجمع')} • {data.summary.total_users} {t('ct_users','مستخدم')}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export default CompaniesTab;

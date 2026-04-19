@@ -1,7 +1,7 @@
 """
 Super Admin Panel & Role Management routes
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 import logging
@@ -1021,6 +1021,142 @@ async def unlink_compound_from_company(company_id: str, payload: dict, current_u
         {"$pull": {"compound_ids": compound_id}}
     )
     return {"success": True}
+
+
+@router.get("/super-admin/companies/top10")
+async def top10_companies(metric: str = "compounds", current_user: dict = Depends(require_super_admin)):
+    """أعلى 10 شركات إدارة حسب المقياس المختار (compounds / users / revenue / active_subs)"""
+    db = get_db()
+    companies = await db.companies.find({}, {"_id": 0}).to_list(500)
+    compounds_all = await db.compounds.find({}, {"_id": 0}).to_list(2000)
+    users_all = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(10000)
+    subs_all = await db.user_subscriptions.find({}, {"_id": 0}).to_list(10000)
+    company_subs = await db.company_subscriptions.find({}, {"_id": 0}).to_list(500)
+
+    compound_by_id = {c.get("id"): c for c in compounds_all}
+    sub_by_user = {s.get("user_id"): s for s in subs_all}
+    company_sub_by_co = {s.get("company_id"): s for s in company_subs}
+    now = datetime.now(timezone.utc)
+
+    enriched = []
+    for co in companies:
+        # resolve linked compound ids
+        cpd_ids = set(co.get("compound_ids") or [])
+        for c in compounds_all:
+            cid = c.get("company_id") or c.get("management_company_id")
+            if cid == co.get("id"):
+                cpd_ids.add(c.get("id"))
+        cpds = [compound_by_id[cid] for cid in cpd_ids if cid in compound_by_id]
+        users = [u for u in users_all if u.get("compound_id") in cpd_ids]
+        active_subs = 0
+        expired_subs = 0
+        for u in users:
+            s = sub_by_user.get(u.get("id"))
+            if s and s.get("end_date"):
+                try:
+                    end = datetime.fromisoformat(str(s["end_date"]).replace("Z", "+00:00"))
+                    if end.tzinfo is None: end = end.replace(tzinfo=timezone.utc)
+                    if end > now: active_subs += 1
+                    else: expired_subs += 1
+                except Exception: pass
+        # revenue: company subscription price * paid months approx, else sum plan prices
+        revenue = 0.0
+        csub = company_sub_by_co.get(co.get("id"))
+        if csub:
+            revenue = float(csub.get("total_paid") or csub.get("price") or 0)
+        enriched.append({
+            "id": co.get("id"),
+            "name": co.get("name"),
+            "email": co.get("email", ""),
+            "compounds_count": len(cpds),
+            "total_users": len(users),
+            "active_subs": active_subs,
+            "expired_subs": expired_subs,
+            "revenue": revenue,
+        })
+
+    sort_keys = {
+        "compounds": lambda x: (x["compounds_count"], x["total_users"]),
+        "users": lambda x: (x["total_users"], x["compounds_count"]),
+        "revenue": lambda x: (x["revenue"], x["total_users"]),
+        "active_subs": lambda x: (x["active_subs"], x["total_users"]),
+    }
+    key_fn = sort_keys.get(metric, sort_keys["compounds"])
+    enriched.sort(key=key_fn, reverse=True)
+    top = enriched[:10]
+
+    return {
+        "metric": metric,
+        "top": top,
+        "summary": {
+            "total_companies": len(companies),
+            "total_compounds": len(compounds_all),
+            "total_users": len(users_all),
+        }
+    }
+
+
+@router.post("/super-admin/import-full-structure")
+async def import_full_structure(
+    file: UploadFile = File(...),
+    mode: str = Form("merge"),  # merge | replace
+    current_user: dict = Depends(require_super_admin),
+):
+    """استيراد بنية الإدارة من ملف JSON (merge: يضيف/يحدّث، replace: يستبدل الشركات والمجمعات)"""
+    import json as jsonlib
+    content = await file.read()
+    try:
+        payload = jsonlib.loads(content.decode("utf-8"))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"JSON غير صالح: {str(e)[:100]}")
+
+    db = get_db()
+    companies_in = payload.get("companies", []) or []
+    compounds_in = payload.get("compounds", []) or []
+
+    if not isinstance(companies_in, list) or not isinstance(compounds_in, list):
+        raise HTTPException(status_code=400, detail="بنية الملف غير صحيحة — يجب أن يحتوي على مصفوفات companies و compounds")
+
+    imported_companies = 0
+    imported_compounds = 0
+    updated_companies = 0
+    updated_compounds = 0
+
+    if mode == "replace":
+        # خطر: يحذف كل الشركات والمجمعات الحالية
+        await db.companies.delete_many({})
+        await db.compounds.delete_many({})
+
+    for co in companies_in:
+        if not co.get("id") or not co.get("name"):
+            continue
+        existing = await db.companies.find_one({"id": co["id"]}, {"_id": 0, "id": 1})
+        # normalize
+        co.pop("_id", None)
+        if existing and mode == "merge":
+            await db.companies.update_one({"id": co["id"]}, {"$set": co})
+            updated_companies += 1
+        else:
+            await db.companies.insert_one(co)
+            imported_companies += 1
+
+    for cpd in compounds_in:
+        if not cpd.get("id") or not cpd.get("name"):
+            continue
+        cpd.pop("_id", None)
+        existing = await db.compounds.find_one({"id": cpd["id"]}, {"_id": 0, "id": 1})
+        if existing and mode == "merge":
+            await db.compounds.update_one({"id": cpd["id"]}, {"$set": cpd})
+            updated_compounds += 1
+        else:
+            await db.compounds.insert_one(cpd)
+            imported_compounds += 1
+
+    return {
+        "success": True, "mode": mode,
+        "imported_companies": imported_companies, "updated_companies": updated_companies,
+        "imported_compounds": imported_compounds, "updated_compounds": updated_compounds,
+    }
 
 
 @router.get("/super-admin/export-full-structure")

@@ -261,6 +261,7 @@ async def update_user(
 
 @router.delete("/database/users/{user_id}")
 async def delete_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    db = get_db()
     allowed_roles = ["super_admin", "admin", "company_admin", "app_owner"]
     allowed_usernames = ["johndoe", "admin", "superadmin"]
     if (

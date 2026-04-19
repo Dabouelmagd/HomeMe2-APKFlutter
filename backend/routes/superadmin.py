@@ -11,6 +11,7 @@ from database import get_db
 from auth_deps import get_current_user, require_admin, require_super_admin
 from helpers import serialize_datetime
 import os
+import bcrypt
 
 APP_URL = os.environ.get('APP_URL', os.environ.get('REACT_APP_BACKEND_URL', 'https://homemeapp.net')).rstrip('/')
 
@@ -625,6 +626,62 @@ async def super_admin_get_users(
     except Exception as e:
         logging.error(f"Error: {e}")
         raise HTTPException(status_code=500, detail="Failed")
+
+
+@router.post("/super-admin/users")
+async def super_admin_create_user(user_data: dict, current_user: dict = Depends(require_super_admin)):
+    """إنشاء مستخدم جديد في أي مجمع (Super Admin / App Owner فقط)"""
+    db = get_db()
+    username = (user_data.get("username") or "").strip()
+    email = (user_data.get("email") or "").strip()
+    password = user_data.get("password") or ""
+    full_name = (user_data.get("full_name") or "").strip()
+    role = user_data.get("role") or "resident"
+    compound_id = user_data.get("compound_id")
+    phone = user_data.get("phone", "")
+    unit_number = user_data.get("unit_number", "")
+
+    if not username or not email or not password or not full_name:
+        raise HTTPException(status_code=400, detail="username, email, password, full_name مطلوبة")
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="كلمة المرور يجب ألا تقل عن 6 أحرف")
+
+    existing = await db.users.find_one({"$or": [{"username": username}, {"email": email}]})
+    if existing:
+        if existing.get("username") == username:
+            raise HTTPException(status_code=400, detail="اسم المستخدم مستخدم بالفعل")
+        raise HTTPException(status_code=400, detail="البريد الإلكتروني مستخدم بالفعل")
+
+    if compound_id:
+        compound = await db.compounds.find_one({"id": compound_id})
+        if not compound:
+            raise HTTPException(status_code=400, detail="المجمع غير موجود")
+
+    valid_roles = ["super_admin", "company_admin", "admin", "manager", "security", "resident", "family_head", "family_member", "app_owner"]
+    if role not in valid_roles:
+        raise HTTPException(status_code=400, detail=f"دور غير صالح. الأدوار المتاحة: {valid_roles}")
+
+    password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "username": username,
+        "email": email,
+        "password_hash": password_hash,
+        "role": role,
+        "compound_id": compound_id,
+        "family_id": None,
+        "full_name": full_name,
+        "phone": phone,
+        "unit_number": unit_number,
+        "is_family_head": False,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "profile_picture_url": None,
+    }
+    await db.users.insert_one(user_doc)
+    user_doc.pop("_id", None)
+    user_doc.pop("password_hash", None)
+    return {"success": True, "user": serialize_datetime(user_doc)}
 
 
 @router.put("/super-admin/users/{user_id}/role")

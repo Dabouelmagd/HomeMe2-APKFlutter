@@ -100,6 +100,9 @@ const SessionSwitcher = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{user.full_name || user.username}</p>
+                {user.email && (
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate font-mono" data-testid="session-current-email">{user.email}</p>
+                )}
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border text-[9px] font-bold ${getBadge(user.active_role || user.role).bg}`} data-testid="session-current-role-badge">
                     <span className="text-[11px]">{getBadge(user.active_role || user.role).dot}</span>
@@ -126,6 +129,7 @@ const SessionSwitcher = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">{s.user?.full_name || s.user?.username}</p>
+                    {s.user?.email && <p className="text-[9px] text-gray-500 dark:text-gray-400 truncate font-mono">{s.user.email}</p>}
                     <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 mt-0.5 rounded-full border text-[9px] font-bold ${getBadge(s.user?.role).bg}`} data-testid={`session-role-badge-${s.user?.username}`}>
                       <span className="text-[11px]">{getBadge(s.user?.role).dot}</span>
                       <span>{roleLabels[s.user?.role] || s.user?.role}</span>

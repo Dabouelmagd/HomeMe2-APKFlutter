@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -502,7 +503,18 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
 
       {/* Campaigns dashboard */}
       {campaignsOpen && (
-        <CampaignsDashboard onClose={() => setCampaignsOpen(false)} t={t} />
+        <CampaignsDashboard onClose={() => setCampaignsOpen(false)} onClone={(c) => {
+          setCampaignsOpen(false);
+          setBulkForm({
+            days_before_expiry: c.days_before_expiry || 7,
+            discount: c.discount || 20,
+            message: c.message || '',
+            ab_test: !!c.ab_test,
+            variant_a_message: c.variant_a_message || '',
+            variant_b_message: c.variant_b_message || '',
+          });
+          openBulkOffer();
+        }} t={t} />
       )}
 
       {/* Auto-renewal config */}
@@ -921,18 +933,38 @@ const AddCompoundModal = ({ company, onClose, onSave, t }) => {
 };
 
 // ==================== CampaignsDashboard ====================
-const CampaignsDashboard = ({ onClose, t }) => {
+const CampaignsDashboard = ({ onClose, onClone, t }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [chartCampaign, setChartCampaign] = useState(null); // campaign whose timeline is open
+
   useEffect(() => {
     axios.get(`${API}/super-admin/bulk-campaigns`, getToken())
       .then(res => setData(res.data))
       .catch(err => toast.error(err.response?.data?.detail || t('hs_load_failed','فشل التحميل')))
       .finally(() => setLoading(false));
   }, [t]);
+
+  const downloadPdf = async (c) => {
+    try {
+      const res = await axios.get(`${API}/super-admin/bulk-campaigns/${c.id}/pdf`, {
+        ...getToken(), responseType: 'blob',
+      });
+      const url = URL.createObjectURL(res.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `campaign-${c.id.substring(0,8)}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success(t('hs_pdf_downloaded','تم تحميل PDF'), { id: 'hs-pdf-ok' });
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('hs_pdf_failed','فشل تصدير PDF'));
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-gray-800 rounded-2xl w-full max-w-4xl p-6 space-y-4 border border-indigo-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="hs-campaigns-dashboard">
+      <div className="bg-gray-800 rounded-2xl w-full max-w-5xl p-6 space-y-4 border border-indigo-500/30 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="hs-campaigns-dashboard">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-white">📈 {t('hs_campaigns_title','لوحة حملات العروض الجماعية')}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-white text-xl">✕</button>
@@ -965,6 +997,7 @@ const CampaignsDashboard = ({ onClose, t }) => {
                     <th className="px-3 py-2 text-center text-gray-400">{t('hs_used','مستخدم')}</th>
                     <th className="px-3 py-2 text-center text-gray-400">{t('hs_conversion','تحويل')}</th>
                     <th className="px-3 py-2 text-center text-gray-400">A/B</th>
+                    <th className="px-3 py-2 text-center text-gray-400">{t('hs_actions','إجراءات')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
@@ -996,17 +1029,85 @@ const CampaignsDashboard = ({ onClose, t }) => {
                             </div>
                           ) : <span className="text-gray-600 text-[10px]">—</span>}
                         </td>
+                        <td className="px-3 py-2 text-center">
+                          <div className="flex gap-1 justify-center flex-wrap">
+                            <button title={t('hs_view_timeline','رسم بياني')} onClick={() => setChartCampaign(c)} className="px-1.5 py-0.5 text-[10px] bg-indigo-600/20 text-indigo-300 rounded hover:bg-indigo-600/30" data-testid={`hs-campaign-chart-${c.id}`}>📊</button>
+                            <button title={t('hs_clone_campaign','استنساخ')} onClick={() => onClone && onClone(c)} className="px-1.5 py-0.5 text-[10px] bg-purple-600/20 text-purple-300 rounded hover:bg-purple-600/30" data-testid={`hs-campaign-clone-${c.id}`}>🔁</button>
+                            <button title={t('hs_download_pdf','تحميل PDF')} onClick={() => downloadPdf(c)} className="px-1.5 py-0.5 text-[10px] bg-rose-600/20 text-rose-300 rounded hover:bg-rose-600/30" data-testid={`hs-campaign-pdf-${c.id}`}>📄</button>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })}
                   {(!data.campaigns || data.campaigns.length === 0) && (
-                    <tr><td colSpan="7" className="px-3 py-6 text-center text-gray-500">{t('hs_no_campaigns','لا توجد حملات بعد.')}</td></tr>
+                    <tr><td colSpan="8" className="px-3 py-6 text-center text-gray-500">{t('hs_no_campaigns','لا توجد حملات بعد.')}</td></tr>
                   )}
                 </tbody>
               </table>
             </div>
           </>
         ) : null}
+
+        {chartCampaign && (
+          <CampaignTimelineModal campaign={chartCampaign} onClose={() => setChartCampaign(null)} t={t} />
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ==================== CampaignTimelineModal ====================
+const CampaignTimelineModal = ({ campaign, onClose, t }) => {
+  const [timeline, setTimeline] = useState(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    axios.get(`${API}/super-admin/bulk-campaigns/${campaign.id}/timeline`, getToken())
+      .then(res => setTimeline(res.data))
+      .catch(err => toast.error(err.response?.data?.detail || t('hs_load_failed','فشل التحميل')))
+      .finally(() => setLoading(false));
+  }, [campaign.id, t]);
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4" onClick={onClose}>
+      <div className="bg-gray-800 rounded-2xl w-full max-w-3xl p-6 space-y-4 border border-indigo-500/40" onClick={e => e.stopPropagation()} data-testid="hs-campaign-timeline-modal">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-base font-bold text-white">📊 {t('hs_timeline_title','الرسم البياني للاستخدام عبر الزمن')}</h4>
+            <p className="text-[11px] text-gray-400 mt-0.5">{t('hs_campaign_id','معرّف الحملة')}: <code className="text-indigo-300">{campaign.id.substring(0,8)}</code></p>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-white text-xl">✕</button>
+        </div>
+        {loading ? <div className="text-center text-gray-400 py-10">{t('hs_loading','جاري التحميل...')}</div>
+          : timeline?.series?.length > 0 ? (
+          <div className="bg-gray-900/50 rounded-xl p-3 border border-gray-700" style={{ height: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={timeline.series} margin={{ top: 10, right: 20, left: 10, bottom: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis dataKey="date" stroke="#9ca3af" fontSize={11} />
+                <YAxis stroke="#9ca3af" fontSize={11} allowDecimals={false} />
+                <Tooltip contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', borderRadius: 8 }} labelStyle={{ color: '#e5e7eb' }} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <Line type="monotone" dataKey="cumulative_used" name={t('hs_cum_used','تراكمي مستخدَم')} stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} />
+                {campaign.ab_test && (
+                  <>
+                    <Line type="monotone" dataKey="cumulative_used_a" name={t('hs_variant_a','النسخة A')} stroke="#8b5cf6" strokeWidth={2} strokeDasharray="4 2" dot={{ r: 2 }} />
+                    <Line type="monotone" dataKey="cumulative_used_b" name={t('hs_variant_b','النسخة B')} stroke="#ec4899" strokeWidth={2} strokeDasharray="4 2" dot={{ r: 2 }} />
+                  </>
+                )}
+                <Line type="monotone" dataKey="daily_used" name={t('hs_daily_used','يومي')} stroke="#3b82f6" strokeWidth={1.5} dot={{ r: 2 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <div className="text-center text-gray-400 py-10 text-sm">
+            📭 {t('hs_no_usage_yet','لا يوجد استخدام لأي كوبون من هذه الحملة بعد.')}
+            <div className="text-[11px] text-gray-500 mt-1">{t('hs_sent_total','المُرسَل')}: {timeline?.sent || 0}</div>
+          </div>
+        )}
+        <div className="flex items-center justify-around text-xs pt-2 border-t border-gray-700">
+          <div className="text-center"><div className="text-[10px] text-gray-400">{t('hs_sent','مرسل')}</div><div className="text-blue-300 font-bold">{timeline?.sent || 0}</div></div>
+          <div className="text-center"><div className="text-[10px] text-gray-400">{t('hs_used','مستخدم')}</div><div className="text-emerald-300 font-bold">{timeline?.total_used || 0}</div></div>
+          <div className="text-center"><div className="text-[10px] text-gray-400">{t('hs_conversion','تحويل')}</div><div className="text-pink-300 font-bold">{timeline?.sent ? Math.round(100 * (timeline.total_used || 0) / timeline.sent) : 0}%</div></div>
+        </div>
       </div>
     </div>
   );

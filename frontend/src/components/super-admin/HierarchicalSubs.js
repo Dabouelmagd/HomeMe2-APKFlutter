@@ -162,7 +162,7 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
         await axios.post(`${API}/super-admin/users/${uid}/send-gift`, payload, getToken());
         sent += 1;
       }
-      toast.success(t('hs_gift_sent','تم إرسال الهدية إلى')+` ${sent} ${t('hs_users','مستخدم')}`);
+      toast.success(t('hs_gift_sent','تم إرسال الهدية إلى')+` ${sent} ${t('hs_users','مستخدم')}`, { id: 'hs-gift-sent' });
       setGiftTarget(null);
       setGiftForm({ type: 'extend_trial', days: 7, discount: 20, plan: 'basic', message: '' });
       reload();

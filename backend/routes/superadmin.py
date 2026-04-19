@@ -216,7 +216,20 @@ async def send_user_gift(user_id: str, gift: dict, current_user: dict = Depends(
     # تطبيق الهدية حسب النوع
     if gift_type == "extend_trial":
         days = int(gift.get("details", {}).get("days", 7))
-        new_end = datetime.now(timezone.utc) + timedelta(days=days)
+        now = datetime.now(timezone.utc)
+        # Extend forward from existing end_date if it's still in the future
+        existing = await db.user_subscriptions.find_one({"user_id": user_id}, {"_id": 0, "end_date": 1})
+        base = now
+        if existing and existing.get("end_date"):
+            try:
+                existing_end = datetime.fromisoformat(str(existing["end_date"]).replace("Z", "+00:00"))
+                if existing_end.tzinfo is None:
+                    existing_end = existing_end.replace(tzinfo=timezone.utc)
+                if existing_end > now:
+                    base = existing_end
+            except Exception:
+                pass
+        new_end = base + timedelta(days=days)
         await db.user_subscriptions.update_one(
             {"user_id": user_id},
             {"$set": {"end_date": new_end.isoformat(), "status": "active", "gift_extended": True}},

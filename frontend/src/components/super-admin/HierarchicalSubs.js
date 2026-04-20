@@ -239,6 +239,10 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
   const saveNewUser = async (form) => {
     try {
       const payload = { ...form, compound_id: addUserCompound?.id };
+      // If role is company_admin, company_id comes from the form; compound_id becomes optional
+      if (form.role === 'company_admin') {
+        payload.compound_id = null;
+      }
       await axios.post(`${API}/super-admin/users`, payload, getToken());
       toast.success(t('hs_user_created','تم إنشاء المستخدم'));
       setAddUserCompound(null);
@@ -483,7 +487,7 @@ const HierarchicalSubs = ({ t, onOpenCompound }) => {
 
       {/* Add user to compound modal */}
       {addUserCompound && (
-        <AddUserModal compound={addUserCompound} onClose={() => setAddUserCompound(null)} onSave={saveNewUser} t={t} roleLabel={roleLabel} />
+        <AddUserModal compound={addUserCompound} onClose={() => setAddUserCompound(null)} onSave={saveNewUser} t={t} roleLabel={roleLabel} companies={data?.companies || []} />
       )}
 
       {/* Edit compound modal */}
@@ -769,14 +773,15 @@ const EditUserModal = ({ user, setUser, onClose, onSave, t, roleLabel }) => (
 );
 
 // ==================== AddUserModal ====================
-const AddUserModal = ({ compound, onClose, onSave, t, roleLabel }) => {
-  const [form, setForm] = useState({ username: '', email: '', password: '', full_name: '', phone: '', role: 'resident', unit_number: '' });
+const AddUserModal = ({ compound, onClose, onSave, t, roleLabel, companies = [] }) => {
+  const [form, setForm] = useState({ username: '', email: '', password: '', full_name: '', phone: '', role: 'resident', unit_number: '', company_id: '' });
   const submit = () => {
     if (!form.username || !form.email || !form.password || !form.full_name) {
       toast.error(t('hs_required_fields','الاسم واسم المستخدم والبريد وكلمة المرور مطلوبة'));
       return;
     }
     if (form.password.length < 6) { toast.error(t('hs_pw_short','كلمة المرور قصيرة جدًا (6 أحرف على الأقل)')); return; }
+    if (form.role === 'company_admin' && !form.company_id) { toast.error(t('hs_company_required','اختر الشركة التي سيديرها')); return; }
     onSave(form);
   };
   return (
@@ -803,6 +808,16 @@ const AddUserModal = ({ compound, onClose, onSave, t, roleLabel }) => {
               </select>
             </div>
           </div>
+          {form.role === 'company_admin' && (
+            <div className="bg-purple-900/30 border border-purple-600/40 rounded-lg p-3">
+              <label className="block text-xs text-purple-200 mb-1 font-semibold">🏢 {t('hs_which_company','الشركة التي سيديرها')} *</label>
+              <select value={form.company_id} onChange={e => setForm({...form, company_id: e.target.value})} className="w-full bg-gray-900 border border-purple-600/50 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-add-company-id">
+                <option value="">— {t('hs_select_company','اختر شركة')} —</option>
+                {companies.map(co => (<option key={co.id} value={co.id}>{co.name}</option>))}
+              </select>
+              <p className="text-[10px] text-purple-300/70 mt-1">{t('hs_company_admin_hint','هذا المستخدم سيرى فقط مجمعات هذه الشركة في لوحة تحكمه.')}</p>
+            </div>
+          )}
           <div>
             <label className="block text-xs text-gray-400 mb-1">{t('hs_email','البريد الإلكتروني')} *</label>
             <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="hs-add-email" />

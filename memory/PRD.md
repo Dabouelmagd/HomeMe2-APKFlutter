@@ -3,7 +3,19 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-44)
+## Latest Fixes (Feb 2026 — iterations 26-45)
+
+### Iter 45: Auto-link company_admin + Sidebar Alert Badges ✅
+- **🔗 Auto-link `company_id` for `company_admin` creation**:
+  - Backend (`routes/superadmin.py` user creation): validation enforces that `company_id` is provided and references an existing company whenever `role == "company_admin"`. Returns 400 with clear Arabic message otherwise.
+  - Frontend (`HierarchicalSubs.js` AddUserModal): shows a purple-highlighted company dropdown when role is `company_admin`, with helper text explaining the implication. `company_id` is sent with the payload; `compound_id` is nullified for this role (company admins don't belong to any single compound).
+  - Verified via curl: 3 scenarios (missing/invalid/valid) return 400/400/200 respectively with correct payload.
+- **🔴 Sidebar Alert Badges** (`routes/sidebar_alerts.py` + `Layout.js`):
+  - New endpoint `GET /api/sidebar-alerts/companies` returns: `active_companies`, `expiring_contracts` (≤7 days), `empty_companies` (no compounds), `urgent` (sum).
+  - `Layout.js` fetches alerts every 2 minutes for `app_owner`/`super_admin`; renders:
+    - 🔴 Red pulsing badge with count when `urgent > 0` (tooltip lists breakdown)
+    - 💜 Indigo count badge showing total active companies when no urgent alerts
+  - Live verification: 6 companies, 5 without compounds → badge correctly displays **"5"** in red next to "إدارة الشركات والمجمعات" link.
 
 ### Iter 44: Move "Companies Management" to Sidebar (separate page) ✅
 - **🎯 User request fulfilled**: "إدارة الشركات" is no longer buried as a tab inside "المجتمعات السكنية" — it now has a **direct sidebar link** called **"إدارة الشركات والمجمعات"** that lands straight on the full CompaniesTab.

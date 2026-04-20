@@ -68,6 +68,7 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   // Compound logo
   const [compoundLogo, setCompoundLogo] = useState(null);
+  const [companiesAlerts, setCompaniesAlerts] = useState({ urgent: 0, expiring_contracts: 0, empty_companies: 0, active_companies: 0 });
   // const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
@@ -92,6 +93,29 @@ const Layout = ({ children, isTrialMode = false }) => {
     };
     fetchCompoundLogo();
   }, [user?.compound_id]);
+
+  // Fetch sidebar alert badges (for owner/super_admin only)
+  useEffect(() => {
+    const role = user?.role;
+    if (role !== 'app_owner' && role !== 'super_admin') return;
+    const api = process.env.REACT_APP_BACKEND_URL;
+    const token = localStorage.getItem('token');
+    if (!api || !token) return;
+    const fetchAlerts = async () => {
+      try {
+        const res = await fetch(`${api}/api/sidebar-alerts/companies`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCompaniesAlerts(data);
+        }
+      } catch { /* silent */ }
+    };
+    fetchAlerts();
+    const interval = setInterval(fetchAlerts, 120000); // refresh every 2min
+    return () => clearInterval(interval);
+  }, [user?.role]);
 
   // Handle scroll to show/hide scroll-to-top button
   useEffect(() => {
@@ -594,6 +618,22 @@ const Layout = ({ children, isTrialMode = false }) => {
                           {item.name === t('financial_management') && (
                             <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-medium">
                               $2.5K
+                            </span>
+                          )}
+                          {item.name === t('owner_companies_management', 'إدارة الشركات والمجمعات') && companiesAlerts.urgent > 0 && (
+                            <span
+                              title={`🔴 ${companiesAlerts.urgent} تنبيه عاجل — ${companiesAlerts.expiring_contracts} عقد ينتهي خلال 7 أيام • ${companiesAlerts.empty_companies} شركة بدون مجمعات`}
+                              className="bg-red-500 text-white text-xs rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold animate-pulse"
+                              data-testid="sidebar-companies-urgent-badge">
+                              {companiesAlerts.urgent > 99 ? '99+' : companiesAlerts.urgent}
+                            </span>
+                          )}
+                          {item.name === t('owner_companies_management', 'إدارة الشركات والمجمعات') && companiesAlerts.urgent === 0 && companiesAlerts.active_companies > 0 && (
+                            <span
+                              title={`${companiesAlerts.active_companies} شركة نشطة`}
+                              className="bg-indigo-600/40 text-indigo-200 text-[10px] rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-semibold"
+                              data-testid="sidebar-companies-count-badge">
+                              {companiesAlerts.active_companies}
                             </span>
                           )}
                         </Link>

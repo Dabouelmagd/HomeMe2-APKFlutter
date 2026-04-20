@@ -686,6 +686,7 @@ async def super_admin_create_user(user_data: dict, current_user: dict = Depends(
     full_name = (user_data.get("full_name") or "").strip()
     role = user_data.get("role") or "resident"
     compound_id = user_data.get("compound_id")
+    company_id = user_data.get("company_id")
     phone = user_data.get("phone", "")
     unit_number = user_data.get("unit_number", "")
 
@@ -693,6 +694,14 @@ async def super_admin_create_user(user_data: dict, current_user: dict = Depends(
         raise HTTPException(status_code=400, detail="username, email, password, full_name مطلوبة")
     if len(password) < 6:
         raise HTTPException(status_code=400, detail="كلمة المرور يجب ألا تقل عن 6 أحرف")
+
+    # When role is company_admin, company_id is MANDATORY and must reference an existing company
+    if role == "company_admin":
+        if not company_id:
+            raise HTTPException(status_code=400, detail="company_id مطلوب عند إنشاء مدير شركة. اختر الشركة التي سيديرها.")
+        company = await db.companies.find_one({"id": company_id})
+        if not company:
+            raise HTTPException(status_code=400, detail="الشركة المحددة غير موجودة")
 
     existing = await db.users.find_one({"$or": [{"username": username}, {"email": email}]})
     if existing:
@@ -717,6 +726,7 @@ async def super_admin_create_user(user_data: dict, current_user: dict = Depends(
         "password_hash": password_hash,
         "role": role,
         "compound_id": compound_id,
+        "company_id": company_id if role == "company_admin" else user_data.get("company_id"),
         "family_id": None,
         "full_name": full_name,
         "phone": phone,

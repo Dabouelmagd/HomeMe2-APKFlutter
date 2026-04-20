@@ -2374,6 +2374,7 @@ from routes.advertiser import router as advertiser_router
 from routes.compound_admin import router as compound_admin_router
 from routes.company_admin import router as company_admin_router
 from routes.compound_invites import router as compound_invites_router
+from routes.sidebar_alerts import router as sidebar_alerts_router
 
 app.include_router(monitoring_router)
 app.include_router(finance_router)
@@ -2386,6 +2387,7 @@ app.include_router(advertiser_router)
 app.include_router(compound_admin_router)
 app.include_router(company_admin_router)
 app.include_router(compound_invites_router)
+app.include_router(sidebar_alerts_router)
 app.include_router(exports_router)
 app.include_router(facilities_router)
 app.include_router(maintenance_router)

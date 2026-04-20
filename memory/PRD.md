@@ -3,7 +3,25 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-45)
+## Latest Fixes (Feb 2026 — iterations 26-46)
+
+### Iter 46: Centralized Alerts Dashboard ✅
+- **🔔 `/app/alerts` page** — single-pane-of-glass for urgent items across 5 sources:
+  - 📋 Contracts expiring within 30 days (severity by days-left: ≤3 critical / ≤7 high / ≤30 medium)
+  - 🏢 Companies with zero compounds (medium)
+  - 📢 Advertiser ads awaiting approval (with hours-waiting severity escalation)
+  - 🔑 User subscriptions expiring within 14 days
+  - 🔗 Compound invites near max_uses or within 3 days of expiry
+- **Backend** (`routes/alerts.py`): single `GET /api/alerts/dashboard` endpoint returns flat alerts array + summary (critical/high/medium/low counts) + by_type counts. Each alert has quick action `{label, href}` that deep-links directly to the fix surface. Scoped by role: owner/super_admin see everything, company_admin sees only their company scope.
+- **Frontend** (`pages/AlertsDashboard.js`):
+  - 5 summary cards (clickable severity filters with ring highlight)
+  - Type filter pills with counts
+  - Color-coded cards per severity (red/orange/amber/sky gradients) with action button
+  - Empty state: ✨ "كل شيء تحت السيطرة!"
+- **Sidebar integration** (`Layout.js`):
+  - New top-level link "لوحة التنبيهات" in App Owner section 1 (at position #2 after main dashboard)
+  - Red pulsing badge with urgent count; hides when 0
+- **Test verified**: 8 real alerts (3 critical subs + 5 empty companies), 200 OK, Playwright screenshot shows full Arabic RTL dashboard rendering correctly.
 
 ### Iter 45: Auto-link company_admin + Sidebar Alert Badges ✅
 - **🔗 Auto-link `company_id` for `company_admin` creation**:

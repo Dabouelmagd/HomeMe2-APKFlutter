@@ -56,6 +56,7 @@ import AdvertiserPortal from './pages/AdvertiserPortal';
 import AdvertiserRegister from './pages/AdvertiserRegister';
 import CompanyAdminDashboard from './pages/CompanyAdminDashboard';
 import JoinViaInvite from './pages/JoinViaInvite';
+import AlertsDashboard from './pages/AlertsDashboard';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
 import SubscriptionManagement from './components/SubscriptionManagement';
@@ -633,6 +634,12 @@ function App() {
                 <Route path="advertiser" element={
                   <ProtectedRoute>
                     <AdvertiserPortal />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="alerts" element={
+                  <ProtectedRoute>
+                    <AlertsDashboard />
                   </ProtectedRoute>
                 } />
                 

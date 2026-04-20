@@ -321,6 +321,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       title: t('owner_app_control', 'تحكم عام للأبلكيشن'),
       items: [
         { name: t('owner_dashboard', 'لوحة التحكم الرئيسية'), href: 'dashboard', icon: HomeIcon, show: true },
+        { name: t('alerts_center', 'لوحة التنبيهات'), href: 'alerts', icon: BellIcon, show: true },
         { name: t('sa_compounds', 'المجمعات السكنية'), href: 'super-admin?tab=compounds', icon: BuildingOfficeIcon, show: true },
         { name: t('sa_users', 'المستخدمين'), href: 'super-admin?tab=users', icon: UsersIcon, show: true },
         { name: t('owner_budget', 'الميزانية العامة'), href: 'owner-budget', icon: CurrencyDollarIcon, show: true },
@@ -634,6 +635,14 @@ const Layout = ({ children, isTrialMode = false }) => {
                               className="bg-indigo-600/40 text-indigo-200 text-[10px] rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-semibold"
                               data-testid="sidebar-companies-count-badge">
                               {companiesAlerts.active_companies}
+                            </span>
+                          )}
+                          {item.name === t('alerts_center', 'لوحة التنبيهات') && companiesAlerts.urgent > 0 && (
+                            <span
+                              title={`🔔 ${companiesAlerts.urgent} تنبيه عاجل`}
+                              className="bg-red-500 text-white text-xs rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold animate-pulse"
+                              data-testid="sidebar-alerts-badge">
+                              {companiesAlerts.urgent > 99 ? '99+' : companiesAlerts.urgent}
                             </span>
                           )}
                         </Link>

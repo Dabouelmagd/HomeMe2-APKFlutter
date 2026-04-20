@@ -312,6 +312,7 @@ const Layout = ({ children, isTrialMode = false }) => {
     {
       title: t('owner_company_control', 'تحكم في حسابات شركات الإدارة'),
       items: [
+        { name: t('owner_companies_management', 'إدارة الشركات والمجمعات'), href: 'super-admin?tab=companies', icon: BuildingOffice2Icon, show: true },
         { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
         { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: 'subscription-reminders', icon: BellIcon, show: true },
       ]
@@ -334,8 +335,9 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('owner_dashboard', 'لوحة التحكم'), href: 'dashboard', icon: HomeIcon, show: true },
         { name: t('sa_compounds', 'المجمعات السكنية'), href: 'super-admin?tab=compounds', icon: BuildingOfficeIcon, show: true },
+        { name: t('owner_companies_management', 'إدارة الشركات والمجمعات'), href: 'super-admin?tab=companies', icon: BuildingOffice2Icon, show: true },
         { name: t('sa_users', 'إدارة المستخدمين'), href: 'super-admin?tab=users', icon: UsersIcon, show: true },
-        { name: t('od_mgmt_companies', 'شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
+        { name: t('od_mgmt_companies', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
         { name: t('satisfaction_ratings', 'رضا العملاء'), href: 'satisfaction', icon: StarIcon, show: true },
       ]
     },

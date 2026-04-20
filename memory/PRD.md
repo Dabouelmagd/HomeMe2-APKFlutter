@@ -3,7 +3,15 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-43)
+## Latest Fixes (Feb 2026 — iterations 26-44)
+
+### Iter 44: Move "Companies Management" to Sidebar (separate page) ✅
+- **🎯 User request fulfilled**: "إدارة الشركات" is no longer buried as a tab inside "المجتمعات السكنية" — it now has a **direct sidebar link** called **"إدارة الشركات والمجمعات"** that lands straight on the full CompaniesTab.
+- **Frontend (`Layout.js`)**:
+  - Added sidebar link in App Owner section "تحكم في حسابات شركات الإدارة" → `super-admin?tab=companies` (at the top of the section for visibility)
+  - Added same link in Super Admin sidebar after "المجمعات السكنية" so both roles have direct access
+  - `owner_companies_management` translation key with Arabic fallback "إدارة الشركات والمجمعات"
+- **Secondary fix**: Corrected a startup crash in `server.py` line 2600 — the static files guard was too loose (only checked for `/app/frontend/build` existence, not the inner `/static` subfolder), causing `RuntimeError: Directory 'build/static' does not exist` when only a partial build artifact was present. Guard now verifies both. Backend startup verified clean after the fix.
 
 ### Iter 43: Compound Invite Links — Self-Registration ✅
 - **🔗 Shareable invite links per compound**: Admins generate tokens that residents/managers/security can use to self-register without manual onboarding.

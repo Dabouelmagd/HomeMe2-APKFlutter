@@ -2597,7 +2597,7 @@ async def shutdown_db_client():
 import os as _os
 _frontend_build = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "frontend", "build")
 
-if _os.path.exists(_frontend_build):
+if _os.path.exists(_frontend_build) and _os.path.exists(_os.path.join(_frontend_build, "static")):
     from fastapi.responses import FileResponse as _FileResponse
 
     # Serve static assets from build

@@ -234,7 +234,7 @@ async def top10_companies(metric: str = "compounds", current_user: dict = Depend
         csub = company_sub_by_co.get(co.get("id"))
         if csub:
             revenue = float(csub.get("total_paid") or csub.get("price") or 0)
-        enriched.append({
+        entry = {
             "id": co.get("id"),
             "name": co.get("name"),
             "email": co.get("email", ""),
@@ -242,21 +242,28 @@ async def top10_companies(metric: str = "compounds", current_user: dict = Depend
             "total_users": len(users),
             "active_subs": active_subs,
             "expired_subs": expired_subs,
-            "revenue": revenue,
-        })
+        }
+        # الإيرادات المالية مقصورة على مالك التطبيق فقط
+        if current_user.get("role") == "app_owner":
+            entry["revenue"] = revenue
+        enriched.append(entry)
 
+    # منع السوبر أدمن من الترتيب حسب الإيرادات
+    effective_metric = metric
+    if metric == "revenue" and current_user.get("role") != "app_owner":
+        effective_metric = "compounds"
     sort_keys = {
         "compounds": lambda x: (x["compounds_count"], x["total_users"]),
         "users": lambda x: (x["total_users"], x["compounds_count"]),
-        "revenue": lambda x: (x["revenue"], x["total_users"]),
+        "revenue": lambda x: (x.get("revenue", 0), x["total_users"]),
         "active_subs": lambda x: (x["active_subs"], x["total_users"]),
     }
-    key_fn = sort_keys.get(metric, sort_keys["compounds"])
+    key_fn = sort_keys.get(effective_metric, sort_keys["compounds"])
     enriched.sort(key=key_fn, reverse=True)
     top = enriched[:10]
 
     return {
-        "metric": metric,
+        "metric": effective_metric,
         "top": top,
         "summary": {
             "total_companies": len(companies),

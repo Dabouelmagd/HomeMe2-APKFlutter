@@ -51,18 +51,26 @@ async def super_admin_dashboard(current_user: dict = Depends(require_super_admin
 
         recent_users = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(10).to_list(10)
 
-        return serialize_datetime({
-            "stats": {
-                "total_compounds": total_compounds,
-                "total_users": total_users,
-                "total_residents": total_residents,
-                "total_admins": total_admins,
+        # الأرقام المالية مقصورة على مالك التطبيق فقط
+        is_owner = current_user.get("role") == "app_owner"
+        stats = {
+            "total_compounds": total_compounds,
+            "total_users": total_users,
+            "total_residents": total_residents,
+            "total_admins": total_admins,
+        }
+        if is_owner:
+            stats.update({
                 "total_revenue": round(total_revenue, 2),
                 "total_expenses": round(total_expenses, 2),
-                "net_balance": round(total_revenue - total_expenses, 2)
-            },
+                "net_balance": round(total_revenue - total_expenses, 2),
+            })
+
+        return serialize_datetime({
+            "stats": stats,
             "compounds": compound_stats,
-            "recent_users": recent_users
+            "recent_users": recent_users,
+            "can_view_finance": is_owner,
         })
     except Exception as e:
         logging.error(f"Super admin dashboard error: {e}")
@@ -594,17 +602,22 @@ async def subscription_analytics(current_user: dict = Depends(require_super_admi
             {"_id": 0}
         ).sort("created_at", -1).limit(20).to_list(20)
         
-        return serialize_datetime({
+        # المبالغ المالية (الإيرادات والمدفوعات) مقصورة على مالك التطبيق فقط
+        is_owner = current_user.get("role") == "app_owner"
+        result = {
             "total_users": len(users),
             "active_subscriptions": len(active_subs),
             "free_users": len([u for u in users if not u.get("subscription_active")]),
             "by_plan": by_plan,
             "by_type": by_type,
-            "monthly_revenue_estimate": revenue_estimate,
             "expiring_soon": expiring_soon[:20],
-            "recent_payments": transactions,
-            "trial_users": len([u for u in users if u.get("subscription_type") == "trial"])
-        })
+            "trial_users": len([u for u in users if u.get("subscription_type") == "trial"]),
+            "can_view_finance": is_owner,
+        }
+        if is_owner:
+            result["monthly_revenue_estimate"] = revenue_estimate
+            result["recent_payments"] = transactions
+        return serialize_datetime(result)
     except Exception as e:
         logging.error(f"Subscription analytics error: {e}")
         raise HTTPException(status_code=500, detail="Failed")

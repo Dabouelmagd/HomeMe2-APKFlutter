@@ -7,11 +7,12 @@
 - Full Name: Dalia Abou El Magd
 - Role: app_owner
 
-## Super Admin
+## Super Admin (مساعد مالك التطبيق — بدون صلاحيات مالية)
 - Username: superadmin
 - Password: SuperAdmin2024!
 - Email: superadmin@homeme.app
 - Role: super_admin
+- **ملاحظة:** هذا الحساب يدير كل شيء (مجمعات، مستخدمين، إعلانات، شركات، ترجمات) لكنه **لا يرى أي بيانات مالية** (إيرادات، مصروفات، الإدارة المالية، إيرادات الإعلانات، إيرادات الشركات). الماليات مقصورة على `app_owner` فقط.
 
 ## Company Admin (مدير الشركة)
 - Username: testcompany2

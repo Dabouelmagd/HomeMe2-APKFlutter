@@ -20,8 +20,9 @@ async def get_owner_budget(
     current_user: dict = Depends(get_current_user)
 ):
     """Get comprehensive budget overview for the app owner"""
-    if current_user.get("role") not in ["app_owner", "super_admin"]:
-        raise HTTPException(403, "App Owner access required")
+    # الماليات مقصورة على مالك التطبيق فقط — السوبر أدمن معاون بدون صلاحية مالية
+    if current_user.get("role") != "app_owner":
+        raise HTTPException(403, "الوصول للماليات مقصور على مالك التطبيق فقط")
 
     db = get_db()
     now = datetime.now(timezone.utc)

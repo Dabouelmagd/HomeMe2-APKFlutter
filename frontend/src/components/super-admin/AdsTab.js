@@ -31,6 +31,40 @@ const MAX_TITLE_LENGTHS = {
 };
 
 /**
+ * يقرأ أبعاد الصورة محلياً (قبل الرفع) ويرجع {w, h} أو null للفيديو
+ */
+const readImageDimensions = (file) => new Promise((resolve, reject) => {
+  if (file.type.startsWith('video/')) { resolve(null); return; }
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => { URL.revokeObjectURL(url); resolve({ w: img.naturalWidth, h: img.naturalHeight }); };
+  img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('invalid_image')); };
+  img.src = url;
+});
+
+/**
+ * يتحقق من الحد الأدنى لأبعاد الصورة حسب موقع الإعلان
+ * يرجع {ok: true} لو القياس مقبول، أو {ok: false, message: '...'} لو مرفوض
+ */
+const validateImageDimensions = async (file, position, t) => {
+  try {
+    const dims = await readImageDimensions(file);
+    if (!dims) return { ok: true }; // فيديو - نتخطى
+    const rec = RECOMMENDED_SIZES[position];
+    if (!rec) return { ok: true };
+    if (dims.w < rec.minW || dims.h < rec.minH) {
+      return {
+        ok: false,
+        message: t('sa_img_too_small', `الصورة ${dims.w}×${dims.h} صغيرة جداً. المقاس الأدنى المطلوب: ${rec.minW}×${rec.minH} — اختاري صورة أكبر`)
+      };
+    }
+    return { ok: true, dims };
+  } catch {
+    return { ok: false, message: t('sa_img_invalid', 'ملف الصورة غير صالح') };
+  }
+};
+
+/**
  * AdHealthChecker — فحص ذكي للصورة + الرابط + العنوان
  */
 const AdHealthChecker = ({ ad, t }) => {
@@ -631,10 +665,17 @@ const AdsTab = ({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_media', 'رفع صورة أو فيديو')}</label>
+              <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_media', 'رفع صورة أو فيديو')} {RECOMMENDED_SIZES[newAd.position] && <span className="text-[10px] text-indigo-300 font-normal">· {t('sa_min_size', 'الحد الأدنى')}: {RECOMMENDED_SIZES[newAd.position].minW}×{RECOMMENDED_SIZES[newAd.position].minH} · {t('sa_ideal', 'المثالي')}: {RECOMMENDED_SIZES[newAd.position].w}×{RECOMMENDED_SIZES[newAd.position].h}</span>}</label>
               <input type="file" accept="image/*,video/mp4,video/webm" disabled={uploadingNew} onChange={async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
+                // تحقق من مقاس الصورة قبل الرفع
+                const check = await validateImageDimensions(file, newAd.position, t);
+                if (!check.ok) {
+                  toast.error(check.message);
+                  e.target.value = ''; // امسحي الملف المختار
+                  return;
+                }
                 const formData = new FormData();
                 formData.append('file', file);
                 setUploadingNew(true);
@@ -978,10 +1019,17 @@ const AdsTab = ({
                 )}
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_replace', 'تغيير الصورة/الفيديو (اختياري)')}</label>
+                <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_replace', 'تغيير الصورة/الفيديو (اختياري)')} {editAd.position && RECOMMENDED_SIZES[editAd.position] && <span className="text-[10px] text-indigo-300 font-normal">· {t('sa_min_size', 'الحد الأدنى')}: {RECOMMENDED_SIZES[editAd.position].minW}×{RECOMMENDED_SIZES[editAd.position].minH} · {t('sa_ideal', 'المثالي')}: {RECOMMENDED_SIZES[editAd.position].w}×{RECOMMENDED_SIZES[editAd.position].h}</span>}</label>
                 <input type="file" accept="image/*,video/mp4,video/webm" disabled={uploadingEdit} onChange={async (e) => {
                   const file = e.target.files[0];
                   if (!file) return;
+                  // تحقق من مقاس الصورة قبل الرفع
+                  const check = await validateImageDimensions(file, editAd.position, t);
+                  if (!check.ok) {
+                    toast.error(check.message);
+                    e.target.value = '';
+                    return;
+                  }
                   const formData = new FormData();
                   formData.append('file', file);
                   setUploadingEdit(true);

@@ -210,13 +210,23 @@ const AccountSelector = () => {
       }
 
       // If entered via homepage key icon, keep only the owner/super_admin card
+      // Otherwise (normal login), hide the owner/super_admin cards from view
       const finalList = ownerOnly
         ? accountsList.filter(a => a.role === 'app_owner' || a.role === 'super_admin')
-        : accountsList;
+        : accountsList.filter(a => a.role !== 'app_owner' && a.role !== 'super_admin');
 
       // Guard: owner_only entry but the logged-in user is neither owner nor super_admin → block
       if (ownerOnly && finalList.length === 0) {
         toast.error(t('as_owner_only_block', 'هذا المدخل مخصص للمالك والسوبر أدمن فقط'));
+        navigate('/', { replace: true });
+        return;
+      }
+
+      // Normal login but user is pure owner/super_admin with no compound cards → redirect to owner-only entry
+      if (!ownerOnly && finalList.length === 0 && (user?.role === 'app_owner' || user?.role === 'super_admin')) {
+        toast.info(t('as_owner_use_key', 'هذا الحساب مخصص لبوابة المالك. يرجى الدخول عبر أيقونة المفتاح في الصفحة الرئيسية'));
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         navigate('/', { replace: true });
         return;
       }

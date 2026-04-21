@@ -366,6 +366,10 @@ const AdsTab = ({
   const totalSlots = ALL_POSITIONS.reduce((s, p) => s + p.maxSlots, 0);
   const totalBooked = Object.values(adsByPos).reduce((s, v) => s + v.length, 0);
 
+  // حالة الرفع لمنع إنشاء الإعلان قبل اكتمال رفع الصورة
+  const [uploadingNew, setUploadingNew] = useState(false);
+  const [uploadingEdit, setUploadingEdit] = useState(false);
+
   const posLabels = {
     banner: t('sa_pos_banner','بانر أعلى'), sidebar: t('sa_pos_sidebar','جانبي'), inline: t('sa_pos_inline','داخلي'), dashboard: t('sa_pos_dashboard','لوحة التحكم'),
     homepage_hero: t('pos_homepage_hero','الرئيسية-هيرو'), homepage_mid: t('pos_homepage_mid','الرئيسية-وسط'), homepage_footer: t('pos_homepage_footer','الرئيسية-أسفل'),
@@ -628,17 +632,20 @@ const AdsTab = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_media', 'رفع صورة أو فيديو')}</label>
-              <input type="file" accept="image/*,video/mp4,video/webm" onChange={async (e) => {
+              <input type="file" accept="image/*,video/mp4,video/webm" disabled={uploadingNew} onChange={async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
                 const formData = new FormData();
                 formData.append('file', file);
+                setUploadingNew(true);
                 try {
                   const res = await axios.post(`${API}/ads/upload-media`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
-                  setNewAd({ ...newAd, image_url: res.data.url, media_type: file.type.startsWith('video') ? 'video' : 'image' });
+                  setNewAd(prev => ({ ...prev, image_url: res.data.url, media_type: res.data.type || (file.type.startsWith('video') ? 'video' : 'image') }));
                   toast.success(t('sa_uploaded', 'تم الرفع'));
                 } catch { toast.error(t('sa_upload_failed', 'فشل الرفع')); }
-              }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-green-600 file:text-white" />
+                finally { setUploadingNew(false); }
+              }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-green-600 file:text-white disabled:opacity-50" data-testid="new-ad-upload-input" />
+              {uploadingNew && <p className="text-[10px] text-amber-400 mt-1 flex items-center gap-1" data-testid="new-ad-uploading"><span className="inline-block w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span> {t('sa_uploading', 'جارٍ رفع الصورة... لا تضغطي إنشاء قبل اكتمال الرفع')}</p>}
             </div>
             <div>
               <label className="block text-xs text-gray-400 mb-1">{t('sa_description', 'الوصف')}</label>
@@ -674,7 +681,7 @@ const AdsTab = ({
             <AdPreview ad={newAd} t={t} />
           </div>
           <div className="flex gap-3">
-            <button onClick={handleCreateAd} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500">{t('sa_create', 'إنشاء')}</button>
+            <button onClick={handleCreateAd} disabled={uploadingNew} className="px-5 py-2 bg-green-600 text-white rounded-lg text-sm font-bold hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed" data-testid="create-ad-submit">{uploadingNew ? t('sa_wait_upload', 'جارٍ الرفع...') : t('sa_create', 'إنشاء')}</button>
             <button onClick={() => setShowCreateAd(false)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
           </div>
         </div>
@@ -972,18 +979,21 @@ const AdsTab = ({
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_replace', 'تغيير الصورة/الفيديو (اختياري)')}</label>
-                <input type="file" accept="image/*,video/mp4,video/webm" onChange={async (e) => {
+                <input type="file" accept="image/*,video/mp4,video/webm" disabled={uploadingEdit} onChange={async (e) => {
                   const file = e.target.files[0];
                   if (!file) return;
                   const formData = new FormData();
                   formData.append('file', file);
+                  setUploadingEdit(true);
                   try {
                     const res = await axios.post(`${API}/ads/upload-media`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
-                    setEditAd({ ...editAd, image_url: res.data.url, media_type: res.data.type });
+                    setEditAd(prev => ({ ...prev, image_url: res.data.url, media_type: res.data.type }));
                     toast.success(t('sa_uploaded', 'تم الرفع'));
                   } catch { toast.error(t('sa_upload_failed', 'فشل الرفع')); }
-                }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-blue-600 file:text-white" />
+                  finally { setUploadingEdit(false); }
+                }} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:bg-blue-600 file:text-white disabled:opacity-50" data-testid="edit-ad-upload-input" />
                 <p className="text-[9px] text-amber-400/80 mt-1">💡 {t('sa_upload_optional', 'اتركي هذا الحقل فارغاً إذا لم تريدي تغيير الصورة الحالية')}</p>
+                {uploadingEdit && <p className="text-[10px] text-amber-400 mt-1 flex items-center gap-1" data-testid="edit-ad-uploading"><span className="inline-block w-2 h-2 bg-amber-400 rounded-full animate-pulse"></span> {t('sa_uploading', 'جارٍ رفع الصورة... لا تضغطي حفظ قبل اكتمال الرفع')}</p>}
               </div>
               <div>
                 <label className="block text-xs text-gray-400 mb-1">{t('sa_ad_value', 'القيمة (ج.م)')}</label>
@@ -1017,7 +1027,7 @@ const AdsTab = ({
               <AdPreview ad={editAd} t={t} />
             </div>
             <div className="flex gap-3">
-              <button onClick={handleUpdateAd} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500" data-testid="save-edit-ad">{t('sa_save_changes', 'حفظ التغييرات')}</button>
+              <button onClick={handleUpdateAd} disabled={uploadingEdit} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed" data-testid="save-edit-ad">{uploadingEdit ? t('sa_wait_upload', 'جارٍ الرفع...') : t('sa_save_changes', 'حفظ التغييرات')}</button>
               <button onClick={() => setEditAd(null)} className="px-5 py-2 bg-gray-700 text-gray-300 rounded-lg text-sm">{t('sa_cancel', 'إلغاء')}</button>
             </div>
           </div>

@@ -167,10 +167,24 @@ const AuthProvider = ({ children }) => {
       axios.get(`${API}/auth/me`)
         .then(response => {
           const userData = response.data;
-          // Restore role from session-specific storage
+          // Restore role from session-specific storage — but only if it's compatible with the user's real role
+          // Prevents a previously saved 'app_owner' role from being applied to a super_admin session
           const savedRole = session?.selectedRole || localStorage.getItem('selectedRole');
-          if (savedRole && savedRole !== userData.role) {
+          const ROLE_HIERARCHY = {
+            app_owner: ['app_owner', 'super_admin', 'company_admin', 'admin', 'manager', 'security', 'resident'],
+            super_admin: ['super_admin', 'company_admin', 'admin', 'manager', 'security', 'resident'],
+            company_admin: ['company_admin', 'admin', 'manager', 'security', 'resident'],
+            admin: ['admin', 'manager', 'security', 'resident'],
+            manager: ['manager', 'security', 'resident'],
+            security: ['security', 'resident'],
+            resident: ['resident'],
+          };
+          const allowedSubRoles = ROLE_HIERARCHY[userData.role] || [userData.role];
+          if (savedRole && savedRole !== userData.role && allowedSubRoles.includes(savedRole)) {
             userData.active_role = savedRole;
+          } else if (savedRole && !allowedSubRoles.includes(savedRole)) {
+            // Clean up stale role that doesn't belong to this user
+            localStorage.removeItem('selectedRole');
           }
           const savedCompoundId = session?.selectedCompoundId || localStorage.getItem('selectedCompoundId');
           if (savedCompoundId) {

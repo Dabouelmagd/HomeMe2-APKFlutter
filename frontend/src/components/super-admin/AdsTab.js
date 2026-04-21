@@ -65,6 +65,81 @@ const validateImageDimensions = async (file, position, t) => {
 };
 
 /**
+ * SizesTooltip — زر معلومات بجنب حقل الرفع يعرض جدول كامل بكل المقاسات المطلوبة
+ */
+const SizesTooltip = ({ t, currentPosition }) => {
+  const [open, setOpen] = useState(false);
+  const POSITION_LABELS = {
+    homepage_hero: t('pos_homepage_hero', 'الصفحة الرئيسية - هيرو'),
+    homepage_mid: t('pos_homepage_mid', 'الصفحة الرئيسية - وسط'),
+    homepage_footer: t('pos_homepage_footer', 'الصفحة الرئيسية - أسفل'),
+    banner: t('sa_pos_banner', 'بانر أعلى التطبيق'),
+    sidebar: t('sa_pos_sidebar', 'الشريط الجانبي'),
+    dashboard: t('sa_pos_dashboard', 'لوحة تحكم المقيمين'),
+    inline: t('sa_pos_inline', 'داخل المحتوى'),
+    login_page: t('pos_login', 'صفحة تسجيل الدخول'),
+    popup: t('pos_popup', 'منبثق (Popup)'),
+    notification: t('pos_notification', 'إعلان إشعارات'),
+    splash: t('pos_splash', 'شاشة التحميل'),
+    services_page: t('pos_services', 'صفحة الخدمات'),
+  };
+  return (
+    <span className="relative inline-block" onMouseLeave={() => setOpen(false)}>
+      <button
+        type="button"
+        onMouseEnter={() => setOpen(true)}
+        onClick={() => setOpen(o => !o)}
+        className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-indigo-500 text-white text-[10px] font-bold hover:bg-indigo-400 transition-colors"
+        title={t('sa_sizes_help', 'عرض جدول المقاسات لكل موقع')}
+        data-testid="sizes-tooltip-trigger"
+        aria-label="sizes help"
+      >?</button>
+      {open && (
+        <div
+          className="absolute z-50 top-6 start-0 w-72 bg-gray-900 border border-indigo-500/40 rounded-lg shadow-2xl p-3 text-right"
+          dir="rtl"
+          data-testid="sizes-tooltip-content"
+        >
+          <p className="text-[11px] font-bold text-indigo-300 mb-2 flex items-center gap-1">
+            <span>📐</span>
+            <span>{t('sa_sizes_table_title', 'المقاسات المطلوبة لكل موقع')}</span>
+          </p>
+          <div className="max-h-64 overflow-y-auto space-y-1">
+            <table className="w-full text-[10px]">
+              <thead className="sticky top-0 bg-gray-900">
+                <tr className="text-indigo-200 border-b border-indigo-800">
+                  <th className="py-1 font-semibold text-right">{t('sa_position', 'الموقع')}</th>
+                  <th className="py-1 font-semibold">{t('sa_min_size', 'الأدنى')}</th>
+                  <th className="py-1 font-semibold">{t('sa_ideal', 'المثالي')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(RECOMMENDED_SIZES).map(([pos, s]) => {
+                  const isCurrent = pos === currentPosition;
+                  return (
+                    <tr
+                      key={pos}
+                      className={`border-b border-gray-800 ${isCurrent ? 'bg-indigo-900/40 text-indigo-200 font-bold' : 'text-gray-300'}`}
+                    >
+                      <td className="py-1 pe-1">{POSITION_LABELS[pos] || pos}</td>
+                      <td className="py-1 text-center font-mono text-amber-300">{s.minW}×{s.minH}</td>
+                      <td className="py-1 text-center font-mono text-emerald-300">{s.w}×{s.h}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-[9px] text-gray-500 mt-2 border-t border-gray-800 pt-2">
+            💡 {t('sa_sizes_tip', 'الصور أصغر من الحد الأدنى سيتم رفضها تلقائياً')}
+          </p>
+        </div>
+      )}
+    </span>
+  );
+};
+
+/**
  * AdHealthChecker — فحص ذكي للصورة + الرابط + العنوان
  */
 const AdHealthChecker = ({ ad, t }) => {
@@ -665,7 +740,11 @@ const AdsTab = ({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_media', 'رفع صورة أو فيديو')} {RECOMMENDED_SIZES[newAd.position] && <span className="text-[10px] text-indigo-300 font-normal">· {t('sa_min_size', 'الحد الأدنى')}: {RECOMMENDED_SIZES[newAd.position].minW}×{RECOMMENDED_SIZES[newAd.position].minH} · {t('sa_ideal', 'المثالي')}: {RECOMMENDED_SIZES[newAd.position].w}×{RECOMMENDED_SIZES[newAd.position].h}</span>}</label>
+              <label className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
+                <span>{t('sa_upload_media', 'رفع صورة أو فيديو')}</span>
+                <SizesTooltip t={t} currentPosition={newAd.position} />
+                {RECOMMENDED_SIZES[newAd.position] && <span className="text-[10px] text-indigo-300 font-normal">· {t('sa_min_size', 'الحد الأدنى')}: {RECOMMENDED_SIZES[newAd.position].minW}×{RECOMMENDED_SIZES[newAd.position].minH} · {t('sa_ideal', 'المثالي')}: {RECOMMENDED_SIZES[newAd.position].w}×{RECOMMENDED_SIZES[newAd.position].h}</span>}
+              </label>
               <input type="file" accept="image/*,video/mp4,video/webm" disabled={uploadingNew} onChange={async (e) => {
                 const file = e.target.files[0];
                 if (!file) return;
@@ -1019,7 +1098,11 @@ const AdsTab = ({
                 )}
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1">{t('sa_upload_replace', 'تغيير الصورة/الفيديو (اختياري)')} {editAd.position && RECOMMENDED_SIZES[editAd.position] && <span className="text-[10px] text-indigo-300 font-normal">· {t('sa_min_size', 'الحد الأدنى')}: {RECOMMENDED_SIZES[editAd.position].minW}×{RECOMMENDED_SIZES[editAd.position].minH} · {t('sa_ideal', 'المثالي')}: {RECOMMENDED_SIZES[editAd.position].w}×{RECOMMENDED_SIZES[editAd.position].h}</span>}</label>
+                <label className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">
+                  <span>{t('sa_upload_replace', 'تغيير الصورة/الفيديو (اختياري)')}</span>
+                  <SizesTooltip t={t} currentPosition={editAd.position} />
+                  {editAd.position && RECOMMENDED_SIZES[editAd.position] && <span className="text-[10px] text-indigo-300 font-normal">· {t('sa_min_size', 'الحد الأدنى')}: {RECOMMENDED_SIZES[editAd.position].minW}×{RECOMMENDED_SIZES[editAd.position].minH} · {t('sa_ideal', 'المثالي')}: {RECOMMENDED_SIZES[editAd.position].w}×{RECOMMENDED_SIZES[editAd.position].h}</span>}
+                </label>
                 <input type="file" accept="image/*,video/mp4,video/webm" disabled={uploadingEdit} onChange={async (e) => {
                   const file = e.target.files[0];
                   if (!file) return;

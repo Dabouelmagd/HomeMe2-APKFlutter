@@ -428,27 +428,18 @@ const HomePage = () => {
             <button
               onClick={() => navigate('/login')}
               className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all group relative"
-              data-testid="super-admin-quick-login"
-              title="Super Admin"
+              data-testid="owner-quick-login"
+              title={t('hp_owner_login_tooltip', 'دخول المالك / السوبر أدمن فقط')}
             >
               <KeyIcon className="h-5 w-5" />
             </button>
             <LanguageSwitcher />
-            {user ? (
-              <Link to="/app/dashboard" className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold text-sm hover:shadow-lg transition-all flex items-center gap-1.5" data-testid="header-dashboard">
-                <ChartBarIcon className="h-4 w-4" />
-                {t('hp_go_dashboard', 'لوحة التحكم')}
-              </Link>
-            ) : (
-              <>
-                <Link to="/login" className="px-4 py-2 text-blue-600 border-2 border-blue-600 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-all" data-testid="header-login">
-                  {t('login', 'تسجيل الدخول')}
-                </Link>
-                <Link to="/register" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-sm hover:shadow-lg transition-all" data-testid="header-register">
-                  {t('register_now', 'إنشاء حساب')}
-                </Link>
-              </>
-            )}
+            <Link to="/login" className="px-4 py-2 text-blue-600 border-2 border-blue-600 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-all" data-testid="header-login">
+              {t('login', 'تسجيل الدخول')}
+            </Link>
+            <Link to="/register" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-sm hover:shadow-lg transition-all" data-testid="header-register">
+              {t('register_now', 'إنشاء حساب')}
+            </Link>
           </div>
         </div>
       </header>

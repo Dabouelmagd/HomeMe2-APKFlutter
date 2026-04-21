@@ -3,7 +3,14 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-46)
+## Latest Fixes (Feb 2026 — iterations 26-47)
+
+### Iter 47: Homepage Header Cleanup — Login/Register Always Visible ✅
+- **Removed** the green "لوحة التحكم" (dashboard) shortcut button from the landing page header. It used to replace the login/register buttons when a user was signed in, hiding them from guest visitors browsing on the same device.
+- **Login + Register** buttons now **always visible** for any visitor, regardless of current session state. Guests and existing users see the same clean header.
+- **Key icon (🔑)**: kept as quick access for **Owner / Super Admin only**. Updated tooltip to `"دخول المالك / السوبر أدمن فقط"` to clarify its scope (the `/login` page still handles actual auth/role routing downstream).
+- `data-testid` renamed from `super-admin-quick-login` → `owner-quick-login` to reflect both roles.
+- Verified via Playwright screenshot: logged-in visitor sees `[🔑] [🌐] [تسجيل الدخول] [سجّل الآن]` — no dashboard shortcut.
 
 ### Iter 46: Centralized Alerts Dashboard ✅
 - **🔔 `/app/alerts` page** — single-pane-of-glass for urgent items across 5 sources:

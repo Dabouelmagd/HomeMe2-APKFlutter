@@ -2245,6 +2245,18 @@ async def serve_file(filename: str):
         filename=filename
     )
 
+@api_router.get("/downloads/flutter-assets")
+async def download_flutter_assets():
+    """Public download endpoint for the packaged Flutter assets zip."""
+    zip_path = Path("/app/homeme_flutter_assets.zip")
+    if not zip_path.exists():
+        raise HTTPException(status_code=404, detail="Flutter assets zip not found")
+    return FileResponse(
+        path=str(zip_path),
+        media_type="application/zip",
+        filename="homeme_flutter_assets.zip"
+    )
+
 # Health check
 @api_router.get("/")
 async def root():

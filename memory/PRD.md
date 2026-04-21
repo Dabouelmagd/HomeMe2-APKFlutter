@@ -3,7 +3,24 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-48)
+## Latest Fixes (Feb 2026 — iterations 26-49)
+
+### Iter 49: superadmin.py Refactor + Ad Sizes Tooltip + Image Validation ✅
+- **📂 `routes/superadmin.py` split** from 1755 → 820 lines into 4 focused modules (no URL changes — all endpoints keep their original paths):
+  - `superadmin.py` (820 lines) — dashboard, hierarchical-subs, compound-details, user CRUD, subscription-analytics, expiring-soon, auto-renewal (plus auto-renewal scheduler helpers that still live here)
+  - `superadmin_gifts.py` (360 lines) — `/super-admin/users/{user_id}/send-gift` + `/super-admin/bulk-renewal-offer/{preview|send}` + shared `_build_gift_email` helper
+  - `superadmin_companies.py` (419 lines) — full companies CRUD, link/unlink compound, top10, import/export full-structure
+  - `superadmin_campaigns.py` (204 lines) — `/super-admin/bulk-campaigns` + timeline + PDF export
+  - All 4 routers registered in `server.py` (lines 2342-2346 imports, 2397-2403 include_router)
+  - `superadmin.py` re-imports `_build_gift_email` from `superadmin_gifts.py` for the in-house auto-renewal email flow.
+- **📐 Ad Sizes Tooltip** (`super-admin/AdsTab.js` new `SizesTooltip` component): small "?" button next to the upload label opens a 12-row popup table (position / min-size / ideal-size) and highlights the currently-selected position. Works for both Create and Edit modals.
+- **🖼️ Client-side image dimension validation** (`validateImageDimensions` in AdsTab.js):
+  - Reads image dimensions locally via FileReader + Image API before upload
+  - Compares against `RECOMMENDED_SIZES[position]`
+  - Auto-rejects images smaller than minimum (e.g. 100×100 for `banner` which requires 728×90)
+  - Clear Arabic toast: `"الصورة 100×100 صغيرة جداً. المقاس الأدنى المطلوب: 728×90 — اختاري صورة أكبر"`
+  - Videos are skipped (no dimension check)
+- **🧪 Regression tests**: `/app/backend/tests/test_iter38_superadmin_split.py` — 16/16 backend endpoint tests PASSED; frontend Playwright verification confirms tooltip + validation behavior.
 
 ### Iter 48: Owner-Only Key Icon Login ✅
 - **🔑 Key icon in homepage header now strictly enforces Owner/Super-Admin-only flow**:

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import axios from 'axios';
+import { toast } from 'sonner';
 import {
   ShieldCheckIcon,
   BuildingOfficeIcon,
@@ -74,6 +75,9 @@ const AccountSelector = () => {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
+
+  // When entered via homepage 🔑 key icon, restrict to owner/super_admin account cards only
+  const ownerOnly = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('owner_only') === '1';
 
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -205,11 +209,23 @@ const AccountSelector = () => {
         });
       }
 
-      setAccounts(accountsList);
+      // If entered via homepage key icon, keep only the owner/super_admin card
+      const finalList = ownerOnly
+        ? accountsList.filter(a => a.role === 'app_owner' || a.role === 'super_admin')
+        : accountsList;
+
+      // Guard: owner_only entry but the logged-in user is neither owner nor super_admin → block
+      if (ownerOnly && finalList.length === 0) {
+        toast.error(t('as_owner_only_block', 'هذا المدخل مخصص للمالك والسوبر أدمن فقط'));
+        navigate('/', { replace: true });
+        return;
+      }
+
+      setAccounts(finalList);
 
       // If only one account, auto-select it
-      if (accountsList.length === 1) {
-        setSelected(accountsList[0].id);
+      if (finalList.length === 1) {
+        setSelected(finalList[0].id);
       }
     } catch {
       navigate('/app/dashboard', { replace: true });

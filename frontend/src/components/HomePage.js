@@ -426,7 +426,7 @@ const HomePage = () => {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('/login?owner_only=1')}
               className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all group relative"
               data-testid="owner-quick-login"
               title={t('hp_owner_login_tooltip', 'دخول المالك / السوبر أدمن فقط')}

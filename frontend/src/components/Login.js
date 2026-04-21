@@ -31,21 +31,25 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Preserve ?owner_only=1 flag through the login → selector flow
+  const ownerOnly = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('owner_only') === '1';
+  const selectPath = ownerOnly ? '/select-account?owner_only=1' : '/select-account';
+
   // If already logged in, redirect to account selector or dashboard
   useEffect(() => {
     if (currentUser) {
       const remembered = localStorage.getItem('rememberedAccount');
       const rememberCompound = localStorage.getItem('rememberCompound') === 'true';
-      if (remembered && rememberCompound) {
+      if (remembered && rememberCompound && !ownerOnly) {
         navigate('/app/dashboard', { replace: true });
       } else {
-        navigate('/select-account', { replace: true });
+        navigate(selectPath, { replace: true });
       }
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, navigate, selectPath, ownerOnly]);
   
   // Get the original page the user was trying to access
-  const from = location.state?.from || '/select-account';
+  const from = location.state?.from || selectPath;
 
   // Check for saved credentials and biometric availability on mount
   useEffect(() => {

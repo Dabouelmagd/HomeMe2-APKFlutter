@@ -1,0 +1,49 @@
+{
+  "app": {
+    "name": "HomeMe",
+    "name_ar": "هوم-مي",
+    "tagline_ar": "منصة إدارة المجتمعات السكنية الذكية",
+    "tagline_en": "Smart Residential Community Management Platform",
+    "version": "1.0.0",
+    "website": "https://homeme.app"
+  },
+  "api": {
+    "base_url_production": "https://profile-nav-debug.preview.emergentagent.com",
+    "prefix": "/api",
+    "note": "Replace base_url_production with your final deployed domain. All endpoints are prefixed with /api."
+  },
+  "auth": {
+    "login_endpoint": "/api/auth/login",
+    "register_endpoint": "/api/auth/register",
+    "refresh_endpoint": "/api/auth/refresh",
+    "me_endpoint": "/api/auth/me",
+    "token_type": "Bearer",
+    "storage_key": "token"
+  },
+  "features": {
+    "multi_language": true,
+    "supported_languages": ["ar", "en", "fr"],
+    "default_language": "ar",
+    "rtl_languages": ["ar"],
+    "multi_tenant": true,
+    "multi_session": true,
+    "push_notifications": true,
+    "offline_mode": false,
+    "emergency_sos": true,
+    "qr_gate_access": true,
+    "voice_commands": true,
+    "ai_auto_translation": true
+  },
+  "roles": {
+    "app_owner": "مالك التطبيق",
+    "super_admin": "سوبر أدمن",
+    "company_admin": "مدير شركة إدارة",
+    "admin": "أدمن المجمع",
+    "manager": "إداري",
+    "security": "أمن",
+    "resident": "ساكن",
+    "family_head": "رب أسرة",
+    "family_member": "فرد من العائلة",
+    "advertiser": "معلن"
+  }
+}

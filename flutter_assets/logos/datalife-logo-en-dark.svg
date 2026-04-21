@@ -1,0 +1,10 @@
+<svg width="300" height="80" viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="300" height="80" fill="transparent"/>
+  
+  <!-- Main text: DATA LIFE -->
+  <text x="150" y="45" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="900" fill="#1e40af" text-anchor="middle" letter-spacing="2">DATA LIFE</text>
+  
+  <!-- Subtitle -->
+  <text x="150" y="65" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="300" fill="#64748b" text-anchor="middle" letter-spacing="1">ARTIFICIAL INTELLIGENCE SERVICES</text>
+</svg>

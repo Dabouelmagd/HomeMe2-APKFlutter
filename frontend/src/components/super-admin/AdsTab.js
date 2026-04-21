@@ -96,7 +96,7 @@ const SizesTooltip = ({ t, currentPosition }) => {
       >?</button>
       {open && (
         <div
-          className="absolute z-50 top-6 start-0 w-72 bg-gray-900 border border-indigo-500/40 rounded-lg shadow-2xl p-3 text-right"
+          className="absolute z-50 top-6 start-0 w-96 bg-gray-900 border border-indigo-500/40 rounded-lg shadow-2xl p-3 text-right"
           dir="rtl"
           data-testid="sizes-tooltip-content"
         >
@@ -104,11 +104,12 @@ const SizesTooltip = ({ t, currentPosition }) => {
             <span>📐</span>
             <span>{t('sa_sizes_table_title', 'المقاسات المطلوبة لكل موقع')}</span>
           </p>
-          <div className="max-h-64 overflow-y-auto space-y-1">
+          <div className="max-h-80 overflow-y-auto space-y-1">
             <table className="w-full text-[10px]">
               <thead className="sticky top-0 bg-gray-900">
                 <tr className="text-indigo-200 border-b border-indigo-800">
                   <th className="py-1 font-semibold text-right">{t('sa_position', 'الموقع')}</th>
+                  <th className="py-1 font-semibold text-center">{t('sa_preview_shape', 'الشكل')}</th>
                   <th className="py-1 font-semibold">{t('sa_min_size', 'الأدنى')}</th>
                   <th className="py-1 font-semibold">{t('sa_ideal', 'المثالي')}</th>
                 </tr>
@@ -116,14 +117,39 @@ const SizesTooltip = ({ t, currentPosition }) => {
               <tbody>
                 {Object.entries(RECOMMENDED_SIZES).map(([pos, s]) => {
                   const isCurrent = pos === currentPosition;
+                  // حساب أبعاد الـ thumbnail مع الحفاظ على النسبة الحقيقية
+                  // الحد الأقصى: 48px عرض أو 28px ارتفاع — أيهما يحافظ على النسبة
+                  const maxW = 48, maxH = 28;
+                  const ratio = s.w / s.h;
+                  let tw, th;
+                  if (ratio >= maxW / maxH) {
+                    tw = maxW;
+                    th = Math.round(maxW / ratio);
+                  } else {
+                    th = maxH;
+                    tw = Math.round(maxH * ratio);
+                  }
                   return (
                     <tr
                       key={pos}
                       className={`border-b border-gray-800 ${isCurrent ? 'bg-indigo-900/40 text-indigo-200 font-bold' : 'text-gray-300'}`}
+                      data-testid={`sizes-row-${pos}`}
                     >
-                      <td className="py-1 pe-1">{POSITION_LABELS[pos] || pos}</td>
-                      <td className="py-1 text-center font-mono text-amber-300">{s.minW}×{s.minH}</td>
-                      <td className="py-1 text-center font-mono text-emerald-300">{s.w}×{s.h}</td>
+                      <td className="py-1.5 pe-1">{POSITION_LABELS[pos] || pos}</td>
+                      <td className="py-1.5">
+                        <div className="flex items-center justify-center">
+                          <div
+                            className={`rounded-sm border ${isCurrent ? 'border-indigo-300 bg-gradient-to-br from-indigo-500/60 to-fuchsia-500/60' : 'border-gray-600 bg-gradient-to-br from-gray-600/50 to-gray-700/50'} flex items-center justify-center`}
+                            style={{ width: `${tw}px`, height: `${th}px`, minWidth: '6px', minHeight: '6px' }}
+                            title={`${s.w}×${s.h} (${ratio.toFixed(2)}:1)`}
+                            data-testid={`sizes-thumb-${pos}`}
+                          >
+                            {tw >= 20 && th >= 12 && <span className="text-[7px] text-white/70 font-mono leading-none">{ratio.toFixed(1)}:1</span>}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-1.5 text-center font-mono text-amber-300">{s.minW}×{s.minH}</td>
+                      <td className="py-1.5 text-center font-mono text-emerald-300">{s.w}×{s.h}</td>
                     </tr>
                   );
                 })}
@@ -131,7 +157,7 @@ const SizesTooltip = ({ t, currentPosition }) => {
             </table>
           </div>
           <p className="text-[9px] text-gray-500 mt-2 border-t border-gray-800 pt-2">
-            💡 {t('sa_sizes_tip', 'الصور أصغر من الحد الأدنى سيتم رفضها تلقائياً')}
+            💡 {t('sa_sizes_tip', 'الشكل يعرض النسبة الحقيقية للمقاس · الصور الأصغر من الحد الأدنى سيتم رفضها تلقائياً')}
           </p>
         </div>
       )}

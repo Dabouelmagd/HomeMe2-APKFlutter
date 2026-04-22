@@ -158,41 +158,43 @@ const NotificationCenter = () => {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Notification Page Ad */}
       <div className="max-w-6xl mx-auto px-6 pt-4">
         <InternalAdBanner position="notification" maxAds={1} variant="slim" />
       </div>
-      {/* Enhanced Header Section */}
-      <div className="bg-white shadow-lg">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-6">
-              <div className="bg-gradient-to-br from-indigo-600 to-purple-600 p-4 rounded-2xl shadow-xl relative">
+      {/* Owner-themed Header */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-gray-900 via-rose-950 to-gray-900 text-white shadow-xl">
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(244,63,94,0.4), transparent 50%), radial-gradient(circle at 80% 50%, rgba(168,85,247,0.3), transparent 50%)' }}></div>
+        <div className="relative max-w-6xl mx-auto px-6 py-8">
+          <div className="text-center mb-6">
+            <div className="flex justify-center mb-4">
+              <div className="bg-gradient-to-br from-rose-500 to-pink-600 p-4 rounded-2xl shadow-xl relative">
                 <BellIcon className="h-12 w-12 text-white" />
                 {unreadCount > 0 && (
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center">
+                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center border-2 border-gray-900">
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </div>
                 )}
               </div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <p className="text-rose-300 text-xs font-medium tracking-wider mb-1">{t('notifications_badge', 'مركز الإشعارات')}</p>
+            <h1 className="text-3xl font-bold text-white mb-2">
               {t('notifications')}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm text-gray-300 max-w-3xl mx-auto">
               {t('manage_your_notifications')}
             </p>
           </div>
           
-          {/* Enhanced Action Buttons */}
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`group px-6 py-3 rounded-2xl font-semibold transition-all duration-200 flex items-center justify-center space-x-3 rtl:space-x-reverse ${
+              className={`group px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-3 rtl:space-x-reverse ${
                 showFilters 
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl' 
-                  : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50'
+                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xl' 
+                  : 'bg-white/10 hover:bg-white/20 border border-white/20 text-white backdrop-blur-sm'
               }`}
             >
               <FunnelIcon className="h-5 w-5" />
@@ -203,7 +205,7 @@ const NotificationCenter = () => {
               <button
                 onClick={handleMarkAllAsRead}
                 disabled={loading}
-                className="group bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-2xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-3 rtl:space-x-reverse disabled:opacity-50"
+                className="group bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-3 rtl:space-x-reverse disabled:opacity-50"
               >
                 <CheckIcon className="h-5 w-5" />
                 <span>{t('mark_all_read')} ({unreadCount})</span>
@@ -228,7 +230,7 @@ const NotificationCenter = () => {
                   placeholder={t('search_notifications')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 rtl:pr-12 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all duration-200"
+                  className="w-full pl-12 rtl:pr-12 rtl:pl-4 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-rose-100 focus:border-rose-500 transition-all duration-200"
                 />
               </div>
             </div>
@@ -293,7 +295,7 @@ const NotificationCenter = () => {
                   type="checkbox"
                   checked={selectedNotifications.length === filteredNotifications.length}
                   onChange={selectAllNotifications}
-                  className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  className="rounded border-gray-300 text-rose-600 focus:ring-indigo-500"
                 />
                 <span>
                   {selectedNotifications.length === filteredNotifications.length
@@ -335,16 +337,16 @@ const NotificationCenter = () => {
         {loading && filteredNotifications.length === 0 ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600 mx-auto mb-6"></div>
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-rose-200 border-t-rose-600 mx-auto mb-6"></div>
               <p className="text-gray-500 font-medium">{t('loading_notifications')}</p>
             </div>
           </div>
         ) : filteredNotifications.length === 0 ? (
           <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden max-w-2xl mx-auto">
             {/* Empty State Header */}
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-8 text-center">
-              <div className="bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-                <BellIcon className="h-12 w-12 text-indigo-600" />
+            <div className="bg-gradient-to-r from-rose-50 to-pink-50 p-8 text-center">
+              <div className="bg-gradient-to-br from-rose-100 to-pink-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                <BellIcon className="h-12 w-12 text-rose-600" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">
                 {searchQuery || filter !== 'all' || typeFilter !== 'all'
@@ -379,7 +381,7 @@ const NotificationCenter = () => {
                 className={`group bg-white rounded-2xl shadow-lg border hover:shadow-2xl transition-all duration-300 overflow-hidden ${
                   notification.is_read 
                     ? 'border-gray-100' 
-                    : 'border-indigo-200 ring-2 ring-indigo-50'
+                    : 'border-rose-200 ring-2 ring-rose-50'
                 }`}
               >
                 <div className="p-6">
@@ -390,7 +392,7 @@ const NotificationCenter = () => {
                         type="checkbox"
                         checked={selectedNotifications.includes(notification.id)}
                         onChange={() => toggleNotificationSelection(notification.id)}
-                        className="rounded-lg border-gray-300 text-indigo-600 focus:ring-indigo-500 w-5 h-5"
+                        className="rounded-lg border-gray-300 text-rose-600 focus:ring-indigo-500 w-5 h-5"
                       />
                     </div>
 
@@ -456,7 +458,7 @@ const NotificationCenter = () => {
                           {!notification.is_read && (
                             <button
                               onClick={() => handleMarkAsRead(notification.id)}
-                              className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors"
+                              className="p-2 text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
                               title={t('mark_as_read')}
                             >
                               <CheckIcon className="w-4 h-4" />

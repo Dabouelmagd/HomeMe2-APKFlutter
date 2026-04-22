@@ -31,6 +31,7 @@ import {
   XCircleIcon as XCircleSolidIcon 
 } from '@heroicons/react/24/solid';
 import { formatDate, formatRelativeTime } from '../utils/dateUtils';
+import useTabState from '../hooks/useTabState';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -38,7 +39,7 @@ const API = `${BACKEND_URL}/api`;
 const VotingSystem = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('active');
+  const [activeTab, setActiveTab] = useTabState('active');
   const [polls, setPolls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);

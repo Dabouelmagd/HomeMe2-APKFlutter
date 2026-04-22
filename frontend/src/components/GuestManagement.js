@@ -24,6 +24,7 @@ import {
   TrashIcon
 } from '@heroicons/react/24/outline';
 import { formatDate, formatRelativeTime } from '../utils/dateUtils';
+import useTabState from '../hooks/useTabState';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -31,7 +32,7 @@ const API = `${BACKEND_URL}/api`;
 const GuestManagement = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('guests');
+  const [activeTab, setActiveTab] = useTabState('guests');
   const [guests, setGuests] = useState([]);
   const [visitRequests, setVisitRequests] = useState([]);
   const [securityLogs, setSecurityLogs] = useState([]);

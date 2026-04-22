@@ -30,6 +30,7 @@ import {
   BookmarkIcon as BookmarkSolidIcon
 } from '@heroicons/react/24/solid';
 import { formatDate, formatRelativeTime } from '../utils/dateUtils';
+import useTabState from '../hooks/useTabState';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -37,7 +38,7 @@ const API = `${BACKEND_URL}/api`;
 const EventsAnnouncements = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useTabState('all');
   const [events, setEvents] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);

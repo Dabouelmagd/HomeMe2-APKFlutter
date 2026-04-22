@@ -5,6 +5,7 @@ import OwnerPageHeader from '../components/shared/OwnerPageHeader';
 import { toast } from 'sonner';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
+import useTabState from '../hooks/useTabState';
 import {
   CalendarIcon,
   ClockIcon,
@@ -52,7 +53,7 @@ const FacilityBooking = () => {
   const [myBookings, setMyBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('browse');
+  const [activeTab, setActiveTab] = useTabState('browse');
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 0 }));
   
   // Admin state

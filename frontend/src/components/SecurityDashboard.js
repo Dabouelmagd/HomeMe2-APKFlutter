@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import useTabState from '../hooks/useTabState';
 import {
   ShieldCheckIcon,
   UsersIcon,
@@ -31,7 +32,7 @@ const SecurityDashboard = () => {
   const isRTL = i18n.language === 'ar';
   const isAdmin = ['admin', 'super_admin', 'company_admin', 'app_owner', 'manager'].includes(user?.role);
 
-  const [activeTab, setActiveTab] = useState('visitors');
+  const [activeTab, setActiveTab] = useTabState('visitors');
   const [securityLogs, setSecurityLogs] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);

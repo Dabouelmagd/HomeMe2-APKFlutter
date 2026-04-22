@@ -19,6 +19,7 @@ import {
   ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import useTabState from '../hooks/useTabState';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -26,7 +27,7 @@ const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getIt
 const CompoundFinance = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('balance');
+  const [activeTab, setActiveTab] = useTabState('balance');
   const [balanceSheet, setBalanceSheet] = useState(null);
   const [obligations, setObligations] = useState([]);
   const [unitCharges, setUnitCharges] = useState({ charges: [], summary: {} });

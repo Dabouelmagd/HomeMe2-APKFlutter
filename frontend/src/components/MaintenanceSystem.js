@@ -17,6 +17,7 @@ import {
   PlusIcon
 } from '@heroicons/react/24/outline';
 import { formatDate } from '../utils/dateUtils';
+import useTabState from '../hooks/useTabState';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -24,7 +25,7 @@ const API = `${BACKEND_URL}/api`;
 const MaintenanceSystem = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('requests');
+  const [activeTab, setActiveTab] = useTabState('requests');
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);

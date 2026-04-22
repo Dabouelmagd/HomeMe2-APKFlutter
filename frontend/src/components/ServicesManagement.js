@@ -27,6 +27,7 @@ import {
   XCircleIcon
 } from '@heroicons/react/24/outline';
 import InternalAdBanner from './InternalAdBanner';
+import useTabState from '../hooks/useTabState';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -433,7 +434,7 @@ const ServicesManagement = () => {
   const [serviceProviders, setServiceProviders] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('services');
+  const [activeTab, setActiveTab] = useTabState('services');
   const [showAddService, setShowAddService] = useState(false);
   const [showBookService, setShowBookService] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);

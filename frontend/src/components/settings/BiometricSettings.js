@@ -128,7 +128,7 @@ const BiometricSettings = () => {
       {biometricAvailable && (
         <>
           {/* Current Status */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-lg hover:border-rose-200 dark:hover:border-rose-800 transition-all">
             <div className="p-6">
               <h3 className="font-bold text-gray-900 dark:text-white mb-4">
                 {t('biometric_status', 'حالة البصمة')}
@@ -222,14 +222,14 @@ const BiometricSettings = () => {
           </div>
 
           {/* Info */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-5">
+          <div className="bg-rose-50 dark:bg-rose-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-5">
             <div className="flex gap-3">
-              <ShieldCheckIcon className="w-6 h-6 text-blue-500 flex-shrink-0" />
+              <ShieldCheckIcon className="w-6 h-6 text-rose-500 flex-shrink-0" />
               <div>
-                <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-2">
+                <h4 className="font-bold text-blue-800 dark:text-rose-300 mb-2">
                   {t('security_info', 'معلومات الأمان')}
                 </h4>
-                <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1.5">
+                <ul className="text-sm text-rose-700 dark:text-rose-400 space-y-1.5">
                   <li>• {t('biometric_info_1', 'البصمة مخزنة بأمان على جهازك فقط')}</li>
                   <li>• {t('biometric_info_2', 'لا يتم إرسال بيانات بصمتك إلى أي خادم')}</li>
                   <li>• {t('biometric_info_3', 'يمكنك إزالة البصمة في أي وقت')}</li>

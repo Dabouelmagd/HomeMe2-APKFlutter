@@ -89,10 +89,10 @@ const ProfileSettings = () => {
   return (
     <div className="space-y-6">
       {/* Profile Picture & Basic Info */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-lg hover:border-rose-200 dark:hover:border-rose-800 transition-all">
         <div className="p-6">
           <h3 className="font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-            <UserIcon className="w-5 h-5 text-blue-500" />
+            <UserIcon className="w-5 h-5 text-rose-500" />
             {t('personal_information', 'المعلومات الشخصية')}
           </h3>
           
@@ -104,16 +104,16 @@ const ProfileSettings = () => {
                   <img 
                     src={profilePreview} 
                     alt="Profile" 
-                    className="w-24 h-24 rounded-2xl object-cover border-4 border-blue-100 dark:border-blue-900" 
+                    className="w-24 h-24 rounded-2xl object-cover border-4 border-rose-100 dark:border-rose-900" 
                   />
                 ) : (
-                  <div className="w-24 h-24 rounded-2xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center border-4 border-blue-100 dark:border-blue-900">
-                    <UserIcon className="w-12 h-12 text-blue-300 dark:text-blue-700" />
+                  <div className="w-24 h-24 rounded-2xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center border-4 border-rose-100 dark:border-rose-900">
+                    <UserIcon className="w-12 h-12 text-rose-300 dark:text-rose-700" />
                   </div>
                 )}
                 <label 
                   htmlFor="profile-picture" 
-                  className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-2.5 rounded-xl cursor-pointer hover:bg-blue-600 transition-colors shadow-lg"
+                  className="absolute -bottom-2 -right-2 bg-rose-500 text-white p-2.5 rounded-xl cursor-pointer hover:bg-rose-600 transition-colors shadow-lg"
                 >
                   <CameraIcon className="w-4 h-4" />
                 </label>
@@ -128,7 +128,7 @@ const ProfileSettings = () => {
               <div>
                 <h4 className="font-bold text-gray-900 dark:text-white text-lg">{user?.full_name}</h4>
                 <p className="text-gray-500 dark:text-gray-400">@{user?.username}</p>
-                <p className="text-xs text-blue-500 mt-1">{t('click_to_change', 'انقر لتغيير الصورة')}</p>
+                <p className="text-xs text-rose-500 mt-1">{t('click_to_change', 'انقر لتغيير الصورة')}</p>
               </div>
             </div>
 
@@ -142,7 +142,7 @@ const ProfileSettings = () => {
                   type="text"
                   value={profileData.full_name}
                   onChange={(e) => setProfileData(prev => ({ ...prev, full_name: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
                 />
               </div>
               <div>
@@ -153,7 +153,7 @@ const ProfileSettings = () => {
                   type="tel"
                   value={profileData.phone}
                   onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
                   dir="ltr"
                 />
               </div>
@@ -186,7 +186,7 @@ const ProfileSettings = () => {
             <button 
               type="submit" 
               disabled={saving}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-blue-500/25"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-rose-500/25"
             >
               {saving ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -200,10 +200,10 @@ const ProfileSettings = () => {
       </div>
 
       {/* Password Change */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-lg hover:border-rose-200 dark:hover:border-rose-800 transition-all">
         <div className="p-6">
           <h3 className="font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-            <LockClosedIcon className="w-5 h-5 text-purple-500" />
+            <LockClosedIcon className="w-5 h-5 text-pink-500" />
             {t('change_password', 'تغيير كلمة المرور')}
           </h3>
           
@@ -216,7 +216,7 @@ const ProfileSettings = () => {
                 type="password"
                 value={profileData.current_password}
                 onChange={(e) => setProfileData(prev => ({ ...prev, current_password: e.target.value }))}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                 required
               />
             </div>
@@ -229,7 +229,7 @@ const ProfileSettings = () => {
                   type="password"
                   value={profileData.new_password}
                   onChange={(e) => setProfileData(prev => ({ ...prev, new_password: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                   required
                 />
               </div>
@@ -241,7 +241,7 @@ const ProfileSettings = () => {
                   type="password"
                   value={profileData.confirm_password}
                   onChange={(e) => setProfileData(prev => ({ ...prev, confirm_password: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                   required
                 />
               </div>
@@ -250,7 +250,7 @@ const ProfileSettings = () => {
             <button 
               type="submit"
               disabled={savingPassword}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-purple-500/25"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-pink-500 hover:bg-pink-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-pink-500/25"
             >
               {savingPassword ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

@@ -73,10 +73,10 @@ const LanguageSettings = () => {
   return (
     <div className="space-y-6">
       {/* Language Selection */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-lg hover:border-rose-200 dark:hover:border-rose-800 transition-all">
         <div className="p-6">
           <h3 className="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-            <GlobeAltIcon className="w-5 h-5 text-cyan-500" />
+            <GlobeAltIcon className="w-5 h-5 text-rose-500" />
             {t('select_language', 'اختر اللغة')}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
@@ -91,7 +91,7 @@ const LanguageSettings = () => {
                 disabled={changing}
                 className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all ${
                   selectedLanguage === lang.code
-                    ? 'bg-cyan-50 dark:bg-cyan-900/20 border-2 border-cyan-500'
+                    ? 'bg-rose-50 dark:bg-rose-900/20 border-2 border-rose-500'
                     : 'bg-gray-50 dark:bg-gray-700/50 border-2 border-transparent hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
@@ -106,7 +106,7 @@ const LanguageSettings = () => {
                 
                 {/* Check Icon */}
                 {selectedLanguage === lang.code && (
-                  <div className="w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center">
                     <CheckIcon className="w-5 h-5 text-white" />
                   </div>
                 )}
@@ -117,14 +117,14 @@ const LanguageSettings = () => {
       </div>
 
       {/* RTL Info */}
-      <div className="bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-2xl p-5">
+      <div className="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-2xl p-5">
         <div className="flex gap-3">
           <div className="text-2xl">💡</div>
           <div>
-            <h4 className="font-bold text-cyan-800 dark:text-cyan-300 mb-1">
+            <h4 className="font-bold text-rose-800 dark:text-rose-300 mb-1">
               {t('language_tip', 'نصيحة')}
             </h4>
-            <p className="text-sm text-cyan-700 dark:text-cyan-400">
+            <p className="text-sm text-rose-700 dark:text-rose-400">
               {t('rtl_support_info', 'اللغة العربية تدعم الكتابة من اليمين إلى اليسار (RTL) بشكل كامل في التطبيق.')}
             </p>
           </div>

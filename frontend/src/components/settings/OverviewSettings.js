@@ -18,9 +18,9 @@ const OverviewSettings = () => {
       label: t('total_residents', 'إجمالي السكان'), 
       value: '125', 
       icon: UserGroupIcon,
-      color: 'bg-blue-500',
-      lightColor: 'bg-blue-50 dark:bg-blue-900/20',
-      textColor: 'text-blue-600'
+      color: 'bg-rose-500',
+      lightColor: 'bg-rose-50 dark:bg-rose-900/20',
+      textColor: 'text-rose-600'
     },
     { 
       label: t('total_units', 'إجمالي الوحدات'), 
@@ -34,9 +34,9 @@ const OverviewSettings = () => {
       label: t('active_services', 'الخدمات النشطة'), 
       value: '12', 
       icon: WrenchScrewdriverIcon,
-      color: 'bg-purple-500',
-      lightColor: 'bg-purple-50 dark:bg-purple-900/20',
-      textColor: 'text-purple-600'
+      color: 'bg-pink-500',
+      lightColor: 'bg-pink-50 dark:bg-pink-900/20',
+      textColor: 'text-pink-600'
     },
     { 
       label: t('this_month', 'هذا الشهر'), 
@@ -70,7 +70,7 @@ const OverviewSettings = () => {
       </div>
 
       {/* Compound Info */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-lg hover:border-rose-200 dark:hover:border-rose-800 transition-all">
         <div className="p-6">
           <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
             <ChartBarIcon className="w-5 h-5 text-indigo-500" />

@@ -42,10 +42,10 @@ const PrivacySettings = () => {
   return (
     <div className="space-y-6">
       {/* Profile Visibility */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-lg hover:border-rose-200 dark:hover:border-rose-800 transition-all">
         <div className="p-6">
           <h3 className="font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
-            <EyeIcon className="w-5 h-5 text-purple-500" />
+            <EyeIcon className="w-5 h-5 text-pink-500" />
             {t('profile_visibility', 'ظهور الملف الشخصي')}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
@@ -58,7 +58,7 @@ const PrivacySettings = () => {
                 key={option.value}
                 className={`flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all ${
                   privacySettings.profile_visibility === option.value
-                    ? 'bg-purple-50 dark:bg-purple-900/20 border-2 border-purple-500'
+                    ? 'bg-pink-50 dark:bg-pink-900/20 border-2 border-pink-500'
                     : 'bg-gray-50 dark:bg-gray-700/50 border-2 border-transparent hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
@@ -73,7 +73,7 @@ const PrivacySettings = () => {
                   />
                   <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                     privacySettings.profile_visibility === option.value
-                      ? 'border-purple-500 bg-purple-500'
+                      ? 'border-pink-500 bg-pink-500'
                       : 'border-gray-300 dark:border-gray-600'
                   }`}>
                     {privacySettings.profile_visibility === option.value && (
@@ -92,10 +92,10 @@ const PrivacySettings = () => {
       </div>
 
       {/* Toggles */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-lg hover:border-rose-200 dark:hover:border-rose-800 transition-all">
         <div className="p-6 space-y-1">
           <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-            <ShieldCheckIcon className="w-5 h-5 text-purple-500" />
+            <ShieldCheckIcon className="w-5 h-5 text-pink-500" />
             {t('privacy_controls', 'التحكم في الخصوصية')}
           </h3>
           
@@ -108,7 +108,7 @@ const PrivacySettings = () => {
             <button
               onClick={() => setPrivacySettings(prev => ({ ...prev, activity_status: !prev.activity_status }))}
               className={`relative w-14 h-8 rounded-full transition-colors ${
-                privacySettings.activity_status ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'
+                privacySettings.activity_status ? 'bg-pink-500' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
@@ -126,7 +126,7 @@ const PrivacySettings = () => {
             <button
               onClick={() => setPrivacySettings(prev => ({ ...prev, data_sharing: !prev.data_sharing }))}
               className={`relative w-14 h-8 rounded-full transition-colors ${
-                privacySettings.data_sharing ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'
+                privacySettings.data_sharing ? 'bg-pink-500' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
@@ -144,7 +144,7 @@ const PrivacySettings = () => {
             <button
               onClick={() => setPrivacySettings(prev => ({ ...prev, marketing_emails: !prev.marketing_emails }))}
               className={`relative w-14 h-8 rounded-full transition-colors ${
-                privacySettings.marketing_emails ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-600'
+                privacySettings.marketing_emails ? 'bg-pink-500' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
@@ -159,7 +159,7 @@ const PrivacySettings = () => {
       <button 
         onClick={handlePrivacyUpdate}
         disabled={saving}
-        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-purple-500/25"
+        className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-pink-500 hover:bg-pink-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-pink-500/25"
       >
         {saving ? (
           <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

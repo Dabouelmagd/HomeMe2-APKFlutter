@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import PushNotifications from './PushNotifications';
 import {
   Cog6ToothIcon,
@@ -34,7 +34,23 @@ import {
 const Settings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // Persist active tab in URL so page refresh keeps user on the same screen
+  const activeTab = searchParams.get('tab') || null;
+
+  const setActiveTab = (tab) => {
+    if (tab) {
+      setSearchParams({ tab }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  };
+
+  // Navigate directly to the dashboard on the back button instead of browser history,
+  // to avoid jumping to the previously-visited sidebar page
+  const goBackHome = () => {
+    navigate('/app/dashboard');
+  };
 
   const settingsCategories = [
     {
@@ -208,7 +224,7 @@ const Settings = () => {
                 </div>
               </div>
               <button 
-                onClick={() => navigate(-1)}
+                onClick={goBackHome}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-colors text-sm font-semibold backdrop-blur-sm"
                 data-testid="settings-back-btn"
               >

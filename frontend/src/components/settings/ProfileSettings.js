@@ -49,6 +49,13 @@ const ProfileSettings = () => {
   });
   const [profilePicture, setProfilePicture] = useState(null);
   const [profilePreview, setProfilePreview] = useState(user?.profile_picture_url || null);
+
+  // Sync preview when user updates (e.g. after save or login from another tab)
+  React.useEffect(() => {
+    if (!profilePicture) {
+      setProfilePreview(user?.profile_picture_url || null);
+    }
+  }, [user?.profile_picture_url, profilePicture]);
   const [saving, setSaving] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
 
@@ -76,10 +83,7 @@ const ProfileSettings = () => {
       const formData = new FormData();
       formData.append('full_name', profileData.full_name);
       formData.append('phone', profileData.phone || '');
-      // Send email only if it changed
-      if (profileData.email && profileData.email !== user?.email) {
-        formData.append('email', profileData.email);
-      }
+      // Email is read-only — not sent in the update
       if (profilePicture) {
         formData.append('profile_picture', profilePicture, profilePicture.name || 'avatar.jpg');
       }
@@ -191,9 +195,10 @@ const ProfileSettings = () => {
               <div className="relative">
                 {profilePreview ? (
                   <img 
-                    src={profilePreview} 
+                    src={profilePreview.startsWith('blob:') || profilePreview.startsWith('http') ? profilePreview : `${BACKEND_URL}${profilePreview}`} 
                     alt="Profile" 
                     className="w-24 h-24 rounded-2xl object-cover border-4 border-rose-100 dark:border-rose-900" 
+                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
                   />
                 ) : (
                   <div className="w-24 h-24 rounded-2xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center border-4 border-rose-100 dark:border-rose-900">
@@ -265,12 +270,12 @@ const ProfileSettings = () => {
                 <input
                   type="email"
                   value={profileData.email}
-                  onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
+                  readOnly
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-medium cursor-not-allowed focus:outline-none"
                   dir="ltr"
                   data-testid="profile-email-input"
                 />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('email_editable_hint', 'يمكنك تغيير البريد الإلكتروني — تأكدي من صحته')}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">🔒 {t('email_readonly_hint', 'البريد الإلكتروني مرتبط بحسابك — للاستفسار عن تغييره تواصلي مع الدعم الفني')}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

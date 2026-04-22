@@ -45,7 +45,8 @@ import {
   ExclamationTriangleIcon,
   ShieldCheckIcon,
   LanguageIcon,
-  SignalIcon
+  SignalIcon,
+  LifebuoyIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import SessionSwitcher from './SessionSwitcher';
@@ -69,6 +70,7 @@ const Layout = ({ children, isTrialMode = false }) => {
   // Compound logo
   const [compoundLogo, setCompoundLogo] = useState(null);
   const [companiesAlerts, setCompaniesAlerts] = useState({ urgent: 0, expiring_contracts: 0, empty_companies: 0, active_companies: 0 });
+  const [supportTicketsAlerts, setSupportTicketsAlerts] = useState({ open: 0, in_progress: 0, total_active: 0 });
   // const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
@@ -112,8 +114,20 @@ const Layout = ({ children, isTrialMode = false }) => {
         }
       } catch { /* silent */ }
     };
+    const fetchSupportCounts = async () => {
+      try {
+        const res = await fetch(`${api}/api/sidebar-alerts/support-tickets`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSupportTicketsAlerts(data);
+        }
+      } catch { /* silent */ }
+    };
     fetchAlerts();
-    const interval = setInterval(fetchAlerts, 120000); // refresh every 2min
+    fetchSupportCounts();
+    const interval = setInterval(() => { fetchAlerts(); fetchSupportCounts(); }, 60000); // refresh every 60s
     return () => clearInterval(interval);
   }, [user?.role]);
 
@@ -331,6 +345,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('ad_realtime_analytics', 'تحليلات الإعلانات'), href: 'ad-analytics', icon: SignalIcon, show: true },
         { name: t('satisfaction_ratings', 'رضا العملاء'), href: 'satisfaction', icon: StarIcon, show: true },
         { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
+        { name: t('sa_support_tickets_nav', 'تذاكر الدعم الفني'), href: 'super-admin?tab=support_tickets', icon: LifebuoyIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
     },
@@ -378,6 +393,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('advanced_analytics', 'تحليلات المجمعات'), href: 'analytics', icon: ChartPieIcon, show: true },
         { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
+        { name: t('sa_support_tickets_nav', 'تذاكر الدعم الفني'), href: 'super-admin?tab=support_tickets', icon: LifebuoyIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
     },
@@ -644,6 +660,14 @@ const Layout = ({ children, isTrialMode = false }) => {
                               className="bg-red-500 text-white text-xs rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold animate-pulse"
                               data-testid="sidebar-alerts-badge">
                               {companiesAlerts.urgent > 99 ? '99+' : companiesAlerts.urgent}
+                            </span>
+                          )}
+                          {item.name === t('sa_support_tickets_nav', 'تذاكر الدعم الفني') && supportTicketsAlerts.total_active > 0 && (
+                            <span
+                              title={`🎧 ${supportTicketsAlerts.open} تذكرة جديدة • ${supportTicketsAlerts.in_progress} قيد المعالجة`}
+                              className={`text-white text-xs rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold ${supportTicketsAlerts.open > 0 ? 'bg-rose-500 animate-pulse' : 'bg-amber-500'}`}
+                              data-testid="sidebar-support-tickets-badge">
+                              {supportTicketsAlerts.total_active > 99 ? '99+' : supportTicketsAlerts.total_active}
                             </span>
                           )}
                         </Link>

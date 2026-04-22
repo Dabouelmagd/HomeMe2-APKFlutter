@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../App';
 import PushNotifications from './PushNotifications';
 import {
   Cog6ToothIcon,
@@ -34,9 +35,15 @@ import {
 const Settings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   // Persist active tab in URL so page refresh keeps user on the same screen
   const activeTab = searchParams.get('tab') || null;
+
+  // Roles that are not tenant-level admins — they must NOT see compound-specific
+  // admin settings (Overview / Residences / Registration Links). They can still
+  // manage users & add admins from their own dashboards.
+  const isHighLevelAdmin = user?.role === 'app_owner' || user?.role === 'super_admin';
 
   const setActiveTab = (tab) => {
     if (tab) {
@@ -114,25 +121,28 @@ const Settings = () => {
       id: 'admin',
       title: t('admin_settings', 'إعدادات المدير'),
       items: [
-        {
-          id: 'overview',
-          name: t('overview', 'نظرة عامة'),
-          description: t('overview_desc', 'إحصائيات ومعلومات المجمع'),
-          icon: Cog6ToothIcon,
-          color: 'bg-indigo-500',
-          lightColor: 'bg-indigo-50 dark:bg-indigo-900/20',
-          textColor: 'text-indigo-600 dark:text-indigo-400'
-        },
-        {
-          id: 'residences',
-          name: t('residences_list', 'قائمة الإقامات'),
-          description: t('residences_desc', 'عرض وإدارة الوحدات السكنية'),
-          icon: HomeModernIcon,
-          color: 'bg-teal-500',
-          lightColor: 'bg-teal-50 dark:bg-teal-900/20',
-          textColor: 'text-teal-600 dark:text-teal-400',
-          badge: '1'
-        },
+        // Overview / Residences / Registration Links are compound-level — hide for App Owner & Super Admin
+        ...(isHighLevelAdmin ? [] : [
+          {
+            id: 'overview',
+            name: t('overview', 'نظرة عامة'),
+            description: t('overview_desc', 'إحصائيات ومعلومات المجمع'),
+            icon: Cog6ToothIcon,
+            color: 'bg-indigo-500',
+            lightColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+            textColor: 'text-indigo-600 dark:text-indigo-400'
+          },
+          {
+            id: 'residences',
+            name: t('residences_list', 'قائمة الإقامات'),
+            description: t('residences_desc', 'عرض وإدارة الوحدات السكنية'),
+            icon: HomeModernIcon,
+            color: 'bg-teal-500',
+            lightColor: 'bg-teal-50 dark:bg-teal-900/20',
+            textColor: 'text-teal-600 dark:text-teal-400',
+            badge: '1'
+          }
+        ]),
         {
           id: 'user_management',
           name: t('user_management', 'إدارة المستخدمين'),
@@ -151,16 +161,19 @@ const Settings = () => {
           lightColor: 'bg-rose-50 dark:bg-rose-900/20',
           textColor: 'text-rose-600 dark:text-rose-400'
         },
-        {
-          id: 'registration_links',
-          name: t('registration_links', 'روابط التسجيل'),
-          description: t('registration_links_desc', 'إنشاء روابط دعوة للسكان'),
-          icon: KeyIcon,
-          color: 'bg-pink-500',
-          lightColor: 'bg-pink-50 dark:bg-pink-900/20',
-          textColor: 'text-pink-600 dark:text-pink-400',
-          badge: '0'
-        }
+        // Registration Links are compound-level — hide for App Owner & Super Admin
+        ...(isHighLevelAdmin ? [] : [
+          {
+            id: 'registration_links',
+            name: t('registration_links', 'روابط التسجيل'),
+            description: t('registration_links_desc', 'إنشاء روابط دعوة للسكان'),
+            icon: KeyIcon,
+            color: 'bg-pink-500',
+            lightColor: 'bg-pink-50 dark:bg-pink-900/20',
+            textColor: 'text-pink-600 dark:text-pink-400',
+            badge: '0'
+          }
+        ])
       ]
     }
   ];
@@ -178,6 +191,16 @@ const Settings = () => {
 
   // Render content based on active tab
   const renderContent = () => {
+    // Block compound-level tabs for App Owner and Super Admin (e.g. if accessed via direct URL)
+    if (isHighLevelAdmin && ['overview', 'residences', 'registration_links'].includes(activeTab)) {
+      return (
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 text-center">
+          <p className="text-gray-600 dark:text-gray-300">
+            {t('setting_unavailable_for_role', 'هذا الإعداد غير متاح لدورك الحالي.')}
+          </p>
+        </div>
+      );
+    }
     switch (activeTab) {
       case 'overview':
         return <OverviewSettings />;

@@ -271,8 +271,12 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
         "role": current_user.get('role',''),
         "compound_id": current_user.get('compound_id',''),
         "full_name": current_user.get('full_name',''),
-        "is_family_head": getattr(current_user, 'is_family_head', False),
-        "family_id": getattr(current_user, 'family_id', None)
+        "email": current_user.get('email',''),
+        "phone": current_user.get('phone',''),
+        "profile_picture_url": current_user.get('profile_picture_url',''),
+        "company_id": current_user.get('company_id', None),
+        "is_family_head": current_user.get('is_family_head', False),
+        "family_id": current_user.get('family_id', None)
     }
 
 # WebAuthn/Biometric Authentication Routes

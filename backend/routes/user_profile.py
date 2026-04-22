@@ -14,7 +14,7 @@ from helpers import serialize_datetime
 
 router = APIRouter(prefix="/api")
 
-UPLOAD_DIR = Path(os.environ.get("UPLOAD_DIR", "/app/backend/uploads"))
+UPLOAD_DIR = Path("/app/uploads")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 

@@ -36,13 +36,41 @@ class EmailService:
         self.smtp_password = os.environ.get('SMTP_PASSWORD', '')
         self.from_email = os.environ.get('SMTP_FROM_EMAIL', 'info@datalifeai.com')
         self.from_name = os.environ.get('SMTP_FROM_NAME', 'HomeMe')
+
+        # Dedicated mailboxes (see /app/backend/.env)
+        # "security" → alerts sent to residents/admins (homeme_security@)
+        # "support"  → bug reports / complaints / technical support (homeme_residence@)
+        self.mailboxes = {
+            'main': {
+                'user': self.smtp_user,
+                'password': self.smtp_password,
+                'from_email': self.from_email,
+                'from_name': self.from_name,
+            },
+            'security': {
+                'user': os.environ.get('SMTP_SECURITY_USER', self.smtp_user),
+                'password': os.environ.get('SMTP_SECURITY_PASSWORD', self.smtp_password),
+                'from_email': os.environ.get('SMTP_SECURITY_FROM_EMAIL', self.from_email),
+                'from_name': os.environ.get('SMTP_SECURITY_FROM_NAME', 'HomeMe Security'),
+            },
+            'support': {
+                'user': os.environ.get('SMTP_SUPPORT_USER', self.smtp_user),
+                'password': os.environ.get('SMTP_SUPPORT_PASSWORD', self.smtp_password),
+                'from_email': os.environ.get('SMTP_SUPPORT_USER', self.from_email),
+                'from_name': 'HomeMe Support',
+            },
+        }
+
+    def _get_mailbox(self, mailbox: str = 'main') -> dict:
+        return self.mailboxes.get(mailbox) or self.mailboxes['main']
     
-    def _send_email_sync(self, to_email: str, subject: str, html_content: str, text_content: str = None) -> bool:
-        """Synchronous email sending function"""
+    def _send_email_sync(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main') -> bool:
+        """Synchronous email sending function. `mailbox` picks which From account to use: main | security | support."""
         try:
+            mb = self._get_mailbox(mailbox)
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
-            msg['From'] = f"{self.from_name} <{self.from_email}>"
+            msg['From'] = f"{mb['from_name']} <{mb['from_email']}>"
             msg['To'] = to_email
             
             # Add text and HTML parts
@@ -57,18 +85,18 @@ class EmailService:
             context = ssl.create_default_context()
             
             with smtplib.SMTP_SSL(self.smtp_host, self.smtp_port, context=context) as server:
-                server.login(self.smtp_user, self.smtp_password)
-                server.sendmail(self.from_email, to_email, msg.as_string())
+                server.login(mb['user'], mb['password'])
+                server.sendmail(mb['from_email'], to_email, msg.as_string())
             
-            logger.info(f"Email sent successfully to {to_email}")
+            logger.info(f"Email sent successfully to {to_email} via mailbox={mailbox}")
             return True
             
         except Exception as e:
-            logger.error(f"Failed to send email to {to_email}: {str(e)}")
+            logger.error(f"Failed to send email to {to_email} via mailbox={mailbox}: {str(e)}")
             return False
     
-    async def send_email(self, to_email: str, subject: str, html_content: str, text_content: str = None) -> bool:
-        """Async wrapper for email sending"""
+    async def send_email(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main') -> bool:
+        """Async wrapper for email sending. `mailbox`: main | security | support."""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
             executor,
@@ -76,7 +104,8 @@ class EmailService:
             to_email,
             subject,
             html_content,
-            text_content
+            text_content,
+            mailbox,
         )
     
     # ==================== RESIDENT NOTIFICATIONS ====================
@@ -437,6 +466,61 @@ class EmailService:
         """
         
         return await self.send_email(admin_email, subject, html_content)
+
+    # ==================== SECURITY NOTIFICATIONS (sent from homeme_security@) ====================
+
+    async def send_security_alert(
+        self,
+        to_email: str,
+        recipient_name: str,
+        alert_title: str,
+        alert_body: str,
+        severity: str = "high",
+        compound_name: str = None,
+    ) -> bool:
+        """
+        Send a security alert email from the dedicated security mailbox (homeme_security@).
+        `severity`: critical | high | medium | low
+        """
+        severity_colors = {
+            'critical': '#dc2626',
+            'high': '#ea580c',
+            'medium': '#ca8a04',
+            'low': '#16a34a',
+        }
+        color = severity_colors.get(severity.lower(), '#ea580c')
+        severity_label_ar = {
+            'critical': 'حرج', 'high': 'عاجل', 'medium': 'متوسط', 'low': 'عادي',
+        }.get(severity.lower(), severity)
+
+        subject = f"🚨 [HomeMe Security] {alert_title}"
+        html_content = f"""
+        <!DOCTYPE html>
+        <html dir="rtl"><head><meta charset="UTF-8"></head>
+        <body style="font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#f5f5f5;padding:24px;">
+          <div style="max-width:640px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+            <div style="background:linear-gradient(135deg,{color} 0%,#7c2d12 100%);color:#fff;padding:24px;text-align:center;">
+              <div style="font-size:40px;">🚨</div>
+              <h1 style="margin:8px 0 4px;font-size:22px;">تنبيه أمني</h1>
+              <span style="display:inline-block;background:rgba(255,255,255,0.25);padding:4px 12px;border-radius:20px;font-size:12px;">{severity_label_ar.upper()}</span>
+            </div>
+            <div style="padding:24px;color:#333;line-height:1.8;">
+              <p>مرحباً <b>{recipient_name}</b>،</p>
+              <div style="background:#fef2f2;border-right:4px solid {color};padding:16px;border-radius:8px;margin:16px 0;">
+                <h3 style="margin:0 0 8px;color:{color};">{alert_title}</h3>
+                <p style="margin:0;white-space:pre-wrap;">{alert_body}</p>
+              </div>
+              {f'<p style="color:#666;font-size:14px;">📍 المجمع: <b>{compound_name}</b></p>' if compound_name else ''}
+              <p style="color:#666;font-size:13px;margin-top:20px;">يرجى اتخاذ الإجراء المناسب فوراً ومراجعة النظام.</p>
+            </div>
+            <div style="background:#f8f9fa;padding:16px;text-align:center;color:#888;font-size:12px;">
+              HomeMe Security · {datetime.now(tz=None).strftime('%Y-%m-%d %H:%M')}
+            </div>
+          </div>
+        </body></html>
+        """
+        text_content = f"[HomeMe Security] {alert_title}\n\n{alert_body}\n\nSeverity: {severity}"
+        return await self.send_email(to_email, subject, html_content, text_content, mailbox="security")
 
 
 # Create singleton instance

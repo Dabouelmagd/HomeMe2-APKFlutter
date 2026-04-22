@@ -103,6 +103,7 @@ import TermsPrivacy from './components/TermsPrivacy';
 import ContactUs from './components/ContactUs';
 import Newsletter from './components/Newsletter';
 import HelpCenter from './components/HelpCenter';
+import ContactSupport from './pages/ContactSupport';
 import MobileOptimized from './components/MobileOptimized';
 // SubscriptionCodesManagement replaced by SubscriptionCodesUnified
 import SubscriptionActivation from './components/SubscriptionActivation';
@@ -755,6 +756,10 @@ function App() {
                 
                 <Route path="help" element={
                   <HelpCenter />
+                } />
+                
+                <Route path="support" element={
+                  <ContactSupport />
                 } />
                 
                 <Route path="mobile-app" element={

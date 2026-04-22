@@ -31,8 +31,11 @@
 - Password: Security2024!
 - Role: security
 
-## Email (SMTP)
-- info@datalifeai.com (configured in backend .env)
+## Email (SMTP) — mail.datalifeai.com (Port 465 SSL, Port 993 IMAP)
+- **Main / System emails** (welcome, password-reset, invites, daily reports) → `homeme_superadmin@datalifeai.com`
+- **Security alerts** (emergency, intrusion) → `homeme_security@datalifeai.com`
+- **Support / Technical Support inbox** (receives complaints via `/api/support/contact`) → `homeme_residence@datalifeai.com`
+- Passwords are configured in `backend/.env`: `SMTP_PASSWORD`, `SMTP_SECURITY_PASSWORD`, `SMTP_SUPPORT_PASSWORD`
 
 ## Payment Integrations
 - Stripe: Test key in environment

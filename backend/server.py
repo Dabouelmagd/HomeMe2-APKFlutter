@@ -2343,6 +2343,7 @@ from routes.superadmin import router as superadmin_router
 from routes.superadmin_gifts import router as superadmin_gifts_router
 from routes.superadmin_companies import router as superadmin_companies_router
 from routes.superadmin_campaigns import router as superadmin_campaigns_router
+from routes.support import router as support_router
 from routes.exports import router as exports_router
 from routes.facilities import router as facilities_router
 from routes.maintenance import router as maintenance_router
@@ -2401,6 +2402,7 @@ app.include_router(superadmin_router)
 app.include_router(superadmin_gifts_router)
 app.include_router(superadmin_companies_router)
 app.include_router(superadmin_campaigns_router)
+app.include_router(support_router)
 app.include_router(mgmt_contracts_router)
 app.include_router(advertiser_router)
 app.include_router(compound_admin_router)

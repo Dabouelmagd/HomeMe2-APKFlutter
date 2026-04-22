@@ -451,6 +451,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('settings_nav'), href: 'settings', icon: Cog6ToothIcon, show: true },
         { name: t('help_center'), href: 'help', icon: QuestionMarkCircleIcon, show: true },
+        { name: t('contact_support_nav', 'تواصل مع الدعم الفني'), href: 'support', icon: QuestionMarkCircleIcon, show: true },
       ]
     }
   ]);

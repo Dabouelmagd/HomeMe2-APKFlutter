@@ -1,12 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../../App';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { UserIcon, CameraIcon, LockClosedIcon, CheckIcon } from '@heroicons/react/24/outline';
+import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+
+// Helper: center a square crop on an image
+const centerAspectCrop = (mediaWidth, mediaHeight) =>
+  centerCrop(
+    makeAspectCrop({ unit: '%', width: 80 }, 1, mediaWidth, mediaHeight),
+    mediaWidth,
+    mediaHeight
+  );
+
+// Convert a completed crop into a cropped image Blob
+async function getCroppedBlob(imageEl, cropPct, mimeType = 'image/jpeg') {
+  const scaleX = imageEl.naturalWidth / imageEl.width;
+  const scaleY = imageEl.naturalHeight / imageEl.height;
+  const cropX = (cropPct.x / 100) * imageEl.width * scaleX;
+  const cropY = (cropPct.y / 100) * imageEl.height * scaleY;
+  const cropW = (cropPct.width / 100) * imageEl.width * scaleX;
+  const cropH = (cropPct.height / 100) * imageEl.height * scaleY;
+  const outSize = Math.min(512, Math.max(cropW, cropH));
+  const canvas = document.createElement('canvas');
+  canvas.width = outSize;
+  canvas.height = outSize;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(imageEl, cropX, cropY, cropW, cropH, 0, 0, outSize, outSize);
+  return new Promise((resolve) => canvas.toBlob((b) => resolve(b), mimeType, 0.92));
+}
 
 const ProfileSettings = () => {
   const { t } = useTranslation();
@@ -24,26 +52,38 @@ const ProfileSettings = () => {
   const [saving, setSaving] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
 
+  // Cropping state
+  const [cropSrc, setCropSrc] = useState(null); // data URL of the original file for the cropper
+  const [crop, setCrop] = useState();
+  const [completedCrop, setCompletedCrop] = useState();
+  const imgRef = useRef(null);
+
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
       const formData = new FormData();
       formData.append('full_name', profileData.full_name);
-      formData.append('phone', profileData.phone);
-      
+      formData.append('phone', profileData.phone || '');
+      // Send email only if it changed
+      if (profileData.email && profileData.email !== user?.email) {
+        formData.append('email', profileData.email);
+      }
       if (profilePicture) {
-        formData.append('profile_picture', profilePicture);
+        formData.append('profile_picture', profilePicture, profilePicture.name || 'avatar.jpg');
       }
 
       const response = await axios.put(`${API}/users/${user.id}/profile`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
 
-      updateUser({ ...user, ...response.data });
-      toast.success(t('profile_updated_successfully', 'تم تحديث الملف الشخصي'));
+      const updatedUser = response.data?.user || response.data;
+      updateUser({ ...user, ...updatedUser });
+      setProfilePicture(null);
+      toast.success(t('profile_updated_successfully', 'تم تحديث الملف الشخصي بنجاح'));
     } catch (error) {
-      toast.error(t('failed_to_update_profile', 'فشل تحديث الملف الشخصي'));
+      const msg = error?.response?.data?.detail || t('failed_to_update_profile', 'فشل تحديث الملف الشخصي');
+      toast.error(typeof msg === 'string' ? msg : t('failed_to_update_profile', 'فشل تحديث الملف الشخصي'));
     } finally {
       setSaving(false);
     }
@@ -74,16 +114,50 @@ const ProfileSettings = () => {
 
   const handleProfilePictureChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (!file.type.startsWith('image/')) {
-        toast.error(t('please_select_image_file', 'يرجى اختيار ملف صورة'));
-        return;
-      }
-      setProfilePicture(file);
-      const reader = new FileReader();
-      reader.onload = (e) => setProfilePreview(e.target.result);
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error(t('please_select_image_file', 'يرجى اختيار ملف صورة'));
+      return;
     }
+    // Open cropper with the chosen image
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setCropSrc(ev.target.result);
+      setCrop(undefined);
+      setCompletedCrop(undefined);
+    };
+    reader.readAsDataURL(file);
+    // Reset input so selecting the same file twice still triggers change
+    e.target.value = '';
+  };
+
+  const onCropImageLoad = (e) => {
+    const { width, height } = e.currentTarget;
+    setCrop(centerAspectCrop(width, height));
+  };
+
+  const confirmCrop = async () => {
+    if (!imgRef.current || !completedCrop) {
+      toast.error(t('crop_first', 'يرجى تحديد منطقة الصورة أولاً'));
+      return;
+    }
+    try {
+      const blob = await getCroppedBlob(imgRef.current, completedCrop, 'image/jpeg');
+      if (!blob) throw new Error('no-blob');
+      const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+      setProfilePicture(croppedFile);
+      setProfilePreview(URL.createObjectURL(blob));
+      setCropSrc(null);
+      toast.success(t('crop_ready', 'تم اقتصاص الصورة — لا تنسي الحفظ'));
+    } catch {
+      toast.error(t('crop_failed', 'فشل اقتصاص الصورة'));
+    }
+  };
+
+  const cancelCrop = () => {
+    setCropSrc(null);
+    setCrop(undefined);
+    setCompletedCrop(undefined);
   };
 
   return (
@@ -164,11 +238,12 @@ const ProfileSettings = () => {
                 <input
                   type="email"
                   value={profileData.email}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                  disabled
+                  onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-all"
                   dir="ltr"
+                  data-testid="profile-email-input"
                 />
-                <p className="text-xs text-gray-400 mt-1">{t('email_cannot_be_changed', 'لا يمكن تغيير البريد الإلكتروني')}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('email_editable_hint', 'يمكنك تغيير البريد الإلكتروني — تأكدي من صحته')}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -186,6 +261,7 @@ const ProfileSettings = () => {
             <button 
               type="submit" 
               disabled={saving}
+              data-testid="save-profile-btn"
               className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-rose-500/25"
             >
               {saving ? (
@@ -262,6 +338,73 @@ const ProfileSettings = () => {
           </form>
         </div>
       </div>
+
+      {/* Image Cropper Modal */}
+      {cropSrc && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          data-testid="crop-modal"
+          onClick={cancelCrop}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-gradient-to-r from-rose-500 to-pink-600 px-5 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-white">
+                <CameraIcon className="w-5 h-5" />
+                <h3 className="font-bold">{t('crop_title', 'اقتصاص صورة الملف الشخصي')}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={cancelCrop}
+                className="text-white/80 hover:text-white text-2xl leading-none"
+                data-testid="crop-cancel-x"
+              >×</button>
+            </div>
+            <div className="flex-1 overflow-auto p-4 bg-gray-100 dark:bg-gray-900 flex items-center justify-center" style={{ minHeight: '300px' }}>
+              <ReactCrop
+                crop={crop}
+                onChange={(_, pct) => setCrop(pct)}
+                onComplete={(_, pct) => setCompletedCrop(pct)}
+                aspect={1}
+                circularCrop
+                keepSelection
+              >
+                <img
+                  ref={imgRef}
+                  src={cropSrc}
+                  alt="crop source"
+                  onLoad={onCropImageLoad}
+                  style={{ maxHeight: '60vh', maxWidth: '100%', display: 'block' }}
+                  data-testid="crop-image"
+                />
+              </ReactCrop>
+            </div>
+            <div className="px-5 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex items-center justify-between gap-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t('crop_hint', '💡 اسحبي زوايا المربع لاقتصاص الصورة')}</p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={cancelCrop}
+                  className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
+                  data-testid="crop-cancel"
+                >{t('cancel', 'إلغاء')}</button>
+                <button
+                  type="button"
+                  onClick={confirmCrop}
+                  disabled={!completedCrop}
+                  className="px-5 py-2 text-sm bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg font-bold hover:shadow-lg disabled:opacity-50 flex items-center gap-1"
+                  data-testid="crop-confirm"
+                >
+                  <CheckIcon className="w-4 h-4" />
+                  {t('apply_crop', 'تطبيق الاقتصاص')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

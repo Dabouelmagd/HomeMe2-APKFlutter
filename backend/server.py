@@ -2245,6 +2245,16 @@ async def serve_file(filename: str):
         filename=filename
     )
 
+
+@api_router.get("/files/users/{filename}")
+async def serve_user_file(filename: str):
+    """Serve user profile pictures."""
+    file_path = UPLOAD_DIR / "users" / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    mime_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
+    return FileResponse(path=str(file_path), media_type=mime_type, filename=filename)
+
 @api_router.get("/downloads/flutter-assets")
 async def download_flutter_assets():
     """Public download endpoint for the packaged Flutter assets zip."""

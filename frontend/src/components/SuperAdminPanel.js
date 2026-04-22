@@ -23,6 +23,7 @@ import CompoundDetailModal from './super-admin/CompoundDetailModal';
 import HierarchicalSubs from './super-admin/HierarchicalSubs';
 import CompaniesTab from './super-admin/CompaniesTab';
 import AdvertiserAdsTab from './super-admin/AdvertiserAdsTab';
+import SupportTicketsTab from './super-admin/SupportTicketsTab';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -445,6 +446,7 @@ const SuperAdminPanel = () => {
               { id: 'analytics', label: t('sa_analytics', 'تحليلات الاشتراكات') },
             ] : []),
             { id: 'translations', label: t('sa_translations', 'إدارة الترجمات') },
+            { id: 'support_tickets', label: t('sa_support_tickets', '🎧 تذاكر الدعم') },
           ].map(tab => (
             <button key={tab.id} onClick={() => handleTabChange(tab.id)}
               className={`px-5 py-2.5 rounded-lg text-sm font-medium ${activeTab === tab.id ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
@@ -888,6 +890,10 @@ const SuperAdminPanel = () => {
 
         {activeTab === 'advertiser_ads' && (
           <AdvertiserAdsTab t={t} />
+        )}
+
+        {activeTab === 'support_tickets' && (
+          <SupportTicketsTab t={t} />
         )}
 
       </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import OwnerPageHeader from './shared/OwnerPageHeader';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import { toast } from 'sonner';
@@ -906,18 +907,14 @@ const ServicesManagement = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 text-center">
-          {t('services_management')}
-        </h1>
-        <p className="text-gray-600 mt-2 text-center">
-          {user?.role === 'admin' 
-            ? t('manage_compound_services_bookings')
-            : t('view_available_services')
-          }
-        </p>
-      </div>
+    <div>
+      <OwnerPageHeader
+        iconEmoji="🛎️"
+        badge={t('services_badge', 'الخدمات والمرافق')}
+        title={t('services_management')}
+        subtitle={user?.role === 'admin' ? t('manage_compound_services_bookings') : t('view_available_services')}
+      />
+      <div className="p-6">
 
       {/* Services Page Ad */}
       <div className="mb-6">
@@ -1971,6 +1968,7 @@ const ServicesManagement = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

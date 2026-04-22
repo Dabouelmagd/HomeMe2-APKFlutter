@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import OwnerPageHeader from './shared/OwnerPageHeader';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -252,40 +253,34 @@ const EventsAnnouncements = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 text-center">{t('events_announcements')}</h1>
-            <p className="text-gray-600 mt-2">{t('events_announcements_description')}</p>
+    <div>
+      <OwnerPageHeader
+        iconEmoji="📣"
+        badge={t('events_badge', 'الأحداث والإعلانات')}
+        title={t('events_announcements')}
+        subtitle={t('events_announcements_description')}
+        actions={user?.role === 'admin' && (
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => { setCreateType('announcement'); setShowCreateModal(true); }}
+              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold text-sm"
+              data-testid="new-announcement-btn"
+            >
+              <MegaphoneIcon className="w-5 h-5 mr-2" />
+              {t('new_announcement')}
+            </button>
+            <button
+              onClick={() => { setCreateType('event'); setShowCreateModal(true); }}
+              className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg transition-all font-semibold text-sm backdrop-blur-sm"
+              data-testid="new-event-btn"
+            >
+              <CalendarDaysIcon className="w-5 h-5 mr-2" />
+              {t('new_event')}
+            </button>
           </div>
-          {user?.role === 'admin' && (
-            <div className="mt-4 sm:mt-0 flex space-x-3">
-              <button
-                onClick={() => {
-                  setCreateType('announcement');
-                  setShowCreateModal(true);
-                }}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <MegaphoneIcon className="w-5 h-5 mr-2" />
-                {t('new_announcement')}
-              </button>
-              <button
-                onClick={() => {
-                  setCreateType('event');
-                  setShowCreateModal(true);
-                }}
-                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <CalendarDaysIcon className="w-5 h-5 mr-2" />
-                {t('new_event')}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+        )}
+      />
+      <div className="p-6 max-w-7xl mx-auto">
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -852,6 +847,7 @@ const EventsAnnouncements = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

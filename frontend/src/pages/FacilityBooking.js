@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import OwnerPageHeader from '../components/shared/OwnerPageHeader';
 import { toast } from 'sonner';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
@@ -317,16 +318,14 @@ const FacilityBooking = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />
-            {t('facility_booking')}
-          </h1>
-          <p className="text-gray-600 mt-1">{t('facility_booking_description')}</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900" dir={isRTL ? 'rtl' : 'ltr'}>
+      <OwnerPageHeader
+        iconEmoji="🏟️"
+        badge={t('facility_booking_badge', 'حجز المرافق المشتركة')}
+        title={t('facility_booking')}
+        subtitle={t('facility_booking_description')}
+      />
+      <div className="max-w-7xl mx-auto p-6">
 
         {/* Tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
@@ -335,7 +334,7 @@ const FacilityBooking = () => {
               onClick={() => setActiveTab('browse')}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
                 activeTab === 'browse'
-                  ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                  ? 'text-rose-600 border-b-2 border-rose-600 bg-rose-50'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >

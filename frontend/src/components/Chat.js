@@ -65,7 +65,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="h-screen flex bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 overflow-hidden">
+    <div className="h-screen flex bg-gradient-to-br from-gray-50 via-rose-50/40 to-pink-50 dark:from-gray-900 dark:via-rose-950/30 dark:to-gray-900 overflow-hidden">
       {/* Enhanced Chat Layout */}
       <div className="flex-1 flex shadow-2xl rounded-xl m-4 overflow-hidden bg-white">
         <ChatSidebar

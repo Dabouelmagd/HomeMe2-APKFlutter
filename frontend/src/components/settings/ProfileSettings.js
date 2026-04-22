@@ -3,7 +3,7 @@ import { useAuth } from '../../App';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { UserIcon, CameraIcon, LockClosedIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { UserIcon, CameraIcon, LockClosedIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -58,6 +58,17 @@ const ProfileSettings = () => {
   const [completedCrop, setCompletedCrop] = useState();
   const imgRef = useRef(null);
 
+  // Tracks if user requested avatar removal (no new picture uploaded)
+  const [removeAvatar, setRemoveAvatar] = useState(false);
+
+  const handleRemoveAvatar = () => {
+    if (!window.confirm(t('remove_avatar_confirm', 'هل تريدين إزالة الصورة الشخصية والرجوع للأيقونة الافتراضية؟'))) return;
+    setProfilePicture(null);
+    setProfilePreview(null);
+    setRemoveAvatar(true);
+    toast.success(t('avatar_marked_for_removal', 'تم وضع علامة الإزالة — اضغطي حفظ التغييرات'));
+  };
+
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -72,6 +83,9 @@ const ProfileSettings = () => {
       if (profilePicture) {
         formData.append('profile_picture', profilePicture, profilePicture.name || 'avatar.jpg');
       }
+      if (removeAvatar) {
+        formData.append('remove_avatar', 'true');
+      }
 
       const response = await axios.put(`${API}/users/${user.id}/profile`, formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -80,6 +94,7 @@ const ProfileSettings = () => {
       const updatedUser = response.data?.user || response.data;
       updateUser({ ...user, ...updatedUser });
       setProfilePicture(null);
+      setRemoveAvatar(false);
       toast.success(t('profile_updated_successfully', 'تم تحديث الملف الشخصي بنجاح'));
     } catch (error) {
       const msg = error?.response?.data?.detail || t('failed_to_update_profile', 'فشل تحديث الملف الشخصي');
@@ -188,9 +203,21 @@ const ProfileSettings = () => {
                 <label 
                   htmlFor="profile-picture" 
                   className="absolute -bottom-2 -right-2 bg-rose-500 text-white p-2.5 rounded-xl cursor-pointer hover:bg-rose-600 transition-colors shadow-lg"
+                  title={t('change_picture', 'تغيير الصورة')}
                 >
                   <CameraIcon className="w-4 h-4" />
                 </label>
+                {(profilePreview || user?.profile_picture_url) && !removeAvatar && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    className="absolute -bottom-2 -left-2 bg-gray-700 hover:bg-red-600 text-white p-2.5 rounded-xl cursor-pointer transition-colors shadow-lg"
+                    title={t('remove_picture', 'إزالة الصورة')}
+                    data-testid="remove-avatar-btn"
+                  >
+                    <TrashIcon className="w-4 h-4" />
+                  </button>
+                )}
                 <input
                   id="profile-picture"
                   type="file"

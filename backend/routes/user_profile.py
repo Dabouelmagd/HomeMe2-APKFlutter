@@ -24,6 +24,7 @@ async def update_user_profile(
     full_name: str = Form(...),
     phone: str = Form(""),
     email: Optional[str] = Form(None),
+    remove_avatar: Optional[str] = Form(None),
     profile_picture: UploadFile = File(None),
     current_user: dict = Depends(get_current_user),
 ):
@@ -50,6 +51,10 @@ async def update_user_profile(
         if existing:
             raise HTTPException(status_code=400, detail="البريد الإلكتروني مستخدم بالفعل")
         update_data["email"] = email_clean
+
+    # Handle profile picture removal
+    if remove_avatar and str(remove_avatar).lower() in ("true", "1", "yes"):
+        update_data["profile_picture_url"] = ""
 
     # Handle profile picture upload
     if profile_picture and profile_picture.filename:

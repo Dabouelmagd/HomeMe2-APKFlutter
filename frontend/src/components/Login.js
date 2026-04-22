@@ -35,9 +35,15 @@ const Login = () => {
   const ownerOnly = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('owner_only') === '1';
   const selectPath = ownerOnly ? '/select-account?owner_only=1' : '/select-account';
 
-  // If already logged in, redirect to account selector or dashboard
+  // Only auto-redirect if user explicitly clicks "continue as" — keep form visible
+  // so she can log in as a different user when clicking "Login" from homepage
+  const alreadyLoggedIn = !!currentUser;
+  const [autoRedirectCancelled, setAutoRedirectCancelled] = useState(false);
+
   useEffect(() => {
-    if (currentUser) {
+    // Only auto-redirect when explicit redirect flag is set (via navigation state)
+    // or if owner_only=1 flow — otherwise show the form so user can switch accounts
+    if (currentUser && location.state?.auto_continue === true && !autoRedirectCancelled) {
       const remembered = localStorage.getItem('rememberedAccount');
       const rememberCompound = localStorage.getItem('rememberCompound') === 'true';
       if (remembered && rememberCompound && !ownerOnly) {
@@ -46,7 +52,17 @@ const Login = () => {
         navigate(selectPath, { replace: true });
       }
     }
-  }, [currentUser, navigate, selectPath, ownerOnly]);
+  }, [currentUser, navigate, selectPath, ownerOnly, location.state, autoRedirectCancelled]);
+
+  const handleSwitchAccount = () => {
+    // Clear session so she can log in fresh
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('selectedRole');
+    localStorage.removeItem('selectedCompoundId');
+    setAutoRedirectCancelled(true);
+    window.location.reload();
+  };
   
   // Get the original page the user was trying to access
   const from = location.state?.from || selectPath;
@@ -180,6 +196,34 @@ const Login = () => {
           />
           <p>{t('welcome_back')}</p>
         </div>
+
+        {alreadyLoggedIn && (
+          <div className="mb-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl" data-testid="already-logged-in-banner" dir="rtl">
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+              <span className="me-1">👋</span>
+              {t('already_logged_as', 'أنت مسجل دخول بالفعل باسم')}{' '}
+              <b className="text-indigo-700 dark:text-indigo-300">{currentUser?.full_name || currentUser?.username}</b>
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => navigate(selectPath, { replace: true })}
+                className="text-xs px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                data-testid="continue-current-session-btn"
+              >
+                {t('continue_current', 'متابعة بحسابي الحالي ←')}
+              </button>
+              <button
+                type="button"
+                onClick={handleSwitchAccount}
+                className="text-xs px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                data-testid="switch-account-btn"
+              >
+                {t('switch_account', '🔄 تسجيل دخول بحساب آخر')}
+              </button>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">

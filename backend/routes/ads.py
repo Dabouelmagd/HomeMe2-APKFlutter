@@ -1456,7 +1456,7 @@ async def check_ctr_alerts_and_notify():
     return len(high_ctr_ads)
 
 
-UPLOAD_DIR = "/app/backend/uploads/ads"
+UPLOAD_DIR = "/app/uploads/ads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 

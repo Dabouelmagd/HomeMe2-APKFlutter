@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useNotifications } from '../App';
+import { toast } from 'react-hot-toast';
 import {
   HomeIcon,
   BuildingOfficeIcon,
@@ -46,7 +47,8 @@ import {
   ShieldCheckIcon,
   LanguageIcon,
   SignalIcon,
-  LifebuoyIcon
+  LifebuoyIcon,
+  SpeakerXMarkIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import SessionSwitcher from './SessionSwitcher';
@@ -71,6 +73,57 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [compoundLogo, setCompoundLogo] = useState(null);
   const [companiesAlerts, setCompaniesAlerts] = useState({ urgent: 0, expiring_contracts: 0, empty_companies: 0, active_companies: 0 });
   const [supportTicketsAlerts, setSupportTicketsAlerts] = useState({ open: 0, in_progress: 0, total_active: 0 });
+  // Mute support-tickets ping (persisted)
+  const [supportSoundMuted, setSupportSoundMuted] = useState(() => {
+    try { return localStorage.getItem('support_sound_muted') === '1'; } catch { return false; }
+  });
+  // Track previous "open" count so we can ping only when it increases
+  const prevOpenRef = useRef(null);
+  // Lazy-init AudioContext only when needed (browsers require a user gesture — will still work on subsequent tick after initial click)
+  const audioCtxRef = useRef(null);
+
+  const toggleSupportMute = () => {
+    setSupportSoundMuted((prev) => {
+      const next = !prev;
+      try { localStorage.setItem('support_sound_muted', next ? '1' : '0'); } catch { /* silent */ }
+      return next;
+    });
+  };
+
+  // Short two-tone ping via Web Audio API (no external asset)
+  const playSupportPing = () => {
+    if (supportSoundMuted) return;
+    try {
+      if (!audioCtxRef.current) {
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        audioCtxRef.current = new Ctx();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') { try { ctx.resume(); } catch { /* silent */ } }
+      const now = ctx.currentTime;
+      // Tone 1
+      const o1 = ctx.createOscillator();
+      const g1 = ctx.createGain();
+      o1.type = 'sine';
+      o1.frequency.setValueAtTime(880, now);
+      g1.gain.setValueAtTime(0.0001, now);
+      g1.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+      g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+      o1.connect(g1).connect(ctx.destination);
+      o1.start(now); o1.stop(now + 0.26);
+      // Tone 2 (slightly higher, delayed)
+      const o2 = ctx.createOscillator();
+      const g2 = ctx.createGain();
+      o2.type = 'sine';
+      o2.frequency.setValueAtTime(1175, now + 0.18);
+      g2.gain.setValueAtTime(0.0001, now + 0.18);
+      g2.gain.exponentialRampToValueAtTime(0.16, now + 0.2);
+      g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.48);
+      o2.connect(g2).connect(ctx.destination);
+      o2.start(now + 0.18); o2.stop(now + 0.5);
+    } catch { /* silent */ }
+  };
   // const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const { user, logout } = useAuth();
   const { unreadCount } = useNotifications();
@@ -100,6 +153,10 @@ const Layout = ({ children, isTrialMode = false }) => {
   useEffect(() => {
     const role = user?.role;
     if (role !== 'app_owner' && role !== 'super_admin') return;
+    // Opportunistically ask for browser Notification permission (silent if denied/unsupported)
+    if ('Notification' in window && Notification.permission === 'default') {
+      try { Notification.requestPermission(); } catch { /* silent */ }
+    }
     const api = process.env.REACT_APP_BACKEND_URL;
     const token = localStorage.getItem('token');
     if (!api || !token) return;
@@ -122,6 +179,42 @@ const Layout = ({ children, isTrialMode = false }) => {
         if (res.ok) {
           const data = await res.json();
           setSupportTicketsAlerts(data);
+          // Ping only when the "open" count increases (new ticket arrived).
+          // First fetch seeds the baseline without alerting.
+          const prev = prevOpenRef.current;
+          const curr = data.open || 0;
+          if (prev !== null && curr > prev) {
+            const delta = curr - prev;
+            playSupportPing();
+            // Toast with quick-link
+            toast.custom((to) => (
+              <div
+                onClick={() => { toast.dismiss(to.id); navigate('/app/super-admin?tab=support_tickets'); }}
+                className="cursor-pointer bg-gradient-to-r from-rose-600 to-pink-600 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 border border-rose-400"
+                data-testid="support-ticket-toast"
+              >
+                <LifebuoyIcon className="w-6 h-6 animate-pulse" />
+                <div className="text-sm leading-tight">
+                  <div className="font-bold">
+                    {delta > 1
+                      ? t('new_support_tickets_n', `وصلت ${delta} تذاكر دعم جديدة`).replace('{{n}}', delta)
+                      : t('new_support_ticket', 'وصلت تذكرة دعم جديدة')}
+                  </div>
+                  <div className="text-xs opacity-90">{t('click_to_view', 'اضغطي للعرض')}</div>
+                </div>
+              </div>
+            ), { duration: 6000 });
+            // Browser notification (if permitted & page not focused)
+            if ('Notification' in window && Notification.permission === 'granted' && document.visibilityState !== 'visible') {
+              try {
+                new Notification(t('new_support_ticket', 'وصلت تذكرة دعم جديدة'), {
+                  body: t('support_ticket_body', 'اضغطي على التنبيه لفتح لوحة تذاكر الدعم'),
+                  tag: 'support-ticket',
+                });
+              } catch { /* silent */ }
+            }
+          }
+          prevOpenRef.current = curr;
         }
       } catch { /* silent */ }
     };
@@ -890,6 +983,19 @@ const Layout = ({ children, isTrialMode = false }) => {
                 >
                   <ShieldCheckIcon className="h-6 w-6" />
                 </Link>
+              )}
+
+              {/* Support Tickets Sound Toggle (owner + super_admin only) */}
+              {(user?.role === 'app_owner' || user?.role === 'super_admin') && (
+                <button
+                  type="button"
+                  onClick={toggleSupportMute}
+                  className={`p-2 relative transition-all rounded-lg ${supportSoundMuted ? 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700' : 'text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-200 hover:bg-rose-50 dark:hover:bg-gray-700'}`}
+                  title={supportSoundMuted ? t('unmute_support_sound', 'تشغيل صوت تنبيه الدعم') : t('mute_support_sound', 'كتم صوت تنبيه الدعم')}
+                  data-testid="support-sound-toggle"
+                >
+                  {supportSoundMuted ? <SpeakerXMarkIcon className="h-6 w-6" /> : <LifebuoyIcon className="h-6 w-6" />}
+                </button>
               )}
 
               {/* Notifications Bell */}

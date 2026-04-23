@@ -5,7 +5,7 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-50)
 
-### Iter 50: Settings RBAC Cleanup + Support Tickets Sidebar Badge ✅
+### Iter 50: Settings RBAC Cleanup + Support Tickets Sidebar Badge + Audio Ping ✅
 - **⚙️ Settings.js** — Compound-level admin items (`overview`, `residences`, `registration_links`) are now hidden from App Owner and Super Admin roles. Direct URL access (`/app/settings?tab=overview` etc.) renders a "setting unavailable for your role" placeholder instead of the compound-only content. Added `isHighLevelAdmin` guard using `useAuth()`.
 - **💾 Save-success toasts verified** across all settings sub-pages: ProfileSettings, PrivacySettings, LanguageSettings, BiometricSettings, and AdminSettings all trigger `toast.success(...)` on 200 responses.
 - **🎧 Support Tickets sidebar badge** (`/api/sidebar-alerts/support-tickets`):
@@ -13,7 +13,12 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
   - `Layout.js`: polls every 60s for app_owner/super_admin alongside companies alerts.
   - "تذاكر الدعم الفني" nav link added to Owner section (`تحكم عام للأبلكيشن`) and Super Admin section (`التواصل والتقارير`), pointing to `super-admin?tab=support_tickets`.
   - Red-pulsing badge when `open>0`, amber when only `in_progress>0`. `data-testid="sidebar-support-tickets-badge"`.
-- Verified by iteration_39 testing agent: frontend flows + backend endpoint + direct-URL guard all pass.
+- **🔔 Real-time Audio Ping for new tickets**:
+  - When the `open` count increases between polls, Layout.js plays a short two-tone Web Audio ping (no external asset), shows a clickable rose toast that navigates to the tickets panel, and fires a browser `Notification` if the tab is backgrounded.
+  - First fetch seeds a baseline so no ping on mount.
+  - Mute toggle (`data-testid="support-sound-toggle"`) added to the topbar for owner/super_admin with localStorage persistence (`support_sound_muted`). Tooltip flips between "كتم صوت تنبيه الدعم" / "تشغيل صوت تنبيه الدعم".
+  - Opportunistic `Notification.requestPermission()` on mount when permission is `default`.
+- Verified by iteration_39 testing agent (RBAC + sidebar + endpoint: all pass, 0 issues) and a live smoke screenshot (mute toggle renders, tooltip flips, localStorage persists, badge=1).
 
 ### Iter 49: superadmin.py Refactor + Ad Sizes Tooltip + Image Validation ✅
 - **📂 `routes/superadmin.py` split** from 1755 → 820 lines into 4 focused modules (no URL changes — all endpoints keep their original paths):

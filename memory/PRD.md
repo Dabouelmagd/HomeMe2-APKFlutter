@@ -3,7 +3,19 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-54)
+## Latest Fixes (Feb 2026 — iterations 26-55)
+
+### Iter 55: Payment-Confirmation Tickets — Filter + One-Click Activation ✅
+- **🆕 Backend** `POST /api/compounds/{id}/subscription/manual-activate` (`routes/compound_subscription.py`):
+  - Owner / super_admin only. Accepts `duration` (one of `1_month` / `3_months` / `6_months` / `9_months` / `1_year` / `lifetime`), optional `plan`, `transaction_ref` (stored in `subscription_code_used` for traceability), and optional `ticket_id`.
+  - Applies the subscription on the compound document + cascades to all admins of the compound.
+  - If `ticket_id` is given, the support ticket is auto-closed with `status=resolved` + `activation_done=true` + `activation_*` fields (plan, duration, ref, by, at).
+- **🆕 SupportTicketsTab enhancements** (`components/super-admin/SupportTicketsTab.js`):
+  - Added `payment_confirmation` to CATEGORY_LABELS with 💰 emerald badge.
+  - New quick-filter button "💰 إيصالات الدفع فقط" (data-testid `st-filter-payments-only`) toggles `filterCategory` between `payment_confirmation` and `all`.
+  - New `PaymentDetailsPanel` subcomponent shown only for payment_confirmation tickets: grid of payment meta, thumbnail of proof image (click-to-expand to full file), "⚡ تفعيل الاشتراك على المجمع" button that opens a mini-form (plan select + duration select) → POST to manual-activate → auto-refresh ticket + show "already activated" banner with full activation details.
+- **⚙️ Payment endpoint stability**: Changed the email send in `POST /api/support/payment-confirmation` to fire-and-forget (`asyncio.create_task`) so SMTP timeouts can't block the API response.
+- Verified end-to-end live: payment ticket submitted → owner viewed it → clicked activate → compound subscription updated → ticket auto-closed with traceability. Confirmed in DB: ticket.activation_done=true, compound.subscription_code_used='INST9988776', compound.subscription_type='3_months'.
 
 ### Iter 54: Payment Confirmation Form + Support Integration ✅
 - **🆕 Backend** `POST /api/support/payment-confirmation` (`routes/support.py`):

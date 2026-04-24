@@ -13,6 +13,7 @@ const CATEGORY_LABELS = {
   feature_request: { ar: 'اقتراح ميزة', icon: '💡', color: 'bg-yellow-600' },
   complaint: { ar: 'شكوى', icon: '⚠️', color: 'bg-orange-600' },
   security: { ar: 'مخاوف أمنية', icon: '🚨', color: 'bg-rose-600' },
+  payment_confirmation: { ar: 'إيصال دفع', icon: '💰', color: 'bg-emerald-600' },
 };
 
 const STATUS_LABELS = {
@@ -179,6 +180,17 @@ const SupportTicketsTab = ({ t }) => {
             <option key={k} value={k}>{v.icon} {v.ar}</option>
           ))}
         </select>
+        <button
+          onClick={() => setFilterCategory(filterCategory === 'payment_confirmation' ? 'all' : 'payment_confirmation')}
+          className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-colors ${
+            filterCategory === 'payment_confirmation'
+              ? 'bg-emerald-600 text-white shadow'
+              : 'bg-emerald-900/40 border border-emerald-600/40 text-emerald-300 hover:bg-emerald-800/50'
+          }`}
+          data-testid="st-filter-payments-only"
+        >
+          💰 إيصالات الدفع فقط
+        </button>
         {filterStatus !== 'all' && (
           <button
             onClick={() => setFilterStatus('all')}
@@ -305,6 +317,18 @@ const SupportTicketsTab = ({ t }) => {
                 <div><span className="text-gray-400">📅 التاريخ: </span><span className="text-white text-xs">{formatDate(selectedTicket.created_at)}</span></div>
               </div>
 
+              {/* Payment confirmation details — only for payment_confirmation category */}
+              {selectedTicket.category === 'payment_confirmation' && (
+                <PaymentDetailsPanel
+                  ticket={selectedTicket}
+                  onActivated={async () => {
+                    const r = await axios.get(`${API}/admin/support-tickets/${selectedTicket.id}`, getAuth());
+                    setSelectedTicket(r.data);
+                    await fetchTickets();
+                  }}
+                />
+              )}
+
               {/* Original message */}
               <div className="bg-indigo-900/30 border-r-4 border-indigo-500 rounded-lg p-4">
                 <p className="text-xs text-indigo-300 mb-2 font-bold">📝 الرسالة الأصلية:</p>
@@ -390,3 +414,169 @@ const SupportTicketsTab = ({ t }) => {
 };
 
 export default SupportTicketsTab;
+
+
+// ---------------------------------------------------------------------------
+// PaymentDetailsPanel — inline block inside the ticket detail drawer shown
+// only for tickets of category='payment_confirmation'. Displays payment meta
+// + proof image + "تفعيل الاشتراك" action button.
+// ---------------------------------------------------------------------------
+const PAYMENT_METHOD_LABEL = {
+  vodafone_cash: 'Vodafone Cash',
+  instapay: 'InstaPay',
+  bank_transfer: 'تحويل بنكي',
+};
+
+const DURATION_OPTIONS = [
+  { key: '1_month', label: 'شهر واحد' },
+  { key: '3_months', label: '3 شهور' },
+  { key: '6_months', label: '6 شهور' },
+  { key: '9_months', label: '9 شهور' },
+  { key: '1_year', label: 'سنة كاملة' },
+  { key: 'lifetime', label: 'دائم (Lifetime)' },
+];
+
+const PLAN_OPTIONS = [
+  { key: 'starter', label: 'مجاني' },
+  { key: 'basic', label: 'أساسي' },
+  { key: 'pro', label: 'احترافي' },
+  { key: 'premium', label: 'متقدم' },
+];
+
+const PaymentDetailsPanel = ({ ticket, onActivated }) => {
+  const [showActivate, setShowActivate] = useState(false);
+  const [plan, setPlan] = useState(ticket.payment_plan || 'pro');
+  const [duration, setDuration] = useState('1_month');
+  const [activating, setActivating] = useState(false);
+  const alreadyActivated = !!ticket.activation_done;
+
+  const activate = async () => {
+    setActivating(true);
+    try {
+      const compoundId = ticket.compound_id;
+      if (!compoundId) {
+        toast.error('لم نتعرف على المجمع المرتبط — يرجى التحقق يدوياً');
+        setActivating(false);
+        return;
+      }
+      await axios.post(
+        `${API}/compounds/${compoundId}/subscription/manual-activate`,
+        { plan, duration, transaction_ref: ticket.transaction_ref, ticket_id: ticket.id },
+        getAuth()
+      );
+      toast.success('✅ تم تفعيل الاشتراك على المجمع');
+      setShowActivate(false);
+      onActivated && onActivated();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'فشل التفعيل');
+    } finally {
+      setActivating(false);
+    }
+  };
+
+  const proofSrc = ticket.proof_url
+    ? (ticket.proof_url.startsWith('http') ? ticket.proof_url : `${BACKEND_URL}${ticket.proof_url}`)
+    : null;
+
+  return (
+    <div className="bg-emerald-900/20 border-2 border-emerald-600/40 rounded-xl p-4 space-y-3" data-testid="payment-details-panel">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <h4 className="text-sm font-bold text-emerald-300">💰 بيانات الدفع</h4>
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-600 text-white font-bold">
+          {PAYMENT_METHOD_LABEL[ticket.payment_method] || ticket.payment_method || '—'}
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-xs">
+        <div><span className="text-gray-400">💳 طريقة الدفع: </span><span className="text-white font-semibold">{PAYMENT_METHOD_LABEL[ticket.payment_method] || '—'}</span></div>
+        <div><span className="text-gray-400">📋 الخطة: </span><span className="text-white">{ticket.payment_plan || '—'}</span></div>
+        <div><span className="text-gray-400">💵 المبلغ: </span><span className="text-white">{ticket.payment_amount || '—'}</span></div>
+        <div><span className="text-gray-400">🔖 رقم العملية: </span><span className="text-emerald-300 font-mono font-bold">{ticket.transaction_ref || '—'}</span></div>
+        <div><span className="text-gray-400">📅 تاريخ التحويل: </span><span className="text-white">{ticket.transfer_date || '—'}</span></div>
+        <div><span className="text-gray-400">👤 المرسل: </span><span className="text-white">{ticket.sender_name || '—'}</span></div>
+        {ticket.sender_phone && <div><span className="text-gray-400">📱 هاتف المرسل: </span><span className="text-white" dir="ltr">{ticket.sender_phone}</span></div>}
+      </div>
+
+      {proofSrc && (
+        <a
+          href={proofSrc}
+          target="_blank"
+          rel="noreferrer"
+          className="block rounded-lg overflow-hidden border border-emerald-600/30 hover:border-emerald-400 transition"
+          data-testid="payment-proof-link"
+        >
+          {proofSrc.match(/\.pdf$/i) ? (
+            <div className="p-4 bg-gray-800 text-center text-xs text-emerald-300">📄 إيصال PDF — اضغطي للعرض</div>
+          ) : (
+            <img src={proofSrc} alt="proof" className="w-full max-h-80 object-contain bg-gray-900" />
+          )}
+        </a>
+      )}
+
+      {alreadyActivated ? (
+        <div className="bg-emerald-700/30 border border-emerald-500 rounded-lg p-3 text-xs text-emerald-200 flex items-center gap-2">
+          <span>✅</span>
+          <span>
+            تم تفعيل الاشتراك مسبقاً — الخطة: <b>{ticket.activation_plan || '—'}</b> · المدة: <b>{ticket.activation_duration || '—'}</b>
+            {ticket.activation_ref && <span className="mx-1">· Ref: <span className="font-mono">{ticket.activation_ref}</span></span>}
+          </span>
+        </div>
+      ) : !showActivate ? (
+        <button
+          onClick={() => setShowActivate(true)}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-md transition-colors"
+          data-testid="activate-subscription-btn"
+        >
+          ⚡ تفعيل الاشتراك على المجمع
+        </button>
+      ) : (
+        <div className="bg-gray-800 rounded-lg p-4 space-y-3">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-bold text-gray-300">الخطة</label>
+              <select
+                value={plan}
+                onChange={(e) => setPlan(e.target.value)}
+                className="mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                data-testid="activate-plan-select"
+              >
+                {PLAN_OPTIONS.map(p => <option key={p.key} value={p.key}>{p.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-gray-300">المدة</label>
+              <select
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                className="mt-1 w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white"
+                data-testid="activate-duration-select"
+              >
+                {DURATION_OPTIONS.map(d => <option key={d.key} value={d.key}>{d.label}</option>)}
+              </select>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={activate}
+              disabled={activating}
+              className="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow disabled:opacity-60"
+              data-testid="activate-confirm-btn"
+            >
+              {activating ? '⏳ جاري التفعيل...' : '✅ تأكيد التفعيل'}
+            </button>
+            <button
+              onClick={() => setShowActivate(false)}
+              className="px-4 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-lg font-bold"
+              data-testid="activate-cancel-btn"
+            >
+              إلغاء
+            </button>
+          </div>
+          <p className="text-[10px] text-gray-500 text-center">
+            سيتم حفظ رقم العملية <span className="font-mono text-emerald-400">{ticket.transaction_ref}</span> في سجل الاشتراك كمرجع للتتبع.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};

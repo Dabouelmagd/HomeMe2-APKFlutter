@@ -459,7 +459,8 @@ async def submit_payment_confirmation(
     }
     await db.support_tickets.insert_one(ticket.copy())
 
-    # Lightweight email notification (best effort)
+    # Lightweight email notification — fire-and-forget so SMTP timeouts
+    # never block the API response.
     try:
         support_email = os.environ.get("SUPPORT_EMAIL", "homeme_residence@datalifeai.com")
         html = f"""
@@ -477,13 +478,14 @@ async def submit_payment_confirmation(
         {f'<p><b>ملاحظات:</b> {notes}</p>' if notes else ''}
         </body></html>
         """
-        await email_service.send_email(
+        import asyncio as _asyncio
+        _asyncio.create_task(email_service.send_email(
             to_email=support_email,
             subject=f"[HomeMe] {subject}",
             html_content=html,
             mailbox="residence",
-        )
+        ))
     except Exception as e:
-        logger.warning(f"payment email send failed: {e}")
+        logger.warning(f"payment email schedule failed: {e}")
 
     return {"ok": True, "ticket_id": ticket["id"], "proof_url": proof_url}

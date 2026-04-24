@@ -13,8 +13,9 @@ Endpoints:
       super_admin + app_owner can apply.
 """
 from fastapi import APIRouter, HTTPException, Depends
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pydantic import BaseModel
+from typing import Optional
 
 from database import get_db
 from auth_deps import get_current_user
@@ -146,4 +147,90 @@ async def apply_code_to_compound(
             "duration_days": result.get("duration_days"),
             "subscription_end": result.get("subscription_end"),
         },
+    }
+
+
+# ---------------------------------------------------------------------------
+# Manual activation — used by the owner / super-admin after verifying a
+# Vodafone Cash / InstaPay / bank-transfer payment confirmation ticket.
+# ---------------------------------------------------------------------------
+DURATION_DAYS = {
+    "1_month": 30,
+    "3_months": 90,
+    "6_months": 180,
+    "9_months": 270,
+    "1_year": 365,
+    "yearly": 365,
+    "lifetime": 36500,
+}
+
+
+class ManualActivateBody(BaseModel):
+    duration: str                              # one of DURATION_DAYS keys
+    plan: Optional[str] = None                 # starter | basic | pro | premium | …
+    transaction_ref: Optional[str] = None      # saved into subscription_code_used for traceability
+    ticket_id: Optional[str] = None            # link the support ticket so it auto-closes
+
+
+@router.post("/compounds/{compound_id}/subscription/manual-activate")
+async def manual_activate_subscription(
+    compound_id: str,
+    body: ManualActivateBody,
+    current_user: dict = Depends(get_current_user),
+):
+    """Owner / super_admin only: activate a paid subscription on a compound
+    without requiring a subscription code. Used after verifying a payment
+    proof attached to a support ticket."""
+    if current_user.get("role") not in ("app_owner", "super_admin"):
+        raise HTTPException(status_code=403, detail="مصرح فقط للمالك / السوبر أدمن")
+
+    if body.duration not in DURATION_DAYS:
+        raise HTTPException(status_code=400, detail=f"المدة يجب أن تكون: {', '.join(DURATION_DAYS.keys())}")
+
+    db = get_db()
+    compound = await db.compounds.find_one({"id": compound_id}, {"_id": 0})
+    if not compound:
+        raise HTTPException(status_code=404, detail="المجمع غير موجود")
+
+    now = datetime.now(timezone.utc)
+    days = DURATION_DAYS[body.duration]
+    end = now + timedelta(days=days)
+    code_ref = (body.transaction_ref or "MANUAL").strip().upper()
+
+    sub_update = {
+        "subscription_active": True,
+        "subscription_type": body.duration,
+        "subscription_plan": body.plan,
+        "subscription_start": now.isoformat(),
+        "subscription_end": end.isoformat(),
+        "subscription_code_used": code_ref,
+        "subscription_updated_at": now.isoformat(),
+    }
+    # Persist on compound + every admin of the compound (same as code path)
+    await db.compounds.update_one({"id": compound_id}, {"$set": sub_update})
+    await db.users.update_many(
+        {"compound_id": compound_id, "role": {"$in": ["admin", "compound_admin"]}},
+        {"$set": {k: v for k, v in sub_update.items() if k != "subscription_updated_at"}},
+    )
+
+    # Auto-close the support ticket if provided
+    if body.ticket_id:
+        await db.support_tickets.update_one(
+            {"id": body.ticket_id},
+            {"$set": {
+                "status": "resolved",
+                "activation_done": True,
+                "activation_by": current_user.get("id"),
+                "activation_ref": code_ref,
+                "activation_duration": body.duration,
+                "activation_plan": body.plan,
+                "activation_at": now.isoformat(),
+                "updated_at": now.isoformat(),
+            }},
+        )
+
+    return {
+        "ok": True,
+        "message": "تم تفعيل الاشتراك على المجمع",
+        "subscription": _format_subscription({**compound, **sub_update}),
     }

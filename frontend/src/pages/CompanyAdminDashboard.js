@@ -57,7 +57,11 @@ const CompanyAdminDashboard = () => {
     return () => { alive = false; };
   }, [refreshKey]);
 
-  const reload = () => setRefreshKey(k => k + 1);
+  const reload = () => {
+    setRefreshKey(k => k + 1);
+    // Notify the header PlanLimitBadge (and CompanyPlanUsageCard) to re-fetch usage.
+    window.dispatchEvent(new CustomEvent('planUsageRefresh'));
+  };
 
   const createCompound = async (form) => {
     try {

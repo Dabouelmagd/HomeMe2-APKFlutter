@@ -53,6 +53,7 @@ import {
 import LanguageSwitcher from './LanguageSwitcher';
 import SessionSwitcher from './SessionSwitcher';
 import QuickAccountSwitcher from './QuickAccountSwitcher';
+import PlanLimitBadge from './PlanLimitBadge';
 import { TransliterationToggle } from './TransliterationToggle';
 import ThemeToggle from './ThemeToggle';
 import BackButton from './BackButton';
@@ -965,6 +966,9 @@ const Layout = ({ children, isTrialMode = false }) => {
 
               {/* Session Switcher */}
               <SessionSwitcher />
+
+              {/* Plan Limit Badge — proactive upgrade CTA for company_admin */}
+              <PlanLimitBadge />
 
               {/* Quick Account Switcher — linked accounts pills */}
               <QuickAccountSwitcher />

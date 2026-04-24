@@ -41,7 +41,12 @@ export const CompanyPlanUsageCard = () => {
     }
   };
 
-  useEffect(() => { fetchUsage(); }, []);
+  useEffect(() => {
+    fetchUsage();
+    const handler = () => fetchUsage();
+    window.addEventListener('planUsageRefresh', handler);
+    return () => window.removeEventListener('planUsageRefresh', handler);
+  }, []);
 
   if (loading) return <div className="h-28 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />;
   if (!usage) return null;

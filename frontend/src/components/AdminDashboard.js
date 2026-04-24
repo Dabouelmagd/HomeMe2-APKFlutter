@@ -6,6 +6,7 @@ import i18n from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import TrialStatus from './TrialStatus';
+import CompoundSubscriptionCard from './CompoundSubscriptionCard';
 import { TransliteratedText } from './TransliterationToggle';
 import {
   UsersIcon,
@@ -308,10 +309,17 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Trial Status */}
-        <div className="mb-8">
+        {/* Trial Status (shows only during active trial) */}
+        <div className="mb-4">
           <TrialStatus showFull={true} />
         </div>
+
+        {/* Compound Subscription — always visible for compound admins */}
+        {user?.compound_id && (
+          <div className="mb-8">
+            <CompoundSubscriptionCard compoundId={user.compound_id} />
+          </div>
+        )}
 
         {/* Main Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" data-testid="stats-grid">

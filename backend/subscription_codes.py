@@ -191,6 +191,30 @@ class SubscriptionCodeManager:
                 {"id": user_id},
                 {"$set": user_update}
             )
+
+            # 🔗 Propagate subscription to the compound (single source of truth)
+            # and to every admin account of that compound — so all of them
+            # skip the trial banner and reflect the same subscription state.
+            try:
+                user_doc = await _get_db().users.find_one({"id": user_id}, {"compound_id": 1, "_id": 0})
+                cid = (user_doc or {}).get("compound_id") or ""
+                if cid and cid != "default-compound":
+                    compound_sub = {
+                        "subscription_active": True,
+                        "subscription_type": verification.get("type"),
+                        "subscription_start": user_update["subscription_start"],
+                        "subscription_end": user_update["subscription_end"],
+                        "subscription_code_used": user_update["subscription_code_used"],
+                        "subscription_updated_at": datetime.now(timezone.utc).isoformat(),
+                    }
+                    await _get_db().compounds.update_one({"id": cid}, {"$set": compound_sub})
+                    # Cascade to all admins of the compound (residents keep their own record untouched)
+                    await _get_db().users.update_many(
+                        {"compound_id": cid, "role": {"$in": ["admin", "compound_admin"]}},
+                        {"$set": user_update}
+                    )
+            except Exception as e:
+                print(f"apply_code: compound propagation warning: {e}")
             
             # Mark code as used
             await _get_db().subscription_codes.update_one(

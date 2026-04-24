@@ -355,7 +355,7 @@ const InstaPayInstructions = () => {
         </ol>
       </div>
       <button
-        onClick={() => { window.location.href = '/app/support'; }}
+        onClick={() => { window.location.href = '/app/support?tab=payment'; }}
         className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all shadow-md shadow-purple-500/30"
         data-testid="instapay-support-cta"
       >
@@ -396,7 +396,7 @@ const VodafoneCashInstructions = () => {
         </ol>
       </div>
       <button
-        onClick={() => { window.location.href = '/app/support'; }}
+        onClick={() => { window.location.href = '/app/support?tab=payment'; }}
         className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-all shadow-md shadow-red-500/30"
         data-testid="vcash-support-cta"
       >

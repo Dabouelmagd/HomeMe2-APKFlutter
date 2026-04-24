@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import PaymentConfirmationForm from '../components/PaymentConfirmationForm';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -12,6 +14,13 @@ const API = `${BACKEND_URL}/api`;
  */
 const ContactSupport = ({ compact = false, onSubmitted = null }) => {
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [tab, setTab] = useState(searchParams.get('tab') === 'payment' ? 'payment' : 'general');
+  const switchTab = (id) => {
+    setTab(id);
+    searchParams.set('tab', id);
+    setSearchParams(searchParams, { replace: true });
+  };
   // Prefix to avoid collision with existing translations (e.g., cs_title exists for company-subs)
   const tr = (key, fallback) => {
     const full = `support_${key}`;
@@ -75,6 +84,47 @@ const ContactSupport = ({ compact = false, onSubmitted = null }) => {
           <p className="text-sm opacity-90">{tr('subtitle', 'نحن هنا لمساعدتك — أرسل رسالتك وسنرد خلال 24-48 ساعة')}</p>
         </div>
 
+        {/* Tabs — general support vs payment confirmation */}
+        <div className="flex border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <button
+            type="button"
+            onClick={() => switchTab('general')}
+            className={`flex-1 px-4 py-3 text-sm font-bold transition-colors ${
+              tab === 'general'
+                ? 'text-indigo-600 border-b-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+            }`}
+            data-testid="contact-tab-general"
+          >
+            🎧 رسالة دعم عامة
+          </button>
+          <button
+            type="button"
+            onClick={() => switchTab('payment')}
+            className={`flex-1 px-4 py-3 text-sm font-bold transition-colors ${
+              tab === 'payment'
+                ? 'text-rose-600 border-b-2 border-rose-500 bg-rose-50 dark:bg-rose-900/20'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
+            }`}
+            data-testid="contact-tab-payment"
+          >
+            💰 إيصال دفع
+          </button>
+        </div>
+
+        {tab === 'payment' && (
+          <div className="p-6">
+            <div className="mb-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 p-4">
+              <h3 className="text-sm font-bold text-rose-800 dark:text-rose-200 mb-1">💳 إرسال إيصال دفع</h3>
+              <p className="text-xs text-rose-700 dark:text-rose-300 leading-relaxed">
+                إذا قمت بالتحويل عبر Vodafone Cash أو InstaPay أو تحويل بنكي، ارفعي صورة الإيصال ورقم العملية هنا ليصل مباشرة لفريق هوم مي — سيتم التفعيل خلال ساعة ✨
+              </p>
+            </div>
+            <PaymentConfirmationForm />
+          </div>
+        )}
+
+        {tab === 'general' && (
         <form onSubmit={handleSubmit} className="p-6 space-y-4" dir="rtl">
           {lastTicket && (
             <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-lg p-3 text-sm" data-testid="last-ticket-banner">
@@ -186,6 +236,7 @@ const ContactSupport = ({ compact = false, onSubmitted = null }) => {
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );

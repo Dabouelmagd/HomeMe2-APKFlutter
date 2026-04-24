@@ -356,3 +356,134 @@ async def delete_ticket(
     if result.deleted_count == 0:
         raise HTTPException(404, "Ticket not found")
     return {"ok": True, "deleted": 1}
+
+
+# ---------------------------------------------------------------------------
+# Payment Confirmation — admins submit proof of offline transfer
+# ---------------------------------------------------------------------------
+from fastapi import File, Form, UploadFile  # noqa: E402
+
+PAYMENT_PROOF_DIR = "/app/uploads/payment_proofs"
+os.makedirs(PAYMENT_PROOF_DIR, exist_ok=True)
+
+
+@router.post("/support/payment-confirmation")
+async def submit_payment_confirmation(
+    request: Request,
+    db=Depends(get_db),
+    method: str = Form(...),               # vodafone_cash | instapay | bank_transfer
+    plan: Optional[str] = Form(None),      # starter | basic | pro | premium | …
+    amount: Optional[str] = Form(None),    # free-form (e.g. "2200 ج.م")
+    transaction_ref: str = Form(...),
+    transfer_date: Optional[str] = Form(None),
+    sender_name: Optional[str] = Form(None),
+    sender_phone: Optional[str] = Form(None),
+    notes: Optional[str] = Form(None),
+    proof: Optional[UploadFile] = File(None),
+):
+    """
+    Admin users submit proof of Vodafone Cash / InstaPay / Bank-Transfer
+    payment. Creates a support_tickets record with category='payment_confirmation'
+    so the owner sees it in the regular tickets panel with a new badge.
+    """
+    current_user = await _optional_user(request, db)
+    if not current_user:
+        raise HTTPException(status_code=401, detail="يجب تسجيل الدخول لإرسال إيصال الدفع")
+
+    allowed_methods = {"vodafone_cash", "instapay", "bank_transfer"}
+    if method not in allowed_methods:
+        raise HTTPException(status_code=400, detail=f"طريقة الدفع يجب أن تكون واحدة من: {', '.join(allowed_methods)}")
+
+    # Save proof file if provided
+    proof_url = None
+    if proof is not None:
+        ext = os.path.splitext(proof.filename or "")[1].lower() or ".png"
+        if ext not in (".png", ".jpg", ".jpeg", ".webp", ".pdf"):
+            raise HTTPException(status_code=400, detail="صيغة الملف غير مدعومة")
+        fname = f"{uuid.uuid4().hex}{ext}"
+        out_path = os.path.join(PAYMENT_PROOF_DIR, fname)
+        try:
+            data = await proof.read()
+            if len(data) > 8 * 1024 * 1024:
+                raise HTTPException(status_code=400, detail="الملف كبير جداً (الحد الأقصى 8MB)")
+            with open(out_path, "wb") as f:
+                f.write(data)
+            proof_url = f"/api/files/payment_proofs/{fname}"
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.warning(f"payment proof save failed: {e}")
+
+    method_label = {
+        "vodafone_cash": "Vodafone Cash",
+        "instapay": "InstaPay",
+        "bank_transfer": "تحويل بنكي",
+    }[method]
+
+    subject = f"إيصال دفع – {method_label}"
+    body_lines = [
+        f"طريقة الدفع: {method_label}",
+        f"الخطة: {plan or '—'}",
+        f"المبلغ: {amount or '—'}",
+        f"رقم العملية: {transaction_ref}",
+        f"تاريخ التحويل: {transfer_date or '—'}",
+        f"اسم المرسل: {sender_name or '—'}",
+        f"هاتف المرسل: {sender_phone or '—'}",
+    ]
+    if notes:
+        body_lines.append("\nملاحظات:\n" + notes)
+
+    ticket = {
+        "id": str(uuid.uuid4()),
+        "name": current_user.get("full_name") or current_user.get("username"),
+        "email": current_user.get("email") or "",
+        "subject": subject,
+        "message": "\n".join(body_lines),
+        "category": "payment_confirmation",
+        "phone": current_user.get("phone") or sender_phone or "",
+        "user_id": current_user.get("id"),
+        "username": current_user.get("username"),
+        "user_role": current_user.get("role"),
+        "compound_id": current_user.get("compound_id") or "",
+        # payment-specific fields
+        "payment_method": method,
+        "payment_plan": plan,
+        "payment_amount": amount,
+        "transaction_ref": transaction_ref,
+        "transfer_date": transfer_date,
+        "sender_name": sender_name,
+        "sender_phone": sender_phone,
+        "proof_url": proof_url,
+        "status": "open",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.support_tickets.insert_one(ticket.copy())
+
+    # Lightweight email notification (best effort)
+    try:
+        support_email = os.environ.get("SUPPORT_EMAIL", "homeme_residence@datalifeai.com")
+        html = f"""
+        <!DOCTYPE html><html dir='rtl'><body style='font-family:Segoe UI,Tahoma,sans-serif'>
+        <h2>💰 إيصال دفع جديد — {method_label}</h2>
+        <ul>
+          <li><b>المستخدم:</b> {ticket['username']} ({ticket.get('user_role') or '—'})</li>
+          <li><b>رقم العملية:</b> {transaction_ref}</li>
+          <li><b>الخطة:</b> {plan or '—'}</li>
+          <li><b>المبلغ:</b> {amount or '—'}</li>
+          <li><b>تاريخ التحويل:</b> {transfer_date or '—'}</li>
+          <li><b>المرسل:</b> {sender_name or '—'} — {sender_phone or '—'}</li>
+        </ul>
+        {f'<p><b>الإيصال:</b> <a href="{proof_url}">عرض</a></p>' if proof_url else ''}
+        {f'<p><b>ملاحظات:</b> {notes}</p>' if notes else ''}
+        </body></html>
+        """
+        await email_service.send_email(
+            to_email=support_email,
+            subject=f"[HomeMe] {subject}",
+            html_content=html,
+            mailbox="residence",
+        )
+    except Exception as e:
+        logger.warning(f"payment email send failed: {e}")
+
+    return {"ok": True, "ticket_id": ticket["id"], "proof_url": proof_url}

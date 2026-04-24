@@ -3,7 +3,18 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-53)
+## Latest Fixes (Feb 2026 — iterations 26-54)
+
+### Iter 54: Payment Confirmation Form + Support Integration ✅
+- **🆕 Backend** `POST /api/support/payment-confirmation` (`routes/support.py`):
+  - Multipart endpoint accepting method (`vodafone_cash`/`instapay`/`bank_transfer`), plan, amount, transaction_ref (required), transfer_date, sender_name/phone, notes, and optional proof file (PNG/JPG/WebP/PDF up to 8MB).
+  - Stores file under `/app/uploads/payment_proofs/` and records a ticket in `support_tickets` with `category='payment_confirmation'` + typed fields (`payment_method`, `transaction_ref`, `proof_url`, `sender_*`).
+  - Sends a formatted HTML email via `email_service` (`residence` mailbox).
+- **🆕 File serving**: Added `GET /api/files/payment_proofs/{filename}` in server.py.
+- **🆕 Frontend** `components/PaymentConfirmationForm.js`:
+  - Method tiles (Vodafone/InstaPay/Bank) with gradient-active state, plan/amount grid, date + sender trio, drag-and-drop file upload with image preview (or icon + filename for PDFs), notes textarea, and full submit flow with success state showing ticket id.
+- **🆕 Support Page tabs**: `/app/support` now has two tabs — "🎧 رسالة دعم عامة" (existing form) and "💰 إيصال دفع" (new). URL param `?tab=payment` deep-links straight to the new flow. CompoundSubscriptionCard InstaPay / Vodafone Cash CTAs now link to `/app/support?tab=payment`.
+- Verified live: form renders all fields correctly, backend accepted test multipart POST, proof file served back HTTP 200.
 
 ### Iter 53: Toast Fix + Modern Payment Methods with Coming-Soon Badges ✅
 - **🐛 Profile Save Toast Bug** — The app had 12 components using `react-hot-toast` but the only `<Toaster>` mounted in `App.js` was from the `sonner` library (different package), so all `toast.success/error` calls from `react-hot-toast` silently failed. Added `<HotToaster>` from `react-hot-toast` alongside the sonner one, with RTL + rose-themed styles. Profile save / language change / privacy update / biometric register toasts now all appear.

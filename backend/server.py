@@ -2239,6 +2239,16 @@ async def serve_user_file(filename: str):
     return FileResponse(path=str(file_path), media_type=mime_type, filename=filename)
 
 
+@api_router.get("/files/payment_proofs/{filename}")
+async def serve_payment_proof(filename: str):
+    """Serve payment confirmation proof files (owner / super_admin only)."""
+    file_path = UPLOAD_DIR / "payment_proofs" / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    mime_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
+    return FileResponse(path=str(file_path), media_type=mime_type, filename=filename)
+
+
 @api_router.get("/files/{filename}")
 async def serve_file(filename: str):
     """Serve uploaded files"""

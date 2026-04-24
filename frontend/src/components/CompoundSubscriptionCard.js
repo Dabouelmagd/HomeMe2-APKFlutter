@@ -218,11 +218,11 @@ const ChangeSubscriptionDialog = ({ compoundId, plans, currentSubscription, onCl
           </p>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { id: 'code', label: 'كود اشتراك',  icon: KeyIcon,              ready: true,  hint: 'فعّلي الاشتراك فوراً' },
+              { id: 'code', label: 'كود اشتراك',  icon: KeyIcon,              ready: true,  hint: 'اطلبيه من هوم مي' },
               { id: 'card', label: 'بطاقة ائتمان', icon: CreditCardIcon,       ready: true,  hint: 'Visa / Master / Meeza' },
               { id: 'bank', label: 'تحويل بنكي',   icon: BanknotesIcon,        ready: true,  hint: 'حوالة يدوية مع إثبات' },
-              { id: 'instapay', label: 'InstaPay', icon: QrCodeIcon,           ready: false, eta: 'Q2 2026', hint: 'تحويل فوري عبر البنك المركزي' },
-              { id: 'vcash', label: 'Vodafone Cash', icon: DevicePhoneMobileIcon, ready: false, eta: 'Q2 2026', hint: 'دفع من محفظتك' },
+              { id: 'instapay', label: 'InstaPay', icon: QrCodeIcon,           ready: true,  hint: 'تحويل فوري عبر البنك المركزي' },
+              { id: 'vcash', label: 'Vodafone Cash', icon: DevicePhoneMobileIcon, ready: true, hint: 'دفع من محفظتك' },
               { id: 'applepay', label: 'Apple / Google Pay', icon: GlobeAltIcon, ready: false, eta: 'Q3 2026', hint: 'دفع بلمسة واحدة' },
             ].map((m) => {
               const Icon = m.icon;
@@ -261,9 +261,13 @@ const ChangeSubscriptionDialog = ({ compoundId, plans, currentSubscription, onCl
         <div className="flex-1 overflow-auto p-5 space-y-4">
           {tab === 'code' && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                {t('enter_code_hint', 'أدخلي كود الاشتراك الخاص بك لتفعيل الاشتراك فوراً.')}
-              </p>
+              <div className="rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 p-3 flex items-start gap-2">
+                <KeyIcon className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
+                <div className="text-xs text-rose-700 dark:text-rose-200 leading-relaxed">
+                  <b className="block mb-0.5">اطلبي كود الاشتراك من <span className="text-pink-600">HomeMe</span> 💎</b>
+                  <span className="text-rose-600/80 dark:text-rose-300/80">تواصلي عبر الواتساب أو صفحة الدعم لاستلام كود تفعيل فوري حسب الخطة.</span>
+                </div>
+              </div>
               <input
                 type="text"
                 value={code}
@@ -307,8 +311,98 @@ const ChangeSubscriptionDialog = ({ compoundId, plans, currentSubscription, onCl
               onCta={() => { toast.success(t('bank_transfer_contact', 'سيتواصل معكم فريق الدعم على بريدك الإلكتروني لاستكمال التحويل')); }}
             />
           )}
+
+          {tab === 'instapay' && (
+            <InstaPayInstructions />
+          )}
+
+          {tab === 'vcash' && (
+            <VodafoneCashInstructions />
+          )}
         </div>
       </div>
+    </div>
+  );
+};
+
+/**
+ * InstaPayInstructions — static guide: send to our InstaPay Address, then share the reference.
+ */
+const InstaPayInstructions = () => {
+  const handle = 'homeme@instapay';
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <QrCodeIcon className="w-5 h-5 text-purple-600" />
+          <h4 className="text-sm font-bold text-purple-800 dark:text-purple-200">ادفعي عبر InstaPay</h4>
+        </div>
+        <ol className="text-xs text-purple-700 dark:text-purple-200 space-y-1.5 list-decimal ps-4">
+          <li>افتحي تطبيق بنكك وادخلي خدمة <b>InstaPay</b>.</li>
+          <li>
+            أرسلي المبلغ إلى عنوان:
+            <span className="inline-flex items-center gap-2 mx-2 px-2 py-1 rounded-md bg-white dark:bg-gray-800 border border-purple-300 dark:border-purple-700 font-mono text-purple-700 dark:text-purple-200">
+              {handle}
+              <button
+                onClick={() => { navigator.clipboard?.writeText(handle); toast.success('تم النسخ'); }}
+                className="text-[10px] text-purple-500 hover:text-purple-700"
+                data-testid="instapay-copy"
+              >نسخ</button>
+            </span>
+          </li>
+          <li>احفظي <b>رقم العملية</b> الذي يظهر بعد التحويل.</li>
+          <li>أرسليه لنا عبر الواتساب أو صفحة الدعم وسنفعل اشتراكك خلال ساعة.</li>
+        </ol>
+      </div>
+      <button
+        onClick={() => { window.location.href = '/app/support'; }}
+        className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all shadow-md shadow-purple-500/30"
+        data-testid="instapay-support-cta"
+      >
+        <CheckCircleIcon className="w-5 h-5" />
+        <span>أرسل رقم العملية للدعم</span>
+      </button>
+    </div>
+  );
+};
+
+/**
+ * VodafoneCashInstructions — static guide with merchant number + copy button.
+ */
+const VodafoneCashInstructions = () => {
+  const number = '01006008552';
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <DevicePhoneMobileIcon className="w-5 h-5 text-red-600" />
+          <h4 className="text-sm font-bold text-red-800 dark:text-red-200">ادفعي عبر Vodafone Cash</h4>
+        </div>
+        <ol className="text-xs text-red-700 dark:text-red-200 space-y-1.5 list-decimal ps-4">
+          <li>اطلبي <b>*9*7#</b> من هاتفك أو افتحي تطبيق "كاش".</li>
+          <li>
+            أرسلي المبلغ إلى رقم هوم مي:
+            <span className="inline-flex items-center gap-2 mx-2 px-2 py-1 rounded-md bg-white dark:bg-gray-800 border border-red-300 dark:border-red-700 font-mono text-red-700 dark:text-red-200">
+              {number}
+              <button
+                onClick={() => { navigator.clipboard?.writeText(number); toast.success('تم النسخ'); }}
+                className="text-[10px] text-red-500 hover:text-red-700"
+                data-testid="vcash-copy"
+              >نسخ</button>
+            </span>
+          </li>
+          <li>احفظي <b>رسالة التأكيد</b> من فودافون.</li>
+          <li>أرسليها لنا عبر الواتساب أو صفحة الدعم وسنفعل اشتراكك فوراً.</li>
+        </ol>
+      </div>
+      <button
+        onClick={() => { window.location.href = '/app/support'; }}
+        className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-all shadow-md shadow-red-500/30"
+        data-testid="vcash-support-cta"
+      >
+        <CheckCircleIcon className="w-5 h-5" />
+        <span>أرسل رسالة التأكيد للدعم</span>
+      </button>
     </div>
   );
 };

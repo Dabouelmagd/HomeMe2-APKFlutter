@@ -30,8 +30,13 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
   const APP_ADMIN_ROLES = ['super_admin', 'app_owner'];
   const activeRole = user?.active_role || user?.role;
   const isAppAdmin = APP_ADMIN_ROLES.includes(activeRole);
-  // إذا كان المجتمع مشترك فعلاً (paid) — لا نعرض بار التجربة
-  const hasPaidSubscription = user?.subscription_type === 'paid' || user?.subscription_status === 'active_paid';
+  // إذا كان الحساب مشترك فعلياً (أي subscription_type غير trial والاشتراك نشط)
+  // نغطي جميع الأنواع: paid, lifetime, 1_month, 3_months, 6_months, 9_months, 1_year, yearly, monthly, …
+  const subType = user?.subscription_type;
+  const hasPaidSubscription = (
+    (subType && subType !== 'trial' && user?.subscription_active !== false) ||
+    user?.subscription_status === 'active_paid'
+  );
 
   useEffect(() => {
     if (isAppAdmin || hasPaidSubscription) {
@@ -104,8 +109,8 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
   }
 
   if (!trialData || !trialData.is_trial) {
-    if (user?.subscription_type === 'paid') {
-      // User has paid subscription
+    if (hasPaidSubscription) {
+      // User has paid subscription (paid / lifetime / monthly / yearly …)
       return showFull ? (
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
           <div className="flex items-center space-x-4">

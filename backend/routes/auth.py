@@ -258,7 +258,13 @@ async def login(user_data: UserLogin, request: Request):
             "unit_number": user.get("unit_number"),
             "full_name": user["full_name"],
             "is_family_head": user.get("is_family_head", False),
-            "family_id": user.get("family_id")
+            "family_id": user.get("family_id"),
+            # Subscription fields — needed by frontend to hide trial banner
+            # for paid / lifetime compounds.
+            "subscription_active": user.get("subscription_active", False),
+            "subscription_type": user.get("subscription_type", "trial"),
+            "subscription_plan": user.get("subscription_plan"),
+            "subscription_end": user.get("subscription_end"),
         }
     }
 
@@ -276,7 +282,14 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
         "profile_picture_url": current_user.get('profile_picture_url',''),
         "company_id": current_user.get('company_id', None),
         "is_family_head": current_user.get('is_family_head', False),
-        "family_id": current_user.get('family_id', None)
+        "family_id": current_user.get('family_id', None),
+        # Subscription fields — needed by frontend to hide trial banner
+        # for paid / lifetime compounds.
+        "subscription_active": current_user.get('subscription_active', False),
+        "subscription_type": current_user.get('subscription_type', 'trial'),
+        "subscription_plan": current_user.get('subscription_plan'),
+        "subscription_end": current_user.get('subscription_end'),
+        "subscription_code_used": current_user.get('subscription_code_used'),
     }
 
 # WebAuthn/Biometric Authentication Routes

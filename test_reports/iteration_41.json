@@ -1,0 +1,42 @@
+{
+  "summary": "Iteration 41 - Tested Plan Limits Enforcement end-to-end. BACKEND: 9/9 pytest passed including (a) login regression for all 3 roles, (b) GET /api/company-admin/plan-usage returns full payload shape for both starter and enterprise plans, (c) POST /api/company-admin/compounds returns 403 with detail={code:'plan_limit_compounds', message:<arabic>, current_plan:'starter', current_plan_name_ar:'مجاني', current_count:1, max_allowed:1} when at limit, (d) POST /api/company-admin/compounds/{id}/users role=resident returns 403 with detail.code='plan_limit_residents' when at limit (test temporarily patched plan_limits.py starter.max_residents=1 with hot reload, restored after). FRONTEND: login flows work for all 3 roles; session switcher handled. PWA service worker + cache updates logged. CRITICAL FRONTEND BUG FOUND (P0): CompanyPlanUsageCard is mounted inside /app/frontend/src/components/AdminDashboard.js line 339 behind `user.role === 'company_admin'`, BUT the router at App.js line 831 routes company_admin users to <CompanyAdminDashboard /> (pages/CompanyAdminDashboard.js) instead of AdminDashboard — so the card is NEVER rendered for testcompany2. data-testid='company-plan-usage-card' is not in the DOM on the login-landing dashboard. Consequently upgrade-plan-btn is also absent and the manual-open path for the upgrade dialog cannot be exercised. The Axios 403 interceptor (GlobalUIProvider.js) and openUpgradeDialog CustomEvent wiring are correct by code review (interceptor guards status===403 && detail.code.startsWith('plan_limit_') and dispatches a CustomEvent that the listener picks up to mount <PlanUpgradeDialog />). Toasters (sonner + react-hot-toast) + PWAInstallPrompt + PlanUpgradeDialog are all mounted once inside GlobalUIProvider.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "CompanyAdminDashboard (pages/CompanyAdminDashboard.js)", "issue": "CompanyPlanUsageCard is not rendered on the dashboard that company_admin users actually see. DashboardRouter in App.js:831 returns <CompanyAdminDashboard /> for role==='company_admin', but CompanyPlanUsageCard is only mounted in AdminDashboard.js:339. Add `import CompanyPlanUsageCard from '../components/CompanyPlanUsageCard';` to pages/CompanyAdminDashboard.js and render <CompanyPlanUsageCard /> near the top of the dashboard so the plan-usage widget + upgrade-plan-btn appears for testcompany2.", "selector": "[data-testid='company-plan-usage-card']", "priority": "HIGH"}
+    ],
+    "integration_issues": [
+      {"flow": "Plan-limit 403 → auto open PlanUpgradeDialog", "issue": "Unable to fully exercise via UI because (1) the CompanyPlanUsageCard + upgrade-plan-btn do not appear on CompanyAdminDashboard and (2) the 'إضافة مجمع' modal in CompanyAdminDashboard.js uses inputs without type=text / placeholder attribute so its name field didn't accept fill via scripted selectors — the submit triggered client-side 'اسم المجمع مطلوب' validation, not the backend 403. Once the first UI bug is fixed, the interceptor path can be verified by clicking upgrade-plan-btn directly. Interceptor code itself in GlobalUIProvider.js lines 29-48 is correct.", "affected_selectors": ["[data-testid='upgrade-plan-btn']", "[data-testid='plan-upgrade-dialog']", "[data-testid^='upgrade-plan-']"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter41_plan_limits.py",
+    "/app/test_reports/pytest/iter41_results.xml"
+  ],
+  "action_items": [
+    "HIGH: Import and render <CompanyPlanUsageCard /> inside /app/frontend/src/pages/CompanyAdminDashboard.js (the dashboard that company_admin users actually land on). Currently it lives only in components/AdminDashboard.js which this role never sees.",
+    "MEDIUM: Add data-testid='compound-form-name-input' (or similar) + placeholder='اسم المجمع' to the compound-name input inside CompoundFormModal in pages/CompanyAdminDashboard.js so automated tests can reliably fill it.",
+    "LOW: pages/CompanyAdminDashboard.js already has an 'إضافة مجمع' button — consider adding a data-testid='add-compound-btn' for stability."
+  ],
+  "critical_code_review_comments": [
+    "backend/plan_limits.py is clean: structured HTTPException with explicit 'code' discriminator is exactly what the frontend interceptor expects. _PLAN_LIMITS mirrors owner_subscriptions.py; worth adding a single-source-of-truth import to prevent drift.",
+    "routes/company_admin.py correctly calls assert_can_add_compound before insert and assert_can_add_resident only when role='resident' (not for manager/admin/security which don't count toward the plan). Clean.",
+    "GlobalUIProvider.js is well structured: interceptor ejects on unmount, CustomEvent-based listener avoids prop drilling. One minor nit — if this component mounts inside a React.StrictMode tree in dev it will register/unregister the interceptor twice, which is harmless but noisy. No production impact.",
+    "CompanyPlanUsageCard.js — good data-testid coverage, handles max == -1 (unlimited) correctly, shows both current/max for compounds and residents. Minor nit: PlanUpgradeDialog currentPlan default is 'starter' but dispatched event may pass undefined if backend omits current_plan — already guarded by `|| 'starter'` in interceptor line 41 and provider line 61.",
+    "CRITICAL: AdminDashboard.js:337 vs DashboardRouter at App.js:824-831. company_admin role is routed to CompanyAdminDashboard so the `user.role==='company_admin' && <CompanyPlanUsageCard />` inside AdminDashboard is dead code for that role. Move the mount to pages/CompanyAdminDashboard.js."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter41_plan_limits.py"
+  ],
+  "success_rate": {"backend": "100% (9/9 pytest incl. real 403 response structure for both compound + resident)", "frontend": "50% — login, dashboard load, toasters mount, GlobalUIProvider wiring all OK; CompanyPlanUsageCard itself cannot be exercised because it is never rendered on the CompanyAdminDashboard that company_admin lands on"},
+  "test_credentials": "Owner_homeme/Dalia1234@ ; superadmin/SuperAdmin2024! ; testcompany2/Company123! (company_id=ab8e7501-964c-4424-859f-af16ba8ad2e5, plan was set to starter during tests and restored to company_enterprise afterwards)",
+  "seed_data_creation": "None persisted. During tests plan was toggled starter↔enterprise on company_subscriptions for company_id ab8e7501-964c-4424-859f-af16ba8ad2e5 (autouse fixture restores original on teardown). plan_limits.py was temporarily patched (max_residents=1) for the resident 403 test and restored in finally.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend plan-limit enforcement is verified. Re-test after main agent moves <CompanyPlanUsageCard /> into pages/CompanyAdminDashboard.js. To reproduce the auto-opening upgrade dialog via interceptor: (1) set db.company_subscriptions.plan='starter' for company ab8e7501-..., (2) login as testcompany2/Company123!, (3) click 'إضافة مجمع', submit any name, (4) POST returns 403 plan_limit_compounds, (5) GlobalUIProvider interceptor dispatches openUpgradeDialog, (6) assert [data-testid='plan-upgrade-dialog'] + 4 tiles [data-testid='upgrade-plan-{starter|company_startup|company_business|company_enterprise}'] present. Remember to reset plan afterwards. The 'إضافة مجمع' modal input lacks a placeholder/testid so Playwright fill requires click+type workaround or the JS `await page.evaluate(el=>...)` path.",
+  "rca_of_the_issue": "Root cause of missing plan-usage card in the UI: DashboardRouter in /app/frontend/src/App.js (line 824-831) branches on user.role and renders <CompanyAdminDashboard /> for company_admin. Meanwhile <CompanyPlanUsageCard /> is only mounted inside /app/frontend/src/components/AdminDashboard.js (line 339) behind a `user.role === 'company_admin'` guard — which is unreachable because company_admin users are routed elsewhere. Fix: add the import + render in /app/frontend/src/pages/CompanyAdminDashboard.js. Reproduction: login testcompany2 → /app/dashboard → no data-testid='company-plan-usage-card' in DOM (verified)."
+}

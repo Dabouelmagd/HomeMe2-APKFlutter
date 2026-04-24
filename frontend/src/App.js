@@ -67,7 +67,6 @@ import FileGallery from './components/FileGallery';
 import MessageScheduling from './components/MessageScheduling';
 import ServiceBooking from './components/ServiceBooking';
 import Pricing from './components/Pricing';
-import PWAInstallPrompt from './components/PWAInstallPrompt';
 import Layout from './components/Layout';
 import ResidentsList from './components/ResidentsList';
 import ResidentProfile from './components/ResidentProfile';
@@ -111,8 +110,7 @@ import AccountSelector from './components/AccountSelector';
 import CompanySubscriptions from './components/CompanySubscriptions';
 import OwnerBudget from './components/OwnerBudget';
 import SubscriptionReminders from './components/SubscriptionReminders';
-import { Toaster } from './components/ui/sonner';
-import { Toaster as HotToaster } from 'react-hot-toast';
+import { GlobalUIProvider } from './providers/GlobalUIProvider';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -812,22 +810,7 @@ function App() {
               </Route>
               </Routes>
             </RouteChangeHandler>
-            <Toaster />
-            <HotToaster
-              position="top-center"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  direction: 'rtl',
-                  fontFamily: 'inherit',
-                  borderRadius: '12px',
-                  padding: '12px 16px',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                },
-              }}
-            />
-            <PWAInstallPrompt />
+            <GlobalUIProvider />
             </TransliterationProvider>
           </NotificationProvider>
         </AuthProvider>

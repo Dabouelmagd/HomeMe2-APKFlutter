@@ -5,6 +5,16 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-58)
 
+### Iter 58: Header Plan-Limit Badge — Proactive Upgrade CTA ✅ (Feb 24, 2026)
+- **🆕 Frontend** `/app/frontend/src/components/PlanLimitBadge.js`:
+  - Compact pill in the header for `company_admin` only — shows "🏢 X/Y مجمع • 👥 X/Y ساكن".
+  - Three states with adaptive tone: emerald (healthy), amber (low — ≤1 compound or ≤10% residents left), rose + animate-pulse (at-limit, "وصلت للحد").
+  - Click → dispatches the existing `openUpgradeDialog` CustomEvent → `GlobalUIProvider` opens `PlanUpgradeDialog` with all 4 tiers (re-uses the proven manual/auto-open path).
+  - Hidden on mobile (`hidden md:inline-flex`); 60s background refetch as a safety net.
+- **🔗 Mounted** in `Layout.js` header (right before `<QuickAccountSwitcher />`).
+- **🔄 Live refresh** via a `planUsageRefresh` CustomEvent dispatched from `CompanyAdminDashboard.reload()` after every CRUD; both `PlanLimitBadge` and `CompanyPlanUsageCard` listen to it for instant badge updates without a full page reload.
+- **✅ Verified** (iter 44, 8/8 frontend checkpoints): badge appears for company_admin only, opens dialog on click, color/text correctly adapts (verified at-limit + healthy states), auto-refresh works after compound creation (4/5 → 3/5 instantly), regression confirmed — badge does NOT appear for app_owner or super_admin.
+
 ### Iter 58: Company Plan Limits Enforcement ✅ (Feb 24, 2026)
 - **🆕 Backend** `/app/backend/plan_limits.py`:
   - `get_company_plan_limits(company_id)` reads `db.company_subscriptions.plan` and returns `{plan, plan_name_ar, max_compounds, max_residents}` mirroring `COMPANY_PLANS_CATALOGUE`.

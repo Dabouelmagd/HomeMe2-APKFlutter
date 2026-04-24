@@ -1113,7 +1113,7 @@ const AdsTab = ({
                       <p className="text-[10px] text-green-400 truncate">✓ {t('sa_media_kept', 'سيتم الاحتفاظ بالوسائط الحالية')}</p>
                       <p className="text-[9px] text-gray-500 truncate font-mono" dir="ltr">{editAd.image_url}</p>
                     </div>
-                    <button type="button" onClick={() => setEditAd({ ...editAd, image_url: '', media_type: undefined })} className="text-[10px] text-red-400 hover:text-red-300 flex-shrink-0 px-2 py-1" title={t('sa_remove_media', 'إزالة')} data-testid="edit-ad-remove-media">
+                    <button type="button" onClick={() => setEditAd({ ...editAd, image_url: '', media_type: undefined, clear_image: true })} className="text-[10px] text-red-400 hover:text-red-300 flex-shrink-0 px-2 py-1" title={t('sa_remove_media', 'إزالة')} data-testid="edit-ad-remove-media">
                       🗑️ {t('sa_remove', 'إزالة')}
                     </button>
                   </div>
@@ -1144,7 +1144,7 @@ const AdsTab = ({
                   setUploadingEdit(true);
                   try {
                     const res = await axios.post(`${API}/ads/upload-media`, formData, { headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' } });
-                    setEditAd(prev => ({ ...prev, image_url: res.data.url, media_type: res.data.type }));
+                    setEditAd(prev => ({ ...prev, image_url: res.data.url, media_type: res.data.type, clear_image: false }));
                     toast.success(t('sa_uploaded', 'تم الرفع'));
                   } catch { toast.error(t('sa_upload_failed', 'فشل الرفع')); }
                   finally { setUploadingEdit(false); }

@@ -51,6 +51,9 @@ class AdUpdate(BaseModel):
     start_date: Optional[str] = None
     end_date: Optional[str] = None
     priority: Optional[int] = None
+    # 🛡️ Opt-in flag required to actually clear image_url. Prevents accidental
+    # wipe when the UI sends image_url="" without user intent.
+    clear_image: Optional[bool] = None
 
 
 # ==================== Ad Campaigns ====================
@@ -397,6 +400,11 @@ async def get_active_ads(position: str = "", compound_id: str = "", current_user
 async def update_ad(ad_id: str, data: AdUpdate, current_user: dict = Depends(require_super_admin)):
     db = get_db()
     update = {k: v for k, v in data.dict().items() if v is not None}
+    # 🛡️ Protect against accidental image wipe: an empty image_url is treated
+    # as "no change" unless the UI sent clear_image=true explicitly.
+    clear_image = update.pop("clear_image", False)
+    if "image_url" in update and update["image_url"] == "" and not clear_image:
+        update.pop("image_url", None)
     if not update:
         raise HTTPException(status_code=400, detail="لا توجد بيانات للتحديث")
     update["updated_at"] = datetime.now(timezone.utc).isoformat()

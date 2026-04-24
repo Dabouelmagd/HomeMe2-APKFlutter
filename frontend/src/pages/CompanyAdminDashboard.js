@@ -9,6 +9,16 @@ import CompanyPlanUsageCard from '../components/CompanyPlanUsageCard';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
+/** Safely extract a string error message from an axios error.
+ *  Backend may return `detail` as a string OR a structured object
+ *  (e.g. plan_limit_* errors). Passing an object directly to sonner
+ *  crashes React with "Objects are not valid as a React child". */
+const errMsg = (err, fallback) => {
+  const d = err?.response?.data?.detail;
+  if (d && typeof d === 'object') return d.message || fallback;
+  return d || fallback;
+};
+
 /**
  * CompanyAdminDashboard — لوحة تحكم مدير الشركة (role = company_admin)
  * - يعرض بيانات الشركة + ملخص
@@ -55,7 +65,7 @@ const CompanyAdminDashboard = () => {
       toast.success('تم إنشاء المجمع');
       setCreateOpen(false);
       reload();
-    } catch (err) { toast.error(err.response?.data?.detail || 'فشل الإنشاء'); }
+    } catch (err) { toast.error(errMsg(err, 'فشل الإنشاء')); }
   };
 
   const saveEdit = async () => {
@@ -67,7 +77,7 @@ const CompanyAdminDashboard = () => {
       toast.success('تم التحديث');
       setEditFor(null);
       reload();
-    } catch (err) { toast.error(err.response?.data?.detail || 'فشل التحديث'); }
+    } catch (err) { toast.error(errMsg(err, 'فشل التحديث')); }
   };
 
   const removeCompound = async (c) => {
@@ -81,7 +91,7 @@ const CompanyAdminDashboard = () => {
       await axios.delete(url, getToken());
       toast.success('تم الحذف');
       reload();
-    } catch (err) { toast.error(err.response?.data?.detail || 'فشل الحذف'); }
+    } catch (err) { toast.error(errMsg(err, 'فشل الحذف')); }
   };
 
   const addUser = async (form) => {
@@ -91,7 +101,7 @@ const CompanyAdminDashboard = () => {
       toast.success('تمت إضافة المستخدم');
       setAddUserFor(null);
       reload();
-    } catch (err) { toast.error(err.response?.data?.detail || 'فشل الإضافة'); }
+    } catch (err) { toast.error(errMsg(err, 'فشل الإضافة')); }
   };
 
   if (loading) return (

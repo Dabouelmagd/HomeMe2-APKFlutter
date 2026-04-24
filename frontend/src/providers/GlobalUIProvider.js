@@ -42,6 +42,9 @@ export const GlobalUIProvider = ({ children }) => {
               },
             })
           );
+          // Normalize detail to a string so downstream `toast.error(err.response.data.detail)`
+          // calls in page components don't try to render an object as a React child.
+          try { error.response.data.detail = detail.message || 'Plan limit reached'; } catch (_e) { /* noop */ }
         }
         return Promise.reject(error);
       }

@@ -1,0 +1,38 @@
+{
+  "summary": "Iteration 43 — Re-tested the auto-open PlanUpgradeDialog via Axios 403 interceptor after main-agent applied TWO fixes: (1) GlobalUIProvider interceptor now normalizes error.response.data.detail from structured object → detail.message string, and (2) CompanyAdminDashboard.js catch blocks use an errMsg() helper that safely extracts .message when detail is an object. AUTO-OPEN FLOW NOW PASSES END-TO-END. Dialog mounts with all 4 tiers, no React child crash, react-hot-toast shows the Arabic plan-limit message, dashboard remains mounted, and the downstream sonner toast (fed by the normalized string detail) also renders correctly without crashing.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_results_passed": [
+    "Login testcompany2/Company123! → select-account step (as-continue-btn) → /app/dashboard",
+    "[data-testid='company-admin-dashboard'] mounted",
+    "Click [data-testid='cad-create-compound-btn'] opens the create modal",
+    "Fill [data-testid='cad-cpd-name']='TEST_auto_open_compound' and submit triggers POST /api/company-admin/compounds → 403 plan_limit_compounds",
+    "react-hot-toast error toast visible top-center with Arabic message: '⛔ خطة \"مجاني\" تسمح بـ 1 مجمع فقط. لديك حالياً 1 مجمع. يرجى ترقية الخطة للمتابعة.'",
+    "[data-testid='plan-upgrade-dialog'] auto-opens (via openUpgradeDialog CustomEvent)",
+    "All 4 tier buttons present & interactive: upgrade-plan-starter, upgrade-plan-company_startup, upgrade-plan-company_business, upgrade-plan-company_enterprise",
+    "NO React 'Objects are not valid as a React child' crash — dashboard DOM still rendered, no react-error-overlay iframe",
+    "Downstream sonner toast (from errMsg helper in createCompound catch) renders the same Arabic string (confirming interceptor detail-normalization works)",
+    "[data-testid='plan-upgrade-close'] closes the dialog cleanly"
+  ],
+  "test_results_failed": [],
+  "test_report_links": [
+    "/app/backend/tests/test_iter41_plan_limits.py"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Fix is correct and defensive at both layers: interceptor-side normalization (GlobalUIProvider.js L47) + page-level errMsg helper (CompanyAdminDashboard.js L16-20). Either one alone would solve the crash, but having both provides belt-and-suspenders for any future page that forgets the helper.",
+    "Minor observation: when the 403 fires, BOTH a react-hot-toast (from interceptor) and a sonner toast (from page catch block) appear with the same message. Not a bug, but slightly duplicative. Optional cleanup: since the interceptor already toasts, the page catch could detect the plan_limit_* case and skip its own toast. Not required."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (not retested per instructions; iter41 9/9 backed)", "frontend": "100% (10/10 checkpoints on auto-open flow)"},
+  "test_credentials": "testcompany2 / Company123! (company_id=ab8e7501-964c-4424-859f-af16ba8ad2e5)",
+  "seed_data_creation": "Toggled db.company_subscriptions.plan starter→enterprise during test; RESTORED to 'company_enterprise' at teardown. No other seed data created. Existing compound count (1) untouched.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Plan Limits Enforcement feature is fully green end-to-end. Manual-open (iter42) + auto-open-via-interceptor (iter43) both verified. If the next iteration touches GlobalUIProvider.js interceptor or any page-level axios catch block, re-run the auto-open probe: set plan='starter' for ab8e7501-964c-4424-859f-af16ba8ad2e5, login testcompany2, click cad-create-compound-btn → fill cad-cpd-name → cad-cpd-save, then expect plan-upgrade-dialog auto-open with 4 tiers. Restore plan to company_enterprise when done.",
+  "rca_of_the_issue": "Previous iteration (42) failure root-caused: structured 403 detail object ({code, message, current_plan, ...}) was passed directly to sonner.toast.error in page catch blocks, triggering React's 'Objects are not valid as a React child' crash that masked the auto-opened dialog. Fix (verified this iteration): (a) Interceptor in GlobalUIProvider.js (lines 28-52) mutates error.response.data.detail to detail.message string AFTER handling the plan_limit case, so any downstream code that renders detail receives a plain string. (b) CompanyAdminDashboard.js adds an errMsg(err, fallback) helper that extracts .message when detail is an object (defense-in-depth). Both applied correctly — auto-open flow now renders dialog with all 4 tiers, no crash, no overlay."
+}

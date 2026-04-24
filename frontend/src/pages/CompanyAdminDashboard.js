@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import InviteLinkModal from '../components/shared/InviteLinkModal';
+import CompanyPlanUsageCard from '../components/CompanyPlanUsageCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -135,6 +136,9 @@ const CompanyAdminDashboard = () => {
           </div>
         </div>
 
+        {/* Plan Usage + Upgrade CTA */}
+        <CompanyPlanUsageCard />
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <StatCard icon="🏘️" label="المجمعات" value={stats.compounds_count || 0} color="blue" />
@@ -236,7 +240,7 @@ const CompoundFormModal = ({ title, initial, onClose, onSave, saveLabel }) => {
         <div className="space-y-3">
           <div>
             <label className="block text-xs text-gray-400 mb-1">اسم المجمع *</label>
-            <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="cad-cpd-name" />
+            <input type="text" placeholder="اسم المجمع" value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="cad-cpd-name" />
           </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1">الموقع</label>

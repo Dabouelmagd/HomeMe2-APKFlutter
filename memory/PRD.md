@@ -3,7 +3,19 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-56)
+## Latest Fixes (Feb 2026 — iterations 26-57)
+
+### Iter 57: Company Plans — Catalogue with Features ✅
+- **🆕 Backend** `GET /api/owner/company-plans` (`routes/owner_subscriptions.py`):
+  - Single source of truth catalogue with 4 tiers — `starter` (مجاني / 0 ج.م), `company_startup` (3500), `company_business` (7500, popular), `company_enterprise` (20000).
+  - Each plan exposes `name_ar`/`name_en`, `monthly_egp`, `max_compounds`, `max_residents`, and a `features_ar`/`features_en` array of human-readable permission strings (5-10 features per tier).
+- **🔗 `GET /api/owner/company-subscriptions` enriched**: each company entry now carries `plan_meta` — its full catalogue entry — so the frontend can display features without a second request.
+- **🎨 CompanySubscriptions UI** (`components/CompanySubscriptions.js`): expanded view now shows a rose-gradient panel "📋 مزايا خطة …" with:
+  - Plan name + "الأكثر شعبية" badge when applicable
+  - Monthly price + currency
+  - 2-column features list with checkmark icons
+  - Limits tiles (max compounds / max residents — "غير محدود" for enterprise)
+- Verified live: opening "شركة الإدارة المتكاملة" shows the Business plan's 10 features + 7500 ج.م + max 5 compounds / 2000 residents.
 
 ### Iter 56: Payment Analytics Dashboard (Scoped for 3 Roles) ✅
 - **🆕 Backend** `GET /api/payment-analytics?days=30&scope=auto` (`routes/payment_analytics.py`):

@@ -14,6 +14,135 @@ from helpers import serialize_datetime
 router = APIRouter(prefix="/api")
 
 
+# ---------------------------------------------------------------------------
+# Plans Catalogue — single source of truth for company subscription plans.
+# Mirrors the pricing landing page (frontend/src/config/plans.js). Each plan
+# exposes `features` — a list of human-readable permission strings we surface
+# to the subscriber so they can see exactly what their tier unlocks.
+# ---------------------------------------------------------------------------
+COMPANY_PLANS_CATALOGUE = [
+    {
+        "key": "starter",
+        "name_ar": "مجاني",
+        "name_en": "Free",
+        "monthly_egp": 0,
+        "max_compounds": 1,
+        "max_residents": 50,
+        "features_ar": [
+            "مجمع واحد فقط",
+            "حتى 50 ساكن",
+            "إدارة الطلبات الأساسية",
+            "إشعارات بسيطة",
+            "دعم فني عبر البريد خلال 48 ساعة",
+        ],
+        "features_en": [
+            "Single compound",
+            "Up to 50 residents",
+            "Basic requests management",
+            "Simple notifications",
+            "Email support (48h)",
+        ],
+    },
+    {
+        "key": "company_startup",
+        "name_ar": "شركة ناشئة",
+        "name_en": "Startup",
+        "monthly_egp": 3500,
+        "max_compounds": 3,
+        "max_residents": 500,
+        "features_ar": [
+            "حتى 3 مجتمعات سكنية",
+            "عدد مستخدمين غير محدود",
+            "إدارة كاملة للطلبات والحوادث",
+            "نظام الفواتير والمدفوعات",
+            "تقارير أساسية",
+            "إعلانات داخلية",
+            "دعم فني خلال 24 ساعة",
+        ],
+        "features_en": [
+            "Up to 3 compounds",
+            "Unlimited users",
+            "Full requests & incidents management",
+            "Billing & payments",
+            "Basic analytics",
+            "Internal ads",
+            "24h support",
+        ],
+    },
+    {
+        "key": "company_business",
+        "name_ar": "شركة متوسطة",
+        "name_en": "Business",
+        "monthly_egp": 7500,
+        "max_compounds": 5,
+        "max_residents": 2000,
+        "popular": True,
+        "features_ar": [
+            "1 - 5 مجتمعات سكنية",
+            "جميع مزايا الباقة الناشئة",
+            "لوحة تحكم متقدمة",
+            "تحليلات مالية ذكية (AI)",
+            "حملات إعلانية مخصصة",
+            "إدارة عدة شركات من حساب واحد",
+            "تقارير PDF/Excel قابلة للتصدير",
+            "إشعارات فورية عبر Push",
+            "دعم فني خلال 12 ساعة",
+            "API مخصص للتكامل",
+        ],
+        "features_en": [
+            "1-5 compounds",
+            "Everything in Startup",
+            "Advanced dashboard",
+            "AI-powered financial insights",
+            "Custom ad campaigns",
+            "Multi-company from one account",
+            "PDF/Excel exports",
+            "Push notifications",
+            "12h support",
+            "Custom API",
+        ],
+    },
+    {
+        "key": "company_enterprise",
+        "name_ar": "شركة كبرى",
+        "name_en": "Enterprise",
+        "monthly_egp": 20000,
+        "max_compounds": -1,
+        "max_residents": -1,
+        "features_ar": [
+            "عدد مجتمعات غير محدود",
+            "عدد سكان غير محدود",
+            "جميع مزايا باقة Business",
+            "حساب مدير حسابات مخصص",
+            "أولوية في التطوير (طلبات مخصصة)",
+            "SLA موثّق 99.9% Uptime",
+            "Training مجاني لفريقك",
+            "تقارير مخصصة حسب الطلب",
+            "Whitelabel (لوحة باسمك)",
+            "دعم فوري 24/7",
+        ],
+        "features_en": [
+            "Unlimited compounds",
+            "Unlimited residents",
+            "Everything in Business",
+            "Dedicated account manager",
+            "Priority feature development",
+            "Documented 99.9% SLA",
+            "Free team training",
+            "Custom reports",
+            "Whitelabel",
+            "24/7 support",
+        ],
+    },
+]
+
+
+@router.get("/owner/company-plans")
+async def get_company_plans(current_user: dict = Depends(get_current_user)):
+    """Return the catalogue of company plans (public to authenticated users)."""
+    return {"plans": COMPANY_PLANS_CATALOGUE}
+
+
 async def _log_sub_change(db, company_id, user, action, description, details=None):
     """Log subscription changes for audit trail"""
     company = await db.companies.find_one({"id": company_id}, {"_id": 0, "name": 1})
@@ -145,6 +274,10 @@ async def get_company_subscriptions(
         plan_price = sub.get("plan_price", 0) if sub else 0
         total_revenue += plan_price
 
+        # Attach plan catalogue metadata (features, limits) for this company
+        plan_key = sub.get("plan", "starter") if sub else "starter"
+        plan_meta = next((p for p in COMPANY_PLANS_CATALOGUE if p["key"] == plan_key), None)
+
         entry = {
             "id": cid,
             "name": company.get("name", ""),
@@ -152,8 +285,9 @@ async def get_company_subscriptions(
             "contact_email": company.get("contact_email", ""),
             "contact_phone": company.get("contact_phone", ""),
             "created_at": company.get("created_at"),
-            "plan": sub.get("plan", "starter") if sub else "starter",
+            "plan": plan_key,
             "plan_price": plan_price,
+            "plan_meta": plan_meta,  # full catalogue entry with features
             "subscription_start": sub.get("current_period_start") if sub else None,
             "subscription_end": sub.get("current_period_end") if sub else None,
             "is_active": is_active,

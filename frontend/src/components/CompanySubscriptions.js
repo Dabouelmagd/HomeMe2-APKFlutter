@@ -249,6 +249,53 @@ const CompanySubscriptions = () => {
               {/* Expanded Details */}
               {expandedCompany === company.id && (
                 <div className="border-t border-gray-100 px-6 py-5 bg-gray-50/50">
+                  {/* Plan features panel — shows what this company's tier includes */}
+                  {company.plan_meta && (
+                    <div className="mb-5 rounded-2xl border-2 border-rose-200 bg-gradient-to-br from-rose-50 to-pink-50 p-4">
+                      <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircleIcon className="w-5 h-5 text-rose-600" />
+                          <h4 className="font-bold text-rose-900">
+                            {t('cs_plan_features', 'مزايا خطة')} {company.plan_meta.name_ar}
+                          </h4>
+                          {company.plan_meta.popular && (
+                            <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold">
+                              {t('hp_most_popular', 'الأكثر شعبية')}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-sm">
+                          <span className="font-bold text-rose-700">
+                            {company.plan_meta.monthly_egp.toLocaleString('ar-EG')} {t('sm_egp', 'ج.م')}
+                          </span>
+                          <span className="text-rose-500/80 text-xs"> / {t('cs_monthly', 'شهرياً')}</span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {(isRTL ? company.plan_meta.features_ar : company.plan_meta.features_en).map((f, idx) => (
+                          <div key={idx} className="flex items-start gap-2 text-xs text-rose-800/90">
+                            <CheckCircleIcon className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+                            <span>{f}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        <div className="rounded-lg bg-white/70 px-3 py-2">
+                          <p className="text-[10px] text-gray-500">{t('cs_max_compounds', 'حد المجمعات')}</p>
+                          <p className="text-sm font-bold text-gray-900">
+                            {company.plan_meta.max_compounds === -1 ? t('cs_unlimited', 'غير محدود') : company.plan_meta.max_compounds}
+                          </p>
+                        </div>
+                        <div className="rounded-lg bg-white/70 px-3 py-2">
+                          <p className="text-[10px] text-gray-500">{t('cs_max_residents', 'حد السكان')}</p>
+                          <p className="text-sm font-bold text-gray-900">
+                            {company.plan_meta.max_residents === -1 ? t('cs_unlimited', 'غير محدود') : company.plan_meta.max_residents.toLocaleString('ar-EG')}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Company Details */}
                     <div>

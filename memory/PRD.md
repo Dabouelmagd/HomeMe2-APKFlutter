@@ -3,7 +3,27 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-57)
+## Latest Fixes (Feb 2026 — iterations 26-58)
+
+### Iter 58: Company Plan Limits Enforcement ✅ (Feb 24, 2026)
+- **🆕 Backend** `/app/backend/plan_limits.py`:
+  - `get_company_plan_limits(company_id)` reads `db.company_subscriptions.plan` and returns `{plan, plan_name_ar, max_compounds, max_residents}` mirroring `COMPANY_PLANS_CATALOGUE`.
+  - `assert_can_add_compound(company_id)` raises **403** with structured detail `{code: 'plan_limit_compounds', message, current_plan, current_plan_name_ar, current_count, max_allowed}` when at cap.
+  - `assert_can_add_resident(company_id)` same shape with `code: 'plan_limit_residents'`.
+- **🔗 Wired** into `/app/backend/routes/company_admin.py`:
+  - `POST /api/company-admin/compounds` calls `assert_can_add_compound` before insert.
+  - `POST /api/company-admin/compounds/{id}/users` calls `assert_can_add_resident` only when `role == 'resident'`.
+  - `GET /api/company-admin/plan-usage` returns plan, limits, current counts, and `can_add_*` flags for the dashboard widget.
+- **🆕 Frontend** `/app/frontend/src/components/CompanyPlanUsageCard.js`:
+  - Card showing current plan + 2 usage tiles (compounds, residents) with progress bars and at-limit red styling.
+  - "ترقية الخطة" button opens `PlanUpgradeDialog` with all 4 tiers, current-plan badge, popular badge, features list, and CTA that deep-links to `/app/support?tab=payment&plan=<key>`.
+- **🆕 Frontend** `/app/frontend/src/providers/GlobalUIProvider.js` (refactor):
+  - Extracted from `App.js`: hosts the global Axios 403 interceptor that detects `plan_limit_*` errors → toasts the Arabic message → dispatches `openUpgradeDialog` CustomEvent → mounts `PlanUpgradeDialog` automatically.
+  - Interceptor also normalizes `error.response.data.detail` from object to its `.message` string so any downstream `toast.error(err.response?.data?.detail)` call site (≈20 components) keeps working without crashes.
+  - Also hosts the Sonner `Toaster`, `react-hot-toast` `HotToaster`, `PWAInstallPrompt`, and the upgrade-dialog state.
+- **🔗 Mounted** `<CompanyPlanUsageCard />` at the top of `/app/frontend/src/pages/CompanyAdminDashboard.js` (the dashboard `company_admin` users actually land on).
+- **🛡️ Defensive** `errMsg(err, fallback)` helper in `CompanyAdminDashboard.js` pulls `.message` from object-shaped detail in all 4 catch blocks (createCompound / saveEdit / removeCompound / addUser).
+- **✅ Verified** end-to-end (iter 41-43): backend 9/9 pytest passing (real 403 structured responses for both compound + resident limits); frontend 100% — manual upgrade-button flow + auto-open-via-interceptor flow both green; all 4 plan tiles render; no React child crash; both toasters render correctly.
 
 ### Iter 57: Company Plans — Catalogue with Features ✅
 - **🆕 Backend** `GET /api/owner/company-plans` (`routes/owner_subscriptions.py`):

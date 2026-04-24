@@ -391,7 +391,7 @@ const NotificationProvider = ({ children }) => {
 };
 
 // Protected Route Component
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const ProtectedRoute = ({ children, adminOnly = false, roles = null }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
@@ -413,6 +413,12 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   }
 
   if (adminOnly && !['admin', 'super_admin', 'company_admin', 'manager', 'app_owner'].includes(user.role)) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+
+  // 🛡️ Per-route role whitelist — prevents role-scoped pages (e.g. /app/super-admin)
+  // from being accessible by unauthorized roles after an account-switch.
+  if (roles && Array.isArray(roles) && !roles.includes(user.role)) {
     return <Navigate to="/app/dashboard" replace />;
   }
 
@@ -641,7 +647,7 @@ function App() {
                 } />
                 
                 <Route path="super-admin" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute roles={['app_owner', 'super_admin']}>
                     <SuperAdminPanel />
                   </ProtectedRoute>
                 } />

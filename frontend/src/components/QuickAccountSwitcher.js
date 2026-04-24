@@ -69,17 +69,20 @@ const QuickAccountSwitcher = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const { access_token, user: newUser } = res.data;
-      // Properly update the multi-session storage so App.js rehydrates with the new user
+      // 🛡️ Clean slate: wipe every piece of previous-user state in this tab.
+      // - Start a brand-new tab session id so no old session leaks into useAuth.
+      // - Clear selected role/compound from the previous user (they may not apply).
+      try { sessionStorage.removeItem('tab_session_id'); } catch { /* silent */ }
+      localStorage.removeItem('selectedRole');
+      localStorage.removeItem('selectedCompoundId');
       saveCurrentSession(access_token, newUser);
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(newUser));
-      // Clear any stale compound/role selection from the previous user
-      localStorage.removeItem('selectedRole');
-      localStorage.removeItem('selectedCompoundId');
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       toast.success(t('account_switched', `تم التبديل إلى ${newUser.full_name || newUser.username}`));
-      // Full reload to rehydrate all providers / role-scoped UI
-      setTimeout(() => { window.location.href = '/app/dashboard'; }, 500);
+      // Hard-navigate with history replacement so the back-button cannot return
+      // us to the previous user's role-scoped page (e.g. /app/super-admin).
+      setTimeout(() => { window.location.replace('/app/dashboard'); }, 450);
     } catch (err) {
       toast.error(err.response?.data?.detail || t('switch_failed', 'فشل التبديل'));
     }

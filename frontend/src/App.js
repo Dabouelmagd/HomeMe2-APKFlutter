@@ -112,6 +112,7 @@ import CompanySubscriptions from './components/CompanySubscriptions';
 import OwnerBudget from './components/OwnerBudget';
 import SubscriptionReminders from './components/SubscriptionReminders';
 import { Toaster } from './components/ui/sonner';
+import { Toaster as HotToaster } from 'react-hot-toast';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -812,6 +813,20 @@ function App() {
               </Routes>
             </RouteChangeHandler>
             <Toaster />
+            <HotToaster
+              position="top-center"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  direction: 'rtl',
+                  fontFamily: 'inherit',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                },
+              }}
+            />
             <PWAInstallPrompt />
             </TransliterationProvider>
           </NotificationProvider>

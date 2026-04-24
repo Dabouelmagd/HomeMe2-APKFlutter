@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import TrialStatus from './TrialStatus';
 import CompoundSubscriptionCard from './CompoundSubscriptionCard';
 import PaymentAnalyticsCard from './PaymentAnalyticsCard';
+import CompanyPlanUsageCard from './CompanyPlanUsageCard';
 import { TransliteratedText } from './TransliterationToggle';
 import {
   UsersIcon,
@@ -329,6 +330,13 @@ const AdminDashboard = () => {
               scope={user?.role === 'company_admin' ? 'company' : 'compound'}
               title={user?.role === 'company_admin' ? '📊 إحصائيات المدفوعات — مجتمعات الشركة' : '📊 إحصائيات المدفوعات'}
             />
+          </div>
+        )}
+
+        {/* Company Plan Usage + Upgrade — only for company_admin */}
+        {user?.role === 'company_admin' && (
+          <div className="mb-8">
+            <CompanyPlanUsageCard />
           </div>
         )}
 

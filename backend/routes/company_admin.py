@@ -94,14 +94,49 @@ async def company_admin_list_compounds(current_user: dict = Depends(_require_com
     return {"compounds": result, "company_id": cid, "total": len(result)}
 
 
+@router.get("/company-admin/plan-usage")
+async def company_admin_plan_usage(current_user: dict = Depends(_require_company_admin), company_id: Optional[str] = None):
+    """Return the company's current plan + usage vs limits for the Upgrade panel."""
+    from plan_limits import get_company_plan_limits
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    plan = await get_company_plan_limits(cid)
+    # Current usage
+    current_compounds = await db.compounds.count_documents({
+        "$or": [{"company_id": cid}, {"management_company_id": cid}]
+    })
+    compound_ids = await db.compounds.find(
+        {"$or": [{"company_id": cid}, {"management_company_id": cid}]},
+        {"_id": 0, "id": 1},
+    ).to_list(length=2000)
+    cids = [c["id"] for c in compound_ids]
+    current_residents = await db.users.count_documents({
+        "role": "resident", "compound_id": {"$in": cids}
+    }) if cids else 0
+    return {
+        "company_id": cid,
+        "plan": plan["plan"],
+        "plan_name_ar": plan["plan_name_ar"],
+        "max_compounds": plan["max_compounds"],
+        "max_residents": plan["max_residents"],
+        "current_compounds": current_compounds,
+        "current_residents": current_residents,
+        "can_add_compound": plan["max_compounds"] == -1 or current_compounds < plan["max_compounds"],
+        "can_add_resident": plan["max_residents"] == -1 or current_residents < plan["max_residents"],
+    }
+
+
 @router.post("/company-admin/compounds")
 async def company_admin_create_compound(payload: dict, current_user: dict = Depends(_require_company_admin), company_id: Optional[str] = None):
     """إنشاء مجمع جديد تحت شركة المدير."""
+    from plan_limits import assert_can_add_compound
     db = get_db()
     cid = await _resolve_company_id(current_user, company_id)
     name = (payload.get("name") or "").strip()
     if not name:
         raise HTTPException(status_code=400, detail="اسم المجمع مطلوب")
+    # Plan-limit enforcement — raises 403 with structured detail if over limit
+    await assert_can_add_compound(cid)
     compound_doc = {
         "id": str(uuid.uuid4()),
         "name": name,
@@ -186,6 +221,11 @@ async def company_admin_add_user_to_compound(compound_id: str, payload: dict, cu
     existing = await db.users.find_one({"$or": [{"username": username}, {"email": email.lower()}]})
     if existing:
         raise HTTPException(status_code=400, detail="اسم المستخدم أو البريد مستخدم بالفعل")
+
+    # Plan-limit enforcement only for residents (other roles are admin/staff)
+    if role == "resident":
+        from plan_limits import assert_can_add_resident
+        await assert_can_add_resident(cid)
 
     password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
     user_doc = {

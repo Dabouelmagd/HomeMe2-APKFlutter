@@ -2402,6 +2402,7 @@ from routes.company_admin import router as company_admin_router
 from routes.compound_invites import router as compound_invites_router
 from routes.sidebar_alerts import router as sidebar_alerts_router
 from routes.compound_subscription import router as compound_subscription_router
+from routes.linked_accounts import router as linked_accounts_router
 from routes.alerts import router as alerts_router
 
 app.include_router(monitoring_router)
@@ -2421,6 +2422,7 @@ app.include_router(company_admin_router)
 app.include_router(compound_invites_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
+app.include_router(linked_accounts_router)
 app.include_router(alerts_router)
 app.include_router(exports_router)
 app.include_router(facilities_router)

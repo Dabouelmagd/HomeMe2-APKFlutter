@@ -3,7 +3,22 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-51)
+## Latest Fixes (Feb 2026 — iterations 26-52)
+
+### Iter 52: Quick Account Switcher (Linked Accounts) ✅
+- **🔗 Linked Accounts Backend** (`routes/linked_accounts.py`):
+  - `GET /api/auth/linked-accounts` — returns the current user's linked accounts (enriched with role/compound).
+  - `POST /api/auth/link-account` — links another account (username + password). Password is verified against `users.password_hash` (bcrypt-aware), preventing spoofing.
+  - `POST /api/auth/switch-account` — issues a fresh JWT for a linked account; only works if the target is in the caller's `linked_test_accounts` list.
+  - `POST /api/auth/unlink-account` — removes a link.
+  - Links stored under `users.linked_test_accounts`; each entry has `{user_id, username, role, compound_id, label, added_at}`.
+- **🎨 QuickAccountSwitcher UI** (`components/QuickAccountSwitcher.js`):
+  - Row of circular pills in the top header: current user pill (larger ring + green dot), one pill per linked account (role-colored gradient), and a dashed "+" button to link a new account.
+  - Hover on a linked pill shows a small red × button for unlinking.
+  - Click a linked pill → calls switch-account → updates token + `window.location.href='/app/dashboard'` for a clean rehydrate.
+  - Link-account modal (`qas-link-dialog`) with username + password + optional label.
+- **📐 Placement**: Mounted in `Layout.js` header between `SessionSwitcher` and `ThemeToggle`. Visible only for `app_owner`, `super_admin`, `company_admin`, `admin`, `compound_admin`.
+- Verified live on Royal City owner dashboard: superadmin account linked, pill shown, switch tested end-to-end.
 
 ### Iter 51: Royal City Trial-Banner P0 + Compound Subscription Card ✅
 - **🐛 P0 Bug Fix** — `TrialStatus.js` was hiding the 14-day trial banner only when `user.subscription_type === 'paid'`, but Royal City admin had `subscription_type === 'lifetime'` (paid via permanent code). The check now recognizes **all non-trial subscription types** while `subscription_active`. Backfilled Royal City compound + its 3 admins with the lifetime state.

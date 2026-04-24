@@ -52,6 +52,7 @@ import {
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import SessionSwitcher from './SessionSwitcher';
+import QuickAccountSwitcher from './QuickAccountSwitcher';
 import { TransliterationToggle } from './TransliterationToggle';
 import ThemeToggle from './ThemeToggle';
 import BackButton from './BackButton';
@@ -964,6 +965,9 @@ const Layout = ({ children, isTrialMode = false }) => {
 
               {/* Session Switcher */}
               <SessionSwitcher />
+
+              {/* Quick Account Switcher — linked accounts pills */}
+              <QuickAccountSwitcher />
 
               {/* Theme Toggle */}
               <ThemeToggle />

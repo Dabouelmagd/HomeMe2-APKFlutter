@@ -3,7 +3,24 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-55)
+## Latest Fixes (Feb 2026 — iterations 26-56)
+
+### Iter 56: Payment Analytics Dashboard (Scoped for 3 Roles) ✅
+- **🆕 Backend** `GET /api/payment-analytics?days=30&scope=auto` (`routes/payment_analytics.py`):
+  - Server-side role scoping: `app_owner`/`super_admin` → global, `company_admin` → compounds of their company, `admin`/`compound_admin` → their single compound.
+  - Returns: `totals` (tickets, activated, pending, activation_rate, total_amount, activated_amount), `methods` breakdown (count/amount/activated per method), `series` (per-day counts/amounts), `top_method`.
+  - Safe numeric extraction from free-form amount strings like "2200 ج.م".
+- **🆕 Frontend** `components/PaymentAnalyticsCard.js`:
+  - Range selector (أسبوع / شهر / 3 شهور / سنة) with active emerald pill.
+  - 4 KPI tiles (tickets, activated + rate, pending, activated amount) with role-themed gradients.
+  - Method breakdown: up to 3 top methods with icon, count, amount, and a gradient progress bar showing share of total.
+  - Per-day bar chart (max ~30-90 bars) with tooltip on hover.
+  - Skeleton loading + empty state.
+- **📌 Integration in 3 surfaces:**
+  - Owner / Super Admin: `SuperAdminPanel` > Overview tab — `scope="global"`, title "إحصائيات المدفوعات — كل المجتمعات".
+  - Compound Admin: `AdminDashboard` below `CompoundSubscriptionCard` — `scope="compound"`.
+  - Company Admin: `AdminDashboard` — `scope="company"`, title "— مجتمعات الشركة".
+- Verified live: Owner Overview renders the card with 5 tickets / 1 activated / 20% rate / 4 pending; method breakdown shows instapay (4) and vodafone_cash (1) with correct percentages.
 
 ### Iter 55: Payment-Confirmation Tickets — Filter + One-Click Activation ✅
 - **🆕 Backend** `POST /api/compounds/{id}/subscription/manual-activate` (`routes/compound_subscription.py`):

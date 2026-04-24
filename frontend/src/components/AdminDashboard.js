@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import TrialStatus from './TrialStatus';
 import CompoundSubscriptionCard from './CompoundSubscriptionCard';
+import PaymentAnalyticsCard from './PaymentAnalyticsCard';
 import { TransliteratedText } from './TransliterationToggle';
 import {
   UsersIcon,
@@ -318,6 +319,16 @@ const AdminDashboard = () => {
         {user?.compound_id && (
           <div className="mb-8">
             <CompoundSubscriptionCard compoundId={user.compound_id} />
+          </div>
+        )}
+
+        {/* Payment Analytics — scoped to compound for admin/compound_admin, to company for company_admin */}
+        {(user?.role === 'admin' || user?.role === 'compound_admin' || user?.role === 'company_admin') && (
+          <div className="mb-8">
+            <PaymentAnalyticsCard
+              scope={user?.role === 'company_admin' ? 'company' : 'compound'}
+              title={user?.role === 'company_admin' ? '📊 إحصائيات المدفوعات — مجتمعات الشركة' : '📊 إحصائيات المدفوعات'}
+            />
           </div>
         )}
 

@@ -24,6 +24,7 @@ import HierarchicalSubs from './super-admin/HierarchicalSubs';
 import CompaniesTab from './super-admin/CompaniesTab';
 import AdvertiserAdsTab from './super-admin/AdvertiserAdsTab';
 import SupportTicketsTab from './super-admin/SupportTicketsTab';
+import PaymentAnalyticsCard from './PaymentAnalyticsCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -456,7 +457,12 @@ const SuperAdminPanel = () => {
 
         {/* Compounds Tab */}
         {activeTab === 'overview' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <>
+            {/* Payment analytics — Owner & Super Admin see global view */}
+            <div className="mb-5">
+              <PaymentAnalyticsCard scope="global" title="📊 إحصائيات المدفوعات — كل المجتمعات" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {compounds.map(c => (
               <button key={c.id} type="button" onClick={() => setSelectedCompound(c.id)} className="bg-gray-800 rounded-xl border border-gray-700 p-5 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/10 transition-all cursor-pointer text-right group" data-testid={`compound-${c.id}`}>
                 <div className="flex items-center gap-3 mb-3">
@@ -480,6 +486,7 @@ const SuperAdminPanel = () => {
               <div className="col-span-3 text-center py-12 text-gray-500">{t("sp_no_compounds", "لا توجد مجتمعات سكنية")}</div>
             )}
           </div>
+          </>
         )}
 
         {/* Users Tab */}

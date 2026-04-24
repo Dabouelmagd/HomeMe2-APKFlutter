@@ -3,7 +3,19 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-52)
+## Latest Fixes (Feb 2026 — iterations 26-53)
+
+### Iter 53: Toast Fix + Modern Payment Methods with Coming-Soon Badges ✅
+- **🐛 Profile Save Toast Bug** — The app had 12 components using `react-hot-toast` but the only `<Toaster>` mounted in `App.js` was from the `sonner` library (different package), so all `toast.success/error` calls from `react-hot-toast` silently failed. Added `<HotToaster>` from `react-hot-toast` alongside the sonner one, with RTL + rose-themed styles. Profile save / language change / privacy update / biometric register toasts now all appear.
+- **🎨 ComingSoonBadge** (new `components/ComingSoonBadge.js`):
+  - Reusable badge with 3 variants: `ribbon` (inline pill), `corner` (absolute corner tag for cards), `overlay` (full-glass blur overlay for disabled tiles).
+  - Animated rainbow-gradient background (`cs-gradient-shift` 3s keyframe in `index.css`), pulsing Sparkles / bouncing Rocket icons, optional ETA text (e.g. "Q2 2026") and optional "🔔 أخبريني عند التفعيل" button.
+- **💳 Modern Payment Selector** in `CompoundSubscriptionCard.js` "تغيير الاشتراك" dialog:
+  - Replaced 3-tab layout with a 6-tile responsive grid, 3 columns × 2 rows.
+  - Row 1 (ready): كود اشتراك, بطاقة ائتمان, تحويل بنكي.
+  - Row 2 (قريباً, corner badge + opacity + cursor-not-allowed): InstaPay (Q2 2026), Vodafone Cash (Q2 2026), Apple/Google Pay (Q3 2026).
+  - Each tile shows: icon, label, one-line hint, active state (rose ring), disabled state (gray + badge).
+- Verified live: dialog renders 6 tiles, 3 corner "قريباً" badges present, animated gradient in Arabic RTL layout.
 
 ### Iter 52: Quick Account Switcher (Linked Accounts) ✅
 - **🔗 Linked Accounts Backend** (`routes/linked_accounts.py`):

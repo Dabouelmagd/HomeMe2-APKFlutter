@@ -12,7 +12,11 @@ import {
   CheckCircleIcon,
   BanknotesIcon,
   XMarkIcon,
+  DevicePhoneMobileIcon,
+  QrCodeIcon,
+  GlobeAltIcon,
 } from '@heroicons/react/24/outline';
+import ComingSoonBadge from './ComingSoonBadge';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -207,30 +211,50 @@ const ChangeSubscriptionDialog = ({ compoundId, plans, currentSubscription, onCl
           </button>
         </div>
 
-        {/* Tabs — 3 payment methods */}
-        <div className="flex border-b border-gray-200 dark:border-gray-700">
-          {[
-            { id: 'code', label: t('pay_code', 'كود اشتراك'), icon: KeyIcon },
-            { id: 'card', label: t('pay_card', 'بطاقة ائتمان'), icon: CreditCardIcon },
-            { id: 'bank', label: t('pay_bank', 'تحويل بنكي'), icon: BanknotesIcon },
-          ].map((tt) => {
-            const Icon = tt.icon;
-            return (
-              <button
-                key={tt.id}
-                onClick={() => setTab(tt.id)}
-                className={`flex-1 px-4 py-3 text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${
-                  tab === tt.id
-                    ? 'text-rose-600 border-b-2 border-rose-500 bg-rose-50 dark:bg-rose-900/20'
-                    : 'text-gray-500 hover:text-gray-700 dark:text-gray-400'
-                }`}
-                data-testid={`change-sub-tab-${tt.id}`}
-              >
-                <Icon className="w-4 h-4" />
-                {tt.label}
-              </button>
-            );
-          })}
+        {/* Payment method selector — 6 modern options, some flagged قريباً */}
+        <div className="px-5 pt-5">
+          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">
+            {t('choose_payment_method', 'اختاري طريقة الدفع')}
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { id: 'code', label: 'كود اشتراك',  icon: KeyIcon,              ready: true,  hint: 'فعّلي الاشتراك فوراً' },
+              { id: 'card', label: 'بطاقة ائتمان', icon: CreditCardIcon,       ready: true,  hint: 'Visa / Master / Meeza' },
+              { id: 'bank', label: 'تحويل بنكي',   icon: BanknotesIcon,        ready: true,  hint: 'حوالة يدوية مع إثبات' },
+              { id: 'instapay', label: 'InstaPay', icon: QrCodeIcon,           ready: false, eta: 'Q2 2026', hint: 'تحويل فوري عبر البنك المركزي' },
+              { id: 'vcash', label: 'Vodafone Cash', icon: DevicePhoneMobileIcon, ready: false, eta: 'Q2 2026', hint: 'دفع من محفظتك' },
+              { id: 'applepay', label: 'Apple / Google Pay', icon: GlobeAltIcon, ready: false, eta: 'Q3 2026', hint: 'دفع بلمسة واحدة' },
+            ].map((m) => {
+              const Icon = m.icon;
+              const active = tab === m.id;
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => { if (m.ready) setTab(m.id); }}
+                  disabled={!m.ready}
+                  className={`relative rounded-xl border-2 p-3 transition-all text-start ${
+                    active
+                      ? 'border-rose-500 bg-rose-50 dark:bg-rose-900/20 shadow'
+                      : m.ready
+                        ? 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-rose-300 cursor-pointer'
+                        : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 opacity-70 cursor-not-allowed'
+                  }`}
+                  data-testid={`change-sub-tab-${m.id}`}
+                  title={m.hint}
+                >
+                  {!m.ready && <ComingSoonBadge variant="corner" label="قريباً" />}
+                  <div className="flex items-center gap-2">
+                    <Icon className={`w-5 h-5 ${active ? 'text-rose-600' : m.ready ? 'text-gray-600 dark:text-gray-300' : 'text-gray-400'}`} />
+                    <span className={`text-xs font-bold ${active ? 'text-rose-700 dark:text-rose-300' : m.ready ? 'text-gray-800 dark:text-gray-100' : 'text-gray-500'}`}>
+                      {m.label}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 leading-tight truncate">{m.hint}</p>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Body */}

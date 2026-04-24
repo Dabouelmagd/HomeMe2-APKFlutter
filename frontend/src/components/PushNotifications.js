@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'sonner';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 
@@ -16,13 +17,28 @@ const PushNotifications = () => {
   const [loading, setLoading] = useState(false);
   const [testStatus, setTestStatus] = useState(null);
   const [vapidPublicKey, setVapidPublicKey] = useState(null);
+  const [permission, setPermission] = useState(typeof Notification !== 'undefined' ? Notification.permission : 'default');
+  const [errorDetail, setErrorDetail] = useState(null);
 
   useEffect(() => {
     checkPushSupport();
     loadVapidKey();
-    checkSubscriptionStatus();
     loadPreferences();
   }, []);
+
+  // Re-check subscription status whenever support flips to true (avoids stale closure)
+  useEffect(() => {
+    if (!isSupported) return;
+    (async () => {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        const subscription = await registration.pushManager.getSubscription();
+        setIsSubscribed(!!subscription);
+      } catch (error) {
+        console.error('Error checking subscription status:', error);
+      }
+    })();
+  }, [isSupported]);
 
   const loadVapidKey = async () => {
     try {
@@ -61,18 +77,6 @@ const PushNotifications = () => {
     }
   };
 
-  const checkSubscriptionStatus = async () => {
-    if (!isSupported) return;
-
-    try {
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.getSubscription();
-      setIsSubscribed(!!subscription);
-    } catch (error) {
-      console.error('Error checking subscription status:', error);
-    }
-  };
-
   const loadPreferences = async () => {
     try {
       const response = await axios.get(`${API}/notifications/preferences`);
@@ -104,23 +108,50 @@ const PushNotifications = () => {
   };
 
   const subscribeToPush = async () => {
-    if (!isSupported || !vapidPublicKey) {
-      alert(t('push_not_supported', 'Push notifications are not supported'));
+    setErrorDetail(null);
+    if (!isSupported) {
+      const msg = t('push_not_supported_browser', 'متصفحك لا يدعم الإشعارات الفورية. جرّب Chrome أو Edge أو Firefox الحديث.');
+      setErrorDetail(msg);
+      toast.error(msg);
       return;
+    }
+    if (!vapidPublicKey) {
+      // Try to reload it once before failing
+      try {
+        const res = await axios.get(`${API}/push/public-key`);
+        setVapidPublicKey(res.data.public_key);
+      } catch (_) { /* ignore */ }
+      if (!vapidPublicKey) {
+        const msg = t('push_key_missing', 'تعذّر تحميل مفتاح الإشعارات. حاول إعادة تحميل الصفحة.');
+        setErrorDetail(msg);
+        toast.error(msg);
+        return;
+      }
     }
 
     setLoading(true);
     try {
-      const permission = await Notification.requestPermission();
-      
-      if (permission !== 'granted') {
-        alert(t('push_permission_denied', 'Push notifications permission was denied'));
+      const permissionResult = await Notification.requestPermission();
+      setPermission(permissionResult);
+
+      if (permissionResult === 'denied') {
+        const msg = t('push_permission_denied_help', 'تم حظر الإشعارات في إعدادات المتصفح. اضغط على أيقونة القفل 🔒 بجانب عنوان الموقع → الإشعارات → السماح، ثم أعد تحميل الصفحة.');
+        setErrorDetail(msg);
+        toast.error(msg, { duration: 7000 });
+        setLoading(false);
+        return;
+      }
+
+      if (permissionResult !== 'granted') {
+        const msg = t('push_permission_not_granted', 'لم تتم الموافقة على الإشعارات. أعد المحاولة واضغط "السماح" في نافذة المتصفح.');
+        setErrorDetail(msg);
+        toast.error(msg);
         setLoading(false);
         return;
       }
 
       const registration = await navigator.serviceWorker.ready;
-      
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
@@ -139,16 +170,21 @@ const PushNotifications = () => {
       await axios.post(`${API}/push/subscribe`, subscriptionData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       setIsSubscribed(true);
-      
+      toast.success(t('push_enabled_success', 'تم تفعيل الإشعارات الفورية بنجاح ✓'));
+
       setTimeout(() => {
         sendTestNotification();
       }, 1000);
-      
+
     } catch (error) {
       console.error('Failed to subscribe to push notifications:', error);
-      alert(t('push_subscription_failed', 'Failed to subscribe to push notifications'));
+      const reason = error?.name === 'NotAllowedError'
+        ? t('push_blocked_browser', 'الإشعارات محظورة في المتصفح. فعّلها من إعدادات الموقع 🔒 ثم أعد المحاولة.')
+        : (error?.message || t('push_subscription_failed', 'فشل تفعيل الإشعارات. حاول مرة أخرى.'));
+      setErrorDetail(reason);
+      toast.error(reason, { duration: 6000 });
     } finally {
       setLoading(false);
     }
@@ -171,9 +207,10 @@ const PushNotifications = () => {
       }
       
       setIsSubscribed(false);
+      toast.success(t('push_unsubscribed', 'تم إيقاف الإشعارات الفورية'));
     } catch (error) {
       console.error('Failed to unsubscribe from push notifications:', error);
-      alert(t('push_unsubscribe_failed', 'Failed to unsubscribe from push notifications'));
+      toast.error(t('push_unsubscribe_failed', 'فشل إيقاف الإشعارات. حاول مرة أخرى.'));
     } finally {
       setLoading(false);
     }
@@ -241,9 +278,16 @@ const PushNotifications = () => {
               <button
                 onClick={subscribeToPush}
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                data-testid="push-enable-btn"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 inline-flex items-center gap-2"
               >
-                {loading ? t('common.loading') : t('notificationCenter.enable')}
+                {loading && (
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                  </svg>
+                )}
+                {loading ? t('common.loading', 'جاري...') : t('notificationCenter.enable')}
               </button>
             ) : (
               <>
@@ -264,6 +308,25 @@ const PushNotifications = () => {
             )}
           </div>
         </div>
+
+        {/* Inline error / permission-denied helper */}
+        {(errorDetail || permission === 'denied') && (
+          <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg" data-testid="push-error-panel">
+            <p className="text-amber-800 text-sm leading-relaxed">
+              {errorDetail || t('push_permission_denied_help', 'تم حظر الإشعارات في إعدادات المتصفح. اضغط على أيقونة القفل 🔒 بجانب عنوان الموقع → الإشعارات → السماح، ثم أعد تحميل الصفحة.')}
+            </p>
+            {permission === 'denied' && (
+              <a
+                href="https://support.google.com/chrome/answer/3220216?hl=ar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-block text-xs text-amber-700 underline hover:text-amber-900"
+              >
+                {t('push_help_link', 'كيف أُفعّل الإشعارات في المتصفح؟')}
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Notification Preferences */}

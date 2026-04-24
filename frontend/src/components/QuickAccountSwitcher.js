@@ -3,10 +3,10 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../App';
+import { saveCurrentSession } from '../utils/sessionManager';
 import {
   UserPlusIcon,
   XMarkIcon,
-  TrashIcon,
   ArrowsRightLeftIcon,
 } from '@heroicons/react/24/outline';
 
@@ -69,11 +69,17 @@ const QuickAccountSwitcher = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const { access_token, user: newUser } = res.data;
+      // Properly update the multi-session storage so App.js rehydrates with the new user
+      saveCurrentSession(access_token, newUser);
       localStorage.setItem('token', access_token);
       localStorage.setItem('user', JSON.stringify(newUser));
+      // Clear any stale compound/role selection from the previous user
+      localStorage.removeItem('selectedRole');
+      localStorage.removeItem('selectedCompoundId');
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       toast.success(t('account_switched', `تم التبديل إلى ${newUser.full_name || newUser.username}`));
-      // Full reload to rehydrate providers / role-scoped UI
-      setTimeout(() => { window.location.href = '/app/dashboard'; }, 600);
+      // Full reload to rehydrate all providers / role-scoped UI
+      setTimeout(() => { window.location.href = '/app/dashboard'; }, 500);
     } catch (err) {
       toast.error(err.response?.data?.detail || t('switch_failed', 'فشل التبديل'));
     }

@@ -1,0 +1,48 @@
+{
+  "summary": "Iter47 — Phase 3 Family Invites end-to-end. Backend 13/14 pytest pass (1 minor edge-case bug). Frontend 100% across all required flows on /app/family for Compound Admin (dalia/Dalia1234@): panel renders, modal opens without compound-select (regression OK), create returns absolute https /join-family/{token} URL with status 'نشط', copy/share toasts work, public /join-family/:token page renders with relationship + inviter + compound info, public registration succeeds and redirects to /login, refresh shows used '1 / 1' and status 'مستخدم', revoke flips status to 'ملغي'.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/family-invites", "issue": "validity_days=0 silently coerced to 14 instead of returning 400. Caused by `int(payload.get('validity_days') or 14)` truthy-fallback. Negative or >90 is correctly rejected. Suggested fix: `v = payload.get('validity_days'); v = 14 if v is None else int(v); if v<1 or v>90: raise 400`."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "tests_passed": [
+    "Backend regression: list_unauth(401/403), create_unauth(401/403), public_token_invalid(404), bad_relationship(400), validity_days=91→400, dalia_create returns structured invite (relationship, max_uses, used_count=0, is_active, compound_id matches inviter, join_url starts /join-family/, family_id auto-allocated), GET lists only own (filtered by created_by), public_view_token returns valid+compound+inviter+remaining_uses, accept creates user (role=resident, family_id, compound_id, unit_number copied from inviter, source='family_invite_link', relationship_to_head='spouse'), used_count increments, used-up token→410, duplicate username→400, short password→400, revoke by other user→403, revoke by creator→200 sets is_active=false, revoked token→410, OWNER without compound→400.",
+    "Frontend dalia /app/family: family-invites-panel visible at top of FamilyManagement → create-family-invite-btn → modal opens → invite-compound-select NOT present (regression confirmed) → relationship=spouse + validity=14 + max_uses=1 + invitee_name='زوجة دالية' + submit → toast 'تم إنشاء رابط الدعوة' + new family-invite-card with absolute https URL ('/join-family/' segment) + status 'نشط' + '0 / 1' usage.",
+    "Frontend public flow: /join-family/<fresh_token> renders join-family-page, shows relationship 'أب / أم' + inviter 'Dalia Abouelmagd' + compound info (Royal City logo + Arabic name in header), filling form + submit → toast 'تم إنشاء حسابك بنجاح' + redirect to /login.",
+    "Frontend post-accept refresh: TEST_iter47_UI_parent card now shows '1 / 1' used and status badge 'مستخدم'.",
+    "Frontend revoke: created TEST_iter47_revoke (driver), clicked family-invite-revoke-{id}, dialog auto-accepted, DELETE 200, toast 'تم إلغاء الرابط', card status flipped to 'ملغي'.",
+    "Frontend copy: family-invite-copy-{id} click → toast 'تم نسخ الرابط' visible."
+  ],
+  "tests_failed": [
+    "Backend test_create_bad_validity_low_400 — POST with validity_days=0 returned 200 instead of 400 (see minor backend issue above)."
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iter47_family_invites.py",
+    "/app/test_reports/pytest/iter47_family_invites.xml"
+  ],
+  "action_items": [
+    "(Optional / low-priority) Tighten validity_days validation in /app/backend/routes/family_invites.py:83 so `validity_days=0` is rejected with 400 (currently coerced to 14 by the `or` fallback).",
+    "Cleanup: ~6 TEST_iter47_* invites + a few TEST_iter47_*/TEST_uifam_* user accounts were created during this run under dalia's family in compound Royal City (88ad3711-c9ae-45fe-a270-65f4524c071c, unit A-101). Main agent may want to remove them from DB before demo."
+  ],
+  "critical_code_review_comments": [
+    "family_invites.py is well-scoped and mirrors compound_invites cleanly (single file, ~280 lines, passes ruff/syntax). Validation, status codes, RBAC all correct.",
+    "_ensure_family_id idempotency: only writes family_id if missing, and also flips inviter to is_family_head=True — good.",
+    "Public accept endpoint correctly atomic-increments used_count via $inc + $addToSet; subsequent _validate_token sees used_up→410 (verified).",
+    "Minor: validity_days=0 falsy-fallback edge-case (see action items).",
+    "Minor: in JoinFamilyByInvite.js, error handling uses `toast` from 'sonner' while FamilyInvitesPanel uses 'react-hot-toast'. Both libraries appear loaded elsewhere in the app, but worth standardising long-term."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "92.8% (13/14)", "frontend": "100% (8/8 flows)"},
+  "test_credentials": "dalia/Dalia1234@ (compound_admin, compound_id=88ad3711-c9ae-45fe-a270-65f4524c071c, unit A-101 — already had compound, no fixture seeding needed). Owner_homeme/Dalia1234@ used for no-compound 400 regression (skipped automatically if owner has compound).",
+  "seed_data_creation": "Created via UI test: 1 spouse invite (زوجة دالية), 1 parent invite (TEST_iter47_UI_parent — used+now full), 1 driver invite (TEST_iter47_revoke — revoked). Created via pytest: ~5 family invites (TEST_iter47_403, TEST_iter47_pw, TEST_iter47_dup, TEST_iter47_spouse, etc.) and ~4 resident user accounts (TEST_iter47_*, TEST_uifam_*, TEST_uifam2_*, TEST_other_*). All inherit dalia's compound_id, family_id, unit_number A-101.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Phase 3 Family Invites is structurally clean and end-to-end green. The single backend edge-case (validity_days=0 silently coerced to 14) is non-blocking — fix is one-line. The route is correctly /join-family/:token (dash) — distinct from /join/:token used by compound invites. JoinFamilyByInvite uses 'sonner' toast while the panel uses 'react-hot-toast'; both work but main agent may want to unify.",
+  "rca_of_the_issue": "Single backend minor: `int(payload.get('validity_days') or 14)` treats 0 as falsy and substitutes the default. Replace with explicit None check: `v = payload.get('validity_days'); v = 14 if v is None else int(v); if v<1 or v>90: raise HTTPException(400, 'validity_days يجب أن يكون بين 1 و 90')`."
+}

@@ -56,6 +56,7 @@ import AdvertiserPortal from './pages/AdvertiserPortal';
 import AdvertiserRegister from './pages/AdvertiserRegister';
 import CompanyAdminDashboard from './pages/CompanyAdminDashboard';
 import JoinViaInvite from './pages/JoinViaInvite';
+import JoinFamilyByInvite from './pages/JoinFamilyByInvite';
 import AlertsDashboard from './pages/AlertsDashboard';
 import FinancialRoute from './components/FinancialRoute';
 import MessageCenter from './components/MessageCenter';
@@ -516,6 +517,7 @@ function App() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/advertiser-register" element={<AdvertiserRegister />} />
                 <Route path="/join/:token" element={<JoinViaInvite />} />
+                <Route path="/join-family/:token" element={<JoinFamilyByInvite />} />
                 <Route path="/debug-login" element={<DebugLogin />} />
                 <Route path="/select-account" element={
                   <ProtectedRoute>

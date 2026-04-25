@@ -20,6 +20,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
+import FamilyInvitesPanel from './family/FamilyInvitesPanel';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -233,6 +234,12 @@ const FamilyManagement = () => {
             </button>
           </div>
         </div>
+
+        {/* Family Invite Links — Phase 3 of hierarchical invitations */}
+        <div className="mb-6 bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+          <FamilyInvitesPanel />
+        </div>
+
         {/* Family Members Grid */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           {familyMembers.length === 0 ? (

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -492,10 +493,24 @@ const AddFamilyMemberToUnit = () => {
                   </div>
                 </div>
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                  <div className="text-xs text-gray-600 mb-1">رابط الدعوة:</div>
+                  <div className="text-xs text-gray-600 mb-2">رابط الدعوة:</div>
                   <code className="text-xs text-gray-900 break-all block bg-white p-2 rounded border border-gray-200" data-testid="invite-url">
                     {inviteData.full_url}
                   </code>
+                  <div className="mt-3 flex flex-col items-center gap-2 bg-white p-3 rounded-lg border border-gray-200">
+                    <div className="bg-white p-2 rounded-xl border-2 border-rose-100">
+                      <QRCodeSVG
+                        value={inviteData.full_url}
+                        size={160}
+                        level="M"
+                        includeMargin={false}
+                        data-testid="invite-qr-code"
+                      />
+                    </div>
+                    <p className="text-[11px] text-gray-500 text-center leading-relaxed">
+                      📱 امسح الكود بكاميرا الموبايل لفتح الرابط مباشرة
+                    </p>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <button

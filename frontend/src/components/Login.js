@@ -121,18 +121,35 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
+    // 🛡️ Browser autofill safety net: read live DOM values in case React state
+    // is stale (autofill populates the input.value but does NOT fire onChange,
+    // so on first submit `formData` may still be empty → 401 "Invalid credentials").
+    const liveUsername = (e.target?.username?.value || formData.username || '').trim();
+    const livePassword = e.target?.password?.value || formData.password || '';
+
+    // Also sync the React state so subsequent renders/effects see the right values.
+    if (liveUsername !== formData.username || livePassword !== formData.password) {
+      setFormData({ username: liveUsername, password: livePassword });
+    }
+
+    if (!liveUsername || !livePassword) {
+      setLoading(false);
+      toast.error(t('login_required_fields', 'يرجى إدخال اسم المستخدم وكلمة المرور'));
+      return;
+    }
+
     try {
-      const result = await login(formData);
+      const result = await login({ username: liveUsername, password: livePassword });
       if (result.success) {
         // Save username if remember me is checked
         if (rememberMe) {
-          localStorage.setItem('savedUsername', formData.username);
+          localStorage.setItem('savedUsername', liveUsername);
           localStorage.setItem('rememberMe', 'true');
         } else {
           localStorage.removeItem('savedUsername');
           localStorage.setItem('rememberMe', 'false');
         }
-        
+
         toast.success(t('welcome_back'));
         // Navigate to the original requested page or dashboard
         navigate(from, { replace: true });
@@ -234,6 +251,7 @@ const Login = () => {
               type="text"
               id="username"
               name="username"
+              autoComplete="username"
               value={formData.username}
               onChange={handleChange}
               className="form-input"
@@ -251,6 +269,7 @@ const Login = () => {
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 name="password"
+                autoComplete="current-password"
                 value={formData.password}
                 onChange={handleChange}
                 className="form-input pe-12"

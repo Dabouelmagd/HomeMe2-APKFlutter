@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../App';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
@@ -8,22 +8,55 @@ import { ShieldCheckIcon, EyeIcon, BellIcon, CheckIcon } from '@heroicons/react/
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+const DEFAULT_PRIVACY = {
+  profile_visibility: 'compound',
+  contact_visibility: 'family',
+  activity_status: true,
+  data_sharing: false,
+  marketing_emails: true,
+};
+
 const PrivacySettings = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const [saving, setSaving] = useState(false);
-  const [privacySettings, setPrivacySettings] = useState({
-    profile_visibility: 'compound',
-    contact_visibility: 'family',
-    activity_status: true,
-    data_sharing: false,
-    marketing_emails: true
-  });
+  const [loading, setLoading] = useState(true);
+  const [privacySettings, setPrivacySettings] = useState(DEFAULT_PRIVACY);
+
+  // Hydrate saved settings from the user object (or fetch from /auth/me) on mount.
+  useEffect(() => {
+    let alive = true;
+    const hydrate = async () => {
+      try {
+        // Prefer cached user from context, then refetch to be safe
+        let saved = user?.privacy_settings;
+        if (!saved) {
+          const res = await axios.get(`${API}/auth/me`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+          });
+          saved = res.data?.privacy_settings;
+        }
+        if (alive && saved && typeof saved === 'object') {
+          setPrivacySettings({ ...DEFAULT_PRIVACY, ...saved });
+        }
+      } catch (_e) {
+        /* keep defaults */
+      } finally {
+        if (alive) setLoading(false);
+      }
+    };
+    hydrate();
+    return () => { alive = false; };
+  }, [user?.id]);
 
   const handlePrivacyUpdate = async () => {
     setSaving(true);
     try {
       await axios.put(`${API}/users/${user.id}/privacy`, privacySettings, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      // Persist in auth context so a return visit shows the saved values immediately
+      if (typeof updateUser === 'function') {
+        updateUser({ ...user, privacy_settings: { ...(user?.privacy_settings || {}), ...privacySettings } });
+      }
       toast.success(t('privacy_settings_updated_successfully', 'تم تحديث إعدادات الخصوصية'));
     } catch (error) {
       toast.error(t('failed_to_update_privacy_settings', 'فشل تحديث إعدادات الخصوصية'));
@@ -41,6 +74,11 @@ const PrivacySettings = () => {
 
   return (
     <div className="space-y-6">
+      {loading && (
+        <div className="h-32 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+      )}
+      {!loading && (
+        <>
       {/* Profile Visibility */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm hover:shadow-lg hover:border-rose-200 dark:hover:border-rose-800 transition-all">
         <div className="p-6">
@@ -159,6 +197,7 @@ const PrivacySettings = () => {
       <button 
         onClick={handlePrivacyUpdate}
         disabled={saving}
+        data-testid="privacy-save-btn"
         className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-pink-500 hover:bg-pink-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-pink-500/25"
       >
         {saving ? (
@@ -168,6 +207,8 @@ const PrivacySettings = () => {
         )}
         <span>{saving ? t('saving', 'جاري الحفظ...') : t('save_privacy_settings', 'حفظ إعدادات الخصوصية')}</span>
       </button>
+        </>
+      )}
     </div>
   );
 };

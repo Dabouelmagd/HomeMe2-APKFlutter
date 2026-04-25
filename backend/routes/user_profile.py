@@ -171,7 +171,7 @@ async def update_user_privacy_settings(
             {"$set": update_data}
         )
         
-        if result.modified_count == 0:
+        if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="User not found")
         
         return {"message": "Privacy settings updated successfully"}

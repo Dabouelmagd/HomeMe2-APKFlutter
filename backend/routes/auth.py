@@ -290,6 +290,8 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
         "subscription_plan": current_user.get('subscription_plan'),
         "subscription_end": current_user.get('subscription_end'),
         "subscription_code_used": current_user.get('subscription_code_used'),
+        # Privacy preferences — used by /app/settings?tab=privacy to hydrate saved values
+        "privacy_settings": current_user.get('privacy_settings') or {},
     }
 
 # WebAuthn/Biometric Authentication Routes

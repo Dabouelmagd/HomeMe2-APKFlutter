@@ -281,10 +281,21 @@ const InviteCard = ({ invite, onRevoke }) => {
       {/* Footer stats */}
       <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
         <span className="inline-flex items-center gap-1"><ClockIcon className="w-3.5 h-3.5" /> ينتهي {expiresShort}</span>
-        <span className="inline-flex items-center gap-1">
-          <UsersIcon className="w-3.5 h-3.5" />
-          {invite.used_count || 0}{invite.max_uses ? ` / ${invite.max_uses}` : ''} مستخدم
-        </span>
+        <div className="flex items-center gap-2">
+          {(invite.reminder_count > 0) && (
+            <span
+              className="inline-flex items-center gap-1 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 px-1.5 py-0.5 rounded-full"
+              title="عدد رسائل التذكير المرسلة"
+              data-testid={`invite-reminders-${invite.id}`}
+            >
+              ✉️ {invite.reminder_count}
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1">
+            <UsersIcon className="w-3.5 h-3.5" />
+            {invite.used_count || 0}{invite.max_uses ? ` / ${invite.max_uses}` : ''} مستخدم
+          </span>
+        </div>
       </div>
 
       {showQr && (

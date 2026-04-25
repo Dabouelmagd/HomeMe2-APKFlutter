@@ -2412,6 +2412,7 @@ from routes.company_admin import router as company_admin_router
 from routes.compound_invites import router as compound_invites_router
 from routes.family_invites import router as family_invites_router
 from routes.invite_stats import router as invite_stats_router
+from routes.invite_drip import router as invite_drip_router
 from routes.sidebar_alerts import router as sidebar_alerts_router
 from routes.compound_subscription import router as compound_subscription_router
 from routes.linked_accounts import router as linked_accounts_router
@@ -2435,6 +2436,7 @@ app.include_router(company_admin_router)
 app.include_router(compound_invites_router)
 app.include_router(family_invites_router)
 app.include_router(invite_stats_router)
+app.include_router(invite_drip_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
 app.include_router(linked_accounts_router)
@@ -2531,6 +2533,12 @@ async def start_daily_report_scheduler():
                 logging.info(f"Auto renewal check completed: {res}")
             except Exception as e:
                 logging.error(f"Auto renewal error: {e}")
+            try:
+                from routes.invite_drip import _process_drip
+                d = await _process_drip()
+                logging.info(f"Invite drip pass: scanned={d.get('scanned')} sent={d.get('sent')} errors={d.get('errors')}")
+            except Exception as e:
+                logging.error(f"Invite drip error: {e}")
 
     _daily_report_task = asyncio.create_task(daily_report_scheduler())
     logging.info("Daily report scheduler started (7:00 AM daily)")

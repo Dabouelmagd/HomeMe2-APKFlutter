@@ -9,6 +9,7 @@ import {
   ChartBarIcon,
   UsersIcon,
   ArrowDownTrayIcon,
+  EnvelopeIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -50,6 +51,16 @@ const InviteStatsCard = () => {
   const [err, setErr] = useState(null);
   const [period, setPeriod] = useState('all');
   const [exporting, setExporting] = useState(false);
+  const [running, setRunning] = useState(false);
+
+  // Detect if current user has high-level admin privileges (drip trigger)
+  const userRole = (() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}');
+      return u?.active_role || u?.role || null;
+    } catch { return null; }
+  })();
+  const canRunDrip = userRole === 'app_owner' || userRole === 'super_admin';
 
   const fetchStats = async (p = period) => {
     try {
@@ -90,6 +101,24 @@ const InviteStatsCard = () => {
       toast.error(e?.response?.data?.detail || 'فشل تصدير CSV');
     } finally {
       setExporting(false);
+    }
+  };
+
+  const runDrip = async () => {
+    setRunning(true);
+    try {
+      const res = await axios.post(`${API}/invite-drip/run`, {}, auth());
+      const { sent = 0, scanned = 0, errors = 0 } = res.data || {};
+      if (sent > 0) {
+        toast.success(`تم إرسال ${sent} تذكير عبر البريد ✉️ (${scanned} رابط مفحوص)`);
+      } else {
+        toast.success(`لا يوجد روابط تستحق التذكير حالياً (${scanned} مفحوص)`);
+      }
+      if (errors > 0) toast.error(`فشل ${errors} في الإرسال — راجع السجلات`);
+    } catch (e) {
+      toast.error(e?.response?.data?.detail || 'فشل تشغيل حملة التذكير');
+    } finally {
+      setRunning(false);
     }
   };
 
@@ -144,6 +173,22 @@ const InviteStatsCard = () => {
             <ArrowDownTrayIcon className="w-3.5 h-3.5" />
             <span>CSV</span>
           </button>
+          {canRunDrip && (
+            <button
+              onClick={runDrip}
+              disabled={running}
+              className="bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded-lg px-2.5 py-1 text-[11px] font-bold inline-flex items-center gap-1 disabled:opacity-50"
+              data-testid="run-drip-btn"
+              title="إرسال تذكير عبر البريد لكل دعوة لم تُستخدم بعد 3 أيام"
+            >
+              {running ? (
+                <span className="w-3.5 h-3.5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <EnvelopeIcon className="w-3.5 h-3.5" />
+              )}
+              <span>{running ? 'يرسل...' : 'تذكير'}</span>
+            </button>
+          )}
         </div>
       </div>
 

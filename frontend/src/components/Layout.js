@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useNotifications } from '../App';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import {
   HomeIcon,
   BuildingOfficeIcon,

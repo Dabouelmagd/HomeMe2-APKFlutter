@@ -19,7 +19,7 @@ import {
   XCircleIcon,
   KeyIcon
 } from '@heroicons/react/24/outline';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 

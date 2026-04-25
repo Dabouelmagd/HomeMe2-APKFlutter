@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useAuth } from '../../App';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { UserIcon, CameraIcon, LockClosedIcon, CheckIcon, TrashIcon } from '@heroicons/react/24/outline';
 import ReactCrop, { centerCrop, makeAspectCrop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';

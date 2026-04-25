@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { Toaster } from '../components/ui/sonner';
-import { Toaster as HotToaster } from 'react-hot-toast';
 import PWAInstallPrompt from '../components/PWAInstallPrompt';
 import { PlanUpgradeDialog } from '../components/CompanyPlanUsageCard';
 
@@ -12,7 +11,7 @@ import { PlanUpgradeDialog } from '../components/CompanyPlanUsageCard';
  * Single mount point for app-wide UI concerns:
  *   1. Axios 403 interceptor → catches `plan_limit_*` errors and
  *      dispatches a `openUpgradeDialog` CustomEvent.
- *   2. Sonner + react-hot-toast toasters.
+ *   2. Sonner toaster.
  *   3. PWA Install Prompt.
  *   4. Plan-Limit Upgrade dialog listener (opens automatically when
  *      any API call returns 403 with `code: plan_limit_*`).
@@ -71,21 +70,7 @@ export const GlobalUIProvider = ({ children }) => {
   return (
     <>
       {children}
-      <Toaster />
-      <HotToaster
-        position="top-center"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            direction: 'rtl',
-            fontFamily: 'inherit',
-            borderRadius: '12px',
-            padding: '12px 16px',
-            fontSize: '14px',
-            fontWeight: 600,
-          },
-        }}
-      />
+      <Toaster richColors position="top-center" dir="rtl" />
       <PWAInstallPrompt />
       {upgradeOpen && (
         <PlanUpgradeDialog

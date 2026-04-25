@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import {
   PlusIcon,
   KeyIcon,
@@ -12,7 +12,10 @@ import {
   ClockIcon,
   UsersIcon,
   UserPlusIcon,
+  QrCodeIcon,
 } from '@heroicons/react/24/outline';
+import QrCodeModal from '../shared/QrCodeModal';
+import InviteStatsCard from '../shared/InviteStatsCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const auth = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -168,6 +171,7 @@ const CreateFamilyInviteModal = ({ onClose, onCreated }) => {
 /* ---------------- One Family Invite Card ---------------- */
 const FamilyInviteCard = ({ invite, onRevoke }) => {
   const [copied, setCopied] = useState(false);
+  const [showQr, setShowQr] = useState(false);
   const url = buildJoinUrl(invite.join_url);
   const status = invite.effective_status || 'active';
   const badge = STATUS_BADGE[status] || STATUS_BADGE.active;
@@ -257,6 +261,15 @@ const FamilyInviteCard = ({ invite, onRevoke }) => {
           <ShareIcon className="w-4 h-4" />
           <span>مشاركة</span>
         </button>
+        <button
+          onClick={() => setShowQr(true)}
+          className="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-3 py-2 text-xs font-bold inline-flex items-center gap-1"
+          data-testid={`family-invite-qr-${invite.id}`}
+          title="QR Code"
+        >
+          <QrCodeIcon className="w-4 h-4" />
+          <span>QR</span>
+        </button>
       </div>
 
       <div className="flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
@@ -266,6 +279,15 @@ const FamilyInviteCard = ({ invite, onRevoke }) => {
           {invite.used_count || 0}{invite.max_uses ? ` / ${invite.max_uses}` : ''}
         </span>
       </div>
+
+      {showQr && (
+        <QrCodeModal
+          url={url}
+          title="QR لدعوة الأسرة"
+          subtitle={RELATIONSHIPS[invite.relationship] || invite.relationship}
+          onClose={() => setShowQr(false)}
+        />
+      )}
     </div>
   );
 };
@@ -295,14 +317,17 @@ const FamilyInvitesPanel = () => {
     if (newInvite) setInvites((prev) => [{ ...newInvite, effective_status: 'active' }, ...prev]);
     setOpenCreate(false);
     fetchInvites();
+    window.dispatchEvent(new CustomEvent('inviteStatsRefresh'));
   };
 
   const onRevoked = (id) => {
     setInvites((prev) => prev.map((i) => i.id === id ? { ...i, is_active: false, effective_status: 'revoked' } : i));
+    window.dispatchEvent(new CustomEvent('inviteStatsRefresh'));
   };
 
   return (
     <div className="space-y-4" data-testid="family-invites-panel">
+      <InviteStatsCard />
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-base font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">

@@ -1,0 +1,49 @@
+{
+  "summary": "Iter48 polish — all 4 enhancements verified GREEN. Backend pytest 8/8 (100%) for /api/invite-stats RBAC + compound/family invite smoke regression. Frontend confirmed: QR modal renders SVG + copy + PNG download (homeme_invite_*.png) + close on Owner panel; InviteStatsCard visible on Owner with stat-total=7 / stat-active=3 / stat-accepted=0 / stat-conversion=0% + per-collection breakdown (compound 2/3 nشط, family 1/4 نشط); Dalia /app/family panel shows InviteStatsCard + 4 family-invite-qr-* buttons; profile save sonner toast 'تم حفظ' fires; revoke toast 'تم إلغاء الرابط' fires; ZERO console warnings about 'react-hot-toast' (fully unwired). conversion_rate within [0..1].",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "tests_passed": [
+    "Backend GET /api/invite-stats unauth → 403 ✓",
+    "Backend GET /api/invite-stats Owner_homeme → 200 scope='all' with compound+family blocks (all 6 keys present, ints) and conversion_rate ∈ [0,1] ✓",
+    "Backend GET /api/invite-stats superadmin → 200 scope='all' ✓",
+    "Backend GET /api/invite-stats dalia (compound_admin) → 200 scope='compound' ✓",
+    "Backend POST/DELETE /api/compound-invites smoke (auth gate + create with compound_id 88ad3711... + list verify by Owner + delete) ✓",
+    "Backend POST/DELETE /api/family-invites smoke (auth gate + create as dalia + list + stats integration confirms total>=1 + delete) ✓",
+    "Frontend Owner /app/settings?tab=registration_links — invite-stats-card visible (total=7/active=3/accepted=0/conversion=0%) with per-collection breakdown ✓",
+    "Frontend Owner — clicked [data-testid='invite-qr-014f36bc...'] → qr-code-modal opens with qr-code-svg-wrap containing valid <svg>, qr-modal-copy + qr-modal-download visible ✓",
+    "Frontend qr-modal-download triggered PNG: homeme_invite_1777144853254.png ✓",
+    "Frontend qr-modal-close hides modal ✓",
+    "Frontend Dalia /app/family — invite-stats-card visible + 4 family-invite-qr-* buttons rendered ✓",
+    "Frontend Dalia revoke flow → 'تم إلغاء الرابط' sonner toast visible ✓",
+    "Frontend Owner profile save → sonner success toast ✓",
+    "Frontend console warnings — 0 mentions of react-hot-toast (zero residual import) ✓",
+    "Confirmed src/ has zero `import 'react-hot-toast'` references (only a hooks/use-toast.js comment that says 'Inspired by'); package.json has no react-hot-toast dependency ✓"
+  ],
+  "tests_failed": [],
+  "test_report_links": [
+    "/app/backend/tests/test_iter48_invite_stats.py",
+    "/app/test_reports/pytest/iter48_invite_stats.xml"
+  ],
+  "action_items": [
+    "(none-blocking) /api/family-invites POST does not echo back invitee_name when invitee_name is provided — listing shows null. Cosmetic; doesn't affect any of the 4 enhancements under review."
+  ],
+  "critical_code_review_comments": [
+    "invite_stats.py is clean (~107 lines, single endpoint, role-based scoping, _id excluded via projection {_id:0}, async, datetime tz-aware). LGTM.",
+    "QrCodeModal.js handles SVG→canvas→PNG download via canvas.toBlob with white background fill — correct approach; download triggered as expected.",
+    "InviteStatsCard.js wires window 'inviteStatsRefresh' event for live updates — verified the panels dispatch this on create/revoke. Good.",
+    "Toast unification confirmed — only sonner imports in src/. The inline comment in hooks/use-toast.js mentioning 'react-hot-toast' is purely descriptive of design inspiration, not an import."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter48_invite_stats.py (NEW — 8 pytest cases)"
+  ],
+  "success_rate": {"backend": "100% (8/8)", "frontend": "100% (all flows passed)"},
+  "test_credentials": "Owner_homeme/Dalia1234@ (app_owner), superadmin/SuperAdmin2024! (super_admin), dalia/Dalia1234@ (compound_admin, compound_id=88ad3711-c9ae-45fe-a270-65f4524c071c)",
+  "seed_data_creation": "Created 4 family invites + 1 compound invite during testing — all cleaned up at end (compound deleted by test fixture; family revoked + hard-deleted explicitly afterward).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 4 polish enhancements (DB cleanup, QR modal, InviteStatsCard, sonner unification) are production-ready. New endpoint /api/invite-stats is RBAC-correct and fast (single aggregation). QrCodeModal is reusable and used by both RegistrationLinksPanel and FamilyInvitesPanel via [data-testid='invite-qr-{id}'] / [data-testid='family-invite-qr-{id}']. The 'inviteStatsRefresh' event is dispatched on create/revoke and InviteStatsCard subscribes — live counter updates work without page refresh. No regressions in compound or family invite flows."
+}

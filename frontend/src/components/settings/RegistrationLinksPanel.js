@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { useAuth } from '../../App';
 import {
   PlusIcon,
@@ -13,7 +13,10 @@ import {
   TrashIcon,
   ClockIcon,
   UsersIcon,
+  QrCodeIcon,
 } from '@heroicons/react/24/outline';
+import QrCodeModal from '../shared/QrCodeModal';
+import InviteStatsCard from '../shared/InviteStatsCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const auth = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -178,6 +181,7 @@ const CreateLinkModal = ({ compoundId, compoundOptions, onClose, onCreated }) =>
 /* ---------------- One Invite Card ---------------- */
 const InviteCard = ({ invite, onRevoke }) => {
   const [copied, setCopied] = useState(false);
+  const [showQr, setShowQr] = useState(false);
   const url = buildJoinUrl(invite.join_url);
   const status = invite.effective_status || 'active';
   const badge = STATUS_BADGE[status] || STATUS_BADGE.active;
@@ -262,6 +266,15 @@ const InviteCard = ({ invite, onRevoke }) => {
           <ShareIcon className="w-4 h-4" />
           <span>مشاركة</span>
         </button>
+        <button
+          onClick={() => setShowQr(true)}
+          className="bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg px-3 py-2 text-xs font-bold inline-flex items-center gap-1"
+          data-testid={`invite-qr-${invite.id}`}
+          title="QR Code"
+        >
+          <QrCodeIcon className="w-4 h-4" />
+          <span>QR</span>
+        </button>
       </div>
 
       {/* Footer stats */}
@@ -272,6 +285,15 @@ const InviteCard = ({ invite, onRevoke }) => {
           {invite.used_count || 0}{invite.max_uses ? ` / ${invite.max_uses}` : ''} مستخدم
         </span>
       </div>
+
+      {showQr && (
+        <QrCodeModal
+          url={url}
+          title="QR لرابط الدعوة"
+          subtitle={`${ROLE_LABELS[invite.role] || invite.role} — ${invite.compound_name || ''}`}
+          onClose={() => setShowQr(false)}
+        />
+      )}
     </div>
   );
 };
@@ -331,14 +353,19 @@ const RegistrationLinksPanel = () => {
     setOpenCreate(false);
     // background re-fetch to be safe
     fetchInvites();
+    window.dispatchEvent(new CustomEvent('inviteStatsRefresh'));
   };
 
   const onRevoked = (id) => {
     setInvites((prev) => prev.map((i) => i.id === id ? { ...i, is_active: false, effective_status: 'revoked' } : i));
+    window.dispatchEvent(new CustomEvent('inviteStatsRefresh'));
   };
 
   return (
     <div className="space-y-6">
+      {/* Aggregated stats */}
+      <InviteStatsCard />
+
       {/* Create button */}
       <button
         onClick={() => setOpenCreate(true)}

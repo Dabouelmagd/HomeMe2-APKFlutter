@@ -68,7 +68,6 @@ const InviteStatsCard = () => {
     const refresh = () => { if (alive) fetchStats(period); };
     window.addEventListener('inviteStatsRefresh', refresh);
     return () => { alive = false; window.removeEventListener('inviteStatsRefresh', refresh); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period]);
 
   const exportCsv = async () => {

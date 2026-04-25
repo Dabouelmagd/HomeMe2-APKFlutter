@@ -57,7 +57,11 @@ const TinyBarChart = ({ data, color = 'pink' }) => {
 
 const Leaderboard = ({ items, valueKey = 'count', color = 'indigo', emptyText, testid }) => {
   if (!items || items.length === 0) {
-    return <p className="text-xs text-gray-400 italic py-4 text-center">{emptyText}</p>;
+    return (
+      <div data-testid={testid}>
+        <p className="text-xs text-gray-400 italic py-4 text-center">{emptyText}</p>
+      </div>
+    );
   }
   const max = Math.max(1, ...items.map((i) => i[valueKey] || 0));
   const colorMap = {

@@ -1,0 +1,34 @@
+{
+  "summary": "Iter46 retest of App Owner & Super Admin Settings → registration_links flow after main-agent fix to Settings.js (removed registration_links from high-level admin block-list) and RegistrationLinksPanel.js (handles both [array] and {compounds:[...]} response shapes). All three target flows now PASS end-to-end. The previously blocking 'هذا الإعداد غير متاح لدورك الحالي.' fallback no longer appears for app_owner / super_admin on /app/settings?tab=registration_links. Wide-scope users see invite-compound-select populated (1 real compound — Royal City — present in this DB) and successfully POST a new invite, getting back a card with an absolute https join URL. Compound-admin regression also clean: create button works, modal opens, no compound-select shown (compound is fixed by role).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "tests_passed": [
+    "App Owner (Owner_homeme/Dalia1234@): /app/settings?tab=registration_links → no role-fallback → [data-testid='create-invite-btn'] visible → modal opens → [data-testid='invite-compound-select'] present with 1 real option (Royal City 88ad3711-c9ae-45fe-a270-65f4524c071c) → role=manager + validity=30 + submit → new InviteCard rendered, all invite-url-{id} elements are absolute https URLs (e.g. https://profile-nav-debug.preview.emergentagent.com/join/DN6gPY2zGk-SPybXhR5l6Akl2T0X1Hdr).",
+    "Super Admin (superadmin/SuperAdmin2024!): same wide-scope flow — btn visible, modal opens, compound-select populated, submit creates invite, absolute https URL rendered (https://profile-nav-debug.preview.emergentagent.com/join/QA1hMN4dMzmlF7iPXbBbr5DJ7WrI_phq).",
+    "Compound Admin (dalia/Dalia1234@) regression: [data-testid='create-invite-btn'] still visible, modal opens, [data-testid='invite-compound-select'] correctly NOT rendered (compound fixed)."
+  ],
+  "tests_failed": [],
+  "test_report_links": [
+    "/app/test_reports/iteration_45.json",
+    "/app/backend/tests/test_iter45_compound_invites.py"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Settings.js gating now correctly limits the high-level block-list to only ['overview','residences']; registration_links is reachable for app_owner / super_admin / company_admin / compound_admin as required by Phase-1 spec.",
+    "RegistrationLinksPanel.fetchCompoundOptions defensively normalizes res.data via `Array.isArray(res.data) ? res.data : (res.data?.compounds || [])` — robust to both response shapes returned by /api/compounds.",
+    "Minor (non-blocker): the test DB currently has only 1 compound (Royal City), so wide-scope role users only see one option. That's enough to satisfy 'at least 1 option' but if you want a richer demo, consider seeding 2-3 compounds.",
+    "Submit button data-testid is `invite-create-submit` (not `submit-invite-btn` mentioned by main-agent prose) — confirmed working; just flagging the naming for future test scripts."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (skipped per request)", "frontend": "100% (3/3 role flows)"},
+  "test_credentials": "Owner_homeme/Dalia1234@, superadmin/SuperAdmin2024!, dalia/Dalia1234@",
+  "seed_data_creation": "Created 2 new test invites via UI: TEST_iter46_AppOwner and TEST_iter46_SuperAdmin (both for compound 88ad3711..., role=manager, validity=30). They are not auto-cleaned — main agent / next iter can ignore or revoke. No new accepted users.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Phase-1 hierarchical registration links UI flow is fully verified across all three admin scopes. Backend already 12/12 in iter45. The earlier blocker (Settings tab gate) is closed. If new compounds are seeded later, optionally re-verify wide-scope dropdown shows >1 option.",
+  "rca_of_the_issue": "Iter45 blocker root-cause: Settings.js high-level admin guard listed registration_links among tabs hidden for app_owner/super_admin, masking RegistrationLinksPanel under the generic 'unavailable for role' fallback. Fix in Settings.js lines 192-202 narrows that block-list to ['overview','residences']. Secondary fix in RegistrationLinksPanel.fetchCompoundOptions accepts the {compounds:[...]} response shape from /api/compounds. Both changes verified end-to-end in this iteration."
+}

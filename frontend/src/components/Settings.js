@@ -161,19 +161,17 @@ const Settings = () => {
           lightColor: 'bg-rose-50 dark:bg-rose-900/20',
           textColor: 'text-rose-600 dark:text-rose-400'
         },
-        // Registration Links are compound-level — hide for App Owner & Super Admin
-        ...(isHighLevelAdmin ? [] : [
-          {
-            id: 'registration_links',
-            name: t('registration_links', 'روابط التسجيل'),
-            description: t('registration_links_desc', 'إنشاء روابط دعوة للسكان'),
-            icon: KeyIcon,
-            color: 'bg-pink-500',
-            lightColor: 'bg-pink-50 dark:bg-pink-900/20',
-            textColor: 'text-pink-600 dark:text-pink-400',
-            badge: '0'
-          }
-        ])
+        // Registration Links — available to all admin roles (App Owner / Super Admin / Company Admin / Compound Admin)
+        {
+          id: 'registration_links',
+          name: t('registration_links', 'روابط التسجيل'),
+          description: t('registration_links_desc', 'إنشاء روابط دعوة للسكان'),
+          icon: KeyIcon,
+          color: 'bg-pink-500',
+          lightColor: 'bg-pink-50 dark:bg-pink-900/20',
+          textColor: 'text-pink-600 dark:text-pink-400',
+          badge: '0'
+        }
       ]
     }
   ];
@@ -191,8 +189,9 @@ const Settings = () => {
 
   // Render content based on active tab
   const renderContent = () => {
-    // Block compound-level tabs for App Owner and Super Admin (e.g. if accessed via direct URL)
-    if (isHighLevelAdmin && ['overview', 'residences', 'registration_links'].includes(activeTab)) {
+    // Block strictly-compound-level tabs for App Owner & Super Admin (e.g. residences/overview).
+    // Note: registration_links IS available to wide-scope admins — they pick the target compound in the create modal.
+    if (isHighLevelAdmin && ['overview', 'residences'].includes(activeTab)) {
       return (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 text-center">
           <p className="text-gray-600 dark:text-gray-300">

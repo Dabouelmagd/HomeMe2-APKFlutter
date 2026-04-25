@@ -310,7 +310,11 @@ const RegistrationLinksPanel = () => {
     if (!isWideScope) return;
     try {
       const res = await axios.get(`${API}/compounds`, auth());
-      const list = (res.data || []).map((c) => ({ id: c.id, name: c.name }));
+      // Endpoint may return either a bare array or { compounds: [...] }
+      const arr = Array.isArray(res.data) ? res.data : (res.data?.compounds || []);
+      const list = arr
+        .filter((c) => c && c.id && c.name)
+        .map((c) => ({ id: c.id, name: c.name }));
       setCompoundOptions(list);
     } catch {
       setCompoundOptions([]);

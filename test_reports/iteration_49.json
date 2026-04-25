@@ -1,0 +1,64 @@
+{
+  "summary": "Iter49 — Backend 100% GREEN (12/12 pytest). Frontend BLOCKED by a CRA dev-server compile error overlay: 'Definition for rule react-hooks/exhaustive-deps was not found' in InviteStatsCard.js:71. The overlay is a full-screen modal that intercepts every click — so even though all data-testids render correctly underneath (invite-stats-card, period-chips, period-7|30|90|all, export-csv-btn, invite-analytics-dashboard, analytics-period-chips, analytics-period-7|30|90, bar-chart, slowest-roles-list), period-chip clicks never trigger network requests and the CSV download never fires. This blocks acceptance of items 5–8 of the request even though the underlying components are correctly wired.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "CRA compile-error overlay", "issue": "ESLint compile error: 'Definition for rule react-hooks/exhaustive-deps was not found react-hooks/exhaustive-deps' at src/components/shared/InviteStatsCard.js:71. The overlay covers the entire page in dev and intercepts pointer events, so all chip clicks are swallowed. Root cause: the file contains an `// eslint-disable-next-line react-hooks/exhaustive-deps` directive on line 71 but the project's ESLint config does NOT have eslint-plugin-react-hooks loaded (CRA preset is partial). Fix options: (a) remove the disable directive and refactor effect deps, (b) ensure plugin is registered in eslintConfig.", "selector": "src/components/shared/InviteStatsCard.js:71", "priority": "CRITICAL"},
+      {"component": "InviteAnalyticsDashboard.Leaderboard empty state", "issue": "When `items` is empty, the component renders a <p> WITHOUT the data-testid; only the populated <ul> branch gets data-testid. So [data-testid='top-compounds-list'] and [data-testid='top-roles-list'] are missing on a clean DB. Move the testid onto the wrapper div instead so it is always present.", "selector": "InviteAnalyticsDashboard.js Leaderboard", "priority": "MEDIUM"},
+      {"component": "FamilyInvitesPanel card", "issue": "The family-invite card UI does not render the invitee_name_hint subtext ('— زوجة دالية'). Backend now persists the hint correctly (verified via API) but the frontend listing card never displays it. Need to add `{inv.invitee_name_hint && <span>— {inv.invitee_name_hint}</span>}` in the header of the family invite card.", "selector": "FamilyInvitesPanel invite card header", "priority": "HIGH"}
+    ],
+    "integration_issues": [
+      {"flow": "InviteStatsCard period-chip refetch", "issue": "Click on [data-testid='period-7'] did NOT fire GET /invite-stats?period_days=7 (no network request observed). Caused by the dev compile-error overlay swallowing clicks; once that is fixed the wiring (useEffect [period]) is correct.", "affected_selectors": ["[data-testid='period-7']", "[data-testid='period-all']"]},
+      {"flow": "CSV download", "issue": "expect_download timed out after 8s on [data-testid='export-csv-btn'] click — same root cause (overlay). Backend endpoint itself is fully verified by pytest (200 + BOM + correct headers + Content-Disposition).", "affected_selectors": ["[data-testid='export-csv-btn']"]},
+      {"flow": "Analytics period chip", "issue": "Click on [data-testid='analytics-period-7'] also did not trigger /invite-analytics?period_days=7. Same root cause.", "affected_selectors": ["[data-testid='analytics-period-7']"]}
+    ],
+    "design_issues": []
+  },
+  "tests_passed": [
+    "BE GET /api/invite-stats?period_days=7|30|90|all → 200 with correct period_days echo (7/30/90/null) ✓",
+    "BE GET /api/invite-stats?period_days=abc → 400 ✓",
+    "BE GET /api/invite-stats/export.csv unauth → 403 ✓",
+    "BE GET /api/invite-stats/export.csv as Owner → 200, content-type 'text/csv; charset=utf-8', Content-Disposition attachment, body starts with BOM \\ufeff, headers exactly 'kind,id,role_or_relationship,compound_id,company_id,max_uses,used_count,is_active,status,created_at,expires_at,created_by_username,note,invitee_name_hint' ✓",
+    "BE GET /api/invite-analytics?period_days=30 as Owner → 200 with all 7 keys; daily_acceptances has 31 buckets ✓",
+    "BE GET /api/invite-analytics?period_days=7 → 8 buckets ✓",
+    "BE GET /api/invite-analytics as compound_admin (dalia, role=admin) → 403 ✓",
+    "BE POST /api/family-invites {invitee_name:'TEST_iter49_dalia_wife'} as dalia → 200; subsequent GET shows invitee_name_hint='TEST_iter49_dalia_wife' ✓",
+    "BE POST /api/family-invites with payload key 'invitee_name_hint' (alternate key) also persists correctly → 200 + listing matches ✓",
+    "FE Owner panel renders [data-testid='invite-stats-card'] + [data-testid='period-chips'] containing all 4 chips (period-7/30/90/all) + [data-testid='export-csv-btn'] ✓",
+    "FE Owner panel renders [data-testid='invite-analytics-dashboard'] + [data-testid='analytics-period-chips'] containing analytics-period-7/30/90 + [data-testid='bar-chart'] ✓",
+    "FE Dalia /app/settings?tab=registration_links — invite-stats-card visible (regression: still works after period-chips addition) ✓"
+  ],
+  "tests_failed": [
+    "FE Dalia regression — [data-testid='invite-analytics-dashboard'] count is 1 (expected 0). RegistrationLinksPanel role gate `role === 'app_owner' || 'super_admin' || 'company_admin'` is correct in code, BUT `user.active_role || user.role` returns 'admin' for dalia, which should NOT match — yet the dashboard renders. Need to verify whether dalia's user object has `active_role='company_admin'` or similar in the JWT. (Suggestion: add a console.log of the matched role.) THIS MAY BE FALSE POSITIVE caused by stale state when impersonating via localStorage injection — re-test with a real login.",
+    "FE period-7 click → no network request (overlay-blocked)",
+    "FE CSV download → expect_download timeout (overlay-blocked)",
+    "FE family invite card → invitee_name_hint subtext NOT visible in DOM after creating an invite with invitee_name (frontend missing render)"
+  ],
+  "test_report_links": [
+    "/app/backend/tests/test_iter49_invite_polish.py",
+    "/app/test_reports/pytest/iter49_invite_polish.xml"
+  ],
+  "action_items": [
+    "CRITICAL: Fix the ESLint compile error in /app/frontend/src/components/shared/InviteStatsCard.js:71 — either remove the `// eslint-disable-next-line react-hooks/exhaustive-deps` directive (and let the warning stand or refactor the effect to include `period` in deps explicitly without disable) OR ensure eslint-plugin-react-hooks is registered in eslintConfig (check package.json + .eslintrc). Without this fix, the entire dev server is blocked by a fullscreen overlay.",
+    "HIGH: Add invitee_name_hint rendering to the family invite card header in FamilyInvitesPanel — e.g. `{inv.invitee_name_hint && <span className='text-xs text-gray-500'> — {inv.invitee_name_hint}</span>}`.",
+    "MEDIUM: In InviteAnalyticsDashboard.Leaderboard, move the data-testid from the <ul> onto an outer wrapper so the testid is present even when items array is empty.",
+    "VERIFY: As Compound Admin (dalia, role=admin), confirm InviteAnalyticsDashboard does NOT render. Re-run with a fresh login session (not localStorage injection) to be certain — the role gate logic appears correct in code."
+  ],
+  "critical_code_review_comments": [
+    "invite_stats.py is well-structured (~330 lines, but 3 endpoints + helpers, single-purpose). Async, _id excluded, tz-aware datetimes, pydantic-free dict payload but with explicit _parse_period helper. _aggregate is O(n). LGTM.",
+    "family_invites.py:118 — accepts both `invitee_name` and `invitee_name_hint` payload keys via `or` chain. Correct.",
+    "InviteStatsCard.js useEffect has `// eslint-disable-next-line react-hooks/exhaustive-deps` on line 71 — the disable directive is for a rule the project's ESLint can't resolve. This is a fragile pattern. Either fully wire the plugin or refactor the effect.",
+    "InviteAnalyticsDashboard.Leaderboard renders <p> on empty without a testid → fragile for tests. Recommend wrapping the conditional inside a div with the testid.",
+    "RegistrationLinksPanel.js role-gate at line 371 uses `role === 'app_owner' || 'super_admin' || 'company_admin'` which is CORRECT — but I observed the dashboard rendering for dalia. Likely cause: in the test I injected localStorage but the auth context may have hydrated `active_role` from the token; main agent should verify."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter49_invite_polish.py (NEW — 12 pytest cases, all passing)"
+  ],
+  "success_rate": {"backend": "100% (12/12)", "frontend": "30% (DOM render OK, but ALL interactive flows blocked by ESLint compile-error overlay; family invite hint UI is missing)"},
+  "test_credentials": "Owner_homeme/Dalia1234@ (app_owner), dalia/Dalia1234@ (admin / compound_id=88ad3711-c9ae-45fe-a270-65f4524c071c)",
+  "seed_data_creation": "Created 1 compound invite (TEST_iter49_owner_seed) and 1 family invite (TEST_iter49_dalia_wife_ui) during the run; both cleaned up at end. test_iter49_invite_polish.py also self-cleans 2 family invites it creates.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "After main agent fixes the ESLint compile-error overlay (remove the disable directive on InviteStatsCard.js:71 OR install/register eslint-plugin-react-hooks), retest: (1) period-7 chip click triggers GET /invite-stats?period_days=7, (2) export-csv-btn triggers download with filename invites_YYYY-MM-DD.csv, (3) analytics-period-7 chip click triggers GET /invite-analytics?period_days=7. Also retest dalia regression — InviteAnalyticsDashboard count must be 0 for role=admin. Lastly, after frontend fix to FamilyInvitesPanel, verify the invitee_name_hint subtext appears on the card. Backend pytest suite test_iter49_invite_polish.py is complete and 100% green — no need to rerun unless backend regresses.",
+  "rca of the issue": "ROOT CAUSE: /app/frontend/src/components/shared/InviteStatsCard.js line 71 contains `// eslint-disable-next-line react-hooks/exhaustive-deps`. The project's ESLint configuration (CRA default) does not register the eslint-plugin-react-hooks rule, so when the disable directive is encountered, eslint throws 'Definition for rule \"react-hooks/exhaustive-deps\" was not found'. CRA dev-server elevates this to a compile error and renders a fullscreen overlay iframe that intercepts ALL pointer events. As a side-effect, every Playwright force-click reaches the overlay first and React state never updates → no network requests are fired for chip clicks/CSV download. REPRO: yarn start; navigate to any page; observe red overlay 'Compiled with problems'. MITIGATION: remove the disable directive (the deps array `[period]` is actually correct — fetchStats is in scope and uses period as captured value; no warning will fire); OR add `'react-hooks': require('eslint-plugin-react-hooks')` to .eslintrc plugins. Once removed, all 4 frontend flows should pass."
+}

@@ -115,7 +115,7 @@ async def create_family_invite(payload: dict, current_user: dict = Depends(get_c
         "expires_at": (datetime.now(timezone.utc) + timedelta(days=validity_days)).isoformat(),
         "is_active": True,
         "note": (payload.get("note") or "").strip() or None,
-        "invitee_name_hint": (payload.get("invitee_name") or "").strip() or None,
+        "invitee_name_hint": (payload.get("invitee_name") or payload.get("invitee_name_hint") or "").strip() or None,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "created_by": current_user.get("id"),
         "created_by_username": current_user.get("username"),

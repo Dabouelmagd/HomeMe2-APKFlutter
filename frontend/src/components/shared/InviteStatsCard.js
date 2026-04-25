@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { toast } from 'sonner';
 import {
   TicketIcon,
   CheckBadgeIcon,
@@ -7,10 +8,18 @@ import {
   ClockIcon,
   ChartBarIcon,
   UsersIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const auth = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+
+const PERIOD_OPTIONS = [
+  { key: '7', label: '7 أيام' },
+  { key: '30', label: '30 يوم' },
+  { key: '90', label: '90 يوم' },
+  { key: 'all', label: 'الكل' },
+];
 
 const StatTile = ({ label, value, icon: Icon, tone = 'gray', testid }) => {
   const tones = {
@@ -39,29 +48,51 @@ const InviteStatsCard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
+  const [period, setPeriod] = useState('all');
+  const [exporting, setExporting] = useState(false);
+
+  const fetchStats = async (p = period) => {
+    try {
+      const res = await axios.get(`${API}/invite-stats`, { ...auth(), params: { period_days: p } });
+      setStats(res.data);
+    } catch (e) {
+      setErr(e?.response?.data?.detail || 'تعذر تحميل الإحصائيات');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     let alive = true;
-    (async () => {
-      try {
-        const res = await axios.get(`${API}/invite-stats`, auth());
-        if (alive) setStats(res.data);
-      } catch (e) {
-        if (alive) setErr(e?.response?.data?.detail || 'تعذر تحميل الإحصائيات');
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    // Refresh on any invite mutation
-    const refresh = async () => {
-      try {
-        const res = await axios.get(`${API}/invite-stats`, auth());
-        if (alive) setStats(res.data);
-      } catch { /* ignore */ }
-    };
+    (async () => { if (alive) await fetchStats(period); })();
+    const refresh = () => { if (alive) fetchStats(period); };
     window.addEventListener('inviteStatsRefresh', refresh);
     return () => { alive = false; window.removeEventListener('inviteStatsRefresh', refresh); };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [period]);
+
+  const exportCsv = async () => {
+    setExporting(true);
+    try {
+      const res = await axios.get(`${API}/invite-stats/export.csv`, {
+        ...auth(),
+        params: { period_days: period },
+        responseType: 'blob',
+      });
+      const blob = new Blob([res.data], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `invites_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('تم تصدير CSV بنجاح');
+    } catch (e) {
+      toast.error(e?.response?.data?.detail || 'فشل تصدير CSV');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   if (loading) return <div className="h-28 bg-gray-100 dark:bg-gray-800 rounded-2xl animate-pulse" data-testid="invite-stats-loading" />;
   if (err) return null;
@@ -74,12 +105,11 @@ const InviteStatsCard = () => {
   const totalAcceptances = (cmp.total_acceptances || 0) + (fam.total_acceptances || 0);
   const conversionPct = stats.conversion_rate ? Math.round(stats.conversion_rate * 100) : 0;
 
-  // Hide the card entirely if there are no invites yet (avoids empty zero-state noise)
-  if (totalInvites === 0) return null;
+  if (totalInvites === 0 && period === 'all') return null;
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-4" data-testid="invite-stats-card">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
         <div>
           <h3 className="text-sm font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
             <ChartBarIcon className="w-4 h-4 text-pink-500" />
@@ -87,7 +117,35 @@ const InviteStatsCard = () => {
           </h3>
           <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">نظرة سريعة على روابط الدعوة في نطاقك</p>
         </div>
-        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{stats.scope}</span>
+        <div className="flex items-center gap-2">
+          {/* Period chips */}
+          <div className="inline-flex bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5" data-testid="period-chips">
+            {PERIOD_OPTIONS.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => setPeriod(p.key)}
+                className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-all ${
+                  period === p.key
+                    ? 'bg-white dark:bg-gray-700 text-pink-600 dark:text-pink-300 shadow-sm'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                }`}
+                data-testid={`period-${p.key}`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={exportCsv}
+            disabled={exporting}
+            className="bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-lg px-2.5 py-1 text-[11px] font-bold inline-flex items-center gap-1 disabled:opacity-50"
+            data-testid="export-csv-btn"
+            title="تصدير CSV"
+          >
+            <ArrowDownTrayIcon className="w-3.5 h-3.5" />
+            <span>CSV</span>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">

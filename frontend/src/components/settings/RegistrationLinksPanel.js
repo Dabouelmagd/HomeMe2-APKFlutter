@@ -17,6 +17,7 @@ import {
 } from '@heroicons/react/24/outline';
 import QrCodeModal from '../shared/QrCodeModal';
 import InviteStatsCard from '../shared/InviteStatsCard';
+import InviteAnalyticsDashboard from '../shared/InviteAnalyticsDashboard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const auth = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -365,6 +366,11 @@ const RegistrationLinksPanel = () => {
     <div className="space-y-6">
       {/* Aggregated stats */}
       <InviteStatsCard />
+
+      {/* Full analytics dashboard — only for high-level admins */}
+      {(role === 'app_owner' || role === 'super_admin' || role === 'company_admin') && (
+        <InviteAnalyticsDashboard />
+      )}
 
       {/* Create button */}
       <button

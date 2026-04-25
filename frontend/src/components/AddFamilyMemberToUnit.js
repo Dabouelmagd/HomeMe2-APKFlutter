@@ -14,7 +14,10 @@ import {
   CalendarIcon,
   XCircleIcon,
   CheckCircleIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  LinkIcon,
+  ClipboardDocumentIcon,
+  ShareIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -30,6 +33,12 @@ const AddFamilyMemberToUnit = () => {
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Invite-link state
+  const [inviteFor, setInviteFor] = useState(null);   // resident card we're inviting into
+  const [inviteData, setInviteData] = useState(null); // server response after create
+  const [inviteBusy, setInviteBusy] = useState(false);
+  const [inviteForm, setInviteForm] = useState({ relationship: 'spouse', validity_days: 14, invitee_name: '' });
 
   const [memberForm, setMemberForm] = useState({
     full_name: '',
@@ -137,6 +146,63 @@ const AddFamilyMemberToUnit = () => {
   const handleAddMember = (resident) => {
     setSelectedUnit(resident);
     setShowAddMemberModal(true);
+  };
+
+  const openInviteModal = (resident) => {
+    setInviteFor(resident);
+    setInviteData(null);
+    setInviteForm({ relationship: 'spouse', validity_days: 14, invitee_name: '' });
+  };
+
+  const closeInviteModal = () => {
+    setInviteFor(null);
+    setInviteData(null);
+    setInviteBusy(false);
+  };
+
+  const buildInviteUrl = (relPath) => {
+    if (!relPath) return '';
+    if (/^https?:/i.test(relPath)) return relPath;
+    return `${window.location.origin}${relPath}`;
+  };
+
+  const createInvite = async () => {
+    if (!inviteFor) return;
+    setInviteBusy(true);
+    try {
+      const res = await axios.post(`${API}/family-invites`, {
+        target_user_id: inviteFor.id,
+        relationship: inviteForm.relationship,
+        validity_days: Number(inviteForm.validity_days) || 14,
+        max_uses: 1,
+        invitee_name: inviteForm.invitee_name.trim() || null,
+        note: `دعوة لوحدة ${inviteFor.unit_number || ''} — ${inviteFor.full_name || ''}`,
+      }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+      const inv = res.data?.invite;
+      if (inv) {
+        inv.full_url = buildInviteUrl(inv.join_url);
+        setInviteData(inv);
+        toast.success('تم إنشاء رابط الدعوة');
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || 'فشل إنشاء الرابط');
+    } finally {
+      setInviteBusy(false);
+    }
+  };
+
+  const copyInvite = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteData.full_url);
+      toast.success('تم نسخ الرابط');
+    } catch {
+      toast.error('فشل النسخ');
+    }
+  };
+
+  const shareWhatsApp = () => {
+    const txt = encodeURIComponent(`أهلاً! 👋 رابط الانضمام لوحدة ${inviteFor.unit_number || ''}:\n${inviteData.full_url}`);
+    window.open(`https://wa.me/?text=${txt}`, '_blank');
   };
 
   const resetForm = () => {
@@ -318,11 +384,21 @@ const AddFamilyMemberToUnit = () => {
                   <button
                     onClick={() => handleAddMember(resident)}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 transition-colors duration-200 font-medium shadow-sm"
+                    data-testid={`add-member-btn-${resident.id}`}
                   >
                     <div className="bg-white/20 p-1 rounded-full">
                       <PlusIcon className="h-5 w-5" />
                     </div>
                     <span>{t('add_member')}</span>
+                  </button>
+                  <button
+                    onClick={() => openInviteModal(resident)}
+                    className="w-full mt-2 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-4 py-2.5 rounded-lg flex items-center justify-center space-x-2 transition-all duration-200 font-medium shadow-sm"
+                    data-testid={`send-invite-link-btn-${resident.id}`}
+                    title="إرسال رابط دعوة بدلاً من الإدخال اليدوي"
+                  >
+                    <LinkIcon className="h-5 w-5" />
+                    <span>إرسال دعوة بالرابط</span>
                   </button>
                 </div>
               </div>
@@ -331,6 +407,126 @@ const AddFamilyMemberToUnit = () => {
           </div>
         )}
       </div>
+
+      {/* Send Invite Link Modal */}
+      {inviteFor && (
+        <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={closeInviteModal} data-testid="send-invite-link-modal">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start justify-between border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-br from-rose-500 to-pink-600 p-2 rounded-lg">
+                  <LinkIcon className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">إرسال رابط دعوة</h3>
+                  <p className="text-sm text-gray-500">
+                    الوحدة {inviteFor.unit_number} — {inviteFor.full_name}
+                  </p>
+                </div>
+              </div>
+              <button onClick={closeInviteModal} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100" data-testid="close-invite-modal">
+                <XCircleIcon className="h-6 w-6" />
+              </button>
+            </div>
+
+            {!inviteData ? (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-gray-700 mb-1 block">صلة القرابة</label>
+                    <select
+                      value={inviteForm.relationship}
+                      onChange={(e) => setInviteForm(p => ({ ...p, relationship: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500"
+                      data-testid="invite-relationship"
+                    >
+                      <option value="spouse">زوج / زوجة</option>
+                      <option value="child">ابن / ابنة</option>
+                      <option value="parent">أب / أم</option>
+                      <option value="sibling">أخ / أخت</option>
+                      <option value="driver">سائق</option>
+                      <option value="helper">خادم / مساعد</option>
+                      <option value="other">أخرى</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-700 mb-1 block">صلاحية الرابط (أيام)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="90"
+                      value={inviteForm.validity_days}
+                      onChange={(e) => setInviteForm(p => ({ ...p, validity_days: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500"
+                      data-testid="invite-validity"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">اسم المدعو (اختياري)</label>
+                  <input
+                    type="text"
+                    value={inviteForm.invitee_name}
+                    onChange={(e) => setInviteForm(p => ({ ...p, invitee_name: e.target.value }))}
+                    placeholder="مثال: أحمد محمد"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500"
+                    data-testid="invite-invitee-name"
+                  />
+                </div>
+                <button
+                  onClick={createInvite}
+                  disabled={inviteBusy}
+                  className="w-full bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white px-4 py-3 rounded-lg font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                  data-testid="create-invite-submit"
+                >
+                  {inviteBusy ? 'جاري الإنشاء...' : (<><LinkIcon className="h-5 w-5" /><span>إنشاء رابط الدعوة</span></>)}
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-800 flex items-start gap-2" data-testid="invite-created-banner">
+                  <CheckCircleIcon className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <div className="font-semibold">تم إنشاء الرابط بنجاح</div>
+                    <div className="text-xs">صالح لمدة {inviteForm.validity_days} يوم — استعمال واحد</div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div className="text-xs text-gray-600 mb-1">رابط الدعوة:</div>
+                  <code className="text-xs text-gray-900 break-all block bg-white p-2 rounded border border-gray-200" data-testid="invite-url">
+                    {inviteData.full_url}
+                  </code>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={copyInvite}
+                    className="flex items-center justify-center gap-2 px-3 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium"
+                    data-testid="copy-invite-url"
+                  >
+                    <ClipboardDocumentIcon className="h-4 w-4" />
+                    نسخ الرابط
+                  </button>
+                  <button
+                    onClick={shareWhatsApp}
+                    className="flex items-center justify-center gap-2 px-3 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium"
+                    data-testid="share-invite-whatsapp"
+                  >
+                    <ShareIcon className="h-4 w-4" />
+                    مشاركة عبر واتساب
+                  </button>
+                </div>
+                <button
+                  onClick={closeInviteModal}
+                  className="w-full px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg"
+                  data-testid="close-invite-after-create"
+                >
+                  إغلاق
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Add Family Member Modal */}
       {showAddMemberModal && selectedUnit && (

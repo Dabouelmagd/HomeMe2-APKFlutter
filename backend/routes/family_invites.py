@@ -67,11 +67,40 @@ async def _ensure_family_id(current_user: dict) -> str:
 
 @router.post("/family-invites")
 async def create_family_invite(payload: dict, current_user: dict = Depends(get_current_user)):
-    """إنشاء رابط دعوة لأحد أفراد الأسرة."""
+    """إنشاء رابط دعوة لأحد أفراد الأسرة.
+
+    Optional ``target_user_id`` (admin/family-head usage):
+      When provided, the invite is scoped to that target's family/unit/compound
+      instead of the caller's own. Allowed for: admin/compound_admin of the
+      target's compound, app_owner, super_admin, or company_admin of the
+      parent company. Useful from the "Add Family Member to Unit" page so an
+      admin can invite a relative directly into a specific unit.
+    """
     db = get_db()
 
-    # The inviter must belong to a compound (residents/family heads have one)
-    compound_id = current_user.get("compound_id")
+    target_user_id = (payload.get("target_user_id") or "").strip() or None
+    inviter_for_invite = current_user
+    if target_user_id:
+        target = await db.users.find_one({"id": target_user_id}, {"_id": 0, "password_hash": 0})
+        if not target:
+            raise HTTPException(status_code=404, detail="الساكن الهدف غير موجود")
+        role = current_user.get("role")
+        same_compound = current_user.get("compound_id") == target.get("compound_id")
+        is_company_admin = (
+            role == "company_admin"
+            and current_user.get("company_id")
+            and current_user.get("company_id") == target.get("company_id")
+        )
+        if not (
+            role in ("app_owner", "super_admin")
+            or is_company_admin
+            or (role in ("admin", "compound_admin") and same_compound)
+        ):
+            raise HTTPException(status_code=403, detail="غير مصرح بإرسال دعوة لهذه الوحدة")
+        inviter_for_invite = target
+
+    # The inviter (or target) must belong to a compound
+    compound_id = inviter_for_invite.get("compound_id")
     if not compound_id:
         raise HTTPException(status_code=400, detail="ليس لديك مجمع مرتبط بحسابك")
 
@@ -99,15 +128,15 @@ async def create_family_invite(payload: dict, current_user: dict = Depends(get_c
         # Default: a family invite is single-use unless caller overrides.
         max_uses = 1
 
-    family_id = await _ensure_family_id(current_user)
+    family_id = await _ensure_family_id(inviter_for_invite)
     token = secrets.token_urlsafe(24)
     doc = {
         "id": str(uuid.uuid4()),
         "token": token,
         "family_id": family_id,
         "compound_id": compound_id,
-        "company_id": current_user.get("company_id"),
-        "unit_number": current_user.get("unit_number"),
+        "company_id": inviter_for_invite.get("company_id"),
+        "unit_number": inviter_for_invite.get("unit_number"),
         "relationship": relationship,
         "max_uses": max_uses,
         "used_count": 0,
@@ -120,6 +149,8 @@ async def create_family_invite(payload: dict, current_user: dict = Depends(get_c
         "created_by": current_user.get("id"),
         "created_by_username": current_user.get("username"),
         "created_by_full_name": current_user.get("full_name"),
+        "target_user_id": target_user_id,
+        "target_user_full_name": inviter_for_invite.get("full_name") if target_user_id else None,
     }
     await db.family_invites.insert_one(doc)
     doc.pop("_id", None)

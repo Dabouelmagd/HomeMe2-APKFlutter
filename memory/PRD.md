@@ -5,6 +5,11 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 60: Send-Invite-Link from "Add Family Member to Unit" (Apr 25, 2026) ✅
+- **🆕 Backend** `routes/family_invites.py`: extended `POST /api/family-invites` to accept optional `target_user_id`. When provided, the invite is scoped to that target's family/unit/compound (not the caller's). RBAC: app_owner / super_admin / company_admin (same company) / admin / compound_admin (same compound). Stores `target_user_id` + `target_user_full_name` for audit.
+- **🆕 Frontend** `components/AddFamilyMemberToUnit.js`: added a rose-gradient "🔗 إرسال دعوة بالرابط" button on every resident card (under the existing "إضافة عضو" button). Opens a compact modal with relationship + validity-days + optional invitee-name fields → POST → success banner with the full URL + "نسخ الرابط" + "مشاركة عبر واتساب" buttons.
+- **Verified** end-to-end: backend curl → 200 with token + correct family_id/unit/compound copied from target. Frontend: dalia (admin) → click invite button → submit → green "تم إنشاء الرابط بنجاح" banner with full join URL + share buttons all rendering in Arabic RTL.
+
 ### Iter 59: P0 — Fix "Add Family Member to Unit" Page (Apr 25, 2026) ✅
 - **Bug**: `/app/add-family-member` page failed to load; backend returned 500 on `GET /api/compounds/{id}/residences`.
 - **Root causes** (in `routes/families_msgs.py`):

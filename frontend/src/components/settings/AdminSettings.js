@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { 
@@ -129,22 +130,82 @@ export const RegistrationLinksSettings = () => {
 // User Management Component
 export const UserManagementSettings = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(`${API}/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const users = res.data?.users || res.data || [];
+      if (!Array.isArray(users) || users.length === 0) {
+        toast.error(t('no_users_to_export', 'لا يوجد مستخدمون للتصدير'));
+        return;
+      }
+      // Build CSV with BOM for Arabic Excel compatibility
+      const headers = ['id', 'username', 'full_name', 'email', 'phone', 'role', 'compound_id', 'unit_number', 'is_active', 'created_at'];
+      const escape = (v) => {
+        if (v === null || v === undefined) return '';
+        const s = String(v).replace(/"/g, '""');
+        return /[",\n]/.test(s) ? `"${s}"` : s;
+      };
+      const rows = [headers.join(',')];
+      users.forEach((u) => rows.push(headers.map((h) => escape(u[h])).join(',')));
+      const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `users_export_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success(t('exported_users', `تم تصدير ${users.length} مستخدم`));
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || t('export_failed', 'فشل تصدير المستخدمين'));
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
       {/* Actions */}
       <div className="grid grid-cols-2 gap-4">
-        <button className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 transition-all">
+        <button
+          type="button"
+          onClick={() => navigate('/app/users')}
+          data-testid="settings-view-all-users-btn"
+          className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-md transition-all cursor-pointer"
+        >
           <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-xl flex items-center justify-center">
             <UserGroupIcon className="w-6 h-6 text-orange-500" />
           </div>
           <span className="font-medium text-gray-900 dark:text-white text-sm">{t('view_all', 'عرض الكل')}</span>
         </button>
-        <button className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 transition-all">
+        <button
+          type="button"
+          onClick={handleExport}
+          disabled={exporting}
+          data-testid="settings-export-users-btn"
+          className="flex flex-col items-center gap-3 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-md transition-all cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+        >
           <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-xl flex items-center justify-center">
-            <ClipboardDocumentIcon className="w-6 h-6 text-orange-500" />
+            {exporting ? (
+              <svg className="animate-spin h-6 w-6 text-orange-500" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+              </svg>
+            ) : (
+              <ClipboardDocumentIcon className="w-6 h-6 text-orange-500" />
+            )}
           </div>
-          <span className="font-medium text-gray-900 dark:text-white text-sm">{t('export', 'تصدير')}</span>
+          <span className="font-medium text-gray-900 dark:text-white text-sm">
+            {exporting ? t('exporting', 'جاري التصدير...') : t('export', 'تصدير')}
+          </span>
         </button>
       </div>
 

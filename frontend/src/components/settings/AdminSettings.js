@@ -77,55 +77,10 @@ export const ResidencesSettings = () => {
   );
 };
 
-// Registration Links Component
-export const RegistrationLinksSettings = () => {
-  const { t } = useTranslation();
-  const [links] = useState([]);
-  const [creating, setCreating] = useState(false);
-
-  const handleCreateLink = async () => {
-    setCreating(true);
-    try {
-      // API call would go here
-      toast.success(t('link_created', 'تم إنشاء الرابط'));
-    } catch (error) {
-      toast.error(t('failed_to_create_link', 'فشل إنشاء الرابط'));
-    } finally {
-      setCreating(false);
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Create New Link */}
-      <button
-        onClick={handleCreateLink}
-        disabled={creating}
-        className="w-full flex items-center justify-center gap-3 p-4 bg-pink-500 hover:bg-pink-600 text-white rounded-xl font-bold transition-all disabled:opacity-50 shadow-lg shadow-pink-500/25"
-      >
-        {creating ? (
-          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-        ) : (
-          <PlusIcon className="w-5 h-5" />
-        )}
-        <span>{t('create_new_link', 'إنشاء رابط جديد')}</span>
-      </button>
-
-      {/* Links List */}
-      {links.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 text-center">
-          <KeyIcon className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 mb-2">{t('no_links', 'لا توجد روابط تسجيل')}</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500">{t('create_link_desc', 'أنشئ رابطاً لدعوة سكان جدد')}</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {/* Links would be mapped here */}
-        </div>
-      )}
-    </div>
-  );
-};
+// Registration Links Component — proxy to the full-featured panel.
+// All real logic lives in /components/settings/RegistrationLinksPanel.js
+import RegistrationLinksPanel from './RegistrationLinksPanel';
+export const RegistrationLinksSettings = () => <RegistrationLinksPanel />;
 
 // User Management Component
 export const UserManagementSettings = () => {

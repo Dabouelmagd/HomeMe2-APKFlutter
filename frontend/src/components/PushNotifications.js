@@ -115,6 +115,20 @@ const PushNotifications = () => {
       toast.error(msg);
       return;
     }
+
+    // ⚡ Fast-path: if the browser already remembered "Block", calling
+    // `Notification.requestPermission()` may either return 'denied' instantly OR
+    // sit in a hung state on some platforms. Detect this BEFORE doing anything else
+    // and show actionable instructions immediately.
+    const currentPerm = (typeof Notification !== 'undefined' && Notification.permission) || 'default';
+    setPermission(currentPerm);
+    if (currentPerm === 'denied') {
+      const msg = t('push_permission_blocked_help', 'الإشعارات محظورة في إعدادات المتصفح لهذا الموقع. لتفعيلها: اضغط على أيقونة القفل 🔒 بجانب عنوان الموقع → الإشعارات → السماح، ثم أعد تحميل الصفحة.');
+      setErrorDetail(msg);
+      toast.error(msg, { duration: 8000 });
+      return;
+    }
+
     // Ensure we have a fresh VAPID key before continuing (state may not have hydrated yet)
     let activeKey = vapidPublicKey;
     if (!activeKey) {
@@ -277,6 +291,35 @@ const PushNotifications = () => {
 
   return (
     <div className="space-y-6">
+      {/* 🚨 Permanent banner when browser-level permission is blocked.
+          This shows the moment the page loads — no need to click "تفعيل" first. */}
+      {permission === 'denied' && (
+        <div className="bg-rose-50 border-2 border-rose-300 rounded-2xl p-5" data-testid="push-blocked-banner">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0">🔒</span>
+            <div className="flex-1">
+              <p className="font-bold text-rose-900 mb-2">
+                {t('push_blocked_title', 'الإشعارات محظورة في إعدادات المتصفح')}
+              </p>
+              <ol className="text-sm text-rose-800 space-y-1 list-decimal list-inside">
+                <li>{t('push_step_1', 'اضغط على أيقونة القفل 🔒 بجانب عنوان الموقع في الأعلى')}</li>
+                <li>{t('push_step_2', 'اختر "إعدادات الموقع" أو "Site settings"')}</li>
+                <li>{t('push_step_3', 'غيّر "الإشعارات" من "حظر" إلى "السماح"')}</li>
+                <li>{t('push_step_4', 'أعد تحميل الصفحة (Cmd+R أو Ctrl+R) ثم اضغط "تفعيل" مرة أخرى')}</li>
+              </ol>
+              <a
+                href="https://support.google.com/chrome/answer/3220216?hl=ar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-block text-xs text-rose-700 underline hover:text-rose-900 font-semibold"
+              >
+                {t('push_help_link', 'دليل مصور خطوة بخطوة ←')}
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Push Subscription Status */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-4">

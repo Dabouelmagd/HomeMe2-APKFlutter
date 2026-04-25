@@ -80,7 +80,8 @@ async def create_family_invite(payload: dict, current_user: dict = Depends(get_c
         raise HTTPException(status_code=400, detail=f"علاقة غير صالحة. المسموح: {VALID_FAMILY_RELATIONSHIPS}")
 
     try:
-        validity_days = int(payload.get("validity_days") or 14)
+        v = payload.get("validity_days")
+        validity_days = 14 if v is None else int(v)
         if validity_days < 1 or validity_days > 90:
             raise ValueError()
     except (TypeError, ValueError):

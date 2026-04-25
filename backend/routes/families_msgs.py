@@ -20,6 +20,7 @@ async def add_family_member(
     member_data: FamilyMemberAdd,
     current_user: dict = Depends(get_current_user)
 ):
+    db = get_db()
     # Check if user is family head
     family = await db.families.find_one({"id": family_id})
     if not family or family["head_user_id"] != current_user['id']:
@@ -52,6 +53,7 @@ async def add_family_member(
 
 @router.get("/families/my")
 async def get_my_family(current_user: dict = Depends(get_current_user)):
+    db = get_db()
     if not current_user.get('family_id',''):
         return {"family": None, "members": []}
     
@@ -73,6 +75,7 @@ async def create_maintenance_fee(
     fee_data: MaintenanceFeeCreate,
     current_user: dict = Depends(require_admin)
 ):
+    db = get_db()
     fee = MaintenanceFee(
         compound_id=current_user.get('compound_id',''),
         unit_number=fee_data.unit_number,
@@ -141,6 +144,7 @@ async def create_payment(
     payment_data: PaymentCreate,
     current_user: dict = Depends(get_current_user)
 ):
+    db = get_db()
     # Get invoice
     invoice = await db.invoices.find_one({"id": payment_data.invoice_id})
     if not invoice:
@@ -225,6 +229,7 @@ async def create_message(
 
 @router.get("/messages")
 async def get_messages(current_user: dict = Depends(get_current_user)):
+    db = get_db()
     if current_user.get('role','') == "admin":
         messages = await db.messages.find({"compound_id": current_user.get('compound_id','')}).sort("created_at", -1).limit(200).to_list(200)
     else:
@@ -238,6 +243,7 @@ async def create_notification(
     notification_data: NotificationCreate,
     current_user: dict = Depends(require_admin)
 ):
+    db = get_db()
     notification = Notification(
         compound_id=current_user.get('compound_id',''),
         sender_id=current_user['id'],
@@ -285,6 +291,7 @@ async def mark_notification_read(
     notification_id: str,
     current_user: dict = Depends(get_current_user)
 ):
+    db = get_db()
     await db.notifications.update_one(
         {"id": notification_id},
         {"$set": {f"is_read.{current_user['id']}": True}}
@@ -295,6 +302,7 @@ async def mark_notification_read(
 # Residence Management Routes
 @router.get("/compounds/{compound_id}/residences")
 async def get_compound_residences(compound_id: str, current_user: dict = Depends(require_admin)):
+    db = get_db()
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
@@ -340,7 +348,7 @@ async def get_compound_residences(compound_id: str, current_user: dict = Depends
             "family_head": family_head,
             "family_members": family_members,
             "member_count": len(family_members),
-            "created_at": family.get("created_at").isoformat() if family.get("created_at") else None
+            "created_at": (family.get("created_at").isoformat() if hasattr(family.get("created_at"), 'isoformat') else family.get("created_at"))
         }
         residences.append(residence)
         occupied_units.add(family.get("unit_number"))
@@ -353,7 +361,7 @@ async def get_compound_residences(compound_id: str, current_user: dict = Depends
             "id": compound.get("id"),
             "name": compound.get("name"),
             "address": compound.get("address"),
-            "created_at": compound.get("created_at").isoformat() if compound.get("created_at") else None
+            "created_at": (compound.get("created_at").isoformat() if hasattr(compound.get("created_at"), 'isoformat') else compound.get("created_at"))
         }
     
     return {
@@ -365,6 +373,7 @@ async def get_compound_residences(compound_id: str, current_user: dict = Depends
 
 @router.get("/compounds/{compound_id}/residents")
 async def get_compound_residents(compound_id: str, current_user: dict = Depends(require_admin)):
+    db = get_db()
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     

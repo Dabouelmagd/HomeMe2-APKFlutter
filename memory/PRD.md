@@ -3,7 +3,14 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-58)
+## Latest Fixes (Feb 2026 — iterations 26-59)
+
+### Iter 59: P0 — Fix "Add Family Member to Unit" Page (Apr 25, 2026) ✅
+- **Bug**: `/app/add-family-member` page failed to load; backend returned 500 on `GET /api/compounds/{id}/residences`.
+- **Root causes** (in `routes/families_msgs.py`):
+  1. `db = get_db()` was missing in **9 endpoints** (`get_compound_residences`, `get_compound_residents`, `add_family_member`, `get_my_family`, `create_maintenance_fee`, `create_payment`, `get_messages`, `create_notification`, `mark_notification_read`) → `NameError: name 'db' is not defined`.
+  2. After fixing `db`, second crash: `family.created_at` and `compound.created_at` are stored as ISO strings (not datetime objects) — calling `.isoformat()` on them raised `AttributeError`. Replaced both with safe `hasattr(..., 'isoformat')` guards.
+- **Verified**: `dalia` admin → `/api/compounds/{id}/residences` now returns **HTTP 200** with full residences payload (TEST001 unit + Test User family head). Frontend page renders header "إضافة فرد عائلة للوحدة", search bar, and "السكان المتاحين (1)" card with the resident — matching original UX.
 
 ### Iter 58: Header Plan-Limit Badge — Proactive Upgrade CTA ✅ (Feb 24, 2026)
 - **🆕 Frontend** `/app/frontend/src/components/PlanLimitBadge.js`:

@@ -115,13 +115,15 @@ const PushNotifications = () => {
       toast.error(msg);
       return;
     }
-    if (!vapidPublicKey) {
-      // Try to reload it once before failing
+    // Ensure we have a fresh VAPID key before continuing (state may not have hydrated yet)
+    let activeKey = vapidPublicKey;
+    if (!activeKey) {
       try {
         const res = await axios.get(`${API}/push/public-key`);
-        setVapidPublicKey(res.data.public_key);
+        activeKey = res.data?.public_key;
+        if (activeKey) setVapidPublicKey(activeKey);
       } catch (_) { /* ignore */ }
-      if (!vapidPublicKey) {
+      if (!activeKey) {
         const msg = t('push_key_missing', 'تعذّر تحميل مفتاح الإشعارات. حاول إعادة تحميل الصفحة.');
         setErrorDetail(msg);
         toast.error(msg);
@@ -130,15 +132,28 @@ const PushNotifications = () => {
     }
 
     setLoading(true);
+    // Top-level safety net: if anything hangs (e.g. serviceWorker.ready never resolves
+    // or the browser silently swallows the permission popup), force-reset loading after 25s.
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+      const msg = t('push_timeout', 'انتهت مهلة تفعيل الإشعارات. تأكد من إعدادات المتصفح وحاول مرة أخرى.');
+      setErrorDetail(msg);
+      toast.error(msg, { duration: 6000 });
+    }, 25000);
+
+    const withTimeout = (promise, ms, label) => Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(`timeout:${label}`)), ms)),
+    ]);
+
     try {
-      const permissionResult = await Notification.requestPermission();
+      const permissionResult = await withTimeout(Notification.requestPermission(), 20000, 'permission');
       setPermission(permissionResult);
 
       if (permissionResult === 'denied') {
         const msg = t('push_permission_denied_help', 'تم حظر الإشعارات في إعدادات المتصفح. اضغط على أيقونة القفل 🔒 بجانب عنوان الموقع → الإشعارات → السماح، ثم أعد تحميل الصفحة.');
         setErrorDetail(msg);
         toast.error(msg, { duration: 7000 });
-        setLoading(false);
         return;
       }
 
@@ -146,16 +161,15 @@ const PushNotifications = () => {
         const msg = t('push_permission_not_granted', 'لم تتم الموافقة على الإشعارات. أعد المحاولة واضغط "السماح" في نافذة المتصفح.');
         setErrorDetail(msg);
         toast.error(msg);
-        setLoading(false);
         return;
       }
 
-      const registration = await navigator.serviceWorker.ready;
+      const registration = await withTimeout(navigator.serviceWorker.ready, 10000, 'sw_ready');
 
-      const subscription = await registration.pushManager.subscribe({
+      const subscription = await withTimeout(registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
-      });
+        applicationServerKey: urlBase64ToUint8Array(activeKey)
+      }), 15000, 'pm_subscribe');
 
       const subscriptionData = {
         endpoint: subscription.endpoint,
@@ -180,12 +194,18 @@ const PushNotifications = () => {
 
     } catch (error) {
       console.error('Failed to subscribe to push notifications:', error);
-      const reason = error?.name === 'NotAllowedError'
-        ? t('push_blocked_browser', 'الإشعارات محظورة في المتصفح. فعّلها من إعدادات الموقع 🔒 ثم أعد المحاولة.')
-        : (error?.message || t('push_subscription_failed', 'فشل تفعيل الإشعارات. حاول مرة أخرى.'));
+      let reason;
+      if (typeof error?.message === 'string' && error.message.startsWith('timeout:')) {
+        reason = t('push_timeout_step', 'لم يستجب المتصفح في الوقت المحدد. تأكد من تفعيل الإشعارات في إعدادات الموقع 🔒 وأعد المحاولة.');
+      } else if (error?.name === 'NotAllowedError') {
+        reason = t('push_blocked_browser', 'الإشعارات محظورة في المتصفح. فعّلها من إعدادات الموقع 🔒 ثم أعد المحاولة.');
+      } else {
+        reason = error?.message || t('push_subscription_failed', 'فشل تفعيل الإشعارات. حاول مرة أخرى.');
+      }
       setErrorDetail(reason);
       toast.error(reason, { duration: 6000 });
     } finally {
+      clearTimeout(safetyTimer);
       setLoading(false);
     }
   };

@@ -180,6 +180,23 @@ async def create_family_invite(payload: dict, current_user: dict = Depends(get_c
     await db.family_invites.insert_one(doc)
     doc.pop("_id", None)
     doc["join_url"] = _build_join_url(token)
+    try:
+        from audit_logger import audit_log
+        await audit_log(
+            actor=current_user,
+            action="invite.create",
+            target_type="family_invite",
+            target_id=doc["id"],
+            details={
+                "relationship": relationship,
+                "unit_number": doc.get("unit_number"),
+                "target_user_id": target_user_id,
+                "max_uses": max_uses,
+                "validity_days": validity_days,
+            },
+        )
+    except Exception:
+        pass
     return {"success": True, "invite": serialize_datetime(doc)}
 
 
@@ -299,6 +316,17 @@ async def revoke_family_invite(invite_id: str, current_user: dict = Depends(get_
             "$push": {"activity_log": _activity_entry("revoked", current_user)},
         },
     )
+    try:
+        from audit_logger import audit_log
+        await audit_log(
+            actor=current_user,
+            action="invite.revoke",
+            target_type="family_invite",
+            target_id=invite_id,
+            details={"unit_number": inv.get("unit_number"), "relationship": inv.get("relationship")},
+        )
+    except Exception:
+        pass
     return {"success": True}
 
 

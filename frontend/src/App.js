@@ -58,6 +58,7 @@ import CompanyAdminDashboard from './pages/CompanyAdminDashboard';
 import JoinViaInvite from './pages/JoinViaInvite';
 import MyInvitesPage from './pages/MyInvitesPage';
 import SystemHealthPage from './pages/SystemHealthPage';
+import AuditLogPage from './pages/AuditLogPage';
 import JoinFamilyByInvite from './pages/JoinFamilyByInvite';
 import AlertsDashboard from './pages/AlertsDashboard';
 import FinancialRoute from './components/FinancialRoute';
@@ -610,6 +611,12 @@ function App() {
                 <Route path="system-health" element={
                   <ProtectedRoute>
                     <SystemHealthPage />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="audit-log" element={
+                  <ProtectedRoute>
+                    <AuditLogPage />
                   </ProtectedRoute>
                 } />
                 

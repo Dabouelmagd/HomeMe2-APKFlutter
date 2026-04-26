@@ -1,7 +1,7 @@
 """
 Admin User Management routes - extracted from server.py
 """
-from fastapi import APIRouter, HTTPException, Depends, Form, File, UploadFile
+from fastapi import APIRouter, HTTPException, Depends, Form, File, UploadFile, Request
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
@@ -203,30 +203,46 @@ async def update_user_status(
 @router.delete("/admin/users/{user_id}")
 async def delete_user(
     user_id: str,
+    request: Request,
     current_user: dict = Depends(require_admin)
 ):
     """Delete a user account (Admin only)"""
     try:
         db = get_db()
         # Prevent admin from deleting themselves
-        if user_id == current_user.id:
+        if user_id == current_user["id"]:
             raise HTTPException(status_code=400, detail="Cannot delete your own account")
-        
-        # Delete user
+
+        # Snapshot before delete (for audit "before" field)
+        victim = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+
         result = await db.users.delete_one({"id": user_id})
-        
+
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="User not found")
         
         # Also delete associated family if exists
         await db.families.delete_many({"head_id": user_id})
-        
+
+        try:
+            from audit_logger import audit_log
+            await audit_log(
+                actor=current_user,
+                action="user.delete",
+                target_type="user",
+                target_id=user_id,
+                before=victim,
+                request=request,
+            )
+        except Exception:
+            pass
+
         return {"message": "User deleted successfully"}
         
     except HTTPException:
         raise
     except Exception as e:
-        logging.error(f"Error deleting user: {e}")
+        logging.error(f"Error deleting user: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to delete user")
 
 @router.get("/search")
@@ -234,100 +250,116 @@ async def global_search(
     q: str,
     current_user: dict = Depends(get_current_user)
 ):
-    """Global search across users, residences, services, and messages"""
+    """Global search across users, residences, services, messages, invites, and tickets.
+
+    Scope rules:
+      - app_owner / super_admin → can search across all compounds
+      - admin / compound_admin / company_admin → scoped to their compound/company
+      - regular users → scoped to their own compound, limited types
+    """
     try:
         db = get_db()
         if len(q.strip()) < 2:
             return {"results": []}
-        
-        search_term = q.strip().lower()
+
+        term = q.strip().lower()
+        regex = {"$regex": term, "$options": "i"}
+        role = current_user.get("role")
+        my_compound = current_user.get("compound_id")
+        is_admin = role in ("admin", "compound_admin", "app_owner", "super_admin", "company_admin")
+        is_owner = role in ("app_owner", "super_admin")
         results = []
-        
-        # Search Users (only if admin or searching own compound)
-        if current_user.role == "admin":
-            users = await db.users.find({
-                "$or": [
-                    {"full_name": {"$regex": search_term, "$options": "i"}},
-                    {"email": {"$regex": search_term, "$options": "i"}},
-                    {"username": {"$regex": search_term, "$options": "i"}},
-                    {"unit_number": {"$regex": search_term, "$options": "i"}}
-                ],
-                "compound_id": current_user.compound_id
-            }).to_list(10)
-            
-            for user in users:
+
+        # ── Users ──
+        if is_admin:
+            user_q = {"$or": [
+                {"full_name": regex},
+                {"email": regex},
+                {"username": regex},
+                {"unit_number": regex},
+                {"phone": regex},
+            ]}
+            if not is_owner and my_compound:
+                user_q["compound_id"] = my_compound
+            users = await db.users.find(user_q, {"_id": 0, "password_hash": 0}).limit(10).to_list(length=10)
+            for u in users:
                 results.append({
-                    "id": user["id"],
+                    "id": u["id"],
                     "type": "user",
-                    "title": user["full_name"],
-                    "description": f"Unit {user.get('unit_number', 'N/A')} • {user['email']}",
-                    "url": "/family"
+                    "title": u.get("full_name") or u.get("username") or "—",
+                    "description": f"@{u.get('username','?')} • {u.get('role','?')} • وحدة {u.get('unit_number') or '—'}",
+                    "icon": "👤",
+                    "url": "/app/admin/users",
                 })
-        
-        # Search Services
-        services = await db.services.find({
-            "$or": [
-                {"name": {"$regex": search_term, "$options": "i"}},
-                {"description": {"$regex": search_term, "$options": "i"}},
-                {"category": {"$regex": search_term, "$options": "i"}}
-            ],
-            "compound_id": current_user.compound_id
-        }).to_list(10)
-        
-        for service in services:
-            results.append({
-                "id": service["id"],
-                "type": "service",
-                "title": service["name"],
-                "description": f"{service.get('category', 'Service')} • ${service.get('base_price', 0)}",
-                "url": "/services"
-            })
-        
-        # Search Messages (own messages only)
-        messages = await db.messages.find({
+
+        # ── Compounds (owner/super only) ──
+        if is_owner:
+            compounds = await db.compounds.find({"$or": [{"name": regex}, {"address": regex}]}, {"_id": 0}).limit(5).to_list(length=5)
+            for c in compounds:
+                results.append({
+                    "id": c["id"],
+                    "type": "compound",
+                    "title": c.get("name") or "—",
+                    "description": f"📍 {c.get('address') or '—'} • {c.get('total_units') or 0} وحدة",
+                    "icon": "🏢",
+                    "url": "/app/super-admin",
+                })
+
+        # ── Services ──
+        if my_compound:
+            services = await db.services.find({
+                "$or": [{"name": regex}, {"description": regex}, {"category": regex}],
+                "compound_id": my_compound,
+            }, {"_id": 0}).limit(8).to_list(length=8)
+            for s in services:
+                results.append({
+                    "id": s["id"],
+                    "type": "service",
+                    "title": s.get("name") or "—",
+                    "description": f"{s.get('category') or 'خدمة'} • {s.get('base_price') or 0} ج.م",
+                    "icon": "🔧",
+                    "url": "/app/services",
+                })
+
+        # ── Family Invites (creator only or admins of compound) ──
+        invite_q_or = [{"created_by": current_user.get("id")}]
+        if is_admin and my_compound:
+            invite_q_or.append({"compound_id": my_compound})
+        invites = await db.family_invites.find({
             "$and": [
-                {"$or": [
-                    {"content": {"$regex": search_term, "$options": "i"}},
-                    {"subject": {"$regex": search_term, "$options": "i"}}
-                ]},
-                {"$or": [
-                    {"sender_id": current_user.id},
-                    {"receiver_id": current_user.id}
-                ]}
+                {"$or": [{"invitee_name_hint": regex}, {"unit_number": regex}, {"target_user_full_name": regex}, {"note": regex}]},
+                {"$or": invite_q_or},
             ]
-        }).to_list(5)
-        
-        for message in messages:
+        }, {"_id": 0}).limit(5).to_list(length=5)
+        for inv in invites:
             results.append({
-                "id": message["id"],
-                "type": "message",
-                "title": message.get("subject", "Message"),
-                "description": message["content"][:100] + ("..." if len(message["content"]) > 100 else ""),
-                "url": "/messages"
+                "id": inv["id"],
+                "type": "invite",
+                "title": inv.get("invitee_name_hint") or inv.get("target_user_full_name") or f"دعوة {inv.get('relationship','')}",
+                "description": f"وحدة {inv.get('unit_number','—')} • {'نشط' if inv.get('is_active') else 'ملغي'}",
+                "icon": "📨",
+                "url": "/app/my-invites",
             })
-        
-        # Search Family Members (own family only)
-        family_id = getattr(current_user, "family_id", None)
-        if family_id:
-            family = await db.families.find_one({"id": family_id})
-            if family and "members" in family:
-                for member in family["members"]:
-                    if (search_term in member.get("full_name", "").lower() or 
-                        search_term in member.get("relationship", "").lower()):
-                        results.append({
-                            "id": member["id"],
-                            "type": "family",
-                            "title": member["full_name"],
-                            "description": f"{member.get('relationship', 'Family Member')} • Age {member.get('age', 'N/A')}",
-                            "url": "/family"
-                        })
-        
-        # Limit total results
-        results = results[:20]
-        
-        return {"results": results}
-        
+
+        # ── Support Tickets (admins) ──
+        if is_admin:
+            t_q = {"$or": [{"subject": regex}, {"description": regex}]}
+            if not is_owner and my_compound:
+                t_q["compound_id"] = my_compound
+            tickets = await db.support_tickets.find(t_q, {"_id": 0}).limit(5).to_list(length=5)
+            for t in tickets:
+                results.append({
+                    "id": t["id"],
+                    "type": "ticket",
+                    "title": t.get("subject") or "تذكرة دعم",
+                    "description": f"حالة: {t.get('status','open')} • {(t.get('description') or '')[:80]}",
+                    "icon": "🎫",
+                    "url": "/app/super-admin?tab=support_tickets",
+                })
+
+        return {"results": results[:30], "query": q}
+
     except Exception as e:
-        logging.error(f"Search error: {e}")
+        logging.error(f"Search error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Search failed")
 

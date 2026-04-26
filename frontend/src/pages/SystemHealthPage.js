@@ -175,6 +175,13 @@ const SystemHealthPage = () => {
     return results.filter((r) => r.result === filter);
   }, [results, filter]);
 
+  const slowEndpoints = useMemo(() => {
+    return [...results]
+      .filter((r) => r.ms !== null && r.ms !== undefined && r.result !== 'skipped')
+      .sort((a, b) => (b.ms || 0) - (a.ms || 0))
+      .slice(0, 10);
+  }, [results]);
+
   const chartData = useMemo(() => {
     if (!history || history.length === 0) return [];
     // history is sorted desc by ran_at — reverse to chronological for the chart
@@ -343,6 +350,48 @@ const SystemHealthPage = () => {
           </div>
           <p className="text-[11px] text-gray-500 mt-2 text-center">
             💡 لو الخط الأحمر بيتسلق، يبقى في regression بيحصل — افتحي آخر فحص لمعرفة المسارات اللي بتفشل
+          </p>
+        </div>
+      )}
+
+      {/* Slowest Endpoints (top 10) */}
+      {slowEndpoints.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-sm p-5 mb-4" data-testid="slow-endpoints-card">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-base font-bold text-gray-900 inline-flex items-center gap-2">
+                🐌 أبطأ 10 مسارات
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">مرتبة من الأبطأ — استخدميها لتحسين الأداء</p>
+            </div>
+          </div>
+          <div className="overflow-hidden border border-gray-100 rounded-xl">
+            {slowEndpoints.map((r, idx) => {
+              const ms = r.ms || 0;
+              const tone = ms > 2000 ? 'bg-rose-500' : ms > 1000 ? 'bg-amber-500' : ms > 500 ? 'bg-yellow-500' : 'bg-emerald-500';
+              const widthPct = Math.min(100, Math.round((ms / Math.max(slowEndpoints[0].ms || 1, 1)) * 100));
+              return (
+                <div key={r.path + idx} className="px-3 py-2.5 border-b last:border-b-0 border-gray-100 hover:bg-gray-50" data-testid={`slow-endpoint-${idx}`}>
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <span className="text-[10px] font-bold text-gray-500 w-5">#{idx + 1}</span>
+                      <code className="text-xs text-gray-800 font-mono truncate" dir="ltr" title={r.path}>{r.path}</code>
+                      <span className="inline-block bg-blue-50 text-blue-700 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border border-blue-200">{(r.methods || []).join(',')}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs font-bold ${ms > 2000 ? 'text-rose-700' : ms > 1000 ? 'text-amber-700' : ms > 500 ? 'text-yellow-700' : 'text-emerald-700'}`}>{ms}ms</span>
+                      <span className="text-[10px] text-gray-500">{r.status_code}</span>
+                    </div>
+                  </div>
+                  <div className="mt-1.5 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                    <div className={`h-full ${tone} transition-all`} style={{ width: `${widthPct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-[11px] text-gray-500 mt-3 text-center">
+            🟢 &lt;500ms سريع &nbsp;•&nbsp; 🟡 500-1000ms مقبول &nbsp;•&nbsp; 🟠 1-2s بطيء &nbsp;•&nbsp; 🔴 &gt;2s محتاج تحسين
           </p>
         </div>
       )}

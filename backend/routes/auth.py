@@ -205,6 +205,7 @@ async def create_admin_user():
 @router.post("/auth/login")
 async def login(user_data: UserLogin, request: Request):
     db = get_db()
+    from audit_logger import audit_log
     user = await db.users.find_one({"username": user_data.username})
     if not user or not verify_password(user_data.password, user["password_hash"]):
         # Log failed login attempt
@@ -214,6 +215,15 @@ async def login(user_data: UserLogin, request: Request):
             details="Failed login attempt - Invalid credentials",
             ip_address=request.client.host if request.client else None,
             status="failed"
+        )
+        await audit_log(
+            actor={"username": user_data.username},
+            action="auth.login",
+            target_type="user",
+            target_id=user_data.username,
+            details={"reason": "invalid_credentials"},
+            request=request,
+            success=False,
         )
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
@@ -225,6 +235,15 @@ async def login(user_data: UserLogin, request: Request):
             details="Failed login attempt - Account disabled",
             ip_address=request.client.host if request.client else None,
             status="failed"
+        )
+        await audit_log(
+            actor=user,
+            action="auth.login",
+            target_type="user",
+            target_id=user["id"],
+            details={"reason": "account_disabled"},
+            request=request,
+            success=False,
         )
         raise HTTPException(status_code=401, detail="Account is disabled")
     
@@ -244,6 +263,15 @@ async def login(user_data: UserLogin, request: Request):
         details=f"Successful login - Role: {user['role']}",
         ip_address=request.client.host if request.client else None,
         status="success"
+    )
+    await audit_log(
+        actor=user,
+        action="auth.login",
+        target_type="user",
+        target_id=user["id"],
+        details={"role": user.get("role"), "compound_id": user.get("compound_id")},
+        request=request,
+        success=True,
     )
     
     return {

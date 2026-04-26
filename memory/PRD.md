@@ -5,6 +5,29 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 70: Audit Log + Global Search v2 + Slow Endpoints Card (Apr 26, 2026) ✅
+
+**🥇 #1 Audit Log (سجل التدقيق)**
+- **Backend** `audit_logger.py`: best-effort logger (`audit_log(actor, action, target_type, target_id, details, before, after, request, success)`) writes to `audit_logs` collection with id/at/actor/IP/UA/action/target/details/before/after.
+- **Backend** `routes/audit_logs.py`: `GET /api/audit-logs` (filter by actor/action/target/success + days range, paginated), `GET /api/audit-logs/summary` (top actions + top actors aggregation). Owner / super_admin only.
+- **Hooks added** to: `auth.login` (success + 2 fail reasons), `family-invites POST` (create), `family-invites DELETE` (revoke), `admin/users DELETE` (with `before` snapshot of victim user).
+- **Frontend** `pages/AuditLogPage.js`: 4 KPI tiles, days filter (1/7/30/90/180), action dropdown, success/fail pills, Top Actions + Top Actors cards, expandable per-row detail (target_id, details JSON, before snapshot, UA), CSV export with BOM.
+- Sidebar entry "سجل التدقيق" added under Owner section.
+
+**🥈 #2 Global Search v2**
+- **Backend** `admin_users.py /search`: Fixed broken `current_user.compound_id` / `.id` AttributeErrors. Expanded scope: users / compounds (owner-only) / services / family-invites (creator+admins) / support-tickets (admins). Each result returns `icon` (emoji) + `url` for direct navigation. RBAC-scoped.
+- **Frontend** `Layout.js`: improved `handleSearchResultClick` to use API-returned `url` first; added new types (compound/invite/ticket) with color-coded styling; render emoji icon when API provides one.
+- Existing ⌘K keyboard shortcut & dropdown UI reused.
+
+**🥉 #3 Slow Endpoints Card (in System Health page)**
+- **Frontend** `SystemHealthPage.js`: derived `slowEndpoints` memo from current scan results — top 10 by latency. Renders a card with rank/path/method/ms/status + colored progress bar (green <500ms / yellow 500-1000 / amber 1-2s / red >2s) + a Arabic-RTL legend.
+- Zero backend changes — leverages the existing scan latency data.
+
+**Verified end-to-end**:
+- Audit page: 3 entries shown after a failed login (`badguy`) + 2 successful logins (`Owner_homeme`/`Dalia`) — correct IPs, badges, expandable details.
+- Search "dalia" returns 2 user results with role, username and unit.
+- Slow endpoints card present + scan reveals top 10 with progress bars.
+
 ### Iter 69: Trends Chart on System Health Page (Apr 26, 2026) ✅
 - **🆕 Frontend** `pages/SystemHealthPage.js`:
   - Loads up to 30 most-recent scans from `GET /api/system/route-health/history?limit=30` on mount + after every scan/trigger.

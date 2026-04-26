@@ -49,6 +49,7 @@ import {
   SignalIcon,
   LifebuoyIcon,
   LinkIcon,
+  ClipboardDocumentListIcon,
   SpeakerXMarkIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -329,20 +330,33 @@ const Layout = ({ children, isTrialMode = false }) => {
   const handleSearchResultClick = (result) => {
     setShowSearchResults(false);
     setSearchQuery('');
-    
-    // Navigate based on result type
+
+    // Prefer url returned by API; fallback to type-based mapping
+    if (result.url) {
+      navigate(result.url);
+      return;
+    }
     switch (result.type) {
       case 'user':
-        navigate('/family');
+        navigate('/app/admin/users');
+        break;
+      case 'compound':
+        navigate('/app/super-admin');
         break;
       case 'residence':
-        navigate('/compound');
+        navigate('/app/compound');
         break;
       case 'service':
-        navigate('/services');
+        navigate('/app/services');
         break;
       case 'message':
-        navigate('/messages');
+        navigate('/app/messages');
+        break;
+      case 'invite':
+        navigate('/app/my-invites');
+        break;
+      case 'ticket':
+        navigate('/app/super-admin?tab=support_tickets');
         break;
       default:
         break;
@@ -443,6 +457,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
         { name: t('sa_support_tickets_nav', 'تذاكر الدعم الفني'), href: 'super-admin?tab=support_tickets', icon: LifebuoyIcon, show: true },
         { name: 'فحص صحة المسارات', href: 'system-health', icon: ShieldCheckIcon, show: true },
+        { name: 'سجل التدقيق', href: 'audit-log', icon: ClipboardDocumentListIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
     },
@@ -882,15 +897,24 @@ const Layout = ({ children, isTrialMode = false }) => {
                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center
                                   ${result.type === 'user' ? 'bg-purple-100 text-purple-600' : ''}
                                   ${result.type === 'residence' ? 'bg-green-100 text-green-600' : ''}
+                                  ${result.type === 'compound' ? 'bg-emerald-100 text-emerald-600' : ''}
                                   ${result.type === 'service' ? 'bg-blue-100 text-blue-600' : ''}
                                   ${result.type === 'message' ? 'bg-orange-100 text-orange-600' : ''}
                                   ${result.type === 'family' ? 'bg-pink-100 text-pink-600' : ''}
+                                  ${result.type === 'invite' ? 'bg-rose-100 text-rose-600' : ''}
+                                  ${result.type === 'ticket' ? 'bg-amber-100 text-amber-600' : ''}
                                   group-hover:scale-110 transition-transform duration-200`}>
-                                  {result.type === 'user' && <UsersIcon className="h-5 w-5" />}
-                                  {result.type === 'residence' && <HomeIcon className="h-5 w-5" />}
-                                  {result.type === 'service' && <WrenchScrewdriverIcon className="h-5 w-5" />}
-                                  {result.type === 'message' && <ChatBubbleLeftEllipsisIcon className="h-5 w-5" />}
-                                  {result.type === 'family' && <UserGroupIcon className="h-5 w-5" />}
+                                  {result.icon ? (
+                                    <span className="text-lg">{result.icon}</span>
+                                  ) : (
+                                    <>
+                                      {result.type === 'user' && <UsersIcon className="h-5 w-5" />}
+                                      {result.type === 'residence' && <HomeIcon className="h-5 w-5" />}
+                                      {result.type === 'service' && <WrenchScrewdriverIcon className="h-5 w-5" />}
+                                      {result.type === 'message' && <ChatBubbleLeftEllipsisIcon className="h-5 w-5" />}
+                                      {result.type === 'family' && <UserGroupIcon className="h-5 w-5" />}
+                                    </>
+                                  )}
                                 </div>
                               </div>
                               <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>

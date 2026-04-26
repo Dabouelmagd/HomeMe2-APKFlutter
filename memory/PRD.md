@@ -5,6 +5,16 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 69: Trends Chart on System Health Page (Apr 26, 2026) ✅
+- **🆕 Frontend** `pages/SystemHealthPage.js`:
+  - Loads up to 30 most-recent scans from `GET /api/system/route-health/history?limit=30` on mount + after every scan/trigger.
+  - Reverses to chronological order, formats labels as `MMM DD HH:MM` Arabic, and renders 3 colored line series (`pass` 🟢 / `warn` 🟠 / `fail` 🔴) using `recharts` `LineChart`.
+  - Two delta-badges (Δ-fail / Δ-pass) compare first vs latest snapshot — green when improving, red when regressing.
+  - Reference line at y=0, hover tooltip, responsive height (260px), grid + Arabic axis labels.
+  - Empty-state guard: chart hides itself when `< 2` scans exist.
+- **No backend changes** — reuses the existing `/history` endpoint built in Iter 67.
+- **Verified**: chart renders 6 SVG paths, 3 line colors visible, real data from 8 scans clearly shows the regression-then-fix arc (red line dropped from ~9 → 0 after Iter 68 fixes).
+
 ### Iter 68: Fixed 9 Discovered Failures + Daily Auto-Scan + Regression Alerts (Apr 26, 2026) ✅
 
 **Part 1 — Bulk fix all 9 failing endpoints discovered by Iter 67's scanner:**

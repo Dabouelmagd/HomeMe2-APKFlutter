@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 import {
   ShieldCheckIcon,
   PlayIcon,
@@ -100,6 +101,16 @@ const SystemHealthPage = () => {
   const [scanning, setScanning] = useState(false);
   const [filter, setFilter] = useState('fail');     // start by surfacing problems
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [history, setHistory] = useState([]);
+
+  const loadHistory = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/system/route-health/history?limit=30`, auth());
+      setHistory(res.data?.items || []);
+    } catch {
+      // silent — chart hides itself if history is empty
+    }
+  }, []);
 
   const loadLast = useCallback(async () => {
     setLoading(true);
@@ -119,12 +130,13 @@ const SystemHealthPage = () => {
       const res = await axios.post(`${API}/system/route-health/scan`, {}, { ...auth(), timeout: 120000 });
       setSnapshot(res.data || null);
       toast.success(`اكتمل الفحص — ${res.data?.summary?.total || 0} مسار في ${res.data?.results?.length || 0}`);
+      loadHistory();
     } catch (err) {
       toast.error(err?.response?.data?.detail || 'فشل الفحص');
     } finally {
       setScanning(false);
     }
-  }, []);
+  }, [loadHistory]);
 
   const triggerDailyNow = useCallback(async () => {
     setScanning(true);
@@ -139,14 +151,15 @@ const SystemHealthPage = () => {
       }
       // Reload last snapshot
       await loadLast();
+      await loadHistory();
     } catch (err) {
       toast.error(err?.response?.data?.detail || 'فشل تشغيل الفحص اليومي');
     } finally {
       setScanning(false);
     }
-  }, [loadLast]);
+  }, [loadLast, loadHistory]);
 
-  useEffect(() => { loadLast(); }, [loadLast]);
+  useEffect(() => { loadLast(); loadHistory(); }, [loadLast, loadHistory]);
 
   useEffect(() => {
     if (!autoRefresh) return undefined;
@@ -161,6 +174,38 @@ const SystemHealthPage = () => {
     if (filter === 'all') return results;
     return results.filter((r) => r.result === filter);
   }, [results, filter]);
+
+  const chartData = useMemo(() => {
+    if (!history || history.length === 0) return [];
+    // history is sorted desc by ran_at — reverse to chronological for the chart
+    const points = [...history].reverse().map((h) => {
+      const s = h.summary || {};
+      const date = new Date(h.ran_at);
+      return {
+        when: date.toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+        full_at: h.ran_at,
+        ran_by: h.ran_by || 'manual',
+        pass: s.pass || 0,
+        warn: s.warn || 0,
+        fail: s.fail || 0,
+        total: s.total || 0,
+      };
+    });
+    return points;
+  }, [history]);
+
+  const trendStats = useMemo(() => {
+    if (chartData.length < 2) return null;
+    const first = chartData[0];
+    const last = chartData[chartData.length - 1];
+    return {
+      runs: chartData.length,
+      fail_delta: (last.fail || 0) - (first.fail || 0),
+      pass_delta: (last.pass || 0) - (first.pass || 0),
+      first_at: first.full_at,
+      last_at: last.full_at,
+    };
+  }, [chartData]);
 
   const grouped = useMemo(() => {
     const out = {};
@@ -256,6 +301,51 @@ const SystemHealthPage = () => {
           <StatTile label="⏸ متخطي" value={summary.skipped} gradient="bg-gradient-to-br from-gray-500 to-slate-600" testId="stat-skipped" />
         </div>
       </div>
+
+      {/* Trends Chart — last N scans */}
+      {chartData.length >= 2 && (
+        <div className="bg-white rounded-2xl shadow-sm p-5 mb-4" data-testid="trends-chart-card">
+          <div className="flex items-start justify-between flex-wrap gap-2 mb-3">
+            <div>
+              <h3 className="text-base font-bold text-gray-900 inline-flex items-center gap-2">
+                📈 الاتجاه التاريخي ({chartData.length} فحص)
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">آخر {chartData.length} فحص — مرتبة من الأقدم للأحدث</p>
+            </div>
+            {trendStats && (
+              <div className="flex items-center gap-2 flex-wrap text-[11px]">
+                <span className={`px-2 py-1 rounded-full font-bold border ${trendStats.fail_delta > 0 ? 'bg-rose-50 text-rose-700 border-rose-200' : trendStats.fail_delta < 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>
+                  Δ فشل: {trendStats.fail_delta > 0 ? '+' : ''}{trendStats.fail_delta}
+                </span>
+                <span className={`px-2 py-1 rounded-full font-bold border ${trendStats.pass_delta >= 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+                  Δ سليم: {trendStats.pass_delta > 0 ? '+' : ''}{trendStats.pass_delta}
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="w-full" style={{ height: 260 }} data-testid="trends-chart-container">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 5, right: 16, bottom: 5, left: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="when" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
+                <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }}
+                  labelStyle={{ fontWeight: 'bold', color: '#374151' }}
+                />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+                <ReferenceLine y={0} stroke="#9ca3af" strokeDasharray="2 2" />
+                <Line type="monotone" dataKey="pass" name="✅ سليم" stroke="#10b981" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="warn" name="⚠️ تحذير" stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="fail" name="❌ فشل" stroke="#ef4444" strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-[11px] text-gray-500 mt-2 text-center">
+            💡 لو الخط الأحمر بيتسلق، يبقى في regression بيحصل — افتحي آخر فحص لمعرفة المسارات اللي بتفشل
+          </p>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm p-3 mb-4 flex flex-wrap items-center gap-2">

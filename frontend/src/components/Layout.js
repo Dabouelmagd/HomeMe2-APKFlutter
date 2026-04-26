@@ -442,6 +442,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('satisfaction_ratings', 'رضا العملاء'), href: 'satisfaction', icon: StarIcon, show: true },
         { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
         { name: t('sa_support_tickets_nav', 'تذاكر الدعم الفني'), href: 'super-admin?tab=support_tickets', icon: LifebuoyIcon, show: true },
+        { name: 'فحص صحة المسارات', href: 'system-health', icon: ShieldCheckIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
     },

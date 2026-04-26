@@ -2437,6 +2437,8 @@ app.include_router(compound_invites_router)
 app.include_router(family_invites_router)
 app.include_router(invite_stats_router)
 app.include_router(invite_drip_router)
+from routes.system_health import router as system_health_router
+app.include_router(system_health_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
 app.include_router(linked_accounts_router)

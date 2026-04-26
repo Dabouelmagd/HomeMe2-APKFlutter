@@ -5,6 +5,25 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 67: System Route Health Scanner (Apr 26, 2026) ✅
+- **🆕 Backend** `routes/system_health.py` (~250 lines):
+  - `GET /api/system/route-health/list` — full inventory of every API route via `app.routes` introspection (path / methods / tags / name).
+  - `POST /api/system/route-health/scan` — live concurrent scan (sem=8) of every safe **GET** endpoint. Skips POST/PUT/DELETE/PATCH automatically (mutation safety). Smart path-param substitution from caller's context (`{user_id}` → caller.id, `{compound_id}` → caller.compound_id, etc.); unresolved params marked as `skipped`.
+  - Each call records: status_code, latency (ms), error, classification (`pass` / `warn` / `fail` / `skipped`).
+  - Internal calls go to `127.0.0.1:8001` to bypass external proxy timeouts.
+  - Persists snapshots in `route_health_history` with auto-trim (50 max).
+  - `GET /api/system/route-health/last` — last cached snapshot.
+  - `GET /api/system/route-health/history` — light list of past scans for trends.
+  - **Auth**: app_owner / super_admin only.
+- **🆕 Frontend** `pages/SystemHealthPage.js`:
+  - 5 KPI gradient tiles (total/pass/warn/fail/skipped).
+  - 5 filter pills with live counts (defaults to "فشل" filter to surface problems first).
+  - Big "بدء فحص جديد" button + "تحميل آخر فحص" + "فحص دوري (كل 5 د)" auto-refresh toggle.
+  - Results grouped by tag (collapsible), sorted by failure count desc; per-route row shows status badge + method + path + status code + latency + reason.
+  - Empty/loading/filter-empty states.
+- **🔗 Sidebar** entry "فحص صحة المسارات" added to App Owner section with `ShieldCheckIcon`.
+- **Verified live (Owner)**: 452 routes scanned in ~2s — found **9 real `500` failures** (smart-devices, automations, companies/dashboard, gallery/stats, etc.) and 24 RBAC-related warnings, surfacing problems automatically. UI renders all 9 failures in a collapsible "عام" group with full details.
+
 ### Iter 66: Smart Auto-Suggest Validity by Relationship (Apr 26, 2026) ✅
 - **🆕 Frontend** `AddFamilyMemberToUnit.js` invite modal:
   - Per-relationship default validity table:

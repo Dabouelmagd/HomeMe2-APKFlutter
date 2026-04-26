@@ -57,6 +57,7 @@ import AdvertiserRegister from './pages/AdvertiserRegister';
 import CompanyAdminDashboard from './pages/CompanyAdminDashboard';
 import JoinViaInvite from './pages/JoinViaInvite';
 import MyInvitesPage from './pages/MyInvitesPage';
+import SystemHealthPage from './pages/SystemHealthPage';
 import JoinFamilyByInvite from './pages/JoinFamilyByInvite';
 import AlertsDashboard from './pages/AlertsDashboard';
 import FinancialRoute from './components/FinancialRoute';
@@ -604,6 +605,12 @@ function App() {
                 
                 <Route path="my-invites" element={
                   <MyInvitesPage />
+                } />
+
+                <Route path="system-health" element={
+                  <ProtectedRoute>
+                    <SystemHealthPage />
+                  </ProtectedRoute>
                 } />
                 
                 <Route path="pricing" element={

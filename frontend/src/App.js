@@ -63,6 +63,8 @@ import OwnerKpiPage from './pages/OwnerKpiPage';
 import VisitorPassesPage from './pages/VisitorPassesPage';
 import PdfReportsPage from './pages/PdfReportsPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
+import SmtpHealthPage from './pages/SmtpHealthPage';
+import BrandingSettingsPage from './pages/BrandingSettingsPage';
 import SecurityScanPage from './pages/SecurityScanPage';
 import PublicVisitorPassPage from './pages/PublicVisitorPassPage';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
@@ -638,6 +640,14 @@ function App() {
                 
                 <Route path="two-factor" element={
                   <TwoFactorSettingsPage />
+                } />
+
+                <Route path="smtp-health" element={
+                  <SmtpHealthPage />
+                } />
+
+                <Route path="branding" element={
+                  <BrandingSettingsPage />
                 } />
                 
                 <Route path="utilities" element={

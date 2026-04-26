@@ -67,6 +67,11 @@ class EmailService:
     def _send_email_sync(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main', attachments: list = None) -> bool:
         """Synchronous email sending function. `mailbox` picks which From account to use: main | security | support.
         attachments: optional list of dicts {filename, content (bytes), mime_type (e.g. 'application/pdf')}."""
+        import time as _time
+        from datetime import datetime as _dt, timezone as _tz
+        start_ts = _time.time()
+        success = False
+        err_msg = None
         try:
             mb = self._get_mailbox(mailbox)
             msg = MIMEMultipart('mixed' if attachments else 'alternative')
@@ -101,12 +106,32 @@ class EmailService:
                 server.login(mb['user'], mb['password'])
                 server.sendmail(mb['from_email'], to_email, msg.as_string())
             
+            success = True
             logger.info(f"Email sent successfully to {to_email} via mailbox={mailbox} attachments={len(attachments) if attachments else 0}")
-            return True
-            
         except Exception as e:
-            logger.error(f"Failed to send email to {to_email} via mailbox={mailbox}: {str(e)}")
-            return False
+            err_msg = str(e)[:500]
+            logger.error(f"Failed to send email to {to_email} via mailbox={mailbox}: {err_msg}")
+        finally:
+            duration_ms = int((_time.time() - start_ts) * 1000)
+            # Fire-and-forget SMTP health log (sync, with own try/except to never affect send path)
+            try:
+                from pymongo import MongoClient
+                _mc = MongoClient(os.environ['MONGO_URL'], serverSelectionTimeoutMS=500)
+                _db = _mc[os.environ['DB_NAME']]
+                _db.smtp_health.insert_one({
+                    "timestamp": _dt.now(_tz.utc).isoformat(),
+                    "mailbox": mailbox,
+                    "to_email": to_email,
+                    "subject": subject[:160],
+                    "success": success,
+                    "error": err_msg,
+                    "duration_ms": duration_ms,
+                    "has_attachment": bool(attachments),
+                })
+                _mc.close()
+            except Exception:
+                pass
+        return success
     
     async def send_email(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main', attachments: list = None) -> bool:
         """Async wrapper for email sending. `mailbox`: main | security | support."""

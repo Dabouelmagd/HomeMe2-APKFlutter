@@ -2449,10 +2449,14 @@ from routes.visitor_passes import router as visitor_passes_router
 from routes.pdf_reports import router as pdf_reports_router
 from routes.two_factor import router as two_factor_router
 from routes.monthly_reports_scheduler import router as monthly_reports_router
+from routes.smtp_health import router as smtp_health_router
+from routes.compound_branding import router as compound_branding_router
 app.include_router(visitor_passes_router)
 app.include_router(pdf_reports_router)
 app.include_router(two_factor_router)
 app.include_router(monthly_reports_router)
+app.include_router(smtp_health_router)
+app.include_router(compound_branding_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
 app.include_router(linked_accounts_router)

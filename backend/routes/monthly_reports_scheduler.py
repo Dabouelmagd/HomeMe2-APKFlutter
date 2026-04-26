@@ -22,6 +22,7 @@ from services.pdf_report_service import (
     render_unit_statement,
     render_summary_report,
 )
+from services.branding import get_compound_branding
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ async def _mark_sent(db, kind: str, target_id: str, month: str, ok: bool, info: 
     })
 
 
-async def _build_unit_statement(db, user: dict, label: str, compound_name: str) -> bytes:
+async def _build_unit_statement(db, user: dict, label: str, compound_name: str, branding: dict | None = None) -> bytes:
     start, end = _month_bounds(label)
     charges = []
     async for c in db.resident_charges.find({
@@ -96,6 +97,7 @@ async def _build_unit_statement(db, user: dict, label: str, compound_name: str) 
         charges=charges,
         payments=payments,
         currency="EGP",
+        branding=branding,
     )
 
 
@@ -159,6 +161,7 @@ async def _build_summary(db, compound: dict, label: str) -> bytes:
         finance=finance,
         operations=operations,
         currency="EGP",
+        branding=get_compound_branding(compound),
     )
 
 
@@ -231,9 +234,10 @@ async def run_monthly_reports(month_label: str = None) -> dict:
             stats["skipped"] += 1
             continue
         try:
-            compound = await db.compounds.find_one({"id": user.get("compound_id")}, {"_id": 0, "name": 1}) if user.get("compound_id") else None
+            compound = await db.compounds.find_one({"id": user.get("compound_id")}, {"_id": 0}) if user.get("compound_id") else None
             compound_name = compound.get("name") if compound else "—"
-            pdf_bytes = await _build_unit_statement(db, user, month_label, compound_name)
+            branding = get_compound_branding(compound)
+            pdf_bytes = await _build_unit_statement(db, user, month_label, compound_name, branding)
             html = _email_html("كشف حساب وحدتك", f"مرفق كشف حساب وحدتك <strong>{user.get('unit_number','—')}</strong> لشهر <strong>{month_label}</strong>.")
             ok = await email_svc.send_email(
                 to_email=user["email"],
@@ -313,9 +317,35 @@ async def scheduler_status(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Admin access required")
     db = get_db()
     runs = await db.report_runs.find({}, {"_id": 0}).sort("created_at", -1).limit(40).to_list(length=40)
-    summary = {
-        "total_runs": await db.report_runs.count_documents({}),
+
+    # Aggregate analytics
+    total = await db.report_runs.count_documents({})
+    success = await db.report_runs.count_documents({"ok": True})
+    failed = total - success
+    by_kind = {}
+    for kind in ("summary", "statement"):
+        t = await db.report_runs.count_documents({"kind": kind})
+        s = await db.report_runs.count_documents({"kind": kind, "ok": True})
+        by_kind[kind] = {"total": t, "success": s, "failed": t - s, "rate": round((s / t) if t else 1.0, 4)}
+
+    # Last 6 months trend
+    months_pipeline = [
+        {"$group": {"_id": "$month", "total": {"$sum": 1}, "success": {"$sum": {"$cond": ["$ok", 1, 0]}}}},
+        {"$sort": {"_id": -1}},
+        {"$limit": 6},
+    ]
+    monthly = []
+    async for m in db.report_runs.aggregate(months_pipeline):
+        monthly.append({"month": m["_id"], "total": m["total"], "success": m["success"], "failed": m["total"] - m["success"]})
+    monthly.reverse()
+
+    return {
+        "total_runs": total,
+        "success_runs": success,
+        "failed_runs": failed,
+        "success_rate": round((success / total) if total else 1.0, 4),
         "last_run_at": runs[0]["created_at"] if runs else None,
+        "by_kind": by_kind,
+        "monthly_trend": monthly,
         "recent": runs,
     }
-    return summary

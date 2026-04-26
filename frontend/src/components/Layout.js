@@ -35,6 +35,7 @@ import {
   HandRaisedIcon,
   HomeModernIcon,
   EnvelopeIcon,
+  SwatchIcon,
   NewspaperIcon,
   PhoneIcon,
   QuestionMarkCircleIcon,
@@ -462,6 +463,8 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'لوحة المؤشرات', href: 'owner-kpis', icon: ChartBarIcon, show: true },
         { name: 'تقارير PDF', href: 'reports', icon: DocumentTextIcon, show: true },
         { name: 'المصادقة الثنائية', href: 'two-factor', icon: ShieldCheckIcon, show: true },
+        { name: 'صحة SMTP', href: 'smtp-health', icon: EnvelopeIcon, show: true },
+        { name: 'تخصيص قالب التقارير', href: 'branding', icon: SwatchIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
     },

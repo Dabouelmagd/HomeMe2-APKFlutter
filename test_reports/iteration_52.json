@@ -1,0 +1,57 @@
+{
+  "summary": "Iter52 — All 3 enhancement features verified end-to-end (17/17 backend pytest pass, 3/3 frontend pages render). (1) Per-compound branding: GET/PUT /api/compounds/{id}/branding work; 403 for unrelated user (security role); 400 on invalid hex ('red', 'not-hex'); PUT persists primary_color/secondary_color/accent_color/brand_label/tagline/signature_text and a fresh GET returns same values; PDF /api/reports/compound/{id}/summary?month=2025-01 returns valid PDF (%PDF- magic bytes) using branded styles. Frontend /app/branding renders compound selector, color pickers (3), 6 color preset buttons, live preview pane, save & preview PDF buttons. (2) Scheduler analytics: /api/reports/scheduler/status returns {total_runs:23, success_runs:23, failed_runs:0, success_rate:1.0, by_kind:{summary, statement} each with {total,success,failed,rate}, monthly_trend[6 months], recent[40]}. Frontend /app/reports → 'عرض سجل الإرسال' reveals 4 KPI cards (إجمالي 23 / نجاح 23 / فشل 0 / معدل 100%), by_kind grid (SUMMARY 100%, STATEMENT 100%), 6-month bar trend (2030-01, 2030-12, 2031-02), and runs table. (3) SMTP Health: GET /api/system/smtp-health/stats?hours=24&threshold=0.30 returns full schema {window_hours, total, success, failed, success_rate, failure_rate, alert(bool), alert_threshold, by_mailbox, trend, recent_failures}; non-admin (security) → 403; alert false when total<5 even at threshold=0.10; POST /test-send by app_owner → 200 {sent, to, mailbox} and smtp_health collection increments by 1; POST /test-send by security → 403; after test-send the by_mailbox['main'] entry appears with avg_duration_ms. Frontend /app/smtp-health renders 4 KPI cards + by_mailbox table (main, 100%, 351ms avg) + test-send form. Email tracking integration confirmed: send_email writes to smtp_health on every attempt. Regression: login, /api/2fa/status, /api/audit-logs, /api/compounds, /api/reports/compound/{id}/(occupancy|invoices|summary) all 200.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/app/* layout", "issues": ["Console shows benign 403 on a background fetch when navigating between admin pages (resource non-blocking; functionality unaffected). Likely a poll for an admin-restricted endpoint hit by a non-restricted layout component — recommend filtering."]}
+    ]
+  },
+  "tests_passed": [
+    "BE GET /api/compounds/{id}/branding owner → 200 {compound_id, name, branding}",
+    "BE GET /api/compounds/{id}/branding security → 403",
+    "BE PUT /api/compounds/{id}/branding {primary_color:'red'} → 400",
+    "BE PUT /api/compounds/{id}/branding {primary_color:'not-hex'} → 400",
+    "BE PUT /api/compounds/{id}/branding full payload → 200 + persisted (verified via fresh GET)",
+    "BE PDF /api/reports/compound/{id}/summary → 200 with %PDF- magic bytes after branding update",
+    "BE GET /api/reports/scheduler/status → all keys present incl. by_kind{summary,statement{total,success,failed,rate}} + monthly_trend[]",
+    "BE GET /api/system/smtp-health/stats owner → 200 with full schema",
+    "BE GET /api/system/smtp-health/stats security → 403",
+    "BE POST /api/system/smtp-health/test-send owner → 200; smtp_health total incremented; by_mailbox['main'] populated",
+    "BE POST /api/system/smtp-health/test-send security → 403",
+    "BE Alert logic — threshold=0.10 with total<5 → alert=false (gate respected)",
+    "BE Regression — /api/2fa/status, /api/compounds, /api/audit-logs, /api/reports/compound/{id}/occupancy?month=, /api/reports/compound/{id}/invoices?month= all 200",
+    "FE /app/branding renders compound selector, brand label/tagline/signature inputs, 3 color pickers, 6 color presets, save + preview buttons, live preview pane",
+    "FE /app/smtp-health renders 4 KPI cards (إجمالي/نجاح/فشل/معدل النجاح) + by_mailbox table + test-send form",
+    "FE /app/reports → 'عرض سجل الإرسال' reveals 4 KPI cards + SUMMARY/STATEMENT by_kind grid + 6-month bar trend + recent runs table"
+  ],
+  "tests_failed": [],
+  "test_report_links": [
+    "/app/backend/tests/test_iter52_branding_smtp_scheduler.py",
+    "/app/test_reports/pytest/iter52_results.xml"
+  ],
+  "action_items": [
+    "Optional: investigate the 403 console error on admin layout page-load (low-impact polling endpoint) — possibly the new SMTP-health auto-poll firing when a non-owner is on a different page.",
+    "Recommend resetting branding fields to compound defaults at the end of test runs by allowing PUT to accept `null` to unset (current PUT can only OVERWRITE; cleanup left brand_label/tagline/signature as empty strings)."
+  ],
+  "critical_code_review_comments": [
+    "compound_branding.py PUT uses dot-notation $set (good — preserves other branding keys). However, hex-color regex is permissive (only checks startsWith '#' and length 4-9). Consider stricter validation: re.fullmatch(r'#[0-9a-fA-F]{3,8}', v).",
+    "compound_branding.py — when payload is empty ({}), the code passes {'$set': {}} which is a no-op MongoDB op. Slightly wasteful; consider short-circuit returning early.",
+    "smtp_health.py /test-send accepts arbitrary `to_email` query param without validation. Should validate as email + reject obvious abuse vectors (e.g. external bounce harvesting). Consider Pydantic EmailStr.",
+    "smtp_health.py /stats trend bucketing by hour-string slicing relies on ISO-format timestamps. If any timestamp is stored as datetime (not str) the slice yields garbage key. Verify EmailService writes string ISO consistently — it does, but worth a regression test.",
+    "smtp_health.py alert logic correctly gates on (total>=5 AND fail_rate>threshold) — good. Consider exposing `min_volume` as a query param for tunability.",
+    "scheduler_status — by_kind only includes 'summary' & 'statement' (hard-coded). If a new kind is added (e.g. 'reminder'), it won't show up. Consider distinct() over kinds.",
+    "branding.py get_compound_branding falls back to compound.name for brand_label and compound.logo_url for logo — good defensive default that means non-branded compounds still produce decent PDFs."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter52_branding_smtp_scheduler.py (NEW — 17 tests, all pass)"
+  ],
+  "success_rate": {"backend": "100% (17/17)", "frontend": "100% (3/3 pages — branding, smtp-health, scheduler analytics in /app/reports)"},
+  "test_credentials": "Owner_homeme / Dalia1234@ used. No auth changes made.",
+  "seed_data_creation": "Branding fields on compound 88ad3711-c9ae-45fe-a270-65f4524c071c set to TEST_HomeMe Royal / TEST_جودة الحياة / TEST_إدارة المجمع + colors #1d4ed8 #9333ea #f59e0b. Cleanup fixture resets brand_label/tagline/signature_text to empty strings (colors retained — main agent may DELETE compound.branding if needed). One smtp_health row added by /test-send (to test@example.com).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter52 verified all 3 features. Backend test file uses /app/frontend/.env to load REACT_APP_BACKEND_URL fallback (env var not exported in pytest shell). SMTP test-send actually succeeds in preview (returned sent:true, 351ms duration), so the failure-tracking branch was NOT exercised here — to test failures, point mailbox to an invalid one or block port 465. Branding test is gentle on PDF content verification (markers may be in compressed PDF stream). compound 88ad3711-c9ae-45fe-a270-65f4524c071c still has TEST_ branding text empty + custom colors — main agent should clean up if desired.",
+  "rca of the issue": "No bugs found. One pre-existing minor friction: pytest does not auto-export REACT_APP_BACKEND_URL — added a fallback loader from /app/frontend/.env so the test file is self-contained."
+}

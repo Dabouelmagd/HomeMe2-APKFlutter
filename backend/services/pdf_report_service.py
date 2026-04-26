@@ -52,13 +52,35 @@ def _format_currency(amount: float, currency: str = "EGP") -> str:
     except Exception:
         return f"0.00 {currency}"
 
-def _header_html(compound_name: str, report_title: str, period: str, report_no: str) -> str:
+
+def _branded_css(branding: dict | None = None) -> str:
+    """Inject compound-specific colors into base CSS."""
+    b = branding or {}
+    primary = b.get("primary_color") or "#4338ca"
+    secondary = b.get("secondary_color") or "#6366f1"
+    accent = b.get("accent_color") or "#eef2ff"
+    css = BASE_CSS
+    css = css.replace("#6366f1", secondary).replace("#4338ca", primary).replace("#c7d2fe", secondary)
+    css = css.replace("#eef2ff", accent)
+    return css
+
+
+def _header_html(compound_name: str, report_title: str, period: str, report_no: str, branding: dict | None = None) -> str:
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    b = branding or {}
+    logo_url = b.get("logo_url")
+    brand_label = b.get("brand_label") or "HomeMe"
+    tagline = b.get("tagline") or "منصة إدارة المجمعات السكنية"
+    logo_html = (
+        f'<img src="{logo_url}" alt="logo" style="height:46px;max-width:140px;object-fit:contain;margin-bottom:4px;" />'
+        if logo_url else ""
+    )
     return f"""
     <div class="header">
       <div>
-        <div class="brand">HomeMe</div>
-        <div class="brand-sub">منصة إدارة المجمعات السكنية</div>
+        {logo_html}
+        <div class="brand">{brand_label}</div>
+        <div class="brand-sub">{tagline}</div>
       </div>
       <div class="report-meta">
         <div><strong>{compound_name}</strong></div>
@@ -70,16 +92,23 @@ def _header_html(compound_name: str, report_title: str, period: str, report_no: 
     <div class="title">{report_title}</div>
     """
 
-def _footer_html() -> str:
-    return """
+
+def _footer_html(branding: dict | None = None) -> str:
+    b = branding or {}
+    sig = b.get("signature_text")
+    sig_html = f'<div style="margin-bottom:6px;color:#374151;font-size:9pt;">{sig}</div>' if sig else ""
+    brand_label = b.get("brand_label") or "HomeMe"
+    return f"""
     <div class="footer">
-      © HomeMe 2026 — تم توليد هذا التقرير تلقائياً. لأي استفسار يرجى التواصل مع إدارة المجمع.
+      {sig_html}
+      © {brand_label} 2026 — تم توليد هذا التقرير تلقائياً. لأي استفسار يرجى التواصل مع إدارة المجمع.
     </div>
     """
 
-def _render_pdf(html_str: str) -> bytes:
+
+def _render_pdf(html_str: str, branding: dict | None = None) -> bytes:
     buf = BytesIO()
-    HTML(string=html_str).write_pdf(buf, stylesheets=[CSS(string=BASE_CSS)])
+    HTML(string=html_str).write_pdf(buf, stylesheets=[CSS(string=_branded_css(branding))])
     return buf.getvalue()
 
 
@@ -93,6 +122,7 @@ def render_unit_statement(
     charges: list,
     payments: list,
     currency: str = "EGP",
+    branding: dict | None = None,
 ) -> bytes:
     total_charges = sum(c.get("amount", 0) for c in charges)
     total_paid = sum(p.get("amount", 0) for p in payments)
@@ -112,7 +142,7 @@ def render_unit_statement(
     ]) or "<tr><td colspan='4' class='empty'>لا توجد مدفوعات</td></tr>"
 
     html_str = f"""<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body class="rtl">
-    {_header_html(compound_name, 'كشف حساب الوحدة', period, f'STM-{unit_number}-{period}')}
+    {_header_html(compound_name, 'كشف حساب الوحدة', period, f'STM-{unit_number}-{period}', branding)}
     <div class="subtitle">الساكن: <strong>{resident_name}</strong> &nbsp;•&nbsp; رقم الوحدة: <strong>{unit_number}</strong></div>
     <div class="kpis">
       <div class="kpi indigo"><div class="label">إجمالي الرسوم</div><div class="value">{_format_currency(total_charges, currency)}</div></div>
@@ -132,9 +162,9 @@ def render_unit_statement(
       <div class="row"><span>إجمالي المدفوعات</span><span>- {_format_currency(total_paid, currency)}</span></div>
       <div class="row grand"><span>الرصيد المستحق</span><span>{_format_currency(balance, currency)}</span></div>
     </div>
-    {_footer_html()}
+    {_footer_html(branding)}
     </body></html>"""
-    return _render_pdf(html_str)
+    return _render_pdf(html_str, branding)
 
 
 # ---------- Compound Occupancy Report ----------
@@ -148,6 +178,7 @@ def render_occupancy_report(
     total_residents: int,
     families_count: int,
     units_by_status: list,
+    branding: dict | None = None,
 ) -> bytes:
     occ_rate = (occupied_units / total_units * 100) if total_units else 0
     rows = "".join([
@@ -157,7 +188,7 @@ def render_occupancy_report(
     ]) or "<tr><td colspan='4' class='empty'>لا توجد بيانات وحدات</td></tr>"
 
     html_str = f"""<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body class="rtl">
-    {_header_html(compound_name, 'تقرير الإشغال الشهري', period, f'OCC-{period}')}
+    {_header_html(compound_name, 'تقرير الإشغال الشهري', period, f'OCC-{period}', branding)}
     <div class="subtitle">نظرة شاملة على إشغال الوحدات والسكان داخل المجمع.</div>
     <div class="kpis">
       <div class="kpi indigo"><div class="label">إجمالي الوحدات</div><div class="value">{total_units}</div></div>
@@ -171,9 +202,9 @@ def render_occupancy_report(
       <table><thead><tr><th>رقم الوحدة</th><th>اسم رب الأسرة</th><th>عدد الأفراد</th><th>الحالة</th></tr></thead>
       <tbody>{rows}</tbody></table>
     </div>
-    {_footer_html()}
+    {_footer_html(branding)}
     </body></html>"""
-    return _render_pdf(html_str)
+    return _render_pdf(html_str, branding)
 
 
 # ---------- Invoices / Collections Report ----------
@@ -183,6 +214,7 @@ def render_invoices_report(
     period: str,
     rows: list,
     currency: str = "EGP",
+    branding: dict | None = None,
 ) -> bytes:
     total_billed = sum(r.get("amount", 0) for r in rows)
     total_paid = sum(r.get("amount", 0) for r in rows if r.get("status") == "paid")
@@ -198,7 +230,7 @@ def render_invoices_report(
     ]) or "<tr><td colspan='7' class='empty'>لا توجد فواتير في هذه الفترة</td></tr>"
 
     html_str = f"""<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body class="rtl">
-    {_header_html(compound_name, 'تقرير الفواتير والتحصيلات', period, f'INV-{period}')}
+    {_header_html(compound_name, 'تقرير الفواتير والتحصيلات', period, f'INV-{period}', branding)}
     <div class="subtitle">تفصيل الفواتير الصادرة والمدفوعة والمتأخرة لكل سكان المجمع.</div>
     <div class="kpis">
       <div class="kpi indigo"><div class="label">إجمالي الفواتير</div><div class="value">{_format_currency(total_billed, currency)}</div></div>
@@ -210,9 +242,9 @@ def render_invoices_report(
       <table><thead><tr><th>المرجع</th><th>الساكن</th><th>الوحدة</th><th>النوع</th><th>الاستحقاق</th><th>المبلغ</th><th>الحالة</th></tr></thead>
       <tbody>{table_rows}</tbody></table>
     </div>
-    {_footer_html()}
+    {_footer_html(branding)}
     </body></html>"""
-    return _render_pdf(html_str)
+    return _render_pdf(html_str, branding)
 
 
 # ---------- Compound Summary Report ----------
@@ -224,9 +256,10 @@ def render_summary_report(
     finance: dict,
     operations: dict,
     currency: str = "EGP",
+    branding: dict | None = None,
 ) -> bytes:
     html_str = f"""<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body class="rtl">
-    {_header_html(compound_name, 'التقرير الشامل للمجمع', period, f'SUM-{period}')}
+    {_header_html(compound_name, 'التقرير الشامل للمجمع', period, f'SUM-{period}', branding)}
     <div class="subtitle">ملخص تنفيذي لأداء المجمع: الإشغال، الماليات، والعمليات.</div>
 
     <div class="section"><h2>الإشغال</h2>
@@ -256,6 +289,6 @@ def render_summary_report(
       </div>
     </div>
 
-    {_footer_html()}
+    {_footer_html(branding)}
     </body></html>"""
-    return _render_pdf(html_str)
+    return _render_pdf(html_str, branding)

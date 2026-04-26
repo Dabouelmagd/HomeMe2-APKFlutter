@@ -57,6 +57,11 @@ async def ensure_indexes():
 
         # Report runs (created below) — for monthly auto-scheduler
         ("report_runs", [("month", 1), ("kind", 1)]),
+
+        # SMTP health
+        ("smtp_health", [("timestamp", -1)]),
+        ("smtp_health", [("success", 1), ("timestamp", -1)]),
+        ("smtp_health", [("mailbox", 1), ("timestamp", -1)]),
     ]
 
     created = 0

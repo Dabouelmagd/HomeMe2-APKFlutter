@@ -21,6 +21,7 @@ from services.pdf_report_service import (
     render_invoices_report,
     render_summary_report,
 )
+from services.branding import get_compound_branding
 
 router = APIRouter(prefix="/api/reports")
 
@@ -71,6 +72,7 @@ async def unit_statement(
 
     compound = await db.compounds.find_one({"id": user.get("compound_id")}, {"_id": 0})
     compound_name = compound.get("name") if compound else "—"
+    branding = get_compound_branding(compound)
 
     start, end, label = _month_bounds(month)
 
@@ -115,6 +117,7 @@ async def unit_statement(
         charges=charges,
         payments=payments,
         currency="EGP",
+        branding=branding,
     )
     return _stream_pdf(pdf_bytes, f"statement-{user.get('unit_number','unit')}-{label}.pdf")
 
@@ -166,6 +169,7 @@ async def occupancy_report(
         total_residents=len(residents),
         families_count=families_count,
         units_by_status=units_by_status,
+        branding=get_compound_branding(compound),
     )
     return _stream_pdf(pdf_bytes, f"occupancy-{compound_id[:8]}-{label}.pdf")
 
@@ -215,6 +219,7 @@ async def invoices_report(
         period=label,
         rows=rows,
         currency="EGP",
+        branding=get_compound_branding(compound),
     )
     return _stream_pdf(pdf_bytes, f"invoices-{compound_id[:8]}-{label}.pdf")
 
@@ -307,5 +312,6 @@ async def summary_report(
         finance=finance,
         operations=operations,
         currency="EGP",
+        branding=get_compound_branding(compound),
     )
     return _stream_pdf(pdf_bytes, f"summary-{compound_id[:8]}-{label}.pdf")

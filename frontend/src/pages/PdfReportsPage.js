@@ -321,8 +321,58 @@ export default function PdfReportsPage() {
             </div>
             {showScheduler && schedulerStatus && (
               <div className="mt-5 bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                <div className="flex justify-between items-center mb-3 text-sm">
-                  <span className="text-gray-600 dark:text-gray-300">إجمالي العمليات: <strong>{schedulerStatus.total_runs}</strong></span>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
+                    <div className="text-[10px] text-gray-500">إجمالي العمليات</div>
+                    <div className="text-xl font-bold">{schedulerStatus.total_runs ?? 0}</div>
+                  </div>
+                  <div className="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-3">
+                    <div className="text-[10px] text-gray-500">نجاح</div>
+                    <div className="text-xl font-bold text-emerald-700">{schedulerStatus.success_runs ?? 0}</div>
+                  </div>
+                  <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
+                    <div className="text-[10px] text-gray-500">فشل</div>
+                    <div className="text-xl font-bold text-red-700">{schedulerStatus.failed_runs ?? 0}</div>
+                  </div>
+                  <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-lg p-3">
+                    <div className="text-[10px] text-gray-500">معدل النجاح</div>
+                    <div className="text-xl font-bold text-indigo-700">{Math.round((schedulerStatus.success_rate || 0) * 100)}%</div>
+                  </div>
+                </div>
+                {schedulerStatus.by_kind && (
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    {Object.entries(schedulerStatus.by_kind).map(([k, v]) => (
+                      <div key={k} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{k}</div>
+                          <div className="text-xs text-gray-500">{Math.round((v.rate || 0) * 100)}%</div>
+                        </div>
+                        <div className="text-xs text-gray-500">إجمالي: {v.total} • نجح: {v.success} • فشل: {v.failed}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {schedulerStatus.monthly_trend && schedulerStatus.monthly_trend.length > 0 && (
+                  <div className="mb-4">
+                    <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">آخر 6 أشهر</div>
+                    <div className="flex items-end gap-2 h-24">
+                      {schedulerStatus.monthly_trend.map((m, i) => {
+                        const max = Math.max(...schedulerStatus.monthly_trend.map(x => x.total));
+                        const h = max > 0 ? Math.max(8, (m.total / max) * 80) : 8;
+                        const sH = m.total > 0 ? (m.success / m.total) * h : 0;
+                        return (
+                          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                            <div className="w-full bg-red-200 rounded-t" style={{ height: `${h}px`, position: 'relative' }}>
+                              <div className="w-full bg-emerald-500 rounded-t absolute bottom-0" style={{ height: `${sH}px` }} />
+                            </div>
+                            <div className="text-[10px] font-mono text-gray-500">{m.month}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+                <div className="flex justify-between items-center mb-2 text-sm">
                   <span className="text-gray-600 dark:text-gray-300">آخر تشغيل: {schedulerStatus.last_run_at?.slice(0, 19)?.replace('T', ' ') || '—'}</span>
                 </div>
                 <div className="max-h-64 overflow-auto">

@@ -9,6 +9,8 @@ import {
   Download,
   Calendar,
   Loader2,
+  Send,
+  Clock,
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -68,6 +70,9 @@ export default function PdfReportsPage() {
   const [compoundId, setCompoundId] = useState('');
   const [residentId, setResidentId] = useState('');
   const [loadingKey, setLoadingKey] = useState(null);
+  const [triggering, setTriggering] = useState(false);
+  const [schedulerStatus, setSchedulerStatus] = useState(null);
+  const [showScheduler, setShowScheduler] = useState(false);
 
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem('user') || 'null');
@@ -132,6 +137,30 @@ export default function PdfReportsPage() {
 
   const role = user?.role;
   const isAdmin = ['app_owner', 'super_admin', 'admin', 'compound_admin'].includes(role);
+
+  const triggerMonthlyNow = async () => {
+    if (!window.confirm(`سيتم توليد وإرسال تقارير شهر ${month} بالبريد الإلكتروني لجميع السكان ومدراء المجمعات. هل تريد المتابعة؟`)) return;
+    setTriggering(true);
+    try {
+      await axios.post(`${API}/reports/run-monthly-now`, { month });
+      toast.success('تم بدء عملية الإرسال في الخلفية. ستستلم النتائج قريباً.');
+      setTimeout(loadSchedulerStatus, 2000);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'فشل بدء العملية');
+    } finally {
+      setTriggering(false);
+    }
+  };
+
+  const loadSchedulerStatus = async () => {
+    try {
+      const r = await axios.get(`${API}/reports/scheduler/status`);
+      setSchedulerStatus(r.data);
+      setShowScheduler(true);
+    } catch (e) {
+      toast.error('فشل تحميل سجل الإرسال');
+    }
+  };
 
   return (
     <div className="min-h-screen p-6" data-testid="pdf-reports-page">
@@ -256,6 +285,78 @@ export default function PdfReportsPage() {
         <div className="mt-8 text-xs text-gray-500 dark:text-gray-400 text-center">
           يتم توليد التقارير لحظياً بصيغة PDF احترافية مع دعم كامل للعربية. الترويسة والشعار يُضافان تلقائياً.
         </div>
+
+        {/* Monthly Scheduler — admin only */}
+        {isAdmin && (
+          <div className="mt-8 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-2xl p-6 border border-indigo-200 dark:border-indigo-800" data-testid="monthly-scheduler-card">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white">
+                <Send className="w-6 h-6" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">الجدولة الشهرية التلقائية</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                  يقوم النظام بإرسال "كشف حساب الوحدة" لكل ساكن و"التقرير الشامل" لمسؤولي المجمع تلقائياً في أول كل شهر (02:00 UTC) عبر البريد الإلكتروني. يمكنك أيضاً تشغيل العملية يدوياً الآن لشهر محدد.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={triggerMonthlyNow}
+                disabled={triggering}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium hover:opacity-90 disabled:opacity-50"
+                data-testid="trigger-monthly-reports-btn"
+              >
+                {triggering ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                تشغيل الآن لشهر {month}
+              </button>
+              <button
+                onClick={loadSchedulerStatus}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-indigo-600 text-indigo-700 dark:text-indigo-300 font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
+                data-testid="view-scheduler-status-btn"
+              >
+                <Clock className="w-4 h-4" />
+                عرض سجل الإرسال
+              </button>
+            </div>
+            {showScheduler && schedulerStatus && (
+              <div className="mt-5 bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                <div className="flex justify-between items-center mb-3 text-sm">
+                  <span className="text-gray-600 dark:text-gray-300">إجمالي العمليات: <strong>{schedulerStatus.total_runs}</strong></span>
+                  <span className="text-gray-600 dark:text-gray-300">آخر تشغيل: {schedulerStatus.last_run_at?.slice(0, 19)?.replace('T', ' ') || '—'}</span>
+                </div>
+                <div className="max-h-64 overflow-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300">
+                      <tr>
+                        <th className="text-start p-2">النوع</th>
+                        <th className="text-start p-2">الشهر</th>
+                        <th className="text-start p-2">الهدف</th>
+                        <th className="text-start p-2">الحالة</th>
+                        <th className="text-start p-2">التاريخ</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(schedulerStatus.recent || []).map((r, i) => (
+                        <tr key={i} className="border-t border-gray-100 dark:border-gray-700">
+                          <td className="p-2">{r.kind}</td>
+                          <td className="p-2 font-mono">{r.month}</td>
+                          <td className="p-2 font-mono text-[10px]">{r.target_id?.slice(0, 8)}</td>
+                          <td className="p-2">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${r.ok ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                              {r.ok ? 'نجح' : 'فشل'}
+                            </span>
+                          </td>
+                          <td className="p-2">{r.created_at?.slice(0, 16)?.replace('T', ' ')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

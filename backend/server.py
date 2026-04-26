@@ -2448,9 +2448,11 @@ app.include_router(owner_kpis_router)
 from routes.visitor_passes import router as visitor_passes_router
 from routes.pdf_reports import router as pdf_reports_router
 from routes.two_factor import router as two_factor_router
+from routes.monthly_reports_scheduler import router as monthly_reports_router
 app.include_router(visitor_passes_router)
 app.include_router(pdf_reports_router)
 app.include_router(two_factor_router)
+app.include_router(monthly_reports_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
 app.include_router(linked_accounts_router)
@@ -2518,6 +2520,26 @@ async def start_renewal_reminders():
     from renewal_reminders import renewal_reminder_loop
     _asyncio.create_task(renewal_reminder_loop())
     logging.info("Renewal reminder loop scheduled (07:30 UTC)")
+
+
+@app.on_event("startup")
+async def ensure_db_indexes():
+    """Ensure performance indexes exist (idempotent)."""
+    try:
+        from db_indexes import ensure_indexes
+        n = await ensure_indexes()
+        logging.info(f"DB indexes ensured ({n} applied)")
+    except Exception as e:
+        logging.warning(f"ensure_indexes failed: {e}")
+
+
+@app.on_event("startup")
+async def start_monthly_reports_scheduler():
+    """Background loop that emails monthly PDF reports (runs at 02:00 UTC, only on day 1)."""
+    import asyncio as _asyncio
+    from routes.monthly_reports_scheduler import monthly_reports_loop
+    _asyncio.create_task(monthly_reports_loop())
+    logging.info("Monthly PDF reports scheduler started (02:00 UTC, day 1 of each month)")
 
 
 @app.on_event("startup")

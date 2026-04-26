@@ -23,7 +23,7 @@ import qrcode
 import bcrypt
 
 from database import get_db
-from auth_deps import get_current_user, create_access_token, JWT_SECRET, JWT_ALGORITHM
+from auth_deps import get_current_user, create_access_token, JWT_SECRET, JWT_ALGORITHM, verify_password
 
 router = APIRouter(prefix="/api/2fa")
 
@@ -38,6 +38,7 @@ class VerifySetupReq(BaseModel):
 
 class DisableReq(BaseModel):
     token_code: str
+    password: str
 
 class VerifyLoginReq(BaseModel):
     temp_token: str
@@ -152,9 +153,14 @@ async def disable_2fa(req: DisableReq, current_user: dict = Depends(get_current_
     if not user or not user.get("two_factor_enabled"):
         raise HTTPException(status_code=400, detail="2FA غير مُفعّل")
 
+    # Re-auth: password must be valid
+    if not user.get("password_hash") or not verify_password(req.password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="كلمة المرور غير صحيحة")
+
+    # And current TOTP must be valid
     totp = pyotp.TOTP(user.get("two_factor_secret", ""))
     if not totp.verify(req.token_code, valid_window=1):
-        raise HTTPException(status_code=401, detail="الرمز غير صحيح")
+        raise HTTPException(status_code=401, detail="رمز TOTP غير صحيح")
 
     await db.users.update_one(
         {"id": current_user["id"]},

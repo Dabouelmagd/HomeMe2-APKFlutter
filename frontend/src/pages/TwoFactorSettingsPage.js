@@ -23,6 +23,7 @@ export default function TwoFactorSettingsPage() {
   const [code, setCode] = useState('');
   const [backupCodes, setBackupCodes] = useState([]);
   const [disableCode, setDisableCode] = useState('');
+  const [disablePassword, setDisablePassword] = useState('');
 
   const refreshStatus = async () => {
     try {
@@ -71,11 +72,16 @@ export default function TwoFactorSettingsPage() {
       toast.error('أدخل الرمز الحالي من تطبيق المصادقة');
       return;
     }
+    if (!disablePassword) {
+      toast.error('أدخل كلمة المرور');
+      return;
+    }
     setLoading(true);
     try {
-      await axios.post(`${API}/2fa/disable`, { token_code: disableCode });
+      await axios.post(`${API}/2fa/disable`, { token_code: disableCode, password: disablePassword });
       toast.success('تم تعطيل المصادقة الثنائية');
       setDisableCode('');
+      setDisablePassword('');
       setStep('idle');
       refreshStatus();
     } catch (e) {
@@ -233,8 +239,16 @@ export default function TwoFactorSettingsPage() {
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
             <h3 className="text-lg font-semibold mb-2 text-red-700 dark:text-red-400">تعطيل المصادقة الثنائية</h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-              لتعطيل 2FA يرجى إدخال الرمز الحالي من تطبيق المصادقة (للتحقق من هويتك).
+              لتعطيل 2FA يرجى إدخال كلمة المرور والرمز الحالي من تطبيق المصادقة (للتحقق المزدوج من هويتك).
             </p>
+            <input
+              type="password"
+              placeholder="كلمة المرور الحالية"
+              value={disablePassword}
+              onChange={(e) => setDisablePassword(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg mb-3"
+              data-testid="disable-2fa-password-input"
+            />
             <input
               type="text"
               maxLength={6}
@@ -247,7 +261,7 @@ export default function TwoFactorSettingsPage() {
             />
             <button
               onClick={disable}
-              disabled={loading || disableCode.length !== 6}
+              disabled={loading || disableCode.length !== 6 || !disablePassword}
               className="w-full px-6 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 inline-flex items-center justify-center gap-2"
               data-testid="disable-2fa-btn"
             >

@@ -64,22 +64,35 @@ class EmailService:
     def _get_mailbox(self, mailbox: str = 'main') -> dict:
         return self.mailboxes.get(mailbox) or self.mailboxes['main']
     
-    def _send_email_sync(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main') -> bool:
-        """Synchronous email sending function. `mailbox` picks which From account to use: main | security | support."""
+    def _send_email_sync(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main', attachments: list = None) -> bool:
+        """Synchronous email sending function. `mailbox` picks which From account to use: main | security | support.
+        attachments: optional list of dicts {filename, content (bytes), mime_type (e.g. 'application/pdf')}."""
         try:
             mb = self._get_mailbox(mailbox)
-            msg = MIMEMultipart('alternative')
+            msg = MIMEMultipart('mixed' if attachments else 'alternative')
             msg['Subject'] = subject
             msg['From'] = f"{mb['from_name']} <{mb['from_email']}>"
             msg['To'] = to_email
             
-            # Add text and HTML parts
+            # Build body alternative part
+            body = MIMEMultipart('alternative')
             if text_content:
-                part1 = MIMEText(text_content, 'plain', 'utf-8')
-                msg.attach(part1)
+                body.attach(MIMEText(text_content, 'plain', 'utf-8'))
+            body.attach(MIMEText(html_content, 'html', 'utf-8'))
+            msg.attach(body)
             
-            part2 = MIMEText(html_content, 'html', 'utf-8')
-            msg.attach(part2)
+            # Add attachments if any
+            if attachments:
+                from email.mime.base import MIMEBase
+                from email import encoders
+                for att in attachments:
+                    mime_type = att.get('mime_type') or 'application/octet-stream'
+                    main_type, sub_type = mime_type.split('/', 1) if '/' in mime_type else ('application', 'octet-stream')
+                    part = MIMEBase(main_type, sub_type)
+                    part.set_payload(att['content'])
+                    encoders.encode_base64(part)
+                    part.add_header('Content-Disposition', f'attachment; filename="{att["filename"]}"')
+                    msg.attach(part)
             
             # Create SSL context and connect
             context = ssl.create_default_context()
@@ -88,14 +101,14 @@ class EmailService:
                 server.login(mb['user'], mb['password'])
                 server.sendmail(mb['from_email'], to_email, msg.as_string())
             
-            logger.info(f"Email sent successfully to {to_email} via mailbox={mailbox}")
+            logger.info(f"Email sent successfully to {to_email} via mailbox={mailbox} attachments={len(attachments) if attachments else 0}")
             return True
             
         except Exception as e:
             logger.error(f"Failed to send email to {to_email} via mailbox={mailbox}: {str(e)}")
             return False
     
-    async def send_email(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main') -> bool:
+    async def send_email(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main', attachments: list = None) -> bool:
         """Async wrapper for email sending. `mailbox`: main | security | support."""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
@@ -106,6 +119,7 @@ class EmailService:
             html_content,
             text_content,
             mailbox,
+            attachments,
         )
     
     # ==================== RESIDENT NOTIFICATIONS ====================

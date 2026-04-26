@@ -40,7 +40,30 @@ const AddFamilyMemberToUnit = () => {
   const [inviteFor, setInviteFor] = useState(null);   // resident card we're inviting into
   const [inviteData, setInviteData] = useState(null); // server response after create
   const [inviteBusy, setInviteBusy] = useState(false);
-  const [inviteForm, setInviteForm] = useState({ relationship: 'spouse', validity_days: 14, invitee_name: '' });
+  const [inviteForm, setInviteForm] = useState({ relationship: 'spouse', validity_days: 30, invitee_name: '' });
+  const [validityTouched, setValidityTouched] = useState(false);
+
+  // Smart defaults: auto-suggest validity_days based on relationship.
+  // Long-term family ties get more time to register; short-term staff
+  // get tighter security windows.
+  const RELATIONSHIP_DEFAULT_DAYS = {
+    spouse: 30,    // permanent — needs more setup time
+    child: 30,
+    parent: 30,
+    sibling: 21,
+    other: 14,
+    helper: 7,     // short-term staff — tighter window
+    driver: 7,
+  };
+  const RELATIONSHIP_HINTS = {
+    spouse: 'يحتاج وقت أكتر للتسجيل (30 يوم)',
+    child: 'علاقة دائمة (30 يوم)',
+    parent: 'علاقة دائمة (30 يوم)',
+    sibling: 'علاقة دائمة (21 يوم)',
+    helper: 'موظف قصير الأمد — تأمين أعلى (7 أيام)',
+    driver: 'موظف قصير الأمد — تأمين أعلى (7 أيام)',
+    other: 'افتراضي (14 يوم)',
+  };
 
   const [memberForm, setMemberForm] = useState({
     full_name: '',
@@ -153,7 +176,8 @@ const AddFamilyMemberToUnit = () => {
   const openInviteModal = (resident) => {
     setInviteFor(resident);
     setInviteData(null);
-    setInviteForm({ relationship: 'spouse', validity_days: 14, invitee_name: '' });
+    setInviteForm({ relationship: 'spouse', validity_days: RELATIONSHIP_DEFAULT_DAYS.spouse, invitee_name: '' });
+    setValidityTouched(false);
   };
 
   const closeInviteModal = () => {
@@ -485,7 +509,15 @@ const AddFamilyMemberToUnit = () => {
                     <label className="text-xs font-medium text-gray-700 mb-1 block">صلة القرابة</label>
                     <select
                       value={inviteForm.relationship}
-                      onChange={(e) => setInviteForm(p => ({ ...p, relationship: e.target.value }))}
+                      onChange={(e) => {
+                        const newRel = e.target.value;
+                        setInviteForm((p) => ({
+                          ...p,
+                          relationship: newRel,
+                          // Auto-update validity only if user hasn't manually changed it
+                          validity_days: validityTouched ? p.validity_days : (RELATIONSHIP_DEFAULT_DAYS[newRel] || 14),
+                        }));
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500"
                       data-testid="invite-relationship"
                     >
@@ -499,18 +531,34 @@ const AddFamilyMemberToUnit = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-700 mb-1 block">صلاحية الرابط (أيام)</label>
+                    <label className="text-xs font-medium text-gray-700 mb-1 flex items-center justify-between">
+                      <span>صلاحية الرابط (أيام)</span>
+                      {!validityTouched && (
+                        <span className="text-[10px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded-full border border-rose-200" data-testid="auto-suggest-badge">
+                          🤖 تلقائي
+                        </span>
+                      )}
+                    </label>
                     <input
                       type="number"
                       min="1"
                       max="90"
                       value={inviteForm.validity_days}
-                      onChange={(e) => setInviteForm(p => ({ ...p, validity_days: e.target.value }))}
+                      onChange={(e) => {
+                        setValidityTouched(true);
+                        setInviteForm((p) => ({ ...p, validity_days: e.target.value }));
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500"
                       data-testid="invite-validity"
                     />
                   </div>
                 </div>
+                {RELATIONSHIP_HINTS[inviteForm.relationship] && !validityTouched && (
+                  <div className="bg-rose-50 border border-rose-200 rounded-lg px-3 py-2 text-xs text-rose-700 flex items-start gap-2" data-testid="relationship-hint">
+                    <span>💡</span>
+                    <span>{RELATIONSHIP_HINTS[inviteForm.relationship]}</span>
+                  </div>
+                )}
                 <div>
                   <label className="text-xs font-medium text-gray-700 mb-1 block">اسم المدعو (اختياري)</label>
                   <input

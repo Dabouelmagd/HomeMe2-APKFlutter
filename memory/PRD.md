@@ -5,6 +5,23 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 66: Smart Auto-Suggest Validity by Relationship (Apr 26, 2026) ✅
+- **🆕 Frontend** `AddFamilyMemberToUnit.js` invite modal:
+  - Per-relationship default validity table:
+    - `spouse / child / parent` → 30 يوم (long-term family)
+    - `sibling` → 21 يوم
+    - `other` → 14 يوم
+    - `helper / driver` → 7 أيام (short-term staff, tighter security)
+  - Auto-updates `validity_days` when relationship changes — **only** if the user hasn't manually overridden the field (`validityTouched` flag tracks user intent).
+  - "🤖 تلقائي" rose pill on the validity label when value is system-suggested; disappears as soon as user types in the field.
+  - Inline 💡 hint banner under the row explaining the suggestion (e.g., "موظف قصير الأمد — تأمين أعلى (7 أيام)").
+- **Verified** all 4 scenarios via Playwright: 
+  1. spouse → 30 ✅ + badge + hint
+  2. switch to driver → auto-recalculates to 7 ✅
+  3. switch to child → auto-recalculates to 30 ✅
+  4. user manually types 50 → badge + hint disappear ✅
+  5. switch relationship after manual edit → value stays at 50 (override sticks) ✅
+
 ### Iter 65: Activity Timeline per Invite (Apr 26, 2026) ✅
 - **🆕 Backend** `family_invites.py`:
   - New field `activity_log: []` on every invite, populated on every state change.

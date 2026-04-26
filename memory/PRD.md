@@ -5,6 +5,10 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 62: QR Download Button (PNG Export) (Apr 26, 2026) ✅
+- **🎨 Frontend** `AddFamilyMemberToUnit.js`: black "📥 تنزيل QR كصورة PNG" button below the inline QR. Renders the SVG QR onto a 1024×1024 white canvas → blob → download as `homeme_invite_<unit>_<timestamp>.png`. Reuses the same approach as the existing `QrCodeModal.js`.
+- **Verified** via Playwright: download event fires correctly, suggested filename `homeme_invite_TEST001_1777204167690.png`, success toast shown.
+
 ### Iter 61: Inline QR Code in Send-Invite Modal (Apr 25, 2026) ✅
 - **🎨 Frontend** `AddFamilyMemberToUnit.js`: After invite creation, the success state now renders an inline `QRCodeSVG` (160px, level M) below the URL with caption "📱 امسح الكود بكاميرا الموبايل لفتح الرابط مباشرة". No extra modal — single-screen flow keeps the create + share + scan all visible together.
 - **Verified** via Playwright: QR rendered successfully (`data-testid="invite-qr-code"`), Arabic caption present, screenshot confirms layout in RTL.

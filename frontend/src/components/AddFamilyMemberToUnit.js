@@ -18,7 +18,8 @@ import {
   MagnifyingGlassIcon,
   LinkIcon,
   ClipboardDocumentIcon,
-  ShareIcon
+  ShareIcon,
+  ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -204,6 +205,45 @@ const AddFamilyMemberToUnit = () => {
   const shareWhatsApp = () => {
     const txt = encodeURIComponent(`أهلاً! 👋 رابط الانضمام لوحدة ${inviteFor.unit_number || ''}:\n${inviteData.full_url}`);
     window.open(`https://wa.me/?text=${txt}`, '_blank');
+  };
+
+  const downloadQrPng = () => {
+    const svg = document.querySelector('[data-testid="invite-qr-code"]');
+    if (!svg) {
+      toast.error('تعذر تحضير الكود');
+      return;
+    }
+    const xml = new XMLSerializer().serializeToString(svg);
+    const svgBlob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+    const svgUrl = URL.createObjectURL(svgBlob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const size = 1024;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      ctx.drawImage(img, 0, 0, size, size);
+      canvas.toBlob((blob) => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const safeUnit = (inviteFor?.unit_number || 'unit').replace(/[^a-z0-9_-]+/gi, '_');
+        a.download = `homeme_invite_${safeUnit}_${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+        URL.revokeObjectURL(svgUrl);
+        toast.success('تم تنزيل QR بنجاح');
+      }, 'image/png');
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(svgUrl);
+      toast.error('فشل تنزيل الصورة');
+    };
+    img.src = svgUrl;
   };
 
   const resetForm = () => {
@@ -510,6 +550,14 @@ const AddFamilyMemberToUnit = () => {
                     <p className="text-[11px] text-gray-500 text-center leading-relaxed">
                       📱 امسح الكود بكاميرا الموبايل لفتح الرابط مباشرة
                     </p>
+                    <button
+                      onClick={downloadQrPng}
+                      className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 hover:bg-black text-white text-xs font-medium rounded-lg transition-colors"
+                      data-testid="download-qr-png"
+                    >
+                      <ArrowDownTrayIcon className="h-4 w-4" />
+                      تنزيل QR كصورة PNG
+                    </button>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">

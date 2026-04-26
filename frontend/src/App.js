@@ -61,6 +61,8 @@ import SystemHealthPage from './pages/SystemHealthPage';
 import AuditLogPage from './pages/AuditLogPage';
 import OwnerKpiPage from './pages/OwnerKpiPage';
 import VisitorPassesPage from './pages/VisitorPassesPage';
+import PdfReportsPage from './pages/PdfReportsPage';
+import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SecurityScanPage from './pages/SecurityScanPage';
 import PublicVisitorPassPage from './pages/PublicVisitorPassPage';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
@@ -245,6 +247,17 @@ const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       const response = await axios.post(`${API}/auth/login`, credentials);
+      
+      // 2FA gate — return temp token to caller without setting session
+      if (response.data?.two_factor_required) {
+        return {
+          success: false,
+          two_factor_required: true,
+          temp_token: response.data.temp_token,
+          ttl_minutes: response.data.ttl_minutes,
+        };
+      }
+      
       const { access_token, user: userData } = response.data;
       
       // Save to multi-session manager (tab-specific)
@@ -268,6 +281,25 @@ const AuthProvider = ({ children }) => {
       return { 
         success: false, 
         error: error.response?.data?.detail || 'Login failed' 
+      };
+    }
+  };
+
+  const verifyTwoFactor = async ({ temp_token, code }) => {
+    try {
+      const r = await axios.post(`${API}/2fa/verify-login`, { temp_token, code });
+      const { access_token, user: userData } = r.data;
+      saveCurrentSession(access_token, userData);
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('user', JSON.stringify(userData));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      setUser(userData);
+      initializeSocket(userData.id);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.detail || '2FA verification failed',
       };
     }
   };
@@ -334,6 +366,7 @@ const AuthProvider = ({ children }) => {
     <AuthContext.Provider value={{
       user,
       login,
+      verifyTwoFactor,
       register,
       logout,
       updateUser,
@@ -597,6 +630,14 @@ function App() {
                 
                 <Route path="services" element={
                   <ServicesManagement />
+                } />
+                
+                <Route path="reports" element={
+                  <PdfReportsPage />
+                } />
+                
+                <Route path="two-factor" element={
+                  <TwoFactorSettingsPage />
                 } />
                 
                 <Route path="utilities" element={

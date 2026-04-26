@@ -27,9 +27,13 @@ const Login = () => {
   const [savedUsername, setSavedUsername] = useState('');
   const [showBiometricLogin, setShowBiometricLogin] = useState(false);
   
-  const { login, user: currentUser } = useAuth();
+  const { login, verifyTwoFactor, user: currentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // 2FA challenge state
+  const [twoFa, setTwoFa] = useState({ pending: false, tempToken: '', code: '' });
+  const [twoFaLoading, setTwoFaLoading] = useState(false);
 
   // Preserve ?owner_only=1 flag through the login → selector flow
   const ownerOnly = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('owner_only') === '1';
@@ -153,6 +157,9 @@ const Login = () => {
         toast.success(t('welcome_back'));
         // Navigate to the original requested page or dashboard
         navigate(from, { replace: true });
+      } else if (result.two_factor_required) {
+        // Open 2FA challenge modal
+        setTwoFa({ pending: true, tempToken: result.temp_token, code: '' });
       } else {
         toast.error(result.error);
       }
@@ -398,6 +405,59 @@ const Login = () => {
           <InternalAdBanner position="login_page" maxAds={1} variant="slim" />
         </div>
       </div>
+
+      {/* 2FA Challenge Modal */}
+      {twoFa.pending && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" data-testid="2fa-challenge-modal">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 max-w-md w-full" dir="rtl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                <FingerPrintIcon className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">المصادقة الثنائية</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                أدخل الرمز من تطبيق المصادقة (أو رمز استعادة).
+              </p>
+            </div>
+            <input
+              type="text"
+              autoFocus
+              value={twoFa.code}
+              onChange={(e) => setTwoFa({ ...twoFa, code: e.target.value.toUpperCase().slice(0, 12) })}
+              placeholder="000000"
+              inputMode="text"
+              className="w-full px-4 py-3 text-2xl text-center tracking-[0.4em] font-mono border-2 border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg mb-4"
+              data-testid="2fa-code-input"
+            />
+            <button
+              onClick={async () => {
+                if (!twoFa.code.trim()) return;
+                setTwoFaLoading(true);
+                const r = await verifyTwoFactor({ temp_token: twoFa.tempToken, code: twoFa.code.trim() });
+                setTwoFaLoading(false);
+                if (r.success) {
+                  setTwoFa({ pending: false, tempToken: '', code: '' });
+                  toast.success(t('welcome_back'));
+                  navigate(from, { replace: true });
+                } else {
+                  toast.error(r.error || 'الرمز غير صحيح');
+                }
+              }}
+              disabled={twoFaLoading || !twoFa.code.trim()}
+              className="w-full px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:opacity-90 disabled:opacity-50"
+              data-testid="2fa-verify-btn"
+            >
+              {twoFaLoading ? '...جارِ التحقق' : 'تحقق وتسجيل دخول'}
+            </button>
+            <button
+              onClick={() => setTwoFa({ pending: false, tempToken: '', code: '' })}
+              className="w-full mt-3 px-4 py-2 text-gray-600 dark:text-gray-300 hover:underline text-sm"
+            >
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

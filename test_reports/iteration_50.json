@@ -1,0 +1,43 @@
+{
+  "summary": "Iter50 — All 3 features tested end-to-end. Backend 100% (12/12 pytest passed). Frontend all 3 new pages render correctly. Bug fixes verified: GET /api/compounds/{id}/services and /bookings now return 200 for App Owner; /app/services UI shows graceful 'لا توجد خدمات' empty state without error toast. PDF Reports: all 4 endpoints (occupancy, invoices, summary, unit statement) return valid %PDF- bytes; RBAC works (resident gets 403 on other compounds); /app/reports renders 4 download cards. 2FA TOTP full lifecycle verified end-to-end: status → setup → verify-setup (invalid 400, valid 200 with 8 backup codes) → login returns temp_token → verify-login with TOTP → backup code works once and reuse fails (401) → disable → subsequent login returns direct access_token. Frontend /app/two-factor renders enable UI. Sidebar shows 'تقارير PDF' and 'المصادقة الثنائية' entries. 2FA was disabled at end of test as requested.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "tests_passed": [
+    "BE GET /api/compounds/{cid}/services as Owner → 200 ✓",
+    "BE GET /api/compounds/{cid}/bookings as Owner → 200 ✓",
+    "BE GET /api/reports/compound/{cid}/occupancy?month=2025-01 → 200 + valid %PDF- bytes ✓",
+    "BE GET /api/reports/compound/{cid}/invoices?month=2025-01 → 200 + valid %PDF- ✓",
+    "BE GET /api/reports/compound/{cid}/summary?month=2025-01 → 200 + valid %PDF- ✓",
+    "BE GET /api/reports/unit/{user_id}/statement?month=2025-01 → 200 + valid %PDF- ✓",
+    "BE GET /api/reports/.../occupancy?month=invalid → 400 ✓",
+    "BE RBAC: resident gets 403/404 on compound report for other compound ✓",
+    "BE GET /api/2fa/status → {enabled:false, eligible:true} ✓",
+    "BE 2FA full lifecycle: setup → verify-setup invalid (400) → valid (200, 8 backup codes) → login returns temp_token + ttl_minutes → verify-login with TOTP (200, full access_token+user) → backup code works once → reuse 401 → disable (200) → relogin returns direct access_token ✓",
+    "BE Regression: /api/compounds 200, /api/audit-logs 200 ✓",
+    "FE /app/reports renders 4 PDF download cards (كشف حساب الوحدة, تقرير الإشغال, الفواتير والتحميلات, التقرير الشامل للمجمع) with month picker + compound select + resident select ✓",
+    "FE /app/two-factor renders enable UI with 'ابدأ التفعيل' button + status banner ('2FA غير مُفعّل') ✓",
+    "FE /app/services as App Owner (no compound_id) shows graceful empty state 'لا توجد خدمات / لا توجد خدمات متاحة' — NO error toast ✓",
+    "FE Sidebar shows 'تقارير PDF' and 'المصادقة الثنائية' entries for app_owner ✓"
+  ],
+  "tests_failed": [],
+  "test_report_links": [
+    "/app/backend/tests/test_iter50_pdf_2fa_services.py",
+    "/app/test_reports/pytest/iter50_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "pdf_reports.py (~310 lines, 4 endpoints + helpers) — clean structure, proper async/await, _id excluded via projections, RBAC helper, tz-aware datetimes, currency stays as constant 'EGP' (acceptable for MVP, could be per-compound later).",
+    "two_factor.py (~225 lines, 5 endpoints + models + helpers) — RFC 6238 compliant, TOTP valid_window=1 (handles clock skew), backup codes bcrypt-hashed and one-time-use via two_factor_backup_used index list, temp_token uses scope='2fa_pending' to prevent misuse as access_token. JWT_SECRET reused from auth_deps — good. ELIGIBLE_ROLES whitelist prevents residents from enabling 2FA.",
+    "Minor: pdf_reports unit_statement queries resident_charges/payments using both due_date string and created_at ISO via $or — robust but slightly heavy. Consider adding indexes on (resident_id, due_date) and (resident_id, payment_date).",
+    "Minor: two_factor.disable does not require password — only TOTP code. RFC permits this but adding password re-auth would be more defensive (recommend P2 hardening).",
+    "Minor: backup codes are returned only once on verify-setup (correct UX) — frontend MUST instruct user to save them. Verified via UI screenshot that this is communicated."
+  ],
+  "updated_files": ["/app/backend/tests/test_iter50_pdf_2fa_services.py (NEW — 12 cases, all pass)"],
+  "success_rate": {"backend": "100% (12/12)", "frontend": "100% (3/3 pages render + sidebar entries)"},
+  "test_credentials": "Owner_homeme/Dalia1234@ — 2FA was enabled and DISABLED at end of test as requested. Account is now in clean state for next runs.",
+  "seed_data_creation": "None persistent — 2FA secret/backup codes were created and fully cleaned up via /api/2fa/disable.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 3 features (services bug fix, PDF reports, 2FA TOTP) are fully working end-to-end. The pytest suite test_iter50_pdf_2fa_services.py is self-contained (handles 2FA setup+disable cleanup automatically) — safe to re-run as regression. pyotp is required for 2FA tests (already installed). To smoke-test PDFs manually, hit GET /api/reports/compound/88ad3711-c9ae-45fe-a270-65f4524c071c/occupancy?month=2025-01 with Owner Bearer token.",
+  "rca of the issue": "N/A — all features verified working."
+}

@@ -247,6 +247,25 @@ async def login(user_data: UserLogin, request: Request):
         )
         raise HTTPException(status_code=401, detail="Account is disabled")
     
+    # 2FA gate — if user has 2FA enabled, return temporary token instead of full session
+    if user.get("two_factor_enabled"):
+        from routes.two_factor import create_temp_2fa_token
+        temp_token = create_temp_2fa_token(user["id"])
+        await audit_log(
+            actor=user,
+            action="auth.login.2fa_required",
+            target_type="user",
+            target_id=user["id"],
+            details={"role": user.get("role")},
+            request=request,
+            success=True,
+        )
+        return {
+            "two_factor_required": True,
+            "temp_token": temp_token,
+            "ttl_minutes": 5,
+        }
+    
     access_token = create_access_token(data={"sub": user["id"]})
     
     # Get compound name if compound_id exists

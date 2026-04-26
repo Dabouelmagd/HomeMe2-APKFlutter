@@ -460,6 +460,8 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'فحص صحة المسارات', href: 'system-health', icon: ShieldCheckIcon, show: true },
         { name: 'سجل التدقيق', href: 'audit-log', icon: ClipboardDocumentListIcon, show: true },
         { name: 'لوحة المؤشرات', href: 'owner-kpis', icon: ChartBarIcon, show: true },
+        { name: 'تقارير PDF', href: 'reports', icon: DocumentTextIcon, show: true },
+        { name: 'المصادقة الثنائية', href: 'two-factor', icon: ShieldCheckIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
     },
@@ -569,6 +571,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('gallery.title'), href: 'gallery', icon: PhotoIcon, show: true },
         { name: t('document_management'), href: 'documents', icon: DocumentTextIcon, show: true },
         { name: t('voting_system'), href: 'voting', icon: HandRaisedIcon, show: true },
+        { name: 'تقارير PDF', href: 'reports', icon: DocumentTextIcon, show: true },
       ]
     },
     {

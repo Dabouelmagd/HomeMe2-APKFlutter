@@ -3,7 +3,43 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-50)
+## Latest Fixes (Feb 2026 — iterations 26-51)
+
+### Iter 51: 2FA Hardening + DB Indexes + Monthly Auto-Scheduler (Apr 26, 2026) ✅
+
+**🛡️ 2FA Hardening — Password Re-Auth Required for Disable:**
+- `routes/two_factor.py`: `DisableReq` now requires both `token_code` and `password`. Disable endpoint calls `verify_password()` before TOTP verification — defends against session-hijack-based disabling.
+- `pages/TwoFactorSettingsPage.js`: disable form has 2 inputs (password + 6-digit code), button disabled until both are filled.
+- Verified: 422 if password missing, 401 if wrong password, 200 on correct password + TOTP.
+
+**⚡ MongoDB Performance Indexes:**
+- `db_indexes.py` — NEW idempotent `ensure_indexes()` creating 18 indexes across 12 collections:
+  - `resident_charges`: (resident_id+due_date), (compound_id+created_at), (compound_id+due_date), (status)
+  - `resident_payments`: (resident_id+payment_date), (compound_id+created_at), (compound_id+payment_date)
+  - `expenses`: (compound_id+date)
+  - `users`: (compound_id+role), (family_id)
+  - `audit_logs`: (timestamp -1), (user_id+timestamp -1)
+  - `notifications`: (recipient_ids+created_at)
+  - `report_runs`, `visitor_passes`, `maintenance_requests`, `complaints`, `service_bookings`: (compound_id+created_at)
+- Hooked into FastAPI startup; logs `DB indexes ensured (18 applied)` on boot.
+
+**📧 Monthly PDF Reports Auto-Scheduler:**
+- `routes/monthly_reports_scheduler.py` — NEW. Daily background loop at 02:00 UTC: on the 1st of each month, generates and emails:
+  - "Compound Summary" PDF → all admins/compound admins/app owners (mailbox=main, with PDF attachment)
+  - "Unit Statement" PDF → each active resident with email
+- Idempotent via `report_runs` collection: `(kind, target_id, month)` tracked; re-runs are skipped.
+- `email_service.py` extended: `send_email()` now accepts `attachments=[{filename, content (bytes), mime_type}]`.
+- Endpoints (admin only):
+  - `POST /api/reports/run-monthly-now {month?}` — manual trigger (background task, returns 202-ish queued)
+  - `GET /api/reports/scheduler/status` — total_runs + last_run_at + recent 40 entries
+- Frontend `pages/PdfReportsPage.js`: new admin-only "الجدولة الشهرية التلقائية" card with "تشغيل الآن لشهر X" + "عرض سجل الإرسال" buttons + collapsible recent-runs table.
+
+**Verified via testing_agent_v3_fork (iteration 51)** — 100% pass rate (11/11 backend + frontend integration):
+- 2FA: 422/401/200 flow ✓
+- 18/18 indexes confirmed in DB ✓
+- Monthly scheduler: idempotent ✓, RBAC 403 for non-admin ✓, 23 historical entries in scheduler-status table ✓
+- Regression: services, bookings, audit-logs, visitor-passes, /2fa/setup all 200 ✓
+- 1 minor bug auto-fixed by testing agent (disable payload missing password — already fixed in our code).
 
 ### Iter 50: Services Bug Fix + PDF Reports + 2FA TOTP (Apr 26, 2026) ✅
 

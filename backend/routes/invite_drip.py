@@ -282,3 +282,123 @@ async def toggle_drip(invite_id: str, payload: dict, current_user: dict = Depend
         {"$set": {"drip_enabled": enabled}},
     )
     return {"success": True, "drip_enabled": enabled}
+
+
+@router.post("/family-invites/{invite_id}/resend-reminder")
+async def resend_family_invite_reminder(
+    invite_id: str,
+    payload: dict,
+    current_user: dict = Depends(get_current_user),
+):
+    """Manual on-demand resend of a family-invite reminder email.
+
+    Body:
+      email (str, optional) — recipient. Defaults to the inviter's own email
+                              so they can forward it manually.
+
+    Permissions:
+      - invite creator
+      - admin/compound_admin of the same compound
+      - company_admin of the same company
+      - app_owner / super_admin
+    """
+    db = get_db()
+    inv = await db.family_invites.find_one({"id": invite_id}, {"_id": 0})
+    if not inv:
+        raise HTTPException(status_code=404, detail="الرابط غير موجود")
+
+    role = current_user.get("role")
+    is_creator = inv.get("created_by") == current_user.get("id")
+    is_owner_or_super = role in ("app_owner", "super_admin")
+    is_compound_admin = role in ("admin", "compound_admin") and current_user.get("compound_id") == inv.get("compound_id")
+    is_company_admin = (
+        role == "company_admin"
+        and current_user.get("company_id")
+        and current_user.get("company_id") == inv.get("company_id")
+    )
+    if not (is_creator or is_owner_or_super or is_compound_admin or is_company_admin):
+        raise HTTPException(status_code=403, detail="غير مصرح بإرسال تذكير لهذا الرابط")
+
+    if not inv.get("is_active"):
+        raise HTTPException(status_code=400, detail="الرابط ملغي — لا يمكن إرسال تذكير")
+    now = datetime.now(timezone.utc)
+    if _is_expired(inv, now):
+        raise HTTPException(status_code=400, detail="الرابط منتهي — لا يمكن إرسال تذكير")
+    if inv.get("used_count", 0) > 0 and inv.get("max_uses") and inv["used_count"] >= inv["max_uses"]:
+        raise HTTPException(status_code=400, detail="الرابط استُخدم بالكامل")
+
+    # Resolve recipient email
+    recipient_email = (payload.get("email") or "").strip().lower() or None
+    if not recipient_email:
+        creator = await db.users.find_one(
+            {"id": inv.get("created_by")},
+            {"_id": 0, "email": 1, "full_name": 1, "username": 1},
+        )
+        if creator and creator.get("email"):
+            recipient_email = creator["email"]
+    if not recipient_email:
+        raise HTTPException(status_code=400, detail="لم نجد إيميل للإرسال — أدخلي إيميل المستلم")
+
+    # Build URL + QR
+    base_url = (payload.get("base_url") or "").strip() or "https://homemeapp.net"
+    join_path = inv.get("join_url") or f"/join-family/{inv.get('token')}"
+    full_url = _build_join_url(join_path, base_url)
+    qr = _qr_data_uri(full_url)
+
+    age_days = 0
+    if inv.get("created_at"):
+        try:
+            c_dt = datetime.fromisoformat(inv["created_at"].replace("Z", "+00:00"))
+            if c_dt.tzinfo is None:
+                c_dt = c_dt.replace(tzinfo=timezone.utc)
+            age_days = (now - c_dt).days
+        except Exception:
+            pass
+
+    inviter_name = inv.get("invitee_name_hint") or inv.get("created_by_full_name") or current_user.get("full_name") or ""
+    next_reminder_no = (inv.get("reminder_count") or 0) + 1
+
+    html = _build_email_html(
+        inviter_name=inviter_name,
+        kind_label="دعوة عائلية",
+        url=full_url,
+        qr_data_uri=qr,
+        reminder_no=next_reminder_no,
+        age_days=age_days,
+        note=inv.get("note"),
+    )
+
+    # Optimistically bump reminder_count + last_reminder_sent_at so the
+    # frontend reflects the action immediately. If SMTP fails later it's a
+    # soft failure (logged) — preview env blocks port 465 so we never want to
+    # block the API response on the email roundtrip.
+    await db.family_invites.update_one(
+        {"id": invite_id},
+        {
+            "$set": {"last_reminder_sent_at": now.isoformat()},
+            "$inc": {"reminder_count": 1},
+        },
+    )
+
+    async def _send_safely():
+        try:
+            es = EmailService()
+            ok = await es.send_email(
+                to_email=recipient_email,
+                subject="⏰ تذكير: رابط الانضمام في انتظارك",
+                html_content=html,
+                mailbox="main",
+            )
+            if not ok:
+                logger.warning(f"manual resend SMTP returned False for invite {invite_id}")
+        except Exception as e:
+            logger.error(f"manual resend SMTP error for invite {invite_id}: {e}")
+
+    import asyncio as _asyncio
+    _asyncio.create_task(_send_safely())
+
+    return {
+        "success": True,
+        "sent_to": recipient_email,
+        "reminder_count": next_reminder_no,
+    }

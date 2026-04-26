@@ -16,6 +16,8 @@ import {
   HomeIcon,
   XMarkIcon,
   ArrowDownTrayIcon,
+  EnvelopeIcon,
+  PaperAirplaneIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -104,13 +106,97 @@ const InviteQrModal = ({ url, title, subtitle, onClose }) => {
   );
 };
 
+/* ---------------- Resend Reminder Modal ---------------- */
+const ResendReminderModal = ({ invite, onClose, onSent }) => {
+  const [email, setEmail] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    setBusy(true);
+    try {
+      const res = await axios.post(
+        `${API}/family-invites/${invite.id}/resend-reminder`,
+        { email: email.trim() || null, base_url: window.location.origin },
+        auth(),
+      );
+      if (res.data?.success) {
+        toast.success(`تم إرسال التذكير إلى ${res.data.sent_to}`);
+        onSent(invite.id, res.data.reminder_count);
+        onClose();
+      } else {
+        toast.error(res.data?.message || 'تعذر الإرسال — جرّبي لاحقاً');
+      }
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || 'فشل إرسال التذكير');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[110] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={(e) => e.stopPropagation()} data-testid="resend-reminder-modal">
+        <div className="flex items-start justify-between border-b border-gray-100 pb-3 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-2 rounded-lg">
+              <EnvelopeIcon className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">إعادة إرسال التذكير</h3>
+              <p className="text-xs text-gray-500">الوحدة {invite.unit_number || '—'} • {RELATIONSHIPS[invite.relationship] || invite.relationship}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
+            <XMarkIcon className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-medium text-gray-700 mb-1 block">إيميل المستلم</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com (اتركيه فارغاً لإرساله لإيميلك)"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500"
+              dir="ltr"
+              data-testid="resend-email-input"
+            />
+            <p className="text-[11px] text-gray-500 mt-1.5 leading-relaxed">
+              💡 لو سيبتيه فاضي، الرابط هيتبعت لإيميلك إنتي عشان تقدري تعيدي مشاركته يدوياً.
+            </p>
+          </div>
+
+          {(invite.reminder_count > 0) && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 text-xs text-amber-800">
+              ⓘ تم إرسال <strong>{invite.reminder_count}</strong> تذكير سابقاً لهذا الرابط.
+            </div>
+          )}
+
+          <button
+            onClick={submit}
+            disabled={busy}
+            className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-4 py-3 rounded-lg font-bold disabled:opacity-50 inline-flex items-center justify-center gap-2"
+            data-testid="resend-submit-btn"
+          >
+            {busy ? 'جاري الإرسال...' : (<><PaperAirplaneIcon className="h-5 w-5" /><span>إرسال التذكير الآن</span></>)}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* ---------------- Single Invite Card ---------------- */
-const InviteCard = ({ invite, onRevoke }) => {
+const InviteCard = ({ invite, onRevoke, onReminderSent }) => {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
+  const [showResend, setShowResend] = useState(false);
   const url = buildJoinUrl(invite.join_url);
   const status = invite.effective_status || 'active';
   const badge = STATUS_BADGE[status] || STATUS_BADGE.active;
+  const isPending = status === 'active' && (invite.used_count || 0) === 0;
 
   const copy = async () => {
     try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 1500); toast.success('تم نسخ الرابط'); }
@@ -183,14 +269,36 @@ const InviteCard = ({ invite, onRevoke }) => {
           <QrCodeIcon className="w-4 h-4" />
           <span>QR</span>
         </button>
+        {isPending && (
+          <button
+            onClick={() => setShowResend(true)}
+            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-lg px-3 py-2 text-xs font-bold inline-flex items-center gap-1 shadow-sm"
+            data-testid={`my-invite-resend-${invite.id}`}
+            title="إعادة إرسال تذكير بالإيميل"
+          >
+            <EnvelopeIcon className="w-4 h-4" />
+            <span>تذكير</span>
+          </button>
+        )}
       </div>
 
       <div className="flex items-center justify-between text-[11px] text-gray-500">
         <span className="inline-flex items-center gap-1"><ClockIcon className="w-3.5 h-3.5" /> ينتهي {expiresShort}</span>
-        <span className="inline-flex items-center gap-1">
-          <UsersIcon className="w-3.5 h-3.5" />
-          {invite.used_count || 0}{invite.max_uses ? ` / ${invite.max_uses}` : ''}
-        </span>
+        <div className="flex items-center gap-2">
+          {(invite.reminder_count > 0) && (
+            <span
+              className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded-full"
+              title="عدد التذكيرات المرسلة"
+              data-testid={`my-invite-reminder-count-${invite.id}`}
+            >
+              ✉️ {invite.reminder_count}
+            </span>
+          )}
+          <span className="inline-flex items-center gap-1">
+            <UsersIcon className="w-3.5 h-3.5" />
+            {invite.used_count || 0}{invite.max_uses ? ` / ${invite.max_uses}` : ''}
+          </span>
+        </div>
       </div>
 
       {showQr && (
@@ -199,6 +307,13 @@ const InviteCard = ({ invite, onRevoke }) => {
           title="QR لرابط الدعوة"
           subtitle={RELATIONSHIPS[invite.relationship] || invite.relationship}
           onClose={() => setShowQr(false)}
+        />
+      )}
+      {showResend && (
+        <ResendReminderModal
+          invite={invite}
+          onClose={() => setShowResend(false)}
+          onSent={onReminderSent}
         />
       )}
     </div>
@@ -236,6 +351,10 @@ const MyInvitesPage = () => {
 
   const onRevoked = (id) => {
     setInvites((prev) => prev.map((i) => (i.id === id ? { ...i, is_active: false, effective_status: 'revoked' } : i)));
+  };
+
+  const onReminderSent = (id, newCount) => {
+    setInvites((prev) => prev.map((i) => (i.id === id ? { ...i, reminder_count: newCount, last_reminder_sent_at: new Date().toISOString() } : i)));
   };
 
   const stats = useMemo(() => {
@@ -331,7 +450,7 @@ const MyInvitesPage = () => {
         </div>
       ) : (
         <div className="space-y-3">
-          {filteredInvites.map((inv) => <InviteCard key={inv.id} invite={inv} onRevoke={onRevoked} />)}
+          {filteredInvites.map((inv) => <InviteCard key={inv.id} invite={inv} onRevoke={onRevoked} onReminderSent={onReminderSent} />)}
         </div>
       )}
     </div>

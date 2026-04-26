@@ -5,6 +5,19 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 64: Manual Resend-Reminder for Pending Family Invites (Apr 26, 2026) ✅
+- **🆕 Backend** `routes/invite_drip.py` — `POST /api/family-invites/{invite_id}/resend-reminder`:
+  - Body: `{ email?: string, base_url?: string }`. Defaults email to inviter's own email if blank.
+  - RBAC: invite creator OR admin/compound_admin (same compound) OR company_admin (same company) OR app_owner/super_admin.
+  - Validates: `is_active`, not expired, not fully used.
+  - Reuses `_build_email_html` + `_qr_data_uri` from the drip module — same template, same QR.
+  - **Fire-and-forget SMTP** via `asyncio.create_task` so preview's blocked port 465 never times out the API. `reminder_count` + `last_reminder_sent_at` are bumped optimistically before scheduling the send.
+- **🆕 Frontend** `pages/MyInvitesPage.js`:
+  - `ResendReminderModal` component — amber-gradient header, optional email input (with hint that empty defaults to the inviter's own inbox), reminder-count info chip, single submit button.
+  - "📧 تذكير" amber-orange button on every active+pending invite card (`used_count = 0`).
+  - Local state updates `reminder_count` instantly after a successful send so the ✉️ badge appears without a full refetch.
+- **Verified** end-to-end: backend `200` instant (no SMTP block), 2 successful sends with `reminder_count` 1 → 2; UI shows green toast + ✉️ badge updates live.
+
 ### Iter 63: "إدارة دعواتي" (My Invites) Page (Apr 26, 2026) ✅
 - **🆕 Frontend** `pages/MyInvitesPage.js` (~280 lines) at `/app/my-invites`:
   - Header with refresh button + 5 KPI tiles (gradient): إجمالي / نشطة / قُبلت (إجمالي) / بانتظار القبول / ملغية أو منتهية.

@@ -14,8 +14,12 @@ from shared_models import *
 
 router = APIRouter(prefix="/api")
 
+@router.get("/compounds/{compound_id}/services")
 async def get_compound_services(compound_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user.get('compound_id','') != compound_id:
+    db = get_db()
+    # Allow app_owner / super_admin to view any compound's services
+    user_role = current_user.get('role','')
+    if user_role not in ('app_owner', 'super_admin') and current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     services = await db.services.find({"compound_id": compound_id}).to_list(length=10000)
@@ -74,6 +78,7 @@ async def update_service(
     service_data: ServiceCreate,
     current_user: dict = Depends(require_admin)
 ):
+    db = get_db()
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
@@ -101,6 +106,7 @@ async def delete_service(
     service_id: str,
     current_user: dict = Depends(require_admin)
 ):
+    db = get_db()
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
@@ -118,6 +124,7 @@ async def create_booking(
     booking_data: ServiceBookingCreate,
     current_user: dict = Depends(get_current_user)
 ):
+    db = get_db()
     # Verify service exists and is in the same compound
     service = await db.services.find_one({"id": service_id, "compound_id": current_user.get('compound_id','')})
     if not service:
@@ -181,7 +188,9 @@ async def get_my_bookings(current_user: dict = Depends(get_current_user)):
 
 @router.get("/compounds/{compound_id}/bookings")
 async def get_compound_bookings(compound_id: str, current_user: dict = Depends(require_admin)):
-    if current_user.get('compound_id','') != compound_id:
+    db = get_db()
+    user_role = current_user.get('role','')
+    if user_role not in ('app_owner', 'super_admin') and current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
     bookings = await db.service_bookings.find({"compound_id": compound_id}).to_list(length=10000)

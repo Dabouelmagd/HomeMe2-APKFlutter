@@ -543,6 +543,13 @@ const ServicesManagement = () => {
 
   const fetchServices = async () => {
     try {
+      if (!user?.compound_id) {
+        // App Owner / Super Admin without a default compound — show empty state silently
+        console.log('No compound_id on user, skipping services fetch');
+        setServices([]);
+        setLoading(false);
+        return;
+      }
       console.log('Fetching services for compound:', user.compound_id);
       console.log('API URL:', `${API}/compounds/${user.compound_id}/services`);
       
@@ -742,6 +749,10 @@ const ServicesManagement = () => {
 
   const fetchBookings = async () => {
     try {
+      if (!user?.compound_id) {
+        setBookings([]);
+        return;
+      }
       const response = await axios.get(`${API}/compounds/${user.compound_id}/bookings`);
       setBookings(response.data.bookings);
     } catch (error) {

@@ -3,7 +3,38 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-51)
+## Latest Fixes (Feb 2026 — iterations 26-52)
+
+### Iter 52: Per-Compound PDF Branding + Scheduler Analytics + SMTP Health Tracker (Apr 26, 2026) ✅
+
+**🎨 Per-Compound PDF Template Branding:**
+- `services/pdf_report_service.py`: `_branded_css(branding)` injects compound-specific colors (primary/secondary/accent) by find/replace into base CSS. `_header_html(branding)` shows custom logo, brand label, tagline. `_footer_html(branding)` shows signature.
+- `services/branding.py`: `get_compound_branding(compound)` extractor (supports nested `branding.{...}` and legacy `logo_url`).
+- All 4 `render_*` functions now accept `branding: dict | None`.
+- `routes/compound_branding.py` — NEW. `GET/PUT /api/compounds/{id}/branding`. Hex-color validation (`#xxx` to `#xxxxxxxx`). RBAC: app_owner / super_admin everywhere; admin/compound_admin only their own compound.
+- `pages/BrandingSettingsPage.js` — split-screen UX: form on right (logo URL, brand label, tagline, signature, 3 color pickers + 6 preset palettes), live preview on left that updates instantly, plus "معاينة PDF" opens a real branded PDF in new tab.
+- Verified by AI vision on PDF: emerald/teal scheme + custom brand label "Royal City Gardens" + tagline + signature all rendered correctly.
+
+**📊 Scheduler Analytics Dashboard:**
+- `routes/monthly_reports_scheduler.py: scheduler/status` extended with:
+  - `total_runs`, `success_runs`, `failed_runs`, `success_rate`
+  - `by_kind: {summary, statement}` each with `{total, success, failed, rate}`
+  - `monthly_trend`: aggregation pipeline returning last 6 months `{month, total, success, failed}`
+- `pages/PdfReportsPage.js`: scheduler card now shows 4 KPI cards (total / success / failed / rate %) + per-kind grid + custom 6-month bar chart (red bar for total, emerald overlay for success ratio) + existing recent-runs table.
+
+**📧 SMTP Health Tracker:**
+- `email_service.py:_send_email_sync` instrumented to log every attempt to `smtp_health` collection: `{timestamp, mailbox, to_email, subject, success, error, duration_ms, has_attachment}`. Uses sync pymongo client in finally block — never blocks/breaks send path.
+- `routes/smtp_health.py` — NEW (admin-only):
+  - `GET /api/system/smtp-health/stats?hours=24&threshold=0.30` returns total/success/failed/rate, per-mailbox breakdown (success_rate, avg_duration_ms), hourly trend buckets, last 20 failures, and `alert` flag (only fires when `total>=5 AND failure_rate>threshold`).
+  - `POST /api/system/smtp-health/test-send` (owner-only) sends synthetic test email.
+- `db_indexes.py` — added 3 indexes on smtp_health (timestamp -1, success+timestamp, mailbox+timestamp).
+- `pages/SmtpHealthPage.js` — dashboard with 4 KPI cards, configurable window (1h-30d) and threshold (10%-50%), red alert banner when threshold breached, by-mailbox table, recent-failures table, test-send form.
+
+**Verified via testing_agent_v3_fork (iteration 52)** — 100% pass (17/17 backend + 3/3 frontend pages):
+- Branding: GET/PUT 200 ✓, 403 for outsiders ✓, 400 for invalid hex ✓, PDF reflects new colors+label ✓
+- Scheduler analytics: full schema ✓
+- SMTP Health: stats schema ✓, RBAC ✓, test-send tracks success/failure ✓, alert gate (total>=5) ✓
+- Regression: 2FA, audit-logs, reports, compounds — all green ✓.
 
 ### Iter 51: 2FA Hardening + DB Indexes + Monthly Auto-Scheduler (Apr 26, 2026) ✅
 

@@ -5,6 +5,18 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 63: "إدارة دعواتي" (My Invites) Page (Apr 26, 2026) ✅
+- **🆕 Frontend** `pages/MyInvitesPage.js` (~280 lines) at `/app/my-invites`:
+  - Header with refresh button + 5 KPI tiles (gradient): إجمالي / نشطة / قُبلت (إجمالي) / بانتظار القبول / ملغية أو منتهية.
+  - 5 filter pills (الكل / نشطة / مستخدمة / منتهية / ملغية) with live count badges; active pill uses rose-pink gradient.
+  - Invite cards with status badge, unit-number chip, target name, full URL, Copy + WhatsApp + QR buttons, used/max counter, expiry date, and revoke button (active only).
+  - QR modal with download-PNG button (1024×1024 white-bg canvas).
+  - Empty state per filter category.
+- **🔗 Sidebar entry** in `Layout.js` Family section: "إدارة دعواتي" with `LinkIcon`.
+- **🔗 Quick link** from "إضافة فرد للوحدة" page header → "📊 إدارة كل الدعوات اللي بعتيها" for discoverability.
+- **Backend** reuses existing `GET /api/family-invites` (filtered by `created_by = current_user.id`) + `DELETE /api/family-invites/{id}` for revoke. No backend changes needed.
+- **Verified** end-to-end: 4 invites listed, stats correct, revoke flow tested → toast appears, stats auto-update (4→3 active), filter "ملغية" shows the revoked card with red "ملغي" badge.
+
 ### Iter 62: QR Download Button (PNG Export) (Apr 26, 2026) ✅
 - **🎨 Frontend** `AddFamilyMemberToUnit.js`: black "📥 تنزيل QR كصورة PNG" button below the inline QR. Renders the SVG QR onto a 1024×1024 white canvas → blob → download as `homeme_invite_<unit>_<timestamp>.png`. Reuses the same approach as the existing `QrCodeModal.js`.
 - **Verified** via Playwright: download event fires correctly, suggested filename `homeme_invite_TEST001_1777204167690.png`, success toast shown.

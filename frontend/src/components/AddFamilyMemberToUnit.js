@@ -330,6 +330,14 @@ const AddFamilyMemberToUnit = () => {
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               {t('add_family_members_any_unit')}
             </p>
+            <a
+              href="/app/my-invites"
+              className="inline-flex items-center gap-1.5 mt-3 text-sm text-rose-600 hover:text-rose-700 font-medium"
+              data-testid="link-to-my-invites"
+            >
+              <LinkIcon className="h-4 w-4" />
+              📊 إدارة كل الدعوات اللي بعتيها
+            </a>
           </div>
         </div>
 

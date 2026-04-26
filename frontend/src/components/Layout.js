@@ -48,6 +48,7 @@ import {
   LanguageIcon,
   SignalIcon,
   LifebuoyIcon,
+  LinkIcon,
   SpeakerXMarkIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -539,6 +540,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('family_management'), href: 'family', icon: UsersIcon, show: true },
         { name: t('add_family_member'), href: 'add-family-member', icon: UserPlusIcon, show: true },
+        { name: 'إدارة دعواتي', href: 'my-invites', icon: LinkIcon, show: true },
       ]
     },
     {

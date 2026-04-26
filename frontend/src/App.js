@@ -56,6 +56,7 @@ import AdvertiserPortal from './pages/AdvertiserPortal';
 import AdvertiserRegister from './pages/AdvertiserRegister';
 import CompanyAdminDashboard from './pages/CompanyAdminDashboard';
 import JoinViaInvite from './pages/JoinViaInvite';
+import MyInvitesPage from './pages/MyInvitesPage';
 import JoinFamilyByInvite from './pages/JoinFamilyByInvite';
 import AlertsDashboard from './pages/AlertsDashboard';
 import FinancialRoute from './components/FinancialRoute';
@@ -599,6 +600,10 @@ function App() {
                 
                 <Route path="add-family-member" element={
                   <AddFamilyMemberToUnit />
+                } />
+                
+                <Route path="my-invites" element={
+                  <MyInvitesPage />
                 } />
                 
                 <Route path="pricing" element={

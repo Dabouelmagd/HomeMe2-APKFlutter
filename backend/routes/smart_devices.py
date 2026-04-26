@@ -26,12 +26,17 @@ async def get_smart_devices(
     """Get smart devices with filtering"""
     try:
         db = get_db()
-        query = {"compound_id": current_user.compound_id, "is_active": True}
-        
+        compound_id = current_user.get("compound_id")
+        # High-level admins without a compound get an empty list (graceful no-op)
+        if not compound_id:
+            return {"devices": []}
+
+        query = {"compound_id": compound_id, "is_active": True}
+
         # Family-specific devices or shared devices
-        if current_user.role != "admin":
+        if current_user.get("role") not in ("admin", "compound_admin", "app_owner", "super_admin", "company_admin"):
             query["$or"] = [
-                {"family_id": current_user.family_id},
+                {"family_id": current_user.get("family_id")},
                 {"is_shared": True},
                 {"family_id": None}  # Common area devices
             ]
@@ -46,7 +51,7 @@ async def get_smart_devices(
         return {"devices": [serialize_datetime(device) for device in devices]}
         
     except Exception as e:
-        logging.error(f"Error getting smart devices: {e}")
+        logging.error(f"Error getting smart devices: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to get smart devices")
 
 @router.post("/smart-devices")
@@ -196,15 +201,16 @@ async def get_device_logs(
 @router.get("/automations")
 async def get_automations(current_user: dict = Depends(get_current_user)):
     """Get device automations"""
-    db = get_db()
     try:
         db = get_db()
-        query = {"compound_id": current_user.compound_id}
-        
-        # Family-specific automations for non-admins
-        if current_user.role != "admin":
+        compound_id = current_user.get("compound_id")
+        if not compound_id:
+            return {"automations": []}
+        query = {"compound_id": compound_id}
+
+        if current_user.get("role") not in ("admin", "compound_admin", "app_owner", "super_admin", "company_admin"):
             query["$or"] = [
-                {"family_id": current_user.family_id},
+                {"family_id": current_user.get("family_id")},
                 {"family_id": None}  # Common automations
             ]
         
@@ -213,7 +219,7 @@ async def get_automations(current_user: dict = Depends(get_current_user)):
         return {"automations": [serialize_datetime(automation) for automation in automations]}
         
     except Exception as e:
-        logging.error(f"Error getting automations: {e}")
+        logging.error(f"Error getting automations: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to get automations")
 
 @router.post("/automations")

@@ -239,7 +239,7 @@ async def get_individual_dashboard(
         db = get_db()
         # Get user's compound
         compound = await db.individual_compounds.find_one({
-            "owner_id": current_user.id,
+            "owner_id": current_user["id"],
             "status": "active"
         })
         
@@ -303,8 +303,11 @@ async def get_individual_dashboard(
             "account_type": "individual"
         }
         
+    except HTTPException:
+        # Preserve intended status codes (404 etc.)
+        raise
     except Exception as e:
-        logger.error(f"Error getting individual dashboard: {e}")
+        logger.error(f"Error getting individual dashboard: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/individual/upgrade")

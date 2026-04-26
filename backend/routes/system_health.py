@@ -16,7 +16,7 @@ Design choices:
   - Restricted to app_owner / super_admin.
 """
 from fastapi import APIRouter, HTTPException, Depends, Request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 import re
 import time
@@ -222,8 +222,7 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
     # Persist (cap history at 50 entries)
     try:
         await db.route_health_history.insert_one({**snapshot})
-        await db.route_health_history.update_many({}, {"$unset": {"_id": ""}})  # noop safe
-        # Trim history
+        # Trim history beyond 50
         old = await db.route_health_history.find(
             {}, {"_id": 1, "ran_at": 1}
         ).sort("ran_at", -1).to_list(length=200)
@@ -264,3 +263,302 @@ async def scan_history(limit: int = 20, current_user: dict = Depends(get_current
         {}, {"_id": 0, "ran_at": 1, "ran_by": 1, "summary": 1}
     ).sort("ran_at", -1).to_list(length=max(1, min(limit, 50)))
     return {"items": items, "total": len(items)}
+
+
+@router.post("/trigger-daily-now")
+async def trigger_daily_now(request: Request, current_user: dict = Depends(get_current_user)):
+    """Manually trigger a 'daily-style' scan: compares against prev snapshot and
+    emails owners if NEW failures are detected. Useful for testing the alert flow.
+
+    Uses the caller's own bearer token so results are consistent with the
+    interactive `POST /scan` endpoint (the daily auto-scheduler uses the
+    internal helper with a synthesized owner token instead)."""
+    if current_user.get("role") not in ("app_owner", "super_admin"):
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    db = get_db()
+    prev = await db.route_health_history.find_one({}, sort=[("ran_at", -1)])
+    prev_failed_paths = set(r["path"] for r in (prev.get("results") or []) if r.get("result") == "fail") if prev else set()
+
+    # Re-use the same logic as POST /scan — pass caller token as auth
+    base = "http://127.0.0.1:8001"
+    auth_header = request.headers.get("authorization") or ""
+    headers = {"Authorization": auth_header} if auth_header else {}
+
+    routes = list(_enumerate_routes(request))
+    results = []
+    summary = {"total": 0, "pass": 0, "warn": 0, "fail": 0, "skipped": 0}
+
+    async with httpx.AsyncClient(base_url=base, timeout=10.0) as client:
+        sem = asyncio.Semaphore(8)
+
+        async def _check(route: dict):
+            entry = {
+                "path": route["path"], "methods": route["methods"], "tags": route["tags"],
+                "name": route["name"], "tested_method": None, "tested_path": None,
+                "status_code": None, "ms": None, "result": "skipped", "reason": None, "error": None,
+            }
+            if "GET" not in route["methods"]:
+                entry["result"] = "skipped"; entry["reason"] = "non-GET"; return entry
+            if _is_skipped(route["path"]):
+                entry["result"] = "skipped"; entry["reason"] = "blacklisted"; return entry
+            target_path = route["path"]
+            if PATH_PARAM_RE.search(target_path):
+                resolved = _resolve_params(target_path, current_user)
+                if not resolved:
+                    entry["result"] = "skipped"; entry["reason"] = "unresolved param"; return entry
+                target_path = resolved
+            entry["tested_method"] = "GET"; entry["tested_path"] = target_path
+            t0 = time.perf_counter()
+            async with sem:
+                try:
+                    resp = await client.get(target_path, headers=headers)
+                    entry["status_code"] = resp.status_code
+                except httpx.ReadTimeout:
+                    entry["error"] = "timeout (>10s)"
+                except Exception as e:
+                    entry["error"] = str(e)[:160]
+            entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
+            entry["result"] = _classify(entry["status_code"], entry["error"])
+            return entry
+
+        results = await asyncio.gather(*[_check(r) for r in routes])
+
+    for r in results:
+        summary["total"] += 1
+        summary[r["result"]] = summary.get(r["result"], 0) + 1
+
+    scan = {
+        "summary": summary,
+        "results": results,
+        "ran_at": datetime.now(timezone.utc).isoformat(),
+        "ran_by": f"manual-trigger:{current_user.get('username')}",
+    }
+    await db.route_health_history.insert_one({**scan})
+
+    all_failed = [r for r in scan["results"] if r["result"] == "fail"]
+    new_failed = [r for r in all_failed if r["path"] not in prev_failed_paths]
+
+    owners = []
+    if new_failed:
+        owners = await db.users.find(
+            {"role": "app_owner", "is_active": True, "email": {"$exists": True, "$ne": None, "$ne": ""}},
+            {"_id": 0, "email": 1, "full_name": 1},
+        ).to_list(length=10)
+        if owners:
+            try:
+                from email_service import EmailService
+                es = EmailService()
+                html = _build_regression_email(prev_failed_paths, new_failed, all_failed, scan["summary"])
+
+                async def _send_all():
+                    for o in owners:
+                        try:
+                            await es.send_email(
+                                to_email=o["email"],
+                                subject=f"⚠️ تنبيه: {len(new_failed)} مسار فاشل جديد في فحص اليوم",
+                                html_content=html,
+                                mailbox="main",
+                            )
+                        except Exception as ee:
+                            logger.error(f"daily-trigger email failed: {ee}")
+
+                # Fire-and-forget — preview blocks port 465; never block the response
+                asyncio.create_task(_send_all())
+            except Exception as ee:
+                logger.error(f"daily-trigger email setup failed: {ee}")
+
+    return {
+        "ran_at": scan["ran_at"],
+        "summary": scan["summary"],
+        "new_failures": len(new_failed),
+        "all_failures": len(all_failed),
+        "new_failed_paths": [r["path"] for r in new_failed],
+        "alert_owners_notified": len(owners) if new_failed else 0,
+    }
+
+
+# ============================================================================
+# Daily auto-scan + regression alert
+# ============================================================================
+async def _run_internal_scan(app, db) -> dict:
+    """Internal helper that mimics the public scan endpoint without auth.
+
+    Used by the daily scheduler. Authenticates internally as the first
+    app_owner user found, so RBAC-protected endpoints behave realistically.
+    """
+    # Pick an owner identity to test as (so RBAC behaves like a real run)
+    owner = await db.users.find_one(
+        {"role": {"$in": ["app_owner", "super_admin"]}, "is_active": True},
+        {"_id": 0},
+    )
+    if not owner:
+        return {"summary": {"total": 0, "pass": 0, "warn": 0, "fail": 0, "skipped": 0}, "results": []}
+
+    # Build a JWT for this user using the same auth scheme as login
+    try:
+        from auth_deps import create_access_token
+        token = create_access_token({"sub": owner["id"]})
+    except Exception:
+        token = None
+
+    base = "http://127.0.0.1:8001"
+    headers = {"Authorization": f"Bearer {token}"} if token else {}
+
+    routes = []
+    for r in app.routes:
+        if not isinstance(r, APIRoute):
+            continue
+        if not r.path.startswith("/api/"):
+            continue
+        methods = {m.upper() for m in (r.methods or set())}
+        if not methods:
+            continue
+        routes.append({"path": r.path, "methods": sorted(methods), "tags": list(r.tags or []), "name": r.name})
+
+    results = []
+    async with httpx.AsyncClient(base_url=base, timeout=10.0) as client:
+        sem = asyncio.Semaphore(8)
+
+        async def _check(route: dict):
+            entry = {
+                "path": route["path"], "methods": route["methods"], "tags": route["tags"],
+                "name": route["name"], "tested_method": None, "tested_path": None,
+                "status_code": None, "ms": None, "result": "skipped", "reason": None, "error": None,
+            }
+            if "GET" not in route["methods"]:
+                entry["result"] = "skipped"; entry["reason"] = "non-GET"; return entry
+            if _is_skipped(route["path"]):
+                entry["result"] = "skipped"; entry["reason"] = "blacklisted"; return entry
+            target_path = route["path"]
+            if PATH_PARAM_RE.search(target_path):
+                resolved = _resolve_params(target_path, owner)
+                if not resolved:
+                    entry["result"] = "skipped"; entry["reason"] = "unresolved param"; return entry
+                target_path = resolved
+            entry["tested_method"] = "GET"; entry["tested_path"] = target_path
+            t0 = time.perf_counter()
+            async with sem:
+                try:
+                    resp = await client.get(target_path, headers=headers)
+                    entry["status_code"] = resp.status_code
+                except httpx.ReadTimeout:
+                    entry["error"] = "timeout (>10s)"
+                except Exception as e:
+                    entry["error"] = str(e)[:160]
+            entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
+            entry["result"] = _classify(entry["status_code"], entry["error"])
+            return entry
+
+        results = await asyncio.gather(*[_check(r) for r in routes])
+
+    summary = {"total": 0, "pass": 0, "warn": 0, "fail": 0, "skipped": 0}
+    for r in results:
+        summary["total"] += 1
+        summary[r["result"]] = summary.get(r["result"], 0) + 1
+    return {"summary": summary, "results": results}
+
+
+def _build_regression_email(prev_failed_paths: set, new_failed: list, all_failed: list, summary: dict) -> str:
+    rows_html = ""
+    for r in all_failed:
+        is_new = r["path"] in (set(rf["path"] for rf in new_failed))
+        badge = '<span style="background:#dc2626;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;margin-right:6px;">جديد</span>' if is_new else ''
+        rows_html += f"""<tr>
+          <td style='padding:6px 8px;border-bottom:1px solid #eee;font-family:monospace;font-size:12px;'>{badge}{r['path']}</td>
+          <td style='padding:6px 8px;border-bottom:1px solid #eee;text-align:center;'>{r.get('status_code') or '—'}</td>
+          <td style='padding:6px 8px;border-bottom:1px solid #eee;text-align:center;'>{r.get('ms') or '—'}ms</td>
+        </tr>"""
+    return f"""
+    <div style='font-family:Tahoma,Arial,sans-serif;direction:rtl;max-width:640px;margin:auto;'>
+      <div style='background:linear-gradient(135deg,#dc2626,#f43f5e);color:#fff;padding:20px;border-radius:12px 12px 0 0;'>
+        <h2 style='margin:0;'>⚠️ تنبيه فحص يومي — Failures جديدة</h2>
+        <p style='margin:6px 0 0;opacity:0.9;font-size:14px;'>تم اكتشاف {len(new_failed)} مسار فاشل جديد في فحص اليوم</p>
+      </div>
+      <div style='background:#fff;padding:20px;border:1px solid #eee;border-radius:0 0 12px 12px;'>
+        <p>الإجمالي: <b>{summary.get('total',0)}</b> &nbsp;|&nbsp;
+           ✅ {summary.get('pass',0)} &nbsp;|&nbsp;
+           ⚠️ {summary.get('warn',0)} &nbsp;|&nbsp;
+           <span style='color:#dc2626;'>❌ {summary.get('fail',0)}</span></p>
+        <h3 style='color:#374151;'>المسارات الفاشلة:</h3>
+        <table style='width:100%;border-collapse:collapse;'>
+          <thead>
+            <tr style='background:#f9fafb;'>
+              <th style='padding:8px;text-align:right;font-size:12px;'>المسار</th>
+              <th style='padding:8px;text-align:center;font-size:12px;'>الكود</th>
+              <th style='padding:8px;text-align:center;font-size:12px;'>الزمن</th>
+            </tr>
+          </thead>
+          <tbody>{rows_html}</tbody>
+        </table>
+        <p style='color:#6b7280;font-size:12px;margin-top:20px;text-align:center;'>
+          مرسلة تلقائياً من نظام Health Scanner • للتفاصيل افتح صفحة "فحص صحة المسارات"
+        </p>
+      </div>
+    </div>
+    """
+
+
+async def daily_health_scan_loop(app):
+    """Background loop: at ~06:00 UTC every day, run a full scan and email
+    the app owner if any NEW failures appeared compared to the last snapshot."""
+    await asyncio.sleep(60)  # let app finish booting
+    while True:
+        try:
+            now = datetime.now(timezone.utc)
+            # Compute next 06:00 UTC (tomorrow if we've already passed today's)
+            target = now.replace(hour=6, minute=0, second=0, microsecond=0)
+            if target <= now:
+                target = target + timedelta(days=1)
+            sleep_secs = max(60, (target - now).total_seconds())
+            await asyncio.sleep(sleep_secs)
+
+            db = get_db()
+            # Fetch previous snapshot (before we run the new one)
+            prev = await db.route_health_history.find_one({}, sort=[("ran_at", -1)])
+            prev_failed_paths = set(r["path"] for r in (prev.get("results") or []) if r.get("result") == "fail") if prev else set()
+
+            scan = await _run_internal_scan(app, db)
+            scan["ran_at"] = datetime.now(timezone.utc).isoformat()
+            scan["ran_by"] = "daily-scheduler"
+            await db.route_health_history.insert_one({**scan})
+
+            # Trim history
+            old = await db.route_health_history.find({}, {"_id": 1, "ran_at": 1}).sort("ran_at", -1).to_list(length=200)
+            if len(old) > 50:
+                await db.route_health_history.delete_many({"_id": {"$in": [o["_id"] for o in old[50:]]}})
+
+            all_failed = [r for r in scan["results"] if r["result"] == "fail"]
+            new_failed = [r for r in all_failed if r["path"] not in prev_failed_paths]
+
+            if new_failed:
+                # Email the app owner(s)
+                owners = await db.users.find(
+                    {"role": "app_owner", "is_active": True, "email": {"$exists": True, "$ne": None, "$ne": ""}},
+                    {"_id": 0, "email": 1, "full_name": 1},
+                ).to_list(length=10)
+                if owners:
+                    try:
+                        from email_service import EmailService
+                        es = EmailService()
+                        html = _build_regression_email(prev_failed_paths, new_failed, all_failed, scan["summary"])
+                        for o in owners:
+                            try:
+                                await es.send_email(
+                                    to_email=o["email"],
+                                    subject=f"⚠️ تنبيه: {len(new_failed)} مسار فاشل جديد في فحص اليوم",
+                                    html_content=html,
+                                    mailbox="main",
+                                )
+                            except Exception as ee:
+                                logger.error(f"daily-scan email send failed: {ee}")
+                    except Exception as ee:
+                        logger.error(f"daily-scan email setup failed: {ee}")
+                logger.warning(f"daily-scan: {len(new_failed)} NEW failures detected — emailed {len(owners)} owner(s)")
+            else:
+                logger.info(f"daily-scan: clean — total={scan['summary']['total']} pass={scan['summary']['pass']} fail={scan['summary']['fail']}")
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logger.error(f"daily-scan loop error: {e}", exc_info=True)
+            # Sleep an hour and try again to avoid tight error loops
+            await asyncio.sleep(3600)

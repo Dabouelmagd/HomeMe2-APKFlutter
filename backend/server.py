@@ -2500,6 +2500,15 @@ app.include_router(api_router)
 
 
 @app.on_event("startup")
+async def start_daily_health_scan():
+    """Start the daily route-health auto-scan background task (~06:00 UTC)."""
+    import asyncio as _asyncio
+    from routes.system_health import daily_health_scan_loop
+    _asyncio.create_task(daily_health_scan_loop(app))
+    logging.info("Daily route-health scan loop scheduled (06:00 UTC)")
+
+
+@app.on_event("startup")
 async def start_daily_report_scheduler():
     """Start the daily report background task"""
     global _daily_report_task

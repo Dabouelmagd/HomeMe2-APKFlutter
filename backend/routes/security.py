@@ -382,33 +382,27 @@ async def get_user_subscription(user_id: str, current_user: dict = Depends(get_c
     try:
         db = get_db()
         # التحقق من الصلاحيات
-        if current_user.id != user_id and current_user.role != "admin":
+        if current_user["id"] != user_id and current_user.get("role") not in ("admin", "compound_admin", "company_admin", "app_owner", "super_admin"):
             raise HTTPException(status_code=403, detail="غير مسموح")
         
         # البحث عن الاشتراك النشط
         subscription = await db.user_subscriptions.find_one({
             "user_id": user_id,
             "is_active": True
-        }, sort=[("created_at", -1)])
-        
+        }, {"_id": 0}, sort=[("created_at", -1)])
+
         if not subscription:
-            return SubscriptionCodeResponse(
-                success=False,
-                message="لا يوجد اشتراك نشط"
-            )
-        
-        return SubscriptionCodeResponse(
-            success=True,
-            message="تم العثور على الاشتراك",
-            subscription=UserSubscription(**subscription)
-        )
-        
+            return {"success": False, "message": "لا يوجد اشتراك نشط", "subscription": None}
+
+        return {
+            "success": True,
+            "message": "تم العثور على الاشتراك",
+            "subscription": subscription,
+        }
+
     except HTTPException:
         raise
     except Exception as e:
-        logging.error(f"Error getting user subscription: {e}")
-        return SubscriptionCodeResponse(
-            success=False,
-            message="خطأ في الحصول على الاشتراك"
-        )
+        logging.error(f"Error getting user subscription: {e}", exc_info=True)
+        return {"success": False, "message": "خطأ في الحصول على الاشتراك", "subscription": None}
 

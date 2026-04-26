@@ -5,6 +5,29 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 68: Fixed 9 Discovered Failures + Daily Auto-Scan + Regression Alerts (Apr 26, 2026) ✅
+
+**Part 1 — Bulk fix all 9 failing endpoints discovered by Iter 67's scanner:**
+- **`smart_devices.py`** (`/smart-devices`, `/automations`): missing graceful handling for users without `compound_id`. Replaced `current_user.compound_id` (AttributeError) with `.get("compound_id")` and added an early-return for high-level admins → returns empty list cleanly.
+- **`gallery_init.py`** (`/gallery/stats`): the route called `get_file_stats(...)` defined in `server.py` but never imported. Inlined the aggregation pipeline directly + added the `compound_id` early-return.
+- **`utility.py`** (7 endpoints): every function in this file was missing `db = get_db()` AND used `current_user.family_id` attribute access. Added `db = get_db()` at the top of all 7 endpoints + replaced all `.family_id` with `.get("family_id")`.
+- **`individual.py`** (`/individual/dashboard`): used `current_user.id` (AttributeError) → fixed to `current_user["id"]`. Also wrapped except clause to preserve `HTTPException` codes (404 was being swallowed into 500).
+- **`companies.py`** (3 endpoints — dashboard / compounds / pricing/calculate): replaced ALL 18 occurrences of `current_user.id` with `current_user["id"]` (`replace_all=true`). Added `except HTTPException: raise` guards to preserve real status codes.
+- **`security.py`** (`/users/{user_id}/subscription`): used undefined `SubscriptionCodeResponse` model + `UserSubscription` reference + `current_user.id`. Replaced response model with plain dict + project `_id: 0` from MongoDB find + expanded RBAC roles list.
+- **Result**: scan went from **9 fail / 24 warn → 0 fail / 28 warn** ✨ (warns are legit RBAC-blocked endpoints).
+
+**Part 2 — Daily Auto-Scan + Email Regression Alerts:**
+- **🆕 Backend** `routes/system_health.py`:
+  - `_run_internal_scan(app, db)` — auth-less helper that synthesizes a JWT for the first owner/super_admin so the scheduler can run unattended.
+  - `daily_health_scan_loop(app)` — APScheduler-style asyncio loop that runs at **06:00 UTC daily**: runs scan → diffs against previous snapshot → if any **NEW** failures appeared, builds a beautiful Arabic RTL HTML email (gradient header, "جديد" red badge on new entries, summary line, sortable table) → sends to all active app_owner accounts via `EmailService`.
+  - `POST /api/system/route-health/trigger-daily-now` — manual trigger of the same regression-detection flow using the caller's own bearer token (consistent with `/scan`). Fire-and-forget SMTP so preview's blocked port 465 never blocks the response.
+- **🆕 Server startup hook** in `server.py`: schedules `daily_health_scan_loop` on startup. Verified in logs: "Daily route-health scan loop scheduled (06:00 UTC)".
+- **🆕 Frontend** `pages/SystemHealthPage.js`:
+  - New rose-pink "🔔 تشغيل الفحص اليومي + تنبيه" button next to "بدء فحص جديد".
+  - Permanent rose-gradient info banner: "فحص يومي تلقائي مفعّل — يتم تشغيله يومياً الساعة 6:00 ص (UTC). إذا تم اكتشاف failures جديدة..."
+  - On trigger: shows green toast "✅ لا توجد failures جديدة" if clean, or amber warning toast "🔔 تم اكتشاف N فشل جديد — تم إرسال إيميل لـ M مالك" otherwise.
+- **Verified**: trigger ran and reported `new_failures: 0` consistently, and the previous (pre-fix) trigger correctly identified 2 new failures and sent regression email to the owner.
+
 ### Iter 67: System Route Health Scanner (Apr 26, 2026) ✅
 - **🆕 Backend** `routes/system_health.py` (~250 lines):
   - `GET /api/system/route-health/list` — full inventory of every API route via `app.routes` introspection (path / methods / tags / name).

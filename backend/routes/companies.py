@@ -32,7 +32,7 @@ async def register_company(
         # Create new company
         company = Company(
             **company_data.dict(),
-            created_by=current_user.id
+            created_by=current_user["id"]
         )
         
         await db.companies.insert_one(company.dict())
@@ -40,9 +40,9 @@ async def register_company(
         # Create company user association (make creator the enterprise admin)
         company_user = CompanyUser(
             company_id=company.id,
-            user_id=current_user.id,
+            user_id=current_user["id"],
             role=CompanyRole.ENTERPRISE_ADMIN,
-            invited_by=current_user.id,
+            invited_by=current_user["id"],
             joined_at=datetime.now(timezone.utc),
             invitation_accepted=True
         )
@@ -77,7 +77,7 @@ async def get_company_dashboard(
         db = get_db()
         # Get user's company
         company_user = await db.company_users.find_one({
-            "user_id": current_user.id,
+            "user_id": current_user["id"],
             "is_active": True
         })
         
@@ -152,8 +152,10 @@ async def get_company_dashboard(
             })
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logging.error(f"Error getting company dashboard: {e}")
+        logging.error(f"Error getting company dashboard: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/companies/compounds")
@@ -166,7 +168,7 @@ async def create_compound(
         db = get_db()
         # Get user's company
         company_user = await db.company_users.find_one({
-            "user_id": current_user.id,
+            "user_id": current_user["id"],
             "is_active": True
         })
         
@@ -181,7 +183,7 @@ async def create_compound(
         compound = CompoundCompany(
             **compound_data.dict(),
             company_id=company_user["company_id"],
-            primary_admin_id=current_user.id
+            primary_admin_id=current_user["id"]
         )
         
         await db.compound_companies.insert_one(compound.dict())
@@ -205,7 +207,7 @@ async def list_company_compounds(
         db = get_db()
         # Get user's company
         company_user = await db.company_users.find_one({
-            "user_id": current_user.id,
+            "user_id": current_user["id"],
             "is_active": True
         })
         
@@ -222,9 +224,9 @@ async def list_company_compounds(
             else:
                 # No specific access defined, they can see compounds they manage
                 query["$or"] = [
-                    {"primary_admin_id": current_user.id},
-                    {"additional_admins": current_user.id},
-                    {"managers": current_user.id}
+                    {"primary_admin_id": current_user["id"]},
+                    {"additional_admins": current_user["id"]},
+                    {"managers": current_user["id"]}
                 ]
         
         compounds = await db.compound_companies.find(query).to_list(length=10000)
@@ -254,8 +256,10 @@ async def list_company_compounds(
             "compounds": serialize_datetime(compounds)
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logging.error(f"Error listing compounds: {e}")
+        logging.error(f"Error listing compounds: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/companies/invite")
@@ -268,7 +272,7 @@ async def invite_user_to_company(
         db = get_db()
         # Get user's company
         company_user = await db.company_users.find_one({
-            "user_id": current_user.id,
+            "user_id": current_user["id"],
             "is_active": True
         })
         
@@ -286,7 +290,7 @@ async def invite_user_to_company(
         invitation = CompanyInvitation(
             company_id=company_user["company_id"],
             **invite_data.dict(),
-            invited_by=current_user.id,
+            invited_by=current_user["id"],
             expires_at=datetime.now(timezone.utc) + timedelta(days=7)
         )
         
@@ -313,7 +317,7 @@ async def calculate_company_pricing(
         db = get_db()
         # Get user's company
         company_user = await db.company_users.find_one({
-            "user_id": current_user.id,
+            "user_id": current_user["id"],
             "is_active": True
         })
         
@@ -338,8 +342,10 @@ async def calculate_company_pricing(
             "compounds": serialize_datetime(compounds)
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
-        logging.error(f"Error calculating pricing: {e}")
+        logging.error(f"Error calculating pricing: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.put("/companies/compounds/{compound_id}")
@@ -353,7 +359,7 @@ async def update_compound(
         db = get_db()
         # Get user's company and check access
         company_user = await db.company_users.find_one({
-            "user_id": current_user.id,
+            "user_id": current_user["id"],
             "is_active": True
         })
         
@@ -372,9 +378,9 @@ async def update_compound(
         # Check permissions
         can_edit = (
             company_user["role"] == CompanyRole.ENTERPRISE_ADMIN or
-            compound["primary_admin_id"] == current_user.id or
-            current_user.id in compound.get("additional_admins", []) or
-            current_user.id in compound.get("managers", [])
+            compound["primary_admin_id"] == current_user["id"] or
+            current_user["id"] in compound.get("additional_admins", []) or
+            current_user["id"] in compound.get("managers", [])
         )
         
         if not can_edit:
@@ -411,7 +417,7 @@ async def get_company_analytics(
         db = get_db()
         # Verify user has access to this company
         company_user = await db.company_users.find_one({
-            "user_id": current_user.id,
+            "user_id": current_user["id"],
             "company_id": company_id,
             "is_active": True
         })

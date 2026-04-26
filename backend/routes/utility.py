@@ -15,6 +15,7 @@ from shared_models import *
 router = APIRouter(prefix="/api")
 
 async def get_utility_connections(compound_id: str, current_user: dict = Depends(get_current_user)):
+    db = get_db()
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
@@ -24,7 +25,7 @@ async def get_utility_connections(compound_id: str, current_user: dict = Depends
     else:
         connections = await db.utility_connections.find({
             "compound_id": compound_id,
-            "family_id": current_user.family_id
+            "family_id": current_user.get("family_id")
         }).to_list(length=10000)
     
     # Clean connections data
@@ -50,15 +51,16 @@ async def create_utility_connection(
     connection_data: UtilityConnectionCreate,
     current_user: dict = Depends(get_current_user)
 ):
+    db = get_db()
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
-    if not current_user.family_id:
+    if not current_user.get("family_id"):
         raise HTTPException(status_code=400, detail="User must be part of a family")
     
     connection = UtilityConnection(
         compound_id=compound_id,
-        family_id=current_user.family_id,
+        family_id=current_user.get("family_id"),
         unit_number=current_user.get('unit_number','') or "N/A",
         utility_type=connection_data.utility_type,
         provider_name=connection_data.provider_name,
@@ -73,10 +75,12 @@ async def create_utility_connection(
 
 @router.get("/utility-bills/my")
 async def get_my_utility_bills(current_user: dict = Depends(get_current_user)):
-    if not current_user.family_id:
+    db = get_db()
+    family_id = current_user.get("family_id")
+    if not family_id:
         return {"bills": []}
-    
-    bills = await db.utility_bills.find({"family_id": current_user.family_id}).to_list(length=10000)
+
+    bills = await db.utility_bills.find({"family_id": family_id}).to_list(length=10000)
     
     # Clean bills data
     clean_bills = []
@@ -102,6 +106,7 @@ async def get_my_utility_bills(current_user: dict = Depends(get_current_user)):
 
 @router.get("/compounds/{compound_id}/utility-bills")
 async def get_compound_utility_bills(compound_id: str, current_user: dict = Depends(require_admin)):
+    db = get_db()
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
@@ -136,6 +141,7 @@ async def create_utility_bill(
     bill_data: UtilityBillCreate,
     current_user: dict = Depends(require_admin)
 ):
+    db = get_db()
     if current_user.get('compound_id','') != compound_id:
         raise HTTPException(status_code=403, detail="Access denied")
     
@@ -170,12 +176,13 @@ async def pay_utility_bill(
     bill_id: str,
     current_user: dict = Depends(get_current_user)
 ):
+    db = get_db()
     # Get the bill
     bill = await db.utility_bills.find_one({"id": bill_id})
     if not bill:
         raise HTTPException(status_code=404, detail="Bill not found")
     
-    if bill["family_id"] != current_user.family_id:
+    if bill["family_id"] != current_user.get("family_id"):
         raise HTTPException(status_code=403, detail="Access denied")
     
     if bill["status"] != PaymentStatus.PENDING:
@@ -187,7 +194,7 @@ async def pay_utility_bill(
     
     payment = UtilityPayment(
         bill_id=bill_id,
-        family_id=current_user.family_id,
+        family_id=current_user.get("family_id"),
         amount=bill["amount"],
         government_transaction_id=government_tx_id,
         homeMe_transaction_id=homeMe_tx_id
@@ -234,11 +241,12 @@ async def get_utility_bill_receipt(
     bill_id: str,
     current_user: dict = Depends(get_current_user)
 ):
+    db = get_db()
     bill = await db.utility_bills.find_one({"id": bill_id})
     if not bill:
         raise HTTPException(status_code=404, detail="Bill not found")
     
-    if bill["family_id"] != current_user.family_id and current_user.get('role','') != UserRole.ADMIN:
+    if bill["family_id"] != current_user.get("family_id") and current_user.get('role','') != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Access denied")
     
     payment = await db.utility_payments.find_one({"bill_id": bill_id})

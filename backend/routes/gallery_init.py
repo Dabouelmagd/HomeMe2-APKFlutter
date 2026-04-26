@@ -44,20 +44,40 @@ async def get_gallery_stats(current_user: dict = Depends(get_current_user)):
     """Get file gallery statistics"""
     try:
         db = get_db()
+        compound_id = current_user.get("compound_id")
+        if not compound_id:
+            return {"stats": {"by_type": {}, "total_files": 0, "total_size": 0, "total_size_mb": 0.0}}
         # Get user's accessible chats
         user_chats = await db.chats.find({
-            "compound_id": current_user.get('compound_id',''),
-            "participants": current_user['id'],
+            "compound_id": compound_id,
+            "participants": current_user["id"],
             "is_active": True
         }).to_list(length=10000)
-        
-        user_chat_ids = [chat["id"] for chat in user_chats]
-        stats = await get_file_stats(user_chat_ids)
-        
-        return {"stats": stats}
-        
+
+        chat_ids = [chat["id"] for chat in user_chats]
+        if not chat_ids:
+            return {"stats": {"by_type": {}, "total_files": 0, "total_size": 0, "total_size_mb": 0.0}}
+
+        pipeline = [
+            {"$match": {"chat_id": {"$in": chat_ids}, "attachments": {"$exists": True, "$not": {"$size": 0}}, "is_deleted": False}},
+            {"$unwind": "$attachments"},
+            {"$group": {"_id": "$attachments.file_type", "count": {"$sum": 1}, "total_size": {"$sum": "$attachments.file_size"}}},
+        ]
+        agg = await db.chat_messages.aggregate(pipeline).to_list(length=10000)
+        by_type = {}
+        total_files = 0
+        total_size = 0
+        for s in agg:
+            ft = s.get("_id") or "unknown"
+            cnt = s.get("count") or 0
+            sz = s.get("total_size") or 0
+            by_type[ft] = {"count": cnt, "size": sz, "size_mb": round(sz / (1024 * 1024), 2)}
+            total_files += cnt
+            total_size += sz
+        return {"stats": {"by_type": by_type, "total_files": total_files, "total_size": total_size, "total_size_mb": round(total_size / (1024 * 1024), 2)}}
+
     except Exception as e:
-        logging.error(f"Error getting gallery stats: {e}")
+        logging.error(f"Error getting gallery stats: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to get gallery statistics")
 
 # ============ MESSAGE SCHEDULING ENDPOINTS ============

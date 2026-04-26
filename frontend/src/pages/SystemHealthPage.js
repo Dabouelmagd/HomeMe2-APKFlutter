@@ -13,6 +13,7 @@ import {
   ChevronUpIcon,
   ClockIcon,
   ChartBarIcon,
+  BellAlertIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -125,6 +126,26 @@ const SystemHealthPage = () => {
     }
   }, []);
 
+  const triggerDailyNow = useCallback(async () => {
+    setScanning(true);
+    try {
+      const res = await axios.post(`${API}/system/route-health/trigger-daily-now`, {}, { ...auth(), timeout: 120000 });
+      const d = res.data || {};
+      const newFails = d.new_failures || 0;
+      if (newFails > 0) {
+        toast.warning(`🔔 تم اكتشاف ${newFails} فشل جديد — تم إرسال إيميل تنبيه إلى ${d.alert_owners_notified} مالك`);
+      } else {
+        toast.success(`✅ لا توجد failures جديدة (${d.summary?.fail || 0} فشل قائم)`);
+      }
+      // Reload last snapshot
+      await loadLast();
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || 'فشل تشغيل الفحص اليومي');
+    } finally {
+      setScanning(false);
+    }
+  }, [loadLast]);
+
   useEffect(() => { loadLast(); }, [loadLast]);
 
   useEffect(() => {
@@ -205,7 +226,25 @@ const SystemHealthPage = () => {
               {scanning ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : <PlayIcon className="w-4 h-4" />}
               <span>{scanning ? 'جاري الفحص...' : 'بدء فحص جديد'}</span>
             </button>
+            <button
+              onClick={triggerDailyNow}
+              disabled={scanning}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white rounded-lg font-bold shadow-md disabled:opacity-50"
+              data-testid="trigger-daily-btn"
+              title="يفحص ويبعث تنبيه إيميل لو في فشل جديد"
+            >
+              <BellAlertIcon className="w-4 h-4" />
+              <span>تشغيل الفحص اليومي + تنبيه</span>
+            </button>
           </div>
+        </div>
+
+        {/* Daily auto-scan info */}
+        <div className="mt-4 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200 rounded-lg px-4 py-3 text-sm text-rose-800 flex items-center gap-2" data-testid="auto-scan-info">
+          <BellAlertIcon className="w-5 h-5 flex-shrink-0" />
+          <span>
+            <strong>فحص يومي تلقائي مفعّل</strong> — يتم تشغيله يومياً الساعة 6:00 ص (UTC). إذا تم اكتشاف <em>failures جديدة</em> مقارنةً بآخر فحص، سيتم إرسال إيميل تنبيه فوري للمالك تلقائياً.
+          </span>
         </div>
 
         {/* Summary tiles */}

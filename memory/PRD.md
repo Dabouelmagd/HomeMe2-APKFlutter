@@ -5,6 +5,32 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 72: Visitor QR Pass — Full E2E Feature (Apr 26, 2026) ✅
+
+**🆕 Backend** `routes/visitor_passes.py` (~210 lines):
+- Collection `visitor_passes` with: id, token, compound_id, resident_id+name, unit_number, visitor_name+phone+vehicle_plate+purpose, valid_from/until, max_uses, used_count, used_at, used_by_security_id+name, is_active, activity_log[], created_at.
+- 5 endpoints:
+  - `POST /api/visitor-passes` — resident creates a pass (validation: name required, 1≤valid_hours≤168, 1≤max_uses≤10).
+  - `GET /api/visitor-passes/my` — resident's own passes (computed `effective_status`).
+  - `GET /api/visitor-passes/compound` — admin/security view scoped to compound, with optional `?status=` filter.
+  - `GET /api/visitor-passes/public/{token}` — **no-auth** public verification page (minimal info, for QR landing).
+  - `POST /api/visitor-passes/{token}/redeem` — security redeems at gate (RBAC: admin/security/compound_admin), validates not used/expired/revoked/not_yet_valid, increments `used_count`, records `used_by_security_*`.
+  - `DELETE /api/visitor-passes/{id}` — soft-revoke (resident or admin).
+- Activity log + audit_log integration (`visitor_pass.create/redeem/revoke`).
+
+**🆕 Frontend** — 3 pages:
+- **`pages/VisitorPassesPage.js`** (resident view at `/app/visitor-passes`): list + 5 filter pills (all/active/used/expired/revoked) with counts, big "دعوة زائر جديد" button → modal with name/phone/plate/purpose/hours/uses fields → success toast. Each card shows visitor info, QR thumbnail (70px), validity range, used_count/max_uses, security name if redeemed, and 4 action buttons (نسخ / واتساب / تنزيل PNG / إلغاء).
+- **`pages/SecurityScanPage.js`** (security view at `/app/security-scan`): big QR icon + textarea for token/URL paste (auto-extracts token from URL) + "تفعيل الدخول" button → result card colored green/red with full visitor + host + plate + purpose details and used_count/max_uses display.
+- **`pages/PublicVisitorPassPage.js`** (no-auth at `/visitor/:token`): beautiful gradient card with status badge (active/used/expired/revoked), all visitor info, validity range, footer note "على الأمن مسح الرابط من تطبيق HomeMe لتفعيل الدخول".
+
+**Sidebar** entries added: "تذاكر الزوار" + "مسح تذكرة (الأمن)".
+
+**Verified end-to-end via Playwright + curl**:
+1. Resident creates pass for "سارة محمد" → toast appears, card renders with QR ✅
+2. Public page at `/visitor/{token}` shows full info with green "نشط - صالح" badge ✅
+3. Security scans (paste full URL) → "تم تسجيل الدخول للزائر سارة محمد" ✅
+4. Pass auto-marked as used in resident's view + security name recorded ✅
+
 ### Iter 71: Onboarding + KPIs + PWA + Renewals + Pytest Suite (Apr 26, 2026) ✅
 
 **🆕 #4 Onboarding Wizard** — Backend `routes/onboarding.py` (state/advance/dismiss endpoints, tracks `onboarding_step`, `onboarding_completed`, `onboarding_dismissed_at` on user). Frontend `components/OnboardingWizard.js` — 5-step modal (welcome → compound → first resident → first invite → done) gated by `useAuth()` user + `/app/*` route check. Navigates to relevant page on each step. Smooth progress bar + dots indicator + "تخطي للأبد" option.

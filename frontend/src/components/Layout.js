@@ -50,6 +50,7 @@ import {
   LifebuoyIcon,
   LinkIcon,
   ClipboardDocumentListIcon,
+  QrCodeIcon,
   SpeakerXMarkIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -558,6 +559,8 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('family_management'), href: 'family', icon: UsersIcon, show: true },
         { name: t('add_family_member'), href: 'add-family-member', icon: UserPlusIcon, show: true },
         { name: 'إدارة دعواتي', href: 'my-invites', icon: LinkIcon, show: true },
+        { name: 'تذاكر الزوار', href: 'visitor-passes', icon: TicketIcon, show: true },
+        { name: 'مسح تذكرة (الأمن)', href: 'security-scan', icon: QrCodeIcon, show: true },
       ]
     },
     {

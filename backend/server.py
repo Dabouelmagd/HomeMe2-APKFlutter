@@ -2445,6 +2445,8 @@ from routes.onboarding import router as onboarding_router
 app.include_router(onboarding_router)
 from routes.owner_kpis import router as owner_kpis_router
 app.include_router(owner_kpis_router)
+from routes.visitor_passes import router as visitor_passes_router
+app.include_router(visitor_passes_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
 app.include_router(linked_accounts_router)

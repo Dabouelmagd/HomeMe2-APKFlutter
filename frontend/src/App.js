@@ -60,6 +60,9 @@ import MyInvitesPage from './pages/MyInvitesPage';
 import SystemHealthPage from './pages/SystemHealthPage';
 import AuditLogPage from './pages/AuditLogPage';
 import OwnerKpiPage from './pages/OwnerKpiPage';
+import VisitorPassesPage from './pages/VisitorPassesPage';
+import SecurityScanPage from './pages/SecurityScanPage';
+import PublicVisitorPassPage from './pages/PublicVisitorPassPage';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
 import OnboardingWizard from './components/OnboardingWizard';
 import JoinFamilyByInvite from './pages/JoinFamilyByInvite';
@@ -524,6 +527,7 @@ function App() {
                 <Route path="/advertiser-register" element={<AdvertiserRegister />} />
                 <Route path="/join/:token" element={<JoinViaInvite />} />
                 <Route path="/join-family/:token" element={<JoinFamilyByInvite />} />
+                <Route path="/visitor/:token" element={<PublicVisitorPassPage />} />
                 <Route path="/debug-login" element={<DebugLogin />} />
                 <Route path="/select-account" element={
                   <ProtectedRoute>
@@ -627,6 +631,14 @@ function App() {
                   <ProtectedRoute>
                     <OwnerKpiPage />
                   </ProtectedRoute>
+                } />
+
+                <Route path="visitor-passes" element={
+                  <VisitorPassesPage />
+                } />
+
+                <Route path="security-scan" element={
+                  <SecurityScanPage />
                 } />
                 
                 <Route path="pricing" element={

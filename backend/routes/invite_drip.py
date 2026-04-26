@@ -372,11 +372,21 @@ async def resend_family_invite_reminder(
     # frontend reflects the action immediately. If SMTP fails later it's a
     # soft failure (logged) — preview env blocks port 465 so we never want to
     # block the API response on the email roundtrip.
+    activity_entry = {
+        "event": "reminder_sent",
+        "at": now.isoformat(),
+        "by_user_id": current_user.get("id"),
+        "by_full_name": current_user.get("full_name") or current_user.get("username"),
+        "by_role": current_user.get("role"),
+        "to_email": recipient_email,
+        "reminder_no": next_reminder_no,
+    }
     await db.family_invites.update_one(
         {"id": invite_id},
         {
             "$set": {"last_reminder_sent_at": now.isoformat()},
             "$inc": {"reminder_count": 1},
+            "$push": {"activity_log": activity_entry},
         },
     )
 

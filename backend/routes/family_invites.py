@@ -34,6 +34,21 @@ from helpers import serialize_datetime
 
 router = APIRouter(prefix="/api")
 
+
+def _activity_entry(event: str, by_user: dict | None, **extra) -> dict:
+    """Build a single activity-log entry with consistent shape."""
+    out = {
+        "event": event,                # created | reminder_sent | accepted | revoked
+        "at": datetime.now(timezone.utc).isoformat(),
+    }
+    if by_user:
+        out["by_user_id"] = by_user.get("id")
+        out["by_full_name"] = by_user.get("full_name") or by_user.get("username")
+        out["by_role"] = by_user.get("role")
+    out.update({k: v for k, v in extra.items() if v is not None})
+    return out
+
+
 VALID_FAMILY_RELATIONSHIPS = [
     "spouse",   # زوج/زوجة
     "child",    # ابن/ابنة
@@ -151,6 +166,16 @@ async def create_family_invite(payload: dict, current_user: dict = Depends(get_c
         "created_by_full_name": current_user.get("full_name"),
         "target_user_id": target_user_id,
         "target_user_full_name": inviter_for_invite.get("full_name") if target_user_id else None,
+        "activity_log": [
+            _activity_entry(
+                "created",
+                current_user,
+                relationship=relationship,
+                unit_number=inviter_for_invite.get("unit_number"),
+                target_user_id=target_user_id,
+                target_user_full_name=inviter_for_invite.get("full_name") if target_user_id else None,
+            )
+        ],
     }
     await db.family_invites.insert_one(doc)
     doc.pop("_id", None)
@@ -187,6 +212,78 @@ async def list_family_invites(current_user: dict = Depends(get_current_user)):
     return {"invites": serialize_datetime(invites), "total": len(invites)}
 
 
+@router.get("/family-invites/{invite_id}/activity")
+async def get_family_invite_activity(invite_id: str, current_user: dict = Depends(get_current_user)):
+    """Return the chronological activity timeline for a family invite.
+
+    Synthesizes events from the stored activity_log + falls back to legacy
+    fields (created_at, revoked_at, reminder_count, accepted_user_ids) so
+    invites created before this feature still show a meaningful timeline.
+    """
+    db = get_db()
+    inv = await db.family_invites.find_one({"id": invite_id}, {"_id": 0})
+    if not inv:
+        raise HTTPException(status_code=404, detail="الرابط غير موجود")
+
+    role = current_user.get("role")
+    is_creator = inv.get("created_by") == current_user.get("id")
+    is_owner_or_super = role in ("app_owner", "super_admin")
+    is_compound_admin = role in ("admin", "compound_admin") and current_user.get("compound_id") == inv.get("compound_id")
+    is_company_admin = (
+        role == "company_admin"
+        and current_user.get("company_id")
+        and current_user.get("company_id") == inv.get("company_id")
+    )
+    if not (is_creator or is_owner_or_super or is_compound_admin or is_company_admin):
+        raise HTTPException(status_code=403, detail="غير مصرح")
+
+    log = list(inv.get("activity_log") or [])
+
+    # Backfill: synthesize events from legacy fields when activity_log is empty.
+    if not log:
+        if inv.get("created_at"):
+            log.append({
+                "event": "created",
+                "at": inv["created_at"],
+                "by_full_name": inv.get("created_by_full_name"),
+                "by_user_id": inv.get("created_by"),
+                "relationship": inv.get("relationship"),
+                "unit_number": inv.get("unit_number"),
+                "target_user_full_name": inv.get("target_user_full_name"),
+                "synthesized": True,
+            })
+        if (inv.get("reminder_count") or 0) > 0 and inv.get("last_reminder_sent_at"):
+            log.append({
+                "event": "reminder_sent",
+                "at": inv["last_reminder_sent_at"],
+                "reminder_no": inv["reminder_count"],
+                "synthesized": True,
+            })
+        for uid in (inv.get("accepted_user_ids") or []):
+            u = await db.users.find_one({"id": uid}, {"_id": 0, "full_name": 1, "username": 1, "created_at": 1})
+            if u:
+                log.append({
+                    "event": "accepted",
+                    "at": u.get("created_at") or inv.get("created_at"),
+                    "user_id": uid,
+                    "full_name": u.get("full_name"),
+                    "username": u.get("username"),
+                    "synthesized": True,
+                })
+        if not inv.get("is_active") and inv.get("revoked_at"):
+            log.append({
+                "event": "revoked",
+                "at": inv["revoked_at"],
+                "synthesized": True,
+            })
+
+    # Sort ascending by `at`
+    log.sort(key=lambda e: e.get("at") or "")
+
+    return {"invite_id": invite_id, "events": log, "total": len(log)}
+
+
+
 @router.delete("/family-invites/{invite_id}")
 async def revoke_family_invite(invite_id: str, current_user: dict = Depends(get_current_user)):
     db = get_db()
@@ -197,7 +294,10 @@ async def revoke_family_invite(invite_id: str, current_user: dict = Depends(get_
         raise HTTPException(status_code=403, detail="لا يمكنك إلغاء رابط لم تنشئه")
     await db.family_invites.update_one(
         {"id": invite_id},
-        {"$set": {"is_active": False, "revoked_at": datetime.now(timezone.utc).isoformat()}},
+        {
+            "$set": {"is_active": False, "revoked_at": datetime.now(timezone.utc).isoformat()},
+            "$push": {"activity_log": _activity_entry("revoked", current_user)},
+        },
     )
     return {"success": True}
 
@@ -296,9 +396,20 @@ async def public_accept_family_invite(token: str, payload: dict):
         "profile_picture_url": None,
     }
     await db.users.insert_one(user_doc)
+    accept_entry = _activity_entry(
+        "accepted",
+        None,
+        user_id=user_doc["id"],
+        full_name=full_name,
+        username=username,
+    )
     await db.family_invites.update_one(
         {"id": inv["id"]},
-        {"$inc": {"used_count": 1}, "$addToSet": {"accepted_user_ids": user_doc["id"]}},
+        {
+            "$inc": {"used_count": 1},
+            "$addToSet": {"accepted_user_ids": user_doc["id"]},
+            "$push": {"activity_log": accept_entry},
+        },
     )
     user_doc.pop("_id", None)
     user_doc.pop("password_hash", None)

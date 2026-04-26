@@ -18,6 +18,10 @@ import {
   ArrowDownTrayIcon,
   EnvelopeIcon,
   PaperAirplaneIcon,
+  ClipboardDocumentCheckIcon,
+  SparklesIcon,
+  PlusCircleIcon,
+  NoSymbolIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -101,6 +105,134 @@ const InviteQrModal = ({ url, title, subtitle, onClose }) => {
           <ArrowDownTrayIcon className="w-4 h-4" />
           تنزيل PNG
         </button>
+      </div>
+    </div>
+  );
+};
+
+/* ---------------- Activity Timeline Modal ---------------- */
+const EVENT_META = {
+  created: { label: 'تم إنشاء الدعوة', icon: PlusCircleIcon, cls: 'bg-emerald-100 text-emerald-700 ring-emerald-200' },
+  reminder_sent: { label: 'إرسال تذكير بالإيميل', icon: EnvelopeIcon, cls: 'bg-amber-100 text-amber-700 ring-amber-200' },
+  accepted: { label: 'تم قبول الدعوة 🎉', icon: SparklesIcon, cls: 'bg-blue-100 text-blue-700 ring-blue-200' },
+  revoked: { label: 'تم إلغاء الدعوة', icon: NoSymbolIcon, cls: 'bg-rose-100 text-rose-700 ring-rose-200' },
+};
+
+const formatDateTime = (iso) => {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return d.toLocaleString('ar-EG', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+  } catch {
+    return iso;
+  }
+};
+
+const ActivityTimelineModal = ({ invite, onClose }) => {
+  const [events, setEvents] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await axios.get(`${API}/family-invites/${invite.id}/activity`, auth());
+        if (alive) setEvents(res.data?.events || []);
+      } catch (err) {
+        if (alive) {
+          toast.error(err?.response?.data?.detail || 'فشل تحميل السجل');
+          setEvents([]);
+        }
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [invite.id]);
+
+  return (
+    <div className="fixed inset-0 z-[110] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col" onClick={(e) => e.stopPropagation()} data-testid="activity-timeline-modal">
+        <div className="flex items-start justify-between border-b border-gray-100 p-5">
+          <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2 rounded-lg">
+              <ClipboardDocumentCheckIcon className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900">سجل أنشطة الدعوة</h3>
+              <p className="text-xs text-gray-500 mt-0.5">
+                الوحدة {invite.unit_number || '—'} • {RELATIONSHIPS[invite.relationship] || invite.relationship}
+              </p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100" data-testid="close-timeline">
+            <XMarkIcon className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto p-5 flex-1">
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => <div key={i} className="h-14 bg-gray-100 rounded-xl animate-pulse" />)}
+            </div>
+          ) : events.length === 0 ? (
+            <div className="text-center py-10">
+              <ClipboardDocumentCheckIcon className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+              <p className="text-sm text-gray-500">لا توجد أنشطة بعد</p>
+            </div>
+          ) : (
+            <ol className="relative border-r-2 border-gray-200 pr-6 space-y-5" data-testid="timeline-list">
+              {events.map((ev, idx) => {
+                const meta = EVENT_META[ev.event] || { label: ev.event, icon: ClipboardDocumentCheckIcon, cls: 'bg-gray-100 text-gray-700 ring-gray-200' };
+                const Icon = meta.icon;
+                return (
+                  <li key={idx} className="relative" data-testid={`timeline-event-${ev.event}-${idx}`}>
+                    <span className={`absolute -right-[34px] top-0 inline-flex items-center justify-center w-8 h-8 rounded-full ring-4 ${meta.cls}`}>
+                      <Icon className="w-4 h-4" />
+                    </span>
+                    <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <span className="text-sm font-bold text-gray-900">{meta.label}</span>
+                        <span className="text-[11px] text-gray-500">{formatDateTime(ev.at)}</span>
+                      </div>
+                      <div className="mt-1 text-xs text-gray-600 space-y-0.5">
+                        {ev.by_full_name && (
+                          <div>👤 بواسطة: <span className="font-medium">{ev.by_full_name}</span>{ev.by_role ? ` (${ev.by_role})` : ''}</div>
+                        )}
+                        {ev.event === 'reminder_sent' && (
+                          <>
+                            {ev.to_email && <div>📧 إلى: <span className="font-mono text-[11px]">{ev.to_email}</span></div>}
+                            {ev.reminder_no && <div>رقم التذكير: <span className="font-bold">{ev.reminder_no}</span></div>}
+                          </>
+                        )}
+                        {ev.event === 'accepted' && (
+                          <>
+                            {ev.full_name && <div>✅ المستخدم الجديد: <span className="font-medium">{ev.full_name}</span></div>}
+                            {ev.username && <div className="text-[11px] text-gray-500">@{ev.username}</div>}
+                          </>
+                        )}
+                        {ev.event === 'created' && (
+                          <>
+                            {ev.target_user_full_name && <div>🎯 لوحدة: <span className="font-medium">{ev.target_user_full_name}</span></div>}
+                            {ev.relationship && <div>صلة القرابة: {RELATIONSHIPS[ev.relationship] || ev.relationship}</div>}
+                          </>
+                        )}
+                        {ev.synthesized && (
+                          <div className="mt-1 text-[10px] text-amber-700 bg-amber-50 inline-block px-2 py-0.5 rounded-full border border-amber-200">
+                            ⓘ مُستخرج من البيانات السابقة
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -193,6 +325,7 @@ const InviteCard = ({ invite, onRevoke, onReminderSent }) => {
   const [copied, setCopied] = useState(false);
   const [showQr, setShowQr] = useState(false);
   const [showResend, setShowResend] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
   const url = buildJoinUrl(invite.join_url);
   const status = invite.effective_status || 'active';
   const badge = STATUS_BADGE[status] || STATUS_BADGE.active;
@@ -280,6 +413,15 @@ const InviteCard = ({ invite, onRevoke, onReminderSent }) => {
             <span>تذكير</span>
           </button>
         )}
+        <button
+          onClick={() => setShowTimeline(true)}
+          className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-lg px-3 py-2 text-xs font-bold inline-flex items-center gap-1 shadow-sm"
+          data-testid={`my-invite-timeline-${invite.id}`}
+          title="سجل أنشطة الدعوة"
+        >
+          <ClipboardDocumentCheckIcon className="w-4 h-4" />
+          <span>السجل</span>
+        </button>
       </div>
 
       <div className="flex items-center justify-between text-[11px] text-gray-500">
@@ -314,6 +456,12 @@ const InviteCard = ({ invite, onRevoke, onReminderSent }) => {
           invite={invite}
           onClose={() => setShowResend(false)}
           onSent={onReminderSent}
+        />
+      )}
+      {showTimeline && (
+        <ActivityTimelineModal
+          invite={invite}
+          onClose={() => setShowTimeline(false)}
         />
       )}
     </div>

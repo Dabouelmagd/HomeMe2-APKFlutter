@@ -5,6 +5,26 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 65: Activity Timeline per Invite (Apr 26, 2026) ✅
+- **🆕 Backend** `family_invites.py`:
+  - New field `activity_log: []` on every invite, populated on every state change.
+  - Helpers: `_activity_entry(event, by_user, **extra)` for consistent shape.
+  - Hooks added to:
+    - `POST /family-invites` (create) → "created" entry with relationship/unit/target.
+    - `DELETE /family-invites/{id}` (revoke) → "revoked" entry with admin info.
+    - `POST /family-invites/token/{token}/accept` (public accept) → "accepted" entry with new user info.
+  - `POST /family-invites/{id}/resend-reminder` (in `invite_drip.py`) → "reminder_sent" entry with recipient + reminder_no.
+- **🆕 Backend endpoint** `GET /api/family-invites/{id}/activity`:
+  - Same RBAC as resend (creator / compound admin / company admin / owner / super_admin).
+  - Returns events sorted ascending by `at`.
+  - **Backwards-compat**: when `activity_log` is empty (legacy invite), synthesizes events from existing fields (`created_at`, `last_reminder_sent_at`, `accepted_user_ids`, `revoked_at`) — each marked with `synthesized: true`.
+- **🆕 Frontend** `pages/MyInvitesPage.js`:
+  - `ActivityTimelineModal` with vertical RTL timeline, color-coded circular icons per event type (green plus / amber envelope / blue sparkles / rose ban).
+  - Each event shows event-specific details: actor + role for created/revoked/reminder, recipient email + reminder# for reminders, new-user info for accepted.
+  - Amber "ⓘ مُستخرج من البيانات السابقة" pill on synthesized events.
+  - "📋 السجل" button (indigo-purple gradient) on every invite card next to QR/share/revoke.
+- **Verified** end-to-end: revoked invite shows synthesized timeline (created → revoked); active invite with fresh reminders shows real entries with recipient email + admin name + role + reminder counter.
+
 ### Iter 64: Manual Resend-Reminder for Pending Family Invites (Apr 26, 2026) ✅
 - **🆕 Backend** `routes/invite_drip.py` — `POST /api/family-invites/{invite_id}/resend-reminder`:
   - Body: `{ email?: string, base_url?: string }`. Defaults email to inviter's own email if blank.

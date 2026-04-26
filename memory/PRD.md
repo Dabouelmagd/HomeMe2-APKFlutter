@@ -3,7 +3,42 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-59)
+## Latest Fixes (Feb 2026 — iterations 26-50)
+
+### Iter 50: Services Bug Fix + PDF Reports + 2FA TOTP (Apr 26, 2026) ✅
+
+**🐛 Bug Fix — Services Page 405/403 Errors:**
+- `routes/compound_services.py`: missing `@router.get` decorator on `get_compound_services` (function existed but never registered as a route → 405). Fixed.
+- 5 handlers were referencing `db` without calling `get_db()` (would crash on real use) → Fixed by adding `db = get_db()` inside each handler.
+- App Owner / Super Admin can now view services & bookings of any compound (added role-based bypass).
+- Frontend `ServicesManagement.js`: added `user.compound_id` guard in `fetchServices`/`fetchBookings` → graceful empty state instead of error toast for users without a default compound.
+
+**🆕 PDF Reports (P1 — Arabic RTL with WeasyPrint):**
+- `services/pdf_report_service.py` — branded HTML templates with Noto Sans Arabic font, KPIs cards, RTL tables, gradient totals, header (logo + compound + period + report no.), footer.
+- `routes/pdf_reports.py` — 4 endpoints (all `/api/reports/...`): `unit/{user_id}/statement`, `compound/{cid}/occupancy`, `compound/{cid}/invoices`, `compound/{cid}/summary`. RBAC: family head, compound admin, app_owner / super_admin. Currency = EGP. `month=YYYY-MM` query param.
+- `pages/PdfReportsPage.js` — 4 download cards with month picker, compound select (for owners), resident select. Uses axios `responseType: 'blob'` to trigger native browser download.
+- Sidebar entry "تقارير PDF" added for app_owner & residents/admins.
+- All 4 endpoints verified producing valid `%PDF-1.7` bytes; Arabic content rendered correctly (verified by AI vision analysis of generated PDF).
+
+**🆕 2FA TOTP (P1 — RFC 6238 compliant):**
+- `routes/two_factor.py` — 5 endpoints (all `/api/2fa/...`):
+  - `GET /status` — returns `{enabled, eligible}`.
+  - `POST /setup` — pyotp.random_base32() + provisioning URI + base64 PNG QR; secret stored unverified.
+  - `POST /verify-setup` — verifies 6-digit TOTP, generates 8 backup codes (bcrypt-hashed, one-time-use), enables 2FA.
+  - `POST /disable` — requires current TOTP code.
+  - `POST /verify-login` — exchanges short-lived (5 min) `temp_token` + TOTP/backup code for full access_token.
+- `routes/auth.py` login flow modified: when `two_factor_enabled=True`, returns `{two_factor_required: true, temp_token, ttl_minutes}` instead of full session.
+- `pages/TwoFactorSettingsPage.js` — 3-step UX (intro → QR + secret + verify → backup codes display with download/copy); shows status banner + disable form when enabled.
+- `components/Login.js` — 2FA challenge modal (auto-focus, 6-digit input, supports backup code input, calls `verifyTwoFactor()` from AuthContext).
+- `App.js` — `verifyTwoFactor()` added to AuthContext, exposed alongside `login`.
+- ELIGIBLE_ROLES = app_owner, super_admin, admin, compound_admin, company_admin.
+- Sidebar entry "المصادقة الثنائية" added.
+
+**Verified via testing_agent_v3_fork (iteration 50)** — 100% pass rate (12/12 backend + 3/3 frontend):
+- Services 405 → 200 ✓ ; Services UI no-error toast ✓
+- All 4 PDFs produce `%PDF-` bytes ✓ ; RBAC enforced ✓
+- 2FA full lifecycle: status → setup → verify-setup (invalid 400 / valid 200 + 8 backup codes) → login returns temp_token → verify-login with TOTP ✓ → backup code single-use enforced (reuse 401) ✓ → disable → login returns direct access_token ✓
+- Regression: /api/compounds, /api/audit-logs, /api/visitor-passes, existing pytest suite all green.
 
 ### Iter 72: Visitor QR Pass — Full E2E Feature (Apr 26, 2026) ✅
 

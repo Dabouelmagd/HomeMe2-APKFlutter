@@ -2441,6 +2441,10 @@ from routes.system_health import router as system_health_router
 app.include_router(system_health_router)
 from routes.audit_logs import router as audit_logs_router
 app.include_router(audit_logs_router)
+from routes.onboarding import router as onboarding_router
+app.include_router(onboarding_router)
+from routes.owner_kpis import router as owner_kpis_router
+app.include_router(owner_kpis_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
 app.include_router(linked_accounts_router)
@@ -2499,6 +2503,15 @@ app.include_router(owner_reminders_router, tags=["owner"])
 
 # Include the main API router (for routes still in server.py)
 app.include_router(api_router)
+
+
+@app.on_event("startup")
+async def start_renewal_reminders():
+    """Background loop sending subscription renewal reminders (07:30 UTC daily)."""
+    import asyncio as _asyncio
+    from renewal_reminders import renewal_reminder_loop
+    _asyncio.create_task(renewal_reminder_loop())
+    logging.info("Renewal reminder loop scheduled (07:30 UTC)")
 
 
 @app.on_event("startup")

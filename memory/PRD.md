@@ -5,6 +5,20 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 71: Onboarding + KPIs + PWA + Renewals + Pytest Suite (Apr 26, 2026) ✅
+
+**🆕 #4 Onboarding Wizard** — Backend `routes/onboarding.py` (state/advance/dismiss endpoints, tracks `onboarding_step`, `onboarding_completed`, `onboarding_dismissed_at` on user). Frontend `components/OnboardingWizard.js` — 5-step modal (welcome → compound → first resident → first invite → done) gated by `useAuth()` user + `/app/*` route check. Navigates to relevant page on each step. Smooth progress bar + dots indicator + "تخطي للأبد" option.
+
+**🆕 #5 Owner KPI Dashboard** — Backend `routes/owner_kpis.py` returns: compounds/users counts (total + active + new_30d), DAU/MAU/stickiness from `audit_logs`, MRR + ARR from active subs across 4 collections, churn %, top-5 compounds by resident count, and daily signups for last 30 days. Frontend `pages/OwnerKpiPage.js` — 4 gradient KPI tiles, engagement card, recharts BarChart for signups, top-compounds podium. Sidebar entry "لوحة المؤشرات".
+
+**🆕 #11 PWA Install Prompt** — `components/PwaInstallPrompt.js` listens for `beforeinstallprompt`, registers `/sw.js`, shows a bottom-right card with "تثبيت الآن" button. 7-day localStorage dismiss memory.
+
+**🆕 #12 Subscription Renewal Reminders** — Backend `renewal_reminders.py`: daily 07:30 UTC asyncio loop scans 4 subscription collections, fires emails at -30 / -7 / -1 days with idempotent `renewal_reminders_sent` array. Beautiful Arabic RTL HTML email template. Wired in `server.py` startup.
+
+**🆕 #8 Pytest Test Suite** — `backend/tests/conftest.py` with reusable fixtures (http_client, owner_token, admin_token, *_headers). `backend/tests/test_critical_flows.py` — 15 critical regression tests covering health, login, RBAC enforcement, audit logs, search, route-health, onboarding, owner-kpis, my-invites, and the regression-prone `/compounds/{id}/residences`. **All 15/15 pass** in 1.27s.
+
+**Net total tests passing: 15** • **Net new endpoints: 7** • **Net new pages: 2 + 2 modals**
+
 ### Iter 70: Audit Log + Global Search v2 + Slow Endpoints Card (Apr 26, 2026) ✅
 
 **🥇 #1 Audit Log (سجل التدقيق)**

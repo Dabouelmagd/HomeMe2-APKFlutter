@@ -59,6 +59,9 @@ import JoinViaInvite from './pages/JoinViaInvite';
 import MyInvitesPage from './pages/MyInvitesPage';
 import SystemHealthPage from './pages/SystemHealthPage';
 import AuditLogPage from './pages/AuditLogPage';
+import OwnerKpiPage from './pages/OwnerKpiPage';
+import PwaInstallPrompt from './components/PwaInstallPrompt';
+import OnboardingWizard from './components/OnboardingWizard';
 import JoinFamilyByInvite from './pages/JoinFamilyByInvite';
 import AlertsDashboard from './pages/AlertsDashboard';
 import FinancialRoute from './components/FinancialRoute';
@@ -619,6 +622,12 @@ function App() {
                     <AuditLogPage />
                   </ProtectedRoute>
                 } />
+
+                <Route path="owner-kpis" element={
+                  <ProtectedRoute>
+                    <OwnerKpiPage />
+                  </ProtectedRoute>
+                } />
                 
                 <Route path="pricing" element={
                   <Pricing />
@@ -832,6 +841,8 @@ function App() {
               </Routes>
             </RouteChangeHandler>
             <GlobalUIProvider />
+            <PwaInstallPrompt />
+            <OnboardingWizard />
             </TransliterationProvider>
           </NotificationProvider>
         </AuthProvider>

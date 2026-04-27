@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
 /**
@@ -81,7 +82,7 @@ const AdvertiserAdsTab = ({ t }) => {
           <div className="space-y-3">
             {ads.map(ad => (
               <div key={ad.id} className="bg-gray-800/60 rounded-xl border border-gray-700 p-4 flex flex-col md:flex-row gap-4" data-testid={`aa-row-${ad.id}`}>
-                {ad.image_url && <img src={ad.image_url} alt="" className="w-24 h-24 rounded-lg object-cover" />}
+                {ad.image_url && <img src={ad.image_url.startsWith('http') ? ad.image_url : `${BACKEND_URL}${ad.image_url}`} alt="" className="w-24 h-24 rounded-lg object-cover" />}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div>

@@ -9,9 +9,10 @@ Flow:
   5. Approved ads appear in the normal internal_ads flow (is_active + visible to residents)
   6. Advertiser views analytics: GET /api/advertiser/ads/{id}/stats (impressions, clicks, CTR)
 """
-from fastapi import APIRouter, HTTPException, Depends, Body
+from fastapi import APIRouter, HTTPException, Depends, Body, UploadFile, File
 from datetime import datetime, timezone, timedelta
 from typing import Optional
+from pathlib import Path
 import logging
 import uuid
 import os
@@ -78,6 +79,27 @@ def _require_advertiser(current_user: dict):
 
 
 # ==================== Ads CRUD (advertiser side) ====================
+
+@router.post("/advertiser/upload-image")
+async def advertiser_upload_image(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    """Upload an image for an advertiser ad. Returns {url} to pass to POST /advertiser/ads."""
+    _require_advertiser(current_user)
+    allowed = {"image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"}
+    if file.content_type not in allowed:
+        raise HTTPException(status_code=400, detail="نوع ملف غير مدعوم (PNG, JPG, WEBP, GIF فقط)")
+    contents = await file.read()
+    if len(contents) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="حجم الملف يتجاوز 5 ميجابايت")
+    if len(contents) == 0:
+        raise HTTPException(status_code=400, detail="ملف فارغ")
+    ext_map = {"image/png": "png", "image/jpeg": "jpg", "image/jpg": "jpg", "image/webp": "webp", "image/gif": "gif"}
+    ext = ext_map.get(file.content_type, "png")
+    upload_dir = Path("/app/uploads/ads")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    filename = f"{uuid.uuid4().hex[:12]}.{ext}"
+    (upload_dir / filename).write_bytes(contents)
+    return {"url": f"/api/ads/media/{filename}", "filename": filename, "size_bytes": len(contents)}
+
 
 @router.post("/advertiser/ads")
 async def advertiser_create_ad(payload: dict, current_user: dict = Depends(get_current_user)):

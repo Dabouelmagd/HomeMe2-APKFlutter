@@ -300,10 +300,10 @@ async def login(user_data: UserLogin, request: Request):
             "id": user["id"],
             "username": user["username"],
             "role": user["role"],
-            "compound_id": user["compound_id"],
+            "compound_id": user.get("compound_id"),
             "compound_name": compound_name,
             "unit_number": user.get("unit_number"),
-            "full_name": user["full_name"],
+            "full_name": user.get("full_name"),
             "is_family_head": user.get("is_family_head", False),
             "family_id": user.get("family_id"),
             # Subscription fields — needed by frontend to hide trial banner

@@ -3,7 +3,8 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
 /**
@@ -119,7 +120,7 @@ const AdvertiserPortal = () => {
                     </div>
                     <span className={`text-[10px] bg-${color}-900/40 text-${color}-300 border border-${color}-700/40 px-2 py-0.5 rounded-full whitespace-nowrap`}>{statusLabel[ad.status] || ad.status}</span>
                   </div>
-                  {ad.image_url && <img src={ad.image_url} alt="" className="w-full h-32 rounded-lg object-cover" />}
+                  {ad.image_url && <img src={ad.image_url.startsWith('http') ? ad.image_url : `${BACKEND_URL}${ad.image_url}`} alt="" className="w-full h-32 rounded-lg object-cover" />}
 
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="bg-gray-900/60 rounded-lg p-2">
@@ -175,6 +176,7 @@ const StatCard = ({ icon, label, value, color }) => (
 
 const CreateAdModal = ({ onClose, onSave }) => {
   const [form, setForm] = useState({ title: '', body: '', image_url: '', link_url: '', duration_days: 7 });
+  const [uploadingImage, setUploadingImage] = useState(false);
   const pricePerDay = 50;
   const totalPrice = pricePerDay * form.duration_days;
   const submit = () => {
@@ -195,8 +197,51 @@ const CreateAdModal = ({ onClose, onSave }) => {
             <textarea rows="3" value={form.body} onChange={e => setForm({...form, body: e.target.value})} className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ad-body" />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1">رابط صورة الإعلان (URL)</label>
-            <input type="url" value={form.image_url} onChange={e => setForm({...form, image_url: e.target.value})} placeholder="https://..." className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white" data-testid="ad-image" />
+            <label className="block text-xs text-gray-400 mb-1">صورة الإعلان</label>
+            <div className="space-y-2">
+              <input
+                type="url"
+                value={form.image_url}
+                onChange={e => setForm({...form, image_url: e.target.value})}
+                placeholder="https://... أو ارفع ملفاً أدناه"
+                className="w-full bg-gray-900 border border-gray-600 rounded-lg px-3 py-2 text-sm text-white"
+                data-testid="ad-image"
+              />
+              <label className="flex items-center justify-center gap-2 cursor-pointer bg-purple-900/30 hover:bg-purple-900/50 border-2 border-dashed border-purple-500/50 rounded-lg px-4 py-3 text-sm text-purple-200 transition" data-testid="ad-upload-label">
+                <span>📤 {uploadingImage ? 'جارِ الرفع...' : 'رفع صورة من الجهاز (PNG/JPG/WEBP/GIF ≤ 5MB)'}</span>
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0]; if (!f) return;
+                    if (f.size > 5*1024*1024) { toast.error('الحجم يتجاوز 5MB'); return; }
+                    setUploadingImage(true);
+                    try {
+                      const fd = new FormData(); fd.append('file', f);
+                      const r = await axios.post(`${API}/advertiser/upload-image`, fd, {
+                        ...getToken(), headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' },
+                      });
+                      setForm({...form, image_url: r.data.url});
+                      toast.success('تم رفع الصورة');
+                    } catch (err) {
+                      toast.error(err.response?.data?.detail || 'فشل الرفع');
+                    } finally {
+                      setUploadingImage(false);
+                      e.target.value = '';
+                    }
+                  }}
+                  className="hidden"
+                  data-testid="ad-upload-input"
+                />
+              </label>
+              {form.image_url && (
+                <img
+                  src={form.image_url.startsWith('http') ? form.image_url : `${BACKEND_URL}${form.image_url}`}
+                  alt="preview"
+                  className="w-full h-32 rounded-lg object-cover border border-gray-600"
+                />
+              )}
+            </div>
           </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1">رابط الوجهة (URL)</label>

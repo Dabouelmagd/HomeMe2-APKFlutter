@@ -1122,7 +1122,7 @@ async def save_uploaded_file(file: UploadFile, file_type: str) -> Dict[str, Any]
     
     # Get file info
     mime_type = mimetypes.guess_type(file.filename)[0] or "application/octet-stream"
-    file_url = f"/uploads/{unique_filename}"
+    file_url = f"/api/files/{unique_filename}"
     
     # Create thumbnail for images
     thumbnail_url = None
@@ -1139,7 +1139,7 @@ async def save_uploaded_file(file: UploadFile, file_type: str) -> Dict[str, Any]
                 thumbnail_filename = f"thumb_{unique_filename}"
                 thumbnail_path = UPLOAD_DIR / thumbnail_filename
                 img.save(thumbnail_path, optimize=True, quality=85)
-                thumbnail_url = f"/uploads/{thumbnail_filename}"
+                thumbnail_url = f"/api/files/{thumbnail_filename}"
         except Exception as e:
             logging.warning(f"Could not create thumbnail for {file.filename}: {e}")
     
@@ -2244,6 +2244,23 @@ async def serve_payment_proof(filename: str):
     """Serve payment confirmation proof files (owner / super_admin only)."""
     file_path = UPLOAD_DIR / "payment_proofs" / filename
     if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    mime_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
+    return FileResponse(path=str(file_path), media_type=mime_type, filename=filename)
+
+
+@api_router.get("/files/{subdir}/{filename}")
+async def serve_subdir_file(subdir: str, filename: str):
+    """Serve files from /app/uploads/{subdir}/{filename} (e.g. branding, family_members, services).
+    Important: this route MUST be registered AFTER more specific routes like /files/users/{filename}.
+    Ingress routes only `/api/*` to backend, so any frontend that needs an uploaded file MUST use this prefix.
+    """
+    # Whitelist subdirs to prevent directory traversal
+    allowed_subdirs = {"branding", "family_members", "logos", "ads", "services", "documents", "gallery", "maintenance", "users", "payment_proofs"}
+    if subdir not in allowed_subdirs:
+        raise HTTPException(status_code=404, detail="Invalid subdirectory")
+    file_path = UPLOAD_DIR / subdir / filename
+    if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="File not found")
     mime_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
     return FileResponse(path=str(file_path), media_type=mime_type, filename=filename)

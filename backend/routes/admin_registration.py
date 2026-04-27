@@ -217,7 +217,7 @@ async def complete_registration(
             async with aiofiles.open(file_path, 'wb') as f:
                 await f.write(content)
             
-            profile_picture_url = f"/uploads/users/{unique_filename}"
+            profile_picture_url = f"/api/files/users/{unique_filename}"
         
         # Create the user account
         hashed_password = pwd_context.hash(password)
@@ -350,7 +350,7 @@ async def create_residence_directly(
             async with aiofiles.open(file_path, 'wb') as f:
                 await f.write(content)
             
-            profile_picture_url = f"/uploads/users/{unique_filename}"
+            profile_picture_url = f"/api/files/users/{unique_filename}"
         
         # Generate temporary password
         import secrets

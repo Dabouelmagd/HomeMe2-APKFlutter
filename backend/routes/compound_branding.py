@@ -101,7 +101,7 @@ async def upload_logo(
     dest = LOGO_DIR / filename
     dest.write_bytes(contents)
 
-    logo_url = f"/uploads/branding/{filename}"
+    logo_url = f"/api/files/branding/{filename}"
 
     # Persist to compound document
     await db.compounds.update_one(

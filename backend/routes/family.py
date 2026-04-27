@@ -86,7 +86,7 @@ async def add_family_member_to_unit(
                 with open(file_path, "wb") as buffer:
                     shutil.copyfileobj(profile_picture.file, buffer)
                 
-                profile_picture_url = f"/uploads/{filename}"
+                profile_picture_url = f"/api/files/{filename}"
             except Exception as e:
                 logging.error(f"Error uploading profile picture: {e}")
                 # Continue without profile picture if upload fails
@@ -283,7 +283,7 @@ async def update_family_member_with_profile(
                 await f.write(content)
             
             # Update profile image path
-            update_dict["profile_image"] = f"/uploads/family_members/{unique_filename}"
+            update_dict["profile_image"] = f"/api/files/family_members/{unique_filename}"
         
         # Update the family member
         await db.family_members.update_one(

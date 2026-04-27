@@ -47,7 +47,7 @@ async def upload_company_logo(
             await f.write(content)
         
         # Create public URL (assuming served via static files)
-        logo_url = f"/uploads/logos/{unique_filename}"
+        logo_url = f"/api/files/logos/{unique_filename}"
         
         return {
             "success": True,

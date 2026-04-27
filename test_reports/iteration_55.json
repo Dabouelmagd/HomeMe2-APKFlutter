@@ -1,0 +1,38 @@
+{
+  "summary": "Iteration 55 — Verified bug fix for /api/files/{subdir}/{filename} ingress routing. All 17 backend tests pass: profile picture upload returns /api/files/users/* (was /uploads/*), branding logo returns /api/files/branding/*, ad media works, generic file router serves with correct image content-type (was text/html SPA fallback before fix), whitelist blocks invalid subdirs, migration is idempotent (0 updates on rerun). Regressions all green (2FA, email-templates, smtp-health, scheduler, analytics). Frontend branding page UI loaded showing an existing /api/files/branding/* URL with rendered red-square logo (visual confirmation). Cleanup performed (branding.logo_url unset).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "/app/profile route", "issue": "React Router warning 'No routes matched location /app/profile' observed in console during browser test. Could be a route not registered for app_owner role, or a transient pre-auth render. Not caused by this iteration's file-routing fix, but worth verifying.", "affected_selectors": []}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter55_file_routing.py",
+    "/app/test_reports/pytest/iter55_results.xml"
+  ],
+  "action_items": [
+    "Optional: investigate the React Router warning 'No routes matched location /app/profile' — verify the profile route is registered for app_owner / mounted at the right path in App.js routes config.",
+    "Optional: tighten path-traversal handling — currently relies on FastAPI path param parsing; consider explicit Path normalization & containment check inside UPLOAD_DIR (defense in depth)."
+  ],
+  "critical_code_review_comments": [
+    "server.py /api/files/{subdir}/{filename} correctly enforces a whitelist of allowed subdirs (branding, family_members, logos, ads, services, documents, gallery, maintenance, users, payment_proofs) preventing arbitrary directory access — good.",
+    "Route registration order is correct: /files/payment_proofs/{filename} (specific) → /files/{subdir}/{filename} (subdir) → /files/{filename} (legacy single-level) — FastAPI matches in declaration order so this works, but adding a comment block above each helps future readers.",
+    "Migration script migrate_upload_urls.py imports `from database import init_db, get_db` which only resolves when CWD=/app/backend or PYTHONPATH includes it — fine for one-time runs but could be made package-relative for robustness.",
+    "/uploads static mount still exists at backend level (line ~ FastAPI app.mount). Since ingress doesn't expose it, it's effectively dead code — consider removing to avoid future confusion."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter55_file_routing.py (new — 17 tests)"
+  ],
+  "success_rate": {"backend": "100% (17/17)", "frontend": "verified via API-level proof and partial UI confirmation; full Playwright login retry blocked by env timing — branding page UI did render with /api/files/branding/* URL"},
+  "test_credentials": "Owner_homeme / Dalia1234@ (app_owner). Compound: 88ad3711-c9ae-45fe-a270-65f4524c071c.",
+  "seed_data_creation": "Profile picture uploaded for owner (kept — persists owner avatar). Branding logo uploaded then unset via direct DB update at end of test. Ad media uploaded (small test PNG remains in /app/uploads/ads/).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter55 file-routing bug fix is fully verified via backend pytest (/app/backend/tests/test_iter55_file_routing.py — 17/17). Generic /api/files/{subdir}/{filename} works for whitelisted subdirs; returns 404 for invalid subdir or missing file. Migration is idempotent. Old /uploads/* paths still hit SPA fallback (expected). Frontend branding page renders /api/files/branding/* logo URLs correctly (confirmed visually). Note: console warning about '/app/profile' route not matching may need separate investigation but is unrelated to this fix.",
+  "rca of the issue": "Original bug: K8s ingress only routed /api/* to backend; /uploads/* requests fell through to the frontend nginx which served index.html (SPA fallback) → browser tried to render HTML as <img> source → broken image icon. Fix verified: (a) all upload endpoints now return /api/files/{subdir}/{filename} URLs; (b) new /api/files/{subdir}/{filename} GET route at server.py:2252 reads from /app/uploads/{subdir}/{filename} with whitelist; (c) one-time migration rewrote legacy DB records. Regression test confirms /uploads/* still returns non-image content (proving ingress behavior unchanged) while /api/files/* serves image/png content correctly."
+}

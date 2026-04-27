@@ -41,7 +41,7 @@ async def create_maintenance_request(
                 content = await image.read()
                 async with aiofiles.open(file_path, 'wb') as f:
                     await f.write(content)
-                image_urls.append(f"/uploads/maintenance/{unique_filename}")
+                image_urls.append(f"/api/files/maintenance/{unique_filename}")
 
         maintenance_request = {
             "id": str(uuid.uuid4()), "title": title, "description": description,

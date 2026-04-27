@@ -64,7 +64,7 @@ async def create_admin_account(
             async with aiofiles.open(file_path, 'wb') as f:
                 await f.write(content)
             
-            profile_picture_url = f"/uploads/users/{unique_filename}"
+            profile_picture_url = f"/api/files/users/{unique_filename}"
         
         # Hash password
         hashed_password = pwd_context.hash(password)

@@ -147,7 +147,7 @@ class TestLogoUpload:
         )
         assert r.status_code == 200, r.text
         data = r.json()
-        assert "logo_url" in data and data["logo_url"].startswith("/uploads/branding/")
+        assert "logo_url" in data and data["logo_url"].startswith("/api/files/branding/")
         assert data["size_bytes"] == len(png)
         assert data["filename"].endswith(".png")
         TestLogoUpload.uploaded_filename = data["filename"]

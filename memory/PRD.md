@@ -5,6 +5,20 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-55)
 
+### Iter 56: Bug Fix — Ad Rendering Order (media-first sort) (Apr 27, 2026) ✅
+
+**🐛 المشكلة:** الإعلانات والصور الشخصية لا تظهر — تابع للجلسة السابقة. اتضح أن:
+1. الـ frontend `InternalAdBanner` يستخدم `maxAds={1}` فيعرض إعلاناً واحداً فقط.
+2. الـ backend `/api/ads/public` يرجّع كل الإعلانات النشطة بترتيب حسب `priority`.
+3. كانت الإعلانات الفارغة (بدون image_url) تأتي أولاً، فيُعرض banner بدون صورة بينما الإعلانات الجديدة المرفوعة بصور تُتجاهل.
+
+**🟢 الإصلاح:** Re-rank في `/api/ads/public` و `/api/ads/active`: الإعلانات بمحتوى وسائط (image_url / video_url / media_url) تأتي **أولاً**، ثم تكسر التعادل بـ priority.
+
+**🧪 التحقق:**
+- بعد الإصلاح، endpoint `/api/ads/public?position=homepage_hero` يرجع الترتيب: `test_guard (with image)` → `إعلان الصفحة الرئيسية (empty)` ✓
+- في المتصفح: HomePage الآن تعرض إعلان "test_guard" مع الصورة الفعلية بدلاً من الـ gradient الفارغ ✓
+- صورة الإعلان `/api/ads/media/596b1ed24603.png` تُحمّل بنجاح HTTP 200 image/png ✓
+
 ### Iter 55: Critical Bug Fix — Image Upload Display (/uploads → /api/files routing) (Apr 27, 2026) ✅
 
 **🐛 المشكلة (User Report):** الصور الشخصية والإعلانات لا تظهر بعد رفعها عدة مرات.

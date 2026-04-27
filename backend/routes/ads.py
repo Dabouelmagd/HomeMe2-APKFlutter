@@ -352,6 +352,16 @@ async def get_public_ads(position: str = ""):
             continue
         valid.append(a)
 
+    # Re-rank: ads with media first (so a single-slot rotator never picks an
+    # empty placeholder over a real image). Within each group keep priority/recency order.
+    valid.sort(
+        key=lambda a: (
+            0 if (a.get("image_url") or a.get("video_url") or a.get("media_url")) else 1,
+            -int(a.get("priority", 0) or 0),
+            -((a.get("created_at") or "")[:19].count("")),
+        )
+    )
+
     # Settings
     settings = await db.app_settings.find_one({"key": "ad_settings"}, {"_id": 0}) or {}
     return {"ads": valid, "settings": settings}
@@ -384,6 +394,14 @@ async def get_active_ads(position: str = "", compound_id: str = "", current_user
         if end and end < now:
             continue
         valid_ads.append(a)
+
+    # Re-rank: ads with media first
+    valid_ads.sort(
+        key=lambda a: (
+            0 if (a.get("image_url") or a.get("video_url") or a.get("media_url")) else 1,
+            -int(a.get("priority", 0) or 0),
+        )
+    )
 
     # Track views
     ad_ids = [a["id"] for a in valid_ads if a.get("id")]

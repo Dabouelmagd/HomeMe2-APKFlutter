@@ -1,0 +1,47 @@
+{
+  "summary": "Iter56 — Full regression sweep after file-routing + ad-ordering fixes. Backend: 30/30 new tests pass (test_iter56_full_regression.py) + 17/17 iter55 file-routing tests still green. Verified: (a) Auth for Owner_homeme, superadmin, testcompany2, security all working; (b) /api/ads/public?position=homepage_hero returns the test_guard ad (with /api/ads/media/596b1ed24603.png) FIRST — media-first re-rank confirmed; ad media resolves with content-type image/png; (c) /api/files/{subdir}/{filename} whitelist and 404 handling still working; (d) Owner KPIs schema intact (compounds, users, revenue, churn, top_compounds); (e) SMTP health stats + alerts endpoints green; 4 email templates listed + preview works; audit-logs + summary green; route-health scan green; 2FA status green; compound branding GET green; visitor-pass public invalid token rejected; PDF summary returns %PDF bytes (requires ?month=YYYY-MM query param); plan_limits on company-admin compound create does NOT 403 (company is under limit), so cannot assert 403 path — flagged. Frontend smoke: Home page loads, shows test_guard ad image from /api/ads/media/ (NO /uploads/ paths anywhere in DOM). Owner login succeeds → routed to /select-account (multi-compound chooser). No 'No routes matched location /app/profile' console warning observed during Home + Login flow (iter55 issue appears fixed or doesn't surface on this path). Two 403 resource fetches in console on select-account (likely owner-scoped API that requires compound selection — non-blocking).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "N/A", "issue": "test_advertiser / TestAd123! account does not exist in DB. Advertiser-portal E2E flow (upload-media + POST /api/advertiser/ads) could not be executed end-to-end. 4 other TEST_adv_* advertiser users exist but passwords are unknown."},
+      {"endpoint": "GET /api/compounds", "issue": "Response includes MongoDB _id field alongside id — should be excluded per code-review guidelines (ObjectId leak). See compounds[0]._id in response body."},
+      {"endpoint": "POST /api/company-admin/compounds", "issue": "testcompany2 was able to create TEST_over_limit_compound without hitting plan_limit_compounds 403. Either the company plan limit is unset/very high, or limit enforcement is not active for this account. Could not verify the 403 structured-detail path. (Test created compounds were cleaned up from DB.)"}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {"flow": "Owner dashboard post-login", "issue": "Two 403 resource-fetch errors in console on /select-account page (XHR). Likely owner API that requires compound context before selection. Non-blocking but worth surfacing.", "affected_selectors": []}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter56_full_regression.py",
+    "/app/backend/tests/test_iter55_file_routing.py",
+    "/app/test_reports/pytest/iter56_results.xml"
+  ],
+  "action_items": [
+    "Create the test_advertiser user (password TestAd123!, role=advertiser) so advertiser-portal E2E tests can run end-to-end (upload-media + create ad). Currently 401 on login.",
+    "Exclude MongoDB _id from /api/compounds response payload (and audit similar listing endpoints) — currently leaks ObjectId in compounds[0]._id.",
+    "Verify company-admin plan_limit_compounds enforcement path: testcompany2 was able to create an extra compound. Either plan limit is mis-configured on that account or assert_can_add_compound is not gating POST /api/company-admin/compounds.",
+    "Investigate the 2 x 403 XHR errors on /select-account page after Owner login (console network errors) — identify the failing owner endpoint and gate the call on compound selection or return 200 with empty payload."
+  ],
+  "critical_code_review_comments": [
+    "[CONFIRMED FIX] /api/ads/public + /api/ads/active correctly re-rank ads with image_url first then by priority — the test_guard ad (with /api/ads/media/596b1ed24603.png) is served as the first ad in homepage_hero, ahead of empty placeholder ads.",
+    "[CONFIRMED FIX] All uploaded media resolves via /api/files/{subdir}/{filename} or /api/ads/media/{filename}. Zero /uploads/* paths remain in rendered DOM (Home page scan).",
+    "[DATA LEAK] /api/compounds response leaks MongoDB ObjectId (_id) — violates the 'never return _id' rule. Projection `{_id: 0}` should be added to the DB query.",
+    "[LEGACY DATA URLS] Some existing compounds still have `logo_url` as a base64 data: URL embedded in DB (observed in /api/compounds response). New uploads go through /api/files/branding/*, but the legacy rows haven't been migrated. Consider extending the iter55 migration to rewrite data: URLs → file-backed storage for consistency.",
+    "[DEAD CODE] backend app.mount('/uploads', ...) is still present but unreachable via ingress — remove to avoid future confusion (iter55 flagged this too, still present).",
+    "[MISSING SEED] No test_advertiser user seed exists despite being a declared test credential — add to onboarding/seed script."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter56_full_regression.py (new, 30 tests all passing)"
+  ],
+  "success_rate": {"backend": "100% (30/30 new + 17/17 iter55 regressions)", "frontend": "Smoke verified — home + login both render; no /uploads/* paths; test_guard ad image loads from /api/ads/media/. Full admin-portal deep click-through not executed."},
+  "test_credentials": "Owner_homeme / Dalia1234@; superadmin / SuperAdmin2024!; testcompany2 / Company123!; security / Security2024!. test_advertiser / TestAd123! DOES NOT EXIST — needs to be seeded.",
+  "seed_data_creation": "Test created 2x TEST_over_limit_compound via company-admin; both were deleted from DB at end of test run (cleanup verified).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter56 full regression green for all currently-seeded accounts. The main gaps for next agent: (1) once test_advertiser user is seeded, run advertiser E2E (upload-media + create ad + verify image URL under /api/files/ads/* or /api/ads/media/*). (2) Fix _id exposure in /api/compounds and retest. (3) Investigate the 2 x 403 XHR calls on /select-account (owner-side). (4) plan_limit_compounds was NOT triggered for testcompany2 — either plan limit is too high or enforcement is not gating /api/company-admin/compounds POST. File routing from iter55 remains 100% green. Media-first ad ordering from iter56 main-agent fix is confirmed working in production traffic.",
+  "rca of the issue": "N/A — no active bugs; this is a stability sweep. Only minor issues flagged (missing test_advertiser seed, _id leak in /api/compounds, unverified plan-limit enforcement, 2 x 403 post-login XHRs)."
+}

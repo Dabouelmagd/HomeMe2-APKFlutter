@@ -72,7 +72,7 @@ async def get_available_compounds(current_user: dict = Depends(get_current_user)
     """Get all available compounds for compound selection"""
     try:
         db = get_db()
-        compounds = await db.compounds.find({}).to_list(length=10000)
+        compounds = await db.compounds.find({}, {"_id": 0}).to_list(length=10000)
         
         # Serialize datetime objects
         serialized_compounds = [serialize_datetime(compound) for compound in compounds]

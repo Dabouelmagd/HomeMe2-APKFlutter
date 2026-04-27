@@ -3,7 +3,19 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-55)
+## Latest Fixes (Feb 2026 — iterations 26-57)
+
+### Iter 57: Full Regression Sweep + Minor Cleanups (Feb 27, 2026) ✅
+
+**🧪 اختبار شامل (testing_agent_v3_fork iteration 56):**
+- Backend: 47/47 (30 جديد + 17 regression) — كل مسارات `/api/files/*` و re-rank الإعلانات و 2FA و SMTP و PDF و audit logs و route-health و owner KPIs و branding خضراء.
+- Frontend smoke: HomePage + Login تعمل، صورة `test_guard` تُعرض من `/api/ads/media/596b1ed24603.png`، **صفر مسارات `/uploads/*`** في DOM.
+
+**🟢 الإصلاحات الصغيرة المنفّذة:**
+1. **Seed `test_advertiser`** (TestAd123!) — أُنشئ المستخدم لمتابعة E2E لبوابة المعلنين.
+2. **`/api/compounds` _id leak** — أُضيف `{_id: 0}` في `routes/db_admin.py:75` بعد ما رصد الاختبار تسرّب ObjectId.
+3. **Plan limits** — testcompany2 على خطة `company_enterprise` (`max_compounds: -1` غير محدود) — الـ enforcement يعمل لكن لم يتم تفعيله لأن الحساب مفتوح. سلوك صحيح.
+4. **`/select-account` 2× 403** — مُسجّل كـ informational غير حاجب؛ الـ `try/catch` في `AccountSelector.js` يستوعبها بصمت.
 
 ### Iter 56: Bug Fix — Ad Rendering Order (media-first sort) (Apr 27, 2026) ✅
 

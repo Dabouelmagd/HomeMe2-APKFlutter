@@ -31,6 +31,14 @@
 - Password: Security2024!
 - Role: security
 
+## Test Advertiser (معلن — للاختبار)
+- Username: test_advertiser
+- Password: TestAd123!
+- Email: test_advertiser@homeme.app
+- Full Name: Test Advertiser
+- Company: HomeMe QA
+- Role: advertiser
+
 ## Email (SMTP) — mail.datalifeai.com (Port 465 SSL, Port 993 IMAP)
 - **Main / System emails** (welcome, password-reset, invites, daily reports) → `homeme_superadmin@datalifeai.com`
 - **Security alerts** (emergency, intrusion) → `homeme_security@datalifeai.com`

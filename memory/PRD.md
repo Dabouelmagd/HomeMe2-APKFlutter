@@ -3,7 +3,33 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-54)
+## Latest Fixes (Feb 2026 — iterations 26-55)
+
+### Iter 55: Critical Bug Fix — Image Upload Display (/uploads → /api/files routing) (Apr 27, 2026) ✅
+
+**🐛 المشكلة (User Report):** الصور الشخصية والإعلانات لا تظهر بعد رفعها عدة مرات.
+
+**Root Cause:** Kubernetes ingress routes only `/api/*` to the backend; everything else (including `/uploads/*`) was intercepted by the React frontend and returned `index.html` (text/html) instead of the file. So although uploads succeeded server-side, image rendering broke in the browser.
+
+**Fix:**
+- `server.py`: NEW generic GET `/api/files/{subdir}/{filename}` route with whitelisted subdirs (branding, family_members, logos, ads, services, documents, gallery, maintenance, users, payment_proofs) + path-traversal protection.
+- Migrated all upload endpoints to return `/api/files/{subdir}/{filename}` URLs:
+  - `routes/admin_users.py`, `routes/admin_registration.py` → `profile_picture_url = /api/files/users/...`
+  - `routes/family.py` → `profile_image = /api/files/family_members/...`
+  - `routes/compound_branding.py` → `logo_url = /api/files/branding/...`
+  - `routes/maintenance.py` → `image_urls = /api/files/maintenance/...`
+  - `routes/payments.py` → `logo_url = /api/files/logos/...`
+  - `server.py` (inline upload handlers) → `/api/files/...`
+- `migrations/migrate_upload_urls.py`: NEW idempotent one-time migration to rewrite legacy `/uploads/*` → `/api/files/*` across 10 collections (users, family_members, internal_ads, ad_campaigns, compounds, maintenance_requests, complaints, messages, voice_messages, gallery). Already executed (0 docs needed migration — DB was clean).
+
+**Verified via testing_agent_v3_fork (iteration 55)** — 100% pass (17/17 backend):
+- Profile picture upload returns `/api/files/users/...` ✓ ; GET returns 200 image/png ✓
+- Old `/uploads/users/...` returns text/html (confirms ingress behavior) ✓
+- Branding logo upload + GET ✓
+- Ad media upload (no regression) ✓
+- Generic file router with whitelist ✓ (404 for invalid subdir, 404 for missing file)
+- Migration is idempotent (0 updates on re-run) ✓
+- Frontend live verification: branding page renders new logo URL ✓
 
 ### Iter 54: Logo Upload + SMTP Auto-Alerts + Email Template Editor (Apr 27, 2026) ✅
 

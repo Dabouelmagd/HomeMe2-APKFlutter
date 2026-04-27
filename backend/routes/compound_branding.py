@@ -2,15 +2,24 @@
 Compound branding endpoints — let admins customize PDF report look.
 GET /api/compounds/{id}/branding   — current settings
 PUT /api/compounds/{id}/branding   — update (RBAC: admin/compound_admin of that compound, or app_owner/super_admin)
+POST /api/compounds/{id}/branding/logo  — upload logo file (multipart)
 """
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from pydantic import BaseModel
 from typing import Optional
+from pathlib import Path
+import uuid
+import os
 
 from database import get_db
 from auth_deps import get_current_user
 
 router = APIRouter(prefix="/api/compounds")
+
+LOGO_DIR = Path("/app/uploads/branding")
+LOGO_DIR.mkdir(parents=True, exist_ok=True)
+ALLOWED_TYPES = {"image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"}
+MAX_LOGO_BYTES = 2 * 1024 * 1024  # 2 MB
 
 
 class BrandingPayload(BaseModel):
@@ -65,3 +74,39 @@ async def update_branding(compound_id: str, payload: BrandingPayload, current_us
 
     fresh = await db.compounds.find_one({"id": compound_id}, {"_id": 0, "branding": 1})
     return {"branding": fresh.get("branding") or {}, "updated": True}
+
+
+@router.post("/{compound_id}/branding/logo")
+async def upload_logo(
+    compound_id: str,
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
+    db = get_db()
+    if not _can_edit(current_user, compound_id):
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    if file.content_type not in ALLOWED_TYPES:
+        raise HTTPException(status_code=400, detail="نوع ملف غير مدعوم. الأنواع المسموحة: PNG, JPG, WEBP, SVG")
+
+    contents = await file.read()
+    if len(contents) > MAX_LOGO_BYTES:
+        raise HTTPException(status_code=413, detail="حجم الملف يتجاوز 2 ميجابايت")
+    if len(contents) == 0:
+        raise HTTPException(status_code=400, detail="ملف فارغ")
+
+    ext_map = {"image/png": "png", "image/jpeg": "jpg", "image/jpg": "jpg", "image/webp": "webp", "image/svg+xml": "svg"}
+    ext = ext_map.get(file.content_type, "png")
+    filename = f"{compound_id}_{uuid.uuid4().hex[:8]}.{ext}"
+    dest = LOGO_DIR / filename
+    dest.write_bytes(contents)
+
+    logo_url = f"/uploads/branding/{filename}"
+
+    # Persist to compound document
+    await db.compounds.update_one(
+        {"id": compound_id},
+        {"$set": {"branding.logo_url": logo_url}},
+    )
+
+    return {"logo_url": logo_url, "size_bytes": len(contents), "filename": filename}

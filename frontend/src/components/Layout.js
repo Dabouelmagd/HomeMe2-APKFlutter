@@ -465,6 +465,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'المصادقة الثنائية', href: 'two-factor', icon: ShieldCheckIcon, show: true },
         { name: 'صحة SMTP', href: 'smtp-health', icon: EnvelopeIcon, show: true },
         { name: 'تخصيص قالب التقارير', href: 'branding', icon: SwatchIcon, show: true },
+        { name: 'قوالب البريد', href: 'email-templates', icon: EnvelopeIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
     },

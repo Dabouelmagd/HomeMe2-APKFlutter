@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
-import { Palette, Save, Image as ImageIcon, Loader2, Eye } from 'lucide-react';
+import { Palette, Save, Image as ImageIcon, Loader2, Eye, Upload } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -22,6 +22,32 @@ export default function BrandingSettingsPage() {
   const [branding, setBranding] = useState({});
   const [loading, setLoading] = useState(false);
   const [previewing, setPreviewing] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  const handleLogoUpload = async (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 2 * 1024 * 1024) {
+      toast.error('حجم الملف يتجاوز 2 ميجابايت');
+      return;
+    }
+    setUploadingLogo(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', f);
+      const r = await axios.post(`${API}/compounds/${compoundId}/branding/logo`, fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      const fullUrl = `${BACKEND_URL}${r.data.logo_url}`;
+      setBranding({ ...branding, logo_url: fullUrl });
+      toast.success('تم رفع الشعار بنجاح');
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'فشل رفع الشعار');
+    } finally {
+      setUploadingLogo(false);
+      e.target.value = '';
+    }
+  };
 
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem('user') || 'null');
@@ -118,14 +144,35 @@ export default function BrandingSettingsPage() {
                 <ImageIcon className="w-5 h-5 text-indigo-600" /> العلامة التجارية
               </h3>
               <Field label="رابط الشعار (URL)" testid="logo-url-input">
-                <input
-                  type="text"
-                  placeholder="https://example.com/logo.png"
-                  value={branding.logo_url || ''}
-                  onChange={(e) => updateField('logo_url', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm"
-                  data-testid="branding-logo-url-input"
-                />
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="https://example.com/logo.png"
+                    value={branding.logo_url || ''}
+                    onChange={(e) => updateField('logo_url', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg text-sm"
+                    data-testid="branding-logo-url-input"
+                  />
+                  <div className="flex items-center gap-2">
+                    <label
+                      className={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg cursor-pointer text-sm font-medium border-2 border-dashed ${uploadingLogo ? 'opacity-50 pointer-events-none' : 'border-indigo-300 text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/20'}`}
+                      data-testid="upload-logo-btn"
+                    >
+                      {uploadingLogo ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      {uploadingLogo ? 'جارِ الرفع…' : 'رفع شعار من الجهاز (PNG/JPG/WEBP/SVG ≤ 2MB)'}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                        data-testid="branding-logo-file-input"
+                      />
+                    </label>
+                    {branding.logo_url && (
+                      <img src={branding.logo_url} alt="logo preview" className="w-12 h-12 object-contain border border-gray-200 rounded" />
+                    )}
+                  </div>
+                </div>
               </Field>
               <Field label="اسم العلامة التجارية" testid="brand-label-input">
                 <input

@@ -62,6 +62,9 @@ async def ensure_indexes():
         ("smtp_health", [("timestamp", -1)]),
         ("smtp_health", [("success", 1), ("timestamp", -1)]),
         ("smtp_health", [("mailbox", 1), ("timestamp", -1)]),
+
+        # SMTP alerts dedupe
+        ("smtp_alerts", [("timestamp", -1)]),
     ]
 
     created = 0

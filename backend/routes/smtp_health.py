@@ -105,3 +105,26 @@ async def smtp_test_send(
         mailbox=mailbox,
     )
     return {"sent": ok, "to": to_email, "mailbox": mailbox}
+
+
+@router.get("/alerts")
+async def list_alerts(
+    limit: int = Query(20, ge=1, le=100),
+    current_user: dict = Depends(get_current_user),
+):
+    """Recent SMTP alert dispatches."""
+    if current_user.get("role") not in ("app_owner", "super_admin"):
+        raise HTTPException(status_code=403, detail="Owner access required")
+    db = get_db()
+    items = await db.smtp_alerts.find({}, {"_id": 0}).sort("timestamp", -1).limit(limit).to_list(length=limit)
+    return {"alerts": items, "total": await db.smtp_alerts.count_documents({})}
+
+
+@router.post("/alerts/check-now")
+async def check_alert_now(current_user: dict = Depends(get_current_user)):
+    """Force an immediate threshold check (owner only)."""
+    if current_user.get("role") not in ("app_owner", "super_admin"):
+        raise HTTPException(status_code=403, detail="Owner access required")
+    from smtp_alerts import _maybe_alert
+    await _maybe_alert()
+    return {"checked": True}

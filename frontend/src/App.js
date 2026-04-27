@@ -65,6 +65,7 @@ import PdfReportsPage from './pages/PdfReportsPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
 import BrandingSettingsPage from './pages/BrandingSettingsPage';
+import EmailTemplatesPage from './pages/EmailTemplatesPage';
 import SecurityScanPage from './pages/SecurityScanPage';
 import PublicVisitorPassPage from './pages/PublicVisitorPassPage';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
@@ -648,6 +649,10 @@ function App() {
 
                 <Route path="branding" element={
                   <BrandingSettingsPage />
+                } />
+
+                <Route path="email-templates" element={
+                  <EmailTemplatesPage />
                 } />
                 
                 <Route path="utilities" element={

@@ -23,6 +23,7 @@ from services.pdf_report_service import (
     render_summary_report,
 )
 from services.branding import get_compound_branding
+from routes.email_templates import get_template_or_default, render_template
 
 logger = logging.getLogger(__name__)
 
@@ -208,10 +209,13 @@ async def run_monthly_reports(month_label: str = None) -> dict:
                 await _mark_sent(db, "summary", cid, month_label, False, "no recipients")
                 continue
             html = _email_html("التقرير الشهري للمجمع", f"يسعدنا إرسال <strong>التقرير الشامل لشهر {month_label}</strong> الخاص بمجمع <strong>{compound.get('name','—')}</strong>.")
+            tpl = await get_template_or_default("monthly_summary")
+            rendered = render_template(tpl, {"compound_name": compound.get("name","—"), "period": month_label})
+            html = _email_html("التقرير الشهري للمجمع", rendered["html"])
             for to in recipients:
                 ok = await email_svc.send_email(
                     to_email=to,
-                    subject=f"HomeMe — التقرير الشهري لمجمع {compound.get('name','—')} ({month_label})",
+                    subject=rendered["subject"],
                     html_content=html,
                     attachments=[{"filename": f"summary-{cid[:8]}-{month_label}.pdf", "content": pdf_bytes, "mime_type": "application/pdf"}],
                 )
@@ -238,10 +242,17 @@ async def run_monthly_reports(month_label: str = None) -> dict:
             compound_name = compound.get("name") if compound else "—"
             branding = get_compound_branding(compound)
             pdf_bytes = await _build_unit_statement(db, user, month_label, compound_name, branding)
-            html = _email_html("كشف حساب وحدتك", f"مرفق كشف حساب وحدتك <strong>{user.get('unit_number','—')}</strong> لشهر <strong>{month_label}</strong>.")
+            tpl = await get_template_or_default("monthly_statement")
+            rendered = render_template(tpl, {
+                "resident_name": user.get("full_name") or user.get("username", "—"),
+                "unit_number": user.get("unit_number") or "—",
+                "period": month_label,
+                "compound_name": compound_name,
+            })
+            html = _email_html("كشف حساب وحدتك", rendered["html"])
             ok = await email_svc.send_email(
                 to_email=user["email"],
-                subject=f"HomeMe — كشف حساب الوحدة {user.get('unit_number','—')} ({month_label})",
+                subject=rendered["subject"],
                 html_content=html,
                 attachments=[{"filename": f"statement-{user.get('unit_number','unit')}-{month_label}.pdf", "content": pdf_bytes, "mime_type": "application/pdf"}],
             )

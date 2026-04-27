@@ -3,7 +3,45 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-52)
+## Latest Fixes (Feb 2026 — iterations 26-54)
+
+### Iter 54: Logo Upload + SMTP Auto-Alerts + Email Template Editor (Apr 27, 2026) ✅
+
+**📤 Logo File Upload (replacing URL-only):**
+- `routes/compound_branding.py: POST /api/compounds/{id}/branding/logo` — multipart upload, validates content-type (PNG/JPG/WEBP/SVG only), 2MB cap, persists to `/app/uploads/branding/{compound_id}_{hex8}.{ext}`, sets `compound.branding.logo_url`.
+- `pages/BrandingSettingsPage.js`: dual UI — keep URL input + add file upload button (dashed-border drop zone) + 12px×12px live thumbnail preview. Toast on success/failure.
+
+**🚨 Auto SMTP Failure Alerts:**
+- `smtp_alerts.py` — NEW. Hourly background loop calls `_maybe_alert()`:
+  - Reads `smtp_health` for last `SMTP_ALERT_WINDOW_HOURS` (default 6h)
+  - Skips if `total < SMTP_ALERT_MIN_TOTAL` (default 5)
+  - If `failure_rate > SMTP_ALERT_THRESHOLD` (default 30%) AND no alert in last `SMTP_ALERT_COOLDOWN_HOURS` (default 12h): emails all `app_owner` + `super_admin` users with stats + sample failures table.
+  - Logs each dispatch to `smtp_alerts` collection.
+- `server.py`: `start_smtp_alerts_loop` startup hook.
+- `routes/smtp_health.py`: added `GET /alerts` (history, owner-only) + `POST /alerts/check-now` (manual trigger).
+- `db_indexes.py`: added `smtp_alerts.timestamp -1` index.
+
+**📝 Email Template Editor with `{{variable}}` Substitution:**
+- `routes/email_templates.py` — NEW. 4 default templates seeded:
+  - `monthly_summary` — vars: compound_name, period
+  - `monthly_statement` — vars: resident_name, unit_number, period, compound_name
+  - `renewal_reminder` — vars: user_name, days_left, end_date
+  - `generic` — vars: title, body
+- Endpoints (admin GET, owner-only mutate):
+  - `GET /api/email-templates` — list with `is_customized` flag
+  - `GET /api/email-templates/{kind}` — single
+  - `PUT /api/email-templates/{kind}` — owner-only update
+  - `POST /api/email-templates/{kind}/reset` — restore default
+  - `POST /api/email-templates/{kind}/preview` — server-side render with sample variables (Mustache-style `{{var}}` substitution, missing vars left as-is for visibility)
+- `routes/monthly_reports_scheduler.py`: now uses `get_template_or_default()` + `render_template()` for both summary & statement emails — admins can fully customize automated email copy without code changes.
+- `pages/EmailTemplatesPage.js` — sidebar list (4 templates with checkmark for customized) + editor (subject input + 12-row HTML textarea + clickable variable chips that copy `{{var}}` to clipboard) + live preview rendered with sample data.
+
+**Verified via testing_agent_v3_fork (iteration 54)** — 100% pass (22/22 backend + 3/3 frontend pages):
+- Logo: 200 valid / 400 wrong type / 413 oversize / static file served / 403 RBAC ✓
+- Templates: 4 seeded ✓, GET/PUT/preview/reset ✓, 403 non-owner mutate ✓, 400 missing fields ✓, 404 unknown kind ✓
+- SMTP alerts: list/check-now/RBAC ✓, no spurious alert when fail_rate below threshold ✓
+- Integration: monthly run uses templates ✓
+- Regression: analytics returns real DB data ✓, all previous endpoints green ✓
 
 ### Iter 52: Per-Compound PDF Branding + Scheduler Analytics + SMTP Health Tracker (Apr 26, 2026) ✅
 

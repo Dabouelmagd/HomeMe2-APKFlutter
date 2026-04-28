@@ -192,3 +192,47 @@ async def repair_broken(current_user: dict = Depends(get_current_user)):
         "repaired": repaired,
         "still_missing": missing,
     }
+
+
+@router.post("/clear-broken-refs")
+async def clear_broken_refs(current_user: dict = Depends(get_current_user)):
+    """Clear broken DB references whose files cannot be restored from any backup.
+    Sets the field to None (or removes the broken filename from array fields).
+    Use this AFTER /repair-broken when files truly cannot be recovered.
+    """
+    _require_owner(current_user)
+    db = get_db()
+    scan = await _scan(db)
+    cleared = []
+    skipped = []
+    for b in scan["broken"]:
+        # Only clear if file is NOT in any backup (truly missing)
+        if find_in_backups(b["subdir"], b["filename"]) is not None:
+            skipped.append({**b, "reason": "available in backup — use repair-broken instead"})
+            continue
+        coll, doc_id, field = b["collection"], b["doc_id"], b["field"]
+        if not doc_id:
+            skipped.append({**b, "reason": "missing doc_id"})
+            continue
+        try:
+            # Detect if field stores an array of urls (e.g., maintenance.image_urls)
+            doc = await db[coll].find_one({"id": doc_id}, {"_id": 0, field: 1})
+            if not doc:
+                skipped.append({**b, "reason": "doc not found"})
+                continue
+            value = doc.get(field)
+            if isinstance(value, list):
+                # Remove the matching url from the array
+                new_arr = [u for u in value if not (isinstance(u, str) and b["filename"] in u)]
+                await db[coll].update_one({"id": doc_id}, {"$set": {field: new_arr}})
+            else:
+                await db[coll].update_one({"id": doc_id}, {"$set": {field: None}})
+            cleared.append(b)
+        except Exception as e:
+            skipped.append({**b, "reason": f"update failed: {e}"})
+    return {
+        "cleared_count": len(cleared),
+        "skipped_count": len(skipped),
+        "cleared": cleared,
+        "skipped": skipped,
+    }

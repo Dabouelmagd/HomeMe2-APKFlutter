@@ -147,7 +147,7 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
 
     async with httpx.AsyncClient(base_url=base, timeout=10.0) as client:
         # Bound concurrency to keep server load reasonable
-        sem = asyncio.Semaphore(8)
+        sem = asyncio.Semaphore(16)
 
         async def _check(route: dict):
             entry = {
@@ -186,8 +186,8 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
 
             entry["tested_method"] = "GET"
             entry["tested_path"] = target_path
-            t0 = time.perf_counter()
             async with sem:
+                t0 = time.perf_counter()
                 try:
                     resp = await client.get(target_path, headers=headers)
                     entry["status_code"] = resp.status_code
@@ -195,7 +195,7 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
                     entry["error"] = "timeout (>10s)"
                 except Exception as e:
                     entry["error"] = str(e)[:160]
-            entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
+                entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
             entry["result"] = _classify(entry["status_code"], entry["error"])
             return entry
 
@@ -289,7 +289,7 @@ async def trigger_daily_now(request: Request, current_user: dict = Depends(get_c
     summary = {"total": 0, "pass": 0, "warn": 0, "fail": 0, "skipped": 0}
 
     async with httpx.AsyncClient(base_url=base, timeout=10.0) as client:
-        sem = asyncio.Semaphore(8)
+        sem = asyncio.Semaphore(16)
 
         async def _check(route: dict):
             entry = {
@@ -308,8 +308,8 @@ async def trigger_daily_now(request: Request, current_user: dict = Depends(get_c
                     entry["result"] = "skipped"; entry["reason"] = "unresolved param"; return entry
                 target_path = resolved
             entry["tested_method"] = "GET"; entry["tested_path"] = target_path
-            t0 = time.perf_counter()
             async with sem:
+                t0 = time.perf_counter()
                 try:
                     resp = await client.get(target_path, headers=headers)
                     entry["status_code"] = resp.status_code
@@ -317,7 +317,7 @@ async def trigger_daily_now(request: Request, current_user: dict = Depends(get_c
                     entry["error"] = "timeout (>10s)"
                 except Exception as e:
                     entry["error"] = str(e)[:160]
-            entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
+                entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
             entry["result"] = _classify(entry["status_code"], entry["error"])
             return entry
 
@@ -417,7 +417,7 @@ async def _run_internal_scan(app, db) -> dict:
 
     results = []
     async with httpx.AsyncClient(base_url=base, timeout=10.0) as client:
-        sem = asyncio.Semaphore(8)
+        sem = asyncio.Semaphore(16)
 
         async def _check(route: dict):
             entry = {
@@ -436,8 +436,8 @@ async def _run_internal_scan(app, db) -> dict:
                     entry["result"] = "skipped"; entry["reason"] = "unresolved param"; return entry
                 target_path = resolved
             entry["tested_method"] = "GET"; entry["tested_path"] = target_path
-            t0 = time.perf_counter()
             async with sem:
+                t0 = time.perf_counter()
                 try:
                     resp = await client.get(target_path, headers=headers)
                     entry["status_code"] = resp.status_code
@@ -445,7 +445,7 @@ async def _run_internal_scan(app, db) -> dict:
                     entry["error"] = "timeout (>10s)"
                 except Exception as e:
                     entry["error"] = str(e)[:160]
-            entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
+                entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
             entry["result"] = _classify(entry["status_code"], entry["error"])
             return entry
 

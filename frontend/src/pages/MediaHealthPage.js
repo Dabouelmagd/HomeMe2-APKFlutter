@@ -75,6 +75,23 @@ export default function MediaHealthPage() {
     } finally { setBusy(false); }
   };
 
+  const clearRefs = async () => {
+    if (!broken.length) { toast.info('لا توجد ملفات مكسورة'); return; }
+    if (!window.confirm('سيتم مسح المراجع التي ملفاتها غير قابلة للاستعادة من أي نسخة احتياطية. هل تريدين المتابعة؟')) return;
+    setBusy(true);
+    try {
+      const res = await axios.post(`${API}/api/media-health/clear-broken-refs`, {}, { headers: headers() });
+      if (res.data.cleared_count) {
+        toast.success(`تم مسح ${res.data.cleared_count} مرجع من قاعدة البيانات`);
+      } else {
+        toast.info('لا توجد مراجع للمسح. كل المراجع قابلة للاستعادة — استخدمي زر الإصلاح بدلاً من ذلك.');
+      }
+      await load();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'فشل المسح');
+    } finally { setBusy(false); }
+  };
+
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto" data-testid="media-health-page">
       <header className="mb-6 flex items-center justify-between flex-wrap gap-3">
@@ -90,6 +107,11 @@ export default function MediaHealthPage() {
           <button data-testid="repair-btn" onClick={repair} disabled={busy || !broken.length}
                   className="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-rose-600 to-pink-600 hover:opacity-90 disabled:opacity-50 font-bold text-sm">
             🔧 إصلاح المكسور ({broken.length})
+          </button>
+          <button data-testid="clear-refs-btn" onClick={clearRefs} disabled={busy || !broken.length}
+                  className="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-orange-600 to-red-700 hover:opacity-90 disabled:opacity-50 font-bold text-sm"
+                  title="مسح المراجع التي ملفاتها غير قابلة للاستعادة من قاعدة البيانات">
+            🗑️ مسح المراجع التالفة
           </button>
           <button onClick={load} disabled={busy}
                   className="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-sm">⟳ تحديث</button>

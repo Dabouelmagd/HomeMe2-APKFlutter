@@ -77,6 +77,7 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   // Compound logo
   const [compoundLogo, setCompoundLogo] = useState(null);
+  const [appBranding, setAppBranding] = useState(null);
   const [companiesAlerts, setCompaniesAlerts] = useState({ urgent: 0, expiring_contracts: 0, empty_companies: 0, active_companies: 0 });
   const [supportTicketsAlerts, setSupportTicketsAlerts] = useState({ open: 0, in_progress: 0, total_active: 0 });
   // Mute support-tickets ping (persisted)
@@ -154,6 +155,20 @@ const Layout = ({ children, isTrialMode = false }) => {
     };
     fetchCompoundLogo();
   }, [user?.compound_id]);
+
+  // Fetch HomeMe global branding (used as fallback logo for owner/super_admin & on header)
+  useEffect(() => {
+    const fetchAppBranding = async () => {
+      try {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/app-branding`);
+        if (res.ok) {
+          const data = await res.json();
+          setAppBranding(data || null);
+        }
+      } catch (e) { /* silent */ }
+    };
+    fetchAppBranding();
+  }, []);
 
   // Fetch sidebar alert badges (for owner/super_admin only)
   useEffect(() => {
@@ -464,7 +479,9 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'تقارير PDF', href: 'reports', icon: DocumentTextIcon, show: true },
         { name: 'المصادقة الثنائية', href: 'two-factor', icon: ShieldCheckIcon, show: true },
         { name: 'صحة SMTP', href: 'smtp-health', icon: EnvelopeIcon, show: true },
+        { name: 'صحة الوسائط والنسخ الاحتياطي', href: 'media-health', icon: ShieldCheckIcon, show: true },
         { name: 'تخصيص قالب التقارير', href: 'branding', icon: SwatchIcon, show: true },
+        { name: 'لوجو وألوان هوم مي', href: 'app-branding', icon: SwatchIcon, show: activeRole === 'app_owner' },
         { name: 'قوالب البريد', href: 'email-templates', icon: EnvelopeIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
@@ -652,19 +669,32 @@ const Layout = ({ children, isTrialMode = false }) => {
             <div className="w-6"></div>
           </div>
 
-          {/* Compound Logo - shown if available */}
-          {compoundLogo && (
-            <div className="mb-1">
-              <img 
-                src={compoundLogo}
-                alt="Compound Logo"
-                className="h-16 w-16 rounded-2xl object-cover border-2 border-gray-100 dark:border-gray-600 shadow-md"
-                data-testid="compound-logo-sidebar"
-              />
-            </div>
-          )}
+          {/* Sidebar Logo: HomeMe global branding for owner/super_admin without a compound, else compound logo */}
+          {(() => {
+            const isHighLevel = activeRole === 'app_owner' || activeRole === 'super_admin';
+            const homemeLogoUrl = appBranding?.logo_url
+              ? `${process.env.REACT_APP_BACKEND_URL}${appBranding.logo_url}`
+              : null;
+            const showHomeMeLogo = isHighLevel && !user?.compound_id && homemeLogoUrl;
+            const logoSrc = showHomeMeLogo ? homemeLogoUrl : compoundLogo;
+            const altText = showHomeMeLogo ? (appBranding?.app_name_ar || 'HomeMe') : 'Compound Logo';
+            const testId = showHomeMeLogo ? 'homeme-logo-sidebar' : 'compound-logo-sidebar';
+            return logoSrc ? (
+              <div className="mb-1">
+                <img
+                  src={logoSrc}
+                  alt={altText}
+                  className="h-16 w-16 rounded-2xl object-cover border-2 border-gray-100 dark:border-gray-600 shadow-md"
+                  data-testid={testId}
+                />
+              </div>
+            ) : null;
+          })()}
           {user?.compound_name && (
             <p className={`text-sm font-bold mb-0.5 text-center ${isSuperAdmin ? 'text-purple-300' : 'text-gray-800 dark:text-gray-200'}`}>{user.compound_name}</p>
+          )}
+          {!user?.compound_id && (activeRole === 'app_owner' || activeRole === 'super_admin') && appBranding?.app_name_ar && (
+            <p className={`text-sm font-bold mb-0.5 text-center ${isSuperAdmin ? 'text-purple-300' : 'text-gray-800 dark:text-gray-200'}`} data-testid="homeme-app-name-sidebar">{appBranding.app_name_ar}</p>
           )}
           
           {/* HomeMe Brand */}

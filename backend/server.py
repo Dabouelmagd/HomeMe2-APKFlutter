@@ -2254,14 +2254,23 @@ async def serve_subdir_file(subdir: str, filename: str):
     """Serve files from /app/uploads/{subdir}/{filename} (e.g. branding, family_members, services).
     Important: this route MUST be registered AFTER more specific routes like /files/users/{filename}.
     Ingress routes only `/api/*` to backend, so any frontend that needs an uploaded file MUST use this prefix.
+    Self-healing: if file is missing, attempt restore from latest backup snapshot before 404.
     """
     # Whitelist subdirs to prevent directory traversal
-    allowed_subdirs = {"branding", "family_members", "logos", "ads", "services", "documents", "gallery", "maintenance", "users", "payment_proofs"}
+    allowed_subdirs = {"branding", "family_members", "logos", "ads", "services", "documents", "gallery", "maintenance", "users", "payment_proofs", "homeme"}
     if subdir not in allowed_subdirs:
         raise HTTPException(status_code=404, detail="Invalid subdirectory")
     file_path = UPLOAD_DIR / subdir / filename
     if not file_path.exists() or not file_path.is_file():
-        raise HTTPException(status_code=404, detail="File not found")
+        # Self-heal: try restoring from latest backup before giving up
+        try:
+            from services.media_backup import restore_file
+            if restore_file(subdir, filename):
+                file_path = UPLOAD_DIR / subdir / filename
+        except Exception as _e:
+            logging.warning(f"self-heal failed for {subdir}/{filename}: {_e}")
+        if not file_path.exists() or not file_path.is_file():
+            raise HTTPException(status_code=404, detail="File not found")
     mime_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
     return FileResponse(path=str(file_path), media_type=mime_type, filename=filename)
 
@@ -2476,6 +2485,10 @@ app.include_router(monthly_reports_router)
 app.include_router(smtp_health_router)
 app.include_router(compound_branding_router)
 app.include_router(email_templates_router)
+from routes.media_health import router as media_health_router
+app.include_router(media_health_router)
+from routes.app_branding import router as app_branding_router
+app.include_router(app_branding_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
 app.include_router(linked_accounts_router)
@@ -2581,6 +2594,21 @@ async def start_daily_health_scan():
     from routes.system_health import daily_health_scan_loop
     _asyncio.create_task(daily_health_scan_loop(app))
     logging.info("Daily route-health scan loop scheduled (06:00 UTC)")
+
+
+@app.on_event("startup")
+async def start_media_backup_loop():
+    """Daily media-backup snapshot of /app/uploads/* into /app/backups/media/YYYY-MM-DD/ (03:00 UTC)."""
+    import asyncio as _asyncio
+    from services.media_backup import media_backup_loop, take_snapshot
+    # Take one snapshot on startup so we always have at least one recovery point
+    try:
+        res = take_snapshot()
+        logging.info(f"Initial media snapshot: {res}")
+    except Exception as e:
+        logging.warning(f"Initial media snapshot failed: {e}")
+    _asyncio.create_task(media_backup_loop())
+    logging.info("Media backup loop scheduled (03:00 UTC daily)")
 
 
 @app.on_event("startup")

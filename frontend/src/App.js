@@ -66,6 +66,8 @@ import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
 import BrandingSettingsPage from './pages/BrandingSettingsPage';
 import EmailTemplatesPage from './pages/EmailTemplatesPage';
+import MediaHealthPage from './pages/MediaHealthPage';
+import AppBrandingPage from './pages/AppBrandingPage';
 import SecurityScanPage from './pages/SecurityScanPage';
 import PublicVisitorPassPage from './pages/PublicVisitorPassPage';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
@@ -653,6 +655,18 @@ function App() {
 
                 <Route path="email-templates" element={
                   <EmailTemplatesPage />
+                } />
+
+                <Route path="media-health" element={
+                  <ProtectedRoute>
+                    <MediaHealthPage />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="app-branding" element={
+                  <ProtectedRoute>
+                    <AppBrandingPage />
+                  </ProtectedRoute>
                 } />
                 
                 <Route path="utilities" element={

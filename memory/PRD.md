@@ -3,7 +3,31 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-57)
+## Latest Fixes (Feb 2026 — iterations 26-58)
+
+### Iter 58: Media Backup + Self-Healing + HomeMe App Branding (Feb 28, 2026) ✅
+
+**🛡️ نظام نسخ احتياطي ذكي للوسائط (Self-Healing):**
+- `services/media_backup.py` — جديد. Daily snapshot لكامل `/app/uploads/*` إلى `/app/backups/media/YYYY-MM-DD/`. Incremental (يتخطى الملفات المتطابقة)، احتفاظ 30 يوم.
+- Background loop ينفّذ السنابشوت يومياً 03:00 UTC + سنابشوت أولي وقت إقلاع الخادم.
+- **Self-Heal**: تعديل `serve_subdir_file` في `server.py` — لو ملف مفقود من `/app/uploads/{subdir}/`، يحاول استرجاعه من أحدث نسخة احتياطية قبل ما يرجع 404. تم التحقق E2E: حذف `homeme_xxx.png` يدوياً → GET للملف → 200 image/png + الملف رجع للقرص ✓.
+- `routes/media_health.py` — جديد. 6 endpoints (overview/orphans/broken/backups/backup-now/repair-broken). Owner/Super-Admin only.
+- `pages/MediaHealthPage.js` — جديد. لوحة بـ 5 KPIs + 4 tabs (نظرة عامة، مكسورة، يتيمة، نسخ احتياطية) + أزرار "نسخ احتياطي الآن" و "إصلاح المكسور".
+- DB_REFS في الـ scanner تغطي 14 collection×field (users, family_members, compounds, internal_ads, advertiser_ads, maintenance, complaints, services, support_tickets, messages, voice_messages, gallery).
+
+**🎨 لوجو وألوان HomeMe (App-Level Branding):**
+- `routes/app_branding.py` — جديد. Collection `app_settings.homeme_branding` يحفظ `{logo_url, app_name_ar/en, tagline_ar/en, primary/secondary/accent_color}`.
+- `GET /api/app-branding` — public (يستخدمها صفحة Login + Layout).
+- `PUT /api/app-branding` — owner-only، validation للألوان hex.
+- `POST /api/app-branding/logo` — multipart upload (PNG/JPG/WEBP/SVG ≤2MB) → يحفظ في `/app/uploads/homeme/` ويُرجع `/api/files/homeme/{filename}`.
+- `homeme` أُضيف للـ whitelist في `serve_subdir_file`.
+- `pages/AppBrandingPage.js` — جديد. معاينة حية + رفع لوجو + 3 color pickers + form لاسم وشعار التطبيق.
+- `Layout.js` — Owner/Super-Admin بدون compound_id يرى لوجو HomeMe (data-testid: `homeme-logo-sidebar`) واسم التطبيق (`homeme-app-name-sidebar`) بدلاً من فراغ.
+- Sidebar: "صحة الوسائط والنسخ الاحتياطي" + "لوجو وألوان هوم مي" أُضيفا تحت قسم App Owner.
+
+**Verified via testing_agent_v3_fork (iteration 57)** — 100% نجاح:
+- Backend: 23/23 pytest (overview/orphans/broken/backups/backup-now/repair-broken/RBAC/PUT validation/upload size/wrong type/self-heal E2E).
+- Frontend: 8/8 Playwright (public branding endpoint, MediaHealth + AppBranding rendering, sidebar entries، Owner-only access enforced في الـ UI ورسالة "هذه الصفحة متاحة للمالك والسوبر أدمن فقط").
 
 ### Iter 57: Full Regression Sweep + Minor Cleanups (Feb 27, 2026) ✅
 

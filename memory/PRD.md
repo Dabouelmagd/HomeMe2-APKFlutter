@@ -5,7 +5,37 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 60: Performance Budget Tracker + Sidebar Scroll Fix (Feb 28, 2026) ✅
+
+**🐛 Bug Fix — السايدبار يرجع لأعلى عند التنقل:**
+- **السبب الجذري:** عنصر `<nav>` يُعاد إنشاؤه عند كل route change، فيُعاد تعيين `scrollTop` إلى 0.
+- **الإصلاح في `Layout.js`:** ref على `<nav>` + حفظ scrollTop في `sessionStorage` عند كل scroll (debounced via rAF) + استعادة الموضع عند تغيير `location.pathname` + scroll-into-view لـ active link لو خارج viewport.
+
+**🆕 Performance Budget Tracker (P3):**
+- `services/perf_budget.py` — يسجل عينات latency (ring buffer 200/endpoint) ويحسب p50/p95/mean. Threshold = `max(p50*2, p95+100, 500ms)`. Regression = 3 قياسات متتالية تتجاوز الـ threshold.
+- `routes/perf_budget.py` — 3 endpoints owner-only (overview/regressions/recompute).
+- التكامل مع Smoke Test: كل تشغيل (manual/auto) يُغذي perf samples ويحسب baselines.
+- Email Alerts للمالكين عند ظهور regression جديدة.
+- UI: `components/PerfBudgetCard.js` يعرض جدول بكل endpoints مع p50/p95/threshold/latest/sparkline.
+
 ### Iter 59: Pre-Deploy Smoke Test + Synthetic Monitor + Critical Bug Fixes (Feb 28, 2026) ✅
+
+**🐛 Bug Fix — Registration Failed (Critical):**
+- **السبب:** `shared_models.py` يستخدم `uuid.uuid4()` في 30+ موديل بدون `import uuid` → HTTP 500.
+- **الإصلاح:** إضافة `import uuid` واحدة. كل التسجيل (Owner/Company/Resident) يعمل الآن.
+
+**🐛 Bug Fix — Health Scanner timing:**
+- **السبب:** `t0 = time.perf_counter()` كان قبل `async with sem:` فيُحتسب وقت الطابور كـ latency.
+- **الإصلاح:** نقل التايمر داخل الـ semaphore + رفع concurrency 8→16. النتيجة: `/api/` من 16090ms → 21ms.
+
+**🆕 Pre-Deploy Smoke Test (P1):**
+- `services/smoke_test_runner.py` — 15 اختبار حرج (login 4 أدوار، register، KPIs، files، ads، إلخ).
+- `routes/smoke_test.py` — 4 endpoints owner-only (run/last/history/deploy-status).
+- CLI: `python -m services.smoke_test_runner` (exit 0/1 لـ CI/CD).
+- Synthetic Monitor: background loop كل 30 دقيقة + email alerts على failures جديدة.
+- UI: `components/SmokeTestCard.js` بانر ديناميكي (أخضر/أحمر/أصفر) في صفحة System Health.
+
+
 
 **🐛 Bug Fix — Registration Failed لتسجيل شركة الإدارة (Critical):**
 - **السبب الجذري:** `shared_models.py` كان يستخدم `uuid.uuid4()` في `Field(default_factory=...)` لكن **`import uuid` ناقص** — أي endpoint يبني نموذج فيه `id` field كان يفشل بـ `NameError` (HTTP 500).

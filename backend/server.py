@@ -2491,6 +2491,8 @@ from routes.app_branding import router as app_branding_router
 app.include_router(app_branding_router)
 from routes.smoke_test import router as smoke_test_router
 app.include_router(smoke_test_router)
+from routes.perf_budget import router as perf_budget_router
+app.include_router(perf_budget_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
 app.include_router(linked_accounts_router)

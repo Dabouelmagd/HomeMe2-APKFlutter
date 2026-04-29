@@ -47,6 +47,16 @@ async def run_now(current_user: dict = Depends(get_current_user)):
     summary.pop("_id", None)
     await _persist(db, summary, source=f"manual:{current_user.get('username')}")
     summary.pop("_id", None)
+    # Also feed Performance Budget Tracker so manual runs contribute to baselines
+    try:
+        from services.perf_budget import record_samples, recompute_baselines, detect_regressions
+        samples = [{"endpoint": r["name"], "ms": r.get("ms"), "status_code": r.get("status_code"), "passed": r.get("passed")} for r in summary.get("results", [])]
+        await record_samples(samples, source="manual_run")
+        await recompute_baselines()
+        await detect_regressions()
+    except Exception as e:
+        import logging as _lg
+        _lg.warning(f"perf budget update on manual run failed: {e}")
     return summary
 
 
@@ -173,6 +183,73 @@ async def smoke_test_monitor_loop():
             else:
                 logging.info("[smoke_monitor] All smoke tests pass.")
             last_failed_set = failed_now
+
+            # Performance Budget Tracker — record samples + check regressions
+            try:
+                from services.perf_budget import record_samples, recompute_baselines, detect_regressions
+                samples = [{"endpoint": r["name"], "ms": r.get("ms"), "status_code": r.get("status_code"), "passed": r.get("passed")} for r in summary.get("results", [])]
+                await record_samples(samples, source="smoke_monitor")
+                await recompute_baselines()
+                regs = await detect_regressions()
+                if regs["new_regressions"]:
+                    await _email_perf_regressions_to_owners(db, regs["new_regressions"])
+                    logging.info(f"[perf_budget] {len(regs['new_regressions'])} new regression(s); emailed owners.")
+                elif regs["resolved"]:
+                    logging.info(f"[perf_budget] {len(regs['resolved'])} regression(s) auto-resolved.")
+            except Exception as e:
+                logging.warning(f"[perf_budget] cycle failed: {e}")
         except Exception as e:
             logging.error(f"[smoke_monitor] loop iteration crashed: {e}")
         await asyncio.sleep(interval_s)
+
+
+async def _email_perf_regressions_to_owners(db, regressions: list):
+    """Send a single email per cycle listing newly-detected slow endpoints."""
+    try:
+        from email_service import EmailService
+        owners = []
+        async for u in db.users.find({"role": {"$in": ["app_owner", "super_admin"]}, "is_active": True}, {"_id": 0, "email": 1}):
+            if u.get("email"):
+                owners.append(u["email"])
+        if not owners:
+            return 0
+        rows = "".join(
+            f"<tr><td style='padding:6px 10px;border:1px solid #eee'>{r['endpoint']}</td>"
+            f"<td style='padding:6px 10px;border:1px solid #eee;color:#c00;font-weight:bold'>{r['current_ms']}ms</td>"
+            f"<td style='padding:6px 10px;border:1px solid #eee'>{r['p50']}ms</td>"
+            f"<td style='padding:6px 10px;border:1px solid #eee'>{r['p95']}ms</td>"
+            f"<td style='padding:6px 10px;border:1px solid #eee'>{r['threshold_ms']}ms</td></tr>"
+            for r in regressions
+        )
+        html = f"""
+<div dir='rtl' style='font-family:Arial,sans-serif;max-width:720px;margin:auto'>
+  <div style='background:linear-gradient(135deg,#f59e0b,#b45309);color:#fff;padding:18px;border-radius:12px 12px 0 0'>
+    <h2 style='margin:0'>⏱️ Performance Regression — {len(regressions)} endpoint أبطأ من الميزانية</h2>
+    <p style='margin:6px 0 0;opacity:.9;font-size:13px'>Performance Budget Tracker اكتشف أن endpoints أصبحت أبطأ من المعتاد لـ 3 قياسات متتالية.</p>
+  </div>
+  <div style='background:#fff;padding:16px;border:1px solid #eee;border-top:0;border-radius:0 0 12px 12px'>
+    <table style='border-collapse:collapse;width:100%;font-size:14px'>
+      <thead><tr style='background:#fef3c7'>
+        <th style='padding:6px 10px;border:1px solid #eee;text-align:right'>Endpoint</th>
+        <th style='padding:6px 10px;border:1px solid #eee;text-align:right'>الزمن الحالي</th>
+        <th style='padding:6px 10px;border:1px solid #eee;text-align:right'>p50 (المتوسط)</th>
+        <th style='padding:6px 10px;border:1px solid #eee;text-align:right'>p95</th>
+        <th style='padding:6px 10px;border:1px solid #eee;text-align:right'>الميزانية</th>
+      </tr></thead>
+      <tbody>{rows}</tbody>
+    </table>
+    <p style='margin-top:14px;font-size:12px;color:#666'>افتحي صفحة فحص صحة المسارات → بطاقة "ميزانية الأداء" لمتابعة التفاصيل.</p>
+  </div>
+</div>"""
+        es = EmailService()
+        sent = 0
+        for em in owners:
+            try:
+                await es.send_email(to_email=em, subject=f"⏱️ Performance Regression ({len(regressions)}) — HomeMe", body=html, is_html=True)
+                sent += 1
+            except Exception as e:
+                logging.warning(f"perf email to {em} failed: {e}")
+        return sent
+    except Exception as e:
+        logging.warning(f"_email_perf_regressions_to_owners crashed: {e}")
+        return 0

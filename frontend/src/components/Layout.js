@@ -86,6 +86,9 @@ const Layout = ({ children, isTrialMode = false }) => {
   });
   // Track previous "open" count so we can ping only when it increases
   const prevOpenRef = useRef(null);
+  // Sidebar scroll position persistence (so navigating between pages doesn't reset scroll to top)
+  const sidebarNavRef = useRef(null);
+  const SIDEBAR_SCROLL_KEY = 'homeme_sidebar_scroll';
   // Lazy-init AudioContext only when needed (browsers require a user gesture — will still work on subsequent tick after initial click)
   const audioCtxRef = useRef(null);
 
@@ -137,6 +140,48 @@ const Layout = ({ children, isTrialMode = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
+
+  // Restore sidebar scroll position after navigation (so clicking a sub-item doesn't jump to top)
+  useEffect(() => {
+    const nav = sidebarNavRef.current;
+    if (!nav) return;
+    let saved = 0;
+    try { saved = parseInt(sessionStorage.getItem(SIDEBAR_SCROLL_KEY) || '0', 10) || 0; } catch { /* ignore */ }
+    // Use rAF to wait until the nav children are rendered
+    const id = requestAnimationFrame(() => {
+      if (saved > 0) nav.scrollTop = saved;
+      // If active link is out of view, scroll it into view (smoothly)
+      const active = nav.querySelector('a[data-active="true"]');
+      if (active) {
+        const navRect = nav.getBoundingClientRect();
+        const linkRect = active.getBoundingClientRect();
+        const outOfView = linkRect.top < navRect.top + 16 || linkRect.bottom > navRect.bottom - 16;
+        if (outOfView) {
+          active.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+        }
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [location.pathname]);
+
+  // Persist scroll position as user scrolls the sidebar (debounced via rAF)
+  useEffect(() => {
+    const nav = sidebarNavRef.current;
+    if (!nav) return;
+    let frame = 0;
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        try { sessionStorage.setItem(SIDEBAR_SCROLL_KEY, String(nav.scrollTop)); } catch { /* ignore */ }
+      });
+    };
+    nav.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      nav.removeEventListener('scroll', onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
 
   // Fetch compound logo
   useEffect(() => {
@@ -705,7 +750,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         </div>
 
         {/* Scrollable Navigation Area */}
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 sidebar-scroll">
+        <nav ref={sidebarNavRef} className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 sidebar-scroll" data-testid="sidebar-nav">
           <div className="space-y-2">
             {navigationSections.map((section, sectionIndex) => {
               const visibleItems = section.items.filter(item => item.show);
@@ -755,6 +800,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                         <Link
                           key={item.name}
                           to={item.href}
+                          data-active={isActive(item.href) ? 'true' : 'false'}
                           className={`
                             group flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200
                             ${isActive(item.href)

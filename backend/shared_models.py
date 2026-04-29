@@ -1,6 +1,7 @@
 """
 Shared Pydantic models for HomeMe backend routes
 """
+import uuid
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime, date

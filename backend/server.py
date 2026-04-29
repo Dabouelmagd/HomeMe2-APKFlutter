@@ -2489,6 +2489,8 @@ from routes.media_health import router as media_health_router
 app.include_router(media_health_router)
 from routes.app_branding import router as app_branding_router
 app.include_router(app_branding_router)
+from routes.smoke_test import router as smoke_test_router
+app.include_router(smoke_test_router)
 app.include_router(sidebar_alerts_router)
 app.include_router(compound_subscription_router)
 app.include_router(linked_accounts_router)
@@ -2609,6 +2611,15 @@ async def start_media_backup_loop():
         logging.warning(f"Initial media snapshot failed: {e}")
     _asyncio.create_task(media_backup_loop())
     logging.info("Media backup loop scheduled (03:00 UTC daily)")
+
+
+@app.on_event("startup")
+async def start_smoke_test_monitor():
+    """Synthetic monitor: run smoke tests every 30 min; alert owners on new failures."""
+    import asyncio as _asyncio
+    from routes.smoke_test import smoke_test_monitor_loop
+    _asyncio.create_task(smoke_test_monitor_loop())
+    logging.info("Smoke-test synthetic monitor started (30 min interval)")
 
 
 @app.on_event("startup")

@@ -16,6 +16,7 @@ import {
   ChartBarIcon,
   BellAlertIcon,
 } from '@heroicons/react/24/outline';
+import SmokeTestCard from '../components/SmokeTestCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const auth = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -232,6 +233,7 @@ const SystemHealthPage = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen" data-testid="system-health-page">
+      <SmokeTestCard />
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-5">
         <div className="flex items-start justify-between flex-wrap gap-3">

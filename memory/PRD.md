@@ -3,7 +3,40 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-58)
+## Latest Fixes (Feb 2026 — iterations 26-59)
+
+### Iter 59: Pre-Deploy Smoke Test + Synthetic Monitor + Critical Bug Fixes (Feb 28, 2026) ✅
+
+**🐛 Bug Fix — Registration Failed لتسجيل شركة الإدارة (Critical):**
+- **السبب الجذري:** `shared_models.py` كان يستخدم `uuid.uuid4()` في `Field(default_factory=...)` لكن **`import uuid` ناقص** — أي endpoint يبني نموذج فيه `id` field كان يفشل بـ `NameError` (HTTP 500).
+- **الإصلاح:** إضافة `import uuid` (سطر واحد). 30+ موديل أصبحت تعمل (User, Compound, Family، إلخ).
+
+**🐛 Bug Fix — System Health Scanner يعرض كل المسارات بـ 16 ثانية:**
+- **السبب الجذري:** الـ scanner كان يبدأ التايمر **قبل** الحصول على semaphore slot، فيُحتسب وقت انتظار الطابور (15+ ثانية مع 489 endpoint و 8 concurrent) كـ latency حقيقي.
+- **الإصلاح:** نقل `t0 = time.perf_counter()` داخل `async with sem:` block (3 مواضع) + رفع concurrency من 8 → 16.
+- **النتيجة:** `/api/` (root) من **16090ms → 21ms**. `/api/facility-bookings` من ~6000ms (مزيف) → **147ms** (حقيقي). **0 failures في 501 مسار**.
+
+**🆕 Pre-Deploy Smoke Test (P1):**
+- `services/smoke_test_runner.py` — جديد. 15 اختبار حرج (login owner/super/company، register، dashboards، files، ads، KPIs، audit، alerts، compounds id-leak، media-health، smtp-health، file 404 safety).
+- `routes/smoke_test.py` — 4 endpoints owner-only:
+  - `POST /api/system/smoke-test/run` — تشغيل الفحص فوراً
+  - `GET /api/system/smoke-test/last` — آخر نتيجة كاملة
+  - `GET /api/system/smoke-test/history?limit=N` — السجل (يستثني الـ results للـ payload size)
+  - `GET /api/system/smoke-test/deploy-status` — `{deploy_safe, passed, failed, failed_tests, stale}` للـ deploy-gate
+- **CLI:** `cd /app/backend && python -m services.smoke_test_runner` (exit code 0 لو نجح، 1 لو فشل) — قابل للاستخدام في CI/CD.
+- **🔄 Synthetic Monitor:** Background loop يدور **كل 30 دقيقة** (`smoke_test_monitor_loop`)، يحفظ النتائج في `smoke_test_runs`، ويرسل إيميل لكل `app_owner`/`super_admin` عند ظهور **failure جديد** (idempotent عبر `last_failed_set` set).
+- **🛡️ Deploy Gate UI:** `components/SmokeTestCard.js` بانر دينامي على رأس صفحة "فحص صحة المسارات":
+  - 🟢 أخضر: "جاهز للنشر" + الإحصائيات + آخر تشغيل
+  - 🔴 أحمر: "🚫 لا تنشر — اختبارات حرجة فاشلة!"
+  - 🟡 أصفر: "نتيجة قديمة (>6 ساعات)" أو "لم يتم تشغيل بعد"
+  - زر "🚀 تشغيل الآن" + قسم expandable يعرض كل الـ 15 اختبار + history.
+
+**🧪 الاختبار الحي:**
+- CLI: 15/15 ✅ (deploy_safe: true)
+- HTTP: `POST /api/system/smoke-test/run` → 1898ms → 15/15 ✅
+- RBAC: 403 لـ test_advertiser ✓
+- Synthetic monitor: تأكد من تشغيله في الخلفية كل 30 دقيقة (سجل `[smoke_monitor] All smoke tests pass.`)
+- UI: البانر يعرض "✅ جاهز للنشر" بشكل صحيح في الواجهة (بـ Playwright).
 
 ### Iter 58: Media Backup + Self-Healing + HomeMe App Branding (Feb 28, 2026) ✅
 

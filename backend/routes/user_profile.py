@@ -75,6 +75,14 @@ async def update_user_profile(
         with open(file_path, 'wb') as f:
             f.write(content)
 
+        # Dual-write to MongoDB for deployment-survival
+        try:
+            from services.media_store import save_to_db
+            await save_to_db("users", unique_filename, profile_picture.content_type or "", content)
+        except Exception as _e:
+            import logging as _lg
+            _lg.warning(f"user profile pic DB backup failed: {_e}")
+
         update_data["profile_picture_url"] = f"/api/files/users/{unique_filename}"
 
     result = await db.users.update_one({"id": user_id}, {"$set": update_data})

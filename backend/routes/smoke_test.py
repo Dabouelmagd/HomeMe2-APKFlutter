@@ -152,8 +152,7 @@ async def _email_failures_to_owners(db, summary: dict):
                 await es.send_email(
                     to_email=o["email"],
                     subject=f"🚨 Smoke Test Failed ({summary.get('failed')}/{summary.get('total')}) — HomeMe",
-                    body=html,
-                    is_html=True,
+                    html_content=html,
                 )
                 sent += 1
             except Exception as e:
@@ -245,7 +244,7 @@ async def _email_perf_regressions_to_owners(db, regressions: list):
         sent = 0
         for em in owners:
             try:
-                await es.send_email(to_email=em, subject=f"⏱️ Performance Regression ({len(regressions)}) — HomeMe", body=html, is_html=True)
+                await es.send_email(to_email=em, subject=f"⏱️ Performance Regression ({len(regressions)}) — HomeMe", html_content=html)
                 sent += 1
             except Exception as e:
                 logging.warning(f"perf email to {em} failed: {e}")

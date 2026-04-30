@@ -2252,9 +2252,11 @@ async def serve_payment_proof(filename: str):
 @api_router.get("/files/{subdir}/{filename}")
 async def serve_subdir_file(subdir: str, filename: str):
     """Serve files from /app/uploads/{subdir}/{filename} (e.g. branding, family_members, services).
-    Important: this route MUST be registered AFTER more specific routes like /files/users/{filename}.
-    Ingress routes only `/api/*` to backend, so any frontend that needs an uploaded file MUST use this prefix.
-    Self-healing: if file is missing, attempt restore from latest backup snapshot before 404.
+    Multi-layer self-healing:
+      1. Serve from disk if exists
+      2. If missing on disk, try to restore from latest backup snapshot
+      3. If not in any backup, try to restore from MongoDB persistent store (survives deployments!)
+      4. Else 404
     """
     # Whitelist subdirs to prevent directory traversal
     allowed_subdirs = {"branding", "family_members", "logos", "ads", "services", "documents", "gallery", "maintenance", "users", "payment_proofs", "homeme"}
@@ -2262,13 +2264,21 @@ async def serve_subdir_file(subdir: str, filename: str):
         raise HTTPException(status_code=404, detail="Invalid subdirectory")
     file_path = UPLOAD_DIR / subdir / filename
     if not file_path.exists() or not file_path.is_file():
-        # Self-heal: try restoring from latest backup before giving up
+        # Self-heal layer 1: try latest backup snapshot
         try:
             from services.media_backup import restore_file
             if restore_file(subdir, filename):
                 file_path = UPLOAD_DIR / subdir / filename
         except Exception as _e:
-            logging.warning(f"self-heal failed for {subdir}/{filename}: {_e}")
+            logging.warning(f"self-heal (backup) failed for {subdir}/{filename}: {_e}")
+        # Self-heal layer 2: try MongoDB persistent store
+        if not file_path.exists() or not file_path.is_file():
+            try:
+                from services.media_store import restore_to_disk_from_db
+                if await restore_to_disk_from_db(subdir, filename):
+                    file_path = UPLOAD_DIR / subdir / filename
+            except Exception as _e:
+                logging.warning(f"self-heal (DB) failed for {subdir}/{filename}: {_e}")
         if not file_path.exists() or not file_path.is_file():
             raise HTTPException(status_code=404, detail="File not found")
     mime_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"

@@ -1507,6 +1507,14 @@ async def upload_ad_media(file: UploadFile = File(...), current_user: dict = Dep
     with open(filepath, "wb") as f:
         f.write(content)
 
+    # Dual-write to MongoDB so image survives container rebuilds / deployments
+    try:
+        from services.media_store import save_to_db
+        await save_to_db("ads", filename, file.content_type or "", content)
+    except Exception as _e:
+        import logging as _lg
+        _lg.warning(f"ads upload DB backup failed: {_e}")
+
     media_type = "video" if ext in allowed_video else "image"
     media_url = f"/api/ads/media/{filename}"
 
@@ -1515,11 +1523,34 @@ async def upload_ad_media(file: UploadFile = File(...), current_user: dict = Dep
 
 @router.get("/ads/media/{filename}")
 async def serve_ad_media(filename: str):
-    """Serve uploaded ad media"""
-    from fastapi.responses import FileResponse
+    """Serve uploaded ad media with full self-healing (backup → DB → 404)"""
+    from fastapi.responses import FileResponse, Response
     filepath = os.path.join(UPLOAD_DIR, filename)
     if not os.path.exists(filepath):
-        raise HTTPException(status_code=404, detail="ملف غير موجود")
+        # Self-heal: try backup snapshots first
+        try:
+            from services.media_backup import restore_file
+            restore_file("ads", filename)
+        except Exception:
+            pass
+        # Self-heal: try MongoDB persistent store (survives deployments)
+        if not os.path.exists(filepath):
+            try:
+                from services.media_store import load_from_db
+                result = await load_from_db("ads", filename)
+                if result:
+                    content_type, data = result
+                    # Write back to disk for cache
+                    try:
+                        with open(filepath, "wb") as f:
+                            f.write(data)
+                    except Exception:
+                        pass
+                    return Response(content=data, media_type=content_type)
+            except Exception:
+                pass
+        if not os.path.exists(filepath):
+            raise HTTPException(status_code=404, detail="ملف غير موجود")
     return FileResponse(filepath)
 
 

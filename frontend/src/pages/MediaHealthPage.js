@@ -22,20 +22,25 @@ export default function MediaHealthPage() {
   const [tab, setTab] = useState('overview');
   const [busy, setBusy] = useState(false);
 
+  const [dbOverview, setDbOverview] = useState(null);
+  const [migrateBusy, setMigrateBusy] = useState(false);
+
   const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
   const load = async () => {
     try {
-      const [ov, bk, or, bn] = await Promise.all([
+      const [ov, bk, or, bn, dbo] = await Promise.all([
         axios.get(`${API}/api/media-health/overview`, { headers: headers() }),
         axios.get(`${API}/api/media-health/backups`, { headers: headers() }),
         axios.get(`${API}/api/media-health/orphans`, { headers: headers() }),
         axios.get(`${API}/api/media-health/broken`, { headers: headers() }),
+        axios.get(`${API}/api/media-health/db-overview`, { headers: headers() }).catch(() => ({ data: null })),
       ]);
       setOverview(ov.data);
       setSnapshots(bk.data?.snapshots || []);
       setOrphans(or.data?.orphans || []);
       setBroken(bn.data?.broken || []);
+      setDbOverview(dbo.data);
     } catch (e) {
       toast.error(e.response?.data?.detail || 'فشل تحميل البيانات');
     }
@@ -92,6 +97,18 @@ export default function MediaHealthPage() {
     } finally { setBusy(false); }
   };
 
+  const migrateToDb = async () => {
+    if (!window.confirm('🔐 هذا الحل الجذري الدائم لمشكلة اختفاء الإعلانات.\n\nسيتم نسخ كل الصور من القرص إلى MongoDB. بعدها تعيش الصور مع الـ deployments ولن تختفي أبداً.\n\nكل صورة جديدة ستُنسخ تلقائياً للـ DB من الآن فصاعداً.\n\nهل تريدين المتابعة؟')) return;
+    setMigrateBusy(true);
+    try {
+      const res = await axios.post(`${API}/api/media-health/migrate-to-db`, {}, { headers: headers() });
+      toast.success(`✅ تم نسخ ${res.data.copied} ملف للـ MongoDB (تم تخطّي ${res.data.skipped} لأنها محفوظة مسبقاً). المجموع الآن في DB: ${res.data.db_state?.total_files} ملف.`);
+      await load();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'فشل الترحيل');
+    } finally { setMigrateBusy(false); }
+  };
+
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto" data-testid="media-health-page">
       <header className="mb-6 flex items-center justify-between flex-wrap gap-3">
@@ -112,6 +129,11 @@ export default function MediaHealthPage() {
                   className="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-orange-600 to-red-700 hover:opacity-90 disabled:opacity-50 font-bold text-sm"
                   title="مسح المراجع التي ملفاتها غير قابلة للاستعادة من قاعدة البيانات">
             🗑️ مسح المراجع التالفة
+          </button>
+          <button data-testid="migrate-db-btn" onClick={migrateToDb} disabled={migrateBusy}
+                  className="px-4 py-2 rounded-xl text-white bg-gradient-to-r from-violet-600 to-fuchsia-700 hover:opacity-90 disabled:opacity-50 font-bold text-sm animate-pulse"
+                  title="الحل الجذري: نسخ كل الصور إلى MongoDB لتعيش مع أي deployment">
+            {migrateBusy ? '⏳ جاري الترحيل...' : '🔐 ترحيل للـ MongoDB (دائم)'}
           </button>
           <button onClick={load} disabled={busy}
                   className="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-sm">⟳ تحديث</button>
@@ -142,6 +164,39 @@ export default function MediaHealthPage() {
             <div className="text-2xl font-extrabold text-violet-900 dark:text-violet-200" data-testid="kpi-snapshots">{overview.snapshot_count}</div>
             {overview.last_snapshot && <div className="text-[11px] text-violet-700 dark:text-violet-400 mt-0.5">آخر: {overview.last_snapshot.snapshot}</div>}
           </div>
+        </div>
+      )}
+
+      {dbOverview && (
+        <div className="mb-6 rounded-xl p-4 bg-gradient-to-br from-indigo-600 to-violet-700 text-white shadow-lg" data-testid="db-persistent-card">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <div className="text-xs font-bold opacity-90 mb-1">🔐 حماية MongoDB الدائمة (الحل الجذري)</div>
+              <div className="text-xl font-extrabold">
+                {dbOverview.total_files > 0
+                  ? `✅ ${dbOverview.total_files} ملف محمي في قاعدة البيانات`
+                  : '⚠️ لم يتم تفعيل الحماية الدائمة بعد'}
+              </div>
+              <div className="text-sm opacity-90 mt-0.5">
+                {dbOverview.total_files > 0
+                  ? 'الصور محفوظة في MongoDB ولن تختفي مع أي deployment. كل صورة جديدة تُنسخ تلقائياً.'
+                  : 'اضغطي "🔐 ترحيل للـ MongoDB" أعلاه لضمان عدم اختفاء الصور أبداً.'}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-extrabold" data-testid="kpi-db-files">{dbOverview.total_files}</div>
+              <div className="text-xs opacity-80">{fmtBytes(dbOverview.total_bytes)}</div>
+            </div>
+          </div>
+          {Object.keys(dbOverview.by_subdir || {}).length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2 text-xs">
+              {Object.entries(dbOverview.by_subdir).map(([sub, info]) => (
+                <span key={sub} className="px-2 py-1 rounded-full bg-white/20 backdrop-blur-sm">
+                  /{sub}: <strong>{info.files}</strong>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

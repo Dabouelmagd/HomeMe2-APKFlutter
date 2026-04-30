@@ -194,6 +194,32 @@ async def repair_broken(current_user: dict = Depends(get_current_user)):
     }
 
 
+@router.post("/migrate-to-db")
+async def migrate_to_db(current_user: dict = Depends(get_current_user)):
+    """PERMANENT FIX: Copy every file on disk into MongoDB so they survive deployments.
+    K8s container disk is ephemeral — each deploy wipes /app/uploads. MongoDB is not.
+    After this runs once, every existing file is safe. Every new upload is also dual-written
+    automatically from here on.
+    """
+    _require_owner(current_user)
+    try:
+        from services.media_store import migrate_disk_to_db, db_overview
+        res = await migrate_disk_to_db()
+        overview = await db_overview()
+        return {"success": True, **res, "db_state": overview}
+    except Exception as e:
+        logging.error(f"migrate-to-db failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Migration failed: {e}")
+
+
+@router.get("/db-overview")
+async def db_overview_route(current_user: dict = Depends(get_current_user)):
+    """Show how many files + bytes are persisted in MongoDB media_files collection."""
+    _require_owner(current_user)
+    from services.media_store import db_overview
+    return await db_overview()
+
+
 @router.post("/clear-broken-refs")
 async def clear_broken_refs(current_user: dict = Depends(get_current_user)):
     """Clear broken DB references whose files cannot be restored from any backup.

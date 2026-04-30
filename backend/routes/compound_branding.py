@@ -101,6 +101,14 @@ async def upload_logo(
     dest = LOGO_DIR / filename
     dest.write_bytes(contents)
 
+    # Dual-write to MongoDB for deployment-survival
+    try:
+        from services.media_store import save_to_db
+        await save_to_db("branding", filename, file.content_type or "", contents)
+    except Exception as _e:
+        import logging as _lg
+        _lg.warning(f"branding logo DB backup failed: {_e}")
+
     logo_url = f"/api/files/branding/{filename}"
 
     # Persist to compound document

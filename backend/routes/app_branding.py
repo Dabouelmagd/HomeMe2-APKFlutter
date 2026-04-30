@@ -117,6 +117,13 @@ async def upload_logo(file: UploadFile = File(...), current_user: dict = Depends
     fname = f"homeme_{secrets.token_hex(8)}.{ext}"
     path = HOMEME_DIR / fname
     path.write_bytes(data)
+    # Dual-write to MongoDB for deployment-survival
+    try:
+        from services.media_store import save_to_db
+        await save_to_db("homeme", fname, ct, data)
+    except Exception as _e:
+        import logging as _lg
+        _lg.warning(f"app-branding logo DB backup failed: {_e}")
     url = f"/api/files/homeme/{fname}"
 
     db = get_db()

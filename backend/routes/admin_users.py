@@ -64,6 +64,14 @@ async def create_admin_account(
             async with aiofiles.open(file_path, 'wb') as f:
                 await f.write(content)
             
+            # Dual-write to MongoDB for deployment-survival
+            try:
+                from services.media_store import save_to_db
+                await save_to_db("users", unique_filename, profile_picture.content_type or "", content)
+            except Exception as _e:
+                import logging as _lg
+                _lg.warning(f"admin profile pic DB backup failed: {_e}")
+            
             profile_picture_url = f"/api/files/users/{unique_filename}"
         
         # Hash password

@@ -98,6 +98,13 @@ async def advertiser_upload_image(file: UploadFile = File(...), current_user: di
     upload_dir.mkdir(parents=True, exist_ok=True)
     filename = f"{uuid.uuid4().hex[:12]}.{ext}"
     (upload_dir / filename).write_bytes(contents)
+    # Dual-write to MongoDB so image survives container rebuilds
+    try:
+        from services.media_store import save_to_db
+        await save_to_db("ads", filename, file.content_type or "", contents)
+    except Exception as _e:
+        import logging as _lg
+        _lg.warning(f"advertiser upload DB backup failed: {_e}")
     return {"url": f"/api/ads/media/{filename}", "filename": filename, "size_bytes": len(contents)}
 
 

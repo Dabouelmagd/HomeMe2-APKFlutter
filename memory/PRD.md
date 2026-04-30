@@ -5,6 +5,32 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 61: 🔐 الحل الجذري الدائم لمشكلة اختفاء الإعلانات (MongoDB Persistent Media Store) (Feb 29, 2026) ✅
+
+**🐛 السبب الحقيقي الجذري (أخيراً!) للمشكلة المتكررة 10+ مرات:**
+- **K8s Container Disk ephemeral** — كل deployment يمسح `/app/uploads/*` بالكامل.
+- الـ MongoDB يحتفظ بـ `image_url = /api/ads/media/X.jpg` لكن الملف **محذوف من القرص** بعد أي نشر.
+- **حتى نظام الـ Self-Healing Backup كان يفشل** لأن `/app/backups/media/` موجود على نفس القرص المؤقت!
+- تأكيد بالاختبار: `https://homemeapp.net/api/ads/media/2d86a5bac5e8.jpeg` → **HTTP 404** (الملف محذوف).
+
+**🔐 الحل الدائم — MongoDB-backed Persistent Media Store:**
+- `services/media_store.py` — جديد. كل ملف مرفوع يُنسخ في MongoDB collection `media_files` كـ Binary مع content_type + SHA256 + size cap 12MB.
+- **Dual-write**: كل endpoint يرفع صور (ads, advertiser, compound_branding, app_branding, admin_users, user_profile) الآن يكتب في Disk **و** MongoDB.
+- **Multi-layer Self-Heal** في `serve_subdir_file` + `serve_ad_media`:
+  1. القرص أولاً
+  2. لو غير موجود → Backup snapshot
+  3. لو غير موجود → MongoDB (**تعيش مع أي deployment!**)
+  4. Cache للقرص بعد الاستعادة
+- **One-time Migration Endpoint**: `POST /api/media-health/migrate-to-db` ينسخ كل الملفات الموجودة على القرص إلى MongoDB (idempotent via SHA256).
+- **Stats Endpoint**: `GET /api/media-health/db-overview` لمتابعة حالة DB media.
+- **UI**: كارت بنفسجي بارز في `/app/media-health` يعرض "🔐 حماية MongoDB الدائمة" + عدد الملفات المحمية + زر "ترحيل" + تفصيل لكل subdir.
+
+**🧪 التحقق E2E:**
+- ✅ Migration: 41 ملف من القرص → MongoDB (0 errors)
+- ✅ Test: حذف ملف من القرص **و** كل snapshots → GET /api/ads/media/X.png → **HTTP 200 + استعادة تلقائية من DB** ✓
+- ✅ Test: نفس الاختبار على `/api/files/ads/` → **HTTP 200** ✓
+- ✅ UI: الكارت يعرض "✅ 41 ملف محمي في قاعدة البيانات" + توزيع: users(8)، logos(4)، ads(13)، branding(8)، payment_proofs(5)، homeme(3).
+
 ### Iter 60: Performance Budget Tracker + Sidebar Scroll Fix (Feb 28, 2026) ✅
 
 **🐛 Bug Fix — السايدبار يرجع لأعلى عند التنقل:**

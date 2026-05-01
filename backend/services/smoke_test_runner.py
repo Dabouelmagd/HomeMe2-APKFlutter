@@ -186,7 +186,7 @@ TESTS: list[tuple[str, str, Callable]] = [
     ("login_owner",            "auth",     test_login_owner),
     ("login_super_admin",      "auth",     test_login_super_admin),
     ("login_company_admin",    "auth",     test_login_company_admin),
-    ("login_invalid_password", "auth",     test_login_invalid),
+    ("login_invalid_password", "security", test_login_invalid),
     ("register_company_admin", "auth",     test_register_company_admin),
     ("app_branding_public",    "core",     test_app_branding_public),
     ("owner_kpis",             "owner",    test_owner_kpis),

@@ -121,10 +121,11 @@ export default function SmokeTestCard() {
       {expanded && (
         <div className="p-5 space-y-4">
           {last?.results?.length > 0 ? (
-            <div>
-              <h4 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-2">نتائج الاختبارات</h4>
-              <div className="space-y-1.5">
-                {last.results.map(r => {
+            <div className="space-y-4">
+              {(() => {
+                const security = last.results.filter(r => r.category === 'security');
+                const service = last.results.filter(r => r.category !== 'security');
+                const renderRow = (r) => {
                   const isSkipped = r.skipped;
                   const bg = isSkipped
                     ? 'bg-slate-50 dark:bg-slate-800/30'
@@ -142,8 +143,33 @@ export default function SmokeTestCard() {
                       <span className="text-xs text-gray-500 w-16 text-left">{r.ms || 0}ms</span>
                     </div>
                   );
-                })}
-              </div>
+                };
+                return (
+                  <>
+                    <div>
+                      <h4 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-2">
+                        🧪 اختبارات صحة الخدمة
+                        <span className="text-xs text-gray-500 font-normal">({service.filter(r => r.passed && !r.skipped).length}/{service.length - service.filter(r => r.skipped).length} نجح)</span>
+                      </h4>
+                      <div className="space-y-1.5">{service.map(renderRow)}</div>
+                    </div>
+                    {security.length > 0 && (
+                      <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <h4 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-2 flex items-center gap-2">
+                          🛡️ اختبارات أمان
+                          <span className="text-xs text-gray-500 font-normal">
+                            (يجب أن يرفض الطلبات غير المصرّحة — {security.filter(r => r.passed).length}/{security.length} مُحصّن)
+                          </span>
+                        </h4>
+                        <div className="space-y-1.5">{security.map(renderRow)}</div>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-2 px-1">
+                          💡 هذه الاختبارات تتحقق أن النظام يرفض الوصول الخاطئ (مثل كلمة مرور خاطئة أو مسار غير موجود). ظهور status 401/404 هنا <strong>يعني أن الأمان يعمل بشكل صحيح</strong>.
+                        </p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           ) : null}
 

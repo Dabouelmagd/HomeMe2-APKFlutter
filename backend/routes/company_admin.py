@@ -549,14 +549,26 @@ async def company_admin_crm_summary(current_user: dict = Depends(_require_compan
         u["compound_name"] = compound_name.get(u.get("compound_id"))
         late_payers.append(u)
 
-    # Count total private notes on users under these compounds
-    user_ids = [u["id"] async for u in db.users.find({"compound_id": {"$in": cids}}, {"_id": 0, "id": 1})]
+    # Count total private notes on users under these compounds via a single aggregation
+    # join on user_notes → users. Avoids loading all user_ids into memory.
     notes_total = 0
-    if user_ids:
-        try:
-            notes_total = await db.user_notes.count_documents({"user_id": {"$in": user_ids}})
-        except Exception:
-            notes_total = 0
+    try:
+        pipeline2 = [
+            {"$lookup": {
+                "from": "users",
+                "localField": "user_id",
+                "foreignField": "id",
+                "as": "u",
+                "pipeline": [{"$project": {"_id": 0, "compound_id": 1}}],
+            }},
+            {"$unwind": "$u"},
+            {"$match": {"u.compound_id": {"$in": cids}}},
+            {"$count": "total"},
+        ]
+        async for d in db.user_notes.aggregate(pipeline2):
+            notes_total = d.get("total", 0)
+    except Exception:
+        notes_total = 0
 
     return {
         "company_id": cid,

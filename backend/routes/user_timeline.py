@@ -45,8 +45,27 @@ async def _require_access(current_user: dict, target_user: dict):
     if role in ("app_owner", "super_admin"):
         return True
     # Compound admin of target's compound
-    if role in ("admin", "company_admin") and current_user.get("compound_id") == target_user.get("compound_id"):
+    if role == "admin" and current_user.get("compound_id") == target_user.get("compound_id"):
         return True
+    # Company admin — allowed if target is in a compound managed by their company
+    if role == "company_admin":
+        company_id = current_user.get("company_id")
+        target_cpd = target_user.get("compound_id")
+        if company_id and target_cpd:
+            db = get_db()
+            cpd = await db.compounds.find_one(
+                {"id": target_cpd},
+                {"_id": 0, "management_company_id": 1, "company_id": 1}
+            )
+            if cpd and (cpd.get("management_company_id") == company_id
+                        or cpd.get("company_id") == company_id):
+                return True
+            # Fallback — legacy compound_ids list on company
+            co = await db.companies.find_one(
+                {"id": company_id}, {"_id": 0, "compound_ids": 1}
+            )
+            if co and target_cpd in (co.get("compound_ids") or []):
+                return True
     # Users can see their own timeline
     if current_user.get("id") == target_user.get("id"):
         return True

@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import useTabState from '../hooks/useTabState';
+import PageHeader from './shared/PageHeader';
 import {
   ShieldCheckIcon,
   UsersIcon,
@@ -201,20 +202,14 @@ const SecurityDashboard = () => {
 
   return (
     <div className="space-y-5" dir={isRTL ? 'rtl' : 'ltr'} data-testid="security-dashboard">
-      {/* Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 via-cyan-950 to-slate-900 rounded-2xl p-6 text-white shadow-xl">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-cyan-500/15 via-transparent to-transparent"></div>
-        <div className="relative flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
-              <ShieldCheckIcon className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-black" data-testid="sec-title">{t('sec_dashboard', 'لوحة تحكم الأمن')}</h1>
-              <p className="text-cyan-300 text-xs">{t('sec_welcome', 'مرحباً')}، {user?.full_name || user?.username}</p>
-              <p className="text-[10px] text-gray-400">{user?.compound_name || ''}</p>
-            </div>
-          </div>
+      {/* Header — Unified */}
+      <PageHeader
+        theme="blue"
+        icon={ShieldCheckIcon}
+        badge={t('sec_welcome', 'مرحباً') + '، ' + (user?.full_name || user?.username)}
+        title={t('sec_dashboard', 'لوحة تحكم الأمن')}
+        subtitle={user?.compound_name || ''}
+        actions={
           <div className="hidden sm:flex flex-col items-end gap-1">
             <div className="flex items-center gap-2 bg-green-500/15 backdrop-blur px-3 py-1.5 rounded-lg border border-green-500/25">
               <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
@@ -222,8 +217,9 @@ const SecurityDashboard = () => {
             </div>
             <span className="text-[10px] text-gray-500">{new Date().toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</span>
           </div>
-        </div>
-      </div>
+        }
+        testId="sec-page-header"
+      />
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

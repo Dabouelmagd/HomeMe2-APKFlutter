@@ -22,6 +22,7 @@ import {
   ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import InternalAdBanner from './InternalAdBanner';
+import PageHeader from './shared/PageHeader';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -59,21 +60,14 @@ const ResidentDashboard = () => {
 
   return (
     <div className="space-y-5" dir={isRTL ? 'rtl' : 'ltr'} data-testid="resident-dashboard">
-      {/* Welcome Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 rounded-2xl p-6 text-white shadow-xl">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent"></div>
-        <div className="relative flex items-center justify-between">
-          <div>
-            <p className="text-blue-200 text-xs font-medium tracking-wider mb-1">{t('rd_welcome_label', 'مرحباً بك في منزلك')}</p>
-            <h1 className="text-2xl font-black mb-1" data-testid="welcome-title">
-              {t('rd_hello', 'أهلاً')}، {user?.full_name || user?.name || t('rd_resident', 'مقيم')}
-            </h1>
-            <p className="text-blue-200 text-sm">
-              {t('unit', 'الوحدة')} {dashboardData?.family?.unit_number || user?.unit_number || '-'} 
-              {user?.compound_name && <span className="mx-1">•</span>}
-              {user?.compound_name}
-            </p>
-          </div>
+      {/* Welcome Header — Unified */}
+      <PageHeader
+        theme="blue"
+        iconEmoji="🏡"
+        badge={t('rd_welcome_label', 'مرحباً بك في منزلك')}
+        title={`${t('rd_hello', 'أهلاً')}، ${user?.full_name || user?.name || t('rd_resident', 'مقيم')}`}
+        subtitle={`${t('unit', 'الوحدة')} ${dashboardData?.family?.unit_number || user?.unit_number || '-'}${user?.compound_name ? ' • ' + user.compound_name : ''}`}
+        actions={
           <div className="hidden sm:flex flex-col items-end gap-1">
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur px-3 py-1.5 rounded-lg border border-white/20">
               <HomeModernIcon className="w-4 h-4 text-blue-200" />
@@ -81,8 +75,9 @@ const ResidentDashboard = () => {
             </div>
             <span className="text-[10px] text-blue-300">{new Date().toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
           </div>
-        </div>
-      </div>
+        }
+        testId="resident-page-header"
+      />
 
       {/* Pending Payment Alert */}
       {pendingCount > 0 && (

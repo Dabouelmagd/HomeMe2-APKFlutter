@@ -25,9 +25,12 @@ const CrmRetentionPanel = ({ refreshKey = 0, onUserClick }) => {
     setLoading(true);
     axios.get(`${API}/company-admin/crm-summary`, getToken())
       .then((res) => { if (alive) setData(res.data); })
-      .catch(() => {
-        if (alive) {
-          setData(null);
+      .catch((err) => {
+        if (!alive) return;
+        setData(null);
+        // Suppress noisy first-load 401s / network blips (AppVersionGuard reload etc.)
+        const st = err?.response?.status;
+        if (st && st >= 500) {
           toast.error('فشل تحميل ملخص CRM');
         }
       })

@@ -1,0 +1,40 @@
+{
+  "summary": "Iter63 — Regression for unified PageHeader rollout + verification of company_admin timeline RBAC fix and crm-summary notes_total aggregation refactor. Backend: 5/5 new pytest cases green in /app/backend/tests/test_iter63_unified_ui_and_timeline_rbac.py PLUS prior 8/8 iter62 still green (13/13 total). Frontend: Playwright across 3 dashboards confirms unified PageHeader testIds render correctly: cad-page-header (company_admin testcompany2 → 'شركة المعمار الحديث'), resident-page-header (test/resident → 'مرحباً بك في منزلك ... TEST001 • رويال سيتي'), sec-page-header (security → 'لوحة تحكم الأمن • مراقبة مباشرة'). The previously reported 403 toast on UserTimelineModal opened from CRM drilldown is FIXED — the inner GET /api/users/{id}/timeline now returns 200 (verified via network capture: 2× 200 responses) and no permission-denied toast appears; modal renders user header, VIP/late_payer chips and notes editor cleanly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "CompanyAdminDashboard PageHeader",
+        "issues": [
+          "PageHeader text shows a small concatenation glitch: '🏢Co./Admin — شركة إدارةشركة المعمار الحديث📧 info@modern-arch.com📱 +201001234567#MC-001مرحباًشركة الأمل للإدارة' — emojis and labels are flowing without separators in the rendered text content (visually OK in screenshot due to bidi/RTL, but missing whitespace/aria-labels makes screen-reader output unreadable). Consider adding aria-label or visible separators."
+        ]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter63_unified_ui_and_timeline_rbac.py",
+    "/app/backend/tests/test_iter62_crm_summary.py",
+    "/app/test_reports/pytest/iter63_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "user_timeline.py:_require_access — company_admin path now correctly checks both management_company_id, company_id and legacy compound_ids list. Good defensive coverage. Minor: this query runs on every timeline request; for high-traffic admins consider caching the company→compound_ids set for a few minutes.",
+    "PageHeader testIds (cad-page-header, resident-page-header, sec-page-header) are inconsistent in naming convention — recommend a single prefix like ph-{role} or page-header-{role} for grep-ability.",
+    "company_admin.py crm-summary aggregation refactor with $lookup+$match is much cleaner than materializing user_ids — verified notes_total still increments/decrements correctly (5/5 tests pass)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter63_unified_ui_and_timeline_rbac.py (new)"
+  ],
+  "success_rate": {"backend": "100% (13/13 — 5 new + 8 iter62 regression)", "frontend": "100% on requested flows (4/4 sub-tasks)"},
+  "test_credentials": "All from /app/memory/test_credentials.md — testcompany2/Company123!, test/test123, security/Security2024!, newco_admin/NewCo123! (used to verify cross-company 403), superadmin/SuperAdmin2024!",
+  "seed_data_creation": "None persistent — created+deleted one transient note on test resident user during notes_total round-trip test.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter63 unified PageHeader rollout fully verified. testIds in production: cad-page-header (CompanyAdminDashboard), resident-page-header (ResidentDashboard), sec-page-header (SecurityDashboard). Backend RBAC fix in /app/backend/routes/user_timeline.py:_require_access lets company_admin access timeline for users in management_company_id OR company_id OR legacy compound_ids[]. Test files: /app/backend/tests/test_iter63_unified_ui_and_timeline_rbac.py covers timeline RBAC (200 same-company, 403 other-company, 200 super_admin, 401/403 anon) and crm-summary notes_total round-trip (create+verify+delete+verify). Use REACT_APP_BACKEND_URL env var when running pytest.",
+  "rca of the issue": "Previous iter62 issue: /api/users/{id}/timeline returned 403 for company_admin via CRM drilldown because _require_access only allowed app_owner/super_admin/compound-admin/self. Fix in user_timeline.py adds a company_admin branch checking compounds.management_company_id == current_user.company_id (with fallback to legacy company_ids list and companies.compound_ids). Confirmed via Playwright network capture (200 OK on /api/users/d6012878-.../timeline?days=90&type=all&limit=100) and 4 backend unit tests."
+}

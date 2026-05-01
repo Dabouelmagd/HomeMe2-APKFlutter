@@ -9,6 +9,9 @@ import CompoundOnboardingWizard from '../components/company-admin/CompoundOnboar
 import AggregatedStatsPanel from '../components/company-admin/AggregatedStatsPanel';
 import CrmRetentionPanel from '../components/company-admin/CrmRetentionPanel';
 import UserTimelineModal from '../components/UserTimelineModal';
+import PageHeader from '../components/shared/PageHeader';
+import SectionCard from '../components/shared/SectionCard';
+import EmptyState from '../components/shared/EmptyState';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -152,25 +155,26 @@ const CompanyAdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-blue-950 p-6" dir="rtl" data-testid="company-admin-dashboard">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-900/60 to-purple-900/60 backdrop-blur border border-indigo-500/30 rounded-2xl p-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-[10px] text-indigo-300 uppercase tracking-wider mb-1">Co./Admin — شركة إدارة</div>
-              <h1 className="text-3xl font-bold text-white">🏢 {company.name}</h1>
-              <p className="text-xs text-gray-400 mt-2">{company.description || '—'}</p>
-              <div className="flex flex-wrap gap-3 text-[11px] text-gray-400 mt-3">
-                {company.contact_email && <span>📧 {company.contact_email}</span>}
-                {company.contact_phone && <span>📱 {company.contact_phone}</span>}
-                {company.company_code && <span className="bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">#{company.company_code}</span>}
-              </div>
-            </div>
+        {/* Unified Page Header */}
+        <PageHeader
+          theme="indigo"
+          iconEmoji="🏢"
+          badge="Co./Admin — شركة إدارة"
+          title={company.name || '—'}
+          subtitle={company.description || undefined}
+          meta={<>
+            {company.contact_email && <span>📧 {company.contact_email}</span>}
+            {company.contact_phone && <span>📱 {company.contact_phone}</span>}
+            {company.company_code && <span className="bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">#{company.company_code}</span>}
+          </>}
+          actions={
             <div className="text-[11px] text-gray-400 text-end">
               <div>مرحباً</div>
               <div className="text-white font-semibold text-sm">{user?.full_name || user?.username}</div>
             </div>
-          </div>
-        </div>
+          }
+          testId="cad-page-header"
+        />
 
         {/* Plan Usage + Upgrade CTA */}
         <CompanyPlanUsageCard />
@@ -184,31 +188,39 @@ const CompanyAdminDashboard = () => {
         }} />
 
         {/* CRM / Retention Panel — VIP + Late Payers cross-compound */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
+        <SectionCard
+          title="🧠 CRM & الاحتفاظ بالعملاء"
+          subtitle="تاغات وملاحظات السكان عبر كل المجمعات"
+          variant="light"
+          testId="cad-crm-section"
+        >
           <CrmRetentionPanel
             refreshKey={refreshKey}
             onUserClick={(u) => setCrmUser(u)}
           />
-        </div>
+        </SectionCard>
 
         {/* Action bar */}
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-white">🏘️ مجمعاتي</h2>
-          <button onClick={() => setCreateOpen(true)} className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold shadow-lg" data-testid="cad-create-compound-btn">
+          <button onClick={() => setCreateOpen(true)} className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-indigo-500/30 transition" data-testid="cad-create-compound-btn">
             ➕ إضافة مجمع
           </button>
         </div>
 
         {/* Compounds grid */}
         {compounds.length === 0 ? (
-          <div className="text-center py-16 bg-gray-800/40 rounded-2xl border-2 border-dashed border-gray-700">
-            <div className="text-5xl mb-3">🏗️</div>
-            <h3 className="text-lg text-white mb-2">لا توجد مجمعات بعد</h3>
-            <p className="text-sm text-gray-400 mb-4">ابدأ بإضافة أول مجمع تحت إدارة شركتك</p>
-            <button onClick={() => setCreateOpen(true)} className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold" data-testid="cad-create-first-btn">
-              ➕ أنشئ أول مجمع
-            </button>
-          </div>
+          <EmptyState
+            icon="🏗️"
+            title="لا توجد مجمعات بعد"
+            subtitle="ابدأ بإضافة أول مجمع تحت إدارة شركتك"
+            cta={
+              <button onClick={() => setCreateOpen(true)} className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-indigo-500/30 hover:shadow-lg text-white rounded-lg font-bold text-sm" data-testid="cad-create-first-btn">
+                ➕ أنشئ أول مجمع
+              </button>
+            }
+            testId="cad-empty-state"
+          />
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {compounds.map(c => (

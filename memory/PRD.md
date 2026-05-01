@@ -5,6 +5,49 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 64: Company-Admin Mini-Owner Suite — Phases 1-5 (May 1, 2026) ✅
+
+**🏗️ Phase 1 — Onboarding Wizard (First-Login Gate):**
+- New `components/company-admin/CompoundOnboardingWizard.js` — multi-row wizard with add/remove rows, plan-limit aware bulk submit, "تخطّي مؤقتاً" stored in `localStorage.cad_onboarding_skipped`.
+- New `POST /api/company-admin/compounds/bulk` — atomic plan-limit check + insert + back-link via `companies.compound_ids`.
+- `CompanyAdminDashboard.js` now gates rendering: if `compounds.length === 0 && !skipped` → render wizard, else render full dashboard.
+
+**📊 Phase 2 — Aggregated Stats Dashboard:**
+- New `GET /api/company-admin/aggregated-stats` — returns totals + per-compound breakdown for: users by role (residents, managers, security, accountants), unpaid `unit_charges` count + amount, open `financial_obligations` count + remaining amount, open complaints, pending maintenance.
+- New `components/company-admin/AggregatedStatsPanel.js` — 9 stat cards (with red-ring urgency on issue counts), expandable per-compound drill-down rows with "🚀 فتح" button that navigates to the unified admin surface.
+- Replaces the old basic 3-card stats grid.
+
+**🧭 Phase 3 — Unified Sidebar / Co./Admin Branding:**
+- `Layout.js` role label now shows **"Co./Admin — شركة إدارة"** (indigo) for `company_admin` instead of falling back to "مقيم".
+- The existing `isAdminRole` already includes `company_admin`, so company admins see the full admin sidebar (Finance, Complaints, Maintenance, Services, Visitors, Subscriptions, etc.) once they pick a compound.
+
+**📧 Phase 4 — Email/Notification Fanout:**
+- `helpers.notify_compound_admins` extended to:
+  1. Resolve the compound's parent management company.
+  2. Pull `company_admin / assistant_manager / accountant` users for that company.
+  3. Persist in-app notifications for them (de-dup'd).
+  4. Best-effort SMTP email fanout via `EmailService` for each company-level admin (fire-and-forget asyncio task).
+- Roles `assistant_manager` and `accountant` now also receive compound-scoped admin notifications.
+
+**🛡 Phase 5 — RBAC Hardening (Compound Context Switching):**
+- `auth_deps.get_current_user` now reads optional `X-Active-Compound-Id` request header. When present:
+  - For `app_owner / super_admin`: applied directly.
+  - For `company_admin / assistant_manager / accountant`: only applied if the compound is owned by their `company_id` (verified via DB lookup). Cross-company attempts silently fall back.
+- Frontend `App.js` adds an axios request interceptor that injects `X-Active-Compound-Id` from `localStorage.selectedCompoundId` on every request.
+- Net effect: every existing admin endpoint that uses `current_user["compound_id"]` now scopes correctly when a company_admin "enters" a compound — no per-route RBAC changes needed.
+
+**🆕 New roles supported in `company_admin` user creation:**
+- `accountant` (محاسب 🧾)
+- `assistant_manager` (مدير مساعد 🤝)
+- Updated `valid_roles` in `routes/company_admin.py :: company_admin_add_user_to_compound` and the `AddUserModal` UI grid (`grid-cols-7`).
+
+**Verified end-to-end via curl + screenshot**:
+- Bulk create respects plan limit (rejected 2 compounds when plan allows 1).
+- Aggregated stats returned 1 compound, 5 residents, 1 security, 6 open complaints, 17 pending maintenance, 75,000 ج.م unpaid charges for شركة الأمل للإدارة.
+- `X-Active-Compound-Id` accepted for legitimate compound, rejected for bogus ID — falls back to user's stored compound_id.
+- Co./Admin label rendered in header; full admin sidebar visible.
+
+
 ### Iter 63: Orphan Company-Admins Sync + Auto-Heal Back-Link (May 1, 2026) ✅
 
 **🩹 Bug Fix — `company_admin` users missing from SuperAdmin "Companies" tab:**

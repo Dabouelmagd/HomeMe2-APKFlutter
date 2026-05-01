@@ -174,6 +174,18 @@ const AuthProvider = ({ children }) => {
     cleanupStaleSessions();
     migrateFromLegacy();
 
+    // Inject X-Active-Compound-Id on every request so company_admin (and
+    // owner/super_admin) can switch compound context cleanly. Backend
+    // verifies the compound is owned by the user's company before honouring it.
+    const reqInterceptorId = axios.interceptors.request.use((config) => {
+      const cid = localStorage.getItem('selectedCompoundId');
+      if (cid) {
+        config.headers = config.headers || {};
+        config.headers['X-Active-Compound-Id'] = cid;
+      }
+      return config;
+    });
+
     // Get this tab's session
     const session = getCurrentSession();
     const token = session?.token || localStorage.getItem('token');
@@ -234,6 +246,7 @@ const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
+    return () => { axios.interceptors.request.eject(reqInterceptorId); };
   }, []);
 
   const initializeSocket = (userId) => {

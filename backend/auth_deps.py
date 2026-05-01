@@ -2,7 +2,7 @@
 Shared authentication dependencies for HomeMe backend.
 All route modules import auth middleware from here.
 """
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
 import jwt
@@ -61,7 +61,7 @@ def validate_password_strength(password: str) -> tuple:
     return True, ""
 
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), request: Request = None):
     from database import get_db
     db = get_db()
     try:
@@ -78,6 +78,39 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
             user["impersonator_id"] = payload.get("impersonator_id")
             user["impersonator_username"] = payload.get("impersonator_username")
             user["is_impersonation"] = True
+        # ----------------------------------------------------------------
+        # Active-compound override for company_admin: allow them to operate
+        # "as a mini-owner" on any compound owned by their management company.
+        # The frontend sends X-Active-Compound-Id when a company_admin (or
+        # owner/super_admin) selects a specific compound from their dashboard.
+        # We only honour the override when the compound is actually inside the
+        # company's tree, so cross-company access is impossible.
+        # ----------------------------------------------------------------
+        try:
+            if request is not None:
+                active_cid = request.headers.get("x-active-compound-id") or request.headers.get("X-Active-Compound-Id")
+                role = user.get("role")
+                if active_cid and role in ("company_admin", "assistant_manager", "accountant", "app_owner", "super_admin"):
+                    if role in ("app_owner", "super_admin"):
+                        user["compound_id"] = active_cid
+                    else:
+                        company_id = user.get("company_id")
+                        if company_id:
+                            cpd = await db.compounds.find_one(
+                                {
+                                    "id": active_cid,
+                                    "$or": [
+                                        {"company_id": company_id},
+                                        {"management_company_id": company_id},
+                                    ],
+                                },
+                                {"_id": 0, "id": 1},
+                            )
+                            if cpd:
+                                user["compound_id"] = active_cid
+        except Exception:
+            # Never let header parsing break auth
+            pass
         return UserDict(user)
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")

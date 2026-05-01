@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import InviteLinkModal from '../components/shared/InviteLinkModal';
 import CompanyPlanUsageCard from '../components/CompanyPlanUsageCard';
+import CompoundOnboardingWizard from '../components/company-admin/CompoundOnboardingWizard';
+import AggregatedStatsPanel from '../components/company-admin/AggregatedStatsPanel';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -38,6 +40,9 @@ const CompanyAdminDashboard = () => {
   const [addUserFor, setAddUserFor] = useState(null);
   const [inviteFor, setInviteFor] = useState(null);
   const [error, setError] = useState(null);
+  const [onboardingSkipped, setOnboardingSkipped] = useState(() => {
+    return localStorage.getItem('cad_onboarding_skipped') === '1';
+  });
 
   useEffect(() => {
     let alive = true;
@@ -125,7 +130,18 @@ const CompanyAdminDashboard = () => {
   );
 
   const company = me?.company || {};
-  const stats = me?.stats || {};
+
+  // Onboarding gate: first login + no compounds yet → show wizard
+  const showOnboarding = !loading && !error && compounds.length === 0 && !onboardingSkipped;
+  if (showOnboarding) {
+    return (
+      <CompoundOnboardingWizard
+        companyName={company.name}
+        onComplete={() => { reload(); }}
+        onSkip={() => { localStorage.setItem('cad_onboarding_skipped', '1'); setOnboardingSkipped(true); }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-blue-950 p-6" dir="rtl" data-testid="company-admin-dashboard">
@@ -134,7 +150,7 @@ const CompanyAdminDashboard = () => {
         <div className="bg-gradient-to-r from-indigo-900/60 to-purple-900/60 backdrop-blur border border-indigo-500/30 rounded-2xl p-6">
           <div className="flex items-start justify-between">
             <div>
-              <div className="text-[10px] text-indigo-300 uppercase tracking-wider mb-1">شركة إدارة</div>
+              <div className="text-[10px] text-indigo-300 uppercase tracking-wider mb-1">Co./Admin — شركة إدارة</div>
               <h1 className="text-3xl font-bold text-white">🏢 {company.name}</h1>
               <p className="text-xs text-gray-400 mt-2">{company.description || '—'}</p>
               <div className="flex flex-wrap gap-3 text-[11px] text-gray-400 mt-3">
@@ -153,12 +169,13 @@ const CompanyAdminDashboard = () => {
         {/* Plan Usage + Upgrade CTA */}
         <CompanyPlanUsageCard />
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <StatCard icon="🏘️" label="المجمعات" value={stats.compounds_count || 0} color="blue" />
-          <StatCard icon="👥" label="إجمالي المستخدمين" value={stats.total_users || 0} color="emerald" />
-          <StatCard icon="🎯" label="نشاط" value={compounds.filter(c => (c.users_count || 0) > 0).length} color="amber" />
-        </div>
+        {/* Aggregated Stats Panel — إحصائيات شاملة + drill-down per-compound */}
+        <AggregatedStatsPanel refreshKey={refreshKey} onSelectCompound={(c) => {
+          // Select this compound and navigate to the shared admin dashboard (same UX as Owner/Admin)
+          localStorage.setItem('selectedCompoundId', c.id);
+          localStorage.setItem('selectedCompoundName', c.name || '');
+          navigate('/app/dashboard');
+        }} />
 
         {/* Action bar */}
         <div className="flex items-center justify-between">
@@ -223,14 +240,6 @@ const CompanyAdminDashboard = () => {
   );
 };
 
-const StatCard = ({ icon, label, value, color }) => (
-  <div className={`bg-gradient-to-br from-${color}-600/25 to-${color}-800/10 border border-${color}-600/40 rounded-xl p-5 text-center`}>
-    <div className="text-3xl mb-1">{icon}</div>
-    <div className="text-3xl font-bold text-white">{value}</div>
-    <div className="text-xs text-gray-400 mt-1">{label}</div>
-  </div>
-);
-
 const MiniStat = ({ label, val, color }) => (
   <div className={`bg-${color}-900/30 border border-${color}-700/40 rounded p-1.5`}>
     <div className={`text-sm font-bold text-${color}-300`}>{val}</div>
@@ -286,6 +295,8 @@ const AddUserModal = ({ compound, onClose, onSave }) => {
     { v: 'resident', l: 'ساكن', emoji: '🏠' },
     { v: 'family_head', l: 'رب أسرة', emoji: '👨‍👩‍👧' },
     { v: 'manager', l: 'إداري', emoji: '👔' },
+    { v: 'assistant_manager', l: 'مدير مساعد', emoji: '🤝' },
+    { v: 'accountant', l: 'محاسب', emoji: '🧾' },
     { v: 'security', l: 'أمن', emoji: '🛡' },
     { v: 'admin', l: 'أدمن', emoji: '⚙️' },
   ];
@@ -331,7 +342,7 @@ const AddUserModal = ({ compound, onClose, onSave }) => {
           </div>
           <div>
             <label className="block text-xs text-gray-400 mb-1">الدور</label>
-            <div className="grid grid-cols-5 gap-1">
+            <div className="grid grid-cols-4 md:grid-cols-7 gap-1">
               {roles.map(r => (
                 <button key={r.v} type="button" onClick={() => setForm({...form, role: r.v})}
                   className={`px-1 py-1.5 rounded-lg text-[10px] font-semibold border ${form.role === r.v ? 'bg-green-600 border-green-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800'}`}

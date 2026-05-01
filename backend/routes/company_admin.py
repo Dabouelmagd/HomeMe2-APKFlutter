@@ -211,7 +211,7 @@ async def company_admin_add_user_to_compound(compound_id: str, payload: dict, cu
     password = payload.get("password") or ""
     full_name = (payload.get("full_name") or "").strip()
     role = payload.get("role") or "resident"
-    valid_roles = ["resident", "family_head", "manager", "security", "admin"]
+    valid_roles = ["resident", "family_head", "manager", "security", "admin", "accountant", "assistant_manager"]
     if role not in valid_roles:
         raise HTTPException(status_code=400, detail=f"دور غير صالح: {valid_roles}")
     if not username or not email or not password or not full_name:
@@ -263,3 +263,202 @@ async def company_admin_list_compound_users(compound_id: str, current_user: dict
         raise HTTPException(status_code=403, detail="هذا المجمع لا ينتمي لشركتك")
     users = await db.users.find({"compound_id": compound_id}, {"_id": 0, "password_hash": 0}).to_list(length=2000)
     return {"users": serialize_datetime(users), "total": len(users)}
+
+
+# ==================== Onboarding: Bulk Compound Creation ====================
+
+@router.post("/company-admin/compounds/bulk")
+async def company_admin_bulk_create_compounds(payload: dict, current_user: dict = Depends(_require_company_admin), company_id: Optional[str] = None):
+    """إنشاء مجموعة كمبوندات دفعة واحدة (Onboarding Wizard).
+    
+    payload = {"compounds": [{"name": str, "location": str, "address": str, "description": str}, ...]}
+    - يتحقق من حدود الباقة قبل الإدراج
+    - يتجاهل العناصر بدون name
+    """
+    from plan_limits import get_company_plan_limits
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    items = payload.get("compounds") or []
+    if not isinstance(items, list) or not items:
+        raise HTTPException(status_code=400, detail="قائمة الكمبوندات مطلوبة")
+
+    # Plan-limit check (one-shot)
+    plan = await get_company_plan_limits(cid)
+    current_cpds = await db.compounds.count_documents({
+        "$or": [{"company_id": cid}, {"management_company_id": cid}]
+    })
+    valid_items = [it for it in items if (it.get("name") or "").strip()]
+    if plan["max_compounds"] != -1 and (current_cpds + len(valid_items)) > plan["max_compounds"]:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "code": "plan_limit_compounds",
+                "message": f"باقتك تسمح بـ {plan['max_compounds']} كمبوند فقط. لديك حالياً {current_cpds} وتحاول إضافة {len(valid_items)}.",
+                "current": current_cpds,
+                "max": plan["max_compounds"],
+            }
+        )
+
+    created = []
+    now = datetime.now(timezone.utc).isoformat()
+    for it in valid_items:
+        doc = {
+            "id": str(uuid.uuid4()),
+            "name": it["name"].strip(),
+            "location": (it.get("location") or "").strip(),
+            "address": (it.get("address") or "").strip(),
+            "description": (it.get("description") or "").strip(),
+            "company_id": cid,
+            "management_company_id": cid,
+            "created_at": now,
+            "created_by": current_user.get("id"),
+            "is_active": True,
+        }
+        await db.compounds.insert_one(doc)
+        doc.pop("_id", None)
+        created.append(doc)
+
+    if created:
+        await db.companies.update_one(
+            {"id": cid},
+            {"$addToSet": {"compound_ids": {"$each": [c["id"] for c in created]}}}
+        )
+
+    return {"success": True, "created": serialize_datetime(created), "count": len(created)}
+
+
+# ==================== Aggregated Dashboard Stats ====================
+
+@router.get("/company-admin/aggregated-stats")
+async def company_admin_aggregated_stats(current_user: dict = Depends(_require_company_admin), company_id: Optional[str] = None):
+    """إحصائيات شاملة لكل كمبوندات الشركة (للوحة تحكم مدير الشركة).
+    
+    يُرجع:
+      - totals: إجماليات المستخدمين، السكان، الأمن، الإداريين
+      - finance: إجمالي الرسوم غير المدفوعة (unit_charges)، الالتزامات المفتوحة (obligations)
+      - issues: شكاوى مفتوحة + طلبات صيانة معلّقة
+      - per_compound: تفصيل لكل كمبوند (نفس المقاييس)
+    """
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+
+    # Resolve all compounds under this company
+    compounds = await db.compounds.find(
+        {"$or": [{"company_id": cid}, {"management_company_id": cid}]},
+        {"_id": 0}
+    ).to_list(length=500)
+    # Include legacy via companies.compound_ids
+    company = await db.companies.find_one({"id": cid}, {"_id": 0, "compound_ids": 1, "name": 1})
+    legacy_ids = [x for x in (company.get("compound_ids") or []) if x not in {c["id"] for c in compounds}]
+    if legacy_ids:
+        extras = await db.compounds.find({"id": {"$in": legacy_ids}}, {"_id": 0}).to_list(length=500)
+        compounds.extend(extras)
+
+    cids = [c["id"] for c in compounds]
+    per = {c["id"]: {
+        "id": c["id"],
+        "name": c.get("name"),
+        "location": c.get("location") or c.get("address") or "",
+        "users": 0, "residents": 0, "managers": 0, "security": 0, "accountants": 0,
+        "unpaid_charges_amount": 0.0, "unpaid_charges_count": 0,
+        "open_obligations_amount": 0.0, "open_obligations_count": 0,
+        "open_complaints": 0, "pending_maintenance": 0,
+    } for c in compounds}
+
+    totals = {
+        "compounds_count": len(compounds),
+        "users": 0, "residents": 0, "managers": 0, "security": 0, "accountants": 0,
+        "unpaid_charges_amount": 0.0, "unpaid_charges_count": 0,
+        "open_obligations_amount": 0.0, "open_obligations_count": 0,
+        "open_complaints": 0, "pending_maintenance": 0,
+    }
+
+    if not cids:
+        return {"company_id": cid, "company_name": company.get("name") if company else None,
+                "totals": totals, "per_compound": []}
+
+    # --- Users aggregation ---
+    users_by_cpd = {}
+    async for u in db.users.find({"compound_id": {"$in": cids}}, {"_id": 0, "password_hash": 0}):
+        pcid = u.get("compound_id")
+        if pcid not in per:
+            continue
+        role = u.get("role") or ""
+        per[pcid]["users"] += 1
+        totals["users"] += 1
+        if role == "resident":
+            per[pcid]["residents"] += 1; totals["residents"] += 1
+        elif role in ("manager", "assistant_manager"):
+            per[pcid]["managers"] += 1; totals["managers"] += 1
+        elif role == "security":
+            per[pcid]["security"] += 1; totals["security"] += 1
+        elif role == "accountant":
+            per[pcid]["accountants"] += 1; totals["accountants"] += 1
+        users_by_cpd.setdefault(pcid, []).append(u.get("id"))
+
+    # --- Finance: unpaid unit_charges ---
+    try:
+        async for ch in db.unit_charges.find(
+            {"compound_id": {"$in": cids}, "status": {"$in": ["unpaid", "pending", "overdue"]}},
+            {"_id": 0, "compound_id": 1, "amount": 1, "status": 1}
+        ):
+            pcid = ch.get("compound_id")
+            amt = float(ch.get("amount") or 0)
+            if pcid in per:
+                per[pcid]["unpaid_charges_amount"] += amt
+                per[pcid]["unpaid_charges_count"] += 1
+            totals["unpaid_charges_amount"] += amt
+            totals["unpaid_charges_count"] += 1
+    except Exception:
+        pass
+
+    # --- Finance: open obligations (maintenance dues, etc.) ---
+    try:
+        async for ob in db.financial_obligations.find(
+            {"compound_id": {"$in": cids}, "status": {"$in": ["pending", "open", "unpaid", "partial"]}},
+            {"_id": 0, "compound_id": 1, "amount": 1, "amount_paid": 1, "status": 1}
+        ):
+            pcid = ob.get("compound_id")
+            remaining = float(ob.get("amount") or 0) - float(ob.get("amount_paid") or 0)
+            if remaining < 0:
+                remaining = 0
+            if pcid in per:
+                per[pcid]["open_obligations_amount"] += remaining
+                per[pcid]["open_obligations_count"] += 1
+            totals["open_obligations_amount"] += remaining
+            totals["open_obligations_count"] += 1
+    except Exception:
+        pass
+
+    # --- Complaints (open) ---
+    try:
+        async for co in db.complaints.find(
+            {"compound_id": {"$in": cids}, "status": {"$in": ["open", "pending", "in_progress", "new"]}},
+            {"_id": 0, "compound_id": 1}
+        ):
+            pcid = co.get("compound_id")
+            if pcid in per:
+                per[pcid]["open_complaints"] += 1
+            totals["open_complaints"] += 1
+    except Exception:
+        pass
+
+    # --- Maintenance requests (pending) ---
+    try:
+        async for mr in db.maintenance_requests.find(
+            {"compound_id": {"$in": cids}, "status": {"$in": ["pending", "open", "in_progress", "assigned", "new"]}},
+            {"_id": 0, "compound_id": 1}
+        ):
+            pcid = mr.get("compound_id")
+            if pcid in per:
+                per[pcid]["pending_maintenance"] += 1
+            totals["pending_maintenance"] += 1
+    except Exception:
+        pass
+
+    return {
+        "company_id": cid,
+        "company_name": company.get("name") if company else None,
+        "totals": totals,
+        "per_compound": serialize_datetime(list(per.values())),
+    }

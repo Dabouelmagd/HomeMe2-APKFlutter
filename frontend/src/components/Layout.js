@@ -1069,11 +1069,13 @@ const Layout = ({ children, isTrialMode = false }) => {
                   <span className={`text-[10px] font-medium ${
                     (activeRole === 'app_owner') ? 'text-rose-500' :
                     (activeRole === 'super_admin') ? 'text-purple-500' :
+                    (activeRole === 'company_admin') ? 'text-indigo-500' :
                     (activeRole === 'admin') ? 'text-emerald-500' :
                     'text-gray-400'
                   }`}>
                     {activeRole === 'app_owner' ? t('role_owner', 'مالك التطبيق') :
                      activeRole === 'super_admin' ? t('role_super_admin', 'سوبر أدمن') :
+                     activeRole === 'company_admin' ? t('role_co_admin', 'Co./Admin — شركة إدارة') :
                      activeRole === 'admin' ? t('role_admin', 'مدير') :
                      activeRole === 'security' ? t('role_security', 'أمن') :
                      t('role_resident', 'مقيم')}

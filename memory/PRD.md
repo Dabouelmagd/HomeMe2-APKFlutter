@@ -5,6 +5,37 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 70: Stripe Payment Gateway (May 1, 2026) ✅
+
+**💳 Complete payment flow for paid company subscription plans.**
+
+**Backend (`routes/stripe_payments.py`):**
+- Uses `emergentintegrations.payments.stripe.checkout` with `STRIPE_API_KEY=sk_test_emergent` from env.
+- `POST /api/stripe/create-checkout-session` — body `{plan_key, origin_url}`. Server-side `PLAN_PRICES` table (anti-price-manipulation): startup=3500 EGP, business=7500, enterprise=20000. Creates Stripe session + inserts `payment_transactions` row with `status=initiated, payment_status=pending`. Metadata stores `company_id + plan_key + user_id` for idempotent webhook activation.
+- `GET /api/stripe/checkout-status/{session_id}` — user-scoped (403 if session belongs to another user, 404 if missing). Polls Stripe, on `paid` calls `_activate_subscription` (idempotent).
+- `POST /api/webhook/stripe` — webhook with signature verification. On `checkout.session.completed + payment_status=paid` → same `_activate_subscription` flow. Both paths are idempotent (no double-activation via `payment_transactions.payment_status` check).
+- `GET /api/stripe/my-transactions` — paying user's history.
+- Activation flips `company_subscriptions.status: pending_payment → active` + stamps `activated_at` + `last_payment_session_id`.
+- **Security tests verified**: 400 for starter/invalid plan, 401 unauth, 400 no company_id, 403 cross-user checkout-status access.
+
+**Frontend:**
+- `CompanyPlanUsageCard` → `requestUpgrade` now creates a Stripe session and `window.location.href = session.url`. Button shows "💳 الدفع والترقية" for paid plans + loading state "⏳ جارٍ فتح صفحة الدفع...".
+- New `pages/PaymentSuccess.js` — reads `session_id` from query, polls `/api/stripe/checkout-status/{id}` up to 10 times at 2.5s intervals. Displays "🎉 تم تفعيل اشتراكك بنجاح" card with plan name + amount + currency. Dispatches `planUsageRefresh` on success so the dashboard updates instantly.
+- New `pages/PaymentCancel.js` — friendly "لا تقلق، لم يتم خصم أي مبلغ" + CTA back to dashboard.
+- Routes: `/app/payment-success?session_id=…` and `/app/payment-cancel` mounted in `App.js`.
+
+**Flow (end-to-end):**
+1. User registers with `selected_plan=company_business` → `status=pending_payment`.
+2. Logs in → sees plan-usage card with "الدفع والترقية" CTA.
+3. Clicks → backend creates Stripe session → redirect to `checkout.stripe.com/c/pay/cs_test_...`.
+4. Pays with Stripe test card (4242 4242 4242 4242) → Stripe redirects to `/app/payment-success?session_id=…`.
+5. Polling + webhook both fire → `_activate_subscription` runs once → `status=active`, all plan feature flags now enforced.
+
+**🧪 Test results (testing_agent_v3_fork iter60):**
+- Backend: **11/11 PASS**
+- Frontend: **PASS** — live Stripe URL `https://checkout.stripe.com/c/pay/cs_test_...` captured after clicking "الدفع والترقية" as newco_admin.
+
+
 ### Iter 69: Plan Picker on Registration Page (May 1, 2026) ✅
 
 **🎯 Inline plan-comparison cards during self-registration for `company_admin`.**

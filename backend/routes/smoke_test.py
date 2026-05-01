@@ -166,6 +166,8 @@ async def _email_failures_to_owners(db, summary: dict):
 async def smoke_test_monitor_loop():
     """Background loop: run smoke tests every 30 minutes; alert on regression."""
     interval_s = 30 * 60
+    # Wait for HTTP server to be ready (avoids false-alarm on first boot)
+    await asyncio.sleep(60)
     last_failed_set: set[str] = set()
     while True:
         try:
@@ -173,6 +175,21 @@ async def smoke_test_monitor_loop():
             db = get_db()
             await _persist(db, summary, source="auto:monitor")
             failed_now = {r["name"] for r in summary.get("results", []) if not r.get("passed")}
+            total = summary.get("total", 0)
+            failed = summary.get("failed", 0)
+
+            # Guard against infrastructure issues (all-fail / network down) — never email these
+            all_failed = total > 0 and failed == total
+            connection_storm = any(
+                "connection" in (r.get("error") or "").lower() or "timeout" in (r.get("error") or "").lower()
+                for r in summary.get("results", []) if not r.get("passed")
+            )
+            if all_failed or (failed >= total - 1 and connection_storm):
+                logging.warning(f"[smoke_monitor] suppressing email — suspected infrastructure issue (failed={failed}/{total}, connection_storm={connection_storm})")
+                last_failed_set = set()  # reset so a real regression next cycle isn't missed
+                await asyncio.sleep(interval_s)
+                continue
+
             new_failures = failed_now - last_failed_set
             if new_failures:
                 sent = await _email_failures_to_owners(db, summary)

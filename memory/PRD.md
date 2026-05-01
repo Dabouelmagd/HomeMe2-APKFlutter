@@ -1301,6 +1301,13 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 72: Same-Origin API Fallback ✅ (2026-05-01)
+- **Problem**: production deployment at `homemeapp.net` has frontend bundle baked with `REACT_APP_BACKEND_URL=https://dashboard-rescue-12.emergent.host`. Some users (cached SW from previous deploys, browser extensions, ISP filters, third-party-cookie blocks) saw "Network Error" on login/register because the cross-origin POST never made it out of the browser, even though the same backend is also reachable at `https://homemeapp.net/api/...`.
+- **Fix in `App.js`**:
+  1. Global axios response interceptor: on `Network Error` against `BACKEND_URL`, probes `<origin>/api/health` once per session; if reachable, transparently retries the same request against same-origin. Tagged `__sameOriginRetried` to prevent loops.
+  2. `login()` rewritten to try a list of targets `[BACKEND_URL, window.location.origin]` (only the first if same), advancing only on real network errors. Other auth flows benefit via the global interceptor.
+- **Verified**: login on preview still passes through the first target instantly. When the cross-origin POST is artificially aborted (`page.route('...', route.abort())`), the console correctly logs `[homeme] login network error on … — trying next target` — confirming the fallback path activates as designed.
+
 ### Iter 71: PWA + StrictMode restore + Theme + Polish ✅ (2026-05-01)
 - **Re-enabled `React.StrictMode`** in `index.js` and **re-enabled Service Worker registration** in `index.html`. Rewrote `public/sw.js` (v5-safe) to a passthrough-only worker that **never** intercepts fetches — eliminates the legacy hang on POST that broke login. Push-notification & PWA install handlers preserved.
 - **Fixed 404 on `/api/companies/my-compounds`** (called from `AccountSelector.js` after company-admin login). Switched to the correct `/api/company-admin/compounds` endpoint and unwrapped the `{compounds:[]}` envelope.

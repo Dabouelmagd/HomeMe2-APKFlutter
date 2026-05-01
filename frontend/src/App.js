@@ -136,6 +136,76 @@ import { GlobalUIProvider } from './providers/GlobalUIProvider';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// ──────────────────────────────────────────────────────────────────────
+// Same-origin fallback interceptor
+// ──────────────────────────────────────────────────────────────────────
+// Problem: when the production frontend is served from a custom domain
+// (e.g. https://homemeapp.net) but REACT_APP_BACKEND_URL was baked at
+// build-time to a different host (e.g. https://dashboard-rescue-12.emergent.host),
+// some users get "Network Error" because their browser/extension/ISP/cached
+// SW blocks the cross-origin request — even though the same backend is
+// also exposed at the same origin (e.g. https://homemeapp.net/api/...).
+//
+// Defensive fix: if a request to the configured BACKEND_URL fails with a
+// Network Error AND the page origin differs from BACKEND_URL AND the
+// same-origin /api is reachable, transparently retry against same-origin.
+// We do this once per request (no infinite loop) by tagging the config.
+// ──────────────────────────────────────────────────────────────────────
+let _sameOriginApiAvailable = null;
+async function _detectSameOriginApi() {
+  if (typeof window === 'undefined') return false;
+  if (_sameOriginApiAvailable !== null) return _sameOriginApiAvailable;
+  const sameOrigin = window.location.origin;
+  if (!BACKEND_URL || sameOrigin === BACKEND_URL) {
+    _sameOriginApiAvailable = false;
+    return false;
+  }
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 4000);
+    const r = await fetch(`${sameOrigin}/api/health`, { signal: ctrl.signal, method: 'GET' });
+    clearTimeout(t);
+    _sameOriginApiAvailable = r.ok;
+    return r.ok;
+  } catch {
+    _sameOriginApiAvailable = false;
+    return false;
+  }
+}
+
+axios.interceptors.response.use(
+  (resp) => resp,
+  async (error) => {
+    const cfg = error?.config || {};
+    const hasResponse = !!error?.response;
+    const isNetworkError = !hasResponse && (
+      error?.message === 'Network Error' || error?.code === 'ERR_NETWORK'
+    );
+    if (
+      !isNetworkError ||
+      cfg.__sameOriginRetried ||
+      !cfg.url ||
+      typeof cfg.url !== 'string' ||
+      !cfg.url.startsWith(BACKEND_URL || '__nope__')
+    ) {
+      return Promise.reject(error);
+    }
+    // Probe same-origin /api once per session.
+    const ok = await _detectSameOriginApi();
+    if (!ok) return Promise.reject(error);
+    const fallbackUrl = cfg.url.replace(BACKEND_URL, window.location.origin);
+    const newCfg = { ...cfg, url: fallbackUrl, __sameOriginRetried: true };
+    // Use bare axios (cfg already carries headers/auth/method/data).
+    try {
+      // eslint-disable-next-line no-console
+      console.warn('[homeme] cross-origin failed → retrying same-origin:', fallbackUrl);
+      return await axios.request(newCfg);
+    } catch (e) {
+      return Promise.reject(e);
+    }
+  }
+);
+
 // Auth Context
 const AuthContext = createContext();
 
@@ -297,59 +367,77 @@ const AuthProvider = ({ children }) => {
   };
 
   const login = async (credentials) => {
+    // Try the configured BACKEND_URL first, then transparently fall back to
+    // same-origin /api/auth/login if the cross-origin request fails with a
+    // network error (cached SW, ad-blocker, ISP block, etc).
+    const cleanClient = axios.create({
+      timeout: 20000,
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const targets = [`${API}/auth/login`];
     try {
-      // Use a fresh axios instance with NO global interceptors and NO inherited
-      // defaults. The shared `axios` instance accumulates interceptors and the
-      // global `axios.defaults.headers.common.Authorization` from previous
-      // sessions, which has caused the login XHR's onload to never fire.
-      const cleanClient = axios.create({
-        timeout: 20000,
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const response = await cleanClient.post(`${API}/auth/login`, credentials);
-      
-      // 2FA gate — return temp token to caller without setting session
-      if (response.data?.two_factor_required) {
-        return {
-          success: false,
-          two_factor_required: true,
-          temp_token: response.data.temp_token,
-          ttl_minutes: response.data.ttl_minutes,
-        };
+      if (typeof window !== 'undefined' && BACKEND_URL && window.location.origin !== BACKEND_URL) {
+        targets.push(`${window.location.origin}/api/auth/login`);
       }
-      
-      const { access_token, user: userData } = response.data;
-      
-      // Save to multi-session manager (tab-specific)
-      saveCurrentSession(access_token, userData);
-      // Keep legacy storage for backward compatibility
-      localStorage.setItem('token', access_token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      
-      setUser(userData);
-      try { initializeSocket(userData.id); } catch (_e) { /* socket non-critical */ }
-      
-      setTimeout(() => {
-        autoSubscribeToPush().then(success => {
-          if (success) console.log('Push notifications enabled');
-        });
-      }, 1500);
-      
-      return { success: true };
-    } catch (error) {
-      const detail = error.response?.data?.detail;
+    } catch (_e) { /* no window — SSR safety */ }
+
+    let response = null;
+    let lastError = null;
+    for (const url of targets) {
+      try {
+        response = await cleanClient.post(url, credentials);
+        break;
+      } catch (err) {
+        lastError = err;
+        // Only fall through to next target on real network errors.
+        const isNetworkError = !err?.response && (
+          err?.message === 'Network Error' || err?.code === 'ERR_NETWORK'
+        );
+        if (!isNetworkError) break;
+        // eslint-disable-next-line no-console
+        console.warn('[homeme] login network error on', url, '— trying next target');
+      }
+    }
+    if (!response) {
+      const error = lastError;
+      const detail = error?.response?.data?.detail;
       let msg;
       if (typeof detail === 'string') msg = detail;
       else if (Array.isArray(detail) && detail.length > 0) {
         msg = detail.map(d => d.msg || d.message || '').filter(Boolean).join(' • ');
-      } else if (error.response?.status === 401) msg = 'اسم المستخدم أو كلمة المرور غير صحيحة';
-      else if (error.response?.status) msg = `فشل تسجيل الدخول (HTTP ${error.response.status})`;
-      else if (error.message === 'Network Error' || !error.response) {
-        msg = 'تعذّر الاتصال بالخادم. تحقّق من اتصالك بالإنترنت ثم حاول مرة أخرى.';
-      } else msg = 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.';
+      } else if (error?.response?.status === 401) msg = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+      else if (error?.response?.status) msg = `فشل تسجيل الدخول (HTTP ${error.response.status})`;
+      else msg = 'تعذّر الاتصال بالخادم. تحقّق من اتصالك بالإنترنت ثم حاول مرة أخرى.';
       return { success: false, error: msg };
     }
+
+    // 2FA gate — return temp token to caller without setting session
+    if (response.data?.two_factor_required) {
+      return {
+        success: false,
+        two_factor_required: true,
+        temp_token: response.data.temp_token,
+        ttl_minutes: response.data.ttl_minutes,
+      };
+    }
+
+    const { access_token, user: userData } = response.data;
+
+    saveCurrentSession(access_token, userData);
+    localStorage.setItem('token', access_token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+
+    setUser(userData);
+    try { initializeSocket(userData.id); } catch (_e) { /* socket non-critical */ }
+
+    setTimeout(() => {
+      autoSubscribeToPush().then(success => {
+        if (success) console.log('Push notifications enabled');
+      });
+    }, 1500);
+
+    return { success: true };
   };
 
   const verifyTwoFactor = async ({ temp_token, code }) => {

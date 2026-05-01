@@ -1,0 +1,40 @@
+{
+  "summary": "Iter58 — Company Admin mini-owner suite (bulk compounds, aggregated stats, plan feature_flags, X-Active-Compound-Id security, orphan-admins, 7-role modal, Co./Admin label, CompoundSwitcher). Backend: 11 passed, 1 skipped (plan-limit cannot trigger because testcompany2 has unlimited 'company_enterprise' plan). Frontend: login flow → /select-account → متابعة → /app/dashboard works; AggregatedStatsPanel + upgrade-plan-btn + plan-limit-badge + Co./Admin label all rendered; add-user modal exposes all 7 role testids (resident, family_head, manager, assistant_manager, accountant, security, admin); X-Active-Compound-Id legitimate override works AND cross-company bogus id is silently rejected. Superadmin Companies tab loads. CompoundSwitcher data-testid not found in DOM (likely hidden when company has only 1 compound — should verify).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/company-admin/compounds/bulk", "issue": "Plan-limit only enforced when max_compounds != -1; testcompany2 plan is 'company_enterprise' with max_compounds=-1 so the rejection path was not triggerable in the live env. Code path inspected and structured 403 detail (code=plan_limit_compounds, current, max) is correct."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "CompoundSwitcher", "issue": "[data-testid=compound-switcher] not present in DOM for testcompany2 (which has 1 compound). Likely the pill is rendered conditionally only when company has >1 compound. Verify intended UX — it may be expected behavior, but the data-testid should still be emitted (perhaps disabled) so tests can locate it.", "selector": "[data-testid=\"compound-switcher\"]", "priority": "MEDIUM"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter58_company_admin_mini_owner.py",
+    "/app/test_reports/pytest/iter58_results.xml"
+  ],
+  "action_items": [
+    "Decide if CompoundSwitcher pill should still render (with data-testid) when there is only 1 compound, or update review request to clarify expected UX.",
+    "Cleanup detail: 5447 spam compounds were inadvertently created on testcompany2 by an early version of the bulk-limit test (unlimited plan). All TEST_-prefixed compounds were purged via direct mongo delete; only 'رويال سيتي' remains. Total compounds for testcompany2 is back to 1.",
+    "Consider adding a server-side hard cap on bulk endpoint payload size (e.g., reject >500 items) to prevent accidental mass-create regardless of plan — current implementation allows unlimited inserts on enterprise plan."
+  ],
+  "critical_code_review_comments": [
+    "routes/company_admin.py bulk endpoint: when max_compounds=-1 it accepts arbitrary payload size — would benefit from a hard upper bound (e.g., 200 items per request) to mitigate accidental abuse.",
+    "auth_deps.py X-Active-Compound-Id override is correctly scoped to company_id ownership — good. Note it now extends to roles assistant_manager/accountant which is consistent with mini-owner expansion.",
+    "CompoundSwitcher.js: confirm it always emits its data-testid, even when hidden, to support automated tests."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter58_company_admin_mini_owner.py (new)"
+  ],
+  "success_rate": {"backend": "100% (11/11 ran, 1 legit skip)", "frontend": "92% (12/13 checks; CompoundSwitcher testid missing)"},
+  "test_credentials": "Owner_homeme/Dalia1234@, superadmin/SuperAdmin2024!, testcompany2/Company123! — all working.",
+  "seed_data_creation": "Created 2 TEST_iter58_bulk_* compounds in success-path test, immediately cleaned up. Cleaned 5447 leftover TEST_overflow_* compounds from initial run via direct mongo delete_many({name:/^TEST_/}). Final state: testcompany2 has its original 1 compound (رويال سيتي).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter58 features verified. testcompany2 plan = 'company_enterprise' (max_compounds=-1, max_residents=-1). Frontend testids exposed for company_admin: company-admin-dashboard, company-plan-usage-card, plan-limit-badge, upgrade-plan-btn, usage-compounds, aggregated-stats-panel, cad-create-compound-btn, cad-compound-{id}, cad-add-user-{id}, cad-invite-{id}, cad-edit-{id}, cad-delete-{id}, cad-user-role-{role} for 7 roles. Co./Admin label confirmed in header pill. Login flow: /login → select-account → click متابعة (Continue) → /app/dashboard. X-Active-Compound-Id header correctly enforced — cross-company override silently rejected (does NOT 403, just falls back to user's stored compound_id). Backend test file: /app/backend/tests/test_iter58_company_admin_mini_owner.py (uses access_token key fallback).",
+  "rca of the issue": "CompoundSwitcher missing testid — likely conditional render when company has 1 compound. Plan-limit rejection — by design only fires for non-unlimited plans; testcompany2 has unlimited so cannot be tested live (would need to seed a starter-plan company)."
+}

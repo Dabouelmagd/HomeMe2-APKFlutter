@@ -119,6 +119,7 @@ async def company_admin_plan_usage(current_user: dict = Depends(_require_company
         "plan_name_ar": plan["plan_name_ar"],
         "max_compounds": plan["max_compounds"],
         "max_residents": plan["max_residents"],
+        "feature_flags": plan.get("feature_flags", {}),
         "current_compounds": current_compounds,
         "current_residents": current_residents,
         "can_add_compound": plan["max_compounds"] == -1 or current_compounds < plan["max_compounds"],

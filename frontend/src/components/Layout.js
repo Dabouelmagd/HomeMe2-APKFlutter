@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, useNotifications } from '../App';
 import { toast } from 'sonner';
 import ImpersonationBanner from './ImpersonationBanner';
+import CompoundSwitcher from './company-admin/CompoundSwitcher';
 import {
   HomeIcon,
   BuildingOfficeIcon,
@@ -1082,6 +1083,9 @@ const Layout = ({ children, isTrialMode = false }) => {
                   </span>
                 </div>
               </div>
+
+              {/* Compound Switcher — Quick navigation across company's compounds */}
+              <CompoundSwitcher />
 
               {/* Session Switcher */}
               <SessionSwitcher />

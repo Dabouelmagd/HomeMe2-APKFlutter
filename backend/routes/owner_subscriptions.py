@@ -19,6 +19,9 @@ router = APIRouter(prefix="/api")
 # Mirrors the pricing landing page (frontend/src/config/plans.js). Each plan
 # exposes `features` — a list of human-readable permission strings we surface
 # to the subscriber so they can see exactly what their tier unlocks.
+#
+# `feature_flags` are machine-readable booleans used by `plan_limits.has_feature`
+# and feature-gated endpoints (e.g. PDF reports, AI insights, ad campaigns).
 # ---------------------------------------------------------------------------
 COMPANY_PLANS_CATALOGUE = [
     {
@@ -28,6 +31,16 @@ COMPANY_PLANS_CATALOGUE = [
         "monthly_egp": 0,
         "max_compounds": 1,
         "max_residents": 50,
+        "feature_flags": {
+            "billing_payments": False,
+            "ads_campaigns": False,
+            "pdf_excel_exports": False,
+            "ai_financial_insights": False,
+            "advanced_dashboard": False,
+            "custom_api": False,
+            "whitelabel": False,
+            "priority_support": False,
+        },
         "features_ar": [
             "مجمع واحد فقط",
             "حتى 50 ساكن",
@@ -50,6 +63,16 @@ COMPANY_PLANS_CATALOGUE = [
         "monthly_egp": 3500,
         "max_compounds": 3,
         "max_residents": 500,
+        "feature_flags": {
+            "billing_payments": True,
+            "ads_campaigns": True,
+            "pdf_excel_exports": False,
+            "ai_financial_insights": False,
+            "advanced_dashboard": False,
+            "custom_api": False,
+            "whitelabel": False,
+            "priority_support": False,
+        },
         "features_ar": [
             "حتى 3 مجتمعات سكنية",
             "عدد مستخدمين غير محدود",
@@ -77,6 +100,16 @@ COMPANY_PLANS_CATALOGUE = [
         "max_compounds": 5,
         "max_residents": 2000,
         "popular": True,
+        "feature_flags": {
+            "billing_payments": True,
+            "ads_campaigns": True,
+            "pdf_excel_exports": True,
+            "ai_financial_insights": True,
+            "advanced_dashboard": True,
+            "custom_api": True,
+            "whitelabel": False,
+            "priority_support": True,
+        },
         "features_ar": [
             "1 - 5 مجتمعات سكنية",
             "جميع مزايا الباقة الناشئة",
@@ -109,6 +142,16 @@ COMPANY_PLANS_CATALOGUE = [
         "monthly_egp": 20000,
         "max_compounds": -1,
         "max_residents": -1,
+        "feature_flags": {
+            "billing_payments": True,
+            "ads_campaigns": True,
+            "pdf_excel_exports": True,
+            "ai_financial_insights": True,
+            "advanced_dashboard": True,
+            "custom_api": True,
+            "whitelabel": True,
+            "priority_support": True,
+        },
         "features_ar": [
             "عدد مجتمعات غير محدود",
             "عدد سكان غير محدود",

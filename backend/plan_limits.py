@@ -17,6 +17,31 @@ _PLAN_LIMITS = {
     "company_enterprise": {"max_compounds": -1, "max_residents": -1},
 }
 
+# Machine-readable feature flags per plan. Mirrors `feature_flags` in
+# COMPANY_PLANS_CATALOGUE. Used by `has_feature` and feature-gated routes.
+_PLAN_FEATURES = {
+    "starter": {
+        "billing_payments": False, "ads_campaigns": False, "pdf_excel_exports": False,
+        "ai_financial_insights": False, "advanced_dashboard": False, "custom_api": False,
+        "whitelabel": False, "priority_support": False,
+    },
+    "company_startup": {
+        "billing_payments": True, "ads_campaigns": True, "pdf_excel_exports": False,
+        "ai_financial_insights": False, "advanced_dashboard": False, "custom_api": False,
+        "whitelabel": False, "priority_support": False,
+    },
+    "company_business": {
+        "billing_payments": True, "ads_campaigns": True, "pdf_excel_exports": True,
+        "ai_financial_insights": True, "advanced_dashboard": True, "custom_api": True,
+        "whitelabel": False, "priority_support": True,
+    },
+    "company_enterprise": {
+        "billing_payments": True, "ads_campaigns": True, "pdf_excel_exports": True,
+        "ai_financial_insights": True, "advanced_dashboard": True, "custom_api": True,
+        "whitelabel": True, "priority_support": True,
+    },
+}
+
 _PLAN_NAME_AR = {
     "starter":            "مجاني",
     "company_startup":    "شركة ناشئة",
@@ -36,7 +61,35 @@ async def get_company_plan_limits(company_id: str) -> dict:
         "plan_name_ar": _PLAN_NAME_AR.get(plan_key, plan_key),
         "max_compounds": limits["max_compounds"],
         "max_residents": limits["max_residents"],
+        "feature_flags": _PLAN_FEATURES.get(plan_key, _PLAN_FEATURES["starter"]),
     }
+
+
+async def has_feature(company_id: str, feature_key: str) -> bool:
+    """True if the company's current plan has `feature_key` enabled."""
+    plan = await get_company_plan_limits(company_id)
+    return bool(plan.get("feature_flags", {}).get(feature_key, False))
+
+
+async def assert_feature_enabled(company_id: str, feature_key: str, feature_name_ar: str = None) -> dict:
+    """Raise 403 plan_limit_feature if the company's plan does NOT include the feature.
+    Returns the plan info on success."""
+    plan = await get_company_plan_limits(company_id)
+    if plan.get("feature_flags", {}).get(feature_key, False):
+        return plan
+    raise HTTPException(
+        status_code=403,
+        detail={
+            "code": "plan_limit_feature",
+            "feature": feature_key,
+            "message": (
+                f"⛔ ميزة \"{feature_name_ar or feature_key}\" غير متاحة في خطة \"{plan['plan_name_ar']}\". "
+                f"يرجى ترقية الخطة لتفعيلها."
+            ),
+            "current_plan": plan["plan"],
+            "current_plan_name_ar": plan["plan_name_ar"],
+        },
+    )
 
 
 async def assert_can_add_compound(company_id: str) -> dict:

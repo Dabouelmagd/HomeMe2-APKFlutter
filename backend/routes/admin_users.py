@@ -208,6 +208,63 @@ async def update_user_status(
         logging.error(f"Error updating user status: {e}")
         raise HTTPException(status_code=500, detail="Failed to update user status")
 
+
+@router.get("/admin/users/{user_id}")
+async def get_user_details(user_id: str, current_user: dict = Depends(require_admin)):
+    """Get full user details (Admin only)"""
+    db = get_db()
+    user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    # Enrich with compound name if applicable
+    if user.get("compound_id"):
+        c = await db.compounds.find_one({"id": user["compound_id"]}, {"_id": 0, "name": 1})
+        if c:
+            user["compound_name"] = c.get("name")
+    return user
+
+
+@router.put("/admin/users/{user_id}")
+async def update_user(
+    user_id: str,
+    payload: dict,
+    current_user: dict = Depends(require_admin)
+):
+    """Update editable user fields (Admin only).
+    Allowed: full_name, email, phone, role, compound_id, is_active, unit_number.
+    Username is immutable. Password updates go through /users/{id}/password.
+    """
+    db = get_db()
+    existing = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+
+    allowed = {"full_name", "email", "phone", "role", "compound_id", "is_active", "unit_number"}
+    update_data = {}
+    for k, v in (payload or {}).items():
+        if k in allowed:
+            update_data[k] = v
+
+    # Prevent demoting the last app_owner
+    if "role" in update_data and existing.get("role") == "app_owner" and update_data["role"] != "app_owner":
+        count = await db.users.count_documents({"role": "app_owner", "is_active": True})
+        if count <= 1:
+            raise HTTPException(status_code=400, detail="لا يمكن تخفيض آخر مالك تطبيق نشط")
+
+    # Guard against email uniqueness conflicts
+    if "email" in update_data and update_data["email"] and update_data["email"] != existing.get("email"):
+        conflict = await db.users.find_one({"email": update_data["email"], "id": {"$ne": user_id}}, {"_id": 0, "id": 1})
+        if conflict:
+            raise HTTPException(status_code=400, detail="هذا البريد الإلكتروني مستخدم مسبقاً")
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="لا توجد حقول صالحة للتحديث")
+
+    await db.users.update_one({"id": user_id}, {"$set": update_data})
+    updated = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
+    return {"message": "تم تحديث المستخدم بنجاح", "user": updated}
+
+
 @router.delete("/admin/users/{user_id}")
 async def delete_user(
     user_id: str,

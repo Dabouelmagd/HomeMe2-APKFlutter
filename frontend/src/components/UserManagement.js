@@ -35,6 +35,9 @@ const UserManagement = () => {
   const [selectedRole, setSelectedRole] = useState('');
   const [showAddUser, setShowAddUser] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [viewingUser, setViewingUser] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
+  const [savingEdit, setSavingEdit] = useState(false);
   
   // New user form data
   const [newUser, setNewUser] = useState({
@@ -160,6 +163,40 @@ const UserManagement = () => {
     } catch (error) {
       console.error('Failed to delete user:', error);
       toast.error(t('user_delete_failed'));
+    }
+  };
+
+  const handleViewUser = (userItem) => setViewingUser(userItem);
+
+  const handleEditUser = (userItem) => {
+    setEditingUser(userItem);
+    setEditFormData({
+      full_name: userItem.full_name || '',
+      email: userItem.email || '',
+      phone: userItem.phone || '',
+      role: userItem.role || 'resident',
+      unit_number: userItem.unit_number || '',
+      is_active: userItem.is_active !== false,
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingUser) return;
+    setSavingEdit(true);
+    try {
+      await axios.put(`${API}/api/admin/users/${editingUser.id}`, editFormData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      toast.success('تم تحديث المستخدم بنجاح');
+      setEditingUser(null);
+      await loadUsersData();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'فشل تحديث المستخدم');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -442,14 +479,18 @@ const UserManagement = () => {
                             {userItem.is_active ? <XCircleIcon className="h-4 w-4" /> : <CheckCircleIcon className="h-4 w-4" />}
                           </button>
                           <button 
+                            onClick={() => handleViewUser(userItem)}
                             className="text-blue-600 hover:text-blue-900"
                             title={t('view_details')}
+                            data-testid={`user-view-${userItem.id}`}
                           >
                             <EyeIcon className="h-4 w-4" />
                           </button>
                           <button 
+                            onClick={() => handleEditUser(userItem)}
                             className="text-green-600 hover:text-green-900"
                             title={t('edit')}
+                            data-testid={`user-edit-${userItem.id}`}
                           >
                             <PencilIcon className="h-4 w-4" />
                           </button>
@@ -586,6 +627,84 @@ const UserManagement = () => {
                 >
                   {t('cancel')}
                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* View User Modal */}
+      {viewingUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setViewingUser(null)} data-testid="user-view-modal">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()} dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl font-bold">
+                {(viewingUser.full_name || viewingUser.username || '?').charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900" data-testid="view-user-name">{viewingUser.full_name || viewingUser.username}</h3>
+                <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold ${getRoleColor(viewingUser.role)}`}>{getRoleName(viewingUser.role)}</span>
+              </div>
+            </div>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center gap-2"><UserIcon className="h-4 w-4 text-gray-500"/><span className="text-gray-500 w-28">{t('username', 'اسم المستخدم')}:</span><span className="font-medium text-gray-800">{viewingUser.username}</span></div>
+              <div className="flex items-center gap-2"><EnvelopeIcon className="h-4 w-4 text-gray-500"/><span className="text-gray-500 w-28">{t('email', 'البريد')}:</span><span className="font-medium text-gray-800">{viewingUser.email || '—'}</span></div>
+              <div className="flex items-center gap-2"><PhoneIcon className="h-4 w-4 text-gray-500"/><span className="text-gray-500 w-28">{t('phone', 'الهاتف')}:</span><span className="font-medium text-gray-800">{viewingUser.phone || '—'}</span></div>
+              {viewingUser.unit_number && <div className="flex items-center gap-2"><span className="text-gray-500 w-28 pr-6">الوحدة:</span><span className="font-medium text-gray-800">{viewingUser.unit_number}</span></div>}
+              {viewingUser.compound_name && <div className="flex items-center gap-2"><span className="text-gray-500 w-28 pr-6">المجمع:</span><span className="font-medium text-gray-800">{viewingUser.compound_name}</span></div>}
+              <div className="flex items-center gap-2"><CalendarIcon className="h-4 w-4 text-gray-500"/><span className="text-gray-500 w-28">تاريخ الإنشاء:</span><span className="font-medium text-gray-800">{viewingUser.created_at ? new Date(viewingUser.created_at).toLocaleString('ar-EG') : '—'}</span></div>
+              <div className="flex items-center gap-2"><span className="text-gray-500 w-28 pr-6">الحالة:</span>{viewingUser.is_active ? <span className="text-emerald-600 font-bold flex items-center gap-1"><CheckCircleIcon className="h-4 w-4"/>نشط</span> : <span className="text-rose-600 font-bold flex items-center gap-1"><XCircleIcon className="h-4 w-4"/>معطل</span>}</div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => { setViewingUser(null); handleEditUser(viewingUser); }} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium" data-testid="view-modal-edit-btn">تعديل</button>
+              <button onClick={() => setViewingUser(null)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg font-medium" data-testid="view-modal-close-btn">إغلاق</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setEditingUser(null)} data-testid="user-edit-modal">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()} dir={isRTL ? 'rtl' : 'ltr'}>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">تعديل المستخدم: <span className="text-blue-600">{editingUser.username}</span></h3>
+            <form onSubmit={(e) => { e.preventDefault(); handleSaveEdit(); }} className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
+                <input type="text" value={editFormData.full_name || ''} onChange={(e) => setEditFormData({...editFormData, full_name: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" data-testid="edit-full-name"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+                <input type="email" value={editFormData.email || ''} onChange={(e) => setEditFormData({...editFormData, email: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" data-testid="edit-email"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">الهاتف</label>
+                <input type="tel" value={editFormData.phone || ''} onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" data-testid="edit-phone"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">رقم الوحدة</label>
+                <input type="text" value={editFormData.unit_number || ''} onChange={(e) => setEditFormData({...editFormData, unit_number: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" data-testid="edit-unit"/>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">الدور</label>
+                <select value={editFormData.role || 'resident'} onChange={(e) => setEditFormData({...editFormData, role: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" data-testid="edit-role">
+                  <option value="resident">مقيم</option>
+                  <option value="manager">إداري</option>
+                  <option value="security">أمن</option>
+                  <option value="admin">مدير مجتمع</option>
+                  <option value="company_admin">إدارة شركة</option>
+                  <option value="advertiser">معلن</option>
+                </select>
+              </div>
+              <div className="flex items-center">
+                <input type="checkbox" id="edit_is_active" checked={editFormData.is_active !== false} onChange={(e) => setEditFormData({...editFormData, is_active: e.target.checked})} className="h-4 w-4 text-blue-600 rounded" data-testid="edit-is-active"/>
+                <label htmlFor="edit_is_active" className="mr-2 block text-sm text-gray-900">حساب نشط</label>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="submit" disabled={savingEdit} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium disabled:opacity-50" data-testid="edit-save-btn">
+                  {savingEdit ? 'جاري الحفظ...' : 'حفظ التعديلات'}
+                </button>
+                <button type="button" onClick={() => setEditingUser(null)} className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 rounded-lg font-medium" data-testid="edit-cancel-btn">إلغاء</button>
               </div>
             </form>
           </div>

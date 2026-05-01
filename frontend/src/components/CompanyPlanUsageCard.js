@@ -159,6 +159,78 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
 
   const [upgrading, setUpgrading] = useState(null);
 
+  // Trial / Coupon / Code state
+  const [trialLoading, setTrialLoading] = useState(false);
+  const [couponOpen, setCouponOpen] = useState(false);
+  const [couponInput, setCouponInput] = useState('');
+  const [couponPlan, setCouponPlan] = useState('company_business');
+  const [couponPreview, setCouponPreview] = useState(null); // {original_price, final_price, discount_amount, coupon_code, plan_key}
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [codeOpen, setCodeOpen] = useState(false);
+  const [codeInput, setCodeInput] = useState('');
+  const [codeLoading, setCodeLoading] = useState(false);
+
+  const activateTrial = async () => {
+    setTrialLoading(true);
+    try {
+      const res = await axios.post(
+        `${API}/company-admin/activate-trial`, {},
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } },
+      );
+      const { toast } = await import('sonner');
+      toast.success(res.data?.message || 'تم تفعيل التجربة المجانية');
+      window.dispatchEvent(new CustomEvent('planUsageRefresh'));
+      onClose && onClose();
+    } catch (err) {
+      const { toast } = await import('sonner');
+      toast.error(err?.response?.data?.detail || 'فشل تفعيل التجربة');
+    } finally {
+      setTrialLoading(false);
+    }
+  };
+
+  const previewCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setCouponLoading(true);
+    setCouponPreview(null);
+    try {
+      const res = await axios.post(
+        `${API}/company-admin/preview-coupon`,
+        { plan_key: couponPlan, coupon_code: couponInput.trim() },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } },
+      );
+      setCouponPreview(res.data);
+      const { toast } = await import('sonner');
+      toast.success(`خصم ${res.data.discount_amount} ج.م — السعر النهائي: ${res.data.final_price} ج.م`);
+    } catch (err) {
+      const { toast } = await import('sonner');
+      toast.error(err?.response?.data?.detail || 'فشل التحقق من الكوبون');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const redeemCode = async () => {
+    if (!codeInput.trim()) return;
+    setCodeLoading(true);
+    try {
+      const res = await axios.post(
+        `${API}/company-admin/redeem-subscription-code`,
+        { code: codeInput.trim() },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } },
+      );
+      const { toast } = await import('sonner');
+      toast.success(res.data?.message || 'تم تفعيل الخطة');
+      window.dispatchEvent(new CustomEvent('planUsageRefresh'));
+      onClose && onClose();
+    } catch (err) {
+      const { toast } = await import('sonner');
+      toast.error(err?.response?.data?.detail || 'فشل تفعيل الكود');
+    } finally {
+      setCodeLoading(false);
+    }
+  };
+
   const requestUpgrade = async (targetPlan) => {
     // Starter plan is free → no payment needed; fall back to the old support flow
     if (targetPlan === 'starter') {
@@ -203,6 +275,150 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
         {reason && (
           <div className="mx-5 mt-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-300 dark:border-rose-800 p-3 text-sm text-rose-800 dark:text-rose-200">
             ⚠️ {reason}
+          </div>
+        )}
+
+        {/* ─── Trial + Coupon + Subscription-Code action bar ─── */}
+        <div className="mx-5 mt-4 grid grid-cols-1 md:grid-cols-3 gap-3" data-testid="plan-extras-bar">
+          {/* 14-day Trial */}
+          <button
+            type="button"
+            onClick={activateTrial}
+            disabled={trialLoading}
+            className="group relative overflow-hidden rounded-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10 p-3 text-right hover:shadow-md hover:border-emerald-500 transition disabled:opacity-60"
+            data-testid="plan-trial-btn"
+          >
+            <div className="flex items-start gap-2">
+              <span className="text-2xl">🎁</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-emerald-800 dark:text-emerald-200">
+                  {trialLoading ? '...جارٍ التفعيل' : 'تجربة مجانية ١٤ يوم'}
+                </div>
+                <div className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80">
+                  جربي الميزات المتقدمة بدون دفع
+                </div>
+              </div>
+            </div>
+          </button>
+
+          {/* Coupon collapsible */}
+          <button
+            type="button"
+            onClick={() => { setCouponOpen((v) => !v); setCodeOpen(false); }}
+            className={`group relative overflow-hidden rounded-xl border-2 p-3 text-right hover:shadow-md transition ${
+              couponOpen ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' : 'border-orange-200 bg-orange-50/40 dark:bg-orange-900/10 hover:border-orange-400'
+            }`}
+            data-testid="plan-coupon-toggle"
+          >
+            <div className="flex items-start gap-2">
+              <span className="text-2xl">🎟️</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-orange-800 dark:text-orange-200">لديكِ كوبون؟</div>
+                <div className="text-[11px] text-orange-700/80 dark:text-orange-300/80">طبّقي خصمًا قبل الدفع</div>
+              </div>
+              <span className="text-orange-700 text-xs">{couponOpen ? '▲' : '▼'}</span>
+            </div>
+          </button>
+
+          {/* Subscription Code collapsible */}
+          <button
+            type="button"
+            onClick={() => { setCodeOpen((v) => !v); setCouponOpen(false); }}
+            className={`group relative overflow-hidden rounded-xl border-2 p-3 text-right hover:shadow-md transition ${
+              codeOpen ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20' : 'border-violet-200 bg-violet-50/40 dark:bg-violet-900/10 hover:border-violet-400'
+            }`}
+            data-testid="plan-code-toggle"
+          >
+            <div className="flex items-start gap-2">
+              <span className="text-2xl">🔑</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-violet-800 dark:text-violet-200">لديكِ كود اشتراك؟</div>
+                <div className="text-[11px] text-violet-700/80 dark:text-violet-300/80">فعّلي خطتك مباشرة</div>
+              </div>
+              <span className="text-violet-700 text-xs">{codeOpen ? '▲' : '▼'}</span>
+            </div>
+          </button>
+        </div>
+
+        {/* Coupon input panel */}
+        {couponOpen && (
+          <div className="mx-5 mt-3 rounded-xl border border-orange-200 dark:border-orange-700 bg-orange-50/50 dark:bg-orange-900/10 p-3" data-testid="plan-coupon-panel">
+            <div className="flex flex-wrap items-end gap-2">
+              <div className="flex-1 min-w-[160px]">
+                <label className="text-[11px] font-semibold text-gray-700 dark:text-gray-300 block mb-1">الخطة المستهدفة</label>
+                <select
+                  value={couponPlan}
+                  onChange={(e) => { setCouponPlan(e.target.value); setCouponPreview(null); }}
+                  className="w-full px-2 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                  data-testid="plan-coupon-plan"
+                >
+                  <option value="company_startup">شركة ناشئة (٣,٥٠٠ ج.م)</option>
+                  <option value="company_business">شركة متوسطة (٧,٥٠٠ ج.م)</option>
+                  <option value="company_enterprise">شركة كبرى (٢٠,٠٠٠ ج.م)</option>
+                </select>
+              </div>
+              <div className="flex-1 min-w-[160px]">
+                <label className="text-[11px] font-semibold text-gray-700 dark:text-gray-300 block mb-1">كود الكوبون</label>
+                <input
+                  type="text"
+                  value={couponInput}
+                  onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponPreview(null); }}
+                  placeholder="مثال: WELCOME20"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 font-mono uppercase"
+                  data-testid="plan-coupon-input"
+                />
+              </div>
+              <button
+                onClick={previewCoupon}
+                disabled={couponLoading || !couponInput.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white disabled:opacity-60"
+                data-testid="plan-coupon-preview-btn"
+              >
+                {couponLoading ? '...جارٍ' : 'تطبيق'}
+              </button>
+            </div>
+            {couponPreview && (
+              <div className="mt-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-300 dark:border-emerald-700 p-3 text-sm" data-testid="plan-coupon-result">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                  <span className="text-gray-500 line-through text-xs">{couponPreview.original_price.toLocaleString('ar-EG')} ج.م</span>
+                  <span className="font-bold text-emerald-700 dark:text-emerald-300">{couponPreview.final_price.toLocaleString('ar-EG')} ج.م</span>
+                  <span className="text-xs text-emerald-600 dark:text-emerald-400">(وفّرتِ {couponPreview.discount_amount.toLocaleString('ar-EG')} ج.م)</span>
+                </div>
+                <div className="text-[11px] text-gray-600 dark:text-gray-400 mt-1">
+                  💡 اضغطي زر الدفع للخطة المختارة في الأسفل لإتمام الترقية بالسعر المخفّض.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Subscription Code input panel */}
+        {codeOpen && (
+          <div className="mx-5 mt-3 rounded-xl border border-violet-200 dark:border-violet-700 bg-violet-50/50 dark:bg-violet-900/10 p-3" data-testid="plan-code-panel">
+            <div className="flex flex-wrap items-end gap-2">
+              <div className="flex-1 min-w-[200px]">
+                <label className="text-[11px] font-semibold text-gray-700 dark:text-gray-300 block mb-1">كود الاشتراك</label>
+                <input
+                  type="text"
+                  value={codeInput}
+                  onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                  placeholder="مثال: HOMEME-PRO-2026"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 font-mono uppercase tracking-wider"
+                  data-testid="plan-code-input"
+                />
+              </div>
+              <button
+                onClick={redeemCode}
+                disabled={codeLoading || !codeInput.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-bold bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white disabled:opacity-60"
+                data-testid="plan-code-redeem-btn"
+              >
+                {codeLoading ? '...جارٍ التفعيل' : 'تفعيل الكود'}
+              </button>
+            </div>
+            <div className="text-[11px] text-violet-700/80 dark:text-violet-300/80 mt-2">
+              💡 الكود يفعّل خطتك فوراً بدون الحاجة للدفع — يُمنح عادةً عبر العروض الخاصة أو شراكات الإعلان.
+            </div>
           </div>
         )}
 

@@ -1301,6 +1301,19 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 77: Plan Modal — Trial + Coupon + Subscription Code ✅ (2026-05-01)
+- **3 new backend endpoints** in `routes/company_admin.py`:
+  - `POST /api/company-admin/activate-trial` — once-per-company 14-day trial. Sets `trial_used=true`, status=`trial`, expires_at = now + 14 days. Returns 400 on second attempt with Arabic message.
+  - `POST /api/company-admin/preview-coupon` `{plan_key, coupon_code}` — validates the coupon (active flag, max_uses, expiry, applicable_plans), computes original/discount/final price, returns preview WITHOUT consuming usage. 404 on invalid.
+  - `POST /api/company-admin/redeem-subscription-code` `{code}` — looks up `subscription_codes` collection, applies plan + duration, increments `times_used`. 404 on invalid.
+- **Frontend `PlanUpgradeDialog`** (in `CompanyPlanUsageCard.js`) gained a **3-button action bar** between the warning banner and plan grid:
+  - 🎁 **تجربة مجانية ١٤ يوم** (emerald) — direct activate, refreshes plan usage, closes modal
+  - 🎟️ **لديكِ كوبون؟** (orange) — toggles a panel with plan dropdown + coupon input + Live preview (shows "وفّرتِ X ج.م" emerald success card on valid)
+  - 🔑 **لديكِ كود اشتراك؟** (violet) — toggles a panel with code input + redeem button. Mutually exclusive with the coupon panel.
+- **Verified end-to-end ✅**: 
+  - Backend curl: trial activate (200 first call → 400 idempotent) — invalid coupon (404) — invalid code (404)
+  - Playwright: Login as testcompany2 → modal opens → 3 buttons render → coupon toggle opens panel + invalid coupon shows red toast + emerald result card pattern works → code toggle auto-closes coupon panel → all data-testids present.
+
 ### Iter 76: Changelog moved to MongoDB + Owner CRUD page ✅ (2026-05-01)
 - **Backend `routes/app_version.py` rewritten**: replaces hard-coded `_CHANGELOG` with MongoDB collection `changelog_entries` (`{id, ar, en, fr, order, is_active, created_at, updated_at, created_by}`). `/api/version` now reads active entries (sorted by `order`, limit 8) and falls back to a built-in seed list when the collection is empty so first-installs/dev environments stay nice.
 - **New owner-only CRUD endpoints** behind `require_app_owner`:

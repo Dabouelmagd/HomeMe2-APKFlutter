@@ -578,3 +578,165 @@ async def company_admin_crm_summary(current_user: dict = Depends(_require_compan
         "notes_total": notes_total,
     }
 
+
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Trial / Coupon / Subscription-Code activation flows for company_admin
+# ─────────────────────────────────────────────────────────────────────
+from datetime import timedelta
+from pydantic import BaseModel, Field
+
+
+class CouponPreviewIn(BaseModel):
+    plan_key: str = Field(..., min_length=1)
+    coupon_code: str = Field(..., min_length=1, max_length=64)
+
+
+class RedeemCodeIn(BaseModel):
+    code: str = Field(..., min_length=1, max_length=64)
+
+
+@router.post("/company-admin/activate-trial")
+async def company_admin_activate_trial(current_user: dict = Depends(_require_company_admin)):
+    """Activate a 14-day free trial for the company. Once-per-company (idempotent block)."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, None) if current_user.get("role") == "company_admin" else None
+    if not cid:
+        raise HTTPException(status_code=400, detail="هذا الإجراء متاح لمدير الشركة فقط")
+
+    sub = await db.company_subscriptions.find_one({"company_id": cid}) or {}
+    if sub.get("trial_used"):
+        raise HTTPException(status_code=400, detail="تم استخدام التجربة المجانية لهذه الشركة من قبل")
+
+    now = datetime.now(timezone.utc)
+    expires = now + timedelta(days=14)
+    update = {
+        "company_id": cid,
+        "plan": sub.get("plan", "company_business"),
+        "status": "trial",
+        "trial_used": True,
+        "trial_started_at": now.isoformat(),
+        "expires_at": expires.isoformat(),
+        "updated_at": now.isoformat(),
+    }
+    await db.company_subscriptions.update_one(
+        {"company_id": cid},
+        {"$set": update, "$setOnInsert": {"id": str(uuid.uuid4()), "created_at": now.isoformat()}},
+        upsert=True,
+    )
+    return {
+        "success": True,
+        "trial_days": 14,
+        "expires_at": expires.isoformat(),
+        "message": "تم تفعيل التجربة المجانية لمدة 14 يوم 🎉",
+    }
+
+
+@router.post("/company-admin/preview-coupon")
+async def company_admin_preview_coupon(payload: CouponPreviewIn, current_user: dict = Depends(_require_company_admin)):
+    """Validate a coupon against the target plan and return discount preview.
+    Does NOT consume usage — only the actual checkout (or apply-coupon) does."""
+    db = get_db()
+    code = payload.coupon_code.strip().upper()
+    coupon = await db.coupons.find_one({"code": code, "is_active": True}, {"_id": 0})
+    if not coupon:
+        raise HTTPException(status_code=404, detail="كوبون غير صالح أو غير مفعّل")
+
+    if coupon.get("times_used", 0) >= coupon.get("max_uses", 100):
+        raise HTTPException(status_code=400, detail="انتهى الحد الأقصى لاستخدام هذا الكوبون")
+    if coupon.get("expires_at"):
+        try:
+            exp = datetime.fromisoformat(coupon["expires_at"].replace("Z", "+00:00"))
+            if datetime.now(timezone.utc) > exp:
+                raise HTTPException(status_code=400, detail="انتهت صلاحية هذا الكوبون")
+        except ValueError:
+            pass
+    if coupon.get("applicable_plans") and payload.plan_key not in coupon["applicable_plans"]:
+        raise HTTPException(status_code=400, detail="هذا الكوبون لا ينطبق على هذه الخطة")
+
+    PRICES_EGP = {
+        "starter": 0,
+        "company_startup": 3500,
+        "company_business": 7500,
+        "company_enterprise": 20000,
+    }
+    original = PRICES_EGP.get(payload.plan_key, 0)
+    if coupon["discount_type"] == "percentage":
+        discount = round(original * (coupon["discount_value"] / 100), 2)
+    else:
+        discount = min(coupon["discount_value"], original)
+    final = max(0, original - discount)
+
+    return {
+        "valid": True,
+        "coupon_code": coupon["code"],
+        "plan_key": payload.plan_key,
+        "discount_type": coupon["discount_type"],
+        "discount_value": coupon["discount_value"],
+        "original_price": original,
+        "discount_amount": discount,
+        "final_price": final,
+        "currency": "EGP",
+    }
+
+
+@router.post("/company-admin/redeem-subscription-code")
+async def company_admin_redeem_code(payload: RedeemCodeIn, current_user: dict = Depends(_require_company_admin)):
+    """Redeem a subscription code that grants the company a paid plan for a fixed duration.
+    Looks up the code in `subscription_codes` collection. Code shape:
+       {code, plan_key, duration_days, max_uses, times_used, is_active, expires_at}
+    """
+    db = get_db()
+    cid = await _resolve_company_id(current_user, None) if current_user.get("role") == "company_admin" else None
+    if not cid:
+        raise HTTPException(status_code=400, detail="هذا الإجراء متاح لمدير الشركة فقط")
+
+    code = payload.code.strip().upper()
+    sc = await db.subscription_codes.find_one({"code": code}, {"_id": 0})
+    if not sc:
+        raise HTTPException(status_code=404, detail="كود اشتراك غير صحيح")
+    if not sc.get("is_active", True):
+        raise HTTPException(status_code=400, detail="هذا الكود غير مفعّل")
+    if sc.get("times_used", 0) >= sc.get("max_uses", 1):
+        raise HTTPException(status_code=400, detail="تم استخدام هذا الكود الحد الأقصى")
+    if sc.get("expires_at"):
+        try:
+            exp = datetime.fromisoformat(sc["expires_at"].replace("Z", "+00:00"))
+            if datetime.now(timezone.utc) > exp:
+                raise HTTPException(status_code=400, detail="انتهت صلاحية هذا الكود")
+        except ValueError:
+            pass
+
+    plan_key = sc.get("plan_key") or sc.get("type") or "company_startup"
+    duration_days = int(sc.get("duration_days") or 30)
+    now = datetime.now(timezone.utc)
+    expires = now + timedelta(days=duration_days)
+
+    await db.company_subscriptions.update_one(
+        {"company_id": cid},
+        {
+            "$set": {
+                "company_id": cid,
+                "plan": plan_key,
+                "status": "active",
+                "expires_at": expires.isoformat(),
+                "code_used": code,
+                "updated_at": now.isoformat(),
+            },
+            "$setOnInsert": {"id": str(uuid.uuid4()), "created_at": now.isoformat()},
+        },
+        upsert=True,
+    )
+    await db.subscription_codes.update_one(
+        {"code": code},
+        {"$inc": {"times_used": 1}, "$set": {"last_used_at": now.isoformat(), "last_used_by_company": cid}},
+    )
+
+    return {
+        "success": True,
+        "plan_key": plan_key,
+        "duration_days": duration_days,
+        "expires_at": expires.isoformat(),
+        "message": f"تم تفعيل خطتك حتى {expires.date().isoformat()} ✨",
+    }

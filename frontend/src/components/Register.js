@@ -11,6 +11,7 @@ import {
   ArrowRightIcon,
   ArrowLeftIcon
 } from '@heroicons/react/24/outline';
+import RegistrationPlanPicker from './RegistrationPlanPicker';
 
 const Register = () => {
   const { t } = useTranslation();
@@ -19,6 +20,7 @@ const Register = () => {
   const [step, setStep] = useState('choose'); // choose, form
   const [accountType, setAccountType] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState('starter');
   const [formData, setFormData] = useState({
     username: '', email: '', password: '', confirmPassword: '',
     full_name: '', phone: '', compound_name: '', company_name: '',
@@ -85,7 +87,8 @@ const Register = () => {
         role: selectedType?.role || 'resident',
         unit_number: formData.unit_number,
         subscription_code: formData.subscription_code,
-        compound_id: ''
+        compound_id: '',
+        ...(accountType === 'company_admin' ? { selected_plan: selectedPlan } : {}),
       };
 
       const result = await register(registerData);
@@ -218,9 +221,12 @@ const Register = () => {
               )}
 
               {accountType === 'company_admin' && (
-                <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
-                  <p className="text-sm text-purple-700 font-medium">{t('company_note', 'سيتم إنشاء حساب شركة لإدارة عدة مجتمعات سكنية. يمكنك إضافة المجتمعات بعد التسجيل.')}</p>
-                </div>
+                <>
+                  <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
+                    <p className="text-sm text-purple-700 font-medium">{t('company_note', 'سيتم إنشاء حساب شركة لإدارة عدة مجتمعات سكنية. يمكنك إضافة المجتمعات بعد التسجيل.')}</p>
+                  </div>
+                  <RegistrationPlanPicker selected={selectedPlan} onSelect={setSelectedPlan} />
+                </>
               )}
 
               {accountType === 'compound_admin' && (

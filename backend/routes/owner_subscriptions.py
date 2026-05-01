@@ -186,6 +186,13 @@ async def get_company_plans(current_user: dict = Depends(get_current_user)):
     return {"plans": COMPANY_PLANS_CATALOGUE}
 
 
+@router.get("/public/company-plans")
+async def get_company_plans_public():
+    """Same catalogue but UNAUTHENTICATED — used by the public registration page
+    so new subscribers can pick their plan before creating the account."""
+    return {"plans": COMPANY_PLANS_CATALOGUE}
+
+
 async def _log_sub_change(db, company_id, user, action, description, details=None):
     """Log subscription changes for audit trail"""
     company = await db.companies.find_one({"id": company_id}, {"_id": 0, "name": 1})

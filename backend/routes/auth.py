@@ -121,13 +121,19 @@ async def register(user_data: UserCreate, request: Request):
         }
         await db.companies.insert_one(new_company)
         await db.users.update_one({"id": user.id}, {"$set": {"company_id": new_company_id}})
-        # Bootstrap default starter subscription so plan-usage endpoints return sensible defaults
+        # Bootstrap subscription with user-selected plan (default: starter).
+        # Whitelist to catalogue keys to prevent arbitrary string injection.
+        ALLOWED_PLANS = {"starter", "company_startup", "company_business", "company_enterprise"}
+        initial_plan = user_data.selected_plan if user_data.selected_plan in ALLOWED_PLANS else "starter"
+        # Paid plans start as 'pending_payment' so an admin can activate after invoice/transfer;
+        # starter (free) is active immediately.
+        status = "active" if initial_plan == "starter" else "pending_payment"
         await db.company_subscriptions.update_one(
             {"company_id": new_company_id},
             {"$setOnInsert": {
                 "company_id": new_company_id,
-                "plan": "starter",
-                "status": "active",
+                "plan": initial_plan,
+                "status": status,
                 "created_at": datetime.now(timezone.utc).isoformat(),
             }},
             upsert=True,

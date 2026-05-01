@@ -348,6 +348,7 @@ class UserCreate(BaseModel):
     phone: Optional[str] = None
     unit_number: Optional[str] = None
     subscription_code: Optional[str] = None
+    selected_plan: Optional[str] = None  # company_admin only: starter|company_startup|company_business|company_enterprise
 
 
 class SubscriptionCode(BaseModel):

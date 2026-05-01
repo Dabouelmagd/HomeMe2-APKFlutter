@@ -5,6 +5,34 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 69: Plan Picker on Registration Page (May 1, 2026) ✅
+
+**🎯 Inline plan-comparison cards during self-registration for `company_admin`.**
+
+**Backend:**
+- `GET /api/public/company-plans` — NEW **unauthenticated** endpoint that exposes the same catalogue as `/api/owner/company-plans`. Used by the public registration page.
+- `shared_models.UserCreate` — added `selected_plan: Optional[str] = None`.
+- `routes/auth.py :: register` — when `role == "company_admin"` and a `selected_plan` is provided:
+  - Whitelist validation: `{starter, company_startup, company_business, company_enterprise}` — anything else silently falls back to `starter` (prevents arbitrary string injection).
+  - Paid plans (non-starter) bootstrap `company_subscriptions.status = "pending_payment"` so an admin can review and activate after receiving payment; starter stays `active`.
+
+**Frontend:**
+- New `components/RegistrationPlanPicker.js` — responsive grid of 4 plan cards:
+  - Shows price in Arabic (٣,٥٠٠ ج.م/شهر), max compounds, max residents, and 4 premium feature bullets (PDF/Excel, AI insights, priority support, white-label).
+  - "⭐ الأكثر شعبية" badge on the Business card (popular flag).
+  - "✓ المختار" badge on selection + indigo ring + shadow.
+  - Amber notice below when a paid plan is selected: "سيتم بدء الحساب بحالة بانتظار الدفع…".
+- `Register.js` — mounts the picker in the company_admin branch of the form + passes `selected_plan` in `registerData`. Default state: `starter`.
+
+**Verified end-to-end via curl + Playwright:**
+- `/api/public/company-plans` returns 4 plans without Authorization header ✅
+- Register with `selected_plan: "company_business"` → subscription created with `plan=company_business, status=pending_payment` ✅
+- Register with malicious `selected_plan: "free_ultra_mega"` → silently falls back to `starter` ✅
+- UI: 4 plan cards render, selecting Business triggers the paid-plan notice, Popular badge appears on Business ✅
+
+**End-to-end E2E test of the original user bug**: Fresh company_admin registration → login → `CompoundOnboardingWizard` renders immediately with correct company name → plan usage card shows chosen plan. Confirmed via Playwright screenshot for user `user_co_test` → "شركة اختبار المستخدم".
+
+
 ### Iter 68: Company Registration Auto-Provisioning Fix (May 1, 2026) ✅
 
 **🐛 Bug reported by user**: "حاولت التسجيل باسم شركة إدارة جديدة لم يدخل" — New company registration from the public sign-up page appeared to fail with "Registration failed" toast, and even when the backend returned 200, the newly-created user was an orphan with no company row, no subscription, and `compound_id='default-compound'`. That broke the CompanyAdminDashboard on first login:

@@ -2497,6 +2497,8 @@ app.include_router(compound_branding_router)
 app.include_router(email_templates_router)
 from routes.media_health import router as media_health_router
 app.include_router(media_health_router)
+from routes.user_crm import router as user_crm_router
+app.include_router(user_crm_router)
 from routes.app_branding import router as app_branding_router
 app.include_router(app_branding_router)
 from routes.smoke_test import router as smoke_test_router

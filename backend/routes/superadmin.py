@@ -839,3 +839,28 @@ async def run_auto_renewal_if_due():
         logging.error(f"Owner summary dispatch error: {e}")
 
     return {"sent": sent, "emails_sent": emails_sent, "targets": len(user_ids), "campaign_id": campaign_id}
+
+
+
+# -----------------------------------------------------------------------------
+# Manual trigger: Subscription renewal reminders (7/3/0 days)
+# -----------------------------------------------------------------------------
+@router.post("/super-admin/trigger-renewals")
+async def trigger_renewal_reminders(current_user: dict = Depends(require_super_admin)):
+    """
+    Run one pass of the renewal-reminder loop on demand.
+    Useful for manual testing / re-sending missed milestones.
+    """
+    try:
+        from renewal_reminders import run_renewal_reminders_once
+        sent = await run_renewal_reminders_once()
+        return {
+            "status": "ok",
+            "emails_dispatched": sent,
+            "triggered_by": current_user.get("username"),
+            "triggered_at": datetime.now(timezone.utc).isoformat(),
+        }
+    except Exception as e:
+        logging.error(f"trigger-renewals failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Renewal trigger failed: {str(e)}")
+

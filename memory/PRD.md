@@ -5,6 +5,31 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 65: Compound Switcher + Plan Feature Flags (May 1, 2026) ✅
+
+**🏘️ Compound Switcher (per user request):**
+- New `components/company-admin/CompoundSwitcher.js` — pill-shaped dropdown in Layout.js header (between user-info-card and SessionSwitcher).
+- Visible only for `company_admin / assistant_manager / accountant`.
+- Lists every compound the company owns (via `/api/company-admin/compounds`).
+- One-click switch: persists to `localStorage.selectedCompoundId` + `selectedCompoundName`, dispatches `planUsageRefresh` and `compoundSwitched` events, then forces a soft `navigate(0)` so all admin routes re-fetch with the new `X-Active-Compound-Id` header.
+- "عرض الإجمالي" button clears the selection and returns to the company-wide overview.
+- Outside-click closes the menu.
+
+**🎚 Plan Feature Flags (machine-readable):**
+- Added `feature_flags` block to every entry of `COMPANY_PLANS_CATALOGUE` in `routes/owner_subscriptions.py`. 8 flags: `billing_payments`, `ads_campaigns`, `pdf_excel_exports`, `ai_financial_insights`, `advanced_dashboard`, `custom_api`, `whitelabel`, `priority_support`.
+- Mirror table `_PLAN_FEATURES` added to `plan_limits.py`.
+- New helpers: `has_feature(company_id, key)`, `assert_feature_enabled(company_id, key, name_ar)` — raise structured 403 `plan_limit_feature` ready for the same upgrade-modal flow as `plan_limit_compounds` / `plan_limit_residents`.
+- `GET /api/company-admin/plan-usage` now returns `feature_flags` for the frontend to gate UI elements per-tier.
+
+**🔧 Fixes during testing:**
+- Removed `user.company_id` precondition from CompoundSwitcher fetch — backend already extracts company_id from JWT, and the user object in some browser contexts hasn't refreshed yet from `/auth/me`. Verified via screenshot: switcher pill renders correctly for testcompany2.
+
+**🧪 Test results (testing_agent_v3_fork iter58):**
+- Backend: 11/11 passed (1 legitimate skip — testcompany2 is on enterprise/unlimited so plan-limit rejection cannot be triggered without changing plan).
+- Frontend: 12/13 passed → fixed the missing CompoundSwitcher testid → re-verified visually.
+- X-Active-Compound-Id legitimate override accepted; cross-company bogus id silently rejected.
+
+
 ### Iter 64: Company-Admin Mini-Owner Suite — Phases 1-5 (May 1, 2026) ✅
 
 **🏗️ Phase 1 — Onboarding Wizard (First-Login Gate):**

@@ -28,13 +28,14 @@ const CompoundSwitcher = () => {
   const eligible = ['company_admin', 'assistant_manager', 'accountant'].includes(activeRole);
 
   useEffect(() => {
-    if (!eligible || !user?.company_id) return;
+    if (!eligible) return;
     const token = localStorage.getItem('token');
+    if (!token) return;
     axios
       .get(`${API}/company-admin/compounds`, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => setCompounds(res.data?.compounds || []))
       .catch(() => setCompounds([]));
-  }, [eligible, user?.company_id]);
+  }, [eligible]);
 
   // Close dropdown on outside click
   useEffect(() => {

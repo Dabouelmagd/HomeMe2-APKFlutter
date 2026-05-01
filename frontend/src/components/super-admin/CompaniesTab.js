@@ -81,6 +81,31 @@ const CompaniesTab = ({ t }) => {
     } catch (err) { toast.error(err.response?.data?.detail || t('ct_delete_failed','فشل الحذف')); }
   };
 
+  const convertOrphanAdmin = async (admin) => {
+    const defaultName = admin.full_name || admin.username || 'شركة جديدة';
+    const name = window.prompt(
+      `${t('ct_convert_orphan_prompt','اسم الشركة الجديدة للمدير')} "${admin.username}":`,
+      defaultName
+    );
+    if (name === null) return; // cancelled
+    try {
+      const res = await axios.post(
+        `${API}/super-admin/companies/from-admin/${admin.id}`,
+        { name: (name || defaultName).trim() },
+        getToken()
+      );
+      const action = res.data?.action;
+      toast.success(
+        action === 'linked'
+          ? t('ct_orphan_linked','تم ربط المدير بالشركة الموجودة')
+          : t('ct_orphan_created','تم إنشاء الشركة وربطها بالمدير')
+      );
+      reload();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || t('ct_orphan_failed','فشل تحويل المدير'));
+    }
+  };
+
   const linkCompound = null;
   const unlinkCompound = null;
 
@@ -245,6 +270,45 @@ const CompaniesTab = ({ t }) => {
           </div>
         ))}
       </div>
+
+      {/* Orphan Company Admins — مدراء شركات دون شركة حقيقية */}
+      {Array.isArray(data?.orphan_admins) && data.orphan_admins.length > 0 && (
+        <div className="bg-gradient-to-br from-amber-900/30 to-orange-900/10 border border-amber-600/40 rounded-xl p-4" data-testid="ct-orphan-admins-section">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">⚠️</span>
+              <div>
+                <div className="font-bold text-amber-300 text-sm">{t('ct_orphan_admins_title','مدراء شركات دون ربط')}</div>
+                <div className="text-[11px] text-amber-200/70">{t('ct_orphan_admins_hint','هؤلاء المستخدمون بدور مدير شركة لكن لا توجد شركة حقيقية مرتبطة بهم. انقر "تحويل إلى شركة" لإنشاء ورابط تلقائي.')}</div>
+              </div>
+            </div>
+            <span className="text-xs bg-amber-600/30 text-amber-200 px-2 py-1 rounded-full border border-amber-500/40">{data.orphan_admins.length}</span>
+          </div>
+          <div className="space-y-2">
+            {data.orphan_admins.map(admin => (
+              <div key={admin.id} className="flex items-center justify-between bg-gray-900/50 border border-amber-700/30 rounded-lg p-3" data-testid={`ct-orphan-${admin.username}`}>
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-2xl">👤</span>
+                  <div className="min-w-0">
+                    <div className="font-semibold text-white text-sm truncate">{admin.full_name || admin.username}</div>
+                    <div className="text-[11px] text-gray-400 truncate">
+                      @{admin.username} • {admin.email || '—'}
+                      {admin.company_id_missing && <span className="text-red-400 ms-2">• {t('ct_orphan_missing_co','مرجع شركة مفقود')}</span>}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => convertOrphanAdmin(admin)}
+                  className="px-3 py-1.5 text-xs bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-lg font-semibold shadow-lg shadow-orange-500/20 flex-shrink-0"
+                  data-testid={`ct-convert-orphan-${admin.username}`}
+                >
+                  🏢 {t('ct_convert_to_company','تحويل إلى شركة')}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* View mode toggle */}
       <div className="flex items-center gap-2 bg-gray-900/40 rounded-lg p-2 border border-gray-700">

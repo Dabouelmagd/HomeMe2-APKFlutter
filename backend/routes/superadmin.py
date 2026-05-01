@@ -407,6 +407,12 @@ async def super_admin_create_user(user_data: dict, current_user: dict = Depends(
         "profile_picture_url": None,
     }
     await db.users.insert_one(user_doc)
+    # Back-link admin_user_id on the target company so SuperAdmin UI can list the pair
+    if role == "company_admin" and company_id:
+        await db.companies.update_one(
+            {"id": company_id, "$or": [{"admin_user_id": None}, {"admin_user_id": {"$exists": False}}]},
+            {"$set": {"admin_user_id": user_doc["id"], "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
     user_doc.pop("_id", None)
     user_doc.pop("password_hash", None)
     return {"success": True, "user": serialize_datetime(user_doc)}

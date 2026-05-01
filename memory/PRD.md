@@ -5,6 +5,20 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 63: Orphan Company-Admins Sync + Auto-Heal Back-Link (May 1, 2026) ✅
+
+**🩹 Bug Fix — `company_admin` users missing from SuperAdmin "Companies" tab:**
+- **Root cause**: `/api/super-admin/companies` returned companies from `db.companies` and matched admins via `company.admin_user_id`. But whenever a `company_admin` user was created (through `/api/super-admin/users`) the `company_id` field was written on the user doc — **without** a corresponding back-reference (`admin_user_id`) on the company. Result: admins were invisible in the UI even when the company existed. Additionally, admins created with a `company_id` pointing to a deleted/missing company became fully orphan.
+
+**Fixes applied:**
+1. **`routes/superadmin_companies.py :: list_companies_full`** — on every call, auto-heals by setting `admin_user_id` on any company that has a matching `company_admin` user but no back-link. Also now returns a new `orphan_admins` array for admins whose `company_id` is null or references a non-existent company.
+2. **`routes/superadmin_companies.py :: create_company_from_orphan_admin`** (NEW) — `POST /api/super-admin/companies/from-admin/{user_id}` — one-click converter: if user's `company_id` points to an existing company it just back-links; otherwise creates a fresh company, seeds it with user's email/phone, and updates the user's `company_id`.
+3. **`routes/superadmin.py :: super_admin_create_user`** — now sets `admin_user_id` on the target company immediately when a new `company_admin` user is created, preventing new orphans.
+4. **`super-admin/CompaniesTab.js`** — new amber-bordered "مدراء شركات دون ربط" section at top; each orphan row has a "🏢 تحويل إلى شركة" button that prompts for the company name and calls the converter endpoint.
+
+**Verified via curl**: 3 legacy `company_admin` users (`testcompany2`, `testco3`, `companytest5`) were healed on first request — their companies now show the linked admin. Synthetic orphan with stale `company_id` surfaced in `orphan_admins`, was converted to a new company, and disappeared from the orphan list on re-fetch.
+
+
 ### Iter 62: Impersonate User + System Accounts Filter + User CRUD Modals (Feb 29, 2026) ✅
 
 **🎭 Impersonate User (أقوى ميزة دعم فني):**

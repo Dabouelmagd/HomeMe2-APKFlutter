@@ -14,7 +14,12 @@ router = APIRouter(prefix="/api")
 
 @router.get("/super-admin/companies")
 async def list_companies_full(current_user: dict = Depends(require_super_admin)):
-    """قائمة شاملة لشركات الإدارة مع كل التفاصيل: المجمعات، المستخدمون، الاشتراكات، الأرقام"""
+    """قائمة شاملة لشركات الإدارة مع كل التفاصيل: المجمعات، المستخدمون، الاشتراكات، الأرقام.
+    
+    يعالج ذاتياً الروابط المفقودة:
+      - يملأ admin_user_id على الشركات المرتبطة بمدير شركة ليس لها مرجع عكسي
+      - يعيد قائمة orphan_admins (مدراء شركات دون شركة حقيقية) لعرضها منفصلة في الواجهة
+    """
     db = get_db()
     companies = await db.companies.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
     compounds_all = await db.compounds.find({}, {"_id": 0}).to_list(1000)
@@ -22,6 +27,24 @@ async def list_companies_full(current_user: dict = Depends(require_super_admin))
     subs_all = await db.user_subscriptions.find({}, {"_id": 0}).to_list(5000)
     sub_by_user = {s.get("user_id"): s for s in subs_all}
     now = datetime.now(timezone.utc)
+
+    # Auto-heal: for every company_admin user, ensure the matching company has admin_user_id set
+    companies_by_id = {c.get("id"): c for c in companies}
+    healed_ids = set()
+    for u in users_all:
+        if u.get("role") != "company_admin":
+            continue
+        cid = u.get("company_id")
+        if not cid:
+            continue
+        co = companies_by_id.get(cid)
+        if co and not co.get("admin_user_id"):
+            await db.companies.update_one(
+                {"id": cid},
+                {"$set": {"admin_user_id": u.get("id"), "updated_at": datetime.now(timezone.utc).isoformat()}}
+            )
+            co["admin_user_id"] = u.get("id")
+            healed_ids.add(cid)
 
     # Build compound_id → compound lookup
     compound_by_id = {c.get("id"): c for c in compounds_all}
@@ -108,7 +131,82 @@ async def list_companies_full(current_user: dict = Depends(require_super_admin))
             "expired_subs": expired_subs,
             "admin_user": admin_user,
         })
-    return {"companies": serialize_datetime(result), "total": len(result)}
+
+    # Orphan company_admins: role=company_admin whose company_id is missing or points to a non-existent company
+    existing_company_ids = set(companies_by_id.keys())
+    orphan_admins = []
+    for u in users_all:
+        if u.get("role") != "company_admin":
+            continue
+        cid = u.get("company_id")
+        if cid and cid in existing_company_ids:
+            continue  # properly linked
+        orphan_admins.append({
+            "id": u.get("id"),
+            "username": u.get("username"),
+            "full_name": u.get("full_name"),
+            "email": u.get("email"),
+            "phone": u.get("phone"),
+            "company_id": cid,  # may be None or stale reference
+            "company_id_missing": bool(cid) and cid not in existing_company_ids,
+            "is_active": u.get("is_active", True),
+            "created_at": u.get("created_at"),
+            "profile_picture_url": u.get("profile_picture_url"),
+        })
+
+    return {
+        "companies": serialize_datetime(result),
+        "total": len(result),
+        "orphan_admins": serialize_datetime(orphan_admins),
+        "healed_companies": list(healed_ids),
+    }
+
+
+@router.post("/super-admin/companies/from-admin/{user_id}")
+async def create_company_from_orphan_admin(user_id: str, payload: dict = None, current_user: dict = Depends(require_super_admin)):
+    """تحويل مدير شركة يتيم إلى شركة كاملة بنقرة واحدة.
+    
+    - إذا كان user.company_id يشير إلى شركة موجودة: يتم ربطها فقط (admin_user_id)
+    - إذا كان يشير إلى شركة غير موجودة أو كان None: يتم إنشاء شركة جديدة وربطها
+    """
+    db = get_db()
+    payload = payload or {}
+    user = await db.users.find_one({"id": user_id, "role": "company_admin"}, {"_id": 0, "password_hash": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="مدير الشركة غير موجود أو ليس بدور company_admin")
+
+    existing_cid = user.get("company_id")
+    if existing_cid:
+        existing_company = await db.companies.find_one({"id": existing_cid}, {"_id": 0})
+        if existing_company:
+            # Just back-link admin if missing
+            if not existing_company.get("admin_user_id"):
+                await db.companies.update_one(
+                    {"id": existing_cid},
+                    {"$set": {"admin_user_id": user_id, "updated_at": datetime.now(timezone.utc).isoformat()}}
+                )
+            return {"success": True, "action": "linked", "company_id": existing_cid}
+
+    # Create a fresh company
+    default_name = (payload.get("name") or user.get("full_name") or user.get("username") or "شركة جديدة").strip()
+    new_company = {
+        "id": str(uuid.uuid4()),
+        "name": default_name,
+        "email": payload.get("email") or user.get("email", ""),
+        "phone": payload.get("phone") or user.get("phone", ""),
+        "address": payload.get("address", ""),
+        "website": payload.get("website", ""),
+        "description": payload.get("description", ""),
+        "compound_ids": [],
+        "admin_user_id": user_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": current_user.get("id"),
+    }
+    await db.companies.insert_one(new_company)
+    # Update the user to reference the new company
+    await db.users.update_one({"id": user_id}, {"$set": {"company_id": new_company["id"]}})
+    new_company.pop("_id", None)
+    return {"success": True, "action": "created", "company": serialize_datetime(new_company)}
 
 
 @router.post("/super-admin/companies")

@@ -1301,7 +1301,15 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
-### Iter 72: Same-Origin API Fallback ✅ (2026-05-01)
+### Iter 73: Same-Origin Rewrite (definitive fix) ✅ (2026-05-01)
+- **Replaces** the response-interceptor fallback from Iter 72 with a single proactive rewrite layer that runs before any module loads — so cross-origin /api calls never even leave the browser.
+- **New file `/app/frontend/src/api/sameOriginRewrite.js`**: when `window.location.origin !== process.env.REACT_APP_BACKEND_URL`, monkey-patches `window.fetch`, `window.WebSocket`, and adds an axios request interceptor that rewrites every `BACKEND_URL/...` URL to `<origin>/...`. ws/wss are auto-derived. Idempotent (safe to call twice). No-op when origins match.
+- **Hooked in `index.js`**: `installSameOriginRewrite()` runs before `<App />` renders.
+- **`App.js`**: removed the multi-target login complication and the response-interceptor fallback (both replaced by the cleaner request-side rewrite). `cleanClient = axios.create(...)` now explicitly attaches the rewrite via `attachRewriteToAxios(cleanClient)` since axios.create() doesn't inherit the global interceptor.
+- **Coverage**: zero changes to ~130 components that import `process.env.REACT_APP_BACKEND_URL` directly — they all benefit transparently.
+- **Verified**: standalone unit test (`/app/frontend/scripts/test_sameOriginRewrite.js`, runs in node) — 4/4 PASS for axios+fetch+WebSocket+passthrough cases. Live Playwright login on preview still passes through (origins match → rewrite is a no-op, `window.fetch` remains native).
+
+### Iter 72: Same-Origin API Fallback ✅ (2026-05-01) (superseded by Iter 73)
 - **Problem**: production deployment at `homemeapp.net` has frontend bundle baked with `REACT_APP_BACKEND_URL=https://dashboard-rescue-12.emergent.host`. Some users (cached SW from previous deploys, browser extensions, ISP filters, third-party-cookie blocks) saw "Network Error" on login/register because the cross-origin POST never made it out of the browser, even though the same backend is also reachable at `https://homemeapp.net/api/...`.
 - **Fix in `App.js`**:
   1. Global axios response interceptor: on `Network Error` against `BACKEND_URL`, probes `<origin>/api/health` once per session; if reachable, transparently retries the same request against same-origin. Tagged `__sameOriginRetried` to prevent loops.

@@ -113,14 +113,14 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI(title="HomeMe API", description="Compound Management System")
 api_router = APIRouter(prefix="/api")
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# NOTE: CORS middleware is registered LATER in the file (around line 2325)
+# with a strict ALLOWED_ORIGINS list. The previous middleware here used
+# `allow_origins=*` together with `allow_credentials=True`, which violates the
+# CORS spec — browsers silently drop responses that combine both, causing
+# axios POST requests (e.g. /api/auth/login) to hang in production while
+# direct fetch() and curl still appear to work. The duplicate middleware was
+# removed to fix the login-button-stuck-on-loading bug. See IMPORTANT note in
+# /app/memory/PRD.md (Iter 78).
 
 # Add rate limiter to app
 app.state.limiter = limiter

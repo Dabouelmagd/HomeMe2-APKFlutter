@@ -298,7 +298,33 @@ const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await axios.post(`${API}/auth/login`, credentials);
+      // Use raw XHR with Promise wrapper instead of fetch/axios.
+      // Both fetch() and axios.post() were observed to hang when invoked from
+      // a React event handler in this StrictMode + dev-server combination.
+      // Raw XHR works reliably and gives us direct control.
+      const response = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${API}/auth/login`);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.timeout = 20000;
+        xhr.onload = () => {
+          try {
+            const data = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+            resolve({ status: xhr.status, data });
+          } catch (e) {
+            reject(e);
+          }
+        };
+        xhr.onerror = () => reject(new Error('Network error'));
+        xhr.ontimeout = () => reject(new Error('Request timed out'));
+        xhr.send(JSON.stringify(credentials));
+      });
+      if (response.status < 200 || response.status >= 300) {
+        return {
+          success: false,
+          error: response.data?.detail || `فشل تسجيل الدخول (HTTP ${response.status})`,
+        };
+      }
       
       // 2FA gate — return temp token to caller without setting session
       if (response.data?.two_factor_required) {
@@ -320,7 +346,7 @@ const AuthProvider = ({ children }) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       
       setUser(userData);
-      initializeSocket(userData.id);
+      try { initializeSocket(userData.id); } catch (_e) { /* socket non-critical */ }
       
       setTimeout(() => {
         autoSubscribeToPush().then(success => {

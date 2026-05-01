@@ -158,9 +158,11 @@
         }
       }
       
-      // Execute on page load  
+      // Execute on page load
       document.addEventListener('DOMContentLoaded', async () => {
         // Force clear all old service workers and caches to fix blank page
+        // and to prevent the legacy SW from intercepting POST requests (which
+        // causes the login button to hang on "جاري تسجيل الدخول...").
         try {
           if ('serviceWorker' in navigator) {
             const regs = await navigator.serviceWorker.getRegistrations();
@@ -171,9 +173,14 @@
             for (const n of names) { await caches.delete(n); }
           }
         } catch(e) { console.log('Cache cleanup:', e); }
-        
+
         await lightCacheRefresh();
-        await registerServiceWorker();
+        // SW registration is INTENTIONALLY DISABLED — the legacy /sw.js
+        // intercepts every fetch (including POST) and re-emits it via
+        // `respondWith(fetch(event.request))`, which can leave POST request
+        // streams hanging in some browsers and breaks the login flow.
+        // If we ever re-enable a PWA SW, ensure it skips non-GET requests.
+        // await registerServiceWorker();
       });
     </script>
     

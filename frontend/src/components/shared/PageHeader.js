@@ -57,11 +57,17 @@ const PageHeader = ({
           )}
           <div className="min-w-0">
             {badge && (
-              <p className={`${t.badge} text-[10px] font-bold tracking-wider uppercase mb-0.5`}>{badge}</p>
+              <p className={`${t.badge} text-[10px] font-bold tracking-wider uppercase mb-0.5`} aria-label="role">{badge}</p>
             )}
             <h1 className="text-2xl md:text-3xl font-extrabold text-white truncate">{title}</h1>
             {subtitle && <p className="text-xs text-gray-300 mt-1">{subtitle}</p>}
-            {meta && <div className="flex flex-wrap gap-3 text-[11px] text-gray-400 mt-2">{meta}</div>}
+            {meta && (
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-gray-400 mt-2" role="list">
+                {React.Children.map(meta.props?.children || meta, (child, i) =>
+                  child ? <span role="listitem" key={i}>{child}</span> : null
+                )}
+              </div>
+            )}
           </div>
         </div>
         {actions && <div className="flex items-center gap-2 flex-wrap">{actions}</div>}

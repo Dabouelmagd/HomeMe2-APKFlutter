@@ -1,0 +1,44 @@
+{
+  "summary": "Comprehensive testing of Company-to-Company Referral / Viral-Loop System (iter65). All 12 backend pytest cases PASSED + direct DB tests for award_referrer_credit idempotency + apply-credit happy path PASSED. Frontend Playwright verified the registration banner (valid CO-R3NDG2 + invalid CO-FAKE99 cases) and the CompanyReferralPanel on the testcompany2 dashboard (all KPIs, ref-link, copy/whatsapp/apply buttons, history toggle + list rows).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/company-admin/referral/my-link", "issue": "Returned `link` uses an old preview hostname (https://3df3f751-...preview.emergentagent.com/register?ref=...) because backend has no APP_URL env var and falls back to REACT_APP_BACKEND_URL inside the backend container which is stale. For production this fallback chain (APP_URL → REACT_APP_BACKEND_URL → https://homemeapp.net) should ensure APP_URL is explicitly set to the user-facing domain to avoid distributing dead share links."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/register?ref=CODE", "issues": ["Account-type cards: company_admin card visually highlighted (purple bg) but there is no input radio with value='company_admin' (it's a card-button selector). Functionally OK; just noting that strict `input[value=company_admin]:checked` testing requires using the visual highlight class instead."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter65_company_referrals.py",
+    "/app/backend/tests/test_iter65_award_credit_direct.py",
+    "/app/test_reports/pytest/iter65_referrals.xml"
+  ],
+  "action_items": [
+    "(Minor) Set APP_URL in backend/.env to the production user-facing hostname so the referral share link in /api/company-admin/referral/my-link returns the correct URL (currently leaks old preview hostname).",
+    "No critical fixes required — viral loop is functional end-to-end."
+  ],
+  "critical_code_review_comments": [
+    "company_referrals.py is well-structured (~430 LOC, single-responsibility) and uses async/await + excludes _id properly.",
+    "track_company_signup gracefully no-ops on bad code (good — registration must not fail because of ref).",
+    "award_referrer_credit idempotency is enforced via companies.referral_reward_given flag — verified twice in tests (1st call True, 2nd call False, no double credit).",
+    "apply-credit returns 400 with Arabic detail when pending < 30 ✓.",
+    "Suggestion: APP_URL fallback chain should prefer a hard-coded production domain over REACT_APP_BACKEND_URL since backend's REACT_APP_BACKEND_URL is often stale in container.",
+    "Suggestion: log the referral_code attempted but not matched in track_company_signup — useful for fraud/debug."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter65_company_referrals.py (NEW)",
+    "/app/backend/tests/test_iter65_award_credit_direct.py (NEW)"
+  ],
+  "success_rate": {"backend": "100% (12/12 pytest + direct DB test)", "frontend": "100% (banner valid+invalid, panel KPIs, link, copy/wa/apply buttons, history toggle+rows)"},
+  "test_credentials": "testcompany2/Company123!, superadmin/SuperAdmin2024!, test/test123 — all from /app/memory/test_credentials.md.",
+  "seed_data_creation": "Registration test created two companies (reftest_<ts> and reftest_inv_<ts>) under testcompany2's CO-R3NDG2 code. Direct DB test then awarded referral credit on one of the freshly-created companies, bringing testcompany2 to: total_signups=2, successful_referrals=2, pending_credit_days=30 (after apply-credit 30 -> 0 -> applied=30). Subscription expires_at extended by 30 days (recorded in credit_history). To reset for clean re-runs: run the cleanup script that zeroes pending_credit_days/applied_credit_days/successful_referrals/total_signups and unsets referred_by_company_id + referral_reward_given.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All endpoints functional. RBAC verified (resident → 403 on /api/company-admin/referral/my-link, 401/403 on super-admin dashboard). Idempotency of award is enforced. apply-credit pushes credit_history and extends company_subscriptions.expires_at. Referral panel renders all data-testids correctly. Only open item is the cosmetic APP_URL fallback that produces an old-preview share link.",
+  "rca_of_the_issue": "N/A — no critical bugs found."
+}

@@ -349,6 +349,7 @@ class UserCreate(BaseModel):
     unit_number: Optional[str] = None
     subscription_code: Optional[str] = None
     selected_plan: Optional[str] = None  # company_admin only: starter|company_startup|company_business|company_enterprise
+    referral_code: Optional[str] = None  # company_admin only: CO-XXXXXX from referrer's share link
 
 
 class SubscriptionCode(BaseModel):

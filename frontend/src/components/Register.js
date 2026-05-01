@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../App';
+import axios from 'axios';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import {
@@ -13,11 +14,16 @@ import {
 } from '@heroicons/react/24/outline';
 import RegistrationPlanPicker from './RegistrationPlanPicker';
 
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
 const Register = () => {
   const { t } = useTranslation();
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [step, setStep] = useState('choose'); // choose, form
+  const [searchParams] = useSearchParams();
+  const refCode = (searchParams.get('ref') || '').trim().toUpperCase();
+  const [refInfo, setRefInfo] = useState(null);  // { valid, referrer_company_name }
+  const [step, setStep] = useState('choose');
   const [accountType, setAccountType] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('starter');
@@ -26,6 +32,22 @@ const Register = () => {
     full_name: '', phone: '', compound_name: '', company_name: '',
     unit_number: '', subscription_code: ''
   });
+
+  // Validate referral code on mount + auto-pick company_admin path if a ref is present
+  useEffect(() => {
+    if (!refCode) return;
+    axios.get(`${API}/public/referral/lookup/${refCode}`)
+      .then((res) => {
+        if (res.data?.valid) {
+          setRefInfo(res.data);
+          // Pre-select company_admin since referrals only reward company-to-company
+          setAccountType('company_admin');
+        } else {
+          setRefInfo({ valid: false });
+        }
+      })
+      .catch(() => setRefInfo({ valid: false }));
+  }, [refCode]);
 
   const accountTypes = [
     {
@@ -88,7 +110,10 @@ const Register = () => {
         unit_number: formData.unit_number,
         subscription_code: formData.subscription_code,
         compound_id: '',
-        ...(accountType === 'company_admin' ? { selected_plan: selectedPlan } : {}),
+        ...(accountType === 'company_admin' ? {
+          selected_plan: selectedPlan,
+          ...(refInfo?.valid ? { referral_code: refCode } : {}),
+        } : {}),
       };
 
       const result = await register(registerData);
@@ -116,6 +141,32 @@ const Register = () => {
             className="h-24 w-auto mx-auto mb-3"
           />
         </div>
+
+        {/* Referral banner — shown when registering via a valid ref link */}
+        {refInfo?.valid && (
+          <div
+            className="mb-4 bg-gradient-to-r from-emerald-50 via-white to-indigo-50 border border-emerald-300 rounded-xl p-4 flex items-center gap-3"
+            data-testid="referral-banner"
+          >
+            <div className="text-3xl">🎉</div>
+            <div className="flex-1 text-right">
+              <div className="text-sm font-bold text-gray-900">
+                مرحباً! أنت مدعو من <span className="text-emerald-700">{refInfo.referrer_company_name}</span>
+              </div>
+              <div className="text-[11px] text-gray-600 mt-0.5">
+                التسجيل سيتم تتبعه لحسابهم. الكود: <code className="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono">{refCode}</code>
+              </div>
+            </div>
+          </div>
+        )}
+        {refCode && refInfo && !refInfo.valid && (
+          <div
+            className="mb-4 bg-amber-50 border border-amber-300 rounded-xl p-3 text-center text-xs text-amber-800"
+            data-testid="referral-banner-invalid"
+          >
+            ⚠️ كود الإحالة <code className="font-mono">{refCode}</code> غير صالح، لكن يمكنك المتابعة بالتسجيل العادي.
+          </div>
+        )}
 
         {/* Step 1: Choose Account Type */}
         {step === 'choose' && (

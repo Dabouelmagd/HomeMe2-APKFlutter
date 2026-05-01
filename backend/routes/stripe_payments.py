@@ -86,6 +86,15 @@ async def _activate_subscription(db, session_id: str, metadata: dict):
     )
     logging.info(f"[stripe] subscription activated company={company_id} plan={plan_key} expires_at={expires_at}")
 
+    # Referral reward — if this company was referred, award their referrer a free month (idempotent)
+    try:
+        from routes.company_referrals import award_referrer_credit
+        awarded = await award_referrer_credit(company_id)
+        if awarded:
+            logging.info(f"[stripe] referral reward awarded to referrer of company={company_id}")
+    except Exception as _re:
+        logging.warning(f"[stripe] referral reward failed for company={company_id}: {_re}")
+
 
 # ---------------------------------------------------------------------------
 # 1. Create Checkout Session

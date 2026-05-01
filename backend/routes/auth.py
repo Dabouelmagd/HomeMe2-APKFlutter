@@ -139,6 +139,15 @@ async def register(user_data: UserCreate, request: Request):
             upsert=True,
         )
 
+        # Referral tracking — link the new company to its referrer (if any)
+        if getattr(user_data, "referral_code", None):
+            try:
+                from routes.company_referrals import track_company_signup
+                await track_company_signup(new_company_id, user_data.referral_code)
+            except Exception as _re:
+                import logging as _lg
+                _lg.warning(f"referral tracking failed: {_re}")
+
     # Apply subscription code after user is created
     if subscription_info:
         await SubscriptionCodeManager.apply_code(

@@ -8,6 +8,7 @@ import CompanyPlanUsageCard from '../components/CompanyPlanUsageCard';
 import CompoundOnboardingWizard from '../components/company-admin/CompoundOnboardingWizard';
 import AggregatedStatsPanel from '../components/company-admin/AggregatedStatsPanel';
 import CrmRetentionPanel from '../components/company-admin/CrmRetentionPanel';
+import CompanyReferralPanel from '../components/company-admin/CompanyReferralPanel';
 import UserTimelineModal from '../components/UserTimelineModal';
 import PageHeader from '../components/shared/PageHeader';
 import SectionCard from '../components/shared/SectionCard';
@@ -197,6 +198,19 @@ const CompanyAdminDashboard = () => {
           <CrmRetentionPanel
             refreshKey={refreshKey}
             onUserClick={(u) => setCrmUser(u)}
+          />
+        </SectionCard>
+
+        {/* Referral Panel — viral loop, earn free months by inviting other companies */}
+        <SectionCard
+          title="🚀 برنامج الإحالة"
+          subtitle="ادعُ شركات صديقة، اربح أشهر مجانية"
+          variant="light"
+          testId="cad-referral-section"
+        >
+          <CompanyReferralPanel
+            refreshKey={refreshKey}
+            onRefresh={() => setRefreshKey(k => k + 1)}
           />
         </SectionCard>
 

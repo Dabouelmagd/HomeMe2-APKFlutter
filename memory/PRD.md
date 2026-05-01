@@ -1301,6 +1301,12 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 75: Changelog Modal — "What's New" post-update ✅ (2026-05-01)
+- **Backend `routes/app_version.py`**: `/api/version` now returns a `changelog` array of 5 user-facing bullets in **3 languages** (ar/en/fr). Update the list manually with each release — short, friendly strings only.
+- **Frontend `AppVersionGuard.js`**: when a new version is detected, captures `data.changelog` and stores it under `app_changelog_pending` in localStorage just before the hard reload.
+- **New `components/ChangelogModal.js`**: mounts at App root, reads `app_changelog_pending` on every load, picks the user's locale (ar/en/fr from i18next or `<html lang>`), renders a polished violet-gradient modal with numbered bullets and a "يلا نبدأ 🎉" CTA, then clears the key (one-shot — never re-shown for the same release).
+- **Verified via Playwright**: injected mock changelog → reloaded → modal appeared with 4 numbered items in correct Arabic + RTL layout → clicking the CTA closed the modal AND cleared `app_changelog_pending` from localStorage as expected.
+
 ### Iter 74: Auto-Update Banner (UX-friendly) ✅ (2026-05-01)
 - **Replaced** the silent auto-reload behavior in `AppVersionGuard.js` with a friendly top banner: "📦 إصدار جديد متاح من التطبيق — اضغطي تحديث الآن للحصول على آخر التغييرات".
 - **Two actions**: 🔄 **تحديث الآن** (clears caches + SW + hard reload, preserving auth/sessions) — **لاحقًا** (snoozes for 30 min via `app_update_snooze_until` localStorage key).

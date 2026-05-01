@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const STORAGE_KEY = 'app_build_version';
 const SNOOZE_KEY = 'app_update_snooze_until'; // epoch ms
+const CHANGELOG_PENDING_KEY = 'app_changelog_pending'; // read by ChangelogModal after reload
 const POLL_MS = 5 * 60 * 1000; // every 5 minutes
 const SNOOZE_MS = 30 * 60 * 1000; // 30 minutes
 
@@ -22,6 +23,7 @@ const SNOOZE_MS = 30 * 60 * 1000; // 30 minutes
  */
 const AppVersionGuard = () => {
   const [newVersion, setNewVersion] = useState(null); // string when banner should show
+  const [pendingChangelog, setPendingChangelog] = useState(null); // captured changelog array
   const [reloading, setReloading] = useState(false);
   const reloadingRef = useRef(false);
 
@@ -46,6 +48,9 @@ const AppVersionGuard = () => {
           return;
         }
         if (stored !== current && !isSnoozed()) {
+          // Capture the changelog so we can persist it to localStorage right
+          // before the reload — ChangelogModal will pick it up on next mount.
+          if (Array.isArray(data?.changelog)) setPendingChangelog(data.changelog);
           // Don't update STORAGE_KEY yet — only after the user confirms,
           // so the banner re-appears on next poll if they navigate away.
           setNewVersion(current);
@@ -73,9 +78,15 @@ const AppVersionGuard = () => {
     reloadingRef.current = true;
     setReloading(true);
 
-    // Persist the new version so we don't loop into the banner after reload.
+    // Persist the new version + pending changelog so ChangelogModal can show
+    // it after the reload, and we don't loop into the banner.
     if (newVersion) localStorage.setItem(STORAGE_KEY, newVersion);
     localStorage.removeItem(SNOOZE_KEY);
+    if (pendingChangelog && pendingChangelog.length > 0) {
+      try {
+        localStorage.setItem(CHANGELOG_PENDING_KEY, JSON.stringify(pendingChangelog));
+      } catch { /* quota exceeded — non-fatal, skip changelog */ }
+    }
 
     // Preserve auth + per-tab session keys.
     const token = localStorage.getItem('token');

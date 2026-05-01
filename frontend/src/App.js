@@ -65,6 +65,7 @@ import VisitorPassesPage from './pages/VisitorPassesPage';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
 import AppVersionGuard from './components/AppVersionGuard';
+import ChangelogModal from './components/ChangelogModal';
 import PdfReportsPage from './pages/PdfReportsPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
@@ -633,6 +634,7 @@ function App() {
   return (
     <div className="App">
       <AppVersionGuard />
+      <ChangelogModal />
       <BrowserRouter>
         <ScrollToTop />
         <ThemeProvider>

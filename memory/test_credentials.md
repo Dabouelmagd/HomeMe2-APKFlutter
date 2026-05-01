@@ -19,7 +19,17 @@
 - Password: Company123!
 - Role: company_admin
 - company_id: ab8e7501-964c-4424-859f-af16ba8ad2e5 (شركة المعمار الحديث)
+- Plan: company_enterprise (كل الـ feature_flags مفعّلة)
+- Compounds: 2 (كمبوند مدينتي + كمبوند الرحاب)
 - Dashboard: CompanyAdminDashboard (auto-routed on login)
+
+## Company Admin — خطة مجانية (لاختبار Onboarding/feature gating)
+- Username: newco_admin
+- Password: NewCo123!
+- Role: company_admin
+- Company: شركة الاختبار للأونبوردنج (compound_ids: [] فارغة)
+- Plan: starter (مجاني — pdf_excel_exports = false)
+- يعرض Onboarding Wizard فوراً عند الدخول
 
 ## Test Admin (if created)
 - Username: admin

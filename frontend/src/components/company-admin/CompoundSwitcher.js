@@ -31,10 +31,23 @@ const CompoundSwitcher = () => {
     if (!eligible) return;
     const token = localStorage.getItem('token');
     if (!token) return;
-    axios
-      .get(`${API}/company-admin/compounds`, { headers: { Authorization: `Bearer ${token}` } })
-      .then((res) => setCompounds(res.data?.compounds || []))
-      .catch(() => setCompounds([]));
+    let alive = true;
+    const fetchCompounds = () => {
+      axios
+        .get(`${API}/company-admin/compounds`, { headers: { Authorization: `Bearer ${token}` } })
+        .then((res) => { if (alive) setCompounds(res.data?.compounds || []); })
+        .catch(() => { if (alive) setCompounds([]); });
+    };
+    fetchCompounds();
+    // Re-fetch when the dashboard refreshes (e.g. after Onboarding wizard creates new compounds)
+    const onRefresh = () => fetchCompounds();
+    window.addEventListener('planUsageRefresh', onRefresh);
+    window.addEventListener('compoundSwitched', onRefresh);
+    return () => {
+      alive = false;
+      window.removeEventListener('planUsageRefresh', onRefresh);
+      window.removeEventListener('compoundSwitched', onRefresh);
+    };
   }, [eligible]);
 
   // Close dropdown on outside click

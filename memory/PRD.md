@@ -5,6 +5,38 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 66: E2E Onboarding fix + Real Feature Gating + Upgrade UX (May 1, 2026) ✅
+
+**🐛 Bug Fixed during E2E test of Onboarding flow:**
+- Generic `OnboardingWizard.js` (the resident-onboarding popup with "أهلاً بكِ في HomeMe") was opening on top of the new `CompoundOnboardingWizard` and intercepting clicks on its inputs/buttons.
+- **Fix**: Added role-skip in `OnboardingWizard.js` — it now early-returns for `company_admin / assistant_manager / accountant / super_admin / app_owner` so management-company roles get only their dedicated wizard.
+
+**🔄 CompoundSwitcher live-refresh:**
+- Subscribes to `planUsageRefresh` and `compoundSwitched` window events → re-fetches `/api/company-admin/compounds` so newly-created compounds (via Onboarding Wizard or "إضافة مجمع" button) appear in the switcher pill immediately, no page refresh needed.
+- `CompoundOnboardingWizard.onComplete` now dispatches `planUsageRefresh` before calling `reload()`.
+
+**🎚 REAL Feature Gating (PDF/Excel exports):**
+- New helper `plan_limits.gate_company_feature(current_user, feature_key, name_ar)` — no-op for users without `company_id`, otherwise enforces `assert_feature_enabled`.
+- Applied to:
+  - `routes/exports.py :: GET /api/financial/export-excel`
+  - `routes/exports.py :: GET /api/residents/{id}/export-pdf`
+  - `routes/pdf_reports.py :: GET /api/reports/unit/{id}/statement`
+  - `routes/pdf_reports.py :: GET /api/reports/compound/{id}/occupancy|invoices|summary`
+- Behaviour: starter (free) → 403 with structured `{code:'plan_limit_feature', message, current_plan_name_ar}`. Enterprise → 200 (delivered 7749-byte xlsx). Standalone admins (no company_id) → unaffected.
+
+**📣 Upgrade UX — Global Axios Response Interceptor:**
+- `App.js` now intercepts every 4xx/5xx response. When status=403 and `detail.code` is `plan_limit_feature | plan_limit_compounds | plan_limit_residents`, fires a `sonner` toast with the Arabic message + an action button "🚀 ترقية الخطة" that:
+  1. Navigates to `/app/dashboard`
+  2. Dispatches `openUpgradeModal` event.
+- `CompanyPlanUsageCard` listens for `openUpgradeModal` → opens its existing 4-plan comparison modal.
+- Net effect: any feature-gated 403 from anywhere in the app → polished "you need to upgrade" toast → one click → upgrade modal opens. No need to update each calling component.
+
+**🧪 Verification:**
+- E2E onboarding flow: newco_admin login → wizard appears → fill 1 compound → save → dashboard renders → logout → re-login → wizard NOT shown again, dashboard direct (verified via Playwright).
+- 403 contracts verified via curl: starter blocked, enterprise allowed, message in Arabic with plan name.
+- Test data: `newco_admin / NewCo123!` (free plan, empty company) ready for user to test Onboarding from a clean state.
+
+
 ### Iter 65: Compound Switcher + Plan Feature Flags (May 1, 2026) ✅
 
 **🏘️ Compound Switcher (per user request):**

@@ -137,7 +137,10 @@ const CompanyAdminDashboard = () => {
     return (
       <CompoundOnboardingWizard
         companyName={company.name}
-        onComplete={() => { reload(); }}
+        onComplete={() => {
+          window.dispatchEvent(new CustomEvent('planUsageRefresh'));
+          reload();
+        }}
         onSkip={() => { localStorage.setItem('cad_onboarding_skipped', '1'); setOnboardingSkipped(true); }}
       />
     );

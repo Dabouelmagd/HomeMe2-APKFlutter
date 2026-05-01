@@ -186,6 +186,33 @@ const AuthProvider = ({ children }) => {
       return config;
     });
 
+    // Surface plan-limit / feature-gate errors as a friendly upgrade toast.
+    // Backend returns: 403 { detail: { code: 'plan_limit_feature'|'plan_limit_compounds'|'plan_limit_residents', message, current_plan_name_ar } }
+    const resInterceptorId = axios.interceptors.response.use(
+      (resp) => resp,
+      (err) => {
+        const detail = err?.response?.data?.detail;
+        if (
+          err?.response?.status === 403 &&
+          detail && typeof detail === 'object' &&
+          (detail.code === 'plan_limit_feature' || detail.code === 'plan_limit_compounds' || detail.code === 'plan_limit_residents')
+        ) {
+          // Lazy import to avoid circular dep at module load
+          import('sonner').then(({ toast }) => {
+            toast.error(detail.message || 'هذه الميزة غير متاحة في خطتك الحالية', {
+              description: detail.current_plan_name_ar ? `الخطة الحالية: ${detail.current_plan_name_ar}` : undefined,
+              duration: 6500,
+              action: {
+                label: '🚀 ترقية الخطة',
+                onClick: () => { window.location.href = '/app/dashboard'; window.dispatchEvent(new CustomEvent('openUpgradeModal')); },
+              },
+            });
+          }).catch(() => {});
+        }
+        return Promise.reject(err);
+      }
+    );
+
     // Get this tab's session
     const session = getCurrentSession();
     const token = session?.token || localStorage.getItem('token');
@@ -246,7 +273,10 @@ const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
-    return () => { axios.interceptors.request.eject(reqInterceptorId); };
+    return () => {
+      axios.interceptors.request.eject(reqInterceptorId);
+      axios.interceptors.response.eject(resInterceptorId);
+    };
   }, []);
 
   const initializeSocket = (userId) => {

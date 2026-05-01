@@ -12,6 +12,7 @@ from database import get_db
 from auth_deps import get_current_user, require_admin
 from helpers import serialize_datetime
 from pdf_report_service import PDFReportService
+from plan_limits import gate_company_feature
 
 router = APIRouter(prefix="/api")
 
@@ -22,6 +23,7 @@ async def export_financial_excel(
     month: Optional[int] = None,
     current_user: dict = Depends(require_admin)
 ):
+    await gate_company_feature(current_user, "pdf_excel_exports", "تصدير Excel/PDF")
     import openpyxl
     from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
@@ -237,6 +239,7 @@ async def get_resident_profile(
 
 @router.get("/residents/{resident_id}/export-pdf")
 async def export_resident_pdf(resident_id: str, current_user: dict = Depends(require_admin)):
+    await gate_company_feature(current_user, "pdf_excel_exports", "تصدير Excel/PDF")
     from reportlab.lib import colors
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle

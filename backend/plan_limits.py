@@ -92,6 +92,20 @@ async def assert_feature_enabled(company_id: str, feature_key: str, feature_name
     )
 
 
+async def gate_company_feature(current_user: dict, feature_key: str, feature_name_ar: str = None):
+    """Convenience wrapper for routes: gate ONLY if the user belongs to a management company.
+    
+    - If user has company_id → enforce the feature flag (raises 403 if disabled).
+    - If user has no company_id → no-op (admins of standalone compounds keep all features).
+    """
+    if not current_user:
+        return None
+    company_id = current_user.get("company_id")
+    if not company_id:
+        return None
+    return await assert_feature_enabled(company_id, feature_key, feature_name_ar)
+
+
 async def assert_can_add_compound(company_id: str) -> dict:
     """Raise 403 with structured error if adding a compound would exceed the limit.
     Returns the plan info on success."""

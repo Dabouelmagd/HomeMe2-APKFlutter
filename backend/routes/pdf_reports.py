@@ -22,6 +22,7 @@ from services.pdf_report_service import (
     render_summary_report,
 )
 from services.branding import get_compound_branding
+from plan_limits import gate_company_feature
 
 router = APIRouter(prefix="/api/reports")
 
@@ -57,6 +58,7 @@ async def unit_statement(
     month: str = Query(..., description="YYYY-MM"),
     current_user: dict = Depends(get_current_user),
 ):
+    await gate_company_feature(current_user, "pdf_excel_exports", "تقارير PDF")
     db = get_db()
     user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
     if not user:
@@ -128,6 +130,7 @@ async def occupancy_report(
     month: str = Query(..., description="YYYY-MM"),
     current_user: dict = Depends(get_current_user),
 ):
+    await gate_company_feature(current_user, "pdf_excel_exports", "تقارير PDF")
     db = get_db()
     if not _can_access_compound(current_user, compound_id):
         raise HTTPException(status_code=403, detail="Access denied")
@@ -180,6 +183,7 @@ async def invoices_report(
     month: str = Query(..., description="YYYY-MM"),
     current_user: dict = Depends(get_current_user),
 ):
+    await gate_company_feature(current_user, "pdf_excel_exports", "تقارير PDF")
     db = get_db()
     if not _can_access_compound(current_user, compound_id):
         raise HTTPException(status_code=403, detail="Access denied")
@@ -230,6 +234,7 @@ async def summary_report(
     month: str = Query(..., description="YYYY-MM"),
     current_user: dict = Depends(get_current_user),
 ):
+    await gate_company_feature(current_user, "pdf_excel_exports", "تقارير PDF")
     db = get_db()
     if not _can_access_compound(current_user, compound_id):
         raise HTTPException(status_code=403, detail="Access denied")

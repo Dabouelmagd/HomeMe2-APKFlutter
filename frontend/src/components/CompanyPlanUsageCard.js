@@ -45,7 +45,13 @@ export const CompanyPlanUsageCard = () => {
     fetchUsage();
     const handler = () => fetchUsage();
     window.addEventListener('planUsageRefresh', handler);
-    return () => window.removeEventListener('planUsageRefresh', handler);
+    // Open upgrade modal in response to plan-gated 403 errors handled by axios interceptor
+    const onOpenUpgrade = () => setShowUpgrade(true);
+    window.addEventListener('openUpgradeModal', onOpenUpgrade);
+    return () => {
+      window.removeEventListener('planUsageRefresh', handler);
+      window.removeEventListener('openUpgradeModal', onOpenUpgrade);
+    };
   }, []);
 
   if (loading) return <div className="h-28 rounded-2xl bg-gray-100 dark:bg-gray-800 animate-pulse" />;

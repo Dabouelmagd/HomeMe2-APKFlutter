@@ -77,6 +77,12 @@ const OnboardingWizard = () => {
 
   useEffect(() => {
     if (!user || !user.id || !onAppRoute) return undefined;
+    // Skip the generic owner-style onboarding for management-company roles —
+    // they have their own dedicated CompoundOnboardingWizard at the dashboard root.
+    const role = user.active_role || user.role;
+    if (['company_admin', 'assistant_manager', 'accountant', 'super_admin', 'app_owner'].includes(role)) {
+      return undefined;
+    }
     let alive = true;
     (async () => {
       try {

@@ -38,8 +38,12 @@ export default function SmokeTestCard() {
       const res = await axios.post(`${API}/system/smoke-test/run`, {}, auth());
       setLast(res.data);
       const ok = res.data?.deploy_safe;
-      if (ok) toast.success(`✅ كل ${res.data.total} اختبار نجح — جاهز للنشر`);
-      else toast.error(`❌ ${res.data.failed}/${res.data.total} اختبار فشل — لا تنشر التطبيق!`);
+      if (ok) {
+        const sk = res.data?.skipped || 0;
+        toast.success(sk > 0
+          ? `✅ ${res.data.passed - sk}/${res.data.total - sk} اختبار حرج نجح (${sk} متخطّى — بيئة prod) — جاهز للنشر`
+          : `✅ كل ${res.data.total} اختبار نجح — جاهز للنشر`);
+      } else toast.error(`❌ ${res.data.failed}/${res.data.total} اختبار فشل — لا تنشر التطبيق!`);
       await load();
     } catch (e) {
       toast.error(e.response?.data?.detail || 'فشل تشغيل smoke test');
@@ -59,7 +63,17 @@ export default function SmokeTestCard() {
       return { tone: 'amber', title: 'لم يتم تشغيل smoke test بعد', sub: 'اضغطي "تشغيل الآن" لفحص جاهزية النشر' };
     }
     if (deploySafe && !isStale) {
-      return { tone: 'emerald', title: '✅ جاهز للنشر — كل الاختبارات الحرجة ناجحة', sub: `${last.passed}/${last.total} اختبار · آخر تشغيل ${new Date(last.started_at).toLocaleString('ar-EG')}` };
+      const sk = last?.skipped || 0;
+      const total = last?.total || 0;
+      const passedCount = (last?.passed || 0) - sk;
+      const relevantTotal = total - sk;
+      return {
+        tone: 'emerald',
+        title: '✅ جاهز للنشر — كل الاختبارات الحرجة ناجحة',
+        sub: sk > 0
+          ? `${passedCount}/${relevantTotal} اختبار حرج · ${sk} متخطّى (حسابات اختبار غير متوفّرة في prod) · آخر تشغيل ${new Date(last.started_at).toLocaleString('ar-EG')}`
+          : `${last.passed}/${last.total} اختبار · آخر تشغيل ${new Date(last.started_at).toLocaleString('ar-EG')}`,
+      };
     }
     if (!deploySafe) {
       return { tone: 'rose', title: '🚫 لا تنشر — اختبارات حرجة فاشلة!', sub: `${last.failed}/${last.total} اختبار فشل · يجب الإصلاح أولاً` };
@@ -97,6 +111,7 @@ export default function SmokeTestCard() {
           <div className="mt-4 flex gap-2 flex-wrap text-xs">
             <span className="px-2 py-1 rounded-full bg-white/20">إجمالي: {last.total}</span>
             <span className="px-2 py-1 rounded-full bg-emerald-500/40" data-testid="smoke-passed-count">نجح: {last.passed}</span>
+            {last.skipped > 0 && <span className="px-2 py-1 rounded-full bg-slate-500/50" data-testid="smoke-skipped-count">متخطّى: {last.skipped}</span>}
             <span className="px-2 py-1 rounded-full bg-rose-600/60" data-testid="smoke-failed-count">فشل: {last.failed}</span>
             <span className="px-2 py-1 rounded-full bg-white/20">⏱ {last.duration_ms}ms</span>
           </div>
@@ -109,17 +124,25 @@ export default function SmokeTestCard() {
             <div>
               <h4 className="font-bold text-sm text-gray-800 dark:text-gray-100 mb-2">نتائج الاختبارات</h4>
               <div className="space-y-1.5">
-                {last.results.map(r => (
-                  <div key={r.name} className={`flex items-center gap-3 p-2 rounded-lg ${r.passed ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-rose-50 dark:bg-rose-950/30'}`} data-testid={`smoke-row-${r.name}`}>
-                    <span className="text-lg">{r.passed ? '✅' : '❌'}</span>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold">
-                      {CATEGORY_LABELS[r.category] || r.category}
-                    </span>
-                    <span className="font-mono text-sm flex-1 text-gray-800 dark:text-gray-100">{r.name}</span>
-                    {r.status_code && <span className={`text-xs font-bold ${r.status_code < 300 ? 'text-emerald-700' : r.status_code < 500 ? 'text-amber-700' : 'text-rose-700'}`}>{r.status_code}</span>}
-                    <span className="text-xs text-gray-500 w-16 text-left">{r.ms || 0}ms</span>
-                  </div>
-                ))}
+                {last.results.map(r => {
+                  const isSkipped = r.skipped;
+                  const bg = isSkipped
+                    ? 'bg-slate-50 dark:bg-slate-800/30'
+                    : r.passed ? 'bg-emerald-50 dark:bg-emerald-950/30' : 'bg-rose-50 dark:bg-rose-950/30';
+                  const icon = isSkipped ? '⏭️' : r.passed ? '✅' : '❌';
+                  return (
+                    <div key={r.name} className={`flex items-center gap-3 p-2 rounded-lg ${bg}`} data-testid={`smoke-row-${r.name}`}>
+                      <span className="text-lg">{icon}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold">
+                        {CATEGORY_LABELS[r.category] || r.category}
+                      </span>
+                      <span className="font-mono text-sm flex-1 text-gray-800 dark:text-gray-100">{r.name}</span>
+                      {r.note && <span className="text-[10px] text-gray-500 italic">{r.note}</span>}
+                      {r.status_code ? <span className={`text-xs font-bold ${r.status_code < 300 ? 'text-emerald-700' : r.status_code < 500 ? 'text-amber-700' : 'text-rose-700'}`}>{r.status_code}</span> : null}
+                      <span className="text-xs text-gray-500 w-16 text-left">{r.ms || 0}ms</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           ) : null}

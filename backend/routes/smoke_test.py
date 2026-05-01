@@ -174,7 +174,7 @@ async def smoke_test_monitor_loop():
             summary = await run_smoke_tests()
             db = get_db()
             await _persist(db, summary, source="auto:monitor")
-            failed_now = {r["name"] for r in summary.get("results", []) if not r.get("passed")}
+            failed_now = {r["name"] for r in summary.get("results", []) if not r.get("passed") and not r.get("skipped")}
             total = summary.get("total", 0)
             failed = summary.get("failed", 0)
 

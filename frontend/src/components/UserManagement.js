@@ -33,6 +33,7 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
+  const [showSystemAccounts, setShowSystemAccounts] = useState(false);
   const [showAddUser, setShowAddUser] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [viewingUser, setViewingUser] = useState(null);
@@ -57,7 +58,7 @@ const UserManagement = () => {
 
   useEffect(() => {
     filterUsers();
-  }, [searchQuery, selectedRole, users]);
+  }, [searchQuery, selectedRole, showSystemAccounts, users]);
 
   const loadUsersData = async () => {
     try {
@@ -79,6 +80,12 @@ const UserManagement = () => {
 
   const filterUsers = () => {
     let filtered = [...users];
+
+    // System accounts filter (hide super_admin & app_owner by default)
+    const SYSTEM_ROLES = new Set(['super_admin', 'app_owner']);
+    if (!showSystemAccounts) {
+      filtered = filtered.filter(u => !SYSTEM_ROLES.has(u.role));
+    }
 
     // Search filter
     if (searchQuery.trim()) {
@@ -285,6 +292,22 @@ const UserManagement = () => {
             <option value="resident">{t('resident')}</option>
             <option value="staff">{t('staff')}</option>
           </select>
+
+          {/* System accounts toggle — only for Owner / Super Admin */}
+          {(user?.role === 'app_owner' || user?.role === 'super_admin') && (
+            <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 bg-white" title="إظهار حسابات النظام (Super Admin / App Owner)">
+              <input
+                type="checkbox"
+                checked={showSystemAccounts}
+                onChange={(e) => setShowSystemAccounts(e.target.checked)}
+                className="h-4 w-4 text-purple-600 rounded border-gray-300 focus:ring-purple-500"
+                data-testid="toggle-system-accounts"
+              />
+              <span className="text-sm text-gray-700 font-medium whitespace-nowrap">
+                {showSystemAccounts ? '👁️ إظهار حسابات النظام' : '🙈 إخفاء حسابات النظام'}
+              </span>
+            </label>
+          )}
         </div>
 
         {/* Stats Cards */}

@@ -115,9 +115,9 @@ async def get_my_referral_link(
     company = await db.companies.find_one({"id": cid}, {"_id": 0, "name": 1})
     doc = await _ensure_referral_doc(db, cid)
 
-    # Build shareable link
+    # Build shareable link — prefer explicit APP_URL > the production domain > stale fallback
     import os as _os
-    app_url = (_os.environ.get("APP_URL") or _os.environ.get("REACT_APP_BACKEND_URL")
+    app_url = (_os.environ.get("APP_URL")
                or "https://homemeapp.net").rstrip("/")
     link = f"{app_url}/register?ref={doc['code']}"
 
@@ -304,6 +304,11 @@ async def track_company_signup(new_company_id: str, ref_code: str) -> bool:
         return False
     ref = await db.company_referrals.find_one({"code": code}, {"_id": 0})
     if not ref:
+        try:
+            import logging as _lg
+            _lg.info(f"[referral] track_company_signup: code not found = {code}")
+        except Exception:
+            pass
         return False
     referrer_id = ref.get("company_id")
     if not referrer_id or referrer_id == new_company_id:

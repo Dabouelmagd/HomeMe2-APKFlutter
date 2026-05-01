@@ -3,7 +3,30 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-64)
+## Latest Fixes (Feb 2026 — iterations 26-65)
+
+### Iter 77: Company-to-Company Referral / Viral-Loop System (May 1, 2026) ✅
+
+**🚀 Companies invite other companies → earn 30 days free per successful paid signup → auto-extend their own subscription.**
+
+**Backend (`routes/company_referrals.py`, ~430 LOC):**
+- Auto-generated unique code per company `CO-XXXXXX` (alphanumeric, no confusing chars).
+- `GET /api/company-admin/referral/my-link` → code, link, total_signups, successful_referrals, pending_credit_days, applied_credit_days, share_message.
+- `GET /api/company-admin/referral/history` → list of referred companies + their plan/status + credit ledger.
+- `POST /api/company-admin/referral/apply-credit` → consumes 30 pending days, extends `company_subscriptions.expires_at` by 30, pushes credit_history entry, notifies user.
+- `GET /api/public/referral/lookup/{code}` → validates code at signup-time (returns referrer company name).
+- `GET /api/super-admin/referral/dashboard` → global KPIs + top-10 referrers.
+- Hooks:
+  - **`auth.py`** — `track_company_signup()` called after `company_admin` registers (sets `companies.referred_by_company_id` + `referred_by_code`, increments referrer counter).
+  - **`stripe_payments._activate_subscription`** — `award_referrer_credit()` called when a referred company's first paid subscription activates. Idempotent via `companies.referral_reward_given` flag.
+
+**Frontend:**
+- `Register.js` accepts `?ref=CO-XXXXXX`, validates via public lookup, auto-selects company_admin path, shows green emerald banner ("مرحباً! أنت مدعو من …") + amber banner if code invalid.
+- `CompanyReferralPanel.js` (rendered inside `CompanyAdminDashboard` SectionCard): 4 KPI cards (signups/successful/pending/applied), copy-link + WhatsApp-share buttons, conditional **"طبّق 30 يوم على اشتراكي"** CTA, drillable history list of invited companies + credit ledger.
+
+**🧪 Iter 65 testing agent: 24/24 backend pytest green + 100% Playwright FE.** Zero critical bugs. Idempotency verified twice (1st call awards, 2nd no-ops). Cosmetic fix applied: `APP_URL` fallback no longer leaks stale container hostnames; logs unmatched ref codes for fraud/debug.
+
+---
 
 ### Iter 76: Design System Living Style-Guide (May 1, 2026) ✅
 

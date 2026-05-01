@@ -2508,6 +2508,9 @@ app.include_router(impersonate_router)
 
 from routes.disaster_recovery import router as disaster_recovery_router
 app.include_router(disaster_recovery_router)
+
+from routes.stripe_payments import router as stripe_payments_router
+app.include_router(stripe_payments_router)
 from routes.user_timeline import router as user_timeline_router
 app.include_router(user_timeline_router)
 app.include_router(sidebar_alerts_router)

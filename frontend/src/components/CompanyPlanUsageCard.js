@@ -157,9 +157,34 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
     fetch();
   }, []);
 
-  const requestUpgrade = (targetPlan) => {
-    // Deep-link to support-payment form with plan pre-filled
-    window.location.href = `/app/support?tab=payment&plan=${targetPlan}`;
+  const [upgrading, setUpgrading] = useState(null);
+
+  const requestUpgrade = async (targetPlan) => {
+    // Starter plan is free → no payment needed; fall back to the old support flow
+    if (targetPlan === 'starter') {
+      window.location.href = '/app/support?tab=payment';
+      return;
+    }
+    try {
+      setUpgrading(targetPlan);
+      const res = await axios.post(
+        `${API}/stripe/create-checkout-session`,
+        { plan_key: targetPlan, origin_url: window.location.origin },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+        return;
+      }
+      throw new Error('No checkout URL returned');
+    } catch (err) {
+      const msg = err?.response?.data?.detail || 'فشل فتح صفحة الدفع';
+      try {
+        const { toast } = await import('sonner');
+        toast.error(typeof msg === 'string' ? msg : 'فشل فتح صفحة الدفع');
+      } catch { /* noop */ }
+      setUpgrading(null);
+    }
   };
 
   return (
@@ -231,17 +256,20 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
                 </ul>
                 <button
                   onClick={() => !isCurrent && requestUpgrade(p.key)}
-                  disabled={isCurrent || !isUpgrade}
+                  disabled={isCurrent || !isUpgrade || upgrading === p.key}
                   className={`mt-3 w-full px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
                     isCurrent
                       ? 'bg-gray-200 dark:bg-gray-700 text-gray-500 cursor-not-allowed'
                       : isUpgrade
-                        ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-md'
+                        ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-md disabled:opacity-60'
                         : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
                   }`}
                   data-testid={`upgrade-cta-${p.key}`}
                 >
-                  {isCurrent ? 'خطتك الحالية' : isUpgrade ? 'ترقية الآن' : 'خطة أقل'}
+                  {upgrading === p.key ? '⏳ جارٍ فتح صفحة الدفع...' :
+                   isCurrent ? 'خطتك الحالية' :
+                   isUpgrade ? (p.monthly_egp > 0 ? '💳 الدفع والترقية' : 'ترقية الآن') :
+                   'خطة أقل'}
                 </button>
               </div>
             );

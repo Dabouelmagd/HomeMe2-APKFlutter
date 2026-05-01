@@ -61,6 +61,8 @@ import SystemHealthPage from './pages/SystemHealthPage';
 import AuditLogPage from './pages/AuditLogPage';
 import OwnerKpiPage from './pages/OwnerKpiPage';
 import VisitorPassesPage from './pages/VisitorPassesPage';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentCancel from './pages/PaymentCancel';
 import PdfReportsPage from './pages/PdfReportsPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
@@ -748,6 +750,14 @@ function App() {
 
                 <Route path="visitor-passes" element={
                   <VisitorPassesPage />
+                } />
+
+                <Route path="payment-success" element={
+                  <PaymentSuccess />
+                } />
+
+                <Route path="payment-cancel" element={
+                  <PaymentCancel />
                 } />
 
                 <Route path="security-scan" element={

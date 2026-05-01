@@ -1,0 +1,42 @@
+{
+  "summary": "Iter60 — Stripe Payments for Company Subscriptions. Backend 11/11 PASS. Frontend E2E Stripe redirect captured live (newco_admin → upgrade-plan-btn → الدفع والترقية → https://checkout.stripe.com/c/pay/cs_test_...).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/auth/register", "issue": "Requires compound_id in body (422 if omitted); company_admin self-registrations always default compound_id → 'default-compound'. Acceptable but undocumented — consider making compound_id optional for role=company_admin."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter60_stripe_payments.py",
+    "/app/test_reports/pytest/iter60_stripe_results.xml"
+  ],
+  "action_items": [
+    "OPTIONAL — add dedicated data-testid to the 'الدفع والترقية' button in PlanUpgradeDialog, e.g. data-testid=\"pay-upgrade-company_business\", for stable e2e selection. Test currently falls back to text match.",
+    "OPTIONAL — verify the 'ترقية الآن' testid convention. The visible upgrade trigger on CompanyAdminDashboard uses data-testid=\"upgrade-plan-btn\" (NOT 'plan-usage-upgrade-btn'). Keep consistent naming.",
+    "ENHANCEMENT — /api/company-admin/plan-usage does NOT expose subscription 'status' (pending_payment/active). Frontend currently cannot know if user is in a pending_payment state without another endpoint — consider adding 'status' to the response so the UI can show a 'أكمل الدفع' CTA for paid-plan admins who skipped checkout."
+  ],
+  "critical_code_review_comments": [
+    "backend/routes/stripe_payments.py _activate_subscription: idempotency relies only on payment_status=='paid' check. If Stripe webhook arrives before the polling response updates txn, both paths run update_one — safe but wasteful. Consider wrapping in find_one_and_update with filter {session_id, payment_status:{$ne:'paid'}} for true atomic idempotency.",
+    "backend/routes/stripe_payments.py webhook at /api/webhook/stripe: route is public (no auth) and relies solely on signature verification. If STRIPE_WEBHOOK_SECRET is not configured inside emergentintegrations, signature check may be lenient — confirm with the library. Add per-IP rate limit for defense in depth.",
+    "Frontend PaymentSuccess.js line 50 originally used `// eslint-disable-next-line react-hooks/exhaustive-deps` but the react-hooks plugin is NOT installed in this CRA config, causing CRA to throw 'Definition for rule was not found' as an ERROR that bricked the entire dev build (red overlay on EVERY route). Testing agent removed the offending comment so the build compiles. Main agent should either install eslint-plugin-react-hooks or keep comments generic (`// eslint-disable-next-line`).",
+    "PLAN_PRICES is duplicated conceptually with owner_subscriptions catalogue. Consider moving to a shared constants module to prevent drift.",
+    "stripe_payments.py does not validate payload.origin_url scheme/host — an attacker could supply origin_url='javascript:alert(1)' as a Stripe success_url. emergentintegrations may sanitize, but defense-in-depth should whitelist http(s) and an allow-list of known frontend hosts.",
+    "No cleanup for abandoned payment_transactions rows (status=initiated, created >24h ago) → unbounded growth over time."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter60_stripe_payments.py (new, 11 tests)",
+    "/app/frontend/src/pages/PaymentSuccess.js (removed offending eslint-disable comment that broke CRA compile — blocker fix required for ANY frontend testing)"
+  ],
+  "success_rate": {"backend": "100% (11/11)", "frontend": "100% (Stripe redirect flow verified end-to-end with live checkout.stripe.com URL)"},
+  "test_credentials": "newco_admin/NewCo123! (starter, used for Stripe happy-path), testcompany2/Company123! (enterprise, used for cross-user 403), Owner_homeme/Dalia1234@ (no-company 400). All working.",
+  "seed_data_creation": "TestRegisterPendingPayment created one TEST_stripe_<uuid8> user + company + pending_payment subscription per run. Also created multiple payment_transactions rows under newco_admin's user_id via Stripe test-mode sessions (no real charge). Recommend cleanup of TEST_stripe_* users and payment_transactions where plan_key='company_business' & status='initiated' before production.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter60 Stripe integration fully verified live: (1) create-checkout-session produces real https://checkout.stripe.com URLs with amount_total=750000 cents for company_business; (2) checkout-status, my-transactions, cross-user 403, nonexistent-404 all enforced; (3) starter/invalid_plan/no-company all return 400; (4) no-auth returns 403. (5) register with selected_plan=company_business creates company_subscriptions row with status='pending_payment' + plan='company_business' (verified directly in MongoDB). FRONTEND FLOW: login newco_admin → /select-account → click account-card-company_admin → as-continue-btn → /app/dashboard → wizard-skip (newco_admin has 0 compounds so onboarding wizard overlays dashboard) → CompanyPlanUsageCard's 'ترقية الخطة' button testid=upgrade-plan-btn opens PlanUpgradeDialog → click button with text 'الدفع والترقية' inside company_business card → redirects to checkout.stripe.com/c/pay/cs_test_... (verified via request interceptor). IMPORTANT: PaymentSuccess.js had a blocking ESLint error preventing the dev build from compiling at all; testing agent removed the offending `// eslint-disable-next-line react-hooks/exhaustive-deps` comment. Regression endpoints /api/auth/me, /api/company-admin/plan-usage, /api/company-admin/aggregated-stats all 200 OK.",
+  "rca of the issue": "No functional Stripe bugs. Only a frontend build blocker in PaymentSuccess.js (unknown ESLint rule reference) that bricked the whole SPA with a red compile-error overlay — fixed by removing the stale rule-specific disable comment. All 11 backend tests + live frontend redirect confirmed."
+}

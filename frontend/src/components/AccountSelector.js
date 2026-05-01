@@ -185,8 +185,9 @@ const AccountSelector = () => {
         });
 
         try {
-          const res = await axios.get(`${API}/companies/my-compounds`, { headers });
-          for (const c of (res.data || [])) {
+          const res = await axios.get(`${API}/company-admin/compounds`, { headers });
+          const list = Array.isArray(res.data) ? res.data : (res.data?.compounds || []);
+          for (const c of list) {
             accountsList.push({
               id: `admin_${c.id || c.compound_id}`,
               role: 'admin',

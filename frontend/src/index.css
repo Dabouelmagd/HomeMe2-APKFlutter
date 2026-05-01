@@ -220,4 +220,42 @@ code {
   .btn-redesign-outline {
     @apply btn-redesign bg-gradient-to-r from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600 focus:ring-amber-500 hover:scale-105;
   }
+
+  /* ──────────────────────────────────────────────────────────────────
+     Company-Admin signature theme (purple/violet)
+     Used by all "شركة الإدارة" pages so they're visually distinct from
+     resident, compound-admin, owner, and super-admin dashboards.
+     ────────────────────────────────────────────────────────────────── */
+  .company-admin-bg {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 15% 18%, rgba(168, 85, 247, 0.18), transparent 45%),
+      radial-gradient(circle at 85% 12%, rgba(99, 102, 241, 0.20), transparent 50%),
+      radial-gradient(circle at 50% 95%, rgba(236, 72, 153, 0.12), transparent 55%),
+      linear-gradient(135deg, #0b0820 0%, #1a0f3d 45%, #261052 100%);
+    position: relative;
+    color: #f5f3ff;
+  }
+
+  .company-admin-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(168, 85, 247, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(168, 85, 247, 0.04) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+  }
+
+  /* Compound card hover for company-admin pages */
+  .company-admin-card {
+    @apply bg-white/5 border border-violet-400/20 rounded-xl backdrop-blur-sm transition;
+  }
+  .company-admin-card:hover {
+    @apply border-violet-400/50 shadow-lg;
+    box-shadow: 0 10px 32px -12px rgba(168, 85, 247, 0.45);
+  }
 }

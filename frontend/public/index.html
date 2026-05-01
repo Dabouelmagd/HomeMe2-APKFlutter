@@ -175,12 +175,10 @@
         } catch(e) { console.log('Cache cleanup:', e); }
 
         await lightCacheRefresh();
-        // SW registration is INTENTIONALLY DISABLED — the legacy /sw.js
-        // intercepts every fetch (including POST) and re-emits it via
-        // `respondWith(fetch(event.request))`, which can leave POST request
-        // streams hanging in some browsers and breaks the login flow.
-        // If we ever re-enable a PWA SW, ensure it skips non-GET requests.
-        // await registerServiceWorker();
+        // SW v5 is safe: it does NOT intercept any fetch (passthrough only),
+        // so POSTs (login/register) cannot hang on it. Re-enabled to keep
+        // push notifications & PWA install flow working.
+        await registerServiceWorker();
       });
     </script>
     

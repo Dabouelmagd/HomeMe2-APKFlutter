@@ -121,12 +121,12 @@ const CompanyAdminDashboard = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center text-gray-400" dir="rtl">جاري التحميل...</div>
+    <div className="company-admin-bg flex items-center justify-center text-violet-200" dir="rtl">جاري التحميل...</div>
   );
 
   if (error) return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex items-center justify-center p-6" dir="rtl">
-      <div className="bg-red-900/30 border border-red-700 rounded-2xl p-6 max-w-md text-center">
+    <div className="company-admin-bg flex items-center justify-center p-6" dir="rtl">
+      <div className="bg-red-900/30 border border-red-700 rounded-2xl p-6 max-w-md text-center relative z-10">
         <div className="text-3xl mb-2">⚠️</div>
         <h2 className="text-xl font-bold text-white mb-2">حسابك غير مرتبط بشركة</h2>
         <p className="text-sm text-red-200 mb-4">{error}</p>
@@ -154,8 +154,8 @@ const CompanyAdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-blue-950 p-6" dir="rtl" data-testid="company-admin-dashboard">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="company-admin-bg p-6" dir="rtl" data-testid="company-admin-dashboard">
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
         {/* Unified Page Header */}
         <PageHeader
           theme="indigo"
@@ -238,7 +238,7 @@ const CompanyAdminDashboard = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {compounds.map(c => (
-              <div key={c.id} className="bg-gray-800/70 border border-gray-700 rounded-xl p-5 space-y-3 hover:border-indigo-500/50 transition" data-testid={`cad-compound-${c.id}`}>
+              <div key={c.id} className="company-admin-card p-5 space-y-3" data-testid={`cad-compound-${c.id}`}>
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">

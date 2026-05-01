@@ -1301,7 +1301,14 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
-### Iter 66: Registration Error UX — Clear Arabic error messages + Live password rules ✅ (2026-05-01)
+### Iter 71: PWA + StrictMode restore + Theme + Polish ✅ (2026-05-01)
+- **Re-enabled `React.StrictMode`** in `index.js` and **re-enabled Service Worker registration** in `index.html`. Rewrote `public/sw.js` (v5-safe) to a passthrough-only worker that **never** intercepts fetches — eliminates the legacy hang on POST that broke login. Push-notification & PWA install handlers preserved.
+- **Fixed 404 on `/api/companies/my-compounds`** (called from `AccountSelector.js` after company-admin login). Switched to the correct `/api/company-admin/compounds` endpoint and unwrapped the `{compounds:[]}` envelope.
+- **Show/Hide password toggle** in `Register.js` for both password + confirm-password fields (eye/eye-off icons with `data-testid` for testing).
+- **Distinct purple-violet theme for all شركة الإدارة pages**: added `.company-admin-bg` and `.company-admin-card` utilities in `index.css` (deep #0b0820 → #261052 gradient + ambient violet/pink radial glows + grid texture). Applied across `CompanyAdminDashboard.js` (loading / error / main / cards). The page is now visually unmistakable from owner/super-admin/resident dashboards.
+- **End-to-end verified via Playwright**: login → /select-account (purple cards) → /app/dashboard (purple ambient theme), SW controlled, no `/api/companies/my-compounds` 404, password toggle flips input type from `password` to `text` correctly.
+
+### Iter 70: Registration Error UX — Clear Arabic error messages + Live password rules ✅ (2026-05-01)
 - **Problem**: Management-company registration was silently failing with a generic "Registration failed" English toast — user had no idea WHY (their password was missing uppercase/special-char to match backend rules).
 - **Fix 1 — `App.js` `register()` & `login()`**: rewrote error extraction to handle string detail, Pydantic-array detail (422), HTTP status codes, and network/CORS errors with localized Arabic messages. No more silent "Registration failed".
 - **Fix 2 — `Register.js` client-side validation**: added pre-submit checks that mirror `validate_password_strength` in `auth_deps.py` (≥8 chars, uppercase, lowercase, digit, special char). Each rule emits its own Arabic toast on violation.

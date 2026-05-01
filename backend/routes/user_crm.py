@@ -51,7 +51,7 @@ async def _authorize(db, actor: dict, target_user_id: str) -> dict:
     if role in ("app_owner", "super_admin"):
         return target
 
-    if role in ("admin", "compound_admin", "security"):
+    if role in ("admin", "compound_admin"):
         if actor.get("compound_id") and actor["compound_id"] == target.get("compound_id"):
             return target
         raise HTTPException(status_code=403, detail="المستخدم ليس من مجمعك")
@@ -103,12 +103,19 @@ async def add_tag(user_id: str, payload: dict = Body(...), current_user: dict = 
 
     user = await db.users.find_one({"id": user_id}, {"_id": 0, "crm_tags": 1, "crm_tag_colors": 1})
     tags = (user or {}).get("crm_tags") or []
+    colors = (user or {}).get("crm_tag_colors") or {}
     if tag in tags:
-        return {"success": True, "tags": tags, "colors": (user or {}).get("crm_tag_colors") or {}}
+        # Idempotent: update color if a new one was supplied
+        if colors.get(tag) != color:
+            colors[tag] = color
+            await db.users.update_one(
+                {"id": user_id},
+                {"$set": {"crm_tag_colors": colors, "crm_updated_at": _now()}},
+            )
+        return {"success": True, "tags": tags, "colors": colors}
     if len(tags) >= MAX_TAGS_PER_USER:
         raise HTTPException(status_code=400, detail=f"أقصى عدد للتاغات: {MAX_TAGS_PER_USER}")
 
-    colors = (user or {}).get("crm_tag_colors") or {}
     colors[tag] = color
     await db.users.update_one(
         {"id": user_id},
@@ -117,13 +124,19 @@ async def add_tag(user_id: str, payload: dict = Body(...), current_user: dict = 
             "$set": {"crm_tag_colors": colors, "crm_updated_at": _now()},
         },
     )
+    # Re-read for strict consistency
+    refreshed = await db.users.find_one({"id": user_id}, {"_id": 0, "crm_tags": 1, "crm_tag_colors": 1})
     try:
         from audit_logger import audit_log
         await audit_log(actor=current_user, action="user_crm.tag_add", target_type="user",
                         target_id=user_id, details={"tag": tag, "color": color})
     except Exception:
         pass
-    return {"success": True, "tags": tags + [tag], "colors": colors}
+    return {
+        "success": True,
+        "tags": (refreshed or {}).get("crm_tags") or (tags + [tag]),
+        "colors": (refreshed or {}).get("crm_tag_colors") or colors,
+    }
 
 
 @router.delete("/{user_id}/tags/{tag}")
@@ -243,8 +256,27 @@ async def tag_suggestions(current_user: dict = Depends(get_current_user)):
     if role not in ("app_owner", "super_admin", "admin", "compound_admin", "company_admin"):
         raise HTTPException(status_code=403, detail="غير مصرح")
     db = get_db()
-    # Aggregate distinct tags
+    # Tenant scoping: app_owner/super_admin see ALL; compound admins see their compound;
+    # company_admin sees all compounds managed by their company.
+    match: dict = {"crm_tags": {"$exists": True, "$ne": []}}
+    if role in ("admin", "compound_admin"):
+        if not current_user.get("compound_id"):
+            return {"suggestions": []}
+        match["compound_id"] = current_user.get("compound_id")
+    elif role == "company_admin":
+        company_id = current_user.get("company_id")
+        if not company_id:
+            return {"suggestions": []}
+        compounds = await db.compounds.find(
+            {"management_company_id": company_id}, {"_id": 0, "id": 1}
+        ).to_list(500)
+        ids = [c.get("id") for c in compounds if c.get("id")]
+        if not ids:
+            return {"suggestions": []}
+        match["compound_id"] = {"$in": ids}
+
     pipeline = [
+        {"$match": match},
         {"$unwind": {"path": "$crm_tags", "preserveNullAndEmptyArrays": False}},
         {"$group": {"_id": "$crm_tags", "count": {"$sum": 1}}},
         {"$sort": {"count": -1}},

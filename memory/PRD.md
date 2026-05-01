@@ -3,7 +3,43 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-59)
+## Latest Fixes (Feb 2026 — iterations 26-61)
+
+### Iter 73: User CRM (Tags + Private Notes) + Renewal Trigger Endpoint (May 1, 2026) ✅
+
+**🏷️ Admins can now tag residents (VIP, late_payer, recurring_complaints, …) and attach private colour-coded notes — all inside the User Timeline modal.**
+
+**Backend (`routes/user_crm.py`):**
+- `GET  /api/users/{user_id}/crm` → `{tags, tag_colors, notes}`.
+- `POST /api/users/{user_id}/tags` body `{tag, color}` — lower-cased, idempotent, updates colour on repeat.
+- `DELETE /api/users/{user_id}/tags/{tag}` — removes tag and colour entry.
+- `POST /api/users/{user_id}/notes` body `{text, color}` — colour-coded private note.
+- `PUT  /api/users/{user_id}/notes/{note_id}` — author OR super_admin can edit.
+- `DELETE /api/users/{user_id}/notes/{note_id}` — same auth rule.
+- `GET  /api/users/crm/tag-suggestions` — autocomplete list **scoped per tenant** (compound_admin → own compound, company_admin → managed compounds, super_admin → global).
+- Limits: 32-char tag, 2000-char note, 20 tags per user.
+- Audit-logged for every mutation.
+- Full RBAC: app_owner/super_admin unrestricted; compound_admin scoped to their compound; company_admin scoped to their managed compounds; all other roles → 403.
+
+**Frontend (`components/UserTimelineModal.js`):**
+- New **CRM panel** between analytics and events: tag chips (removable), colour-picker, add-tag input with auto-complete suggestions; notes list (author + timestamp) with inline delete on hover; textarea + colour to add new note.
+- Tags also rendered as white pills in modal header under the user name for at-a-glance visibility.
+
+**🧪 Verified (Iter 61 testing agent): 22/22 pytest tests green** — persistence, idempotency, validation limits, tenant-scoped suggestions, RBAC boundaries (resident 403, cross-compound 403).
+
+---
+
+**🔔 Subscription Renewal — Manual Trigger Endpoint**
+
+**Backend (`routes/superadmin.py`):**
+- `POST /api/super-admin/trigger-renewals` (super_admin only) — runs one pass of `renewal_reminders.run_renewal_reminders_once()` on demand.
+- Returns `{status, emails_dispatched, triggered_by, triggered_at}`.
+- Respects existing 7/3/0-day milestone idempotency (`renewal_reminders_sent: ["co_7","co_3","co_0"]`).
+
+**🧪 Verified end-to-end:**
+- Set `expires_at = now + 7d` → trigger → `emails_dispatched: 1` → email logged (`company2@test.com`).
+- Rerun → `0` (idempotency ✅).
+- Repeated for 3d and 0d milestones — all three saved distinct keys.
 
 ### Iter 72: Subscription Badge + Auto-Expiry (May 1, 2026) ✅
 

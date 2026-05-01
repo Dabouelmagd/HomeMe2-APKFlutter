@@ -49,6 +49,19 @@
 - Company: HomeMe QA
 - Role: advertiser
 
+## Secondary Test Advertiser (for end-to-end CRM/ads flow)
+- Username: adtest_fork
+- Password: AdTest123!
+- Email: adtest_fork@test.com
+- Role: advertiser
+
+## Test Resident (for timeline/CRM tag/note testing)
+- Username: test
+- Password: test123
+- user_id: d6012878-6794-4d9a-8196-8577da883f5d
+- Role: resident
+- Compound: 88ad3711-c9ae-45fe-a270-65f4524c071c
+
 ## Email (SMTP) — mail.datalifeai.com (Port 465 SSL, Port 993 IMAP)
 - **Main / System emails** (welcome, password-reset, invites, daily reports) → `homeme_superadmin@datalifeai.com`
 - **Security alerts** (emergency, intrusion) → `homeme_security@datalifeai.com`

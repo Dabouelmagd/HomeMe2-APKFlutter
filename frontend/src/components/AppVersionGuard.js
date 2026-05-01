@@ -27,6 +27,20 @@ const AppVersionGuard = () => {
     const hardReload = async () => {
       if (reloadingRef.current) return;
       reloadingRef.current = true;
+
+      // Show a friendly toast so the refresh isn't a surprise.
+      // Sonner is loaded asynchronously to avoid adding to the initial bundle.
+      try {
+        const { toast } = await import('sonner');
+        toast.success('🔄 تم تحديث التطبيق — جارٍ إعادة التحميل...', {
+          duration: 1800,
+          position: 'top-center',
+        });
+      } catch { /* ignore toast failure — reload still proceeds */ }
+
+      // Short pause so the user sees the message before the hard reload.
+      await new Promise((r) => setTimeout(r, 1400));
+
       // Preserve auth so the user lands back inside the app
       const token = localStorage.getItem('token');
       const tabSessionKeys = Object.keys(localStorage).filter((k) => k.startsWith('session_'));

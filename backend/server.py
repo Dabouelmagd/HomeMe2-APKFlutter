@@ -2321,10 +2321,17 @@ async def root():
 # Router will be included after all endpoints are defined
 
 # CORS middleware - Restricted origins for security
+# IMPORTANT: `allow_credentials` is intentionally False because the upstream
+# Cloudflare/Kubernetes ingress overrides `Access-Control-Allow-Origin` to
+# `*` for some POST responses. The combination `Allow-Origin: *` +
+# `Allow-Credentials: true` violates the CORS spec and causes browsers to
+# silently drop the response (login XHR onload never fires). The frontend
+# does not rely on cookies for auth — it sends the JWT in the Authorization
+# header — so disabling credentials here is safe and necessary.
 ALLOWED_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://profile-nav-debug.preview.emergentagent.com,https://homemeapp.net,http://localhost:3000').split(',')
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
+    allow_credentials=False,
     allow_origins=ALLOWED_ORIGINS,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"],

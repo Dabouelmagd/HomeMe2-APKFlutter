@@ -480,3 +480,89 @@ async def company_admin_aggregated_stats(current_user: dict = Depends(_require_c
         "totals": totals,
         "per_compound": serialize_datetime(list(per.values())),
     }
+
+
+
+@router.get("/company-admin/crm-summary")
+async def company_admin_crm_summary(current_user: dict = Depends(_require_company_admin), company_id: Optional[str] = None):
+    """ملخص CRM لكل الكمبوندات تحت الشركة.
+
+    يرجع:
+      - tag_counts: عدد المستخدمين لكل تاغ (VIP, late_payer, …) عبر كل المجمعات
+      - vip_users: قائمة سريعة (أقصى 10) لمستخدمي VIP
+      - late_payers: قائمة سريعة (أقصى 10) لأصحاب تاغ late_payer
+      - notes_total: إجمالي عدد الملاحظات الإدارية المضافة
+    """
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+
+    compounds = await db.compounds.find(
+        {"$or": [{"company_id": cid}, {"management_company_id": cid}]},
+        {"_id": 0, "id": 1, "name": 1}
+    ).to_list(length=500)
+    company = await db.companies.find_one({"id": cid}, {"_id": 0, "compound_ids": 1})
+    legacy_ids = [x for x in (company.get("compound_ids") or []) if x not in {c["id"] for c in compounds}]
+    if legacy_ids:
+        extras = await db.compounds.find({"id": {"$in": legacy_ids}}, {"_id": 0, "id": 1, "name": 1}).to_list(length=500)
+        compounds.extend(extras)
+
+    cids = [c["id"] for c in compounds]
+    compound_name = {c["id"]: c.get("name") for c in compounds}
+
+    if not cids:
+        return {
+            "company_id": cid,
+            "tag_counts": {},
+            "vip_users": [],
+            "late_payers": [],
+            "notes_total": 0,
+        }
+
+    # Aggregate tags across all residents of managed compounds
+    pipeline = [
+        {"$match": {"compound_id": {"$in": cids}, "crm_tags": {"$exists": True, "$ne": []}}},
+        {"$unwind": "$crm_tags"},
+        {"$group": {"_id": "$crm_tags", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+    ]
+    tag_counts = {}
+    async for d in db.users.aggregate(pipeline):
+        tag_counts[d["_id"]] = d["count"]
+
+    # VIP list (top 10)
+    vip_users = []
+    async for u in db.users.find(
+        {"compound_id": {"$in": cids}, "crm_tags": "vip"},
+        {"_id": 0, "id": 1, "username": 1, "full_name": 1, "unit_number": 1,
+         "compound_id": 1, "phone": 1, "email": 1}
+    ).limit(10):
+        u["compound_name"] = compound_name.get(u.get("compound_id"))
+        vip_users.append(u)
+
+    # Late payers (top 10)
+    late_payers = []
+    async for u in db.users.find(
+        {"compound_id": {"$in": cids}, "crm_tags": "late_payer"},
+        {"_id": 0, "id": 1, "username": 1, "full_name": 1, "unit_number": 1,
+         "compound_id": 1, "phone": 1, "email": 1}
+    ).limit(10):
+        u["compound_name"] = compound_name.get(u.get("compound_id"))
+        late_payers.append(u)
+
+    # Count total private notes on users under these compounds
+    user_ids = [u["id"] async for u in db.users.find({"compound_id": {"$in": cids}}, {"_id": 0, "id": 1})]
+    notes_total = 0
+    if user_ids:
+        try:
+            notes_total = await db.user_notes.count_documents({"user_id": {"$in": user_ids}})
+        except Exception:
+            notes_total = 0
+
+    return {
+        "company_id": cid,
+        "tag_counts": tag_counts,
+        "vip_users": serialize_datetime(vip_users),
+        "late_payers": serialize_datetime(late_payers),
+        "notes_total": notes_total,
+    }
+

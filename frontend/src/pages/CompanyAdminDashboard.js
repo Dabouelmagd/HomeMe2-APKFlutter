@@ -7,6 +7,8 @@ import InviteLinkModal from '../components/shared/InviteLinkModal';
 import CompanyPlanUsageCard from '../components/CompanyPlanUsageCard';
 import CompoundOnboardingWizard from '../components/company-admin/CompoundOnboardingWizard';
 import AggregatedStatsPanel from '../components/company-admin/AggregatedStatsPanel';
+import CrmRetentionPanel from '../components/company-admin/CrmRetentionPanel';
+import UserTimelineModal from '../components/UserTimelineModal';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -39,6 +41,7 @@ const CompanyAdminDashboard = () => {
   const [editFor, setEditFor] = useState(null);
   const [addUserFor, setAddUserFor] = useState(null);
   const [inviteFor, setInviteFor] = useState(null);
+  const [crmUser, setCrmUser] = useState(null);
   const [error, setError] = useState(null);
   const [onboardingSkipped, setOnboardingSkipped] = useState(() => {
     return localStorage.getItem('cad_onboarding_skipped') === '1';
@@ -180,6 +183,14 @@ const CompanyAdminDashboard = () => {
           navigate('/app/dashboard');
         }} />
 
+        {/* CRM / Retention Panel — VIP + Late Payers cross-compound */}
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <CrmRetentionPanel
+            refreshKey={refreshKey}
+            onUserClick={(u) => setCrmUser(u)}
+          />
+        </div>
+
         {/* Action bar */}
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-white">🏘️ مجمعاتي</h2>
@@ -239,6 +250,7 @@ const CompanyAdminDashboard = () => {
       {editFor && <CompoundFormModal title="✏️ تعديل المجمع" initial={editFor} onClose={() => setEditFor(null)} onSave={async (f) => { setEditFor({...editFor, ...f}); setTimeout(saveEdit, 0); }} saveLabel="حفظ" />}
       {addUserFor && <AddUserModal compound={addUserFor} onClose={() => setAddUserFor(null)} onSave={addUser} />}
       {inviteFor && <InviteLinkModal compound={inviteFor} onClose={() => setInviteFor(null)} />}
+      {crmUser && <UserTimelineModal user={crmUser} onClose={() => { setCrmUser(null); setRefreshKey(k => k + 1); }} />}
     </div>
   );
 };

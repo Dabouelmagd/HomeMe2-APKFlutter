@@ -24,6 +24,7 @@ import HierarchicalSubs from './super-admin/HierarchicalSubs';
 import CompaniesTab from './super-admin/CompaniesTab';
 import AdvertiserAdsTab from './super-admin/AdvertiserAdsTab';
 import SupportTicketsTab from './super-admin/SupportTicketsTab';
+import DisasterRecoveryTab from './super-admin/DisasterRecoveryTab';
 import PaymentAnalyticsCard from './PaymentAnalyticsCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -448,6 +449,9 @@ const SuperAdminPanel = () => {
             ] : []),
             { id: 'translations', label: t('sa_translations', 'إدارة الترجمات') },
             { id: 'support_tickets', label: t('sa_support_tickets', '🎧 تذاكر الدعم') },
+            ...(!isSuperAdminOnly ? [
+              { id: 'disaster_recovery', label: '💾 النسخ الاحتياطي' },
+            ] : []),
           ].map(tab => (
             <button key={tab.id} onClick={() => handleTabChange(tab.id)}
               className={`px-5 py-2.5 rounded-lg text-sm font-medium ${activeTab === tab.id ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
@@ -901,6 +905,10 @@ const SuperAdminPanel = () => {
 
         {activeTab === 'support_tickets' && (
           <SupportTicketsTab t={t} />
+        )}
+
+        {activeTab === 'disaster_recovery' && (
+          <DisasterRecoveryTab />
         )}
 
       </div>

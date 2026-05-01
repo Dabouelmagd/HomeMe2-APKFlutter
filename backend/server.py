@@ -2505,6 +2505,9 @@ from routes.perf_budget import router as perf_budget_router
 app.include_router(perf_budget_router)
 from routes.impersonate import router as impersonate_router
 app.include_router(impersonate_router)
+
+from routes.disaster_recovery import router as disaster_recovery_router
+app.include_router(disaster_recovery_router)
 from routes.user_timeline import router as user_timeline_router
 app.include_router(user_timeline_router)
 app.include_router(sidebar_alerts_router)

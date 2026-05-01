@@ -1,0 +1,37 @@
+{
+  "summary": "Iter59 — Disaster Recovery Wizard + plan-feature gating. Backend 14/14 PASS. Frontend 3/3 PASS (Owner DR download, testcompany2 CompoundSwitcher, newco_admin onboarding).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter59_disaster_recovery.py",
+    "/app/test_reports/pytest/iter59_results.xml"
+  ],
+  "action_items": [
+    "Optional: review request asked for testid `compound-switcher` but the actual testids emitted are `compound-switcher-root` and `compound-switcher-btn`. The component renders correctly and is visible — only the testid name differs from request. No functional bug.",
+    "Optional: DR `/restore` returns a flat string detail for missing-confirm (FastAPI 422) and Arabic detail for wrong-confirm (400). Both behaviors verified — could optionally mirror the structured `code:` pattern used by plan_limit responses for frontend parsing parity."
+  ],
+  "critical_code_review_comments": [
+    "routes/disaster_recovery.py: snapshot streams the ENTIRE zip into RAM via BytesIO before sending. Fine for current DB size (~250KB) but for >100MB DBs this will spike memory. Consider stream-writing chunks once DBs grow.",
+    "routes/disaster_recovery.py: restore drops then bulk-inserts each collection. If insert_many fails mid-collection, that collection is left empty (drop already executed). Consider per-collection try/except with restore-from-temp pattern for true atomicity.",
+    "routes/disaster_recovery.py line 196: confirm check uses literal string 'I_UNDERSTAND_OVERWRITE' — make it case-sensitive constant exposed via /preview so frontend stays in sync.",
+    "DR endpoints have NO rate limit — a malicious super-admin token (or compromised one) could DoS by repeatedly downloading full snapshots. Consider 1-per-minute throttle.",
+    "plan_limits.py duplicates plan/limits catalogue (also in routes/owner_subscriptions.py) — keep DRY by importing or moving to shared constants module."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter59_disaster_recovery.py (new)"
+  ],
+  "success_rate": {"backend": "100% (14/14)", "frontend": "100% (3/3 critical flows)"},
+  "test_credentials": "Owner_homeme/Dalia1234@, superadmin/SuperAdmin2024!, testcompany2/Company123!, newco_admin/NewCo123! — all working.",
+  "seed_data_creation": "None. The DR restore-happy-path test re-imports the SAME snapshot just taken (idempotent by design); audit row added to disaster_recovery_runs.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter59 DR Wizard fully verified live: snapshot ZIP ~250KB contains manifest.json + collections/{name}.json + media/{file} with verified per-collection sha256. RBAC: Owner_homeme (app_owner) and superadmin (super_admin) get 200; company_admin (testcompany2) gets 403 on all 4 endpoints. Restore: 422 for missing confirm, 400 for wrong confirm, 200 for confirm=I_UNDERSTAND_OVERWRITE. History grows after each snapshot/restore. Feature gate: newco_admin (starter plan) gets 403 plan_limit_feature on /api/financial/export-excel + /api/reports/compound/{id}/summary?month=YYYY-MM; testcompany2 (enterprise) bypasses gate. Frontend: Owner DR tab at /app/super-admin?tab=disaster_recovery renders perfectly; download triggered by [data-testid=dr-download-btn] → real ZIP returned via blob (network response 200, 253268 bytes), success toast shown. testcompany2 CompoundSwitcher visible (testids: compound-switcher-root + compound-switcher-btn — note: NOT bare `compound-switcher`). newco_admin sees CompoundOnboardingWizard immediately (compounds=0); generic OnboardingWizard does NOT overlap. /api/reports/compound/{id}/summary requires `month=YYYY-MM` query before its plan-gate triggers (Pydantic validation runs first → 422 if month missing).",
+  "rca of the issue": "No issues. All 14 backend tests pass; all 3 frontend critical flows verified with real network captures."
+}

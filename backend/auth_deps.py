@@ -73,6 +73,11 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         if user is None:
             raise HTTPException(status_code=401, detail="User not found")
         user.pop("_id", None)
+        # Carry impersonation markers from JWT into the user context so routes can detect it
+        if payload.get("impersonation"):
+            user["impersonator_id"] = payload.get("impersonator_id")
+            user["impersonator_username"] = payload.get("impersonator_username")
+            user["is_impersonation"] = True
         return UserDict(user)
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")

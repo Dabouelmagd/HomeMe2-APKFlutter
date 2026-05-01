@@ -5,7 +5,41 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
-### Iter 61: 🔐 الحل الجذري الدائم لمشكلة اختفاء الإعلانات (MongoDB Persistent Media Store) (Feb 29, 2026) ✅
+### Iter 62: Impersonate User + System Accounts Filter + User CRUD Modals (Feb 29, 2026) ✅
+
+**🎭 Impersonate User (أقوى ميزة دعم فني):**
+- `routes/impersonate.py` — 3 endpoints:
+  - `POST /api/impersonate/{user_id}` (owner/super_admin) — يُرجع JWT مؤقت (30 دقيقة)
+  - `GET /api/impersonate/status` — يرجع حالة الجلسة الحالية
+  - `POST /api/impersonate/stop` — إنهاء الجلسة
+- **Security:**
+  - لا يمكن impersonate لـ `app_owner` أو `super_admin` (403)
+  - لا يمكن impersonate للنفس (400)
+  - لا يمكن impersonate لحساب معطّل (400)
+  - غير owner/super_admin يستلم 403
+- **JWT Enhancement**: `auth_deps.get_current_user` الآن يحمل `impersonator_id`, `impersonator_username`, `is_impersonation` من الـ token payload.
+- **Transparency:**
+  - Email تلقائي للمستخدم الأصلي "تم الدخول إلى حسابك بواسطة X"
+  - Audit log entry لكل `impersonate_start` و `impersonate_stop`
+- **UI:**
+  - زر 🎭 في جدول UserManagement (لكل مستخدم غير نظام)
+  - `components/ImpersonationBanner.js` — بانر أحمر/أصفر متحرك في أعلى الصفحة عند وجود جلسة انتحال
+  - Countdown timer (⏱ MM:SS)
+  - زر "↩️ إنهاء والرجوع" يستعيد الجلسة الأصلية من `localStorage.original_token_before_impersonation`
+- **Bug Fix Discovered During Testing**: `POST /api/impersonate/stop` كان يُعتبر `user_id="stop"` لأن `/{user_id}` يسبقه في الـ router. الإصلاح: نقل `/status` و `/stop` قبل `/{user_id}`.
+
+**🙈 System Accounts Filter:**
+- `UserManagement.js` الآن يخفي `app_owner` و `super_admin` افتراضياً
+- Checkbox toggle للـ Owner/Super Admin فقط: "🙈 إخفاء حسابات النظام" ↔ "👁️ إظهار حسابات النظام"
+
+**✏️ User View + Edit Modals:**
+- 2 endpoints جديدة:
+  - `GET /api/admin/users/{id}` — تفاصيل المستخدم + compound_name
+  - `PUT /api/admin/users/{id}` — تحديث الحقول (full_name, email, phone, role, compound_id, is_active, unit_number)
+- Validation: email uniqueness، منع تخفيض آخر app_owner نشط
+- UI: View modal (عرض الكل) + Edit modal (form متكامل) + بوكلير من view إلى edit
+
+
 
 **🐛 السبب الحقيقي الجذري (أخيراً!) للمشكلة المتكررة 10+ مرات:**
 - **K8s Container Disk ephemeral** — كل deployment يمسح `/app/uploads/*` بالكامل.

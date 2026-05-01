@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useNotifications } from '../App';
 import { toast } from 'sonner';
+import ImpersonationBanner from './ImpersonationBanner';
 import {
   HomeIcon,
   BuildingOfficeIcon,
@@ -690,6 +691,8 @@ const Layout = ({ children, isTrialMode = false }) => {
 
   return (
     <div className={`flex h-screen bg-gray-50 dark:bg-gray-900 ${isRTL ? 'rtl' : 'ltr'}`}>
+      {/* Impersonation banner (visible ONLY when current session is an impersonation) */}
+      <ImpersonationBanner />
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div

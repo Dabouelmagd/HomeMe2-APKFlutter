@@ -175,6 +175,38 @@ const UserManagement = () => {
 
   const handleViewUser = (userItem) => setViewingUser(userItem);
 
+  const handleImpersonate = async (userItem) => {
+    const SYSTEM = new Set(['app_owner', 'super_admin']);
+    if (SYSTEM.has(userItem.role)) {
+      toast.error('لا يمكن الدخول بحسابات المالك أو السوبر أدمن');
+      return;
+    }
+    if (!userItem.is_active) {
+      toast.error('لا يمكن الدخول بحساب معطّل');
+      return;
+    }
+    if (!window.confirm(`🎭 هل أنتِ متأكدة من الدخول بحساب "${userItem.full_name || userItem.username}"؟\n\n` +
+      `• الجلسة ستنتهي تلقائياً بعد 30 دقيقة\n` +
+      `• المستخدم سيستلم إيميل إشعار تلقائي (للشفافية)\n` +
+      `• كل action خلال الجلسة سيُسجّل باسمك في audit log\n\n` +
+      `اضغطي موافق للمتابعة.`)) return;
+
+    try {
+      const res = await axios.post(`${API}/api/impersonate/${userItem.id}`, {}, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      // Cache original token so ImpersonationBanner can restore it
+      const origTok = localStorage.getItem('token');
+      if (origTok) localStorage.setItem('original_token_before_impersonation', origTok);
+      localStorage.setItem('token', res.data.access_token);
+      toast.success(`✅ أنتِ الآن تتصفّحين كـ ${userItem.full_name || userItem.username}`);
+      // Hard reload so AuthContext reflects the new user
+      window.location.href = '/app/dashboard';
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'فشل بدء جلسة الانتحال');
+    }
+  };
+
   const handleEditUser = (userItem) => {
     setEditingUser(userItem);
     setEditFormData({
@@ -517,6 +549,18 @@ const UserManagement = () => {
                           >
                             <PencilIcon className="h-4 w-4" />
                           </button>
+                          {/* Impersonate — only for Owner/SuperAdmin; cannot impersonate system roles */}
+                          {(user?.role === 'app_owner' || user?.role === 'super_admin') &&
+                           userItem.role !== 'app_owner' && userItem.role !== 'super_admin' && userItem.id !== user?.id && (
+                            <button
+                              onClick={() => handleImpersonate(userItem)}
+                              className="text-rose-600 hover:text-rose-900"
+                              title="دخول كهذا المستخدم (Impersonate)"
+                              data-testid={`user-impersonate-${userItem.id}`}
+                            >
+                              🎭
+                            </button>
+                          )}
                           <button 
                             onClick={() => handleDeleteUser(userItem.id)}
                             className="text-red-600 hover:text-red-900"

@@ -5,6 +5,39 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 71: AppVersionGuard — Auto Cache-Bust on Deploy (May 1, 2026) ✅
+
+**🐛 Problem reported by user**: After deployment, users see a stale cached `frontend` bundle with old behaviour (login-flow breaks, new features missing) until they manually clear browser cache or hard-reload.
+
+**✅ Fix: Automatic post-deploy cache/SW purge.**
+
+**Backend (`routes/app_version.py`):**
+- `GET /api/version` — public (no auth). Returns `{version, started_at, env}`.
+- `version` is generated once at module-import (`str(int(time.time()))`) — regenerates on every process restart which happens on every deploy.
+
+**Frontend (`components/AppVersionGuard.js`):**
+- Headless component mounted once at the root of `App.js` (before `<BrowserRouter>`).
+- **Flow:**
+  1. Mounts → after 1.5s delay, fetches `/api/version` with `cache: 'no-store'`. Stores the version silently on first visit (nothing to compare yet).
+  2. Re-checks every 5 minutes + on `window.focus` + on `visibilitychange`.
+  3. When the stored version differs from the fetched version → triggers `hardReload`:
+     - Saves auth token + session-scoped keys.
+     - Clears all `window.caches` entries.
+     - Unregisters every service worker (stale CRA SW was a common culprit).
+     - Restores preserved auth.
+     - `window.location.replace(url + ?_v=Date.now())` → full bypass of HTTP cache + CDN.
+- Idempotent via `reloadingRef` — cannot double-reload.
+- Invisible (no UI) and doesn't race with auth boot.
+
+**🧪 Verified via Playwright test:**
+- Mounted → stored `1777634798` silently ✅
+- Injected `999999` as stale version + dispatched `focus` event ✅
+- Guard detected mismatch → URL changed to `?_v=1777634916763` (reload happened) ✅
+- New correct version `1777634798` re-stored after reload ✅
+
+**Impact**: Next deploy onwards, every user gets the fresh build automatically within ≤5 minutes (or immediately on tab-focus). No more "clear cache and try again" support tickets.
+
+
 ### Iter 70: Stripe Payment Gateway (May 1, 2026) ✅
 
 **💳 Complete payment flow for paid company subscription plans.**

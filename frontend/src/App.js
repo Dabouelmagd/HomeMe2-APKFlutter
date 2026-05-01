@@ -63,6 +63,7 @@ import OwnerKpiPage from './pages/OwnerKpiPage';
 import VisitorPassesPage from './pages/VisitorPassesPage';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
+import AppVersionGuard from './components/AppVersionGuard';
 import PdfReportsPage from './pages/PdfReportsPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
@@ -593,6 +594,7 @@ const RequireCompound = ({ children }) => {
 function App() {
   return (
     <div className="App">
+      <AppVersionGuard />
       <BrowserRouter>
         <ScrollToTop />
         <ThemeProvider>

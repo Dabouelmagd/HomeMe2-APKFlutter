@@ -71,6 +71,7 @@ import BrandingSettingsPage from './pages/BrandingSettingsPage';
 import EmailTemplatesPage from './pages/EmailTemplatesPage';
 import MediaHealthPage from './pages/MediaHealthPage';
 import AppBrandingPage from './pages/AppBrandingPage';
+import DesignSystemPage from './pages/DesignSystemPage';
 import SecurityScanPage from './pages/SecurityScanPage';
 import PublicVisitorPassPage from './pages/PublicVisitorPassPage';
 import PwaInstallPrompt from './components/PwaInstallPrompt';
@@ -752,6 +753,10 @@ function App() {
 
                 <Route path="visitor-passes" element={
                   <VisitorPassesPage />
+                } />
+
+                <Route path="design-system" element={
+                  <DesignSystemPage />
                 } />
 
                 <Route path="payment-success" element={

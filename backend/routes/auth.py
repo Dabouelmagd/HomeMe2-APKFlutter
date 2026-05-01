@@ -14,6 +14,7 @@ from shared_models import *
 from subscription_codes import SubscriptionCodeManager
 from webauthn_service import WebAuthnService, WebAuthnRegisterOptions, WebAuthnRegisterVerify, WebAuthnLoginOptions, WebAuthnLoginVerify
 from activity_logger import ActivityLogger
+from email_service import email_service
 
 router = APIRouter(prefix="/api")
 
@@ -96,7 +97,42 @@ async def register(user_data: UserCreate, request: Request):
         user_dict["trial_days"] = 14
     
     await db.users.insert_one(user_dict)
-    
+
+    # --------------------------------------------------------------------
+    # Auto-provision management company when a user self-registers as
+    # `company_admin`. Without this the user becomes an orphan_admin:
+    # no company row → missing from SuperAdmin Companies tab, no company
+    # subscription, and plan-limit enforcement silently defaults to starter.
+    # --------------------------------------------------------------------
+    if user_data.role == "company_admin":
+        new_company_id = str(uuid.uuid4())
+        new_company = {
+            "id": new_company_id,
+            "name": (user_data.full_name or user_data.username or "شركة جديدة").strip(),
+            "email": user_data.email,
+            "phone": user_data.phone or "",
+            "address": "",
+            "website": "",
+            "description": "تم الإنشاء تلقائياً من التسجيل الذاتي",
+            "compound_ids": [],
+            "admin_user_id": user.id,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_by": "self_registration",
+        }
+        await db.companies.insert_one(new_company)
+        await db.users.update_one({"id": user.id}, {"$set": {"company_id": new_company_id}})
+        # Bootstrap default starter subscription so plan-usage endpoints return sensible defaults
+        await db.company_subscriptions.update_one(
+            {"company_id": new_company_id},
+            {"$setOnInsert": {
+                "company_id": new_company_id,
+                "plan": "starter",
+                "status": "active",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }},
+            upsert=True,
+        )
+
     # Apply subscription code after user is created
     if subscription_info:
         await SubscriptionCodeManager.apply_code(

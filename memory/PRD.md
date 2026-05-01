@@ -5,6 +5,29 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 68: Company Registration Auto-Provisioning Fix (May 1, 2026) ✅
+
+**🐛 Bug reported by user**: "حاولت التسجيل باسم شركة إدارة جديدة لم يدخل" — New company registration from the public sign-up page appeared to fail with "Registration failed" toast, and even when the backend returned 200, the newly-created user was an orphan with no company row, no subscription, and `compound_id='default-compound'`. That broke the CompanyAdminDashboard on first login:
+- Orphan user → missing from SuperAdmin "Companies" tab
+- No `company_id` → aggregated-stats unusable
+- No `company_subscriptions` row → plan-usage defaulted silently to starter
+- `compound_id='default-compound'` → confusing bogus reference
+
+**Root cause**: `routes/auth.py :: POST /api/auth/register` only created the User document, regardless of role. It never touched `db.companies` or `db.company_subscriptions`. It also referenced the top-level `email_service` without importing it (visible in backend.err.log as "name 'email_service' is not defined" on every registration).
+
+**Fix applied in `routes/auth.py`:**
+1. Added `from email_service import email_service` to eliminate the welcome-email traceback.
+2. Immediately after `db.users.insert_one(user_dict)`, when `user.role == "company_admin"`:
+   - Create a matching `db.companies` row with `name = full_name|username`, `email/phone` from the form, `admin_user_id = user.id`, `created_by = "self_registration"`.
+   - Back-link: `db.users.update_one(...).{company_id: new_company_id}`.
+   - Upsert a `db.company_subscriptions` row with `plan: "starter"` so plan-limits return sensible values from the very first request.
+
+**Verified end-to-end:**
+- `POST /api/auth/register` for a fresh `company_admin` → 200 → `db.users` has `company_id` set → `db.companies` row exists with `admin_user_id` → `db.company_subscriptions` seeded with `plan=starter`.
+- Login → `/api/auth/me` returns `company_id` correctly → frontend navigates to `CompanyAdminDashboard` → Onboarding Wizard renders IMMEDIATELY with "مرحباً بك في {companyName}" header (screenshot attached).
+- Plan-usage card shows "مجاني" + progress bar 0/1 compound and 0/50 residents → upgrade CTA visible.
+
+
 ### Iter 67: Disaster Recovery Wizard (May 1, 2026) ✅
 
 **🛡 New: One-click full snapshot + restore for SuperAdmin/AppOwner.**

@@ -316,3 +316,15 @@ async def disaster_recovery_history(
         {}, {"_id": 0}
     ).sort("timestamp", -1).to_list(limit)
     return {"runs": docs, "total": len(docs)}
+
+
+# ---------------------------------------------------------------------------
+# 5. Renewal Reminders — manual trigger (used by SuperAdmin + ops testing)
+# ---------------------------------------------------------------------------
+@router.post("/run-renewal-reminders")
+async def run_renewal_reminders_manual(current_user: dict = Depends(get_current_user)):
+    """Manually trigger the renewal-reminder scan. Returns the count of emails queued."""
+    _require_super_admin(current_user)
+    from renewal_reminders import run_renewal_reminders_once
+    sent = await run_renewal_reminders_once()
+    return {"success": True, "emails_queued": sent}

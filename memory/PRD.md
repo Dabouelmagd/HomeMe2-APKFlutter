@@ -1301,6 +1301,12 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 74: Auto-Update Banner (UX-friendly) ✅ (2026-05-01)
+- **Replaced** the silent auto-reload behavior in `AppVersionGuard.js` with a friendly top banner: "📦 إصدار جديد متاح من التطبيق — اضغطي تحديث الآن للحصول على آخر التغييرات".
+- **Two actions**: 🔄 **تحديث الآن** (clears caches + SW + hard reload, preserving auth/sessions) — **لاحقًا** (snoozes for 30 min via `app_update_snooze_until` localStorage key).
+- **Polling unchanged**: every 5 min + on focus + on tab visibility change. First check 1.5s after mount.
+- **Verified via Playwright**: forced stale `app_build_version` → banner appeared on top → "لاحقًا" hides it + persists `app_update_snooze_until` → after un-snooze + reload, banner re-appears as expected.
+
 ### Iter 73: Same-Origin Rewrite (definitive fix) ✅ (2026-05-01)
 - **Replaces** the response-interceptor fallback from Iter 72 with a single proactive rewrite layer that runs before any module loads — so cross-origin /api calls never even leave the browser.
 - **New file `/app/frontend/src/api/sameOriginRewrite.js`**: when `window.location.origin !== process.env.REACT_APP_BACKEND_URL`, monkey-patches `window.fetch`, `window.WebSocket`, and adds an axios request interceptor that rewrites every `BACKEND_URL/...` URL to `<origin>/...`. ws/wss are auto-derived. Idempotent (safe to call twice). No-op when origins match.

@@ -1300,3 +1300,10 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - MOCKED: Smart Devices module
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
+
+### Iter 66: Registration Error UX — Clear Arabic error messages + Live password rules ✅ (2026-05-01)
+- **Problem**: Management-company registration was silently failing with a generic "Registration failed" English toast — user had no idea WHY (their password was missing uppercase/special-char to match backend rules).
+- **Fix 1 — `App.js` `register()` & `login()`**: rewrote error extraction to handle string detail, Pydantic-array detail (422), HTTP status codes, and network/CORS errors with localized Arabic messages. No more silent "Registration failed".
+- **Fix 2 — `Register.js` client-side validation**: added pre-submit checks that mirror `validate_password_strength` in `auth_deps.py` (≥8 chars, uppercase, lowercase, digit, special char). Each rule emits its own Arabic toast on violation.
+- **Fix 3 — Live password rules card**: visible 6-rule checklist below the password fields (turns green ✓ as the user types) so requirements are discoverable before submission. Password input `minLength` bumped from 6→8 to match backend.
+- **Verified**: weak password "12345678" → shows Arabic "كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل (A-Z)". Strong password "TestPass123!" → registers successfully and redirects to login.

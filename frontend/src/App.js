@@ -338,10 +338,17 @@ const AuthProvider = ({ children }) => {
       
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.detail || 'Login failed' 
-      };
+      const detail = error.response?.data?.detail;
+      let msg;
+      if (typeof detail === 'string') msg = detail;
+      else if (Array.isArray(detail) && detail.length > 0) {
+        msg = detail.map(d => d.msg || d.message || '').filter(Boolean).join(' • ');
+      } else if (error.response?.status === 401) msg = 'اسم المستخدم أو كلمة المرور غير صحيحة';
+      else if (error.response?.status) msg = `فشل تسجيل الدخول (HTTP ${error.response.status})`;
+      else if (error.message === 'Network Error' || !error.response) {
+        msg = 'تعذّر الاتصال بالخادم. تحقّق من اتصالك بالإنترنت ثم حاول مرة أخرى.';
+      } else msg = 'فشل تسجيل الدخول. يرجى المحاولة مرة أخرى.';
+      return { success: false, error: msg };
     }
   };
 
@@ -369,10 +376,28 @@ const AuthProvider = ({ children }) => {
       await axios.post(`${API}/auth/register`, userData);
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.detail || 'Registration failed' 
-      };
+      // Extract a human-readable error in Arabic.
+      // FastAPI returns either:
+      //   - 4xx: { detail: "string" }              (our HTTPException)
+      //   - 422: { detail: [{ msg, loc, type }] }  (Pydantic validation)
+      //   - Network/CORS failure → no response object at all
+      const detail = error.response?.data?.detail;
+      let msg;
+      if (typeof detail === 'string') {
+        msg = detail;
+      } else if (Array.isArray(detail) && detail.length > 0) {
+        msg = detail
+          .map(d => `${(d.loc || []).slice(-1)[0] || ''}: ${d.msg || d.message || ''}`.trim())
+          .filter(Boolean)
+          .join(' • ');
+      } else if (error.response?.status) {
+        msg = `فشل التسجيل (HTTP ${error.response.status})`;
+      } else if (error.message === 'Network Error' || !error.response) {
+        msg = 'تعذّر الاتصال بالخادم. تحقّق من اتصالك بالإنترنت ثم حاول مرة أخرى.';
+      } else {
+        msg = 'فشل التسجيل. يرجى المحاولة مرة أخرى.';
+      }
+      return { success: false, error: msg };
     }
   };
 

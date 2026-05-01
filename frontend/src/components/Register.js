@@ -92,8 +92,26 @@ const Register = () => {
       toast.error(t('passwords_no_match', 'كلمتا المرور غير متطابقتين'));
       return;
     }
-    if (formData.password.length < 6) {
-      toast.error(t('password_min_length', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'));
+    // Match backend rules in /app/backend/auth_deps.py validate_password_strength
+    const pwd = formData.password || '';
+    if (pwd.length < 8) {
+      toast.error('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+      return;
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      toast.error('كلمة المرور يجب أن تحتوي على حرف كبير واحد على الأقل (A-Z)');
+      return;
+    }
+    if (!/[a-z]/.test(pwd)) {
+      toast.error('كلمة المرور يجب أن تحتوي على حرف صغير واحد على الأقل (a-z)');
+      return;
+    }
+    if (!/\d/.test(pwd)) {
+      toast.error('كلمة المرور يجب أن تحتوي على رقم واحد على الأقل');
+      return;
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) {
+      toast.error('كلمة المرور يجب أن تحتوي على رمز خاص واحد على الأقل (!@#$%^&*)');
       return;
     }
 
@@ -248,13 +266,42 @@ const Register = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('password', 'كلمة المرور')}</label>
-                  <input type="password" name="password" value={formData.password} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 outline-none" required minLength="6" data-testid="input-password" />
+                  <input type="password" name="password" value={formData.password} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 outline-none" required minLength="8" data-testid="input-password" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">{t('confirm_password', 'تأكيد كلمة المرور')}</label>
-                  <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 outline-none" required minLength="6" data-testid="input-confirm-password" />
+                  <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-300 focus:border-blue-400 outline-none" required minLength="8" data-testid="input-confirm-password" />
                 </div>
               </div>
+
+              {/* Live password requirements checklist — matches backend validate_password_strength */}
+              {(() => {
+                const p = formData.password || '';
+                const rules = [
+                  { ok: p.length >= 8, label: '٨ أحرف على الأقل' },
+                  { ok: /[A-Z]/.test(p), label: 'حرف كبير (A-Z)' },
+                  { ok: /[a-z]/.test(p), label: 'حرف صغير (a-z)' },
+                  { ok: /\d/.test(p), label: 'رقم (0-9)' },
+                  { ok: /[!@#$%^&*(),.?":{}|<>]/.test(p), label: 'رمز خاص (!@#$%^&*)' },
+                  { ok: p && formData.confirmPassword && p === formData.confirmPassword, label: 'تطابق كلمتي المرور' },
+                ];
+                return (
+                  <div
+                    className="bg-gray-50 border border-gray-200 rounded-xl p-3 grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1.5"
+                    data-testid="password-rules"
+                    dir="rtl"
+                  >
+                    {rules.map((r, i) => (
+                      <div key={i} className="flex items-center gap-2 text-xs">
+                        <span className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold ${r.ok ? 'bg-emerald-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
+                          {r.ok ? '✓' : '·'}
+                        </span>
+                        <span className={r.ok ? 'text-emerald-700' : 'text-gray-600'}>{r.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
 
               {/* Conditional fields based on account type */}
               {accountType === 'resident' && (

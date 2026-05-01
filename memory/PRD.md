@@ -5,6 +5,41 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 67: Disaster Recovery Wizard (May 1, 2026) ✅
+
+**🛡 New: One-click full snapshot + restore for SuperAdmin/AppOwner.**
+
+**Backend (`routes/disaster_recovery.py`):**
+- `GET /api/super-admin/disaster-recovery/preview` — returns the manifest summary (collections list, total docs, media count, app version, excluded collections).
+- `GET /api/super-admin/disaster-recovery/snapshot` — streams a single signed `.zip`:
+  - `manifest.json` — version, app_version, generated_at, generated_by, per-collection sha256, per-media-file sha256, totals.
+  - `collections/<name>.json` — MongoDB Extended JSON via `bson.json_util` (preserves ObjectId, datetime, Binary).
+  - `media/<filename>` — raw binary blobs read from the dual-write `media_files` collection.
+  - Excludes runtime-only collections: `fs.files`, `fs.chunks`, `perf_samples`, `smoke_test_runs`.
+  - Always logs the run to `disaster_recovery_runs` collection (audit trail).
+- `POST /api/super-admin/disaster-recovery/restore?confirm=I_UNDERSTAND_OVERWRITE` (multipart `file=…`):
+  - Validates manifest + per-collection sha256 + per-media sha256 BEFORE writing.
+  - Atomic per-collection drop+insert (transactions skipped to support replicaset-less Mongo).
+  - Re-imports media binaries directly into `media_files` (the dual-write target → next read auto-restores `/uploads`).
+  - Returns `{success, restored.collections_count, restored.media_files_count, errors[]}`.
+- `GET /api/super-admin/disaster-recovery/history?limit=20` — paginated audit log.
+- All endpoints require `app_owner | super_admin`. `company_admin / admin / resident` → 403.
+
+**Frontend (`components/super-admin/DisasterRecoveryTab.js`):**
+- Mounted as `tab=disaster_recovery` in `SuperAdminPanel` (visible to app_owner only — hidden when `isSuperAdminOnly`).
+- Hero stats card (collections / docs / media / version).
+- Emerald "📦 Download" card — triggers blob download with timestamped filename `homeme-disaster-recovery-YYYYMMDD-HHMMSS.zip`.
+- Rose "⚠️ Restore" card — file picker + Arabic confirm-word "استعادة" + irreversible warning. POSTs with `confirm=I_UNDERSTAND_OVERWRITE`.
+- Inline result panel showing restored counts + collapsible error list.
+- History feed (last 20 runs) with action emoji, username, timestamp, size.
+
+**🧪 Test results (testing_agent_v3_fork iter59):**
+- Backend: **14/14 PASS** (snapshot 252 KB in <1s, manifest sha256 verified, restore round-trip preserves data, RBAC enforced 403 for company_admin, restore rejects without/with-wrong confirm).
+- Frontend: **3/3 PASS** (Owner DR download triggered real .zip, CompoundSwitcher shows 2 compounds for testcompany2, newco_admin sees Onboarding wizard immediately and dashboard after save).
+
+**Verified manually**: 252 KB ZIP for current data (60 cols, 1061 docs, 41 media), generated in 1.05s.
+
+
 ### Iter 66: E2E Onboarding fix + Real Feature Gating + Upgrade UX (May 1, 2026) ✅
 
 **🐛 Bug Fixed during E2E test of Onboarding flow:**

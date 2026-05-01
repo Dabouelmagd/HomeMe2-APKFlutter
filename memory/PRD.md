@@ -3,7 +3,28 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
-## Latest Fixes (Feb 2026 — iterations 26-63)
+## Latest Fixes (Feb 2026 — iterations 26-64)
+
+### Iter 76: Design System Living Style-Guide (May 1, 2026) ✅
+
+**🎨 `/app/design-system` — A single page showcasing every shared component in every color/theme, with copy-paste code snippets.**
+
+**Page (`pages/DesignSystemPage.js`):**
+- Sticky nav chips: Overview · PageHeaders · StatCards · SectionCards · EmptyStates · Tokens.
+- 6 PageHeader themes rendered in sequence (`indigo`, `rose`, `emerald`, `blue`, `amber`, `slate`) with role-mapping description.
+- StatCards: 9 colors × 2 variants (dark/light), plus a clickable example.
+- SectionCards: dark + light side-by-side.
+- EmptyStates: dark + light side-by-side.
+- Tokens section: spacing scale, typography samples, import snippet.
+- Every example has a `<CodeBlock>` showing exact JSX to copy-paste.
+
+**Access control:** restricted to `app_owner` / `super_admin` — regular users see a "مخصصة للفريق الداخلي" screen. Route: `/app/design-system`.
+
+**Build-time safety:** uses a static `colorMap` for the internal `<Tag>` component so Tailwind JIT picks up all classes at build time (no runtime dynamic-class breakage).
+
+**🧪 Iter64 testing agent: 100% frontend success, 0 bugs.** Regression across CompanyAdmin / Resident / Security dashboards all green.
+
+---
 
 ### Iter 75: Unified UI System (PageHeader + StatCard + SectionCard + EmptyState) (May 1, 2026) ✅
 

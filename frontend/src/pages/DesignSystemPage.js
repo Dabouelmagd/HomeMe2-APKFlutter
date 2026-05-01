@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../App';
 import PageHeader from '../components/shared/PageHeader';
 import StatCard from '../components/shared/StatCard';
 import SectionCard from '../components/shared/SectionCard';
@@ -31,15 +32,44 @@ const CodeBlock = ({ code }) => (
   </pre>
 );
 
-const Tag = ({ children, color = 'indigo' }) => (
-  <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-${color}-100 text-${color}-700 border border-${color}-200 ml-1`}>
-    {children}
-  </span>
-);
+const Tag = ({ children, color = 'indigo' }) => {
+  // Static map so Tailwind JIT picks up classes at build time
+  const colorMap = {
+    indigo:  'bg-indigo-100 text-indigo-700 border-indigo-200',
+    emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    blue:    'bg-blue-100 text-blue-700 border-blue-200',
+    amber:   'bg-amber-100 text-amber-700 border-amber-200',
+    rose:    'bg-rose-100 text-rose-700 border-rose-200',
+  };
+  return (
+    <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full border ml-1 ${colorMap[color] || colorMap.indigo}`}>
+      {children}
+    </span>
+  );
+};
 
 const DesignSystemPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [activeSection, setActiveSection] = useState('overview');
+
+  // Gate: only app_owner / super_admin see the living style-guide in production
+  const role = user?.role;
+  const canView = ['app_owner', 'super_admin'].includes(role);
+  if (!canView) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-gray-900 to-indigo-950 p-6" dir="rtl">
+        <div className="text-center bg-gray-800/70 backdrop-blur border border-gray-700 rounded-2xl p-8 max-w-md" data-testid="ds-forbidden">
+          <div className="text-5xl mb-3">🔒</div>
+          <h1 className="text-xl font-extrabold text-white mb-2">الصفحة مخصصة للفريق الداخلي</h1>
+          <p className="text-sm text-gray-400 mb-5">دليل المكونات متاح لمالك التطبيق والمدير الأعلى فقط.</p>
+          <button onClick={() => navigate(-1)} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-lg font-bold" data-testid="ds-forbidden-back">
+            ← رجوع
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const sections = [
     { id: 'overview',   label: '🏠 نظرة عامة' },
@@ -331,7 +361,7 @@ const DesignSystemPage = () => {
 
         {/* Footer */}
         <div className="text-center text-[10px] text-gray-500 py-4">
-          HomeMe Design System v1 • آخر تحديث مايو 2026 •
+          HomeMe Design System v1 •
           القواعد الكاملة في <code className="text-indigo-400">/app/design_guidelines.md</code>
         </div>
       </div>

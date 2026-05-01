@@ -1301,6 +1301,18 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 76: Changelog moved to MongoDB + Owner CRUD page ✅ (2026-05-01)
+- **Backend `routes/app_version.py` rewritten**: replaces hard-coded `_CHANGELOG` with MongoDB collection `changelog_entries` (`{id, ar, en, fr, order, is_active, created_at, updated_at, created_by}`). `/api/version` now reads active entries (sorted by `order`, limit 8) and falls back to a built-in seed list when the collection is empty so first-installs/dev environments stay nice.
+- **New owner-only CRUD endpoints** behind `require_app_owner`:
+  - `GET /api/owner/changelog` (list all incl. inactive)
+  - `POST /api/owner/changelog` (auto next-order)
+  - `PUT /api/owner/changelog/{id}` (partial update — toggle is_active, edit text, change order)
+  - `DELETE /api/owner/changelog/{id}`
+- **New page `pages/ChangelogManagementPage.js`** mounted at `/app/changelog` (app_owner only). Form for adding new bullet (3 textareas + visibility toggle), table of current entries with reorder arrows, inline edit, hide/show toggle, delete-with-confirm. Uses shared `PageHeader` (indigo theme) + `SectionCard` + `EmptyState` for visual consistency.
+- **Sidebar nav link** added in `Layout.js` for app_owner only → "سجل التحديثات (Changelog)".
+- **Verified end-to-end**: backend curl roundtrip (empty list → create → /version reads from DB → delete → /version returns to fallback) — Playwright UI smoke test (login as Owner_homeme → /app/changelog renders → create entry → row visible → delete → empty state).
+- **Owner workflow now**: edit changelog from the panel → next deploy bumps `_VERSION` → users see "📦 إصدار جديد متاح" banner → "تحديث الآن" → ChangelogModal pulls fresh bullets from DB. **Zero code changes needed for release notes.**
+
 ### Iter 75: Changelog Modal — "What's New" post-update ✅ (2026-05-01)
 - **Backend `routes/app_version.py`**: `/api/version` now returns a `changelog` array of 5 user-facing bullets in **3 languages** (ar/en/fr). Update the list manually with each release — short, friendly strings only.
 - **Frontend `AppVersionGuard.js`**: when a new version is detected, captures `data.changelog` and stores it under `app_changelog_pending` in localStorage just before the hard reload.

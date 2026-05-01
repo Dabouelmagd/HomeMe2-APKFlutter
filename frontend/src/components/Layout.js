@@ -530,6 +530,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'صحة الوسائط والنسخ الاحتياطي', href: 'media-health', icon: ShieldCheckIcon, show: true },
         { name: 'تخصيص قالب التقارير', href: 'branding', icon: SwatchIcon, show: true },
         { name: 'لوجو وألوان هوم مي', href: 'app-branding', icon: SwatchIcon, show: activeRole === 'app_owner' },
+        { name: 'سجل التحديثات (Changelog)', href: 'changelog', icon: DocumentTextIcon, show: activeRole === 'app_owner' },
         { name: 'قوالب البريد', href: 'email-templates', icon: EnvelopeIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
       ]

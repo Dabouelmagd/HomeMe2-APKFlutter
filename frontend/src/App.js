@@ -61,6 +61,7 @@ import MyInvitesPage from './pages/MyInvitesPage';
 import SystemHealthPage from './pages/SystemHealthPage';
 import AuditLogPage from './pages/AuditLogPage';
 import OwnerKpiPage from './pages/OwnerKpiPage';
+import ChangelogManagementPage from './pages/ChangelogManagementPage';
 import VisitorPassesPage from './pages/VisitorPassesPage';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
@@ -787,6 +788,12 @@ function App() {
                 <Route path="owner-kpis" element={
                   <ProtectedRoute>
                     <OwnerKpiPage />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="changelog" element={
+                  <ProtectedRoute>
+                    <ChangelogManagementPage />
                   </ProtectedRoute>
                 } />
 

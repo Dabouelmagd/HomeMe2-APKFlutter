@@ -19,6 +19,7 @@ import {
   XCircleIcon,
   KeyIcon
 } from '@heroicons/react/24/outline';
+import UserTimelineModal from './UserTimelineModal';
 import { toast } from 'sonner';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -37,6 +38,7 @@ const UserManagement = () => {
   const [showAddUser, setShowAddUser] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [viewingUser, setViewingUser] = useState(null);
+  const [timelineUser, setTimelineUser] = useState(null);
   const [editFormData, setEditFormData] = useState({});
   const [savingEdit, setSavingEdit] = useState(false);
   
@@ -561,6 +563,19 @@ const UserManagement = () => {
                               🎭
                             </button>
                           )}
+                          {/* Activity Timeline — Owner / SuperAdmin / Admin of the same compound */}
+                          {(user?.role === 'app_owner' || user?.role === 'super_admin' ||
+                            (user?.role === 'admin' && user?.compound_id === userItem.compound_id) ||
+                            (user?.role === 'company_admin' && user?.compound_id === userItem.compound_id)) && (
+                            <button
+                              onClick={() => setTimelineUser(userItem)}
+                              className="text-indigo-600 hover:text-indigo-900"
+                              title="عرض سجل النشاط (Timeline)"
+                              data-testid={`user-timeline-${userItem.id}`}
+                            >
+                              📋
+                            </button>
+                          )}
                           <button 
                             onClick={() => handleDeleteUser(userItem.id)}
                             className="text-red-600 hover:text-red-900"
@@ -724,6 +739,7 @@ const UserManagement = () => {
             </div>
             <div className="flex gap-3 mt-6">
               <button onClick={() => { setViewingUser(null); handleEditUser(viewingUser); }} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-medium" data-testid="view-modal-edit-btn">تعديل</button>
+              <button onClick={() => { setTimelineUser(viewingUser); setViewingUser(null); }} className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-medium" data-testid="view-modal-timeline-btn">📋 سجل النشاط</button>
               <button onClick={() => setViewingUser(null)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg font-medium" data-testid="view-modal-close-btn">إغلاق</button>
             </div>
           </div>
@@ -777,6 +793,8 @@ const UserManagement = () => {
           </div>
         </div>
       )}
+      {/* Timeline Modal */}
+      {timelineUser && <UserTimelineModal user={timelineUser} onClose={() => setTimelineUser(null)} />}
     </div>
   );
 };

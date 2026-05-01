@@ -51,10 +51,30 @@ _PLAN_NAME_AR = {
 
 
 async def get_company_plan_limits(company_id: str) -> dict:
-    """Return {plan, max_compounds, max_residents, plan_name_ar} for a company."""
+    """Return {plan, max_compounds, max_residents, plan_name_ar} for a company.
+    
+    If the subscription has expired (expires_at < now), the company is auto-downgraded
+    to the starter plan until they renew. Status is flipped to 'expired' in the DB
+    so the frontend badge surfaces it.
+    """
+    from datetime import datetime, timezone
     db = get_db()
-    sub = await db.company_subscriptions.find_one({"company_id": company_id}, {"_id": 0, "plan": 1})
+    sub = await db.company_subscriptions.find_one({"company_id": company_id}, {"_id": 0})
     plan_key = (sub or {}).get("plan") or "starter"
+
+    # Auto-expiry: paid plans whose expires_at is in the past fall back to starter
+    if sub and plan_key != "starter" and sub.get("expires_at") and sub.get("status") != "expired":
+        try:
+            exp = datetime.fromisoformat(sub["expires_at"].replace("Z", "+00:00"))
+            if exp < datetime.now(timezone.utc):
+                await db.company_subscriptions.update_one(
+                    {"company_id": company_id},
+                    {"$set": {"status": "expired", "expired_at": datetime.now(timezone.utc).isoformat()}},
+                )
+                plan_key = "starter"
+        except Exception:
+            pass
+
     limits = _PLAN_LIMITS.get(plan_key, _PLAN_LIMITS["starter"])
     return {
         "plan": plan_key,

@@ -5,6 +5,38 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-59)
 
+### Iter 72: Subscription Badge + Auto-Expiry (May 1, 2026) ✅
+
+**🎟 Header badge showing plan + days remaining + renewal CTA for management companies.**
+
+**Backend:**
+- `GET /api/company-admin/plan-usage` now also returns `status`, `expires_at`, `days_remaining` (computed server-side).
+- Stripe `_activate_subscription` sets `expires_at = now + 30 days` on every successful payment + `activated_at` + `last_payment_session_id`.
+- `plan_limits.get_company_plan_limits` now auto-downgrades expired subscriptions:
+  - If `plan != starter` and `expires_at < now` → flip `status=expired`, `expired_at=now`, return `plan=starter`.
+  - Silent auto-downgrade on every limits lookup — the instant the grace period ends, the company loses paid feature flags and max_compounds/max_residents fall back to starter.
+
+**Frontend (`components/company-admin/SubscriptionBadge.js`):**
+- Pill-shaped badge in Layout header (between CompoundSwitcher and SessionSwitcher).
+- Visible only for `company_admin / assistant_manager / accountant`.
+- Color-coded states:
+  - 🆓 Gray — starter plan
+  - ✅ Green — active with >7 days (or unlimited/enterprise) — `{plan_name_ar} • {N} يوم`
+  - ⏰ Amber — active with 3-7 days remaining (warn)
+  - ⏰ Red + pulse — active with ≤2 days OR status=pending_payment OR status=expired
+- Clicking navigates to `/app/dashboard` and dispatches `openUpgradeModal` → same upgrade flow as the Plan Usage card.
+
+**🧪 Verified via Playwright:**
+- Injected `expires_at = now + 5 days` on testcompany2 → Badge rendered **"⏰ شركة كبرى • 4 يوم"** with amber styling ✅
+- Restored testcompany2 to no-expiry (matches production reality for unlimited enterprise) ✅
+
+**Expected production behaviour:**
+- Paid plan subscriber pays via Stripe → badge shows "✅ شركة متوسطة • 30 يوم" (green).
+- Day 23 → badge turns amber "⏰ شركة متوسطة • 7 يوم" + renewal CTA.
+- Day 28 → badge turns red pulse "⏰ شركة متوسطة • 2 يوم".
+- Day 30 after expiry → badge turns red "⛔ منتهية — جدّد". At the same time, `get_company_plan_limits` silently auto-downgrades the company to starter so advanced features lock.
+
+
 ### Iter 71: AppVersionGuard — Auto Cache-Bust on Deploy (May 1, 2026) ✅
 
 **🐛 Problem reported by user**: After deployment, users see a stale cached `frontend` bundle with old behaviour (login-flow breaks, new features missing) until they manually clear browser cache or hard-reload.

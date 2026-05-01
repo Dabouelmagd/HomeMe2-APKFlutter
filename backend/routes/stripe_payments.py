@@ -13,7 +13,7 @@ Flow:
 """
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import os
 import uuid
 import logging
@@ -65,22 +65,26 @@ async def _activate_subscription(db, session_id: str, metadata: dict):
         logging.error(f"[stripe] missing company_id/plan_key in session {session_id}")
         return
 
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(timezone.utc)
+    now_iso = now.isoformat()
+    # 30-day subscription period (manual monthly cycle — until we move to real Stripe Subscriptions)
+    expires_at = (now + timedelta(days=30)).isoformat()
     await db.payment_transactions.update_one(
         {"session_id": session_id},
-        {"$set": {"payment_status": "paid", "status": "completed", "paid_at": now}},
+        {"$set": {"payment_status": "paid", "status": "completed", "paid_at": now_iso}},
     )
     await db.company_subscriptions.update_one(
         {"company_id": company_id},
         {"$set": {
             "plan": plan_key,
             "status": "active",
-            "activated_at": now,
+            "activated_at": now_iso,
+            "expires_at": expires_at,
             "last_payment_session_id": session_id,
         }},
         upsert=True,
     )
-    logging.info(f"[stripe] subscription activated company={company_id} plan={plan_key}")
+    logging.info(f"[stripe] subscription activated company={company_id} plan={plan_key} expires_at={expires_at}")
 
 
 # ---------------------------------------------------------------------------

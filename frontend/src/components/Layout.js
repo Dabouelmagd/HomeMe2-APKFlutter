@@ -6,6 +6,7 @@ import { useAuth, useNotifications } from '../App';
 import { toast } from 'sonner';
 import ImpersonationBanner from './ImpersonationBanner';
 import CompoundSwitcher from './company-admin/CompoundSwitcher';
+import SubscriptionBadge from './company-admin/SubscriptionBadge';
 import {
   HomeIcon,
   BuildingOfficeIcon,
@@ -1086,6 +1087,9 @@ const Layout = ({ children, isTrialMode = false }) => {
 
               {/* Compound Switcher — Quick navigation across company's compounds */}
               <CompoundSwitcher />
+
+              {/* Subscription Badge — plan status + days remaining + renewal CTA */}
+              <SubscriptionBadge />
 
               {/* Session Switcher */}
               <SessionSwitcher />

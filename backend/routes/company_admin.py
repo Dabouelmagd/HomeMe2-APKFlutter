@@ -113,6 +113,20 @@ async def company_admin_plan_usage(current_user: dict = Depends(_require_company
     current_residents = await db.users.count_documents({
         "role": "resident", "compound_id": {"$in": cids}
     }) if cids else 0
+
+    # Subscription expiry / status — used by the header badge to show days remaining
+    sub = await db.company_subscriptions.find_one({"company_id": cid}, {"_id": 0}) or {}
+    status = sub.get("status", "active" if plan["plan"] == "starter" else "pending_payment")
+    expires_at = sub.get("expires_at")
+    days_remaining = None
+    if expires_at:
+        try:
+            exp_dt = datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
+            delta = exp_dt - datetime.now(timezone.utc)
+            days_remaining = max(0, int(delta.total_seconds() // 86400))
+        except Exception:
+            days_remaining = None
+
     return {
         "company_id": cid,
         "plan": plan["plan"],
@@ -124,6 +138,9 @@ async def company_admin_plan_usage(current_user: dict = Depends(_require_company
         "current_residents": current_residents,
         "can_add_compound": plan["max_compounds"] == -1 or current_compounds < plan["max_compounds"],
         "can_add_resident": plan["max_residents"] == -1 or current_residents < plan["max_residents"],
+        "status": status,
+        "expires_at": expires_at,
+        "days_remaining": days_remaining,
     }
 
 

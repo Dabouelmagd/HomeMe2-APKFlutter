@@ -46,26 +46,37 @@ SKIP_PATTERNS = [
 PATH_PARAM_RE = re.compile(r"\{([^}]+)\}")
 
 
-def _classify(status_code: Optional[int], error: Optional[str], body_text: Optional[str] = None) -> str:
+def _classify_with_reason(status_code: Optional[int], error: Optional[str], body_text: Optional[str] = None) -> tuple:
+    """Returns (result, reason_code) where reason_code is a stable machine-readable
+    token the UI can group/explain. result ∈ pass/warn/fail/skipped."""
     if error:
-        return "fail"
+        if "timeout" in error.lower():
+            return "fail", "timeout"
+        return "fail", "network_error"
     if status_code is None:
-        return "fail"
+        return "fail", "no_response"
     if 200 <= status_code < 300:
-        return "pass"
-    if status_code in (401, 403):
-        # Auth-related — usually means RBAC is correctly blocking; treat as warn
-        return "warn"
+        return "pass", None
+    if status_code == 401:
+        return "warn", "auth_required"
+    if status_code == 403:
+        return "warn", "forbidden_for_tester_role"
     if status_code == 404:
-        return "warn"
+        return "warn", "not_found_for_context"
     if status_code == 422 and body_text and '"type":"missing"' in body_text:
-        # Unscannable endpoint — requires query params the scanner can't
-        # guess (e.g. /api/reports/financial needs compound_id + date range).
-        # These aren't failures; they're just not covered by the scanner.
-        return "skipped"
+        return "skipped", "requires_query_params"
+    if status_code == 422:
+        return "warn", "validation_error"
+    if status_code == 405:
+        return "warn", "method_not_allowed"
     if 400 <= status_code < 500:
-        return "warn"
-    return "fail"
+        return "warn", "client_error"
+    return "fail", "server_error"
+
+
+def _classify(status_code: Optional[int], error: Optional[str], body_text: Optional[str] = None) -> str:
+    """Backward-compatible classifier — thin wrapper over _classify_with_reason."""
+    return _classify_with_reason(status_code, error, body_text)[0]
 
 
 def _is_skipped(path: str) -> bool:
@@ -208,7 +219,13 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
                 except Exception as e:
                     entry["error"] = str(e)[:160]
                 entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
-            entry["result"] = _classify(entry["status_code"], entry["error"], body_text)
+            result, reason_code = _classify_with_reason(entry["status_code"], entry["error"], body_text)
+            entry["result"] = result
+            # Preserve scanner-side reasons ("non-GET", "blacklisted", etc); only
+            # overwrite `reason` if classification produced a more specific code
+            # and a reason wasn't already set by earlier short-circuits above.
+            if reason_code and not entry.get("reason"):
+                entry["reason"] = reason_code
             if entry["result"] == "skipped" and not entry.get("reason"):
                 entry["reason"] = "requires unscannable query params"
             return entry
@@ -335,7 +352,13 @@ async def trigger_daily_now(request: Request, current_user: dict = Depends(get_c
                 except Exception as e:
                     entry["error"] = str(e)[:160]
                 entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
-            entry["result"] = _classify(entry["status_code"], entry["error"], body_text)
+            result, reason_code = _classify_with_reason(entry["status_code"], entry["error"], body_text)
+            entry["result"] = result
+            # Preserve scanner-side reasons ("non-GET", "blacklisted", etc); only
+            # overwrite `reason` if classification produced a more specific code
+            # and a reason wasn't already set by earlier short-circuits above.
+            if reason_code and not entry.get("reason"):
+                entry["reason"] = reason_code
             if entry["result"] == "skipped" and not entry.get("reason"):
                 entry["reason"] = "requires unscannable query params"
             return entry
@@ -468,7 +491,13 @@ async def _run_internal_scan(app, db) -> dict:
                 except Exception as e:
                     entry["error"] = str(e)[:160]
                 entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
-            entry["result"] = _classify(entry["status_code"], entry["error"], body_text)
+            result, reason_code = _classify_with_reason(entry["status_code"], entry["error"], body_text)
+            entry["result"] = result
+            # Preserve scanner-side reasons ("non-GET", "blacklisted", etc); only
+            # overwrite `reason` if classification produced a more specific code
+            # and a reason wasn't already set by earlier short-circuits above.
+            if reason_code and not entry.get("reason"):
+                entry["reason"] = reason_code
             if entry["result"] == "skipped" and not entry.get("reason"):
                 entry["reason"] = "requires unscannable query params"
             return entry

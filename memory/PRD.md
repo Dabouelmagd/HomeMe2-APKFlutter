@@ -1301,6 +1301,15 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 82: Warnings breakdown map — explainable scanner ✅ (2026-05-01)
+- **Backend** `_classify_with_reason` now returns `(result, reason_code)` where `reason_code` is one of `auth_required / forbidden_for_tester_role / not_found_for_context / validation_error / method_not_allowed / client_error / server_error / timeout / network_error / no_response / requires_query_params`. All 3 scan sites (manual, trigger, daily-internal) write the code into `entry.reason`.
+- **Frontend `SystemHealthPage.js`**: new collapsible "🗺️ خريطة التحذيرات" card between the slow-endpoints list and the filters. Groups warns by `reason` with:
+  - Emoji + friendly Arabic label + count badge + full-sentence explanation of why that reason exists (e.g. "الـ RBAC يعمل بشكل صحيح — هذا الـ endpoint للـ app_owner فقط وتم الفحص بحساب super_admin فحجبه كما ينبغي").
+  - Expandable list of every endpoint in that group with status, latency, and path.
+  - Tip at the bottom: **"معظم الـ warns صحية وطبيعية — ركّزي فقط على client_error لو ظهر."**
+- **Verified via Playwright**: full scan → card shows `🛡️ 9 RBAC / ⚠️ 7 client_error / 🔍 5 not_found` → clicking the first group expands to show all 9 403-blocked monitoring/financial admin endpoints with their paths and latencies.
+- **Uses static Tailwind classes** (bg/border/badge mapped per-reason) so JIT compiles every color correctly — no dynamic class strings.
+
 ### Iter 81: Health Scanner false-positives + 2 real bugs ✅ (2026-05-01)
 - **Root cause** of the "8 failing routes" alert: the Health Scanner itself was self-DoS'ing. It ran 16 concurrent requests against its own process with a 10s timeout → heavy Mongo aggregations (disaster-recovery, timeline/csv, perf-budget) exceeded 10s under that load and reported bogus `timeout` fails.
 - **`routes/system_health.py`** hardening (all 3 scan paths: manual, daily-trigger, internal daily):

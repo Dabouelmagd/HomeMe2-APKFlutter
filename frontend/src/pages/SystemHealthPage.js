@@ -400,6 +400,76 @@ const SystemHealthPage = () => {
         </div>
       )}
 
+      {/* Warnings breakdown by reason code — shown when there are warns */}
+      {(() => {
+        const warns = results.filter((r) => r.result === 'warn');
+        if (warns.length === 0) return null;
+
+        const REASON_META = {
+          auth_required: { emoji: '🔐', label: 'يحتاج مصادقة', bg: 'bg-sky-50/40', border: 'border-sky-200', badge: 'bg-sky-200 text-sky-900', desc: 'الـ endpoint يتطلّب تسجيل دخول ولم يمرّر Token صحيح في الفحص.' },
+          forbidden_for_tester_role: { emoji: '🛡️', label: 'محجوب للدور الحالي (RBAC)', bg: 'bg-indigo-50/40', border: 'border-indigo-200', badge: 'bg-indigo-200 text-indigo-900', desc: 'الـ RBAC يعمل بشكل صحيح — هذا الـ endpoint للـ app_owner فقط مثلاً وتم الفحص بحساب super_admin فحجبه كما ينبغي.' },
+          not_found_for_context: { emoji: '🔍', label: 'لا يوجد resource للـ context', bg: 'bg-amber-50/40', border: 'border-amber-200', badge: 'bg-amber-200 text-amber-900', desc: 'الـ endpoint موجود لكن الـ ID المُمرَّر لا يطابق أي سجل (مثلاً لا يوجد compound مرتبط بالمستخدم الذي يجري الفحص).' },
+          validation_error: { emoji: '📋', label: 'خطأ validation', bg: 'bg-orange-50/40', border: 'border-orange-200', badge: 'bg-orange-200 text-orange-900', desc: 'ردّ 422 — عادةً يعني أن الـ payload فاضي أو لا يطابق الـ schema. غالباً endpoints تحتاج query params غير موجودة.' },
+          method_not_allowed: { emoji: '🚫', label: 'Method غير مسموح', bg: 'bg-gray-50/40', border: 'border-gray-200', badge: 'bg-gray-200 text-gray-900', desc: '405 — الـ endpoint لا يقبل GET. قد يكون POST/PUT فقط.' },
+          client_error: { emoji: '⚠️', label: 'خطأ 4xx عام', bg: 'bg-yellow-50/40', border: 'border-yellow-200', badge: 'bg-yellow-200 text-yellow-900', desc: 'ردّ 4xx غير مصنّف بشكل أدق. افتحي الـ endpoint يدوياً لترى السبب الفعلي.' },
+          unknown: { emoji: '❔', label: 'سبب غير مصنّف', bg: 'bg-gray-50/40', border: 'border-gray-200', badge: 'bg-gray-200 text-gray-900', desc: 'غير معروف — يُرجى إعادة تشغيل الفحص.' },
+        };
+
+        const groups = {};
+        warns.forEach((w) => {
+          const r = w.reason || 'unknown';
+          (groups[r] = groups[r] || []).push(w);
+        });
+        const sorted = Object.entries(groups).sort((a, b) => b[1].length - a[1].length);
+
+        return (
+          <div className="bg-white rounded-2xl shadow-sm p-5 mb-4" data-testid="warnings-breakdown-card">
+            <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+              <div>
+                <h3 className="text-base font-bold text-gray-900 inline-flex items-center gap-2">
+                  🗺️ خريطة التحذيرات ({warns.length})
+                </h3>
+                <p className="text-xs text-gray-500 mt-0.5">تصنيف ذكي للـ warns يوضّح السبب الجذري لكل مجموعة — معظمها ليست أخطاء فعلية.</p>
+              </div>
+            </div>
+            <div className="space-y-3">
+              {sorted.map(([reason, items]) => {
+                const meta = REASON_META[reason] || REASON_META.unknown;
+                return (
+                  <details key={reason} className={`group border rounded-xl ${meta.border} ${meta.bg} overflow-hidden`} data-testid={`warn-group-${reason}`}>
+                    <summary className="cursor-pointer px-4 py-3 flex items-center gap-3 hover:bg-white/50 transition select-none">
+                      <span className="text-xl shrink-0">{meta.emoji}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-sm text-gray-900 flex items-center gap-2 flex-wrap">
+                          <span>{meta.label}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${meta.badge}`}>
+                            {items.length} endpoint
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-gray-600 mt-0.5 leading-relaxed">{meta.desc}</div>
+                      </div>
+                      <span className="text-xs text-gray-400 group-open:rotate-180 transition">▾</span>
+                    </summary>
+                    <div className="px-4 pb-3 pt-1 space-y-1">
+                      {items.map((it, i) => (
+                        <div key={it.path + i} className="flex items-center gap-2 text-xs py-1.5 px-2 bg-white/60 rounded border border-gray-100" data-testid={`warn-row-${reason}-${i}`}>
+                          <code className="font-mono text-gray-800 flex-1 min-w-0 truncate" dir="ltr" title={it.path}>{it.path}</code>
+                          <span className="shrink-0 px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-bold">{it.status_code}</span>
+                          {typeof it.ms === 'number' && <span className="shrink-0 text-gray-500">{it.ms}ms</span>}
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-gray-500 mt-4 text-center">
+              💡 معظم الـ warns صحية وطبيعية (RBAC يحجب ما يجب حجبه). ركّزي فقط على <b>client_error</b> لو ظهر لأنه يعني أن endpoint يحتاج فحصاً يدوياً.
+            </p>
+          </div>
+        );
+      })()}
+
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm p-3 mb-4 flex flex-wrap items-center gap-2">
         {FILTERS.map((f) => {

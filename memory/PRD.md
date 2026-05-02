@@ -1301,6 +1301,22 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 81: Health Scanner false-positives + 2 real bugs ✅ (2026-05-01)
+- **Root cause** of the "8 failing routes" alert: the Health Scanner itself was self-DoS'ing. It ran 16 concurrent requests against its own process with a 10s timeout → heavy Mongo aggregations (disaster-recovery, timeline/csv, perf-budget) exceeded 10s under that load and reported bogus `timeout` fails.
+- **`routes/system_health.py`** hardening (all 3 scan paths: manual, daily-trigger, internal daily):
+  - Concurrency: `Semaphore(16) → Semaphore(6)`
+  - Timeout: `10s → 25s`
+  - `_classify()` now treats `422 {"type":"missing"}` as `skipped` with reason `"requires unscannable query params"` instead of `warn` — these endpoints need params the scanner can't synthesize (e.g. `/api/reports/financial` needs `compound_id` + date range). They aren't failures, they're just out-of-scope.
+- **2 real bugs fixed** (surfaced by the improved scan):
+  1. `/api/reports/../reminders/logs` (in `push_email.py`): `NameError: db not defined` — added missing `db = get_db()` + excluded `_id` from projection.
+  2. `/api/database/compounds` (in `db_admin.py`): `AttributeError: 'str' object has no attribute 'isoformat'` — `compound.get("created_at")` is already a string for records written after serialization changes. Guarded with `hasattr(v, 'isoformat')`.
+- **Before → after scan numbers**: `✅ 144 / ⚠️ 32 / ❌ 8` → `✅ 152 / ⚠️ 21 / ❌ 0`.
+
+### Iter 80: QR Code in Quick Invite success card ✅ (2026-05-01)
+- **`AddFamilyMemberToUnit.js`** extended the Quick-Invite success step with a centered QR code (using the already-imported `qrcode.react`) showing the absolute join URL — scan-in-person onboarding at the gate.
+- **Download-QR-SVG button**: serializes the live `<svg>` element to a Blob and triggers a download as `invite-<unit>.svg` (print-ready, vector). Includes toast confirmation.
+- **Verified**: DOM-level assertions show `quick-invite-qr-wrap`, `quick-invite-qr`, `quick-invite-qr-download` all present after invite creation. Screenshot confirmed visual output (QR framed on white card with instruction text + download button).
+
 ### Iter 79: Quick Invite Modal — rapid onboarding for new units ✅ (2026-05-01)
 - **Backend `routes/family_invites.py`**: extended `POST /api/family-invites` to accept an optional `unit_number` override. Only privileged roles (app_owner, super_admin, admin, compound_admin, company_admin) can use it — residents always inherit their own unit. This unlocks creating invites for brand-new units that don't yet have a registered family head.
 - **Frontend `AddFamilyMemberToUnit.js`**: added a self-contained Quick Invite modal with state/handlers (`openQuickInvite`, `createQuickInvite`, `copyQuickInviteLink`). Form collects: unit_number (required) + invitee_name (optional) + relationship + validity_days. Two-step UX:

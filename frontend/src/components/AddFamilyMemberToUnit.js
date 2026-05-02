@@ -1139,6 +1139,55 @@ const AddFamilyMemberToUnit = () => {
                     <div className="text-sm font-bold text-emerald-800">تم إنشاء الرابط بنجاح</div>
                     <div className="text-xs text-emerald-700 mt-1">وحدة {quickInviteData.unit_number}</div>
                   </div>
+
+                  {/* QR Code — scan at the gate to skip copy/paste */}
+                  {quickInviteData.join_url && (
+                    <div
+                      className="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-4 flex flex-col items-center"
+                      data-testid="quick-invite-qr-wrap"
+                    >
+                      <div className="bg-white p-3 rounded-lg shadow-sm">
+                        <QRCodeSVG
+                          id="quick-invite-qr-svg"
+                          value={buildInviteUrl(quickInviteData.join_url)}
+                          size={160}
+                          level="M"
+                          includeMargin={false}
+                          data-testid="quick-invite-qr"
+                        />
+                      </div>
+                      <p className="text-[11px] text-gray-600 mt-2 text-center leading-relaxed">
+                        📷 اطلبي من الساكن مسح الكود بكاميرا الموبايل — يفتح صفحة التسجيل مباشرة.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          try {
+                            const svg = document.getElementById('quick-invite-qr-svg');
+                            if (!svg) return;
+                            const serializer = new XMLSerializer();
+                            const svgStr = serializer.serializeToString(svg);
+                            const blob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `invite-${quickInviteData.unit_number || 'qr'}.svg`;
+                            document.body.appendChild(a);
+                            a.click();
+                            a.remove();
+                            URL.revokeObjectURL(url);
+                            toast.success('تم تنزيل QR Code ✓');
+                          } catch { toast.error('تعذّر التنزيل'); }
+                        }}
+                        className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-md text-xs font-medium"
+                        data-testid="quick-invite-qr-download"
+                      >
+                        <ArrowDownTrayIcon className="h-3.5 w-3.5" />
+                        تنزيل QR للطباعة
+                      </button>
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-1">رابط التسجيل</label>
                     <div className="flex gap-2">

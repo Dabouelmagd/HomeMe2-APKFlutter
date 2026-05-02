@@ -46,7 +46,7 @@ SKIP_PATTERNS = [
 PATH_PARAM_RE = re.compile(r"\{([^}]+)\}")
 
 
-def _classify(status_code: Optional[int], error: Optional[str]) -> str:
+def _classify(status_code: Optional[int], error: Optional[str], body_text: Optional[str] = None) -> str:
     if error:
         return "fail"
     if status_code is None:
@@ -58,6 +58,11 @@ def _classify(status_code: Optional[int], error: Optional[str]) -> str:
         return "warn"
     if status_code == 404:
         return "warn"
+    if status_code == 422 and body_text and '"type":"missing"' in body_text:
+        # Unscannable endpoint — requires query params the scanner can't
+        # guess (e.g. /api/reports/financial needs compound_id + date range).
+        # These aren't failures; they're just not covered by the scanner.
+        return "skipped"
     if 400 <= status_code < 500:
         return "warn"
     return "fail"
@@ -145,9 +150,11 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
     results = []
     summary = {"total": 0, "pass": 0, "warn": 0, "fail": 0, "skipped": 0}
 
-    async with httpx.AsyncClient(base_url=base, timeout=10.0) as client:
-        # Bound concurrency to keep server load reasonable
-        sem = asyncio.Semaphore(16)
+    async with httpx.AsyncClient(base_url=base, timeout=25.0) as client:
+        # Bound concurrency to keep server load reasonable (self-DoS protection —
+        # the scanner is hitting its own process, so too many parallel requests
+        # cause bogus timeouts on heavy endpoints).
+        sem = asyncio.Semaphore(6)
 
         async def _check(route: dict):
             entry = {
@@ -186,17 +193,24 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
 
             entry["tested_method"] = "GET"
             entry["tested_path"] = target_path
+            body_text = None
             async with sem:
                 t0 = time.perf_counter()
                 try:
                     resp = await client.get(target_path, headers=headers)
                     entry["status_code"] = resp.status_code
+                    try:
+                        body_text = resp.text[:500]
+                    except Exception:
+                        body_text = None
                 except httpx.ReadTimeout:
-                    entry["error"] = "timeout (>10s)"
+                    entry["error"] = "timeout (>25s)"
                 except Exception as e:
                     entry["error"] = str(e)[:160]
                 entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
-            entry["result"] = _classify(entry["status_code"], entry["error"])
+            entry["result"] = _classify(entry["status_code"], entry["error"], body_text)
+            if entry["result"] == "skipped" and not entry.get("reason"):
+                entry["reason"] = "requires unscannable query params"
             return entry
 
         tasks = [_check(r) for r in routes]
@@ -288,8 +302,8 @@ async def trigger_daily_now(request: Request, current_user: dict = Depends(get_c
     results = []
     summary = {"total": 0, "pass": 0, "warn": 0, "fail": 0, "skipped": 0}
 
-    async with httpx.AsyncClient(base_url=base, timeout=10.0) as client:
-        sem = asyncio.Semaphore(16)
+    async with httpx.AsyncClient(base_url=base, timeout=25.0) as client:
+        sem = asyncio.Semaphore(6)
 
         async def _check(route: dict):
             entry = {
@@ -308,17 +322,22 @@ async def trigger_daily_now(request: Request, current_user: dict = Depends(get_c
                     entry["result"] = "skipped"; entry["reason"] = "unresolved param"; return entry
                 target_path = resolved
             entry["tested_method"] = "GET"; entry["tested_path"] = target_path
+            body_text = None
             async with sem:
                 t0 = time.perf_counter()
                 try:
                     resp = await client.get(target_path, headers=headers)
                     entry["status_code"] = resp.status_code
+                    try: body_text = resp.text[:500]
+                    except Exception: body_text = None
                 except httpx.ReadTimeout:
-                    entry["error"] = "timeout (>10s)"
+                    entry["error"] = "timeout (>25s)"
                 except Exception as e:
                     entry["error"] = str(e)[:160]
                 entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
-            entry["result"] = _classify(entry["status_code"], entry["error"])
+            entry["result"] = _classify(entry["status_code"], entry["error"], body_text)
+            if entry["result"] == "skipped" and not entry.get("reason"):
+                entry["reason"] = "requires unscannable query params"
             return entry
 
         results = await asyncio.gather(*[_check(r) for r in routes])
@@ -416,8 +435,8 @@ async def _run_internal_scan(app, db) -> dict:
         routes.append({"path": r.path, "methods": sorted(methods), "tags": list(r.tags or []), "name": r.name})
 
     results = []
-    async with httpx.AsyncClient(base_url=base, timeout=10.0) as client:
-        sem = asyncio.Semaphore(16)
+    async with httpx.AsyncClient(base_url=base, timeout=25.0) as client:
+        sem = asyncio.Semaphore(6)
 
         async def _check(route: dict):
             entry = {
@@ -436,17 +455,22 @@ async def _run_internal_scan(app, db) -> dict:
                     entry["result"] = "skipped"; entry["reason"] = "unresolved param"; return entry
                 target_path = resolved
             entry["tested_method"] = "GET"; entry["tested_path"] = target_path
+            body_text = None
             async with sem:
                 t0 = time.perf_counter()
                 try:
                     resp = await client.get(target_path, headers=headers)
                     entry["status_code"] = resp.status_code
+                    try: body_text = resp.text[:500]
+                    except Exception: body_text = None
                 except httpx.ReadTimeout:
-                    entry["error"] = "timeout (>10s)"
+                    entry["error"] = "timeout (>25s)"
                 except Exception as e:
                     entry["error"] = str(e)[:160]
                 entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
-            entry["result"] = _classify(entry["status_code"], entry["error"])
+            entry["result"] = _classify(entry["status_code"], entry["error"], body_text)
+            if entry["result"] == "skipped" and not entry.get("reason"):
+                entry["reason"] = "requires unscannable query params"
             return entry
 
         results = await asyncio.gather(*[_check(r) for r in routes])

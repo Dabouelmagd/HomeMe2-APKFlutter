@@ -349,13 +349,10 @@ async def get_reminder_logs(
     """Get reminder logs (Admin only)"""
     if current_user.get("role") not in ["admin", "super_admin"]:
         raise HTTPException(status_code=403, detail="Admin access required")
-    
-    cursor = db.reminder_logs.find().sort("sent_at", -1).limit(limit)
-    logs = []
-    async for log in cursor:
-        log["_id"] = str(log["_id"])
-        logs.append(log)
-    
+
+    db = get_db()
+    cursor = db.reminder_logs.find({}, {"_id": 0}).sort("sent_at", -1).limit(limit)
+    logs = await cursor.to_list(length=limit)
     return {"logs": logs}
 
 # ==================== END PAYMENT REMINDERS ====================

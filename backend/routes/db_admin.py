@@ -141,7 +141,7 @@ async def get_all_compounds(current_user: dict = Depends(get_current_user)):
             "admin_count": admin_counts.get(cid, 0),
             "resident_count": resident_counts.get(cid, 0),
             "family_count": family_counts.get(cid, 0),
-            "created_at": compound.get("created_at").isoformat() if compound.get("created_at") else None
+            "created_at": (lambda v: v.isoformat() if hasattr(v, 'isoformat') else (v if isinstance(v, str) else None))(compound.get("created_at"))
         }
         compound_data.append(compound_info)
     

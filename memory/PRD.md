@@ -1301,6 +1301,20 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 83: Smart Manual Probe — multi-role endpoint diagnosis ✅ (2026-05-01)
+- **New Backend endpoint** `POST /api/system/route-health/probe` `{path}` → app_owner/super_admin only. For the given path, it:
+  1. Finds a real user for each of the 3 roles (`app_owner`, `super_admin`, `company_admin`) via `db.users.find_one({role, is_active: {$ne: false}})`.
+  2. Issues a short-lived access token for each using `create_access_token`.
+  3. Resolves path params (`{user_id}`, `{company_id}`, etc.) using each user's own context — so the same `/api/users/{id}/subscription` is hit as 3 different concrete URLs.
+  4. Calls the endpoint internally (localhost:8001) with each token, records `status_code`, body snippet (400 chars), latency, and classification reason.
+  5. Synthesizes a **verdict** in Arabic: "✅ يعمل بنجاح في دور X — الـ warn كان بسبب اختلاف context" / "🛡️ محجوب لجميع الأدوار الثلاثة" / "🔍 لا يوجد resource" / "❌ خطأ server حقيقي" / mixed-codes fallback.
+- **Frontend**: 
+  - Added **"🔧 فحص"** button (violet) next to every endpoint row inside the Warnings breakdown groups.
+  - Clicking opens a polished modal with the verdict banner at top and 3 per-role cards color-coded by status (emerald = 2xx, indigo = 403, sky = 401, amber = 404, rose = 5xx, gray = skipped). Each card shows HTTP code, latency, reason code, and the raw body snippet (or "لا يوجد resource متاح لهذا الدور" if the path couldn't be resolved for that role).
+- **Verified end-to-end ✅**:
+  - Backend curl: `probe /api/monitoring/stats` → all 3 roles 403 → verdict "محجوب لجميع الأدوار الثلاثة". `probe /api/company-admin/me` → app_owner 400, super_admin 400, company_admin 200 → verdict "✅ يعمل بنجاح في دور company_admin — الـ warn كان بسبب اختلاف context".
+  - Playwright: 21 probe buttons render, modal opens with correct verdict + all 3 role-context cards.
+
 ### Iter 82: Warnings breakdown map — explainable scanner ✅ (2026-05-01)
 - **Backend** `_classify_with_reason` now returns `(result, reason_code)` where `reason_code` is one of `auth_required / forbidden_for_tester_role / not_found_for_context / validation_error / method_not_allowed / client_error / server_error / timeout / network_error / no_response / requires_query_params`. All 3 scan sites (manual, trigger, daily-internal) write the code into `entry.reason`.
 - **Frontend `SystemHealthPage.js`**: new collapsible "🗺️ خريطة التحذيرات" card between the slow-endpoints list and the filters. Groups warns by `reason` with:

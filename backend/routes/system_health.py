@@ -615,3 +615,112 @@ async def daily_health_scan_loop(app):
             logger.error(f"daily-scan loop error: {e}", exc_info=True)
             # Sleep an hour and try again to avoid tight error loops
             await asyncio.sleep(3600)
+
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Smart manual probe — runs a single path against 3 role contexts
+# (app_owner, super_admin, company_admin) so the operator can see
+# exactly why a warn was emitted and whether it's truly broken or
+# just correctly-blocked / context-specific.
+# ─────────────────────────────────────────────────────────────────────
+from pydantic import BaseModel as _ProbeBM
+
+
+class ProbeIn(_ProbeBM):
+    path: str
+
+
+async def _issue_token_for_role(db, role: str) -> Optional[dict]:
+    """Find a candidate user for the given role and return {token, user}.
+    Returns None if no user of that role exists in the current DB."""
+    user = await db.users.find_one(
+        {"role": role, "is_active": {"$ne": False}},
+        {"_id": 0},
+    )
+    if not user:
+        return None
+    from auth_deps import create_access_token
+    token = create_access_token({"sub": user["id"]})
+    return {"token": token, "user": user}
+
+
+@router.post("/probe")
+async def smart_probe(payload: ProbeIn, request: Request, current_user: dict = Depends(get_current_user)):
+    """Execute the same GET endpoint against three role contexts and return
+    per-context status_code/body/latency so the operator can see *why* an
+    endpoint behaves differently per role."""
+    if current_user.get("role") not in ("app_owner", "super_admin"):
+        raise HTTPException(status_code=403, detail="غير مصرح")
+
+    raw_path = (payload.path or "").strip()
+    if not raw_path.startswith("/api/"):
+        raise HTTPException(status_code=400, detail="path يجب أن يبدأ بـ /api/")
+
+    db = get_db()
+    base = "http://127.0.0.1:8001"
+
+    probe_results = []
+    async with httpx.AsyncClient(base_url=base, timeout=20.0) as client:
+        for role in ("app_owner", "super_admin", "company_admin"):
+            ctx_info = {"role": role, "tested_path": None, "status_code": None, "ms": None, "body_snippet": None, "error": None, "reason": None, "skipped_reason": None}
+            issued = await _issue_token_for_role(db, role)
+            if not issued:
+                ctx_info["skipped_reason"] = "لا يوجد مستخدم بهذا الدور في قاعدة البيانات"
+                probe_results.append(ctx_info)
+                continue
+            user = issued["user"]
+            token = issued["token"]
+            # Resolve path params using that user's context
+            target = raw_path
+            if PATH_PARAM_RE.search(target):
+                resolved = _resolve_params(target, user)
+                if not resolved:
+                    ctx_info["skipped_reason"] = "تعذّر حل parameters الـ path لهذا الدور (مثلاً لا يوجد compound_id)"
+                    probe_results.append(ctx_info)
+                    continue
+                target = resolved
+            ctx_info["tested_path"] = target
+            headers = {"Authorization": f"Bearer {token}"}
+            t0 = time.perf_counter()
+            try:
+                resp = await client.get(target, headers=headers)
+                ctx_info["status_code"] = resp.status_code
+                body = resp.text or ""
+                ctx_info["body_snippet"] = body[:400]
+            except httpx.ReadTimeout:
+                ctx_info["error"] = "timeout (>20s)"
+            except Exception as e:
+                ctx_info["error"] = str(e)[:200]
+            ctx_info["ms"] = round((time.perf_counter() - t0) * 1000, 1)
+            result, reason_code = _classify_with_reason(
+                ctx_info["status_code"], ctx_info["error"], ctx_info.get("body_snippet"),
+            )
+            ctx_info["result"] = result
+            ctx_info["reason"] = reason_code
+            probe_results.append(ctx_info)
+
+    # Short verdict — pick the most-privileged context that returned 2xx, else
+    # describe the best understanding of the endpoint.
+    verdict = "غير محدّد"
+    best_200 = next((c for c in probe_results if c.get("status_code") and 200 <= c["status_code"] < 300), None)
+    if best_200:
+        verdict = f"✅ يعمل بنجاح في دور {best_200['role']} — الـ endpoint سليم فعلياً، الـ warn كان بسبب اختلاف context."
+    else:
+        codes = [c.get("status_code") for c in probe_results if c.get("status_code")]
+        if codes and all(c == 401 for c in codes):
+            verdict = "🔐 يتطلّب authentication — لم يُمرّر token صحيح في الفحص العام."
+        elif codes and all(c == 403 for c in codes):
+            verdict = "🛡️ محجوب لجميع الأدوار الثلاثة — قد يكون محصورًا بدور أدق (e.g. resident فقط)."
+        elif codes and all(c == 404 for c in codes):
+            verdict = "🔍 لا يوجد resource — تحقّقي من أن بيانات الاختبار صحيحة."
+        elif codes and all(c and c >= 500 for c in codes):
+            verdict = "❌ خطأ server حقيقي — افتحي logs لتحديد السبب."
+        elif codes:
+            verdict = f"⚠️ سلوك مختلط — اكواد مختلفة: {codes}"
+
+    return {
+        "path": raw_path,
+        "verdict": verdict,
+        "contexts": probe_results,
+    }

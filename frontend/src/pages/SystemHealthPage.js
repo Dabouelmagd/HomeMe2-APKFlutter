@@ -105,6 +105,31 @@ const SystemHealthPage = () => {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [history, setHistory] = useState([]);
 
+  // Smart probe — manual re-test of a single path across 3 role contexts
+  const [probeOpen, setProbeOpen] = useState(false);
+  const [probePath, setProbePath] = useState('');
+  const [probeLoading, setProbeLoading] = useState(false);
+  const [probeData, setProbeData] = useState(null); // { verdict, contexts: [...] }
+
+  const openSmartProbe = async (path) => {
+    setProbeOpen(true);
+    setProbePath(path);
+    setProbeData(null);
+    setProbeLoading(true);
+    try {
+      const res = await axios.post(
+        `${API}/system/route-health/probe`,
+        { path },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } },
+      );
+      setProbeData(res.data);
+    } catch (err) {
+      setProbeData({ verdict: '❌ فشل تنفيذ الفحص: ' + (err?.response?.data?.detail || err.message), contexts: [] });
+    } finally {
+      setProbeLoading(false);
+    }
+  };
+
   const loadHistory = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/system/route-health/history?limit=30`, auth());
@@ -456,6 +481,15 @@ const SystemHealthPage = () => {
                           <code className="font-mono text-gray-800 flex-1 min-w-0 truncate" dir="ltr" title={it.path}>{it.path}</code>
                           <span className="shrink-0 px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-bold">{it.status_code}</span>
                           {typeof it.ms === 'number' && <span className="shrink-0 text-gray-500">{it.ms}ms</span>}
+                          <button
+                            type="button"
+                            onClick={() => openSmartProbe(it.path)}
+                            className="shrink-0 px-2 py-1 rounded bg-violet-100 hover:bg-violet-200 text-violet-800 font-bold text-[10px] border border-violet-300"
+                            data-testid={`probe-btn-${i}`}
+                            title="فحص يدوي بـ 3 أدوار مختلفة"
+                          >
+                            🔧 فحص
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -524,6 +558,80 @@ const SystemHealthPage = () => {
           </div>
           {grouped.map(([tag, items]) => <TagGroup key={tag} tag={tag} items={items} />)}
         </>
+      )}
+
+      {/* Smart probe modal */}
+      {probeOpen && (
+        <div
+          className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setProbeOpen(false)}
+          data-testid="smart-probe-modal"
+          dir="rtl"
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="px-5 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base font-bold">🔧 فحص يدوي ذكي</h3>
+                <code className="text-xs text-violet-100 font-mono break-all" dir="ltr">{probePath}</code>
+              </div>
+              <button onClick={() => setProbeOpen(false)} className="text-white/80 hover:text-white" data-testid="smart-probe-close">✕</button>
+            </div>
+            <div className="p-5 max-h-[70vh] overflow-y-auto">
+              {probeLoading ? (
+                <div className="py-12 text-center text-sm text-gray-600">جارٍ الفحص في 3 أدوار… ⏳</div>
+              ) : probeData ? (
+                <>
+                  <div className="rounded-xl p-3 mb-4 bg-violet-50 border border-violet-200 text-sm font-semibold text-violet-900" data-testid="smart-probe-verdict">
+                    <span className="text-xs text-violet-600 block mb-0.5">الحكم النهائي:</span>
+                    {probeData.verdict}
+                  </div>
+                  <div className="space-y-3">
+                    {(probeData.contexts || []).map((c, i) => {
+                      const ok = c.status_code && c.status_code >= 200 && c.status_code < 300;
+                      const cardCls = c.skipped_reason
+                        ? 'bg-gray-50 border-gray-200'
+                        : ok
+                          ? 'bg-emerald-50 border-emerald-300'
+                          : c.status_code === 403 ? 'bg-indigo-50 border-indigo-200'
+                          : c.status_code === 401 ? 'bg-sky-50 border-sky-200'
+                          : c.status_code === 404 ? 'bg-amber-50 border-amber-200'
+                          : (c.status_code && c.status_code >= 500) ? 'bg-rose-50 border-rose-300'
+                          : 'bg-yellow-50 border-yellow-200';
+                      return (
+                        <div key={c.role + i} className={`rounded-xl border p-3 ${cardCls}`} data-testid={`probe-ctx-${c.role}`}>
+                          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                            <span className="text-base">{ok ? '✅' : c.skipped_reason ? '⏸' : '⚠️'}</span>
+                            <span className="font-bold text-sm text-gray-900">{c.role}</span>
+                            {c.status_code != null && (
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${ok ? 'bg-emerald-200 text-emerald-900' : c.status_code >= 500 ? 'bg-rose-200 text-rose-900' : 'bg-gray-200 text-gray-800'}`}>
+                                HTTP {c.status_code}
+                              </span>
+                            )}
+                            {typeof c.ms === 'number' && <span className="text-[11px] text-gray-600">{c.ms}ms</span>}
+                            {c.reason && <span className="text-[10px] text-gray-600 font-mono">{c.reason}</span>}
+                          </div>
+                          {c.tested_path && (
+                            <div className="text-[10px] text-gray-500 font-mono mb-1" dir="ltr">→ {c.tested_path}</div>
+                          )}
+                          {c.skipped_reason ? (
+                            <div className="text-xs text-gray-600 italic">{c.skipped_reason}</div>
+                          ) : c.body_snippet ? (
+                            <pre className="text-[11px] text-gray-700 bg-white/70 rounded p-2 overflow-x-auto max-h-28" dir="ltr">{c.body_snippet}</pre>
+                          ) : c.error ? (
+                            <div className="text-xs text-rose-700">خطأ: {c.error}</div>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              ) : null}
+            </div>
+            <div className="px-5 py-3 border-t bg-gray-50 flex justify-end">
+              <button onClick={() => setProbeOpen(false)} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-bold" data-testid="smart-probe-done">إغلاق</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

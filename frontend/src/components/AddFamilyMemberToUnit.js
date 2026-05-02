@@ -365,8 +365,28 @@ const AddFamilyMemberToUnit = () => {
           </div>
         </div>
 
+        {/* Top CTA — go to residents management to add a new main resident */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3" data-testid="family-top-cta">
+          <a
+            href="/app/residents"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm shadow-md transition"
+            data-testid="cta-add-resident"
+          >
+            <UserPlusIcon className="h-5 w-5" />
+            <span>➕ إضافة ساكن رئيسي جديد</span>
+          </a>
+          <a
+            href="/app/my-invites"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold text-sm shadow-md transition"
+            data-testid="cta-manage-invites"
+          >
+            <LinkIcon className="h-5 w-5" />
+            <span>📋 إدارة دعواتي</span>
+          </a>
+        </div>
+
         {/* Enhanced Search Bar */}
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md mx-auto mt-6">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
@@ -390,19 +410,38 @@ const AddFamilyMemberToUnit = () => {
       {/* Residents List */}
       <div className="bg-white rounded-2xl shadow-sm p-6">
         {filteredResidents.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="bg-gray-100 p-4 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
-              <UsersIcon className="h-12 w-12 text-gray-400" />
+          <div className="text-center py-12" data-testid="family-empty-state">
+            <div className="bg-gradient-to-br from-blue-100 to-indigo-100 p-4 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+              <UsersIcon className="h-12 w-12 text-indigo-500" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {searchTerm ? t('no_matching_residents') : t('no_residents_registered')}
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              {searchTerm ? t('no_matching_residents') : 'لا يوجد سكان مسجلين بعد'}
             </h3>
-            <p className="text-gray-500 max-w-sm mx-auto">
-              {searchTerm ? 
-                `${t('try_adjusting_search')} "${searchTerm}"` : 
-                t('no_residents_yet')
-              }
+            <p className="text-gray-500 max-w-md mx-auto mb-6">
+              {searchTerm
+                ? `${t('try_adjusting_search')} "${searchTerm}"`
+                : 'أضيفي الساكن الرئيسي أولاً ثم يمكنك إضافة أفراد عائلته من هنا، أو أرسلي لهم رابط دعوة للتسجيل بأنفسهم.'}
             </p>
+            {!searchTerm && (
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <a
+                  href="/app/residents"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm shadow-md transition"
+                  data-testid="empty-cta-add-resident"
+                >
+                  <UserPlusIcon className="h-5 w-5" />
+                  <span>➕ إضافة ساكن رئيسي</span>
+                </a>
+                <a
+                  href="/app/my-invites"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border-2 border-rose-300 hover:bg-rose-50 text-rose-700 font-bold text-sm shadow-sm transition"
+                  data-testid="empty-cta-invites"
+                >
+                  <LinkIcon className="h-5 w-5" />
+                  <span>📋 رابط دعوة للتسجيل</span>
+                </a>
+              </div>
+            )}
           </div>
         ) : (
           <div>

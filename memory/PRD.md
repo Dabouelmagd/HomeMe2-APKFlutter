@@ -1301,6 +1301,13 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 78: Family page Empty-State CTAs ✅ (2026-05-01)
+- **Problem**: on the "إضافة فرد من الأسرة" page, when no residents are registered yet (or the user isn't bound to a compound — e.g. app_owner), the page showed a dead empty state with NO button to add a resident. The user had no path forward.
+- **Fix in `AddFamilyMemberToUnit.js`**:
+  - Added a top CTA row under the page header with 2 prominent buttons: **➕ إضافة ساكن رئيسي جديد** (emerald gradient → `/app/residents`) and **📋 إدارة دعواتي** (rose gradient → `/app/my-invites`).
+  - Rewrote the empty state with friendlier Arabic copy + the same 2 CTAs (filled + outlined).
+- **Verified via Playwright**: all 4 CTAs render with data-testids (`cta-add-resident`, `cta-manage-invites`, `empty-cta-add-resident`, `empty-cta-invites`).
+
 ### Iter 77: Plan Modal — Trial + Coupon + Subscription Code ✅ (2026-05-01)
 - **3 new backend endpoints** in `routes/company_admin.py`:
   - `POST /api/company-admin/activate-trial` — once-per-company 14-day trial. Sets `trial_used=true`, status=`trial`, expires_at = now + 14 days. Returns 400 on second attempt with Arabic message.

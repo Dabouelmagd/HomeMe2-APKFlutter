@@ -1301,6 +1301,17 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 79: Quick Invite Modal — rapid onboarding for new units ✅ (2026-05-01)
+- **Backend `routes/family_invites.py`**: extended `POST /api/family-invites` to accept an optional `unit_number` override. Only privileged roles (app_owner, super_admin, admin, compound_admin, company_admin) can use it — residents always inherit their own unit. This unlocks creating invites for brand-new units that don't yet have a registered family head.
+- **Frontend `AddFamilyMemberToUnit.js`**: added a self-contained Quick Invite modal with state/handlers (`openQuickInvite`, `createQuickInvite`, `copyQuickInviteLink`). Form collects: unit_number (required) + invitee_name (optional) + relationship + validity_days. Two-step UX:
+  - **Step 1**: filled form → click "🔗 إنشاء رابط الدعوة"
+  - **Step 2**: success card with emerald checkmark, copy-link button, share-via-native-apps button, done button.
+- **Wired to 2 entry points**: top CTA `[data-testid="cta-quick-invite"]` (always visible) + empty-state CTA `[data-testid="empty-cta-quick-invite"]` (shown when no residents yet).
+- **Verified end-to-end ✅**:
+  - Backend curl: `POST /api/family-invites` with `unit_number:"A-99-NEW"` → 200 + invite returned with `unit_number: "A-99-NEW"` and working `join_url`.
+  - Playwright: modal opens → fill form → click create → success card renders with working join link → clipboard copy fires toast.
+- **Result**: onboarding a new unit now takes **~15 seconds** (was: navigate to residents page → create resident → wait → come back → create family invite — ~3-5 minutes of fiddling).
+
 ### Iter 78: Family page Empty-State CTAs ✅ (2026-05-01)
 - **Problem**: on the "إضافة فرد من الأسرة" page, when no residents are registered yet (or the user isn't bound to a compound — e.g. app_owner), the page showed a dead empty state with NO button to add a resident. The user had no path forward.
 - **Fix in `AddFamilyMemberToUnit.js`**:

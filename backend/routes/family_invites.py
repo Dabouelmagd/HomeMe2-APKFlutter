@@ -119,6 +119,17 @@ async def create_family_invite(payload: dict, current_user: dict = Depends(get_c
     if not compound_id:
         raise HTTPException(status_code=400, detail="ليس لديك مجمع مرتبط بحسابك")
 
+    # Admins can override the unit_number to create a "Quick Invite" for a
+    # unit that doesn't have a registered family head yet. Only allowed for
+    # privileged roles — residents always inherit their own unit.
+    override_unit = (payload.get("unit_number") or "").strip()
+    resolved_unit = inviter_for_invite.get("unit_number")
+    if override_unit:
+        role = current_user.get("role")
+        if role in ("app_owner", "super_admin", "admin", "compound_admin", "company_admin"):
+            resolved_unit = override_unit
+        # non-admins silently ignore the override — use their own unit.
+
     relationship = payload.get("relationship") or "other"
     if relationship not in VALID_FAMILY_RELATIONSHIPS:
         raise HTTPException(status_code=400, detail=f"علاقة غير صالحة. المسموح: {VALID_FAMILY_RELATIONSHIPS}")
@@ -151,7 +162,7 @@ async def create_family_invite(payload: dict, current_user: dict = Depends(get_c
         "family_id": family_id,
         "compound_id": compound_id,
         "company_id": inviter_for_invite.get("company_id"),
-        "unit_number": inviter_for_invite.get("unit_number"),
+        "unit_number": resolved_unit,
         "relationship": relationship,
         "max_uses": max_uses,
         "used_count": 0,
@@ -171,7 +182,7 @@ async def create_family_invite(payload: dict, current_user: dict = Depends(get_c
                 "created",
                 current_user,
                 relationship=relationship,
-                unit_number=inviter_for_invite.get("unit_number"),
+                unit_number=resolved_unit,
                 target_user_id=target_user_id,
                 target_user_full_name=inviter_for_invite.get("full_name") if target_user_id else None,
             )

@@ -168,9 +168,72 @@ const AddFamilyMemberToUnit = () => {
     }
   };
 
+  // Quick Invite — for brand-new units where no family head is registered yet
   const handleAddMember = (resident) => {
     setSelectedUnit(resident);
     setShowAddMemberModal(true);
+  };
+
+  const [quickInviteOpen, setQuickInviteOpen] = useState(false);
+  const [quickInviteBusy, setQuickInviteBusy] = useState(false);
+  const [quickInviteData, setQuickInviteData] = useState(null);
+  const [quickInviteForm, setQuickInviteForm] = useState({
+    unit_number: '',
+    invitee_name: '',
+    relationship: 'spouse',
+    validity_days: 30,
+  });
+
+  const openQuickInvite = () => {
+    setQuickInviteOpen(true);
+    setQuickInviteData(null);
+    setQuickInviteForm({ unit_number: '', invitee_name: '', relationship: 'spouse', validity_days: 30 });
+  };
+
+  const closeQuickInvite = () => {
+    setQuickInviteOpen(false);
+    setQuickInviteData(null);
+    setQuickInviteBusy(false);
+  };
+
+  const createQuickInvite = async () => {
+    if (!quickInviteForm.unit_number.trim()) {
+      toast.error('رقم الوحدة مطلوب');
+      return;
+    }
+    setQuickInviteBusy(true);
+    try {
+      const res = await axios.post(`${API}/family-invites`, {
+        unit_number: quickInviteForm.unit_number.trim(),
+        invitee_name: quickInviteForm.invitee_name.trim() || undefined,
+        relationship: quickInviteForm.relationship,
+        validity_days: Number(quickInviteForm.validity_days) || 30,
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      const invite = res.data?.invite || {};
+      setQuickInviteData({
+        join_url: invite.join_url,
+        token: invite.token,
+        unit_number: invite.unit_number,
+        expires_at: invite.expires_at,
+      });
+      toast.success('تم إنشاء رابط الدعوة 🎉');
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || 'فشل إنشاء الدعوة');
+    } finally {
+      setQuickInviteBusy(false);
+    }
+  };
+
+  const copyQuickInviteLink = async () => {
+    if (!quickInviteData?.join_url) return;
+    try {
+      await navigator.clipboard.writeText(quickInviteData.join_url);
+      toast.success('تم نسخ الرابط ✓');
+    } catch {
+      toast.error('تعذّر النسخ — انسخي يدوياً');
+    }
   };
 
   const openInviteModal = (resident) => {
@@ -375,13 +438,21 @@ const AddFamilyMemberToUnit = () => {
             <UserPlusIcon className="h-5 w-5" />
             <span>➕ إضافة ساكن رئيسي جديد</span>
           </a>
-          <a
-            href="/app/my-invites"
+          <button
+            type="button"
+            onClick={openQuickInvite}
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-bold text-sm shadow-md transition"
-            data-testid="cta-manage-invites"
+            data-testid="cta-quick-invite"
           >
             <LinkIcon className="h-5 w-5" />
-            <span>📋 إدارة دعواتي</span>
+            <span>🔗 دعوة سريعة لوحدة جديدة</span>
+          </button>
+          <a
+            href="/app/my-invites"
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white border-2 border-gray-200 hover:border-rose-300 hover:bg-rose-50 text-gray-700 font-bold text-sm shadow-sm transition"
+            data-testid="cta-manage-invites"
+          >
+            <span>📊 إدارة دعواتي</span>
           </a>
         </div>
 
@@ -432,14 +503,15 @@ const AddFamilyMemberToUnit = () => {
                   <UserPlusIcon className="h-5 w-5" />
                   <span>➕ إضافة ساكن رئيسي</span>
                 </a>
-                <a
-                  href="/app/my-invites"
+                <button
+                  type="button"
+                  onClick={openQuickInvite}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white border-2 border-rose-300 hover:bg-rose-50 text-rose-700 font-bold text-sm shadow-sm transition"
-                  data-testid="empty-cta-invites"
+                  data-testid="empty-cta-quick-invite"
                 >
                   <LinkIcon className="h-5 w-5" />
-                  <span>📋 رابط دعوة للتسجيل</span>
-                </a>
+                  <span>🔗 دعوة سريعة لوحدة جديدة</span>
+                </button>
               </div>
             )}
           </div>
@@ -945,6 +1017,170 @@ const AddFamilyMemberToUnit = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Quick Invite Modal — for brand-new units without a registered head */}
+      {quickInviteOpen && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={closeQuickInvite}
+          data-testid="quick-invite-modal"
+          dir="rtl"
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="px-6 py-4 bg-gradient-to-r from-rose-500 to-pink-600 text-white">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-white/20 p-2 rounded-lg">
+                    <LinkIcon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold">دعوة سريعة لوحدة جديدة</h3>
+                    <p className="text-xs text-rose-100 mt-0.5">
+                      أرسلي رابط تسجيل في دقيقة
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={closeQuickInvite}
+                  className="text-white/80 hover:text-white p-1 rounded hover:bg-white/10"
+                  data-testid="quick-invite-close"
+                >
+                  <XCircleIcon className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-4">
+              {!quickInviteData ? (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">رقم الوحدة <span className="text-rose-500">*</span></label>
+                    <input
+                      type="text"
+                      value={quickInviteForm.unit_number}
+                      onChange={(e) => setQuickInviteForm((p) => ({ ...p, unit_number: e.target.value }))}
+                      placeholder="مثال: A-12 أو 304"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-400 outline-none"
+                      data-testid="quick-invite-unit"
+                      autoFocus
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">اسم المدعو (اختياري)</label>
+                    <input
+                      type="text"
+                      value={quickInviteForm.invitee_name}
+                      onChange={(e) => setQuickInviteForm((p) => ({ ...p, invitee_name: e.target.value }))}
+                      placeholder="مثال: أحمد محمد"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-400 outline-none"
+                      data-testid="quick-invite-name"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">صلة القرابة</label>
+                      <select
+                        value={quickInviteForm.relationship}
+                        onChange={(e) => setQuickInviteForm((p) => ({ ...p, relationship: e.target.value }))}
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-400 outline-none"
+                        data-testid="quick-invite-relationship"
+                      >
+                        <option value="spouse">زوج/زوجة</option>
+                        <option value="child">ابن/ابنة</option>
+                        <option value="parent">أب/أم</option>
+                        <option value="sibling">أخ/أخت</option>
+                        <option value="helper">عامل/عاملة</option>
+                        <option value="driver">سائق</option>
+                        <option value="other">أخرى</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">مدة الصلاحية</label>
+                      <select
+                        value={quickInviteForm.validity_days}
+                        onChange={(e) => setQuickInviteForm((p) => ({ ...p, validity_days: Number(e.target.value) }))}
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-400 outline-none"
+                        data-testid="quick-invite-validity"
+                      >
+                        <option value={7}>7 أيام</option>
+                        <option value={14}>14 يوم</option>
+                        <option value={30}>30 يوم</option>
+                        <option value={60}>60 يوم</option>
+                        <option value={90}>90 يوم</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="text-[11px] text-gray-500 bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    💡 سيتم إنشاء رابط تسجيل. عند فتحه، يتمكن المدعو من إكمال بياناته وتسجيل حسابه الخاص بالوحدة المحددة.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={createQuickInvite}
+                    disabled={quickInviteBusy || !quickInviteForm.unit_number.trim()}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white rounded-lg font-bold text-sm shadow-md transition disabled:opacity-60"
+                    data-testid="quick-invite-create-btn"
+                  >
+                    {quickInviteBusy ? '...جاري الإنشاء' : '🔗 إنشاء رابط الدعوة'}
+                  </button>
+                </>
+              ) : (
+                <div className="space-y-4" data-testid="quick-invite-result">
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center">
+                    <div className="text-3xl mb-1">🎉</div>
+                    <div className="text-sm font-bold text-emerald-800">تم إنشاء الرابط بنجاح</div>
+                    <div className="text-xs text-emerald-700 mt-1">وحدة {quickInviteData.unit_number}</div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-700 mb-1">رابط التسجيل</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        readOnly
+                        value={quickInviteData.join_url || ''}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-xs font-mono bg-gray-50"
+                        onFocus={(e) => e.target.select()}
+                        data-testid="quick-invite-link-input"
+                      />
+                      <button
+                        type="button"
+                        onClick={copyQuickInviteLink}
+                        className="shrink-0 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold flex items-center gap-1"
+                        data-testid="quick-invite-copy"
+                      >
+                        <ClipboardDocumentIcon className="h-4 w-4" />
+                        نسخ
+                      </button>
+                    </div>
+                  </div>
+                  {navigator?.share && (
+                    <button
+                      type="button"
+                      onClick={() => navigator.share({ title: 'دعوة انضمام', url: quickInviteData.join_url }).catch(() => {})}
+                      className="w-full px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2"
+                      data-testid="quick-invite-share"
+                    >
+                      <ShareIcon className="h-4 w-4" /> مشاركة عبر التطبيقات
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={closeQuickInvite}
+                    className="w-full px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-bold text-sm"
+                    data-testid="quick-invite-done"
+                  >
+                    تمام
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

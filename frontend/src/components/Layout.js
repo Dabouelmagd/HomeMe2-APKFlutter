@@ -76,6 +76,8 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [isSearching, setIsSearching] = useState(false);
   // State for collapsible menu sections - all expanded by default
   const [expandedSections, setExpandedSections] = useState({});
+  // Sidebar quick-search to filter nav items
+  const [navSearch, setNavSearch] = useState('');
   // State for scroll to top button
   const [showScrollTop, setShowScrollTop] = useState(false);
   // Compound logo
@@ -765,14 +767,50 @@ const Layout = ({ children, isTrialMode = false }) => {
           </div>
         </div>
 
+        {/* Sidebar quick-search */}
+        <div className="px-3 pt-2 pb-1">
+          <div className="relative">
+            <input
+              type="text"
+              value={navSearch}
+              onChange={(e) => setNavSearch(e.target.value)}
+              placeholder="🔍 ابحث في القائمة... (مثلاً: صيانة، عقود)"
+              data-testid="sidebar-quick-search"
+              className={`w-full pl-3 pr-10 py-2 rounded-lg text-sm border ${isSuperAdmin ? 'bg-purple-900/30 border-purple-700/40 text-white placeholder-purple-300' : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            />
+            {navSearch && (
+              <button
+                onClick={() => setNavSearch('')}
+                className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 text-lg"
+                title="مسح"
+                data-testid="sidebar-search-clear"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          {navSearch && (
+            <p className="text-[10px] text-gray-500 mt-1 px-1">اضغط على القسم لفتحه ورؤية النتائج</p>
+          )}
+        </div>
+
         {/* Scrollable Navigation Area */}
         <nav ref={sidebarNavRef} className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 sidebar-scroll" data-testid="sidebar-nav">
           <div className="space-y-2">
             {navigationSections.map((section, sectionIndex) => {
               const visibleItems = section.items.filter(item => item.show);
               if (visibleItems.length === 0) return null;
-              
-              const isExpanded = isSectionExpanded(sectionIndex);
+
+              // Filter by search query (case-insensitive, substring match on name)
+              const q = (navSearch || '').trim().toLowerCase();
+              const filteredItems = q
+                ? visibleItems.filter(it => (it.name || '').toLowerCase().includes(q))
+                : visibleItems;
+
+              // Skip rendering whole section if search yields no matches
+              if (q && filteredItems.length === 0) return null;
+
+              const isExpanded = q ? true : isSectionExpanded(sectionIndex);
               
               // Section colors based on role theme
               const sectionColor = `${theme.hover} border-gray-200 ${theme.text}`;
@@ -798,7 +836,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`text-xs font-normal px-2 py-0.5 rounded-full ${isSuperAdmin ? 'bg-purple-800/30 text-purple-300' : 'bg-white bg-opacity-60'}`}>
-                          {visibleItems.length}
+                          {filteredItems.length}{filteredItems.length !== visibleItems.length ? `/${visibleItems.length}` : ''}
                         </span>
                         {isExpanded ? (
                           <ChevronUpIcon className="h-4 w-4 transition-transform duration-200" />
@@ -812,7 +850,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                   {/* Section Items - Collapsible */}
                   {isExpanded && (
                     <div className="space-y-0.5 mt-0.5">
-                      {visibleItems.map((item) => (
+                      {filteredItems.map((item) => (
                         <Link
                           key={item.name}
                           to={item.href}
@@ -893,6 +931,23 @@ const Layout = ({ children, isTrialMode = false }) => {
                 </div>
               );
             })}
+            {/* "No results" state */}
+            {(navSearch || '').trim() && navigationSections.every(section => {
+              const visibleItems = section.items.filter(item => item.show);
+              const q = navSearch.trim().toLowerCase();
+              return visibleItems.filter(it => (it.name || '').toLowerCase().includes(q)).length === 0;
+            }) && (
+              <div className="text-center py-10 text-sm text-gray-500" data-testid="sidebar-search-no-results">
+                <div className="text-2xl mb-2">🤷‍♂️</div>
+                لا توجد نتائج لـ "<span className="font-bold">{navSearch}</span>"
+                <button
+                  onClick={() => setNavSearch('')}
+                  className="block mx-auto mt-3 text-xs text-blue-600 underline hover:text-blue-800"
+                >
+                  مسح البحث
+                </button>
+              </div>
+            )}
           </div>
         </nav>
 

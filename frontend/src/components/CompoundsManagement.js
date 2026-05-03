@@ -24,6 +24,24 @@ const CompoundsManagement = () => {
     description: '',
   });
 
+  // Edit Compound state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ id: '', name: '', location: '', address: '', description: '' });
+
+  // Create Compound Admin state
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [creatingAdmin, setCreatingAdmin] = useState(false);
+  const [adminForm, setAdminForm] = useState({
+    compound_id: '',
+    compound_name: '',
+    full_name: '',
+    username: '',
+    email: '',
+    password: '',
+    phone: '',
+  });
+
   // Subscription-codes management is only meaningful for super_admin / app_owner
   const canManageCodes = isSuperAdmin || isAppOwner;
   // company_admin can also create new compounds inside its company portfolio
@@ -112,6 +130,100 @@ const CompoundsManagement = () => {
       toast.error(msg);
     } finally {
       setAdding(false);
+    }
+  };
+
+  const openEditModal = (compound) => {
+    setEditForm({
+      id: compound.id,
+      name: compound.name || '',
+      location: compound.location || '',
+      address: compound.address || '',
+      description: compound.description || '',
+    });
+    setShowEditModal(true);
+  };
+
+  const handleEditCompound = async () => {
+    if (!editForm.name.trim()) {
+      toast.error(t('compound_name_required', 'اسم المجمع مطلوب'));
+      return;
+    }
+    setEditing(true);
+    try {
+      const url = isCompanyAdmin
+        ? `${API}/api/company-admin/compounds/${editForm.id}`
+        : `${API}/api/companies/compounds/${editForm.id}`;
+      await axios.put(url, {
+        name: editForm.name.trim(),
+        location: editForm.location,
+        address: editForm.address,
+        description: editForm.description,
+      });
+      toast.success(t('compound_updated_successfully', 'تم تحديث المجمع بنجاح ✅'));
+      setShowEditModal(false);
+      fetchCompounds();
+    } catch (err) {
+      const detail = err?.response?.data?.detail;
+      toast.error(typeof detail === 'string' ? detail : t('failed_to_update_compound', 'فشل تحديث المجمع'));
+    } finally {
+      setEditing(false);
+    }
+  };
+
+  const openCreateAdminModal = (compound) => {
+    // Suggest a username derived from compound name
+    const slug = (compound.name || 'compound')
+      .replace(/[^a-zA-Z0-9\u0600-\u06FF]+/g, '_')
+      .toLowerCase()
+      .slice(0, 20);
+    setAdminForm({
+      compound_id: compound.id,
+      compound_name: compound.name || '',
+      full_name: '',
+      username: `admin_${slug}`,
+      email: '',
+      password: '',
+      phone: '',
+    });
+    setShowAdminModal(true);
+  };
+
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    let pw = '';
+    for (let i = 0; i < 10; i++) pw += chars.charAt(Math.floor(Math.random() * chars.length));
+    setAdminForm((f) => ({ ...f, password: pw }));
+  };
+
+  const handleCreateAdmin = async () => {
+    const { compound_id, full_name, username, email, password, phone } = adminForm;
+    if (!full_name.trim() || !username.trim() || !email.trim() || !password) {
+      toast.error(t('all_fields_required', 'الاسم، اسم المستخدم، البريد، وكلمة المرور كلها مطلوبة'));
+      return;
+    }
+    if (password.length < 6) {
+      toast.error(t('password_min_6', 'كلمة المرور 6 أحرف على الأقل'));
+      return;
+    }
+    setCreatingAdmin(true);
+    try {
+      await axios.post(`${API}/api/company-admin/compounds/${compound_id}/users`, {
+        full_name: full_name.trim(),
+        username: username.trim().toLowerCase(),
+        email: email.trim().toLowerCase(),
+        password,
+        phone: phone.trim(),
+        role: 'admin',
+      });
+      toast.success(t('admin_created_successfully', 'تم إنشاء حساب المدير بنجاح ✅'));
+      setShowAdminModal(false);
+      fetchCompounds();
+    } catch (err) {
+      const detail = err?.response?.data?.detail;
+      toast.error(typeof detail === 'string' ? detail : t('failed_to_create_admin', 'فشل إنشاء الحساب'));
+    } finally {
+      setCreatingAdmin(false);
     }
   };
 
@@ -241,7 +353,7 @@ const CompoundsManagement = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   {t('subscription', 'Subscription')}
                 </th>
-                {canManageCodes && (
+                {(canManageCodes || canAddCompound) && (
                   <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     {t('actions', 'Actions')}
                   </th>
@@ -251,7 +363,7 @@ const CompoundsManagement = () => {
             <tbody className="divide-y divide-gray-200">
               {compounds.length === 0 ? (
                 <tr>
-                  <td colSpan={canManageCodes ? 7 : 6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={(canManageCodes || canAddCompound) ? 7 : 6} className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center">
                       <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -323,6 +435,33 @@ const CompoundsManagement = () => {
                           </svg>
                           {t('send_code', 'Send Code')}
                         </button>
+                      </td>
+                    )}
+                    {canAddCompound && !canManageCodes && (
+                      <td className="px-6 py-4 text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => openEditModal(compound)}
+                            title={t('edit_compound', 'تعديل المجمع')}
+                            className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
+                            data-testid={`edit-compound-${compound.id}`}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => openCreateAdminModal(compound)}
+                            title={t('create_compound_admin', 'إنشاء مدير المجمع')}
+                            className="inline-flex items-center gap-1.5 px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-all"
+                            data-testid={`create-admin-${compound.id}`}
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zm-4 7a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            {t('create_admin', 'إنشاء مدير')}
+                          </button>
+                        </div>
                       </td>
                     )}
                   </tr>
@@ -501,6 +640,212 @@ const CompoundsManagement = () => {
               >
                 {adding ? '...جارٍ الحفظ' : t('add_compound', 'إضافة المجمع')}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Edit Compound Modal */}
+      {showEditModal && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => !editing && setShowEditModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+            dir="rtl"
+            data-testid="edit-compound-modal"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl">
+                  ✏️
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {t('edit_compound', 'تعديل المجمع')}
+                </h3>
+              </div>
+              <button
+                onClick={() => !editing && setShowEditModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+                aria-label="close"
+              >×</button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t('compound_name', 'اسم المجمع')} <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                  data-testid="edit-compound-name-input"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">{t('location', 'الموقع')}</label>
+                <input
+                  type="text"
+                  value={editForm.location}
+                  onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">{t('full_address', 'العنوان التفصيلي')}</label>
+                <input
+                  type="text"
+                  value={editForm.address}
+                  onChange={(e) => setEditForm({ ...editForm, address: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">{t('description', 'وصف مختصر')}</label>
+                <textarea
+                  value={editForm.description}
+                  onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white resize-none"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowEditModal(false)}
+                disabled={editing}
+                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg disabled:opacity-50"
+              >{t('cancel', 'إلغاء')}</button>
+              <button
+                onClick={handleEditCompound}
+                disabled={editing || !editForm.name.trim()}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-md disabled:opacity-60"
+                data-testid="edit-compound-submit-btn"
+              >{editing ? '...جارٍ الحفظ' : t('save_changes', 'حفظ التغييرات')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Compound Admin Modal */}
+      {showAdminModal && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => !creatingAdmin && setShowAdminModal(false)}
+        >
+          <div
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+            dir="rtl"
+            data-testid="create-admin-modal"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl">
+                  👤
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {t('create_compound_admin', 'إنشاء مدير المجمع')}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {t('admin_for_compound', 'حساب admin للمجمع')}: <span className="font-semibold text-emerald-600">{adminForm.compound_name}</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => !creatingAdmin && setShowAdminModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              >×</button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t('full_name', 'الاسم الكامل')} <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={adminForm.full_name}
+                  onChange={(e) => setAdminForm({ ...adminForm, full_name: e.target.value })}
+                  placeholder={t('eg_ahmed_mostafa', 'مثال: أحمد مصطفى')}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
+                  data-testid="admin-full-name-input"
+                  autoFocus
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                    {t('username', 'اسم المستخدم')} <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={adminForm.username}
+                    onChange={(e) => setAdminForm({ ...adminForm, username: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                    {t('email', 'البريد الإلكتروني')} <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={adminForm.email}
+                    onChange={(e) => setAdminForm({ ...adminForm, email: e.target.value })}
+                    placeholder="admin@example.com"
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">{t('phone', 'الهاتف')}</label>
+                <input
+                  type="text"
+                  value={adminForm.phone}
+                  onChange={(e) => setAdminForm({ ...adminForm, phone: e.target.value })}
+                  placeholder="+20 1xxxxxxxxx"
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t('password', 'كلمة المرور')} <span className="text-rose-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={adminForm.password}
+                    onChange={(e) => setAdminForm({ ...adminForm, password: e.target.value })}
+                    placeholder={t('min_6_chars', '6 أحرف على الأقل')}
+                    className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 dark:bg-gray-800 dark:text-white font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={generatePassword}
+                    className="px-3 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-700 font-semibold rounded-lg text-sm whitespace-nowrap"
+                    title={t('auto_generate', 'توليد تلقائي')}
+                  >🎲 {t('generate', 'توليد')}</button>
+                </div>
+                <p className="mt-1.5 text-[11px] text-amber-700 bg-amber-50 dark:bg-amber-900/20 dark:text-amber-200 rounded p-2">
+                  ⚠️ {t('save_password_now', 'احفظ كلمة المرور الآن — لن تظهر مرة أخرى. ستحتاج إرسالها لمدير المجمع.')}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowAdminModal(false)}
+                disabled={creatingAdmin}
+                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg disabled:opacity-50"
+              >{t('cancel', 'إلغاء')}</button>
+              <button
+                onClick={handleCreateAdmin}
+                disabled={creatingAdmin}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold rounded-lg shadow-md disabled:opacity-60"
+                data-testid="create-admin-submit-btn"
+              >{creatingAdmin ? '...جارٍ الإنشاء' : t('create_admin', 'إنشاء المدير')}</button>
             </div>
           </div>
         </div>

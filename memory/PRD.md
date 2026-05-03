@@ -4,6 +4,33 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 95: Edit Compound + Create Compound Admin — Feb 5, 2026 ✅
+
+**🎯 الميزة 1 - Edit Compound Modal:**
+- زر قلم 📝 (data-testid `edit-compound-{id}`) بجوار كل مجمع لـ `company_admin`.
+- Modal RTL أنيق (gradient blue→indigo) بـ 4 حقول: name (مطلوب) / location / address / description.
+- يستخدم `PUT /api/company-admin/compounds/{id}` الموجود مسبقاً.
+- بعد الحفظ: toast نجاح + `fetchCompounds()` لتحديث الجدول.
+
+**🎯 الميزة 2 - Create Compound Admin Modal:**
+- زر "إنشاء مدير" (gradient emerald→teal) بأيقونة مستخدم.
+- Modal RTL مع: full_name (autoFocus + مطلوب) / username (مُقترح من اسم المجمع `admin_<slug>`) / email (مطلوب) / phone / password (مطلوب).
+- زر **🎲 توليد كلمة مرور تلقائي** — يولد 10 أحرف عشوائية من charset آمن (بدون أحرف ملتبسة `0/O/1/l`).
+- تنبيه أصفر: "احفظ كلمة المرور الآن — لن تظهر مرة أخرى".
+- يستخدم `POST /api/company-admin/compounds/{id}/users` مع `role=admin` و plan-limit enforcement.
+
+**🛠️ تعديلات الجدول:**
+- إضافة column "إجراءات" لـ `canAddCompound` (شركة الإدارة) أيضاً، مع حفاظ على عمود "Send Code" لـ super_admin/app_owner.
+- `colSpan` في empty-state يتعدّل بناءً على `canManageCodes || canAddCompound`.
+
+**🧪 Manual E2E:**
+- ✅ `curl PUT /api/company-admin/compounds/{id}` HTTP 200 → location/description محدّثان.
+- ✅ `curl POST /compounds/{id}/users` HTTP 200 → admin user أُنشئ بـ `compound_id` و `company_id`.
+- ✅ Screenshot: 3 أزرار edit + 3 أزرار create-admin ظاهرة. Edit modal يفتح ويعرض القيم المُحدّثة من الـ DB.
+- ✅ Lint نظيف.
+
+
+
 ### Iter 94: Add New Compound Button + Modal — Feb 5, 2026 ✅
 
 **🎯 الميزة:** زر إضافة مجمع جديد داخل صفحة "إدارة المجمعات السكنية" لشركة الإدارة.

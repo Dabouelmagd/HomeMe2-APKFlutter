@@ -12,6 +12,7 @@ import {
   ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import HowToPayButton from './HowToPayButton';
+import PaymentProofUploadModal from './PaymentProofUploadModal';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -23,6 +24,7 @@ const ResidentFinancialDashboard = () => {
   const [charges, setCharges] = useState([]);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedCharge, setSelectedCharge] = useState(null);
+  const [proofModalCharge, setProofModalCharge] = useState(null);
 
   useEffect(() => {
     fetchResidentFinancialData();
@@ -223,6 +225,13 @@ const ResidentFinancialDashboard = () => {
                       <p className="text-xl font-bold text-orange-600">{formatCurrency(charge.amount)}</p>
                       <HowToPayButton amount={charge.amount} chargeTitle={charge.description} variant="button" />
                       <button
+                        onClick={() => setProofModalCharge({ id: charge.id, title: charge.description, amount: charge.amount })}
+                        data-testid={`upload-proof-${charge.id}`}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-semibold transition-all flex items-center gap-1"
+                      >
+                        📤 ارفع إيصال
+                      </button>
+                      <button
                         onClick={() => handlePayNow(charge)}
                         className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all"
                       >
@@ -336,6 +345,16 @@ const ResidentFinancialDashboard = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {proofModalCharge && (
+        <PaymentProofUploadModal
+          chargeId={proofModalCharge.id}
+          chargeTitle={proofModalCharge.title}
+          chargeAmount={proofModalCharge.amount}
+          onClose={() => setProofModalCharge(null)}
+          onSubmitted={() => fetchResidentFinancialData()}
+        />
       )}
     </div>
   );

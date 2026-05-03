@@ -21,6 +21,7 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import useTabState from '../hooks/useTabState';
 import HowToPayButton from './HowToPayButton';
+import PaymentProofsPanel from './PaymentProofsPanel';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -153,6 +154,7 @@ const CompoundFinance = () => {
     { id: 'obligations', label: t('obligations', t('cf_obligations', 'الالتزامات')), icon: DocumentTextIcon },
     { id: 'units', label: t('unit_payments', 'سداد الوحدات'), icon: HomeIcon },
     { id: 'expenses', label: t('expenses', t('cf_expenses', 'المصروفات')), icon: ArrowTrendingDownIcon },
+    { id: 'proofs', label: 'إيصالات الدفع', icon: CreditCardIcon },
   ];
 
   return (
@@ -624,6 +626,9 @@ const CompoundFinance = () => {
               ) : <p className="text-center text-gray-500 py-8">{t('no_expenses', 'لا توجد مصروفات')}</p>}
             </div>
           )}
+
+          {/* Payment Proofs */}
+          {activeTab === 'proofs' && <PaymentProofsPanel />}
         </div>
 
         {/* Add Expense Modal */}

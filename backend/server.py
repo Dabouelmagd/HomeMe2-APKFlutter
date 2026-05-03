@@ -2402,6 +2402,7 @@ from routes.finance import router as finance_router
 from routes.ratings import router as ratings_router2
 from routes.contracts import router as contracts_router
 from routes.compound_payment_methods import router as compound_payment_methods_router
+from routes.payment_proofs import router as payment_proofs_router
 from routes.complaints import router as complaints_router
 from routes.superadmin import router as superadmin_router
 from routes.superadmin_gifts import router as superadmin_gifts_router
@@ -2468,6 +2469,7 @@ app.include_router(finance_router)
 app.include_router(ratings_router2)
 app.include_router(contracts_router)
 app.include_router(compound_payment_methods_router)
+app.include_router(payment_proofs_router)
 app.include_router(complaints_router)
 app.include_router(superadmin_router)
 app.include_router(superadmin_gifts_router)

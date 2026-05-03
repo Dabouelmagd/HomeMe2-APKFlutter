@@ -5,6 +5,50 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-65)
 
+### Iter 80: Payment Proofs — رفع إيصالات السداد + اعتماد بضغطة زر (May 3, 2026) ✅
+
+**🎯 الهدف:** تحويل المدفوعات خارج التطبيق (محفظة، إنستاباي، تحويل بنكي) من فوضى واتساب إلى سجل رقمي منظَّم بالكامل داخل HomeMe.
+
+**Backend (`routes/payment_proofs.py`, ~270 LOC):**
+- Collection `payment_proofs` بحقول كاملة: `compound_id, resident_id, resident_name, unit_number, charge_id, charge_title, amount, method_type, transaction_reference, notes, image_url, status (pending/approved/rejected), reviewed_by, reviewed_at, rejection_reason`.
+- 6 endpoints:
+  - `POST /api/payment-proofs` (multipart) — يرفع المقيم صورة الإيصال (PNG/JPG/WEBP/PDF حتى 8MB) + المبلغ + طريقة الدفع + رقم العملية + ملاحظات. يُحفظ على القرص + dual-write لـ MongoDB media store + إشعار تلقائي للإدارة.
+  - `GET /api/payment-proofs/my` — قائمة إيصالات المقيم.
+  - `GET /api/payment-proofs?status=pending|approved|rejected` — قائمة للإدارة بـ tenant scoping (admin = compound، company_admin = كل compounds شركته via `company_id` أو `management_company_id`).
+  - `POST /api/payment-proofs/{id}/approve` — يُعلِّم الـ unit_charge المرتبط كـ paid + يُنشئ entry في `db.revenue` + يُرسل إشعار للمقيم. **idempotent** (no double-credit).
+  - `POST /api/payment-proofs/{id}/reject` — يحتاج `reason` (400 لو فاضي) + إشعار للمقيم بالسبب.
+  - `DELETE /api/payment-proofs/{id}` — المقيم يحذف pending فقط، الإدارة تحذف أي حالة.
+- Multi-tenant guard `_can_review()` يدعم `company_id` و `management_company_id`.
+
+**Frontend:**
+- `components/PaymentProofUploadModal.js` — Modal أنيق (gradient أخضر) للمقيم: drag-and-drop image picker + معاينة فورية + select لـ 11 طريقة دفع + حقول المبلغ + المرجع + ملاحظات.
+- `components/PaymentProofsPanel.js` — لوحة مراجعة احترافية للإدارة:
+  - فلاتر بـ counts (بانتظار/معتمدة/مرفوضة/الكل).
+  - Grid 2 columns: كل كارت يعرض thumbnail + اسم المقيم + الوحدة + المبلغ + المنهج + المرجع + التاريخ + بادج الحالة.
+  - أزرار "✓ اعتماد" و "✕ رفض" inline + Modal كامل لعرض الصورة بحجم كامل + Modal منفصل لإدخال سبب الرفض.
+- مدمج في:
+  - `CompoundFinance.js` — تبويب جديد **"إيصالات الدفع"** (للإدارة).
+  - `ResidentFinancialDashboard.js` — زر "📤 ارفع إيصال" بجانب كل مستحق معلق + يفتح Modal الرفع → يربط الإيصال تلقائياً بـ charge_id.
+
+**🔄 الـ Workflow الكامل:**
+1. المقيم يدفع خارج التطبيق (فودافون كاش مثلاً) → يفتح صفحة المالية → يضغط "📤 ارفع إيصال" بجانب الالتزام.
+2. يرفع صورة الإيصال + يدخل المبلغ والمرجع.
+3. الإدارة تستلم إشعار تلقائي + يظهر الإيصال في تبويب "إيصالات الدفع - بانتظار المراجعة".
+4. الإدارة تعرض الصورة بحجم كامل، تتحقق من المرجع، وتضغط "✓ اعتماد" → الالتزام يتحول لـ "مدفوع" + يُسجَّل في الإيرادات + المقيم يحصل على إشعار.
+5. لو الإيصال مزيَّف، الإدارة تضغط "✕ رفض" + تكتب سبب → المقيم يرى السبب ويعيد المحاولة.
+
+**🧪 Manual E2E:**
+- ✅ Resident upload: HTTP 200, proof_id + image_url returned
+- ✅ Admin list: pending count = 1
+- ✅ Admin approve: charge marked paid + revenue created + notification sent
+- ✅ Admin reject: required reason validation works (400 without)
+- ✅ Cleanup delete: works for both resident and admin
+- ✅ UI screenshot: tab renders, pills with 0 counts, empty state visible
+
+**🔧 Bonus Fix Discovered:** `compound_payment_methods` & `payment_proofs` queries now both check `company_id` AND `management_company_id` fields on compounds (legacy compounds use `management_company_id` only — was causing empty lists for company_admin).
+
+---
+
 ### Iter 79: How-To-Pay Modal + Stripe Webhook Unification + Finance RBAC Fix (May 3, 2026) ✅
 
 **🎯 Quick Pay Helper Modal — يرفع نسبة التحصيل بـ click واحد:**

@@ -145,7 +145,10 @@ async def list_methods(
 
 
 async def _company_compound_ids(db, company_id: str) -> List[str]:
-    rows = await db.compounds.find({"company_id": company_id}, {"_id": 0, "id": 1}).to_list(500)
+    rows = await db.compounds.find(
+        {"$or": [{"company_id": company_id}, {"management_company_id": company_id}]},
+        {"_id": 0, "id": 1}
+    ).to_list(500)
     return [r["id"] for r in rows if r.get("id")]
 
 

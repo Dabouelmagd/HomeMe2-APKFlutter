@@ -15,9 +15,19 @@ const CompoundsManagement = () => {
   const [showCodeModal, setShowCodeModal] = useState(false);
   const [selectedCode, setSelectedCode] = useState('');
   const [subscriptionCodes, setSubscriptionCodes] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [newCompound, setNewCompound] = useState({
+    name: '',
+    location: '',
+    address: '',
+    description: '',
+  });
 
   // Subscription-codes management is only meaningful for super_admin / app_owner
   const canManageCodes = isSuperAdmin || isAppOwner;
+  // company_admin can also create new compounds inside its company portfolio
+  const canAddCompound = isCompanyAdmin || canManageCodes;
 
   useEffect(() => {
     fetchCompounds();
@@ -80,6 +90,31 @@ const CompoundsManagement = () => {
     setShowCodeModal(true);
   };
 
+  const handleAddCompound = async () => {
+    const name = newCompound.name.trim();
+    if (!name) {
+      toast.error(t('compound_name_required', 'اسم المجمع مطلوب'));
+      return;
+    }
+    setAdding(true);
+    try {
+      const url = isCompanyAdmin
+        ? `${API}/api/company-admin/compounds`
+        : `${API}/api/companies/compounds`;
+      await axios.post(url, newCompound);
+      toast.success(t('compound_added_successfully', 'تم إضافة المجمع بنجاح ✅'));
+      setShowAddModal(false);
+      setNewCompound({ name: '', location: '', address: '', description: '' });
+      fetchCompounds();
+    } catch (err) {
+      const detail = err?.response?.data?.detail;
+      const msg = typeof detail === 'string' ? detail : (detail?.message || t('failed_to_add_compound', 'فشل إضافة المجمع'));
+      toast.error(msg);
+    } finally {
+      setAdding(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -90,13 +125,27 @@ const CompoundsManagement = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          🏘️ {t('compounds_management', 'Compounds Management')}
-        </h1>
-        <p className="text-gray-600">
-          {t('compounds_management_desc', 'Manage all residential compounds and assign subscription codes')}
-        </p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">
+            🏘️ {t('compounds_management', 'Compounds Management')}
+          </h1>
+          <p className="text-gray-600">
+            {t('compounds_management_desc', 'Manage all residential compounds and assign subscription codes')}
+          </p>
+        </div>
+        {canAddCompound && (
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-md hover:shadow-lg hover:from-emerald-600 hover:to-teal-700 transition-all"
+            data-testid="add-compound-btn"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            {t('add_new_compound', 'إضافة مجمع جديد')}
+          </button>
+        )}
       </div>
 
       {/* Statistics Cards */}
@@ -342,6 +391,115 @@ const CompoundsManagement = () => {
                 className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium rounded-lg transition-colors"
               >
                 Send Code
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add New Compound Modal */}
+      {showAddModal && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => !adding && setShowAddModal(false)}
+          data-testid="add-compound-modal"
+        >
+          <div
+            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-lg p-6 sm:p-8 max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+            dir="rtl"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl">
+                  🏘️
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    {t('add_new_compound', 'إضافة مجمع جديد')}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {t('add_compound_subtitle', 'سيتم ربط المجمع تلقائياً بشركتك')}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => !adding && setShowAddModal(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+                aria-label="close"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t('compound_name', 'اسم المجمع')} <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={newCompound.name}
+                  onChange={(e) => setNewCompound({ ...newCompound, name: e.target.value })}
+                  placeholder={t('eg_madinaty', 'مثال: كمبوند مدينتي')}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                  data-testid="add-compound-name-input"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t('location', 'الموقع')}
+                </label>
+                <input
+                  type="text"
+                  value={newCompound.location}
+                  onChange={(e) => setNewCompound({ ...newCompound, location: e.target.value })}
+                  placeholder={t('eg_cairo_new_capital', 'مثال: العاصمة الإدارية')}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t('full_address', 'العنوان التفصيلي')}
+                </label>
+                <input
+                  type="text"
+                  value={newCompound.address}
+                  onChange={(e) => setNewCompound({ ...newCompound, address: e.target.value })}
+                  placeholder={t('full_address_placeholder', 'الشارع، المنطقة، رقم البوابة...')}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                  {t('description', 'وصف مختصر')}
+                </label>
+                <textarea
+                  value={newCompound.description}
+                  onChange={(e) => setNewCompound({ ...newCompound, description: e.target.value })}
+                  placeholder={t('description_placeholder', 'ملاحظات عن المجمع، عدد العمارات، المرافق...')}
+                  rows={3}
+                  className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-800 dark:text-white resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowAddModal(false)}
+                disabled={adding}
+                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors disabled:opacity-50"
+              >
+                {t('cancel', 'إلغاء')}
+              </button>
+              <button
+                onClick={handleAddCompound}
+                disabled={adding || !newCompound.name.trim()}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold rounded-lg shadow-md transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                data-testid="add-compound-submit-btn"
+              >
+                {adding ? '...جارٍ الحفظ' : t('add_compound', 'إضافة المجمع')}
               </button>
             </div>
           </div>

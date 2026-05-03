@@ -4,6 +4,32 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 94: Add New Compound Button + Modal — Feb 5, 2026 ✅
+
+**🎯 الميزة:** زر إضافة مجمع جديد داخل صفحة "إدارة المجمعات السكنية" لشركة الإدارة.
+
+**Backend:** يستخدم `POST /api/company-admin/compounds` الموجود مسبقاً (يربط المجمع تلقائياً بـ `company_id` ويضيف الـ id في `companies.compound_ids`).
+
+**Frontend (`CompoundsManagement.js`):**
+- **زر بارز** في رأس الصفحة (gradient emerald→teal) بأيقونة "+" وtestid `add-compound-btn`. يظهر لـ `isCompanyAdmin || super_admin || app_owner`.
+- **Modal أنيق RTL** مع:
+  - حقل اسم المجمع (مطلوب) + autoFocus
+  - حقل الموقع (placeholder عربي)
+  - حقل العنوان التفصيلي
+  - textarea للوصف
+  - زرّي "إلغاء" و "إضافة المجمع" (gradient emerald)
+  - close-on-backdrop + close-on-X
+  - validation: زر submit معطّل لو الاسم فارغ
+- بعد النجاح: toast "بنجاح" + `fetchCompounds()` للتحديث الفوري بلا reload.
+
+**🧪 Manual E2E:**
+- ✅ `curl POST /api/company-admin/compounds` HTTP 200 → ينشئ المجمع ويُرجع id+company_id.
+- ✅ Screenshot: Modal منسّق بالكامل بالعربية مع 4 حقول + زرّي إجراء.
+- ✅ بعد submit: المجمع يظهر فوراً في الجدول (5 مجمعات بعد الإضافة، رجعت إلى 3 بعد cleanup).
+- ✅ Lint نظيف.
+
+
+
 ### Iter 93: GET /api/messages Fix for company_admin — Feb 5, 2026 ✅
 
 **🐛 المشكلة:** Toast "Failed to load messages" يظهر في `/app/messages` لـ company_admin مع HTTP 500 من backend.

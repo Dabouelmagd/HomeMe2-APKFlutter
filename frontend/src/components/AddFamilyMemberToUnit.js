@@ -22,6 +22,7 @@ import {
   ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
 import CreateResidentModal from './CreateResidentModal';
+import BulkImportResidentsModal from './BulkImportResidentsModal';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -35,6 +36,7 @@ const AddFamilyMemberToUnit = () => {
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [showCreateResident, setShowCreateResident] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -440,6 +442,15 @@ const AddFamilyMemberToUnit = () => {
           >
             <UserPlusIcon className="h-5 w-5" />
             <span>➕ إضافة ساكن رئيسي جديد</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowBulkImport(true)}
+            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold text-sm shadow-md transition"
+            data-testid="cta-bulk-import"
+          >
+            <ArrowDownTrayIcon className="h-5 w-5 rotate-180" />
+            <span>📥 رفع من Excel (دفعة واحدة)</span>
           </button>
           <button
             type="button"
@@ -1242,6 +1253,13 @@ const AddFamilyMemberToUnit = () => {
         <CreateResidentModal
           onClose={() => setShowCreateResident(false)}
           onCreated={() => { setShowCreateResident(false); fetchResidents(); }}
+        />
+      )}
+
+      {showBulkImport && (
+        <BulkImportResidentsModal
+          onClose={() => setShowBulkImport(false)}
+          onImported={() => fetchResidents()}
         />
       )}
     </div>

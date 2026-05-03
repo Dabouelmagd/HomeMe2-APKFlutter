@@ -2612,6 +2612,43 @@ async def ensure_db_indexes():
 
 
 @app.on_event("startup")
+async def backfill_contract_expenses():
+    """One-time idempotent sync: ensure every contract has a linked expense entry."""
+    import asyncio as _asyncio
+
+    async def _runner():
+        await _asyncio.sleep(8)  # let DB connection settle
+        try:
+            from database import get_db
+            from routes.contracts import _sync_contract_expense
+            db = get_db()
+            contracts = await db.contracts.find({}, {"_id": 0}).to_list(2000)
+            synced = 0
+            for c in contracts:
+                if not c.get("id"):
+                    continue
+                exists = await db.expenses.find_one({"contract_id": c["id"]}, {"_id": 1})
+                if not exists:
+                    await _sync_contract_expense(db, c)
+                    synced += 1
+            if synced:
+                logging.info(f"Contract→expense backfill on boot: synced {synced} contracts")
+        except Exception as e:
+            logging.warning(f"contract backfill on boot failed: {e}")
+
+        # Also auto-sync the changelog from file
+        try:
+            from database import get_db as _gdb
+            from routes.app_version import sync_changelog_from_file
+            n = await sync_changelog_from_file(_gdb())
+            logging.info(f"Changelog auto-sync from file: {n} entries refreshed")
+        except Exception as e:
+            logging.warning(f"changelog auto-sync failed: {e}")
+
+    _asyncio.create_task(_runner())
+
+
+@app.on_event("startup")
 async def start_monthly_reports_scheduler():
     """Background loop that emails monthly PDF reports (runs at 02:00 UTC, only on day 1)."""
     import asyncio as _asyncio

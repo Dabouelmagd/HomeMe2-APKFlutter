@@ -73,6 +73,22 @@ async def get_analytics_dashboard(
                 paid_charges += amt
         collection_rate = round((paid_charges / total_charges) * 100, 1) if total_charges else 0.0
 
+        # Expenses (current + prev) — supports both ISO date strings and naked YYYY-MM-DD
+        expenses_total = 0.0
+        prev_expenses_total = 0.0
+        expenses_by_category: Dict[str, float] = {}
+        async for e in db.expenses.find(scope, {"amount": 1, "category": 1, "date": 1, "created_at": 1, "_id": 0}):
+            edate = e.get("date") or e.get("created_at") or ""
+            if isinstance(edate, datetime):
+                edate = edate.isoformat()
+            amt = float(e.get("amount") or 0)
+            if edate >= start_iso:
+                expenses_total += amt
+                cat = e.get("category") or "other"
+                expenses_by_category[cat] = expenses_by_category.get(cat, 0) + amt
+            elif edate >= prev_start_iso and edate < prev_end_iso:
+                prev_expenses_total += amt
+
         # Engagement — active users (logged in or any activity_logs entry within window)
         active_users_window = await db.users.count_documents({**scope, "last_login": {"$gte": start_iso}}) if scope else await db.users.count_documents({"last_login": {"$gte": start_iso}})
         # Fallback to activity_logs if last_login isn't reliably tracked
@@ -222,6 +238,12 @@ async def get_analytics_dashboard(
                 "total": round(revenue, 2),
                 "collection_rate": collection_rate,
                 "growth_rate": _delta(revenue, prev_revenue),
+            },
+            "expenses": {
+                "total": round(expenses_total, 2),
+                "by_category": {k: round(v, 2) for k, v in expenses_by_category.items()},
+                "growth_rate": _delta(expenses_total, prev_expenses_total),
+                "net_balance": round(revenue - expenses_total, 2),
             },
             "engagement": {
                 "rate": engagement_rate,

@@ -370,7 +370,7 @@ const AdvancedAnalytics = () => {
         {!isSuperAdminOnly && (
         <MetricCard
           title={t('revenue_collected')}
-          value={`$${(analytics.revenue?.total || 0).toLocaleString()}`}
+          value={`${(analytics.revenue?.total || 0).toLocaleString()} ج.م`}
           change={analytics.revenue?.growth_rate}
           icon={CurrencyDollarIcon}
           color="text-green-600"
@@ -586,34 +586,65 @@ const AdvancedAnalytics = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
               <MetricCard
                 title={t('total_revenue')}
-                value={`$${(analytics.revenue?.total || 0).toLocaleString()}`}
+                value={`${(analytics.revenue?.total || 0).toLocaleString()} ج.م`}
                 icon={CurrencyDollarIcon}
                 color="text-green-600"
               />
               <MetricCard
-                title={t('outstanding_payments')}
-                value={`$${(analytics.revenue?.outstanding || 0).toLocaleString()}`}
-                icon={ClockIcon}
+                title={'إجمالي المصروفات'}
+                value={`${(analytics.expenses?.total || 0).toLocaleString()} ج.م`}
+                icon={ArrowTrendingUpIcon}
                 color="text-red-600"
+                change={analytics.expenses?.growth_rate}
+              />
+              <MetricCard
+                title={'صافي الرصيد'}
+                value={`${(analytics.expenses?.net_balance ?? ((analytics.revenue?.total || 0) - (analytics.expenses?.total || 0))).toLocaleString()} ج.م`}
+                icon={CurrencyDollarIcon}
+                color={(analytics.expenses?.net_balance ?? 0) >= 0 ? 'text-blue-600' : 'text-red-600'}
               />
               <MetricCard
                 title={t('collection_rate')}
                 value={`${analytics.revenue?.collection_rate || 0}%`}
                 icon={ArrowTrendingUpIcon}
-                color="text-blue-600"
-              />
-              <MetricCard
-                title={t('avg_payment_time')}
-                value={`${analytics.revenue?.avg_payment_time || 0} ${t('days')}`}
-                icon={CalendarDaysIcon}
-                color="text-purple-600"
+                color="text-amber-600"
               />
             </div>
+
+            {/* Expenses by category breakdown */}
+            {analytics.expenses?.by_category && Object.keys(analytics.expenses.by_category).length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">المصروفات حسب التصنيف</h3>
+                <div className="space-y-2">
+                  {Object.entries(analytics.expenses.by_category)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([cat, amt]) => {
+                      const total = analytics.expenses.total || 1;
+                      const pct = (amt / total) * 100;
+                      const labels = {
+                        maintenance: 'صيانة', utilities: 'مرافق', security: 'حراسة',
+                        cleaning: 'نظافة', salaries: 'رواتب', other: 'أخرى'
+                      };
+                      return (
+                        <div key={cat}>
+                          <div className="flex items-center justify-between text-sm mb-1">
+                            <span className="font-semibold text-gray-700">{labels[cat] || cat}</span>
+                            <span className="text-gray-600">{Number(amt).toLocaleString()} ج.م ({pct.toFixed(1)}%)</span>
+                          </div>
+                          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-l from-rose-500 to-red-600 rounded-full" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ChartContainer title={t('monthly_revenue')}>
                 <SimpleChart 
-                  data={analytics.charts?.monthly_revenue || []}
+                  data={analytics.charts?.revenue_trend || analytics.charts?.monthly_revenue || []}
                   type="area"
                   color="#10B981"
                 />

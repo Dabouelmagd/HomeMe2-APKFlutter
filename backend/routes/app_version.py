@@ -10,21 +10,13 @@ dashboard without redeploying):
   POST   /api/owner/changelog
   PUT    /api/owner/changelog/{entry_id}
   DELETE /api/owner/changelog/{entry_id}
+  POST   /api/owner/changelog/sync-from-file → force re-read CHANGELOG_LATEST.md
 
-Storage: collection `changelog_entries`, schema:
-  {
-    id: uuid,
-    ar: str, en: str, fr: str,        # text per language
-    order: int,                       # ascending order in the modal
-    is_active: bool,                  # only active entries shown publicly
-    created_at: iso str,
-    updated_at: iso str,
-    created_by: user_id,
-  }
-
-Fallback: when the collection is empty, /api/version returns a built-in
-seed list so first-time installs and dev environments still get a useful
-"What's new" modal without any DB seeding.
+Auto-sync: on every process boot we read /app/memory/CHANGELOG_LATEST.md and
+upsert each bullet as an entry tagged with the current build version. This way
+every deployment automatically refreshes the "What's new" modal — the developer
+just edits CHANGELOG_LATEST.md, no manual UI step. Manual entries created via
+the owner CRUD UI (source='manual') are preserved untouched.
 """
 from fastapi import APIRouter, HTTPException, Depends
 from datetime import datetime, timezone
@@ -33,45 +25,97 @@ from typing import Optional, List
 import os
 import time
 import uuid
+import logging
 
 from database import get_db
 from auth_deps import require_app_owner
 
 router = APIRouter(prefix="/api", tags=["version"])
 
-# Regenerated on every process start. Cheapest reliable build-stamp.
 _STARTED_AT = datetime.now(timezone.utc).isoformat()
 _VERSION = str(int(time.time()))
 _RUNTIME_ENV = os.environ.get("APP_ENV", "production")
+_CHANGELOG_FILE = "/app/memory/CHANGELOG_LATEST.md"
 
-# Seed list — used only when the DB collection is empty.
 _FALLBACK_CHANGELOG = [
     {
-        "ar": "تجربة تسجيل دخول أسرع وأكثر استقراراً 🚀",
-        "en": "Faster, more reliable login experience 🚀",
-        "fr": "Connexion plus rapide et plus fiable 🚀",
+        "ar": "📤 ارفع إيصال الدفع مباشرةً داخل التطبيق — الإدارة تعتمد بضغطة زر",
+        "en": "Upload payment receipt directly in-app — admin approves with one click",
+        "fr": "Téléchargez votre reçu de paiement dans l'app — l'admin approuve en un clic",
     },
     {
-        "ar": "رسائل خطأ واضحة بالعربية في صفحة تسجيل الشركات + متطلبات كلمة المرور تظهر مباشرةً",
-        "en": "Clear Arabic error messages on the company registration page + live password requirements",
-        "fr": "Messages d'erreur arabes clairs lors de l'inscription d'entreprise + exigences de mot de passe en direct",
+        "ar": "💳 طرق الدفع المعتمدة لكل كمبوند (محفظة، إنستاباي، بنك، فوري…)",
+        "en": "Approved payment methods per compound (wallets, InstaPay, bank…)",
+        "fr": "Méthodes de paiement approuvées par compound",
     },
     {
-        "ar": "إمكانية إظهار/إخفاء كلمة المرور أثناء التسجيل 👁️",
-        "en": "Show / hide password toggle during registration 👁️",
-        "fr": "Afficher / masquer le mot de passe lors de l'inscription 👁️",
-    },
-    {
-        "ar": "هوية بصرية بنفسجية مميّزة لصفحات شركة الإدارة 💜",
-        "en": "Distinctive purple visual theme for management-company pages 💜",
-        "fr": "Thème violet distinctif pour les pages des sociétés de gestion 💜",
-    },
-    {
-        "ar": "تنبيه تلقائي عند توفّر إصدار جديد من التطبيق — اضغطي تحديث الآن للحصول عليه فوراً",
-        "en": "Automatic alert when a new app version is available — tap Update Now to get it instantly",
-        "fr": "Alerte automatique en cas de nouvelle version — appuyez sur Mettre à jour pour l'obtenir",
+        "ar": "🧾 عقود الصيانة تظهر الآن تلقائياً في إجمالي المصروفات والتحليلات",
+        "en": "Maintenance contracts now sync to expenses and analytics automatically",
+        "fr": "Les contrats de maintenance se synchronisent automatiquement aux dépenses",
     },
 ]
+
+
+def _parse_changelog_file(path: str) -> List[dict]:
+    """Read the markdown file and return a list of {ar} dicts in order."""
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+        items: List[dict] = []
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("- ") and not stripped.startswith("- ["):
+                text = stripped[2:].strip()
+                if text and len(text) <= 500:
+                    items.append({"ar": text, "en": text, "fr": text})
+                if len(items) >= 8:
+                    break
+        return items
+    except Exception as e:
+        logging.warning(f"changelog parse failed: {e}")
+        return []
+
+
+async def sync_changelog_from_file(db) -> int:
+    """Read CHANGELOG_LATEST.md and replace the active auto-entries.
+
+    Strategy:
+      1. Soft-disable previous auto entries (source='auto') so file fully drives the modal.
+      2. Insert/update each new file bullet ordered top-to-bottom.
+      3. Manual entries (source='manual') are preserved untouched.
+    """
+    items = _parse_changelog_file(_CHANGELOG_FILE)
+    if not items:
+        return 0
+
+    now = datetime.now(timezone.utc).isoformat()
+    await db.changelog_entries.update_many(
+        {"source": "auto"},
+        {"$set": {"is_active": False, "updated_at": now}},
+    )
+    for idx, it in enumerate(items):
+        existing = await db.changelog_entries.find_one(
+            {"source": "auto", "ar": it["ar"]}, {"_id": 0}
+        )
+        doc = {
+            "ar": it["ar"],
+            "en": it.get("en") or it["ar"],
+            "fr": it.get("fr") or it["ar"],
+            "order": idx + 1,
+            "is_active": True,
+            "source": "auto",
+            "version_tag": _VERSION,
+            "updated_at": now,
+        }
+        if existing:
+            await db.changelog_entries.update_one({"id": existing["id"]}, {"$set": doc})
+        else:
+            doc["id"] = str(uuid.uuid4())
+            doc["created_at"] = now
+            await db.changelog_entries.insert_one(doc)
+    return len(items)
 
 
 class ChangelogEntryIn(BaseModel):
@@ -99,7 +143,6 @@ async def _read_active_changelog(db) -> List[dict]:
     items = await cursor.to_list(length=8)
     if not items:
         return _FALLBACK_CHANGELOG
-    # Strip the order field from the public response.
     return [{"ar": i.get("ar", ""), "en": i.get("en", ""), "fr": i.get("fr", "")} for i in items]
 
 
@@ -116,9 +159,14 @@ async def get_version():
     }
 
 
-# ---------------------------------------------------------------------------
-# Owner-only CRUD
-# ---------------------------------------------------------------------------
+@router.post("/owner/changelog/sync-from-file")
+async def manual_sync_from_file(current_user: dict = Depends(require_app_owner)):
+    """Force-re-read CHANGELOG_LATEST.md and refresh modal entries."""
+    db = get_db()
+    n = await sync_changelog_from_file(db)
+    return {"synced": n, "version_tag": _VERSION}
+
+
 @router.get("/owner/changelog")
 async def list_changelog(current_user: dict = Depends(require_app_owner)):
     db = get_db()
@@ -131,7 +179,6 @@ async def list_changelog(current_user: dict = Depends(require_app_owner)):
 async def create_changelog(payload: ChangelogEntryIn, current_user: dict = Depends(require_app_owner)):
     db = get_db()
     now = datetime.now(timezone.utc).isoformat()
-    # Default order = max+1 so new entries land at the bottom.
     if payload.order is None:
         last = await db.changelog_entries.find_one({}, sort=[("order", -1)])
         next_order = (last.get("order", 0) + 1) if last else 1
@@ -144,6 +191,7 @@ async def create_changelog(payload: ChangelogEntryIn, current_user: dict = Depen
         "fr": (payload.fr or "").strip(),
         "order": next_order,
         "is_active": payload.is_active,
+        "source": "manual",
         "created_at": now,
         "updated_at": now,
         "created_by": current_user.get("id"),

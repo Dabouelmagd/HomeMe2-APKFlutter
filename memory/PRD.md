@@ -5,6 +5,38 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-65)
 
+### Iter 81: Auto-Backfill + Analytics Expenses + Dynamic Changelog (May 3, 2026) ✅
+
+**🐛 إصلاح: العقود لم تُزامن قبل ساعات (P0):**
+- **السبب:** الـ backfill كان داخل `check_expiring_contracts` التي تُجدول كل 24 ساعة فقط → 3 عقود قديمة (225,000 ج.م) ظلت غير مزامنة.
+- **الإصلاح:** أضفت startup hook جديد `backfill_contract_expenses` في `server.py` يُشغّل المزامنة بعد 8 ثوانٍ من الإقلاع (idempotent — يفحص `contract_id` قبل الإنشاء).
+- **النتيجة:** بعد restart واحد، كل العقود تظهر فوراً في `/api/financial/expenses` و `/api/financial/balance-sheet` و `/api/analytics/dashboard`.
+
+**📊 المصروفات في تبويب التحليلات المتقدمة:**
+- **المشكلة الأصلية:** تبويب "المالية" كان يعرض فقط revenue/collection_rate بدون مصروفات.
+- **Backend (`routes/analytics.py`):** أضفت aggregation block جديد `expenses` يُرجع: `total, by_category {maintenance, utilities, security…}, growth_rate, net_balance`. يدعم تواريخ ISO و YYYY-MM-DD.
+- **Frontend (`AdvancedAnalytics.js`):**
+  - استبدلتُ `outstanding_payments` و `avg_payment_time` بـ MetricCards جديدة: **إجمالي المصروفات** (أحمر) + **صافي الرصيد** (أزرق إذا موجب، أحمر سالب).
+  - شريط breakdown ملون "المصروفات حسب التصنيف" مع نسب مئوية ومقياس مرئي.
+  - رمز العملة من `$` إلى `ج.م` في كل البطاقات.
+
+**🔄 Dynamic Changelog (يتغير مع كل تحديث) — حل جذري:**
+- **المشكلة:** الـ `_FALLBACK_CHANGELOG` كان hardcoded → نفس الرسالة كل مرة بغض النظر عن التحديث.
+- **الحل المعماري:**
+  1. ملف جديد `/app/memory/CHANGELOG_LATEST.md` — كل سطر يبدأ بـ `- ` يصبح نقطة في الـ modal. **هذا الملف يُحدَّث مع كل deployment**.
+  2. دالة جديدة `sync_changelog_from_file()` في `app_version.py` تقرأ الملف عند كل إقلاع → تُعطّل الإدخالات السابقة `source='auto'` → تُنشئ إدخالات جديدة بـ `version_tag` للنشرة الحالية. الإدخالات اليدوية (`source='manual'`) لا تتأثر.
+  3. Startup hook جديد يستدعي المزامنة بعد إقلاع DB.
+  4. Endpoint إضافي `POST /api/owner/changelog/sync-from-file` للمزامنة اليدوية الفورية.
+- **النتيجة:** "مركز إصلاح الأخطاء" يعرض فعلياً الميزات الجديدة لكل deployment تلقائياً، الـ 8 نقاط الأحدث بالترتيب: ارفع إيصال، طرق الدفع، إصلاح العقود، كيف أدفع، التحليلات، RBAC، Stripe، multi-tenant.
+
+**🧪 Manual E2E Verification:**
+- ✅ Backfill on boot: log "Contract→expense backfill on boot: synced 3 contracts" + "Changelog auto-sync from file: 8 entries refreshed"
+- ✅ `/api/version` يُرجع 8 إدخالات جديدة (الأول: 📤 ارفع إيصال الدفع)
+- ✅ `/api/analytics/dashboard?compound_id=88ad…&time_range=last_30_days` يُرجع `expenses.total: 102800.0` + `by_category: {maintenance:36800, utilities:18200, security:22200, cleaning:25200, salaries:200, other:200}`
+- ✅ UI screenshot: تبويب "المالية" يعرض الآن البطاقات الجديدة ✓
+
+---
+
 ### Iter 80: Payment Proofs — رفع إيصالات السداد + اعتماد بضغطة زر (May 3, 2026) ✅
 
 **🎯 الهدف:** تحويل المدفوعات خارج التطبيق (محفظة، إنستاباي، تحويل بنكي) من فوضى واتساب إلى سجل رقمي منظَّم بالكامل داخل HomeMe.

@@ -338,6 +338,76 @@ async def get_analytics_dashboard(
         logging.exception(f"Error fetching analytics: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to fetch analytics: {e}")
 
+
+@router.get("/analytics/export")
+async def export_analytics(
+    date_range: str = "last_30_days",
+    compound_id: Optional[str] = None,
+    format: str = "csv",
+    current_user: dict = Depends(require_admin),
+):
+    """Export the analytics dashboard data as CSV or JSON.
+    Reuses the same aggregation logic as `/analytics/dashboard`."""
+    from fastapi.responses import Response
+    import csv
+    import io
+
+    data = await get_analytics_dashboard(
+        date_range=date_range,
+        compound_id=compound_id,
+        time_range=None,
+        current_user=current_user,
+    )
+
+    if format.lower() == "json":
+        import json as _json
+        return Response(
+            content=_json.dumps(data, ensure_ascii=False, default=str, indent=2),
+            media_type="application/json; charset=utf-8",
+            headers={"Content-Disposition": f'attachment; filename="analytics_{date_range}.json"'},
+        )
+
+    # CSV: flatten overview + key metrics + expenses by category + monthly comparison
+    buf = io.StringIO()
+    # BOM so Excel opens Arabic correctly
+    buf.write("\ufeff")
+    writer = csv.writer(buf)
+
+    overview = data.get("overview", {}) if isinstance(data, dict) else {}
+    charts = data.get("charts", {}) if isinstance(data, dict) else {}
+    expenses = data.get("expenses", {}) if isinstance(data, dict) else {}
+
+    writer.writerow(["القسم", "المقياس", "القيمة"])
+    # Overview
+    for k, v in overview.items():
+        if isinstance(v, (str, int, float)):
+            writer.writerow(["نظرة عامة", k, v])
+
+    # Expenses
+    writer.writerow([])
+    writer.writerow(["المصروفات", "إجمالي", expenses.get("total", 0)])
+    writer.writerow(["المصروفات", "معدل النمو", expenses.get("growth_rate", 0)])
+    writer.writerow(["المصروفات", "صافي الرصيد", expenses.get("net_balance", 0)])
+    for cat, val in (expenses.get("by_category") or {}).items():
+        writer.writerow(["المصروفات حسب الفئة", cat, val])
+
+    # Monthly comparison
+    writer.writerow([])
+    writer.writerow(["الشهر", "إيرادات", "مصروفات", "صافي"])
+    for row in charts.get("monthly_comparison", []) or []:
+        writer.writerow([
+            row.get("label", ""),
+            row.get("revenue", 0),
+            row.get("expenses", 0),
+            row.get("net", 0),
+        ])
+
+    return Response(
+        content=buf.getvalue(),
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": f'attachment; filename="analytics_{date_range}.csv"'},
+    )
+
 # ============ PHASE 3: DOCUMENT MANAGEMENT ENDPOINTS ============
 
 # documents routes extracted to routes/documents.py

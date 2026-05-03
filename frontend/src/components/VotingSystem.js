@@ -507,20 +507,20 @@ const VotingSystem = () => {
                     <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
                       <span className="flex items-center">
                         <CalendarDaysIcon className="w-4 h-4 mr-1" />
-                        {t('ends')}: {formatDate(getEndDate(poll))}
+                        {t('ends', 'ينتهي')}: {formatDate(getEndDate(poll))}
                       </span>
                       <span className="flex items-center">
                         <UsersIcon className="w-4 h-4 mr-1" />
-                        {getVotesCount(poll)} {t('votes')}
+                        {getVotesCount(poll)} {t('votes', 'صوت')}
                       </span>
                       <span className="flex items-center">
                         <ChartBarIcon className="w-4 h-4 mr-1" />
-                        {getParticipationRate(poll)}% {t('participation')}
+                        {getParticipationRate(poll)}% {t('participation', 'مشاركة')}
                       </span>
                       {hasUserVoted(poll) && (
                         <span className="flex items-center text-green-600">
                           <CheckCircleSolidIcon className="w-4 h-4 mr-1" />
-                          {t('voted')}
+                          {t('voted', 'تم التصويت')}
                         </span>
                       )}
                     </div>

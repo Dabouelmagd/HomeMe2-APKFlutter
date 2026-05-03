@@ -4,6 +4,33 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 84: Blank Pages Fix (auto-select compound + analytics export) — Feb 5, 2026 ✅
+
+**🐛 المشكلة:** User شكي من 5 صفحات معطلة لـ `testcompany2`:
+1. `/app/compound-payment-methods` — صفحة فارغة (خلفية بنفسجية فقط).
+2. `/app/facility-booking` — قائمة المرافق فارغة.
+3. `/app/my-subscription` — بيانات الاشتراك لا تظهر.
+4. `/app/analytics` — زر "تصدير" يُظهر toast "فشل في تصدير البيانات".
+5. `/app/voting` — labels بالإنجليزية (ends, votes, participation).
+
+**🔍 السبب الجذري:**
+- **المشكلة الرئيسية:** `testcompany2` لديه 3 كمبوندات لكن `selectedCompoundId` في localStorage فارغ. axios interceptor لا يُرسل `X-Active-Compound-Id`، فـ backend يعتمد على `user.compound_id = "default-compound"` (قيمة افتراضية غير موجودة في DB) → كل requests ترجع 404 → الصفحات تظل في حالة loading بلا محتوى.
+- **Missing endpoint:** `/api/analytics/export` غير موجود إطلاقاً في router.
+- **i18n:** مفاتيح `ends`, `votes`, `participation`, `voted` غير موجودة في `ar.json`.
+
+**🛠️ الإصلاح:**
+- **`company-admin/CompoundSwitcher.js`:** auto-select أول كمبوند عند أول fetch إذا `selectedCompoundId` فارغ أو لا ينطبق على أي كمبوند حالي. يُطلق event `compoundSwitched` لتحديث الداشبورد.
+- **`routes/analytics.py`:** إضافة endpoint جديد `GET /api/analytics/export` يُرجع CSV (مع BOM عربي) أو JSON يعتمد على query param `format`. يستخدم نفس aggregation من `/analytics/dashboard` ويتضمن overview + expenses by category + monthly comparison.
+- **`VotingSystem.js`:** إضافة fallback عربي inline لـ `ends='ينتهي'`, `votes='صوت'`, `participation='مشاركة'`, `voted='تم التصويت'`.
+
+**🧪 Manual E2E:**
+- ✅ Login `testcompany2` → dashboard → auto-select `كمبوند مدينتي` في localStorage → كل الصفحات ترسل `X-Active-Compound-Id` تلقائياً.
+- ✅ `/app/compound-payment-methods` يعرض بطاقتي Vodafone Cash + InstaPay مع زر "إضافة طريقة دفع".
+- ✅ `/api/analytics/export?format=csv` HTTP 200 يُرجع CSV بحجم 743 bytes مع جداول: نظرة عامة، المصروفات، المقارنة الشهرية.
+- ✅ صفحة التصويت تعرض "ينتهي: 31/12/2026 | 0 صوت | 0% مشاركة" بالكامل بالعربية.
+
+
+
 ### Iter 83: Voting/Polls — Create Button + Payload Fix (Feb 5, 2026) ✅
 
 **🐛 المشكلة:** المستخدم (`testcompany2`/`company_admin`) يفتح صفحة التصويت ولا يجد زر "إنشاء استطلاع".

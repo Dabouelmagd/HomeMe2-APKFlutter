@@ -35,7 +35,22 @@ const CompoundSwitcher = () => {
     const fetchCompounds = () => {
       axios
         .get(`${API}/company-admin/compounds`, { headers: { Authorization: `Bearer ${token}` } })
-        .then((res) => { if (alive) setCompounds(res.data?.compounds || []); })
+        .then((res) => {
+          if (!alive) return;
+          const list = res.data?.compounds || [];
+          setCompounds(list);
+          // Auto-select when nothing is active yet so company-admin doesn't land
+          // on pages that try to fetch a non-existent "default-compound".
+          const current = localStorage.getItem('selectedCompoundId');
+          const stillValid = current && list.some((c) => c.id === current);
+          if (!stillValid && list.length > 0) {
+            const pick = list[0];
+            localStorage.setItem('selectedCompoundId', pick.id);
+            localStorage.setItem('selectedCompoundName', pick.name || '');
+            setSelectedId(pick.id);
+            window.dispatchEvent(new CustomEvent('compoundSwitched', { detail: { id: pick.id, name: pick.name } }));
+          }
+        })
         .catch(() => { if (alive) setCompounds([]); });
     };
     fetchCompounds();

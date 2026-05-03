@@ -4,6 +4,31 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 90: CompoundsManagement Page Fix for company_admin — Feb 5, 2026 ✅
+
+**🐛 المشكلة:** User شكي أن صفحة `/app/compounds-management` تعرض "لا توجد مجمعات مسجلة" رغم أن CompoundSwitcher يعرض الكمبوندات بشكل صحيح.
+
+**🔍 السبب الجذري:**
+- `CompoundsManagement.js` كان يُنادي `/api/compounds/all` و `/api/subscription-codes/list` — وكلاهما لـ `super_admin`/`app_owner` فقط.
+- لـ `company_admin`: HTTP 403 → empty array → empty state.
+- ليس مجرد bug RBAC — بل **mis-design**: صفحة "إدارة المجمعات" مفترض تخدم role-aware (super_admin يدير الأكواد، company_admin يرى مجمعاته).
+
+**🛠️ الإصلاح:**
+- `usePermissions()` للحصول على `isCompanyAdmin/isSuperAdmin/isAppOwner`.
+- `canManageCodes = isSuperAdmin || isAppOwner` — switch-flag يتحكم بالـ:
+  - **API endpoint:** `company_admin` → `/api/company-admin/compounds`، غيرها → `/api/compounds/all`.
+  - **KPI الرابع:** company_admin يرى "إجمالي المقيمين"، super_admin يرى "أكواد متاحة".
+  - **عمود Actions + زر Send Code:** مخفي لـ company_admin.
+  - **عمود table colspan** يتعدّل (6 لـ company_admin، 7 لـ super_admin).
+- `fetchSubscriptionCodes` لا يُنادى لـ company_admin (يحفظ من 405).
+
+**🧪 Manual E2E:**
+- ✅ Screenshot: 3 مجمعات تظهر (كمبوند مدينتي، كمبوند الرحاب، رويال سيتي) + KPIs (3 مجمعات/2 نشطة/8 مقيمين).
+- ✅ عمود Actions مخفي (لا يوجد زر Send Code لشركة الإدارة).
+- ✅ Lint: نظيف.
+
+
+
 ### Iter 89: Company Portfolio PDF Report — Feb 5, 2026 ✅
 
 **🎯 الهدف:** تقرير PDF شامل يجمع أداء كل المجمعات التابعة لشركة الإدارة في وثيقة واحدة — مفيد للاجتماعات الشهرية مع مالكي المجمعات.

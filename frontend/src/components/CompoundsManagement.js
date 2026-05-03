@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import { usePermissions } from '../hooks/usePermissions';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
 const CompoundsManagement = () => {
   const { t } = useTranslation();
+  const { isCompanyAdmin, isSuperAdmin, isAppOwner } = usePermissions();
   const [compounds, setCompounds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCompound, setSelectedCompound] = useState(null);
@@ -14,16 +16,28 @@ const CompoundsManagement = () => {
   const [selectedCode, setSelectedCode] = useState('');
   const [subscriptionCodes, setSubscriptionCodes] = useState([]);
 
+  // Subscription-codes management is only meaningful for super_admin / app_owner
+  const canManageCodes = isSuperAdmin || isAppOwner;
+
   useEffect(() => {
     fetchCompounds();
-    fetchSubscriptionCodes();
-  }, []);
+    if (canManageCodes) fetchSubscriptionCodes();
+    // eslint-disable-next-line
+  }, [canManageCodes]);
 
   const fetchCompounds = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/api/compounds/all`);
-      setCompounds(response.data);
+      // company_admin doesn't have access to /compounds/all (super-admin only).
+      // Use the company-scoped endpoint instead so they see their own compounds.
+      const url = isCompanyAdmin
+        ? `${API}/api/company-admin/compounds`
+        : `${API}/api/compounds/all`;
+      const response = await axios.get(url);
+      const list = isCompanyAdmin
+        ? (response.data?.compounds || [])
+        : (Array.isArray(response.data) ? response.data : (response.data?.compounds || []));
+      setCompounds(list);
     } catch (error) {
       console.error('Error fetching compounds:', error);
       toast.error(t('failed_load_compounds', 'فشل في تحميل المجمعات'));
@@ -136,9 +150,13 @@ const CompoundsManagement = () => {
         <div className="bg-orange-50 rounded-xl p-6 border border-orange-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-600 text-sm font-medium">{t('available_codes', 'Available Codes')}</p>
+              <p className="text-orange-600 text-sm font-medium">
+                {canManageCodes ? t('available_codes', 'Available Codes') : t('total_residents', 'إجمالي السكان')}
+              </p>
               <p className="text-3xl font-bold text-orange-800">
-                {subscriptionCodes.filter(c => c.is_active).length}
+                {canManageCodes
+                  ? subscriptionCodes.filter(c => c.is_active).length
+                  : compounds.reduce((sum, c) => sum + (c.users_count || c.residents_count || 0), 0)}
               </p>
             </div>
             <div className="bg-orange-100 p-3 rounded-lg">
@@ -174,15 +192,17 @@ const CompoundsManagement = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   {t('subscription', 'Subscription')}
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  {t('actions', 'Actions')}
-                </th>
+                {canManageCodes && (
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('actions', 'Actions')}
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {compounds.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={canManageCodes ? 7 : 6} className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center">
                       <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -243,17 +263,19 @@ const CompoundsManagement = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => openCodeModal(compound)}
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-                      >
-                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
-                        {t('send_code', 'Send Code')}
-                      </button>
-                    </td>
+                    {canManageCodes && (
+                      <td className="px-6 py-4 text-center">
+                        <button
+                          onClick={() => openCodeModal(compound)}
+                          className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                        >
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                          </svg>
+                          {t('send_code', 'Send Code')}
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}

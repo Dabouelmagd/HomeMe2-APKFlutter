@@ -158,6 +158,52 @@ async def get_analytics_dashboard(
                 total += p.get("amount", 0) or 0
             revenue_trend.append({"label": label, "value": round(total, 2)})
 
+        # Monthly Revenue vs Expenses — last 6 months (for the comparative bar chart)
+        monthly_comparison = []
+        comp_months = []
+        cursor_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        for _ in range(6):
+            comp_months.append(cursor_month)
+            if cursor_month.month == 1:
+                cursor_month = cursor_month.replace(year=cursor_month.year - 1, month=12)
+            else:
+                cursor_month = cursor_month.replace(month=cursor_month.month - 1)
+        comp_months.reverse()
+        ar_short_months = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+        for i, m_start in enumerate(comp_months):
+            if i + 1 < len(comp_months):
+                m_end = comp_months[i + 1]
+            else:
+                if m_start.month == 12:
+                    m_end = m_start.replace(year=m_start.year + 1, month=1)
+                else:
+                    m_end = m_start.replace(month=m_start.month + 1)
+            m_start_iso = m_start.isoformat()
+            m_end_iso = m_end.isoformat()
+            # Revenue from db.revenue + resident_payments
+            rev_amt = 0.0
+            async for r in db.revenue.find({**scope, "date": {"$gte": m_start_iso, "$lt": m_end_iso}}, {"amount": 1, "_id": 0}):
+                rev_amt += float(r.get("amount") or 0)
+            async for p in db.resident_payments.find({**scope, "created_at": {"$gte": m_start_iso, "$lt": m_end_iso}}, {"amount": 1, "_id": 0}):
+                rev_amt += float(p.get("amount") or 0)
+            # Expenses from db.expenses
+            exp_amt = 0.0
+            async for e in db.expenses.find(scope, {"amount": 1, "date": 1, "created_at": 1, "_id": 0}):
+                edate = e.get("date") or e.get("created_at") or ""
+                if isinstance(edate, datetime):
+                    edate = edate.isoformat()
+                if m_start_iso <= edate < m_end_iso:
+                    exp_amt += float(e.get("amount") or 0)
+            ar_label = ar_short_months[m_start.month - 1]
+            monthly_comparison.append({
+                "label": ar_label,
+                "month_index": m_start.month,
+                "year": m_start.year,
+                "revenue": round(rev_amt, 2),
+                "expenses": round(exp_amt, 2),
+                "net": round(rev_amt - exp_amt, 2),
+            })
+
         # Activity trend — last 5 days (weekday names)
         activity_trend = []
         for i in range(4, -1, -1):
@@ -255,6 +301,7 @@ async def get_analytics_dashboard(
                 "maintenance_trend": maintenance_trend,
                 "revenue_trend": revenue_trend,
                 "activity_trend": activity_trend,
+                "monthly_comparison": monthly_comparison,
             },
             "recent_activity": recent_activity,
             "summary": {

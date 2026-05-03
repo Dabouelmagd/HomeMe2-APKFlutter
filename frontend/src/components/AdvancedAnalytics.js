@@ -641,6 +641,50 @@ const AdvancedAnalytics = () => {
               </div>
             )}
 
+            {/* 6-month Revenue vs Expenses comparison */}
+            {analytics.charts?.monthly_comparison?.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6" data-testid="monthly-comparison-chart">
+                <div className="flex items-center justify-between flex-wrap gap-2 mb-1">
+                  <h3 className="text-lg font-bold text-gray-900">📊 مقارنة شهرية: الإيرادات vs المصروفات</h3>
+                  <span className="text-xs text-gray-500">آخر 6 أشهر</span>
+                </div>
+                <p className="text-sm text-gray-500 mb-4">حدّد الأشهر التي زادت فيها المصروفات وخطّط الميزانية بشكل أفضل.</p>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={analytics.charts.monthly_comparison}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="label" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(0)}K` : v} />
+                    <Tooltip
+                      formatter={(value, name) => [`${Number(value).toLocaleString()} ج.م`, name]}
+                      labelStyle={{ fontWeight: 'bold' }}
+                      contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb' }}
+                    />
+                    <Legend wrapperStyle={{ fontSize: 13 }} />
+                    <Bar dataKey="revenue" name="الإيرادات" fill="#10b981" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="expenses" name="المصروفات" fill="#ef4444" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+                <div className="grid grid-cols-3 gap-3 mt-4 text-center">
+                  {(() => {
+                    const arr = analytics.charts.monthly_comparison;
+                    const totalRev = arr.reduce((s, m) => s + (m.revenue || 0), 0);
+                    const totalExp = arr.reduce((s, m) => s + (m.expenses || 0), 0);
+                    const net = totalRev - totalExp;
+                    return [
+                      { label: 'إجمالي الإيرادات (6 أشهر)', value: totalRev, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                      { label: 'إجمالي المصروفات (6 أشهر)', value: totalExp, color: 'text-red-600', bg: 'bg-red-50' },
+                      { label: 'صافي الرصيد', value: net, color: net >= 0 ? 'text-blue-600' : 'text-red-600', bg: net >= 0 ? 'bg-blue-50' : 'bg-red-50' },
+                    ].map((m, i) => (
+                      <div key={i} className={`${m.bg} rounded-xl p-3`}>
+                        <p className="text-xs text-gray-600 mb-1">{m.label}</p>
+                        <p className={`font-black text-lg ${m.color}`}>{m.value.toLocaleString()} ج.م</p>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <ChartContainer title={t('monthly_revenue')}>
                 <SimpleChart 

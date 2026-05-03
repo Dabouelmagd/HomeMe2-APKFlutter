@@ -5,6 +5,29 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-65)
 
+### Iter 82: Monthly Revenue vs Expenses Bar Chart (May 3, 2026) ✅
+
+**🎯 الميزة:** Chart تفاعلي يقارن الإيرادات والمصروفات الشهرية لآخر 6 أشهر — يساعد الإدارة على تحديد الأشهر التي زادت فيها مصروفات معينة وتخطيط الميزانية.
+
+**Backend (`routes/analytics.py`):**
+- إضافة `monthly_comparison` array في `charts` block — لكل شهر: `label (بالعربية), month_index, year, revenue, expenses, net`.
+- يجمع الإيرادات من `db.revenue` + `db.resident_payments` معاً.
+- يجمع المصروفات من `db.expenses` مع دعم تواريخ `date` و `created_at`.
+- 6 أشهر تقويمية حقيقية (تتعامل مع تغير السنة بشكل صحيح).
+
+**Frontend (`AdvancedAnalytics.js`):**
+- Recharts `BarChart` مع أعمدة مزدوجة (إيرادات أخضر #10b981 / مصروفات أحمر #ef4444) + radius 6 للحواف الناعمة.
+- Tooltip محلي بـ `ج.م` وتنسيق `toLocaleString`.
+- Y-axis tick formatter ذكي يحوّل الـ 1000 إلى `1K` لعرض أنظف.
+- 3 ملخصات أسفل الـ chart: إجمالي الإيرادات (6 أشهر) + إجمالي المصروفات + صافي الرصيد (الأخير يلون أحمر إذا سالب).
+
+**🧪 Manual E2E:**
+- ✅ `/api/analytics/dashboard?compound_id=88ad…&time_range=last_30_days` يُرجع 6 شهور بأسماء عربية: ديسمبر 2025 → مايو 2026.
+- ✅ بيانات حقيقية لكمبوند رويال سيتي: ديسمبر 120K مصروفات (عقد حراسة)، فبراير 60K (نظافة)، أبريل 102.8K (متعدد).
+- ✅ UI: chart يُرسم بشكل صحيح مع العنوان وملخص "آخر 6 أشهر".
+
+---
+
 ### Iter 81: Auto-Backfill + Analytics Expenses + Dynamic Changelog (May 3, 2026) ✅
 
 **🐛 إصلاح: العقود لم تُزامن قبل ساعات (P0):**

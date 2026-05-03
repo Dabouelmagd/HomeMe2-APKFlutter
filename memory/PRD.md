@@ -4,6 +4,30 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 91: Sidebar Cleanup + Facility Admin + Satisfaction for company_admin — Feb 5, 2026 ✅
+
+**🐛 المشاكل (من screenshot):**
+1. **Sidebar:** "$2.5K" بجانب الإدارة المالية + "3" بجانب مركز الرسائل — أرقام demo hardcoded تربك المستخدم.
+2. **حجز المرافق:** company_admin لا يرى تبويب "إدارة المرافق" ولا زر "إضافة مرفق" → الصفحة تبدو معطلة.
+3. **التقييمات:** company_admin يرى أصفار رغم وجود تقييمات في مجمعات شركته.
+
+**🛠️ الإصلاحات:**
+- **`Layout.js`:** حذف الـ badges الـ hardcoded `$2.5K` و `3`. (احتفظت بـ `New` على Help Center و الـ companiesAlerts الديناميكي).
+- **`FacilityBooking.js`:** `isAdmin` كان `role === 'admin' || 'super_admin'` فقط → غيّرته لـ `['admin','company_admin','super_admin','app_owner'].includes()` → الآن تظهر تبويب "إدارة المرافق" + زر "إضافة مرفق".
+- **`routes/ratings.py` `/ratings/stats`:** أضفت branching حسب الدور:
+  - `company_admin` → يجمع التقييمات من **كل مجمعات الشركة** (DB linkage + legacy compound_ids).
+  - إذا `active_compound_id` مضبوط ضمن مجمعات الشركة → يفلتر عليه فقط.
+  - غير ذلك → سلوك سابق (compound_id من user).
+  - sentinel `__none__` للحالات الفارغة (لا compounds مرتبطة).
+
+**🧪 Manual E2E:**
+- ✅ Dashboard: `$2.5K` غير موجود (`'$2.5K' in body == False`).
+- ✅ `/app/facility-booking`: تبويب "إدارة المرافق" + المنطقة الإدارية ظاهرة.
+- ✅ `GET /api/ratings/stats` HTTP 200 → `total: 7, average: 3.4` (من 1 مجمع له تقييمات).
+- ✅ Lint: backend + frontend نظيفان.
+
+
+
 ### Iter 90: CompoundsManagement Page Fix for company_admin — Feb 5, 2026 ✅
 
 **🐛 المشكلة:** User شكي أن صفحة `/app/compounds-management` تعرض "لا توجد مجمعات مسجلة" رغم أن CompoundSwitcher يعرض الكمبوندات بشكل صحيح.

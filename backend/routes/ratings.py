@@ -115,8 +115,33 @@ async def get_target_ratings(target_type: str, target_id: str, current_user: dic
 async def get_rating_stats(current_user: dict = Depends(require_admin)):
     db = get_db()
     try:
-        compound_id = current_user["compound_id"]
-        all_ratings = await db.ratings.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+        # Build filter: company_admin sees aggregated ratings across all owned compounds.
+        # admins (compound-level) see only their compound. Falls back to user's compound.
+        role = current_user.get("role")
+        active_cid = current_user.get("compound_id")
+        if role == "company_admin":
+            company_id = current_user.get("company_id")
+            if not company_id:
+                raise HTTPException(status_code=400, detail="لا توجد شركة إدارة مرتبطة")
+            # Resolve compounds under this company (DB linkage + legacy compound_ids)
+            compounds = await db.compounds.find({"company_id": company_id}, {"_id": 0, "id": 1}).to_list(length=500)
+            company = await db.companies.find_one({"id": company_id}, {"_id": 0, "compound_ids": 1}) or {}
+            legacy_ids = [x for x in (company.get("compound_ids") or []) if x not in {c["id"] for c in compounds}]
+            if legacy_ids:
+                extras = await db.compounds.find({"id": {"$in": legacy_ids}}, {"_id": 0, "id": 1}).to_list(length=500)
+                compounds.extend(extras)
+            compound_ids = [c["id"] for c in compounds]
+            # If active_compound is set & valid, narrow to it; else use all owned.
+            if active_cid and active_cid in compound_ids:
+                rating_filter = {"compound_id": active_cid}
+            elif compound_ids:
+                rating_filter = {"compound_id": {"$in": compound_ids}}
+            else:
+                rating_filter = {"compound_id": "__none__"}  # no compounds → empty result
+        else:
+            rating_filter = {"compound_id": active_cid} if active_cid else {"compound_id": "__none__"}
+
+        all_ratings = await db.ratings.find(rating_filter, {"_id": 0}).to_list(500)
 
         if not all_ratings:
             return {

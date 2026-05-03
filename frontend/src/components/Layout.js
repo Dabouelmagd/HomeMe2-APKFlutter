@@ -882,16 +882,6 @@ const Layout = ({ children, isTrialMode = false }) => {
                               {t('new')}
                             </span>
                           )}
-                          {item.name === t('message_center') && (
-                            <span className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full font-medium">
-                              3
-                            </span>
-                          )}
-                          {item.name === t('financial_management') && (
-                            <span className="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-medium">
-                              $2.5K
-                            </span>
-                          )}
                           {item.name === t('owner_companies_management', 'إدارة الشركات والمجمعات') && companiesAlerts.urgent > 0 && (
                             <span
                               title={`🔴 ${companiesAlerts.urgent} تنبيه عاجل — ${companiesAlerts.expiring_contracts} عقد ينتهي خلال 7 أيام • ${companiesAlerts.empty_companies} شركة بدون مجمعات`}

@@ -73,7 +73,7 @@ const FacilityBooking = () => {
   
   // Get user from localStorage
   const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-  const isAdmin = storedUser.role === 'admin' || storedUser.role === 'super_admin';
+  const isAdmin = ['admin', 'company_admin', 'super_admin', 'app_owner'].includes(storedUser.role);
 
   useEffect(() => {
     fetchFacilities();

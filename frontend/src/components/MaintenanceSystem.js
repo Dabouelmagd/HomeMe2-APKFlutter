@@ -281,7 +281,7 @@ const MaintenanceSystem = () => {
           >
             {t('my_requests')}
           </button>
-          {user?.role === 'admin' && (
+          {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
             <button
               onClick={() => setActiveTab('manage')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -346,7 +346,7 @@ const MaintenanceSystem = () => {
                   </div>
                   
                   <div className="flex-shrink-0 ml-4">
-                    {user?.role === 'admin' && (
+                    {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
                       <div className="flex space-x-2">
                         <select
                           value={request.status}

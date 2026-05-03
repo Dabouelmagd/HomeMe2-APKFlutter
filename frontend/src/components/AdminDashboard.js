@@ -324,7 +324,7 @@ const AdminDashboard = () => {
         )}
 
         {/* Payment Analytics — scoped to compound for admin/compound_admin, to company for company_admin */}
-        {(user?.role === 'admin' || user?.role === 'compound_admin' || user?.role === 'company_admin') && (
+        {(['admin','company_admin','super_admin','app_owner'].includes(user?.role) || user?.role === 'compound_admin' || user?.role === 'company_admin') && (
           <div className="mb-8">
             <PaymentAnalyticsCard
               scope={user?.role === 'company_admin' ? 'company' : 'compound'}

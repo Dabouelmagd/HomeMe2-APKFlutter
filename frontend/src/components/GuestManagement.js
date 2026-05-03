@@ -716,7 +716,7 @@ const GuestManagement = () => {
                       </div>
                       
                       <div className="flex items-center space-x-2 ml-4">
-                        {request.status === 'pending' && user?.role === 'admin' && (
+                        {request.status === 'pending' && ['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
                           <>
                             <button
                               onClick={() => handleApproveRequest(request.id)}
@@ -1008,7 +1008,7 @@ const GuestManagement = () => {
                   <span className="ml-2 text-sm text-gray-700">{t('escort_required')}</span>
                 </label>
 
-                {user?.role === 'admin' && (
+                {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
                   <label className="flex items-center">
                     <input
                       type="checkbox"

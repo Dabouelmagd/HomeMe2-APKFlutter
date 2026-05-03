@@ -368,7 +368,7 @@ const CompoundManagement = () => {
       try {
         await fetchCompound();
         await fetchResidences();
-        if (user?.role === 'admin' && isMounted) {
+        if (['admin','company_admin','super_admin','app_owner'].includes(user?.role) && isMounted) {
           await fetchRegistrationLinks();
           await fetchAllUsers();
         }
@@ -452,7 +452,7 @@ const CompoundManagement = () => {
         
         // Reload data for the new compound
         await fetchResidences();
-        if (user?.role === 'admin') {
+        if (['admin','company_admin','super_admin','app_owner'].includes(user?.role)) {
           await fetchRegistrationLinks();
         }
         
@@ -1157,7 +1157,7 @@ const CompoundManagement = () => {
             </span>
           </button>
           
-          {user?.role === 'admin' && (
+          {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
             <button
               onClick={() => setActiveTab('registration-links')}
               className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
@@ -1176,7 +1176,7 @@ const CompoundManagement = () => {
             </button>
           )}
           
-          {user?.role === 'admin' && (
+          {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
             <button
               id="manage-users-tab-v2"
               onClick={() => setActiveTab('manage-users')}
@@ -1191,7 +1191,7 @@ const CompoundManagement = () => {
             </button>
           )}
           
-          {user?.role === 'admin' && (
+          {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
             <button
               id="add-admin-tab-v2"
               onClick={() => setActiveTab('add-admin')}
@@ -1631,7 +1631,7 @@ const CompoundManagement = () => {
       )}
 
       {/* Registration Links Tab - Admin Only */}
-      {activeTab === 'registration-links' && user?.role === 'admin' && (
+      {activeTab === 'registration-links' && ['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
@@ -1757,7 +1757,7 @@ const CompoundManagement = () => {
       )}
 
       {/* Manage Users Tab - Admin Only */}
-      {activeTab === 'manage-users' && user?.role === 'admin' && (
+      {activeTab === 'manage-users' && ['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
         <div className="space-y-6">
           <div className="bg-gradient-to-br from-white via-purple-50 to-indigo-50 rounded-2xl shadow-lg border border-purple-100 p-6">
             <div className="flex items-center justify-between mb-6">
@@ -1891,7 +1891,7 @@ const CompoundManagement = () => {
       )}
 
       {/* Add Admin Tab - Admin Only */}
-      {activeTab === 'add-admin' && user?.role === 'admin' && (
+      {activeTab === 'add-admin' && ['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="mb-6">

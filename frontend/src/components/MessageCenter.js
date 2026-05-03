@@ -47,7 +47,7 @@ const MessageCenter = () => {
     
     try {
       await axios.post(`${API}/messages`, messageForm);
-      toast.success('Message sent successfully!');
+      toast.success('تم إرسال الرسالة بنجاح');
       setShowNewMessage(false);
       setMessageForm({
         message_type: 'general',
@@ -56,7 +56,8 @@ const MessageCenter = () => {
       });
       fetchMessages();
     } catch (error) {
-      toast.error('Failed to send message');
+      const detail = error?.response?.data?.detail;
+      toast.error(typeof detail === 'string' ? detail : 'فشل إرسال الرسالة');
     }
   };
 
@@ -127,7 +128,7 @@ const MessageCenter = () => {
               {t('message_center')}
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              {user?.role === 'admin' 
+              {['admin','company_admin','super_admin','app_owner'].includes(user?.role) 
                 ? `${t('communicate_with').replace('{role}', t('residents'))}` 
                 : `${t('communicate_with').replace('{role}', t('management'))}`}
             </p>
@@ -240,7 +241,7 @@ const MessageCenter = () => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('no_messages_yet')}</h3>
               <p className="text-gray-600 text-lg leading-relaxed">
-                {t('start_conversation')} {user?.role === 'admin' 
+                {t('start_conversation')} {['admin','company_admin','super_admin','app_owner'].includes(user?.role) 
                   ? `${t('communicate_with').replace('{role}', t('residents'))}` 
                   : `${t('communicate_with').replace('{role}', t('management'))}`}
               </p>

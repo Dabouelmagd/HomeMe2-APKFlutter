@@ -337,7 +337,7 @@ const UtilityBills = () => {
   const fetchBills = async () => {
     try {
       const timestamp = Date.now();
-      const response = user?.role === 'admin' 
+      const response = ['admin','company_admin','super_admin','app_owner'].includes(user?.role) 
         ? await axios.get(`${API}/compounds/${user.compound_id}/utility-bills?_t=${timestamp}`, {
             headers: { 'Cache-Control': 'no-cache' }
           })
@@ -685,7 +685,7 @@ const UtilityBills = () => {
       {/* Bills Tab */}
       {activeTab === 'bills' && (
         <div className="space-y-6">
-          {user?.role === 'admin' && (
+          {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
             <div className="flex justify-end">
               <button
                 onClick={() => setShowAddBill(true)}
@@ -794,7 +794,7 @@ const UtilityBills = () => {
               <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">{t('no_utility_bills')}</h3>
               <p className="text-gray-600">
-                {user?.role === 'admin'
+                {['admin','company_admin','super_admin','app_owner'].includes(user?.role)
                   ? t('add_first_utility_bill')
                   : t('no_bills_available')
                 }

@@ -565,7 +565,7 @@ const UserManagement = () => {
                           )}
                           {/* Activity Timeline — Owner / SuperAdmin / Admin of the same compound */}
                           {(user?.role === 'app_owner' || user?.role === 'super_admin' ||
-                            (user?.role === 'admin' && user?.compound_id === userItem.compound_id) ||
+                            (['admin','company_admin','super_admin','app_owner'].includes(user?.role) && user?.compound_id === userItem.compound_id) ||
                             (user?.role === 'company_admin' && user?.compound_id === userItem.compound_id)) && (
                             <button
                               onClick={() => setTimelineUser(userItem)}

@@ -116,7 +116,7 @@ const FinancialManagement = () => {
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">{t('financial_management')}</h1>
                   <p className="text-gray-600 mt-1">
-                    {user?.role === 'admin' ? 
+                    {['admin','company_admin','super_admin','app_owner'].includes(user?.role) ? 
                       t('admin_view_manage_payments_invoices') : 
                       t('resident_view_manage_payments_invoices')
                     }

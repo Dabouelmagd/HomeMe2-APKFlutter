@@ -4,6 +4,31 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 86: Message Sending + Global RBAC Fix (38 occurrences) — Feb 5, 2026 ✅
+
+**🐛 المشاكل:** User شكي من 5 صفحات "لا تعمل":
+1. `/app/messages` — "Failed to send message" toast عند إرسال رسالة جديدة.
+2. `/app/events` — لا يوجد زر "إنشاء حدث/إعلان" لشركة الإدارة.
+3. `/app/notifications`, `/app/reports`, `/app/satisfaction` — صفحات فارغة بدون أزرار إدارية ظاهرة.
+
+**🔍 السبب الجذري:**
+- **Backend:** `POST /api/messages` كان يُرجع HTTP 500 بسبب `NameError: name 'json' is not defined` في `families_msgs.py:218` + `manager` (WebSocket) غير مستورد.
+- **Frontend (RBAC):** 38 موضع في 14 ملف يستخدمون `user?.role === 'admin'` فقط → الزر يُخفى عن `company_admin` / `super_admin` / `app_owner` (مدير الشركة لا يرى Create Event/Announcement/Message/Complaint/Maintenance/Service/User/Invoice/Newsletter…).
+
+**🛠️ الإصلاح:**
+- **Backend (`routes/families_msgs.py`):** أضفت `import json` و `from websocket_manager import manager`.
+- **Frontend (`MessageCenter.js`):** toast بالعربية + عرض `detail` من الـ backend.
+- **Global RBAC fix:** `sed` على كل `user?.role === 'admin'` → `['admin','company_admin','super_admin','app_owner'].includes(user?.role)` في 14 ملف: `EventsAnnouncements`, `FinancialManagement`, `CompoundManagement`, `AdminDashboard`, `Newsletter`, `NewChatModal`, `ComplaintsSystem`, `MaintenanceSystem`, `UtilityBills`, `MessageCenter`, `ServicesManagement`, `FinancialRoute`, `GuestManagement`, `UserManagement`.
+- أصلحت كذلك `user?.role !== 'admin'` في `EventsAnnouncements.js:533` (زر "الحضور" للسكان) ليستثني كل الأدوار الإدارية.
+
+**🧪 Manual E2E:**
+- ✅ `curl POST /api/messages` HTTP 200 بعد الإصلاح: `{message_id: "e309..."}`.
+- ✅ Playwright: إرسال رسالة عبر الـ UI → toast "تم إرسال الرسالة بنجاح" (has 'بنجاح' = True).
+- ✅ `/app/events`: `data-testid=new-announcement-btn` و `new-event-btn` موجودان.
+- ✅ Lint: كل الملفات الـ 14 مرت بدون أخطاء.
+
+
+
 ### Iter 85: Attention Badge on Compound Switcher + Trial Plan Choice — Feb 5, 2026 ✅
 
 **🎯 الميزة 1: Attention Badge على زر "اختر كمبوند"**

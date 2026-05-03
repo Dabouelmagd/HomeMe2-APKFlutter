@@ -522,7 +522,7 @@ const ServicesManagement = () => {
   useEffect(() => {
     fetchServices();
     fetchServiceProviders();
-    if (user?.role === 'admin') {
+    if (['admin','company_admin','super_admin','app_owner'].includes(user?.role)) {
       fetchBookings();
     } else {
       fetchMyBookings();
@@ -924,7 +924,7 @@ const ServicesManagement = () => {
         iconEmoji="🛎️"
         badge={t('services_badge', 'الخدمات والمرافق')}
         title={t('services_management')}
-        subtitle={user?.role === 'admin' ? t('manage_compound_services_bookings') : t('view_available_services')}
+        subtitle={['admin','company_admin','super_admin','app_owner'].includes(user?.role) ? t('manage_compound_services_bookings') : t('view_available_services')}
       />
       <div className="p-6">
 
@@ -958,7 +958,7 @@ const ServicesManagement = () => {
                   : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
               }`}
             >
-              {user?.role === 'admin' ? t('all_bookings') : t('my_bookings')} ({bookings.length})
+              {['admin','company_admin','super_admin','app_owner'].includes(user?.role) ? t('all_bookings') : t('my_bookings')} ({bookings.length})
             </button>
             
             <div className="h-6 w-px bg-gray-200"></div>
@@ -980,7 +980,7 @@ const ServicesManagement = () => {
       {/* Services Tab */}
       {activeTab === 'services' && (
         <div className="space-y-6">
-          {user?.role === 'admin' && (
+          {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
                 <div className="flex-1">
@@ -992,7 +992,7 @@ const ServicesManagement = () => {
                 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3">
-                  {user?.role === 'admin' && (
+                  {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
                     <>
                       {/* Primary Action - Add Default Services */}
                       <button
@@ -1109,7 +1109,7 @@ const ServicesManagement = () => {
                         </p>
                       </div>
                     </div>
-                    {user?.role === 'admin' && (
+                    {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
                       <div className="flex space-x-2">
                         <button
                           onClick={() => openEditModal(service)}
@@ -1199,7 +1199,7 @@ const ServicesManagement = () => {
               <WrenchScrewdriverIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-center text-center text-gray-900 text-center mb-2">{t('no_services')}</h3>
               <p className="text-gray-600">
-                {user?.role === 'admin'
+                {['admin','company_admin','super_admin','app_owner'].includes(user?.role)
                   ? t('add_first_service')
                   : t('no_services_available')
                 }
@@ -1214,7 +1214,7 @@ const ServicesManagement = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-center text-gray-900 text-center">
-              {user?.role === 'admin' ? t('all_bookings') : t('my_bookings')}
+              {['admin','company_admin','super_admin','app_owner'].includes(user?.role) ? t('all_bookings') : t('my_bookings')}
             </h3>
           </div>
           <div className="p-6">
@@ -1230,7 +1230,7 @@ const ServicesManagement = () => {
                             {t(booking.status)}
                           </span>
                         </div>
-                        {user?.role === 'admin' && (
+                        {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
                           <p className="text-sm text-gray-600 mb-1">
                             {t('resident')}: {booking.resident_name} ({t('unit')} {booking.unit_number})
                           </p>

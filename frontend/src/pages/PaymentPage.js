@@ -20,19 +20,44 @@ const PaymentPage = () => {
 
   const loadPaymentPackages = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/payments/v1/packages`);
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/payments/plans`);
       if (response.ok) {
         const data = await response.json();
-        setPackages(data.packages);
-        // Set first package as default
-        const firstPackage = Object.keys(data.packages)[0];
-        if (firstPackage) {
-          setSelectedPackage(firstPackage);
+        // Flatten residential + company plans into a single map keyed by plan id.
+        // The backend returns prices in EGP & USD — we display EGP since the
+        // app is Egypt-primary; Stripe checkout itself runs in USD.
+        const flat = {};
+        for (const tier of (data.residential || [])) {
+          flat[tier.id] = {
+            name: `${tier.name} — سكني`,
+            amount: tier.monthly_egp,
+            amount_usd: tier.monthly_usd,
+            currency: 'EGP',
+            description: tier.residents,
+            scope: 'residential',
+          };
         }
+        for (const tier of (data.company || [])) {
+          flat[tier.id] = {
+            name: `${tier.name} — شركات إدارة`,
+            amount: tier.monthly_egp,
+            amount_usd: tier.monthly_usd,
+            currency: 'EGP',
+            description: tier.compounds,
+            scope: 'company',
+          };
+        }
+        // Skip the free starter plan — no point in showing 0-EGP "purchase"
+        delete flat.starter;
+        setPackages(flat);
+        const firstPaid = Object.keys(flat)[0];
+        if (firstPaid) setSelectedPackage(firstPaid);
+      } else {
+        setError('فشل تحميل خطط الاشتراك');
       }
     } catch (error) {
       console.error('Error loading payment packages:', error);
-      setError('Failed to load payment packages');
+      setError('فشل تحميل خطط الاشتراك');
     }
   };
 
@@ -41,7 +66,7 @@ const PaymentPage = () => {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/payments/v1/transactions`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/stripe/my-transactions`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -50,7 +75,8 @@ const PaymentPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setTransactions(data.transactions);
+        // Endpoint returns { transactions: [...] } OR a list directly — handle both.
+        setTransactions(Array.isArray(data) ? data : (data.transactions || []));
       }
     } catch (error) {
       console.error('Error loading transactions:', error);
@@ -135,19 +161,13 @@ const PaymentPage = () => {
         return;
       }
 
-      // Get current URL for success and cancel URLs
-      const currentUrl = window.location.origin + window.location.pathname;
-      
       const requestBody = {
-        package_id: selectedPackage,
-        origin_url: window.location.origin,
-        metadata: {
-          source: 'web_payment_page',
-          package_name: packages[selectedPackage]?.name || selectedPackage
-        }
+        plan: selectedPackage,
+        duration: '1_month',
+        currency: 'egp',
       };
 
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/payments/v1/checkout/session`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/payments/subscribe`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -162,10 +182,12 @@ const PaymentPage = () => {
       }
 
       const data = await response.json();
-      
-      // Redirect to Stripe Checkout
-      if (data.url) {
-        window.location.href = data.url;
+
+      // Backend returns `checkout_url` (current API) — fall back to `url`
+      // for any older mock or proxy.
+      const redirectUrl = data.checkout_url || data.url;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
       } else {
         throw new Error('No checkout URL received');
       }
@@ -177,7 +199,10 @@ const PaymentPage = () => {
     }
   };
 
-  const formatCurrency = (amount, currency = 'USD') => {
+  const formatCurrency = (amount, currency = 'EGP') => {
+    if (currency === 'EGP') {
+      return `${Number(amount).toLocaleString('ar-EG')} ج.م`;
+    }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency,

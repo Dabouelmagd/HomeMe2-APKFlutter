@@ -1301,6 +1301,19 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 85: Payments Center fix — empty dropdown ✅ (2026-05-02)
+- **Reported**: on `homemeapp.net/app/payments` the "اختر خيار الدفع" dropdown was empty and "المتابعة للدفع" was disabled. User couldn't pay anything.
+- **Root cause**: `PaymentPage.js` was calling 3 stale legacy endpoints that don't exist anymore:
+  - `GET /api/payments/v1/packages` → 404
+  - `GET /api/payments/v1/transactions` → 404
+  - `POST /api/payments/v1/checkout/session` → 404
+- **Fix**: rewrote `PaymentPage.js` to use the live current endpoints:
+  - `GET /api/payments/plans` → returns 7 plans (3 residential + 3 company + free starter). Frontend flattens them, drops the free starter, displays in a unified dropdown.
+  - `GET /api/stripe/my-transactions` → user's transaction history.
+  - `POST /api/payments/subscribe` `{plan, duration, currency}` → creates Stripe checkout session, returns `checkout_url`.
+- **EGP currency formatter**: `Intl.NumberFormat` doesn't render EGP cleanly in `ar-EG` locale, so prices now display as `١٬٢٠٠ ج.م` instead of broken `EGP 1,200`.
+- **Verified end-to-end**: Playwright login (testcompany2) → /app/payments → 6 paid plans render in dropdown → selecting any plan updates the price card → "المتابعة للدفع" button is enabled.
+
 ### Iter 84: Smart Multi-Role Scanner + 3 real bugs ✅ (2026-05-01)
 - **Backend `routes/system_health.py` — `scan_routes()` rewritten to smart multi-role mode**:
   1. At scan start, pre-fetches tokens for `app_owner`, `super_admin`, `company_admin` users (one DB hit + JWT mint each — ~3 ops total).

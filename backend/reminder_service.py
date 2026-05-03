@@ -17,7 +17,7 @@ class PaymentReminderService:
     def __init__(self, db):
         self.db = db
         self.email_service = EmailService()
-        self.push_service = PushNotificationService(db)
+        self.push_service = PushNotificationService()
         
     async def check_and_send_reminders(self):
         """

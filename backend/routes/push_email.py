@@ -14,6 +14,7 @@ from database import get_db
 from auth_deps import get_current_user, require_admin, require_super_admin
 from helpers import serialize_datetime
 from push_notification_service import PushNotificationService, get_vapid_public_key
+from reminder_service import PaymentReminderService
 from shared_models import *
 
 
@@ -294,6 +295,7 @@ async def broadcast_push_notification(
 @router.get("/reminders/settings/{compound_id}")
 async def get_reminder_settings(compound_id: str, current_user: dict = Depends(get_current_user)):
     """Get reminder settings for a compound"""
+    db = get_db()
     reminder_service = PaymentReminderService(db)
     return await reminder_service.get_reminder_settings(compound_id)
 
@@ -306,7 +308,8 @@ async def update_reminder_settings(
     """Update reminder settings for a compound (Admin only)"""
     if current_user.get("role") not in ["admin", "super_admin"]:
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
+    db = get_db()
     reminder_service = PaymentReminderService(db)
     return await reminder_service.update_reminder_settings(compound_id, settings)
 
@@ -319,10 +322,10 @@ async def send_manual_reminder(
     """Send a manual reminder for a specific bill (Admin only)"""
     if current_user.get("role") not in ["admin", "super_admin"]:
         raise HTTPException(status_code=403, detail="Admin access required")
-    
+
+    db = get_db()
     reminder_service = PaymentReminderService(db)
     try:
-        db = get_db()
         result = await reminder_service.send_custom_reminder(bill_id, custom_message)
         return {"status": "success", **result}
     except ValueError as e:

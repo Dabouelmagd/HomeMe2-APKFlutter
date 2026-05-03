@@ -323,9 +323,11 @@ const SystemHealthPage = () => {
         {/* Daily auto-scan info */}
         <div className="mt-4 bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200 rounded-lg px-4 py-3 text-sm text-rose-800 flex items-center gap-2" data-testid="auto-scan-info">
           <BellAlertIcon className="w-5 h-5 flex-shrink-0" />
-          <span>
-            <strong>فحص يومي تلقائي مفعّل</strong> — يتم تشغيله يومياً الساعة 6:00 ص (UTC). إذا تم اكتشاف <em>failures جديدة</em> مقارنةً بآخر فحص، سيتم إرسال إيميل تنبيه فوري للمالك تلقائياً.
-          </span>
+                <span>
+                  <strong>فحص يومي تلقائي مفعّل</strong> — يتم تشغيله يومياً الساعة 6:00 ص (UTC). إذا تم اكتشاف <em>failures جديدة</em> مقارنةً بآخر فحص، سيتم إرسال إيميل تنبيه فوري للمالك تلقائياً.
+                  <br/>
+                  <strong className="text-purple-700">🧠 وضع الفحص الذكي:</strong> كل endpoint يتم اختباره بدور المستخدم الحالي، وفي حال عدم نجاحه يُعاد المحاولة بأدوار (app_owner / super_admin / company_admin) ويُحفظ أفضل نتيجة.
+                </span>
         </div>
 
         {/* Summary tiles */}

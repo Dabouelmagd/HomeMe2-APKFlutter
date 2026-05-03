@@ -493,6 +493,8 @@ async def get_company_analytics(
             "analytics": serialize_datetime(analytics)
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Error getting company analytics: {e}")
         raise HTTPException(status_code=500, detail=str(e))

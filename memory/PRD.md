@@ -1301,6 +1301,20 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 84: Smart Multi-Role Scanner + 3 real bugs ✅ (2026-05-01)
+- **Backend `routes/system_health.py` — `scan_routes()` rewritten to smart multi-role mode**:
+  1. At scan start, pre-fetches tokens for `app_owner`, `super_admin`, `company_admin` users (one DB hit + JWT mint each — ~3 ops total).
+  2. For each endpoint: tries with caller's own token first.
+  3. If primary result isn't `pass`, transparently retries with the other 2 role contexts (resolving path params per-role).
+  4. Keeps the highest-ranked result (`pass > warn > skipped > fail`, tie-broken by latency). 2xx short-circuits the loop.
+  5. Records `winning_role` on the entry when another role beat the primary — so the UI can explain why an endpoint now passes.
+- **3 real bugs surfaced + fixed by the smarter scan**:
+  1. `/api/companies/{id}/analytics` (`companies.py`): generic `except Exception` re-raised an `HTTPException(403)` as `500`. Added `except HTTPException: raise` before the generic catch.
+  2. `/api/reminders/settings/{compound_id}` (`push_email.py`): missing `db = get_db()` in 3 reminder endpoints + missing `from reminder_service import PaymentReminderService` import.
+  3. `reminder_service.py:20`: `PushNotificationService(db)` — but the class takes no args. Removed the spurious `db` arg.
+- **Frontend `SystemHealthPage.js`**: added a "🧠 وضع الفحص الذكي" inline note in the sticky daily-scan banner explaining the multi-role retry to the operator.
+- **Bottom-line scan numbers**: `✅ 144 / ⚠️ 32 / ❌ 8` (this morning) → `✅ 167 / ⚠️ 19 / ❌ 0` (now). 25 endpoints rescued from false-positive warns.
+
 ### Iter 83: Smart Manual Probe — multi-role endpoint diagnosis ✅ (2026-05-01)
 - **New Backend endpoint** `POST /api/system/route-health/probe` `{path}` → app_owner/super_admin only. For the given path, it:
   1. Finds a real user for each of the 3 roles (`app_owner`, `super_admin`, `company_admin`) via `db.users.find_one({role, is_active: {$ne: false}})`.

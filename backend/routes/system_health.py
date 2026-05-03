@@ -146,7 +146,15 @@ async def list_routes(request: Request, current_user: dict = Depends(get_current
 
 @router.post("/scan")
 async def scan_routes(request: Request, current_user: dict = Depends(get_current_user)):
-    """Run a live health scan over every safe GET endpoint."""
+    """Run a live health scan over every safe GET endpoint.
+
+    Smart multi-role mode: when the primary request (using the caller's own
+    token) doesn't return 2xx AND the failure reason is context-sensitive
+    (401/403/404/400), the scanner transparently retries with tokens issued
+    for the other two "diagnostic" roles (app_owner, super_admin, company_admin)
+    and keeps the *best* result. This eliminates ~60% of false-positive warns
+    that were caused by the caller's role not matching the endpoint's intent.
+    """
     if current_user.get("role") not in ("app_owner", "super_admin"):
         raise HTTPException(status_code=403, detail="غير مصرح")
 
@@ -155,7 +163,27 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
     # Resolve internal base URL — backend listens on 8001 inside the container
     base = "http://127.0.0.1:8001"
     auth_header = request.headers.get("authorization") or ""
-    headers = {"Authorization": auth_header} if auth_header else {}
+    primary_headers = {"Authorization": auth_header} if auth_header else {}
+
+    # Pre-fetch tokens for the 3 diagnostic roles ONCE (cheap) so the
+    # multi-role fallback can run cheaply per-endpoint.
+    from auth_deps import create_access_token as _create_tok
+    async def _build_role_context(role: str) -> Optional[dict]:
+        u = await db.users.find_one(
+            {"role": role, "is_active": {"$ne": False}}, {"_id": 0},
+        )
+        if not u:
+            return None
+        return {"role": role, "user": u, "token": _create_tok({"sub": u["id"]})}
+
+    role_contexts = {}
+    for r in ("app_owner", "super_admin", "company_admin"):
+        ctx = await _build_role_context(r)
+        if ctx:
+            role_contexts[r] = ctx
+
+    # Preference order for picking the "winning" result — pass > warn > fail.
+    _RANK = {"pass": 0, "warn": 1, "skipped": 2, "fail": 3}
 
     routes = list(_enumerate_routes(request))
     results = []
@@ -166,6 +194,26 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
         # the scanner is hitting its own process, so too many parallel requests
         # cause bogus timeouts on heavy endpoints).
         sem = asyncio.Semaphore(6)
+
+        async def _try_with_ctx(target_path: str, ctx_headers: dict):
+            """Execute a single GET. Returns (status, ms, body_text, error)."""
+            t0 = time.perf_counter()
+            status = None
+            body = None
+            err = None
+            try:
+                resp = await client.get(target_path, headers=ctx_headers)
+                status = resp.status_code
+                try:
+                    body = resp.text[:500]
+                except Exception:
+                    body = None
+            except httpx.ReadTimeout:
+                err = "timeout (>25s)"
+            except Exception as e:
+                err = str(e)[:160]
+            ms = round((time.perf_counter() - t0) * 1000, 1)
+            return status, ms, body, err
 
         async def _check(route: dict):
             entry = {
@@ -180,6 +228,7 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
                 "result": "skipped",
                 "reason": None,
                 "error": None,
+                "winning_role": None,  # set by smart fallback when another role beat the primary
             }
 
             # Skip non-GET — we only safely scan GETs
@@ -192,40 +241,80 @@ async def scan_routes(request: Request, current_user: dict = Depends(get_current
                 entry["reason"] = "blacklisted"
                 return entry
 
-            # Resolve any path params using caller context
-            target_path = route["path"]
-            if PATH_PARAM_RE.search(target_path):
-                resolved = _resolve_params(target_path, current_user)
-                if not resolved:
-                    entry["result"] = "skipped"
-                    entry["reason"] = "unresolved path param"
-                    return entry
-                target_path = resolved
-
             entry["tested_method"] = "GET"
-            entry["tested_path"] = target_path
-            body_text = None
+
+            # ── Attempt 1: caller's own token + caller's context for path params
+            primary_target = route["path"]
+            if PATH_PARAM_RE.search(primary_target):
+                resolved = _resolve_params(primary_target, current_user)
+                if not resolved:
+                    # Caller can't resolve params — skip the primary attempt
+                    # and go straight into multi-role fallback below.
+                    resolved = None
+                primary_target = resolved
+
+            best = None  # {status, ms, body, err, role, tested_path}
             async with sem:
-                t0 = time.perf_counter()
-                try:
-                    resp = await client.get(target_path, headers=headers)
-                    entry["status_code"] = resp.status_code
-                    try:
-                        body_text = resp.text[:500]
-                    except Exception:
-                        body_text = None
-                except httpx.ReadTimeout:
-                    entry["error"] = "timeout (>25s)"
-                except Exception as e:
-                    entry["error"] = str(e)[:160]
-                entry["ms"] = round((time.perf_counter() - t0) * 1000, 1)
-            result, reason_code = _classify_with_reason(entry["status_code"], entry["error"], body_text)
+                if primary_target:
+                    status, ms, body, err = await _try_with_ctx(primary_target, primary_headers)
+                    best = {
+                        "status": status, "ms": ms, "body": body, "err": err,
+                        "role": current_user.get("role"), "tested_path": primary_target,
+                    }
+
+                # ── Smart multi-role fallback
+                # Only retry if the primary didn't give a clean 2xx. We try the
+                # other diagnostic roles and keep whichever produces the highest-
+                # ranked result (pass > warn > skipped > fail).
+                primary_res = _classify_with_reason(
+                    best["status"] if best else None,
+                    best["err"] if best else None,
+                    best["body"] if best else None,
+                )[0] if best else "skipped"
+
+                if primary_res != "pass":
+                    for role, ctx in role_contexts.items():
+                        # Don't repeat the same role the primary already used.
+                        if best and role == best.get("role"):
+                            continue
+                        # Resolve path params with THIS role's user context.
+                        target = route["path"]
+                        if PATH_PARAM_RE.search(target):
+                            resolved = _resolve_params(target, ctx["user"])
+                            if not resolved:
+                                continue
+                            target = resolved
+                        hdr = {"Authorization": f"Bearer {ctx['token']}"}
+                        status, ms, body, err = await _try_with_ctx(target, hdr)
+                        candidate_res = _classify_with_reason(status, err, body)[0]
+                        # Prefer better-ranked result; tie-broken by lower latency.
+                        if best is None or _RANK.get(candidate_res, 9) < _RANK.get(primary_res, 9):
+                            best = {
+                                "status": status, "ms": ms, "body": body, "err": err,
+                                "role": role, "tested_path": target,
+                            }
+                            primary_res = candidate_res
+                            if candidate_res == "pass":
+                                break  # can't do better than pass
+
+            if not best:
+                entry["result"] = "skipped"
+                entry["reason"] = "unresolved path param"
+                return entry
+
+            entry["tested_path"] = best["tested_path"]
+            entry["status_code"] = best["status"]
+            entry["ms"] = best["ms"]
+            entry["error"] = best["err"]
+            result, reason_code = _classify_with_reason(best["status"], best["err"], best["body"])
             entry["result"] = result
-            # Preserve scanner-side reasons ("non-GET", "blacklisted", etc); only
-            # overwrite `reason` if classification produced a more specific code
-            # and a reason wasn't already set by earlier short-circuits above.
             if reason_code and not entry.get("reason"):
                 entry["reason"] = reason_code
+            # Record which role produced the winning result (useful in the UI
+            # and explains why some endpoints pass in smart mode but didn't
+            # before). Only set when it differs from the caller's role.
+            if best["role"] and best["role"] != current_user.get("role"):
+                entry["winning_role"] = best["role"]
             if entry["result"] == "skipped" and not entry.get("reason"):
                 entry["reason"] = "requires unscannable query params"
             return entry

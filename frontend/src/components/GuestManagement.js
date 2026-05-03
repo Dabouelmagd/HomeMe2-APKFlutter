@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +32,7 @@ const API = `${BACKEND_URL}/api`;
 
 const GuestManagement = () => {
   const { user } = useAuth();
+  const { isAdmin } = usePermissions();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useTabState('guests');
   const [guests, setGuests] = useState([]);
@@ -716,7 +718,7 @@ const GuestManagement = () => {
                       </div>
                       
                       <div className="flex items-center space-x-2 ml-4">
-                        {request.status === 'pending' && ['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+                        {request.status === 'pending' && isAdmin && (
                           <>
                             <button
                               onClick={() => handleApproveRequest(request.id)}
@@ -1008,7 +1010,7 @@ const GuestManagement = () => {
                   <span className="ml-2 text-sm text-gray-700">{t('escort_required')}</span>
                 </label>
 
-                {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+                {isAdmin && (
                   <label className="flex items-center">
                     <input
                       type="checkbox"

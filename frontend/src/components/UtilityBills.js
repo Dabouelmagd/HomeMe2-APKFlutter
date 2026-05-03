@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
@@ -163,6 +164,7 @@ const getGasProviders = (country = 'EG') => {
 const UtilityBills = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const { isAdmin } = usePermissions();
   const [bills, setBills] = useState([]);
   const [connections, setConnections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -337,7 +339,7 @@ const UtilityBills = () => {
   const fetchBills = async () => {
     try {
       const timestamp = Date.now();
-      const response = ['admin','company_admin','super_admin','app_owner'].includes(user?.role) 
+      const response = isAdmin 
         ? await axios.get(`${API}/compounds/${user.compound_id}/utility-bills?_t=${timestamp}`, {
             headers: { 'Cache-Control': 'no-cache' }
           })
@@ -685,7 +687,7 @@ const UtilityBills = () => {
       {/* Bills Tab */}
       {activeTab === 'bills' && (
         <div className="space-y-6">
-          {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+          {isAdmin && (
             <div className="flex justify-end">
               <button
                 onClick={() => setShowAddBill(true)}
@@ -794,7 +796,7 @@ const UtilityBills = () => {
               <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-2">{t('no_utility_bills')}</h3>
               <p className="text-gray-600">
-                {['admin','company_admin','super_admin','app_owner'].includes(user?.role)
+                {isAdmin
                   ? t('add_first_utility_bill')
                   : t('no_bills_available')
                 }

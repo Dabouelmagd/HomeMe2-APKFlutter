@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +20,7 @@ const API = `${BACKEND_URL}/api`;
 
 const FinancialManagement = () => {
   const { user } = useAuth();
+  const { isAdmin } = usePermissions();
   const { t } = useTranslation();
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,7 +118,7 @@ const FinancialManagement = () => {
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">{t('financial_management')}</h1>
                   <p className="text-gray-600 mt-1">
-                    {['admin','company_admin','super_admin','app_owner'].includes(user?.role) ? 
+                    {isAdmin ? 
                       t('admin_view_manage_payments_invoices') : 
                       t('resident_view_manage_payments_invoices')
                     }

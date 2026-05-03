@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,7 @@ const API = `${BACKEND_URL}/api`;
 
 const MessageCenter = () => {
   const { user } = useAuth();
+  const { isAdmin } = usePermissions();
   const { t } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -128,7 +130,7 @@ const MessageCenter = () => {
               {t('message_center')}
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              {['admin','company_admin','super_admin','app_owner'].includes(user?.role) 
+              {isAdmin 
                 ? `${t('communicate_with').replace('{role}', t('residents'))}` 
                 : `${t('communicate_with').replace('{role}', t('management'))}`}
             </p>
@@ -241,7 +243,7 @@ const MessageCenter = () => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">{t('no_messages_yet')}</h3>
               <p className="text-gray-600 text-lg leading-relaxed">
-                {t('start_conversation')} {['admin','company_admin','super_admin','app_owner'].includes(user?.role) 
+                {t('start_conversation')} {isAdmin 
                   ? `${t('communicate_with').replace('{role}', t('residents'))}` 
                   : `${t('communicate_with').replace('{role}', t('management'))}`}
               </p>

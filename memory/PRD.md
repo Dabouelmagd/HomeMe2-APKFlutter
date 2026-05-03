@@ -4,6 +4,42 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 92: Dynamic Sidebar Badges + 11-File usePermissions Migration — Feb 5, 2026 ✅
+
+**🎯 الميزة 1 - Sidebar Badges ديناميكية:**
+
+**Backend:** ملف جديد `routes/sidebar_badges.py`:
+- `GET /api/sidebar/badges` يُرجع `{messages_unread, payment_proofs_pending, negative_ratings_7d, total}`.
+- `_resolve_compound_scope()` helper يفلتر حسب الدور: company_admin يجمع كل مجمعات الشركة، باقي الـ admins يفلترون بمجمعهم. Sentinel `__none__` للحالات الفارغة.
+- مسجّل في `server.py`.
+
+**Frontend (`Layout.js`):**
+- State جديد `sidebarBadges`.
+- `useEffect` منفصل يعمل لكل الأدوار الإدارية (`app_owner/super_admin/company_admin/admin/manager`) — كان bug سابق: الـ effect الأصلي يحتوي على `if (role !== 'app_owner' && role !== 'super_admin') return;` مما منع التشغيل لـ company_admin.
+- Polling كل 60 ثانية.
+- 3 badges جديدة في الـ sidebar:
+  - 📩 مركز الرسائل: `bg-blue-500` بعدد الرسائل غير المقروءة.
+  - 💰 الإدارة المالية: `bg-amber-500 animate-pulse` بعدد إيصالات الدفع المنتظرة.
+  - ⭐ التقييمات: `bg-rose-500 animate-pulse` بعدد التقييمات السلبية في آخر 7 أيام.
+
+**🎯 الميزة 2 - ترحيل 11 ملف لـ usePermissions hook:**
+
+**الملفات المُرحَّلة:** FinancialManagement, CompoundManagement, AdminDashboard, Newsletter, ComplaintsSystem, MaintenanceSystem, UtilityBills, MessageCenter, ServicesManagement, GuestManagement, UserManagement.
+
+**العملية (sed + awk):**
+- إضافة `import { usePermissions } from '../hooks/usePermissions';` بعد import React.
+- استبدال 36 instance من `['admin','company_admin','super_admin','app_owner'].includes(user?.role)` بـ `isAdmin`.
+- إضافة `const { isAdmin } = usePermissions();` بعد `useAuth()` في 11 ملف.
+- إصلاح bug خطير في `ComplaintsSystem.js`: كان فيه سطر `const isAdmin = isAdmin || user?.role === 'super_admin';` (recursive declaration) — حذفته لأن `usePermissions` يوفر `isAdmin` فعلاً.
+
+**🧪 Manual E2E:**
+- ✅ `curl /api/sidebar/badges` HTTP 200 → `{messages_unread:0, payment_proofs_pending:1, negative_ratings_7d:1, total:2}`.
+- ✅ Screenshot: badge `1` rose-pulsing بجانب "التقييمات" في الـ sidebar.
+- ✅ Smoke-test: 9 صفحات (finances, maintenance, complaints, services, newsletters, users, guests, utilities, messages) تحمّل بدون compile errors.
+- ✅ Lint: كل الـ 11 ملف نظيف.
+
+
+
 ### Iter 91: Sidebar Cleanup + Facility Admin + Satisfaction for company_admin — Feb 5, 2026 ✅
 
 **🐛 المشاكل (من screenshot):**

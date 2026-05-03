@@ -85,6 +85,7 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [appBranding, setAppBranding] = useState(null);
   const [companiesAlerts, setCompaniesAlerts] = useState({ urgent: 0, expiring_contracts: 0, empty_companies: 0, active_companies: 0 });
   const [supportTicketsAlerts, setSupportTicketsAlerts] = useState({ open: 0, in_progress: 0, total_active: 0 });
+  const [sidebarBadges, setSidebarBadges] = useState({ messages_unread: 0, payment_proofs_pending: 0, negative_ratings_7d: 0 });
   // Mute support-tickets ping (persisted)
   const [supportSoundMuted, setSupportSoundMuted] = useState(() => {
     try { return localStorage.getItem('support_sound_muted') === '1'; } catch { return false; }
@@ -291,8 +292,35 @@ const Layout = ({ children, isTrialMode = false }) => {
     };
     fetchAlerts();
     fetchSupportCounts();
-    const interval = setInterval(() => { fetchAlerts(); fetchSupportCounts(); }, 60000); // refresh every 60s
+    const interval = setInterval(() => {
+      fetchAlerts();
+      fetchSupportCounts();
+    }, 60000); // refresh every 60s
     return () => clearInterval(interval);
+  }, [user?.role]);
+
+  // Sidebar dynamic badges — runs for ALL admin roles (app_owner / super_admin / company_admin / admin)
+  useEffect(() => {
+    const role = user?.role;
+    const adminRoles = ['app_owner', 'super_admin', 'company_admin', 'admin', 'manager'];
+    if (!adminRoles.includes(role)) return;
+    const api = process.env.REACT_APP_BACKEND_URL;
+    const token = localStorage.getItem('token');
+    if (!api || !token) return;
+    const fetchSidebarBadges = async () => {
+      try {
+        const res = await fetch(`${api}/api/sidebar/badges`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setSidebarBadges(data);
+        }
+      } catch { /* silent */ }
+    };
+    fetchSidebarBadges();
+    const iv = setInterval(fetchSidebarBadges, 60000);
+    return () => clearInterval(iv);
   }, [user?.role]);
 
   // Handle scroll to show/hide scroll-to-top button
@@ -880,6 +908,33 @@ const Layout = ({ children, isTrialMode = false }) => {
                           {item.name === t('help_center') && (
                             <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-medium animate-bounce">
                               {t('new')}
+                            </span>
+                          )}
+                          {item.name === t('message_center') && sidebarBadges.messages_unread > 0 && (
+                            <span
+                              title={`${sidebarBadges.messages_unread} رسالة غير مقروءة`}
+                              className="bg-blue-500 text-white text-[10px] rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold"
+                              data-testid="sidebar-messages-unread-badge"
+                            >
+                              {sidebarBadges.messages_unread > 99 ? '99+' : sidebarBadges.messages_unread}
+                            </span>
+                          )}
+                          {item.name === t('financial_management') && sidebarBadges.payment_proofs_pending > 0 && (
+                            <span
+                              title={`${sidebarBadges.payment_proofs_pending} إيصال دفع بانتظار المراجعة`}
+                              className="bg-amber-500 text-white text-[10px] rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold animate-pulse"
+                              data-testid="sidebar-payment-proofs-badge"
+                            >
+                              {sidebarBadges.payment_proofs_pending > 99 ? '99+' : sidebarBadges.payment_proofs_pending}
+                            </span>
+                          )}
+                          {item.name === t('satisfaction_ratings', 'التقييمات') && sidebarBadges.negative_ratings_7d > 0 && (
+                            <span
+                              title={`${sidebarBadges.negative_ratings_7d} تقييم سلبي (≤2 نجمة) خلال 7 أيام`}
+                              className="bg-rose-500 text-white text-[10px] rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold animate-pulse"
+                              data-testid="sidebar-negative-ratings-badge"
+                            >
+                              {sidebarBadges.negative_ratings_7d > 99 ? '99+' : sidebarBadges.negative_ratings_7d}
                             </span>
                           )}
                           {item.name === t('owner_companies_management', 'إدارة الشركات والمجمعات') && companiesAlerts.urgent > 0 && (

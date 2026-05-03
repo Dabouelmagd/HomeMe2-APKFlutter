@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +21,7 @@ const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getIt
 
 const ComplaintsSystem = () => {
   const { user } = useAuth();
+  const { isAdmin } = usePermissions();
   const { t } = useTranslation();
 
   const typeConfig = {
@@ -34,7 +36,6 @@ const ComplaintsSystem = () => {
     resolved: { label: t('cs_resolved', 'تم الحل'), color: 'bg-green-100 text-green-700', icon: CheckCircleIcon },
     closed: { label: t('cs_closed', 'مغلقة'), color: 'bg-gray-100 text-gray-600', icon: CheckCircleIcon }
   };
-  const isAdmin = ['admin','company_admin','super_admin','app_owner'].includes(user?.role) || user?.role === 'super_admin';
   const [complaints, setComplaints] = useState([]);
   const [summary, setSummary] = useState({});
   const [loading, setLoading] = useState(true);

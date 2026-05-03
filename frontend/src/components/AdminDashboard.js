@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +33,7 @@ const API = `${BACKEND_URL}/api`;
 
 const AdminDashboard = () => {
   const { user } = useAuth();
+  const { isAdmin } = usePermissions();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState(null);
@@ -324,7 +326,7 @@ const AdminDashboard = () => {
         )}
 
         {/* Payment Analytics — scoped to compound for admin/compound_admin, to company for company_admin */}
-        {(['admin','company_admin','super_admin','app_owner'].includes(user?.role) || user?.role === 'compound_admin' || user?.role === 'company_admin') && (
+        {(isAdmin || user?.role === 'compound_admin' || user?.role === 'company_admin') && (
           <div className="mb-8">
             <PaymentAnalyticsCard
               scope={user?.role === 'company_admin' ? 'company' : 'compound'}

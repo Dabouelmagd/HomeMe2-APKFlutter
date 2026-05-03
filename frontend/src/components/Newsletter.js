@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import {
@@ -16,6 +17,7 @@ import {
 const Newsletter = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { isAdmin } = usePermissions();
   const [newsletters, setNewsletters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -154,7 +156,7 @@ const Newsletter = () => {
         onBack={() => setSelectedNewsletter(null)}
         onEdit={() => handleEditNewsletter(selectedNewsletter)}
         onDelete={() => handleDeleteNewsletter(selectedNewsletter.id)}
-        canEdit={['admin','company_admin','super_admin','app_owner'].includes(user?.role)}
+        canEdit={isAdmin}
       />
     );
   }
@@ -169,7 +171,7 @@ const Newsletter = () => {
               <h1 className="text-3xl font-bold text-gray-900 text-center">{t('community_newsletter')}</h1>
               <p className="text-gray-600 mt-2">{t('newsletter.subtitle')}</p>
             </div>
-            {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+            {isAdmin && (
               <button
                 onClick={handleCreateNewsletter}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
@@ -209,7 +211,7 @@ const Newsletter = () => {
             </select>
 
             {/* Status Filter (Admin only) */}
-            {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+            {isAdmin && (
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -243,7 +245,7 @@ const Newsletter = () => {
               {newsletters.length === 0 ? (
                 <div className="col-span-full text-center py-12">
                   <p className="text-gray-500 text-lg">{t('newsletter.no_newsletters')}</p>
-                  {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+                  {isAdmin && (
                     <button
                       onClick={handleCreateNewsletter}
                       className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
@@ -271,7 +273,7 @@ const Newsletter = () => {
                           <span className={`px-2 py-1 text-xs font-medium rounded-full ${getCategoryColor(newsletter.category)}`}>
                             {newsletter.category}
                           </span>
-                          {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+                          {isAdmin && (
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(newsletter.status)}`}>
                               {newsletter.status}
                             </span>
@@ -313,7 +315,7 @@ const Newsletter = () => {
                           <span>Read More</span>
                         </button>
 
-                        {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+                        {isAdmin && (
                           <div className="flex space-x-2">
                             <button
                               onClick={() => handleEditNewsletter(newsletter)}

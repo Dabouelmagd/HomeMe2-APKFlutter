@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePermissions } from '../hooks/usePermissions';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +25,7 @@ const API = `${BACKEND_URL}/api`;
 
 const MaintenanceSystem = () => {
   const { user } = useAuth();
+  const { isAdmin } = usePermissions();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useTabState('requests');
   const [requests, setRequests] = useState([]);
@@ -281,7 +283,7 @@ const MaintenanceSystem = () => {
           >
             {t('my_requests')}
           </button>
-          {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+          {isAdmin && (
             <button
               onClick={() => setActiveTab('manage')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -346,7 +348,7 @@ const MaintenanceSystem = () => {
                   </div>
                   
                   <div className="flex-shrink-0 ml-4">
-                    {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+                    {isAdmin && (
                       <div className="flex space-x-2">
                         <select
                           value={request.status}

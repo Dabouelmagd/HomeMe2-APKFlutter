@@ -1301,6 +1301,16 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 86: Payment plan tabs — residential vs company-management ✅ (2026-05-02)
+- **`PaymentPage.js`**: replaced the single mixed dropdown with a 2-tab pill switcher above the dropdown:
+  - **🏠 سكني (count)** — blue accent — for resident plans
+  - **🏢 شركات إدارة (count)** — violet accent — for company-management plans
+- **Auto-default by role**: company_admin / app_owner / super_admin land on the company tab; everyone else lands on residential.
+- **Reactive selection**: the dropdown only renders the active tab's plans (memoized via `useMemo`); when the tab flips, a side-effect picks the first plan in the new tab automatically so the Stripe button stays enabled.
+- **Color-coded summary card**: violet on company tab, blue on residential — matches the rest of the company-admin theme.
+- **Plan description row**: shows tier description (e.g. "حتى 3 كمباوندات") + "/ شهرياً" suffix on the price.
+- **Verified ✅ via Playwright**: company_admin login → company tab pre-selected → 3 company plans visible → flip to residential → 3 residential plans visible → summary card swaps color + description correctly.
+
 ### Iter 85: Payments Center fix — empty dropdown ✅ (2026-05-02)
 - **Reported**: on `homemeapp.net/app/payments` the "اختر خيار الدفع" dropdown was empty and "المتابعة للدفع" was disabled. User couldn't pay anything.
 - **Root cause**: `PaymentPage.js` was calling 3 stale legacy endpoints that don't exist anymore:

@@ -1,16 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { formatDate as formatDateUtil } from '../utils/dateUtils';
 
 const PaymentPage = () => {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
+  const { user } = useAuth();
   const [packages, setPackages] = useState({});
   const [selectedPackage, setSelectedPackage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [transactions, setTransactions] = useState([]);
   const [showTransactions, setShowTransactions] = useState(false);
+  // Default scope tab — company-managers / owners default to "company",
+  // everyone else defaults to "residential". User can flip the tab freely.
+  const [scope, setScope] = useState(() => {
+    const r = user?.role;
+    return (r === 'company_admin' || r === 'app_owner' || r === 'super_admin') ? 'company' : 'residential';
+  });
 
   useEffect(() => {
     loadPaymentPackages();
@@ -29,7 +37,7 @@ const PaymentPage = () => {
         const flat = {};
         for (const tier of (data.residential || [])) {
           flat[tier.id] = {
-            name: `${tier.name} — سكني`,
+            name: tier.name,
             amount: tier.monthly_egp,
             amount_usd: tier.monthly_usd,
             currency: 'EGP',
@@ -39,7 +47,7 @@ const PaymentPage = () => {
         }
         for (const tier of (data.company || [])) {
           flat[tier.id] = {
-            name: `${tier.name} — شركات إدارة`,
+            name: tier.name,
             amount: tier.monthly_egp,
             amount_usd: tier.monthly_usd,
             currency: 'EGP',
@@ -50,8 +58,8 @@ const PaymentPage = () => {
         // Skip the free starter plan — no point in showing 0-EGP "purchase"
         delete flat.starter;
         setPackages(flat);
-        const firstPaid = Object.keys(flat)[0];
-        if (firstPaid) setSelectedPackage(firstPaid);
+        // Note: we no longer pre-select the first key globally — selection is
+        // driven by the active scope tab in a separate useEffect below.
       } else {
         setError('فشل تحميل خطط الاشتراك');
       }
@@ -60,6 +68,27 @@ const PaymentPage = () => {
       setError('فشل تحميل خطط الاشتراك');
     }
   };
+
+  // Plans visible in the currently active tab. Memoized so the JSX stays
+  // stable across re-renders.
+  const visiblePackages = useMemo(() => {
+    return Object.entries(packages)
+      .filter(([, pkg]) => pkg.scope === scope)
+      .reduce((acc, [k, v]) => { acc[k] = v; return acc; }, {});
+  }, [packages, scope]);
+
+  // Whenever scope or packages change, auto-pick the first plan in the new
+  // tab if the previously-selected one isn't visible anymore.
+  useEffect(() => {
+    const ids = Object.keys(visiblePackages);
+    if (ids.length === 0) {
+      setSelectedPackage('');
+      return;
+    }
+    if (!ids.includes(selectedPackage)) {
+      setSelectedPackage(ids[0]);
+    }
+  }, [visiblePackages, selectedPackage]);
 
   const loadUserTransactions = async () => {
     try {
@@ -249,31 +278,78 @@ const PaymentPage = () => {
             <h2 className="text-xl font-semibold mb-4">{t('make_payment', 'إجراء دفع')}</h2>
             
             <div className="space-y-4">
+              {/* Scope tabs — residential vs company-management */}
+              <div className="flex bg-gray-100 rounded-xl p-1 gap-1" role="tablist" data-testid="payment-scope-tabs">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={scope === 'residential'}
+                  onClick={() => setScope('residential')}
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${
+                    scope === 'residential' ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  data-testid="scope-tab-residential"
+                >
+                  <span>🏠</span>
+                  <span>سكني</span>
+                  <span className="text-[10px] text-gray-400 font-normal">
+                    ({Object.values(packages).filter(p => p.scope === 'residential').length})
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={scope === 'company'}
+                  onClick={() => setScope('company')}
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 ${
+                    scope === 'company' ? 'bg-white text-violet-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  data-testid="scope-tab-company"
+                >
+                  <span>🏢</span>
+                  <span>شركات إدارة</span>
+                  <span className="text-[10px] text-gray-400 font-normal">
+                    ({Object.values(packages).filter(p => p.scope === 'company').length})
+                  </span>
+                </button>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('select_payment_type', 'اختر نوع الدفع')}
+                  {t('select_payment_type', 'اختر الخطة')}
                 </label>
                 <select
                   value={selectedPackage}
                   onChange={(e) => setSelectedPackage(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  data-testid="payment-plan-select"
                 >
-                  <option value="">{t('choose_payment_option', 'اختر خيار الدفع')}</option>
-                  {Object.entries(packages).map(([key, pkg]) => (
+                  {Object.keys(visiblePackages).length === 0 && (
+                    <option value="">لا توجد خطط في هذا التبويب</option>
+                  )}
+                  {Object.entries(visiblePackages).map(([key, pkg]) => (
                     <option key={key} value={key}>
-                      {t(`payment_${key}`, pkg.name)} - {formatCurrency(pkg.amount, pkg.currency)}
+                      {t(`payment_${key}`, pkg.name)} — {formatCurrency(pkg.amount, pkg.currency)}
                     </option>
                   ))}
                 </select>
               </div>
 
-              {selectedPackage && packages[selectedPackage] && (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h3 className="font-medium text-blue-900 mb-2">
-                    {t(`payment_${selectedPackage}`, packages[selectedPackage].name)}
+              {selectedPackage && visiblePackages[selectedPackage] && (
+                <div className={`p-4 rounded-lg border ${
+                  scope === 'company' ? 'bg-violet-50 border-violet-200' : 'bg-blue-50 border-blue-200'
+                }`} data-testid="payment-plan-summary">
+                  <h3 className={`font-medium mb-1 ${scope === 'company' ? 'text-violet-900' : 'text-blue-900'}`}>
+                    {t(`payment_${selectedPackage}`, visiblePackages[selectedPackage].name)}
                   </h3>
-                  <p className="text-2xl font-bold text-blue-900">
-                    {formatCurrency(packages[selectedPackage].amount, packages[selectedPackage].currency)}
+                  {visiblePackages[selectedPackage].description && (
+                    <p className={`text-xs mb-2 ${scope === 'company' ? 'text-violet-700' : 'text-blue-700'}`}>
+                      {visiblePackages[selectedPackage].description}
+                    </p>
+                  )}
+                  <p className={`text-2xl font-bold ${scope === 'company' ? 'text-violet-900' : 'text-blue-900'}`}>
+                    {formatCurrency(visiblePackages[selectedPackage].amount, visiblePackages[selectedPackage].currency)}
+                    <span className="text-xs font-normal opacity-70 ms-1">/ شهرياً</span>
                   </p>
                 </div>
               )}

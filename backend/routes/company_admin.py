@@ -8,7 +8,7 @@ They can:
   - GET/POST users (residents/managers/security) inside any compound under their company
 """
 from fastapi import APIRouter, HTTPException, Depends
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional
 import uuid
 import bcrypt
@@ -92,6 +92,77 @@ async def company_admin_list_compounds(current_user: dict = Depends(_require_com
         cpd["security"] = security
         result.append(serialize_datetime(cpd))
     return {"compounds": result, "company_id": cid, "total": len(result)}
+
+
+@router.get("/company-admin/compounds/attention-summary")
+async def company_admin_attention_summary(
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """للكل كمبوند تابع لشركة الإدارة: عدد العناصر التي تحتاج اهتمام.
+    - `expiring_contracts`: عقود مدّتها تنتهي خلال 30 يوماً.
+    - `open_complaints`: شكاوى بحالة open/pending/in_progress.
+    - `late_payments`: مدفوعات متأخرة.
+    - `total`: مجموع المؤشرات الثلاثة.
+    """
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+
+    # Resolve compounds under this company (same strategy as list endpoint)
+    compounds = await db.compounds.find({"company_id": cid}, {"_id": 0, "id": 1}).to_list(length=500)
+    company = await db.companies.find_one({"id": cid}, {"_id": 0, "compound_ids": 1}) or {}
+    legacy_ids = [x for x in (company.get("compound_ids") or []) if x not in {c["id"] for c in compounds}]
+    if legacy_ids:
+        extras = await db.compounds.find({"id": {"$in": legacy_ids}}, {"_id": 0, "id": 1}).to_list(length=500)
+        compounds.extend(extras)
+
+    now = datetime.now(timezone.utc)
+    soon = now + timedelta(days=30)
+    now_iso = now.isoformat()
+    soon_iso = soon.isoformat()
+    today_date = now.date().isoformat()
+
+    per_compound = {}
+    grand_total = 0
+    for cpd in compounds:
+        cid_one = cpd["id"]
+
+        # Expiring contracts (end_date within next 30 days, still active)
+        expiring_contracts = await db.contracts.count_documents({
+            "compound_id": cid_one,
+            "status": {"$nin": ["cancelled", "terminated", "expired"]},
+            "end_date": {"$gte": now_iso, "$lte": soon_iso},
+        })
+
+        # Open complaints
+        open_complaints = await db.complaints.count_documents({
+            "compound_id": cid_one,
+            "status": {"$in": ["open", "pending", "in_progress", "new"]},
+        })
+
+        # Late payments
+        late_payments = await db.resident_payments.count_documents({
+            "compound_id": cid_one,
+            "$or": [
+                {"status": "overdue"},
+                {"status": {"$in": ["pending", "unpaid"]}, "due_date": {"$lt": today_date}},
+            ],
+        })
+
+        total = expiring_contracts + open_complaints + late_payments
+        grand_total += total
+        per_compound[cid_one] = {
+            "total": total,
+            "expiring_contracts": expiring_contracts,
+            "open_complaints": open_complaints,
+            "late_payments": late_payments,
+        }
+
+    return {
+        "total": grand_total,
+        "per_compound": per_compound,
+        "company_id": cid,
+    }
 
 
 @router.get("/company-admin/plan-usage")
@@ -584,7 +655,6 @@ async def company_admin_crm_summary(current_user: dict = Depends(_require_compan
 # ─────────────────────────────────────────────────────────────────────
 # Trial / Coupon / Subscription-Code activation flows for company_admin
 # ─────────────────────────────────────────────────────────────────────
-from datetime import timedelta
 from pydantic import BaseModel, Field
 
 
@@ -597,13 +667,31 @@ class RedeemCodeIn(BaseModel):
     code: str = Field(..., min_length=1, max_length=64)
 
 
+class ActivateTrialIn(BaseModel):
+    plan_key: Optional[str] = Field(None, description="company_business or company_enterprise")
+
+
 @router.post("/company-admin/activate-trial")
-async def company_admin_activate_trial(current_user: dict = Depends(_require_company_admin)):
-    """Activate a 14-day free trial for the company. Once-per-company (idempotent block)."""
+async def company_admin_activate_trial(
+    payload: Optional[ActivateTrialIn] = None,
+    current_user: dict = Depends(_require_company_admin),
+):
+    """Activate a 14-day free trial for the company on a chosen paid plan.
+    Allowed plan_key values: `company_business` (default) or `company_enterprise`.
+    Once-per-company (idempotent block)."""
     db = get_db()
     cid = await _resolve_company_id(current_user, None) if current_user.get("role") == "company_admin" else None
     if not cid:
         raise HTTPException(status_code=400, detail="هذا الإجراء متاح لمدير الشركة فقط")
+
+    # Validate requested plan
+    ALLOWED_TRIAL_PLANS = {"company_business", "company_enterprise"}
+    requested_plan = (payload.plan_key if payload else None) or "company_business"
+    if requested_plan not in ALLOWED_TRIAL_PLANS:
+        raise HTTPException(
+            status_code=400,
+            detail="التجربة المجانية متاحة فقط على الخطة المتوسطة أو الخطة الكبرى",
+        )
 
     sub = await db.company_subscriptions.find_one({"company_id": cid}) or {}
     if sub.get("trial_used"):
@@ -613,9 +701,10 @@ async def company_admin_activate_trial(current_user: dict = Depends(_require_com
     expires = now + timedelta(days=14)
     update = {
         "company_id": cid,
-        "plan": sub.get("plan", "company_business"),
+        "plan": requested_plan,
         "status": "trial",
         "trial_used": True,
+        "trial_plan": requested_plan,
         "trial_started_at": now.isoformat(),
         "expires_at": expires.isoformat(),
         "updated_at": now.isoformat(),
@@ -625,11 +714,13 @@ async def company_admin_activate_trial(current_user: dict = Depends(_require_com
         {"$set": update, "$setOnInsert": {"id": str(uuid.uuid4()), "created_at": now.isoformat()}},
         upsert=True,
     )
+    plan_label = "المتوسطة" if requested_plan == "company_business" else "الكبرى"
     return {
         "success": True,
+        "plan_key": requested_plan,
         "trial_days": 14,
         "expires_at": expires.isoformat(),
-        "message": "تم تفعيل التجربة المجانية لمدة 14 يوم 🎉",
+        "message": f"تم تفعيل التجربة المجانية لمدة 14 يوم على الخطة {plan_label} 🎉",
     }
 
 

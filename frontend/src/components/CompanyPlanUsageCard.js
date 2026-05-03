@@ -161,6 +161,7 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
 
   // Trial / Coupon / Code state
   const [trialLoading, setTrialLoading] = useState(false);
+  const [trialPlanChoice, setTrialPlanChoice] = useState('company_business');
   const [couponOpen, setCouponOpen] = useState(false);
   const [couponInput, setCouponInput] = useState('');
   const [couponPlan, setCouponPlan] = useState('company_business');
@@ -170,11 +171,13 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
   const [codeInput, setCodeInput] = useState('');
   const [codeLoading, setCodeLoading] = useState(false);
 
-  const activateTrial = async () => {
+  const activateTrial = async (planKey) => {
+    const chosenPlan = planKey || trialPlanChoice;
     setTrialLoading(true);
     try {
       const res = await axios.post(
-        `${API}/company-admin/activate-trial`, {},
+        `${API}/company-admin/activate-trial`,
+        { plan_key: chosenPlan },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } },
       );
       const { toast } = await import('sonner');
@@ -280,26 +283,44 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
 
         {/* ─── Trial + Coupon + Subscription-Code action bar ─── */}
         <div className="mx-5 mt-4 grid grid-cols-1 md:grid-cols-3 gap-3" data-testid="plan-extras-bar">
-          {/* 14-day Trial */}
-          <button
-            type="button"
-            onClick={activateTrial}
-            disabled={trialLoading}
-            className="group relative overflow-hidden rounded-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10 p-3 text-right hover:shadow-md hover:border-emerald-500 transition disabled:opacity-60"
-            data-testid="plan-trial-btn"
+          {/* 14-day Trial — choose between Business or Enterprise */}
+          <div
+            className="group relative overflow-hidden rounded-xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/10 p-3 text-right"
+            data-testid="plan-trial-card"
           >
             <div className="flex items-start gap-2">
               <span className="text-2xl">🎁</span>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-bold text-emerald-800 dark:text-emerald-200">
-                  {trialLoading ? '...جارٍ التفعيل' : 'تجربة مجانية ١٤ يوم'}
+                  تجربة مجانية ١٤ يوم
                 </div>
-                <div className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80">
-                  جربي الميزات المتقدمة بدون دفع
+                <div className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80 mb-2">
+                  جربي الخطة المتوسطة أو الكبرى بدون دفع
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <select
+                    value={trialPlanChoice}
+                    onChange={(e) => setTrialPlanChoice(e.target.value)}
+                    disabled={trialLoading}
+                    className="flex-1 min-w-0 text-[11px] font-semibold rounded-lg border border-emerald-300 bg-white dark:bg-gray-900 px-2 py-1 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
+                    data-testid="plan-trial-plan-select"
+                  >
+                    <option value="company_business">الخطة المتوسطة (7,500 ج.م)</option>
+                    <option value="company_enterprise">الخطة الكبرى (20,000 ج.م)</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => activateTrial()}
+                    disabled={trialLoading}
+                    className="shrink-0 inline-flex items-center justify-center px-3 py-1 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-[11px] font-bold shadow-sm disabled:opacity-60 transition"
+                    data-testid="plan-trial-btn"
+                  >
+                    {trialLoading ? '...' : 'فعّل الآن'}
+                  </button>
                 </div>
               </div>
             </div>
-          </button>
+          </div>
 
           {/* Coupon collapsible */}
           <button

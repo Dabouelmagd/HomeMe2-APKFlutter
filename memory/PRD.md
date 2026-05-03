@@ -4,6 +4,44 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 85: Attention Badge on Compound Switcher + Trial Plan Choice — Feb 5, 2026 ✅
+
+**🎯 الميزة 1: Attention Badge على زر "اختر كمبوند"**
+
+**Backend (`routes/company_admin.py`):**
+- Endpoint جديد `GET /api/company-admin/compounds/attention-summary` يُرجع per-compound counts من:
+  - `expiring_contracts`: عقود end_date ضمن 30 يوم وstatus ≠ cancelled/terminated/expired.
+  - `open_complaints`: شكاوى بحالة open/pending/in_progress/new.
+  - `late_payments`: resident_payments بـ status=overdue أو (pending/unpaid + due_date<today).
+- Response: `{ total, per_compound: {id: {total, expiring_contracts, open_complaints, late_payments}}, company_id }`.
+
+**Frontend (`company-admin/CompoundSwitcher.js`):**
+- Badge أحمر (gradient rose→red) بجانب زر الـ switcher الرئيسي يعرض إجمالي العناصر (`99+` للأكثر من 99).
+- بداخل القائمة المنسدلة: header tinted rose يعرض الإجمالي الإجمالي، وكل كمبوند عنده:
+  - Badge صغير بجانب الاسم
+  - Pills تفصيلية: `📑 عقد` (amber) / `📢 شكوى` (rose) / `💰 دفعة متأخرة` (orange)
+- Polling تلقائي كل 90 ثانية + refresh عند `planUsageRefresh` / `compoundSwitched`.
+
+**🎯 الميزة 2: تجربة 14 يوم على الخطة المتوسطة أو الكبرى**
+
+**Backend (`routes/company_admin.py`):**
+- `POST /api/company-admin/activate-trial` يقبل الآن body اختياري `{plan_key}` بقيم مسموح بها فقط: `company_business` (default) أو `company_enterprise`. أي قيمة أخرى → 400.
+- يحفظ `trial_plan` في `company_subscriptions` + رسالة مُخصصة حسب الخطة (المتوسطة/الكبرى).
+
+**Frontend (`CompanyPlanUsageCard.js`):**
+- استبدلت الزر الواحد "تجربة مجانية" بكارد فيه `<select>` (خطة متوسطة 7,500 ج.م / خطة كبرى 20,000 ج.م) + زر "فعّل الآن".
+- `activateTrial()` يرسل الـ `plan_key` المختار.
+
+**🧪 Manual E2E:**
+- ✅ `curl /compounds/attention-summary` HTTP 200: `{total:8, per_compound:{'88ad...':{total:8, open_complaints:8}}}` — رويال سيتي فيه 8 شكاوى.
+- ✅ Screenshot: الزر يعرض "كمبوند مدينتي 8" (badge أحمر). القائمة تعرض pill "📢 8 شكوى" على رويال سيتي.
+- ✅ `POST /activate-trial {plan_key:starter}` HTTP 400: "التجربة المجانية متاحة فقط على الخطة المتوسطة أو الخطة الكبرى".
+- ✅ `POST /activate-trial {plan_key:company_enterprise}` HTTP 200: trial_plan=enterprise, 14 يوم.
+- ✅ `POST /activate-trial` (no body) HTTP 200: default=company_business.
+- ✅ محاولة ثانية HTTP 400: "تم استخدام التجربة المجانية من قبل".
+
+
+
 ### Iter 84: Blank Pages Fix (auto-select compound + analytics export) — Feb 5, 2026 ✅
 
 **🐛 المشكلة:** User شكي من 5 صفحات معطلة لـ `testcompany2`:

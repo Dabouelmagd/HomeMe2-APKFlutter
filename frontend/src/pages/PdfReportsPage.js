@@ -58,6 +58,16 @@ const reports = [
     endpoint: (params) => `/reports/compound/${params.compoundId}/summary?month=${params.month}`,
     filename: (params) => `summary-${params.month}.pdf`,
   },
+  {
+    key: 'portfolio',
+    title: 'تقرير محفظة الشركة',
+    desc: 'مقارنة شاملة لكل المجمعات (مالياً وتشغيلياً) في PDF واحد — مفيد للاجتماعات الشهرية',
+    icon: Building2,
+    color: 'from-rose-500 to-red-600',
+    needs: 'company', // requires company_admin (no compound selection)
+    endpoint: (params) => `/reports/company/portfolio?month=${params.month}`,
+    filename: (params) => `portfolio-${params.month}.pdf`,
+  },
 ];
 
 export default function PdfReportsPage() {
@@ -260,7 +270,13 @@ export default function PdfReportsPage() {
         {/* Report Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {reports
-            .filter((r) => isAdmin || r.key === 'statement')
+            .filter((r) => {
+              // Resident: only the unit statement
+              if (!isAdmin) return r.key === 'statement';
+              // Portfolio is only for company-level admins (company_admin / super_admin / app_owner)
+              if (r.key === 'portfolio') return isCompanyAdmin || isSuperAdmin || isAppOwner;
+              return true;
+            })
             .map((r) => {
               const Icon = r.icon;
               const loading = loadingKey === r.key;

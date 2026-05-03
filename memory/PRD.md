@@ -4,6 +4,34 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 89: Company Portfolio PDF Report — Feb 5, 2026 ✅
+
+**🎯 الهدف:** تقرير PDF شامل يجمع أداء كل المجمعات التابعة لشركة الإدارة في وثيقة واحدة — مفيد للاجتماعات الشهرية مع مالكي المجمعات.
+
+**Backend:**
+- `services/pdf_report_service.py`: دالة جديدة `render_company_portfolio_report` تُولّد:
+  - **إجماليات المحفظة** (KPIs): عدد المجمعات، إجمالي الوحدات، المشغولة، الشاغرة، متوسط الإشغال، إجمالي السكان.
+  - **الأداء المالي الموحّد**: الإيرادات، المصروفات، صافي الربح (مع تلوين أحمر/أخضر), المتأخرات.
+  - **العمليات**: شكاوى + طلبات صيانة.
+  - **جدول تفصيلي بالمجمعات** (10 أعمدة): اسم، إشغال، %، سكان، إيرادات، مصروفات، صافي، متأخرات، شكاوى، صيانة.
+- `routes/pdf_reports.py`: endpoint جديد `GET /api/reports/company/portfolio?month=YYYY-MM`:
+  - متاح فقط لـ `company_admin` / `super_admin` / `app_owner`.
+  - يحل `company_id` من المستخدم، يجمع كل compounds من DB linkage + legacy `company.compound_ids`.
+  - لكل مجمع يحسب: إشغال (وحدات/سكان/units_count)، إيرادات (resident_payments)، مصروفات (expenses)، متأخرات (resident_charges pending+overdue)، شكاوى+صيانة من الفترة.
+  - يستخدم `gate_company_feature(pdf_excel_exports)` للتحكم بالخطط.
+
+**Frontend (`PdfReportsPage.js`):**
+- بطاقة 5 جديدة `key='portfolio'` بـ rose-red gradient وأيقونة Building2.
+- Filter logic: تظهر فقط لـ `isCompanyAdmin || isSuperAdmin || isAppOwner`.
+- لا تتطلب اختيار مجمع/ساكن (`needs: 'company'`).
+
+**🧪 Manual E2E:**
+- ✅ `curl /reports/company/portfolio?month=2026-02` HTTP 200 → PDF 1.7 بحجم 24KB (24370 bytes).
+- ✅ Screenshot: 5 بطاقات ظاهرة بما فيها بطاقة "تقرير محفظة الشركة" مع زر تنزيل.
+- ✅ Lint: backend + frontend نظيفان.
+
+
+
 ### Iter 88: PDF Reports Page Fix — Feb 5, 2026 ✅
 
 **🐛 المشكلة:** User شكي أن صفحة `/app/reports` "لا تعمل" لشركة الإدارة — كان يظهر تقرير واحد فقط "كشف حساب الوحدة" ويطلب "اختر الساكن أولاً".

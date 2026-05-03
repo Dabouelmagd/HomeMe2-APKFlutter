@@ -294,6 +294,96 @@ def render_summary_report(
     return _render_pdf(html_str, branding)
 
 
+def render_company_portfolio_report(
+    *,
+    company_name: str,
+    period: str,
+    compounds_data: list,
+    currency: str = "EGP",
+    branding: dict | None = None,
+) -> bytes:
+    """Aggregated portfolio report across all compounds owned by a management company."""
+    total_units = sum(c.get("total_units", 0) for c in compounds_data)
+    total_occupied = sum(c.get("occupied", 0) for c in compounds_data)
+    total_vacant = sum(c.get("vacant", 0) for c in compounds_data)
+    total_revenue = sum(c.get("revenue", 0) for c in compounds_data)
+    total_expenses = sum(c.get("expenses", 0) for c in compounds_data)
+    total_net = total_revenue - total_expenses
+    total_outstanding = sum(c.get("outstanding", 0) for c in compounds_data)
+    total_residents = sum(c.get("residents", 0) for c in compounds_data)
+    total_complaints = sum(c.get("complaints", 0) for c in compounds_data)
+    total_maintenance = sum(c.get("maintenance", 0) for c in compounds_data)
+    avg_occupancy = (total_occupied / total_units * 100) if total_units else 0
+
+    if compounds_data:
+        rows_html = ""
+        for c in compounds_data:
+            net = (c.get("revenue", 0) or 0) - (c.get("expenses", 0) or 0)
+            net_color = "#047857" if net >= 0 else "#b91c1c"
+            rows_html += f"""<tr>
+              <td><strong>{c.get('name', '—')}</strong></td>
+              <td>{c.get('occupied', 0)} / {c.get('total_units', 0)}</td>
+              <td>{c.get('occupancy_rate', 0):.1f}%</td>
+              <td>{c.get('residents', 0)}</td>
+              <td>{_format_currency(c.get('revenue', 0), currency)}</td>
+              <td>{_format_currency(c.get('expenses', 0), currency)}</td>
+              <td style="color:{net_color};font-weight:700;">{_format_currency(net, currency)}</td>
+              <td>{_format_currency(c.get('outstanding', 0), currency)}</td>
+              <td>{c.get('complaints', 0)}</td>
+              <td>{c.get('maintenance', 0)}</td>
+            </tr>"""
+        table_html = f"""<table>
+          <thead><tr>
+            <th>المجمع</th><th>الإشغال</th><th>%</th><th>السكان</th>
+            <th>الإيرادات</th><th>المصروفات</th><th>الصافي</th>
+            <th>المتأخرات</th><th>شكاوى</th><th>صيانة</th>
+          </tr></thead>
+          <tbody>{rows_html}</tbody>
+        </table>"""
+    else:
+        table_html = '<div class="empty">لا توجد مجمعات تابعة للشركة بعد.</div>'
+
+    net_color_overall = "#047857" if total_net >= 0 else "#b91c1c"
+
+    html_str = f"""<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body class="rtl">
+    {_header_html(company_name, 'تقرير محفظة الشركة الشامل', period, f'PORT-{period}', branding)}
+    <div class="subtitle">ملخص أداء جميع المجمعات التابعة للشركة خلال الفترة المحددة — مفيد للاجتماعات الشهرية مع مالكي المجمعات.</div>
+
+    <div class="section"><h2>إجماليات المحفظة</h2>
+      <div class="kpis">
+        <div class="kpi indigo"><div class="label">عدد المجمعات</div><div class="value">{len(compounds_data)}</div></div>
+        <div class="kpi indigo"><div class="label">إجمالي الوحدات</div><div class="value">{total_units}</div></div>
+        <div class="kpi green"><div class="label">المشغولة</div><div class="value">{total_occupied}</div></div>
+        <div class="kpi red"><div class="label">الشاغرة</div><div class="value">{total_vacant}</div></div>
+        <div class="kpi indigo"><div class="label">متوسط الإشغال</div><div class="value">{avg_occupancy:.1f}%</div></div>
+        <div class="kpi"><div class="label">إجمالي السكان</div><div class="value">{total_residents}</div></div>
+      </div>
+    </div>
+
+    <div class="section"><h2>الأداء المالي الموحّد</h2>
+      <div class="kpis">
+        <div class="kpi green"><div class="label">الإيرادات الكلية</div><div class="value">{_format_currency(total_revenue, currency)}</div></div>
+        <div class="kpi red"><div class="label">المصروفات الكلية</div><div class="value">{_format_currency(total_expenses, currency)}</div></div>
+        <div class="kpi indigo"><div class="label">صافي الربح</div><div class="value" style="color:{net_color_overall};">{_format_currency(total_net, currency)}</div></div>
+        <div class="kpi"><div class="label">المتأخرات الكلية</div><div class="value">{_format_currency(total_outstanding, currency)}</div></div>
+      </div>
+    </div>
+
+    <div class="section"><h2>العمليات</h2>
+      <div class="kpis">
+        <div class="kpi"><div class="label">إجمالي الشكاوى</div><div class="value">{total_complaints}</div></div>
+        <div class="kpi"><div class="label">طلبات الصيانة</div><div class="value">{total_maintenance}</div></div>
+      </div>
+    </div>
+
+    <div class="section"><h2>تفصيل المجمعات</h2>
+      {table_html}
+    </div>
+
+    {_footer_html(branding)}
+    </body></html>"""
+    return _render_pdf(html_str, branding)
+
 
 # ---------- Compound Balance Sheet (Full) ----------
 CATEGORY_LABELS_AR = {

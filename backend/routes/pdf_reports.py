@@ -20,6 +20,7 @@ from services.pdf_report_service import (
     render_occupancy_report,
     render_invoices_report,
     render_summary_report,
+    render_company_portfolio_report,
 )
 from services.branding import get_compound_branding
 from plan_limits import gate_company_feature
@@ -320,3 +321,105 @@ async def summary_report(
         branding=get_compound_branding(compound),
     )
     return _stream_pdf(pdf_bytes, f"summary-{compound_id[:8]}-{label}.pdf")
+
+
+@router.get("/company/portfolio")
+async def company_portfolio_report(
+    month: str = Query(..., description="YYYY-MM"),
+    current_user: dict = Depends(get_current_user),
+):
+    """تقرير محفظة الشركة الشامل: يجمع أداء كل المجمعات التابعة لشركة الإدارة في PDF واحد."""
+    await gate_company_feature(current_user, "pdf_excel_exports", "تقارير PDF")
+    db = get_db()
+
+    # Resolve company_id (only company_admin/super_admin/app_owner)
+    role = current_user.get("role")
+    if role == "company_admin":
+        company_id = current_user.get("company_id")
+    elif role in ("super_admin", "app_owner"):
+        company_id = current_user.get("active_company_id") or current_user.get("company_id")
+    else:
+        raise HTTPException(status_code=403, detail="هذا التقرير متاح فقط لمدير الشركة")
+
+    if not company_id:
+        raise HTTPException(status_code=400, detail="لا توجد شركة إدارة مرتبطة بحسابك")
+
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0}) or {}
+    company_name = company.get("name") or company.get("company_name") or "شركة الإدارة"
+
+    # Resolve compounds under this company (DB linkage + legacy company.compound_ids)
+    compounds = await db.compounds.find({"company_id": company_id}, {"_id": 0}).to_list(length=500)
+    legacy_ids = [x for x in (company.get("compound_ids") or []) if x not in {c["id"] for c in compounds}]
+    if legacy_ids:
+        extras = await db.compounds.find({"id": {"$in": legacy_ids}}, {"_id": 0}).to_list(length=500)
+        compounds.extend(extras)
+
+    start, end, label = _month_bounds(month)
+    start_iso, end_iso = start.isoformat(), end.isoformat()
+    start_date_str = start.strftime("%Y-%m-01")
+    end_date_str = end.strftime("%Y-%m-%d")
+
+    compounds_data = []
+    for cpd in compounds:
+        cid = cpd["id"]
+
+        # Occupancy
+        residents = await db.users.find({"compound_id": cid, "role": "resident"}, {"_id": 0, "unit_number": 1}).to_list(length=20000)
+        units = {r.get("unit_number") for r in residents if r.get("unit_number")}
+        total_units = cpd.get("total_units") or len(units)
+        occupied = len(units)
+        vacant = max(total_units - occupied, 0)
+        occupancy_rate = (occupied / total_units * 100) if total_units else 0
+
+        # Revenue
+        revenue = 0.0
+        async for p in db.resident_payments.find({
+            "compound_id": cid,
+            "$or": [
+                {"payment_date": {"$gte": start_date_str, "$lte": end_date_str}},
+                {"created_at": {"$gte": start_iso, "$lte": end_iso}},
+            ],
+        }):
+            revenue += p.get("amount", 0) or 0
+
+        # Expenses
+        expenses = 0.0
+        async for e in db.expenses.find({"compound_id": cid, "date": {"$gte": start_iso, "$lte": end_iso}}):
+            expenses += e.get("amount", 0) or 0
+
+        # Outstanding charges
+        outstanding = 0.0
+        async for c in db.resident_charges.find({"compound_id": cid, "status": {"$in": ["pending", "overdue"]}}):
+            outstanding += c.get("amount", 0) or 0
+
+        complaints_count = await db.complaints.count_documents({
+            "compound_id": cid,
+            "created_at": {"$gte": start_iso, "$lte": end_iso},
+        })
+        maintenance_count = await db.maintenance_requests.count_documents({
+            "compound_id": cid,
+            "created_at": {"$gte": start_iso, "$lte": end_iso},
+        })
+
+        compounds_data.append({
+            "name": cpd.get("name", "—"),
+            "total_units": total_units,
+            "occupied": occupied,
+            "vacant": vacant,
+            "occupancy_rate": occupancy_rate,
+            "revenue": revenue,
+            "expenses": expenses,
+            "outstanding": outstanding,
+            "residents": len(residents),
+            "complaints": complaints_count,
+            "maintenance": maintenance_count,
+        })
+
+    pdf_bytes = render_company_portfolio_report(
+        company_name=company_name,
+        period=label,
+        compounds_data=compounds_data,
+        currency="EGP",
+        branding=None,
+    )
+    return _stream_pdf(pdf_bytes, f"portfolio-{company_id[:8]}-{label}.pdf")

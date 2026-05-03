@@ -20,6 +20,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import useTabState from '../hooks/useTabState';
+import HowToPayButton from './HowToPayButton';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -501,11 +502,14 @@ const CompoundFinance = () => {
           {/* Obligations */}
           {activeTab === 'obligations' && (
             <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
                 <h3 className="text-lg font-bold text-gray-900">{t('obligations', t('cf_obligations', 'الالتزامات'))} - {months[filterMonth - 1]} {filterYear}</h3>
-                <button onClick={() => setShowAddObligation(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm" data-testid="add-obligation-btn">
-                  <PlusIcon className="h-4 w-4" />{t('add_obligation', t('cf_add_obl', 'إضافة التزام'))}
-                </button>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <HowToPayButton />
+                  <button onClick={() => setShowAddObligation(true)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm" data-testid="add-obligation-btn">
+                    <PlusIcon className="h-4 w-4" />{t('add_obligation', t('cf_add_obl', 'إضافة التزام'))}
+                  </button>
+                </div>
               </div>
               {obligations.length > 0 ? (
                 <div className="space-y-3">
@@ -530,11 +534,14 @@ const CompoundFinance = () => {
           {/* Unit Payments */}
           {activeTab === 'units' && (
             <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
                 <h3 className="text-lg font-bold text-gray-900">{t('unit_payments', 'سداد الوحدات')} - {months[filterMonth - 1]} {filterYear}</h3>
-                <button onClick={handleNotifyUnpaid} className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm" data-testid="notify-unpaid-btn">
-                  <BellAlertIcon className="h-4 w-4" />{t('notify_unpaid', 'تنبيه المتأخرين')}
-                </button>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <HowToPayButton />
+                  <button onClick={handleNotifyUnpaid} className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm" data-testid="notify-unpaid-btn">
+                    <BellAlertIcon className="h-4 w-4" />{t('notify_unpaid', 'تنبيه المتأخرين')}
+                  </button>
+                </div>
               </div>
               
               {/* Summary bar */}

@@ -235,85 +235,10 @@ async def get_payment_status(
         logging.error(f"Error getting payment status: {e}")
         raise HTTPException(status_code=500, detail="Failed to get payment status")
 
-@router.post("/webhook/stripe")
-async def stripe_webhook(request: Request):
-    """Handle Stripe webhook events"""
-    try:
-        db = get_db()
-        # Get Stripe API key
-        stripe_api_key = os.environ.get('STRIPE_API_KEY')
-        if not stripe_api_key:
-            raise HTTPException(status_code=500, detail="Stripe API key not configured")
-        
-        # Get webhook body and signature
-        body = await request.body()
-        signature = request.headers.get("stripe-signature")
-        
-        # Initialize Stripe checkout
-        webhook_url = f"{os.environ.get('FRONTEND_URL', 'http://localhost:3000')}/api/webhook/stripe"
-        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
-        
-        # Handle webhook
-        webhook_response = await stripe_checkout.handle_webhook(body, signature)
-        
-        # Process the webhook event
-        if webhook_response.event_type == "checkout.session.completed":
-            session_id = webhook_response.session_id
-            
-            # Find and update payment transaction
-            transaction = await db.payment_transactions.find_one({"session_id": session_id})
-            if transaction and transaction["payment_status"] != "paid":
-                # Update transaction
-                await db.payment_transactions.update_one(
-                    {"session_id": session_id},
-                    {"$set": {
-                        "payment_status": "paid",
-                        "updated_at": datetime.utcnow()
-                    }}
-                )
-                
-                # Update utility bill
-                if transaction.get("utility_bill_id"):
-                    await db.utility_bills.update_one(
-                        {"id": transaction["utility_bill_id"]},
-                        {"$set": {
-                            "status": PaymentStatus.PAID,
-                            "payment_date": datetime.utcnow(),
-                            "payment_method": "stripe"
-                        }}
-                    )
-                
-                logging.info(f"Payment completed for session {session_id}")
-        
-                # Check if this is a subscription payment
-                if transaction.get("payment_type") == "subscription":
-                    user_id = transaction.get("user_id")
-                    plan = transaction.get("metadata", {}).get("plan", "basic")
-                    duration = transaction.get("metadata", {}).get("duration", "1_month")
-                    
-                    duration_days = {"1_month": 30, "3_months": 90, "6_months": 180, "9_months": 270, "1_year": 365, "lifetime": 36500}.get(duration, 30)
-                    
-                    sub_end = datetime.now(timezone.utc) + timedelta(days=duration_days)
-                    await db.users.update_one(
-                        {"id": user_id},
-                        {"$set": {
-                            "subscription_active": True,
-                            "subscription_type": duration,
-                            "subscription_plan": plan,
-                            "subscription_start": datetime.now(timezone.utc).isoformat(),
-                            "subscription_end": sub_end.isoformat(),
-                            "subscription_payment_method": "stripe",
-                            "subscription_session_id": session_id
-                        }}
-                    )
-                    logging.info(f"Subscription activated for user {user_id}: {plan}/{duration}")
-        
-        return {"status": "success"}
-        
-    except Exception as e:
-        logging.error(f"Error handling Stripe webhook: {e}")
-        raise HTTPException(status_code=400, detail="Webhook error")
 
+# NOTE: /webhook/stripe was historically defined here too. It has been merged into
+# routes/stripe_payments.py — the unified handler now activates company subscriptions,
+# utility bills, and legacy user subscriptions in a single place.
 
 # ==================== SUBSCRIPTION PAYMENT ENDPOINTS ====================
 

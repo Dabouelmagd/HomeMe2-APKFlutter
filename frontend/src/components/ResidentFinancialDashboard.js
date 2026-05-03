@@ -11,6 +11,7 @@ import {
   ExclamationCircleIcon,
   ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
+import HowToPayButton from './HowToPayButton';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -190,10 +191,13 @@ const ResidentFinancialDashboard = () => {
 
         {/* Pending Charges */}
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl border border-white/20 p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-            <span className="mr-2">⏰</span>
-            {t('pending_charges', 'المستحقات المعلقة')}
-          </h2>
+          <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+              <span className="mr-2">⏰</span>
+              {t('pending_charges', 'المستحقات المعلقة')}
+            </h2>
+            <HowToPayButton variant="button" />
+          </div>
           <div className="space-y-3">
             {charges.length > 0 ? (
               charges.map((charge) => (
@@ -215,8 +219,9 @@ const ResidentFinancialDashboard = () => {
                         {t('due_date', 'تاريخ الاستحقاق')}: {formatDate(charge.due_date)}
                       </p>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 flex-wrap">
                       <p className="text-xl font-bold text-orange-600">{formatCurrency(charge.amount)}</p>
+                      <HowToPayButton amount={charge.amount} chargeTitle={charge.description} variant="button" />
                       <button
                         onClick={() => handlePayNow(charge)}
                         className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all"

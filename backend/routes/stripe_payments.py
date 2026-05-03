@@ -202,6 +202,57 @@ async def get_checkout_status(
     }
 
 
+async def _activate_utility_bill_or_user_subscription(db, session_id: str):
+    """Handle non-company-subscription Stripe transactions (utility bills + legacy user subs).
+    Mirrors logic that used to live in routes/payments.py but is now centralized so a single
+    webhook handler covers all transaction types. Idempotent: skips if already paid.
+    """
+    txn = await db.payment_transactions.find_one({"session_id": session_id})
+    if not txn:
+        return
+    if txn.get("payment_status") == "paid":
+        return
+
+    payment_type = txn.get("payment_type") or txn.get("metadata", {}).get("payment_type")
+    now = datetime.now(timezone.utc)
+
+    # 1. Mark transaction paid
+    await db.payment_transactions.update_one(
+        {"session_id": session_id},
+        {"$set": {"payment_status": "paid", "status": "completed", "paid_at": now.isoformat()}},
+    )
+
+    # 2. Utility bill
+    if txn.get("utility_bill_id"):
+        await db.utility_bills.update_one(
+            {"id": txn["utility_bill_id"]},
+            {"$set": {"status": "paid", "payment_date": now.isoformat(), "payment_method": "stripe"}}
+        )
+        logging.info(f"[stripe] utility bill activated for session {session_id}")
+
+    # 3. Legacy user-level subscription (routes/payments.py:/payments/subscribe)
+    if payment_type == "subscription":
+        user_id = txn.get("user_id")
+        plan = txn.get("metadata", {}).get("plan", "basic")
+        duration = txn.get("metadata", {}).get("duration", "1_month")
+        duration_days = {"1_month": 30, "3_months": 90, "6_months": 180,
+                         "9_months": 270, "1_year": 365, "lifetime": 36500}.get(duration, 30)
+        sub_end = now + timedelta(days=duration_days)
+        await db.users.update_one(
+            {"id": user_id},
+            {"$set": {
+                "subscription_active": True,
+                "subscription_type": duration,
+                "subscription_plan": plan,
+                "subscription_start": now.isoformat(),
+                "subscription_end": sub_end.isoformat(),
+                "subscription_payment_method": "stripe",
+                "subscription_session_id": session_id,
+            }}
+        )
+        logging.info(f"[stripe] user subscription activated user={user_id} plan={plan}/{duration}")
+
+
 # ---------------------------------------------------------------------------
 # 3. Webhook — Stripe server-to-server confirmation
 # ---------------------------------------------------------------------------
@@ -220,7 +271,20 @@ async def stripe_webhook(request: Request):
     db = get_db()
     if getattr(event, "event_type", "") in ("checkout.session.completed", "payment_intent.succeeded"):
         if getattr(event, "payment_status", "") == "paid":
-            await _activate_subscription(db, event.session_id, event.metadata or {})
+            session_id = event.session_id
+            metadata = event.metadata or {}
+
+            # Route to correct activator based on transaction type
+            txn = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
+            if txn:
+                txn_type = txn.get("payment_type") or metadata.get("payment_type")
+                if txn_type == "company_subscription" or metadata.get("company_id"):
+                    await _activate_subscription(db, session_id, metadata)
+                else:
+                    await _activate_utility_bill_or_user_subscription(db, session_id)
+            else:
+                # Fallback: try company subscription (most likely path)
+                await _activate_subscription(db, session_id, metadata)
 
     return {"received": True}
 

@@ -292,3 +292,153 @@ def render_summary_report(
     {_footer_html(branding)}
     </body></html>"""
     return _render_pdf(html_str, branding)
+
+
+
+# ---------- Compound Balance Sheet (Full) ----------
+CATEGORY_LABELS_AR = {
+    "maintenance": "صيانة", "utilities": "مرافق", "security": "حراسة",
+    "cleaning": "نظافة", "salaries": "رواتب", "other": "أخرى",
+    "contract": "عقد", "insurance": "تأمين", "supplies": "مستلزمات",
+}
+SOURCE_LABELS_AR = {
+    "maintenance_fees": "رسوم صيانة", "rent": "إيجارات", "service_charges": "رسوم خدمات",
+    "facility_rentals": "تأجير مرافق", "advertising": "إعلانات", "other": "أخرى",
+}
+
+
+def render_balance_sheet(
+    *,
+    compound_name: str,
+    period: str,
+    total_revenue: float,
+    total_expenses: float,
+    expenses_by_category: dict,
+    revenue_by_source: dict,
+    monthly_breakdown: dict,
+    obligations: dict,
+    recent_expenses: list,
+    recent_revenue: list,
+    currency: str = "EGP",
+    branding: dict | None = None,
+) -> bytes:
+    """Generate the full balance-sheet PDF report (revenue + expenses + breakdowns + monthly trend)."""
+    net = total_revenue - total_expenses
+    coll_rate = obligations.get("collection_rate", 0)
+
+    # Expenses by category rows
+    exp_rows = ""
+    for cat, amt in sorted(expenses_by_category.items(), key=lambda x: -x[1]):
+        pct = (amt / total_expenses * 100) if total_expenses else 0
+        exp_rows += (
+            f"<tr><td>{CATEGORY_LABELS_AR.get(cat, cat)}</td>"
+            f"<td>{_format_currency(amt, currency)}</td>"
+            f"<td>{pct:.1f}%</td></tr>"
+        )
+    if not exp_rows:
+        exp_rows = "<tr><td colspan='3' class='empty'>لا توجد مصروفات</td></tr>"
+
+    # Revenue by source rows
+    rev_rows = ""
+    for src, amt in sorted(revenue_by_source.items(), key=lambda x: -x[1]):
+        pct = (amt / total_revenue * 100) if total_revenue else 0
+        rev_rows += (
+            f"<tr><td>{SOURCE_LABELS_AR.get(src, src)}</td>"
+            f"<td>{_format_currency(amt, currency)}</td>"
+            f"<td>{pct:.1f}%</td></tr>"
+        )
+    if not rev_rows:
+        rev_rows = "<tr><td colspan='3' class='empty'>لا توجد إيرادات</td></tr>"
+
+    # Monthly breakdown rows (sorted asc)
+    months = sorted(monthly_breakdown.items())
+    monthly_rows = ""
+    for m, vals in months:
+        rev = vals.get("revenue", 0)
+        exp = vals.get("expenses", 0)
+        diff = rev - exp
+        diff_class = "green" if diff >= 0 else "red"
+        monthly_rows += (
+            f"<tr><td>{m}</td>"
+            f"<td>{_format_currency(rev, currency)}</td>"
+            f"<td>{_format_currency(exp, currency)}</td>"
+            f"<td class='{diff_class}'>{_format_currency(diff, currency)}</td></tr>"
+        )
+    if not monthly_rows:
+        monthly_rows = "<tr><td colspan='4' class='empty'>لا توجد حركات شهرية</td></tr>"
+
+    # Recent expenses (top 15)
+    recent_exp_rows = ""
+    for e in (recent_expenses or [])[:15]:
+        date_str = (e.get("date") or e.get("created_at") or "")[:10]
+        recent_exp_rows += (
+            f"<tr><td>{date_str}</td>"
+            f"<td>{(e.get('description') or '-')[:60]}</td>"
+            f"<td>{CATEGORY_LABELS_AR.get(e.get('category', 'other'), e.get('category', '-'))}</td>"
+            f"<td>{_format_currency(e.get('amount', 0), currency)}</td></tr>"
+        )
+    if not recent_exp_rows:
+        recent_exp_rows = "<tr><td colspan='4' class='empty'>لا توجد عمليات</td></tr>"
+
+    # Recent revenue (top 10)
+    recent_rev_rows = ""
+    for r in (recent_revenue or [])[:10]:
+        date_str = (r.get("date") or r.get("created_at") or "")[:10]
+        recent_rev_rows += (
+            f"<tr><td>{date_str}</td>"
+            f"<td>{(r.get('description') or '-')[:60]}</td>"
+            f"<td>{SOURCE_LABELS_AR.get(r.get('source', 'other'), r.get('source', '-'))}</td>"
+            f"<td>{_format_currency(r.get('amount', 0), currency)}</td></tr>"
+        )
+    if not recent_rev_rows:
+        recent_rev_rows = "<tr><td colspan='4' class='empty'>لا توجد إيرادات</td></tr>"
+
+    extra_css = """
+    .green { color: #047857; font-weight: 600; }
+    .red { color: #b91c1c; font-weight: 600; }
+    """
+
+    html_str = f"""<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><style>{extra_css}</style></head><body class="rtl">
+    {_header_html(compound_name, 'تقرير الميزانية العمومية', period, f'BS-{period}', branding)}
+    <div class="subtitle">تقرير شامل للإيرادات والمصروفات والتصنيفات لفترة <strong>{period}</strong></div>
+    <div class="kpis">
+      <div class="kpi green"><div class="label">إجمالي الإيرادات</div><div class="value">{_format_currency(total_revenue, currency)}</div></div>
+      <div class="kpi red"><div class="label">إجمالي المصروفات</div><div class="value">{_format_currency(total_expenses, currency)}</div></div>
+      <div class="kpi {'green' if net >= 0 else 'red'}"><div class="label">صافي الرصيد</div><div class="value">{_format_currency(net, currency)}</div></div>
+      <div class="kpi indigo"><div class="label">معدل التحصيل</div><div class="value">{coll_rate:.1f}%</div></div>
+    </div>
+
+    <div class="section"><h2>الإيرادات حسب المصدر</h2>
+      <table><thead><tr><th>المصدر</th><th>المبلغ</th><th>النسبة</th></tr></thead>
+      <tbody>{rev_rows}</tbody></table>
+    </div>
+
+    <div class="section"><h2>المصروفات حسب التصنيف</h2>
+      <table><thead><tr><th>التصنيف</th><th>المبلغ</th><th>النسبة</th></tr></thead>
+      <tbody>{exp_rows}</tbody></table>
+    </div>
+
+    <div class="section"><h2>المقارنة الشهرية</h2>
+      <table><thead><tr><th>الشهر</th><th>الإيرادات</th><th>المصروفات</th><th>الفرق</th></tr></thead>
+      <tbody>{monthly_rows}</tbody></table>
+    </div>
+
+    <div class="section"><h2>أحدث المصروفات</h2>
+      <table><thead><tr><th>التاريخ</th><th>الوصف</th><th>التصنيف</th><th>المبلغ</th></tr></thead>
+      <tbody>{recent_exp_rows}</tbody></table>
+    </div>
+
+    <div class="section"><h2>أحدث الإيرادات</h2>
+      <table><thead><tr><th>التاريخ</th><th>الوصف</th><th>المصدر</th><th>المبلغ</th></tr></thead>
+      <tbody>{recent_rev_rows}</tbody></table>
+    </div>
+
+    <div class="totals">
+      <div class="row"><span>إجمالي الإيرادات</span><span>{_format_currency(total_revenue, currency)}</span></div>
+      <div class="row"><span>إجمالي المصروفات</span><span>- {_format_currency(total_expenses, currency)}</span></div>
+      <div class="row grand"><span>صافي الرصيد</span><span>{_format_currency(net, currency)}</span></div>
+    </div>
+
+    {_footer_html(branding)}
+    </body></html>"""
+    return _render_pdf(html_str, branding)

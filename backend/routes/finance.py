@@ -471,6 +471,117 @@ async def get_balance_sheet(year: Optional[int] = None, compound_id: Optional[st
         raise HTTPException(status_code=500, detail="Failed to generate balance sheet")
 
 
+@router.get("/financial/balance-sheet/export-pdf")
+async def export_balance_sheet_pdf(year: Optional[int] = None, compound_id: Optional[str] = None, current_user: dict = Depends(require_admin)):
+    """Export the full balance sheet (revenue + expenses + breakdowns + monthly trend) as a branded Arabic PDF."""
+    from fastapi.responses import Response
+    from services.pdf_report_service import render_balance_sheet
+
+    db = get_db()
+    try:
+        # Reuse the same scoping logic as get_balance_sheet
+        role = current_user.get("role")
+        cu_compound = current_user.get("compound_id")
+        compound_label = ""
+        if compound_id:
+            scope = {"compound_id": compound_id}
+            cmpd = await db.compounds.find_one({"id": compound_id}, {"_id": 0, "name": 1})
+            compound_label = (cmpd or {}).get("name") or compound_id
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+            company_id = current_user["company_id"]
+            owned = await db.compounds.find(
+                {"$or": [{"company_id": company_id}, {"management_company_id": company_id}]},
+                {"_id": 0, "id": 1}
+            ).to_list(500)
+            cids = [c["id"] for c in owned if c.get("id")]
+            scope = {"compound_id": {"$in": cids}} if cids else {"compound_id": "__never__"}
+            company_doc = await db.companies.find_one({"id": company_id}, {"_id": 0, "name": 1}) or {}
+            compound_label = f"{company_doc.get('name', 'الشركة')} (إجمالي {len(cids)} كمبوندات)"
+        elif role in ("app_owner", "super_admin") and not cu_compound:
+            scope = {}
+            compound_label = "كل الكمبوندات"
+        else:
+            scope = {"compound_id": cu_compound or "default-compound"}
+            cmpd = await db.compounds.find_one({"id": scope["compound_id"]}, {"_id": 0, "name": 1})
+            compound_label = (cmpd or {}).get("name") or "الكمبوند"
+
+        current_year = year or datetime.now().year
+        period = f"عام {current_year}"
+
+        expenses = await db.expenses.find(scope, {"_id": 0}).to_list(2000)
+        total_expenses = sum(float(e.get("amount", 0)) for e in expenses)
+        exp_by_cat: Dict[str, float] = {}
+        for e in expenses:
+            cat = e.get("category", "other")
+            exp_by_cat[cat] = exp_by_cat.get(cat, 0) + float(e.get("amount", 0))
+
+        revenues = await db.revenue.find(scope, {"_id": 0}).to_list(2000)
+        total_revenue = sum(float(r.get("amount", 0)) for r in revenues)
+        rev_by_src: Dict[str, float] = {}
+        for r in revenues:
+            src = r.get("source", "other")
+            rev_by_src[src] = rev_by_src.get(src, 0) + float(r.get("amount", 0))
+
+        all_charges = await db.unit_charges.find(scope, {"_id": 0}).to_list(5000)
+        total_charged = sum(float(c.get("amount", 0)) for c in all_charges)
+        total_collected = sum(float(c.get("amount", 0)) for c in all_charges if c.get("status") == "paid")
+        coll_rate = round((total_collected / total_charged * 100) if total_charged > 0 else 0, 1)
+
+        # Monthly breakdown
+        monthly: Dict[str, Dict[str, float]] = {}
+        for e in expenses:
+            d = e.get("date") or e.get("created_at") or ""
+            if isinstance(d, str) and d:
+                m = d[:7]
+                monthly.setdefault(m, {"expenses": 0, "revenue": 0})
+                monthly[m]["expenses"] += float(e.get("amount", 0))
+        for r in revenues:
+            d = r.get("date") or r.get("created_at") or ""
+            if isinstance(d, str) and d:
+                m = d[:7]
+                monthly.setdefault(m, {"expenses": 0, "revenue": 0})
+                monthly[m]["revenue"] += float(r.get("amount", 0))
+
+        # Sort recent
+        recent_expenses = sorted(expenses, key=lambda x: x.get("date") or x.get("created_at") or "", reverse=True)
+        recent_revenue = sorted(revenues, key=lambda x: x.get("date") or x.get("created_at") or "", reverse=True)
+
+        # Branding
+        branding = None
+        try:
+            from services.branding import get_compound_branding
+            single_cid = compound_id or (cu_compound if cu_compound and cu_compound != "default-compound" else None)
+            if single_cid:
+                cmpd_doc = await db.compounds.find_one({"id": single_cid}, {"_id": 0})
+                branding = get_compound_branding(cmpd_doc)
+        except Exception:
+            pass
+
+        pdf_bytes = render_balance_sheet(
+            compound_name=compound_label,
+            period=period,
+            total_revenue=total_revenue,
+            total_expenses=total_expenses,
+            expenses_by_category=exp_by_cat,
+            revenue_by_source=rev_by_src,
+            monthly_breakdown=monthly,
+            obligations={"total_charged": total_charged, "total_collected": total_collected, "collection_rate": coll_rate},
+            recent_expenses=recent_expenses,
+            recent_revenue=recent_revenue,
+            currency="EGP",
+            branding=branding,
+        )
+        filename = f"balance_sheet_{current_year}_{datetime.now().strftime('%Y%m%d')}.pdf"
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={filename}"},
+        )
+    except Exception as e:
+        logging.error(f"Error exporting balance sheet PDF: {e}")
+        raise HTTPException(status_code=500, detail="Failed to export balance sheet PDF")
+
+
 @router.get("/financial/residents/{resident_id}/account")
 async def get_resident_account(resident_id: str, current_user: dict = Depends(get_current_user)):
     db = get_db()

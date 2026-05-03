@@ -167,7 +167,33 @@ const CompoundFinance = () => {
             <h1 className="text-2xl font-bold text-gray-900">{t('financial_management', t('cf_title', 'الإدارة المالية'))}</h1>
             <p className="text-sm text-gray-500">{t('compound_budget_desc', t('cf_subtitle', 'إدارة ميزانية المجمع والالتزامات والمصروفات'))}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={async () => {
+                try {
+                  toast.info('جارٍ إنشاء PDF...');
+                  const res = await axios.get(`${API}/financial/balance-sheet/export-pdf?year=${filterYear}`, {
+                    ...getToken(), responseType: 'blob'
+                  });
+                  const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', `balance_sheet_${filterYear}.pdf`);
+                  document.body.appendChild(link);
+                  link.click();
+                  link.remove();
+                  setTimeout(() => window.URL.revokeObjectURL(url), 1500);
+                  toast.success('تم تصدير الـ PDF بنجاح');
+                } catch (err) {
+                  toast.error('فشل في تصدير PDF');
+                }
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 text-sm font-medium"
+              data-testid="export-pdf-btn"
+            >
+              <ArrowDownTrayIcon className="h-4 w-4" />
+              تصدير PDF
+            </button>
             <button
               onClick={async () => {
                 try {

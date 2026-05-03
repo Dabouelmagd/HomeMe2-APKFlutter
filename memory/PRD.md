@@ -5,6 +5,51 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-65)
 
+### Iter 78: Compound Payment Methods + Contract→Expense Sync (May 3, 2026) ✅
+
+**🐛 Bug Fix — عقد الصيانة بـ 90,000 ج.م لا يظهر في إجمالي المصروفات:**
+- **السبب الجذري:** العقود في `db.contracts` منفصلة تماماً عن `db.expenses` — الصفحة المالية تجمع `expenses` فقط فلا يظهر العقد.
+- **الإصلاح في `routes/contracts.py`:**
+  - دالة `_sync_contract_expense()` تنشئ/تُحدّث/تحذف entry في `db.expenses` مرتبط بالعقد عبر `contract_id`.
+  - تُستدعى تلقائياً عند `POST/PUT/DELETE /api/contracts`.
+  - مدمجة في loop `check_expiring_contracts` لمزامنة العقود الموجودة (idempotent backfill).
+  - Endpoint إضافي `POST /api/contracts/sync-expenses` للتشغيل اليدوي عند الحاجة.
+- **التحقق E2E:** قبل الإنشاء `total_expenses=0` → بعد إنشاء عقد بـ 90,000 → `total_expenses=90000.0` ✓ ; تحديث القيمة لـ 50,000 → `total_expenses=50000.0` ✓ ; حذف العقد → `total_expenses=0` ✓.
+
+**✨ Feature — طرق الدفع المعتمدة للكمبوند/شركة الإدارة:**
+- **الهدف:** كل شركة إدارة أو كمبوند يضيف قنواته الخاصة (محفظة، إنستاباي، تحويل بنكي، فوري، نقداً) ليظهر للسكان عند سداد الالتزامات.
+- **Backend (`routes/compound_payment_methods.py`, ~210 LOC):**
+  - Collection `compound_payment_methods` بحقول: `method_type`, `display_name`, `account_number`, `account_holder`, `bank_name`, `iban`, `swift_code`, `instructions`, `fee_note`, `is_active`, `sort_order`.
+  - 11 نوع مدعوم: `vodafone_cash, orange_cash, etisalat_cash, we_pay, instapay, bank_transfer, cash, fawry, valu, meeza, other`.
+  - 6 endpoints:
+    - `GET /api/compound-payment-methods/types` — قائمة الأنواع المدعومة.
+    - `GET /api/compound-payment-methods` — مدراء يرون كل الطرق، السكان يرون الطرق المُفعّلة فقط لكمبوندهم + شركة الإدارة المالكة.
+    - `POST /api/compound-payment-methods` — إضافة (admin/compound_admin/company_admin/accountant/owner).
+    - `PUT /api/compound-payment-methods/{id}` — تعديل + حماية tenant scope.
+    - `DELETE /api/compound-payment-methods/{id}`.
+    - `GET /api/compound-payment-methods/public/{compound_id}` — قراءة عامة (no auth).
+  - **Multi-tenant scoping:** `company_admin` ينشئ على مستوى `company_id` فتُورَّث لكل كمبوندات الشركة. `compound_admin` ينشئ على مستوى `compound_id` فقط.
+  - **RBAC:** السكان 403 على mutations; cross-tenant edit/delete مرفوض.
+- **Frontend (`pages/CompoundPaymentMethodsPage.js`, ~330 LOC):**
+  - Hero بنفسجي/إنديجو + زر "إضافة طريقة دفع".
+  - Grid responsive (1/2/3 columns) من الكروت — كل كارت بـ gradient لون مخصص حسب النوع (فودافون أحمر، أورانج برتقالي، إنستاباي بنفسجي، بنك أزرق…).
+  - أزرار: نسخ (للرقم/IBAN), تفعيل/تعطيل, تعديل, حذف.
+  - Modal كامل لإدارة الحقول (يُظهر حقول البنك/IBAN/SWIFT فقط لـ `bank_transfer`).
+  - Empty state ودود ("لا توجد طرق دفع مفعّلة بعد").
+  - السكان وغير الإداريين: يرون الكروت بدون أزرار التعديل (read-only).
+- **Sidebar:** "طرق الدفع المعتمدة" أسفل "مركز المدفوعات" — مرئي للجميع.
+- **Route:** `/app/compound-payment-methods` (ProtectedRoute بدون أدمن).
+
+**🧪 الاختبار E2E:**
+- ✅ Create فودافون كاش + إنستاباي + بنك (testcompany2).
+- ✅ Resident يرى فقط الـ active method من شركة الإدارة (1 method) — السكان لا يرون المعطّلة ولا غير شركتهم.
+- ✅ Public endpoint بدون auth يرجع 1 method.
+- ✅ Update + Delete بنجاح.
+- ✅ Resident يحصل على 403 عند POST.
+- ✅ UI screenshot: الكارت يعرض الرقم + المستفيد + التعليمات + بادج الحالة.
+
+---
+
 ### Iter 77: Company-to-Company Referral / Viral-Loop System (May 1, 2026) ✅
 
 **🚀 Companies invite other companies → earn 30 days free per successful paid signup → auto-extend their own subscription.**

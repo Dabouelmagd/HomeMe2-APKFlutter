@@ -612,6 +612,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('financial_management'), href: 'finances', icon: CurrencyDollarIcon, show: isStaffRole },
         { name: t('payment_center'), href: 'payments', icon: CreditCardIcon, show: true },
+        { name: 'طرق الدفع المعتمدة', href: 'compound-payment-methods', icon: CreditCardIcon, show: true },
         { name: t('contracts_management', 'العقود'), href: 'contracts', icon: DocumentTextIcon, show: isStaffRole },
         { name: t('satisfaction_ratings', 'التقييمات'), href: 'satisfaction', icon: StarIcon, show: isStaffRole },
       ]

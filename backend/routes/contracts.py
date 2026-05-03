@@ -28,6 +28,38 @@ class ContractCreate(BaseModel):
     auto_renew: bool = False
 
 
+async def _sync_contract_expense(db, contract: dict):
+    """Create or update a linked expense entry mirroring the contract value."""
+    try:
+        contract_id = contract["id"]
+        compound_id = contract["compound_id"]
+        value = float(contract.get("value") or 0)
+        if value <= 0:
+            await db.expenses.delete_many({"contract_id": contract_id})
+            return
+        expense_doc = {
+            "category": contract.get("category", "maintenance"),
+            "amount": value,
+            "description": f"عقد: {contract.get('title', '')} - {contract.get('provider_name', '')}",
+            "date": contract.get("start_date") or datetime.now(timezone.utc).isoformat(),
+            "payment_method": "contract",
+            "vendor": contract.get("provider_name", ""),
+            "compound_id": compound_id,
+            "contract_id": contract_id,
+            "status": "completed",
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        existing = await db.expenses.find_one({"contract_id": contract_id})
+        if existing:
+            await db.expenses.update_one({"contract_id": contract_id}, {"$set": expense_doc})
+        else:
+            expense_doc["id"] = str(uuid.uuid4())
+            expense_doc["created_at"] = datetime.now(timezone.utc).isoformat()
+            await db.expenses.insert_one(expense_doc)
+    except Exception as e:
+        logging.error(f"Failed to sync contract expense: {e}")
+
+
 @router.post("/contracts")
 async def create_contract(data: ContractCreate, current_user: dict = Depends(require_admin)):
     db = get_db()
@@ -41,6 +73,7 @@ async def create_contract(data: ContractCreate, current_user: dict = Depends(req
             "created_at": datetime.now(timezone.utc)
         }
         await db.contracts.insert_one(contract)
+        await _sync_contract_expense(db, contract)
         return {"message": "تم إنشاء العقد بنجاح", "contract_id": contract["id"]}
     except Exception as e:
         logging.error(f"Error creating contract: {e}")
@@ -110,8 +143,11 @@ async def update_contract(contract_id: str, data: ContractCreate, current_user: 
             {"id": contract_id, "compound_id": current_user["compound_id"]},
             {"$set": {**data.dict(), "updated_at": datetime.now(timezone.utc)}}
         )
-        if result.modified_count == 0:
+        if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Contract not found")
+        contract = await db.contracts.find_one({"id": contract_id, "compound_id": current_user["compound_id"]}, {"_id": 0})
+        if contract:
+            await _sync_contract_expense(db, contract)
         return {"message": "تم تحديث العقد بنجاح"}
     except HTTPException:
         raise
@@ -127,6 +163,7 @@ async def delete_contract(contract_id: str, current_user: dict = Depends(require
         result = await db.contracts.delete_one({"id": contract_id, "compound_id": current_user["compound_id"]})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Contract not found")
+        await db.expenses.delete_many({"contract_id": contract_id})
         return {"message": "تم حذف العقد بنجاح"}
     except HTTPException:
         raise
@@ -135,10 +172,38 @@ async def delete_contract(contract_id: str, current_user: dict = Depends(require
         raise HTTPException(status_code=500, detail="Failed to delete contract")
 
 
+@router.post("/contracts/sync-expenses")
+async def sync_all_contracts_to_expenses(current_user: dict = Depends(require_admin)):
+    """One-time migration: sync existing contracts as expense entries (idempotent)."""
+    db = get_db()
+    try:
+        contracts = await db.contracts.find({"compound_id": current_user["compound_id"]}, {"_id": 0}).to_list(500)
+        synced = 0
+        for c in contracts:
+            await _sync_contract_expense(db, c)
+            synced += 1
+        return {"message": f"تم مزامنة {synced} عقد كمصروفات", "synced": synced}
+    except Exception as e:
+        logging.error(f"Error syncing contracts: {e}")
+        raise HTTPException(status_code=500, detail="Failed to sync contracts")
+
+
 async def check_expiring_contracts():
     """Check for expiring contracts and notify admins"""
     db = get_db()
     try:
+        # One-time backfill: ensure all contracts have linked expense entries (idempotent)
+        try:
+            contracts_without_expense = await db.contracts.find({}, {"_id": 0}).to_list(2000)
+            for c in contracts_without_expense:
+                if not c.get("id"):
+                    continue
+                exists = await db.expenses.find_one({"contract_id": c["id"]}, {"_id": 1})
+                if not exists:
+                    await _sync_contract_expense(db, c)
+        except Exception as ex:
+            logging.warning(f"Contract→expense backfill skipped: {ex}")
+
         now = datetime.now(timezone.utc)
         warn_30 = (now + timedelta(days=30)).isoformat()[:10]
         warn_7 = (now + timedelta(days=7)).isoformat()[:10]

@@ -51,6 +51,7 @@ import FinancialManagement from './components/FinancialManagement';
 import CompoundFinance from './components/CompoundFinance';
 import SatisfactionDashboard from './components/SatisfactionDashboard';
 import ContractsManagement from './components/ContractsManagement';
+import CompoundPaymentMethodsPage from './pages/CompoundPaymentMethodsPage';
 import ComplaintsSystem from './components/ComplaintsSystem';
 import SuperAdminPanel from './components/SuperAdminPanel';
 import AdvertiserPortal from './pages/AdvertiserPortal';
@@ -854,6 +855,12 @@ function App() {
                 <Route path="contracts" element={
                   <ProtectedRoute adminOnly>
                     <ContractsManagement />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="compound-payment-methods" element={
+                  <ProtectedRoute>
+                    <CompoundPaymentMethodsPage />
                   </ProtectedRoute>
                 } />
                 

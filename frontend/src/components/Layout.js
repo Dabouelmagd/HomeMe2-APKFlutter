@@ -587,15 +587,32 @@ const Layout = ({ children, isTrialMode = false }) => {
 
   // Organized navigation by role
   const navigationSections = isAppOwner ? ownerNavigationSections : (activeRole === 'super_admin' ? superAdminNavigationSections : [
+    // Top-priority section for company_admin (their main job)
+    ...(activeRole === 'company_admin' || activeRole === 'app_owner' || activeRole === 'super_admin' ? [{
+      title: t('management_company', 'شركة الإدارة'),
+      items: [
+        { name: t('compounds_management', 'كمبوندات الشركة'), href: 'compounds-management', icon: BuildingOfficeIcon, show: true },
+        { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: true },
+        { name: t('advanced_analytics', 'تحليلات متقدمة'), href: 'analytics', icon: ChartBarIcon, show: true },
+      ]
+    }] : []),
     {
-      title: t('main_sections'),
+      title: t('main_management', 'الإدارة الرئيسية'),
       items: [
         { name: t('dashboard'), href: 'dashboard', icon: HomeIcon, show: true },
-        { name: t('compound_management'), href: 'compound', icon: BuildingOfficeIcon, show: isAdminRole },
+        { name: t('compound_management'), href: 'compound', icon: BuildingOfficeIcon, show: isAdminRole && activeRole !== 'company_admin' },
         { name: t('residents_list'), href: 'residents', icon: UserGroupIcon, show: isStaffRole },
         { name: t('user_management'), href: 'users', icon: UsersIcon, show: isAdminRole },
         { name: t('monitoring_dashboard'), href: 'monitoring', icon: ChartPieIcon, show: isStaffRole },
-        { name: t('compounds_management', 'Compounds Management'), href: 'compounds-management', icon: HomeIcon, show: activeRole === 'app_owner' || activeRole === 'super_admin' || activeRole === 'company_admin' },
+      ]
+    },
+    {
+      title: t('financial_services'),
+      items: [
+        { name: t('financial_management'), href: 'finances', icon: CurrencyDollarIcon, show: isStaffRole },
+        { name: t('payment_center'), href: 'payments', icon: CreditCardIcon, show: true },
+        { name: 'طرق الدفع المعتمدة', href: 'compound-payment-methods', icon: CreditCardIcon, show: isStaffRole },
+        { name: t('contracts_management', 'العقود'), href: 'contracts', icon: DocumentTextIcon, show: isStaffRole },
       ]
     },
     {
@@ -604,16 +621,6 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('services_management'), href: 'services', icon: WrenchScrewdriverIcon, show: true },
         { name: t('maintenance_system'), href: 'maintenance', icon: CogIcon, show: true },
         { name: t('facility_booking'), href: 'facility-booking', icon: CalendarDaysIcon, show: true },
-        { name: t('guest_management'), href: 'guests', icon: UsersIcon, show: isSecurityRole },
-      ]
-    },
-    {
-      title: t('financial_services'),
-      items: [
-        { name: t('financial_management'), href: 'finances', icon: CurrencyDollarIcon, show: isStaffRole },
-        { name: t('payment_center'), href: 'payments', icon: CreditCardIcon, show: true },
-        { name: 'طرق الدفع المعتمدة', href: 'compound-payment-methods', icon: CreditCardIcon, show: true },
-        { name: t('contracts_management', 'العقود'), href: 'contracts', icon: DocumentTextIcon, show: isStaffRole },
         { name: t('satisfaction_ratings', 'التقييمات'), href: 'satisfaction', icon: StarIcon, show: isStaffRole },
       ]
     },
@@ -623,7 +630,6 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('message_center'), href: 'messages', icon: ChatBubbleLeftEllipsisIcon, show: true },
         { name: t('notifications_nav'), href: 'notifications', icon: BellIcon, show: true },
         { name: t('events_announcements'), href: 'events', icon: SpeakerWaveIcon, show: true },
-        { name: t('complaints_suggestions', 'الشكاوى والاقتراحات'), href: 'complaints', icon: ExclamationTriangleIcon, show: true },
       ]
     },
     {
@@ -633,7 +639,8 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('add_family_member'), href: 'add-family-member', icon: UserPlusIcon, show: true },
         { name: 'إدارة دعواتي', href: 'my-invites', icon: LinkIcon, show: true },
         { name: 'تذاكر الزوار', href: 'visitor-passes', icon: TicketIcon, show: true },
-        { name: 'مسح تذكرة (الأمن)', href: 'security-scan', icon: QrCodeIcon, show: true },
+        { name: 'إدارة الزوار', href: 'guests', icon: UsersIcon, show: isSecurityRole },
+        { name: 'مسح تذكرة (الأمن)', href: 'security-scan', icon: QrCodeIcon, show: isSecurityRole },
       ]
     },
     {
@@ -642,27 +649,29 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('gallery.title'), href: 'gallery', icon: PhotoIcon, show: true },
         { name: t('document_management'), href: 'documents', icon: DocumentTextIcon, show: true },
         { name: t('voting_system'), href: 'voting', icon: HandRaisedIcon, show: true },
-        { name: 'تقارير PDF', href: 'reports', icon: DocumentTextIcon, show: true },
+        { name: 'تقارير PDF', href: 'reports', icon: DocumentTextIcon, show: isStaffRole },
       ]
     },
     {
       title: t('admin_tools'),
       items: [
-        { name: t('advanced_analytics'), href: 'analytics', icon: ChartBarIcon, show: isStaffRole },
+        ...(activeRole !== 'company_admin' && activeRole !== 'app_owner' && activeRole !== 'super_admin' ? [
+          { name: t('advanced_analytics'), href: 'analytics', icon: ChartBarIcon, show: isStaffRole },
+          { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole },
+        ] : []),
         { name: t('subscription_codes_management'), href: 'subscription-codes', icon: KeyIcon, show: activeRole === 'app_owner' },
-        { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole || activeRole === 'company_admin' },
-      ]
+      ].filter(i => i)
     },
     {
       title: t('support_info'),
       items: [
         { name: t('settings_nav'), href: 'settings', icon: Cog6ToothIcon, show: true },
+        { name: t('complaints_suggestions', 'الشكاوى والاقتراحات'), href: 'complaints', icon: ExclamationTriangleIcon, show: true },
         { name: t('help_center'), href: 'help', icon: QuestionMarkCircleIcon, show: true },
         { name: t('contact_support_nav', 'تواصل مع الدعم الفني'), href: 'support', icon: QuestionMarkCircleIcon, show: true },
       ]
     }
   ]);
-
   // Improved isActive function to correctly match current route
   const isActive = (href) => {
     const currentPath = location.pathname;

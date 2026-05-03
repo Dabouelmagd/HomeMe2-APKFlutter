@@ -15,10 +15,18 @@ const PaymentPage = () => {
   const [showTransactions, setShowTransactions] = useState(false);
   // Default scope tab — company-managers / owners default to "company",
   // everyone else defaults to "residential". User can flip the tab freely.
-  const [scope, setScope] = useState(() => {
+  const [scope, setScope] = useState('residential');
+  const [scopeInitialized, setScopeInitialized] = useState(false);
+
+  // Set default scope once auth user finishes loading
+  useEffect(() => {
+    if (scopeInitialized) return;
     const r = user?.role;
-    return (r === 'company_admin' || r === 'app_owner' || r === 'super_admin') ? 'company' : 'residential';
-  });
+    if (!r) return; // wait for user to be defined
+    const next = (r === 'company_admin' || r === 'app_owner' || r === 'super_admin') ? 'company' : 'residential';
+    setScope(next);
+    setScopeInitialized(true);
+  }, [user?.role, scopeInitialized]);
 
   // Billing cycle — 'monthly' or 'yearly'. Yearly = 10× monthly price (i.e.
   // 2 months free) and maps to backend duration "1_year".

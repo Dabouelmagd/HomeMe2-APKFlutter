@@ -118,7 +118,13 @@ export default function SubscriptionManagement() {
   const isActive = sub?.subscription_active;
   const plan = sub?.subscription_plan || sub?.subscription_type || 'none';
 
-  const upgradePlans = [
+  const isCompanyRole = ['company_admin', 'app_owner', 'super_admin'].includes(user?.role);
+
+  const upgradePlans = isCompanyRole ? [
+    { id: 'company_startup', name: t('cp_startup', 'شركة ناشئة'), price: 3500 },
+    { id: 'company_business', name: t('cp_business', 'شركة متوسطة'), price: 7500 },
+    { id: 'company_enterprise', name: t('cp_enterprise', 'شركة كبرى'), price: 20000 },
+  ] : [
     { id: 'basic', name: t('plan_basic'), price: 500 },
     { id: 'pro', name: t('plan_pro'), price: 1200 },
     { id: 'premium', name: t('plan_premium'), price: 2200 },

@@ -42,6 +42,8 @@ const PaymentPage = () => {
             amount_usd: tier.monthly_usd,
             currency: 'EGP',
             description: tier.residents,
+            features: tier.features || [],
+            popular: !!tier.popular,
             scope: 'residential',
           };
         }
@@ -52,6 +54,8 @@ const PaymentPage = () => {
             amount_usd: tier.monthly_usd,
             currency: 'EGP',
             description: tier.compounds,
+            features: tier.features || [],
+            popular: !!tier.popular,
             scope: 'company',
           };
         }
@@ -77,8 +81,9 @@ const PaymentPage = () => {
       .reduce((acc, [k, v]) => { acc[k] = v; return acc; }, {});
   }, [packages, scope]);
 
-  // Whenever scope or packages change, auto-pick the first plan in the new
-  // tab if the previously-selected one isn't visible anymore.
+  // Whenever scope or packages change, auto-pick a sensible default in the
+  // new tab: prefer the "popular" plan if marked, otherwise the first plan.
+  // Skip if the previously-selected plan is still visible.
   useEffect(() => {
     const ids = Object.keys(visiblePackages);
     if (ids.length === 0) {
@@ -86,7 +91,8 @@ const PaymentPage = () => {
       return;
     }
     if (!ids.includes(selectedPackage)) {
-      setSelectedPackage(ids[0]);
+      const popularId = ids.find((id) => visiblePackages[id].popular);
+      setSelectedPackage(popularId || ids[0]);
     }
   }, [visiblePackages, selectedPackage]);
 
@@ -315,44 +321,70 @@ const PaymentPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {t('select_payment_type', 'اختر الخطة')}
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  {t('select_payment_type', 'اختر الخطة المناسبة')}
                 </label>
-                <select
-                  value={selectedPackage}
-                  onChange={(e) => setSelectedPackage(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  data-testid="payment-plan-select"
-                >
-                  {Object.keys(visiblePackages).length === 0 && (
-                    <option value="">لا توجد خطط في هذا التبويب</option>
-                  )}
-                  {Object.entries(visiblePackages).map(([key, pkg]) => (
-                    <option key={key} value={key}>
-                      {t(`payment_${key}`, pkg.name)} — {formatCurrency(pkg.amount, pkg.currency)}
-                    </option>
-                  ))}
-                </select>
+                {Object.keys(visiblePackages).length === 0 ? (
+                  <div className="text-center py-8 text-gray-500 text-sm border border-dashed border-gray-300 rounded-xl">
+                    لا توجد خطط في هذا التبويب
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" data-testid="plan-comparison-grid">
+                    {Object.entries(visiblePackages).map(([key, pkg]) => {
+                      const isSelected = selectedPackage === key;
+                      const accentRing = scope === 'company' ? 'ring-violet-500' : 'ring-blue-500';
+                      const accentBg = scope === 'company' ? 'bg-violet-50' : 'bg-blue-50';
+                      const accentText = scope === 'company' ? 'text-violet-700' : 'text-blue-700';
+                      const accentCheck = scope === 'company' ? 'text-violet-600' : 'text-blue-600';
+                      return (
+                        <button
+                          type="button"
+                          key={key}
+                          onClick={() => setSelectedPackage(key)}
+                          className={`relative text-right p-4 rounded-xl border-2 transition-all hover:shadow-md flex flex-col gap-2 ${
+                            isSelected
+                              ? `border-transparent ring-2 ${accentRing} ${accentBg} shadow-md`
+                              : 'border-gray-200 bg-white hover:border-gray-300'
+                          }`}
+                          data-testid={`plan-card-${key}`}
+                          aria-pressed={isSelected}
+                        >
+                          {pkg.popular && (
+                            <span className={`absolute -top-2 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold text-white ${
+                              scope === 'company' ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600' : 'bg-gradient-to-r from-blue-600 to-indigo-600'
+                            }`}>
+                              ⭐ الأكثر شيوعًا
+                            </span>
+                          )}
+                          <div className="flex items-baseline justify-between gap-2">
+                            <h3 className="font-bold text-base text-gray-900">{pkg.name}</h3>
+                            {isSelected && <span className={`text-xs font-bold ${accentText}`}>✓ مختار</span>}
+                          </div>
+                          {pkg.description && (
+                            <p className="text-[11px] text-gray-500">{pkg.description}</p>
+                          )}
+                          <div className="flex items-baseline gap-1">
+                            <span className={`text-2xl font-extrabold ${accentText}`}>
+                              {Number(pkg.amount).toLocaleString('ar-EG')}
+                            </span>
+                            <span className="text-xs text-gray-500">ج.م / شهرياً</span>
+                          </div>
+                          {(pkg.features || []).length > 0 && (
+                            <ul className="space-y-1 mt-1 text-[11px] text-gray-700" data-testid={`plan-features-${key}`}>
+                              {pkg.features.map((f, i) => (
+                                <li key={i} className="flex items-start gap-1.5">
+                                  <span className={`shrink-0 mt-0.5 ${accentCheck}`}>✓</span>
+                                  <span>{f}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-
-              {selectedPackage && visiblePackages[selectedPackage] && (
-                <div className={`p-4 rounded-lg border ${
-                  scope === 'company' ? 'bg-violet-50 border-violet-200' : 'bg-blue-50 border-blue-200'
-                }`} data-testid="payment-plan-summary">
-                  <h3 className={`font-medium mb-1 ${scope === 'company' ? 'text-violet-900' : 'text-blue-900'}`}>
-                    {t(`payment_${selectedPackage}`, visiblePackages[selectedPackage].name)}
-                  </h3>
-                  {visiblePackages[selectedPackage].description && (
-                    <p className={`text-xs mb-2 ${scope === 'company' ? 'text-violet-700' : 'text-blue-700'}`}>
-                      {visiblePackages[selectedPackage].description}
-                    </p>
-                  )}
-                  <p className={`text-2xl font-bold ${scope === 'company' ? 'text-violet-900' : 'text-blue-900'}`}>
-                    {formatCurrency(visiblePackages[selectedPackage].amount, visiblePackages[selectedPackage].currency)}
-                    <span className="text-xs font-normal opacity-70 ms-1">/ شهرياً</span>
-                  </p>
-                </div>
-              )}
 
               <button
                 onClick={initiatePayment}

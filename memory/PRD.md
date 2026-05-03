@@ -1301,6 +1301,15 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 87: Plan Comparison Cards — visual upgrade ✅ (2026-05-02)
+- **Backend `routes/payments.py`**: enriched `/api/payments/plans` with per-plan `features` arrays (5–7 user-facing benefits each, AR) + `popular: true` flag on `pro` (residential) and `company_business` (companies).
+- **Frontend `PaymentPage.js`**: replaced the dropdown with a 3-column responsive grid of comparison cards:
+  - Card layout: name, "✓ مختار" indicator, description, big EGP price + "/ شهرياً", checklist with ✓ icons.
+  - **"⭐ الأكثر شيوعًا"** ribbon on the popular plan in each scope (gradient violet/indigo).
+  - Selected card gets ring + tinted background matching scope (blue for residential, violet for company).
+  - Auto-pre-selects the popular plan on tab switch (or first available if no popular).
+- **Verified ✅ via Playwright**: 3 cards render per scope, `aria-pressed` toggles correctly on click, popular badge present on `pro` and `company_business`, scope flip auto-selects `pro` (the popular residential).
+
 ### Iter 86: Payment plan tabs — residential vs company-management ✅ (2026-05-02)
 - **`PaymentPage.js`**: replaced the single mixed dropdown with a 2-tab pill switcher above the dropdown:
   - **🏠 سكني (count)** — blue accent — for resident plans

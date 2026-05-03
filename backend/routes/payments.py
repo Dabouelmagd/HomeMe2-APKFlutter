@@ -459,18 +459,91 @@ async def get_subscription_payment_status(session_id: str, current_user: dict = 
 
 @router.get("/payments/plans")
 async def get_subscription_plans():
-    """Get available subscription plans with prices"""
+    """Get available subscription plans with prices + feature checklists.
+    Feature lists are user-facing — keep them concise and benefit-oriented
+    (5–7 bullets max). Used by the Plan Comparison cards on /app/payments."""
     return {
         "residential": [
-            {"id": "starter", "name": "مجاني", "name_en": "Starter", "monthly_egp": 0, "monthly_usd": 0, "residents": "حتى 5 سكان"},
-            {"id": "basic", "name": "أساسي", "name_en": "Basic", "monthly_egp": 500, "monthly_usd": 10, "residents": "غير محدود"},
-            {"id": "pro", "name": "احترافي", "name_en": "Pro", "monthly_egp": 1200, "monthly_usd": 24, "residents": "غير محدود"},
-            {"id": "premium", "name": "متقدم", "name_en": "Premium", "monthly_egp": 2200, "monthly_usd": 44, "residents": "غير محدود"},
+            {
+                "id": "starter", "name": "مجاني", "name_en": "Starter",
+                "monthly_egp": 0, "monthly_usd": 0, "residents": "حتى 5 سكان",
+                "features": [
+                    "حتى 5 سكان",
+                    "إدارة وحدات أساسية",
+                    "تنبيهات بريد إلكتروني",
+                ],
+            },
+            {
+                "id": "basic", "name": "أساسي", "name_en": "Basic",
+                "monthly_egp": 500, "monthly_usd": 10, "residents": "غير محدود",
+                "features": [
+                    "سكان غير محدود",
+                    "بوابة دفع إلكتروني",
+                    "إشعارات Push للموبايل",
+                    "تقارير شهرية بسيطة",
+                ],
+            },
+            {
+                "id": "pro", "name": "احترافي", "name_en": "Pro",
+                "monthly_egp": 1200, "monthly_usd": 24, "residents": "غير محدود",
+                "popular": True,
+                "features": [
+                    "كل ميزات أساسي",
+                    "إدارة الزوار + QR لبوابة الكمباوند",
+                    "حجز المرافق (نادي/قاعة/ملعب)",
+                    "صيانة بتقرير صور + تقييم الفنيين",
+                    "تقارير مالية تفصيلية",
+                ],
+            },
+            {
+                "id": "premium", "name": "متقدم", "name_en": "Premium",
+                "monthly_egp": 2200, "monthly_usd": 44, "residents": "غير محدود",
+                "features": [
+                    "كل ميزات احترافي",
+                    "تكامل بوابات دفع متعددة",
+                    "إعلانات داخلية مدعومة",
+                    "نسخ احتياطية يومية + Disaster Recovery",
+                    "أولوية الدعم الفني (24 ساعة)",
+                ],
+            },
         ],
         "company": [
-            {"id": "company_startup", "name": "شركة ناشئة", "name_en": "Startup", "monthly_egp": 3500, "monthly_usd": 70, "compounds": "حتى 3"},
-            {"id": "company_business", "name": "شركة متوسطة", "name_en": "Business", "monthly_egp": 7500, "monthly_usd": 150, "compounds": "1-5"},
-            {"id": "company_enterprise", "name": "شركة كبرى", "name_en": "Enterprise", "monthly_egp": 20000, "monthly_usd": 400, "compounds": "غير محدود"},
+            {
+                "id": "company_startup", "name": "شركة ناشئة", "name_en": "Startup",
+                "monthly_egp": 3500, "monthly_usd": 70, "compounds": "حتى 3",
+                "features": [
+                    "حتى 3 كمباوندات",
+                    "Dashboard موحّد لكل كمباوندك",
+                    "نظام CRM مبسّط للسكان",
+                    "إحصائيات أداء أسبوعية",
+                    "نسخة تجريبية 14 يوم مجاناً",
+                ],
+            },
+            {
+                "id": "company_business", "name": "شركة متوسطة", "name_en": "Business",
+                "monthly_egp": 7500, "monthly_usd": 150, "compounds": "1-5",
+                "popular": True,
+                "features": [
+                    "حتى 5 كمباوندات",
+                    "كل ميزات الشركة الناشئة",
+                    "نظام إحالة شركات (5% خصم لكل إحالة)",
+                    "تقارير KPI تفصيلية لكل كمباوند",
+                    "إدارة مالية موحّدة + Disaster Recovery",
+                    "إعلانات مدعومة + Advertiser Portal",
+                ],
+            },
+            {
+                "id": "company_enterprise", "name": "شركة كبرى", "name_en": "Enterprise",
+                "monthly_egp": 20000, "monthly_usd": 400, "compounds": "غير محدود",
+                "features": [
+                    "كمباوندات غير محدودة",
+                    "كل ميزات الشركة المتوسطة",
+                    "API مخصّص + White-label",
+                    "Account Manager خاص",
+                    "تدريب الفريق + إعداد افتتاحي",
+                    "SLA 99.9% + دعم على مدار الساعة",
+                ],
+            },
         ],
         "durations": [
             {"id": "1_month", "name": "شهر", "multiplier": 1},

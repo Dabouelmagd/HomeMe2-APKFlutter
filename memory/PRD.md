@@ -5,7 +5,43 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 
 ## Latest Fixes (Feb 2026 — iterations 26-65)
 
-### Iter 78: Compound Payment Methods + Contract→Expense Sync (May 3, 2026) ✅
+### Iter 79: How-To-Pay Modal + Stripe Webhook Unification + Finance RBAC Fix (May 3, 2026) ✅
+
+**🎯 Quick Pay Helper Modal — يرفع نسبة التحصيل بـ click واحد:**
+- مكوّن قابل لإعادة الاستخدام `components/HowToPayButton.js` يفتح Modal أنيق يعرض **طرق الدفع المعتمدة** للكمبوند مع أيقونات ملوّنة وزر نسخ سريع للأرقام/IBAN.
+- مدمج في:
+  - `CompoundFinance.js` → تبويبات "الالتزامات" و "سداد الوحدات" (للإداريين).
+  - `ResidentFinancialDashboard.js` → بانر علوي + زر بجانب كل مستحق معلق (للسكان).
+- يعرض المبلغ المطلوب وعنوان الـ charge داخل الـ Modal لتذكير ما يدفعه.
+
+**🔧 Stripe Webhook Unification — إصلاح تكرار خفي:**
+- **المشكلة:** كان هناك `/webhook/stripe` معرّف في ملفين (`payments.py` و `stripe_payments.py`) — FastAPI يستجيب فقط للأول المسجَّل (`stripe_payments.py`)، فكان handler `payments.py` **dead code** ولا تُفعَّل به فواتير المرافق ولا اشتراكات المستخدمين الفردية.
+- **الإصلاح في `routes/stripe_payments.py`:**
+  - دالة جديدة `_activate_utility_bill_or_user_subscription()` تتولى ما كان يفعله handler الـ legacy.
+  - الـ webhook الموحَّد يفحص `payment_type` / `metadata.company_id` ويُوجّه إلى:
+    - `_activate_subscription` للاشتراكات الشركة.
+    - `_activate_utility_bill_or_user_subscription` لفواتير المرافق + اشتراكات المستخدمين القديمة.
+  - حُذف الـ handler المكرر من `payments.py` بالكامل (مع تعليق توثيقي).
+
+**🐛 Finance RBAC Fix (Pre-existing root-cause of the original bug):**
+- **المشكلة:** `routes/finance.py` كان يستخدم `current_user.get('role') != 'admin'` بشكل صارم على endpoints المصروفات والإيرادات → `company_admin` يحصل على 403 ولا يرى أي مصروف. حتى بعد مزامنة العقد كمصروف، صفحة المصروفات تبقى فارغة.
+- **الإصلاح:** استبدلتُ كل تحققات `role != 'admin'` بـ `Depends(require_admin)` (يسمح بـ admin/super_admin/company_admin/app_owner) في:
+  - `POST/GET /api/financial/expenses`
+  - `POST/GET /api/financial/revenue`
+  - `GET /api/financial/reports/summary`
+- إضافة auto-scoping: المستخدم بدون `app_owner/super_admin` يُقصر تلقائياً على `compound_id` الخاص به لو لم يُمرر بشكل صريح.
+- إضافة `{"_id": 0}` projection + `serialize_datetime()` لتفادي تسريب ObjectId.
+
+**🧪 الاختبار:**
+- testing_agent_v3_fork iter66: **29/30 backend tests PASS** (skip واحد فقط لعدم وجود tenant ثانٍ لاختبار cross-tenant payment-method update).
+- ✅ Contract→expense sync: total_expenses = 0 → 90000 → 50000 → 0 → 12345 → 0 (delete cascade)
+- ✅ 11 method types، CRUD كامل، resident scope، public endpoint، RBAC، tenant guards
+- ✅ Stripe webhook موحَّد، ويرفض الـ bad signatures بـ 400
+- ✅ Manual: company_admin يرى الآن قائمة المصروفات (1 expense من العقد)
+
+---
+
+
 
 **🐛 Bug Fix — عقد الصيانة بـ 90,000 ج.م لا يظهر في إجمالي المصروفات:**
 - **السبب الجذري:** العقود في `db.contracts` منفصلة تماماً عن `db.expenses` — الصفحة المالية تجمع `expenses` فقط فلا يظهر العقد.

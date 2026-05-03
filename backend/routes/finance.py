@@ -31,10 +31,8 @@ class ObligationCreate(BaseModel):
 
 
 @router.post("/financial/expenses")
-async def create_expense(expense_data: ExpenseCreate, current_user: dict = Depends(get_current_user)):
+async def create_expense(expense_data: ExpenseCreate, current_user: dict = Depends(require_admin)):
     db = get_db()
-    if current_user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
     try:
         expense = {
             "id": str(uuid.uuid4()),
@@ -60,30 +58,29 @@ async def create_expense(expense_data: ExpenseCreate, current_user: dict = Depen
 
 
 @router.get("/financial/expenses")
-async def get_expenses(compound_id: Optional[str] = None, start_date: Optional[str] = None, end_date: Optional[str] = None, category: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+async def get_expenses(compound_id: Optional[str] = None, start_date: Optional[str] = None, end_date: Optional[str] = None, category: Optional[str] = None, current_user: dict = Depends(require_admin)):
     db = get_db()
-    if current_user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
     try:
         query = {}
+        # Default-scope to user's compound if no override and they aren't a global admin
         if compound_id:
             query["compound_id"] = compound_id
+        elif current_user.get("role") not in ("app_owner", "super_admin") and current_user.get("compound_id"):
+            query["compound_id"] = current_user["compound_id"]
         if category:
             query["category"] = category
         if start_date and end_date:
             query["date"] = {"$gte": start_date, "$lte": end_date}
-        expenses = await db.expenses.find(query).sort("date", -1).to_list(length=10000)
-        return {"expenses": expenses}
+        expenses = await db.expenses.find(query, {"_id": 0}).sort("date", -1).to_list(length=10000)
+        return {"expenses": serialize_datetime(expenses)}
     except Exception as e:
         logging.error(f"Error fetching expenses: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch expenses")
 
 
 @router.post("/financial/revenue")
-async def create_revenue(revenue_data: RevenueCreate, current_user: dict = Depends(get_current_user)):
+async def create_revenue(revenue_data: RevenueCreate, current_user: dict = Depends(require_admin)):
     db = get_db()
-    if current_user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
     try:
         revenue = {
             "id": str(uuid.uuid4()),
@@ -117,30 +114,28 @@ async def create_revenue(revenue_data: RevenueCreate, current_user: dict = Depen
 
 
 @router.get("/financial/revenue")
-async def get_revenue(compound_id: Optional[str] = None, start_date: Optional[str] = None, end_date: Optional[str] = None, source: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+async def get_revenue(compound_id: Optional[str] = None, start_date: Optional[str] = None, end_date: Optional[str] = None, source: Optional[str] = None, current_user: dict = Depends(require_admin)):
     db = get_db()
-    if current_user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
     try:
         query = {}
         if compound_id:
             query["compound_id"] = compound_id
+        elif current_user.get("role") not in ("app_owner", "super_admin") and current_user.get("compound_id"):
+            query["compound_id"] = current_user["compound_id"]
         if source:
             query["source"] = source
         if start_date and end_date:
             query["date"] = {"$gte": start_date, "$lte": end_date}
-        revenue = await db.revenue.find(query).sort("date", -1).to_list(length=10000)
-        return {"revenue": revenue}
+        revenue = await db.revenue.find(query, {"_id": 0}).sort("date", -1).to_list(length=10000)
+        return {"revenue": serialize_datetime(revenue)}
     except Exception as e:
         logging.error(f"Error fetching revenue: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch revenue")
 
 
 @router.get("/financial/reports/summary")
-async def get_financial_summary(compound_id: str, start_date: str, end_date: str, current_user: dict = Depends(get_current_user)):
+async def get_financial_summary(compound_id: str, start_date: str, end_date: str, current_user: dict = Depends(require_admin)):
     db = get_db()
-    if current_user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="Admin access required")
     try:
         expenses = await db.expenses.find({"compound_id": compound_id, "date": {"$gte": start_date, "$lte": end_date}}).to_list(length=10000)
         revenue = await db.revenue.find({"compound_id": compound_id, "date": {"$gte": start_date, "$lte": end_date}}).to_list(length=10000)

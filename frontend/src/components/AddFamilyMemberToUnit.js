@@ -21,6 +21,7 @@ import {
   ShareIcon,
   ArrowDownTrayIcon
 } from '@heroicons/react/24/outline';
+import CreateResidentModal from './CreateResidentModal';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -33,6 +34,7 @@ const AddFamilyMemberToUnit = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUnit, setSelectedUnit] = useState(null);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [showCreateResident, setShowCreateResident] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -430,14 +432,15 @@ const AddFamilyMemberToUnit = () => {
 
         {/* Top CTA — go to residents management to add a new main resident */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3" data-testid="family-top-cta">
-          <a
-            href="/app/residents"
+          <button
+            type="button"
+            onClick={() => setShowCreateResident(true)}
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-sm shadow-md transition"
             data-testid="cta-add-resident"
           >
             <UserPlusIcon className="h-5 w-5" />
             <span>➕ إضافة ساكن رئيسي جديد</span>
-          </a>
+          </button>
           <button
             type="button"
             onClick={openQuickInvite}
@@ -1233,6 +1236,13 @@ const AddFamilyMemberToUnit = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {showCreateResident && (
+        <CreateResidentModal
+          onClose={() => setShowCreateResident(false)}
+          onCreated={() => { setShowCreateResident(false); fetchResidents(); }}
+        />
       )}
     </div>
   );

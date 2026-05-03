@@ -343,7 +343,7 @@ class UserCreate(BaseModel):
     email: str
     password: str
     role: str
-    compound_id: str
+    compound_id: Optional[str] = None  # admin endpoints resolve from X-Active-Compound-Id header
     full_name: str
     phone: Optional[str] = None
     unit_number: Optional[str] = None

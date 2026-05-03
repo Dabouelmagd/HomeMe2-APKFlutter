@@ -127,35 +127,60 @@ async def get_all_users(current_user: dict = Depends(require_admin)):
         raise HTTPException(status_code=500, detail="Failed to get users")
 
 @router.post("/admin/users")
-async def create_user(user_data: UserCreate, current_user: dict = Depends(require_admin)):
-    """Create a new user (Admin only)"""
+async def create_user(request: Request, user_data: UserCreate, current_user: dict = Depends(require_admin)):
+    """Create a new user (Admin only). Resolves target compound from:
+    1. Explicit user_data.compound_id (validated)
+    2. X-Active-Compound-Id header (for company_admin)
+    3. current_user.compound_id (fallback for single-compound admin)
+    """
+    import bcrypt as _bcrypt
     try:
         db = get_db()
         # Check if username or email already exists
         existing_user = await db.users.find_one({
             "$or": [{"username": user_data.username}, {"email": user_data.email}]
         })
-        
+
         if existing_user:
-            if existing_user["username"] == user_data.username:
+            if existing_user.get("username") == user_data.username:
                 raise HTTPException(status_code=400, detail="Username already exists")
             else:
                 raise HTTPException(status_code=400, detail="Email already exists")
-        
-        # Ensure user is created in the same compound as the admin
-        user_data.compound_id = current_user.compound_id
-        
+
+        # Resolve target compound
+        active_compound = (
+            request.headers.get("X-Active-Compound-Id")
+            or request.headers.get("x-active-compound-id")
+        )
+        target_compound = (
+            getattr(user_data, "compound_id", None)
+            or active_compound
+            or current_user.get("compound_id")
+        )
+        if not target_compound or target_compound == "default-compound":
+            raise HTTPException(status_code=400, detail="يرجى اختيار كمبوند أولاً (X-Active-Compound-Id)")
+
+        # Tenant guard for company_admin
+        role = current_user.get("role")
+        if role in ("company_admin", "assistant_manager", "accountant"):
+            cmpd = await db.compounds.find_one({"id": target_compound}, {"_id": 0, "company_id": 1, "management_company_id": 1})
+            cu_company = current_user.get("company_id")
+            if not cmpd or cu_company not in (cmpd.get("company_id"), cmpd.get("management_company_id")):
+                raise HTTPException(status_code=403, detail="غير مصرح بإنشاء مستخدم خارج شركتك")
+        elif role == "admin":
+            if current_user.get("compound_id") != target_compound:
+                raise HTTPException(status_code=403, detail="غير مصرح بإنشاء مستخدم خارج كمبوندك")
+
         # Hash password
-        password_hash = bcrypt.hashpw(user_data.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        
-        # Create user document
+        password_hash = _bcrypt.hashpw(user_data.password.encode('utf-8'), _bcrypt.gensalt()).decode('utf-8')
+
         user_doc = {
             "id": str(uuid.uuid4()),
             "username": user_data.username,
             "email": user_data.email,
             "password_hash": password_hash,
             "role": user_data.role,
-            "compound_id": current_user.compound_id,  # Enforce compound isolation
+            "compound_id": target_compound,
             "family_id": None,
             "full_name": user_data.full_name,
             "phone": user_data.phone,
@@ -165,14 +190,14 @@ async def create_user(user_data: UserCreate, current_user: dict = Depends(requir
             "created_at": datetime.now(timezone.utc),
             "profile_picture_url": None
         }
-        
+
         result = await db.users.insert_one(user_doc)
-        
+
         if result.inserted_id:
-            return {"message": "User created successfully", "user_id": user_doc["id"]}
+            return {"message": "تم إنشاء الساكن بنجاح", "user_id": user_doc["id"]}
         else:
             raise HTTPException(status_code=500, detail="Failed to create user")
-            
+
     except HTTPException:
         raise
     except Exception as e:

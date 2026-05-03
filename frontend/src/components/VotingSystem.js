@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import OwnerPageHeader from './shared/OwnerPageHeader';
 import { useAuth } from '../App';
+import { usePermissions } from '../hooks/usePermissions';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
@@ -38,9 +39,8 @@ const API = `${BACKEND_URL}/api`;
 
 const VotingSystem = () => {
   const { user } = useAuth();
+  const { isAdmin: isAdminRole } = usePermissions();
   const { t } = useTranslation();
-  const activeRole = user?.active_role || user?.role;
-  const isAdminRole = ['admin', 'manager', 'company_admin', 'super_admin', 'app_owner'].includes(activeRole);
   const [activeTab, setActiveTab] = useTabState('active');
   const [polls, setPolls] = useState([]);
   const [loading, setLoading] = useState(true);

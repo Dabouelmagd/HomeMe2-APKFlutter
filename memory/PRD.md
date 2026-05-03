@@ -4,6 +4,30 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 87: usePermissions Hook — Unified RBAC (Feb 5, 2026) ✅
+
+**🎯 الهدف:** منع تكرار bug `user?.role === 'admin'` المستقبلي بإنشاء مصدر واحد موحّد لفحوص الصلاحيات.
+
+**Frontend (`hooks/usePermissions.js` - ملف جديد):**
+- يُصدر: `{ user, activeRole, isAdmin, isStaff, isCompoundAdmin, isCompanyAdmin, isSuperAdmin, isAppOwner, isManager, isAccountant, isResident, isSecurity, isAdvertiser }`.
+- `isAdmin` = any of `admin/company_admin/super_admin/app_owner` (الاستعمال الأكثر شيوعاً).
+- `isStaff` = يشمل managers/accountants/assistant_managers بالإضافة لـ isAdmin.
+- يعتمد `active_role || role` (يدعم role switching).
+- `useMemo` لتفادي re-renders غير ضرورية.
+
+**تطبيق أولي (مرجع للمطورين):**
+- `VotingSystem.js`: استبدل الكود الـ inline بـ `const { isAdmin: isAdminRole } = usePermissions();`.
+- `EventsAnnouncements.js`: استبدل 3 تكرارات `['admin','company_admin',...].includes(user?.role)` بـ `isAdmin`.
+
+**🧪 Manual E2E:**
+- ✅ `/app/events`: زرا إعلان+حدث يظهران لـ company_admin (screenshot).
+- ✅ `/app/voting`: زر "إنشاء استطلاع" يظهر.
+- ✅ Lint: كل الملفات نظيفة.
+
+**Tech debt متبقي:** الـ 12 ملف الباقي (FinancialManagement, ComplaintsSystem, MaintenanceSystem, …) يستخدم الـ inline array — يمكن ترحيلها تدريجياً كلما تم لمس كل ملف.
+
+
+
 ### Iter 86: Message Sending + Global RBAC Fix (38 occurrences) — Feb 5, 2026 ✅
 
 **🐛 المشاكل:** User شكي من 5 صفحات "لا تعمل":

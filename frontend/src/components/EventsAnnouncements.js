@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import OwnerPageHeader from './shared/OwnerPageHeader';
 import { useAuth } from '../App';
+import { usePermissions } from '../hooks/usePermissions';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
@@ -37,6 +38,7 @@ const API = `${BACKEND_URL}/api`;
 
 const EventsAnnouncements = () => {
   const { user } = useAuth();
+  const { isAdmin } = usePermissions();
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useTabState('all');
   const [events, setEvents] = useState([]);
@@ -260,7 +262,7 @@ const EventsAnnouncements = () => {
         badge={t('events_badge', 'الأحداث والإعلانات')}
         title={t('events_announcements')}
         subtitle={t('events_announcements_description')}
-        actions={['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+        actions={isAdmin && (
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => { setCreateType('announcement'); setShowCreateModal(true); }}
@@ -530,7 +532,7 @@ const EventsAnnouncements = () => {
                         )}
                       </div>
                       
-                      {isEvent && !['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+                      {isEvent && !isAdmin && (
                         <div className="flex space-x-2 mt-4">
                           <button
                             onClick={() => handleRSVP(item.id, 'attending')}
@@ -602,7 +604,7 @@ const EventsAnnouncements = () => {
                         {t('view_details')}
                       </button>
                       
-                      {['admin','company_admin','super_admin','app_owner'].includes(user?.role) && (
+                      {isAdmin && (
                         <div className="flex space-x-1">
                           <button className="p-1 text-gray-600 hover:text-blue-600 transition-colors">
                             <PencilIcon className="w-4 h-4" />

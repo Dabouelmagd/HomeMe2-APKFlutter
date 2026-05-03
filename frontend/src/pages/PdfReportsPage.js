@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { usePermissions } from '../hooks/usePermissions';
 import {
   FileText,
   Building2,
@@ -63,6 +64,8 @@ export default function PdfReportsPage() {
   const today = new Date();
   const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
 
+  const { isAdmin, activeRole, isAppOwner, isSuperAdmin, isCompanyAdmin } = usePermissions();
+
   const [user, setUser] = useState(null);
   const [compounds, setCompounds] = useState([]);
   const [residents, setResidents] = useState([]);
@@ -77,32 +80,46 @@ export default function PdfReportsPage() {
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem('user') || 'null');
     setUser(u);
-    if (u?.compound_id) setCompoundId(u.compound_id);
+    // company_admin جرّب الكمبوند النشط من localStorage أولاً
+    const activeCid = localStorage.getItem('selectedCompoundId') || '';
+    if (activeCid) {
+      setCompoundId(activeCid);
+    } else if (u?.compound_id && u.compound_id !== 'default-compound') {
+      setCompoundId(u.compound_id);
+    }
     if (u?.id && u?.role === 'resident') setResidentId(u.id);
   }, []);
 
   useEffect(() => {
     if (!user) return;
-    const role = user.role;
-    if (role === 'app_owner' || role === 'super_admin') {
+    // App Owner / Super Admin: كل المجمعات
+    if (isAppOwner || isSuperAdmin) {
       axios.get(`${API}/compounds`).then((r) => {
         const list = Array.isArray(r.data) ? r.data : (r.data?.compounds || []);
         setCompounds(list);
         if (!compoundId && list[0]?.id) setCompoundId(list[0].id);
       }).catch(() => {});
+      return;
     }
-  }, [user, compoundId]);
+    // Company Admin: مجمعات الشركة فقط
+    if (isCompanyAdmin) {
+      axios.get(`${API}/company-admin/compounds`).then((r) => {
+        const list = r.data?.compounds || [];
+        setCompounds(list);
+        if (!compoundId && list[0]?.id) setCompoundId(list[0].id);
+      }).catch(() => {});
+    }
+  }, [user, isAppOwner, isSuperAdmin, isCompanyAdmin, compoundId]);
 
   useEffect(() => {
     if (!compoundId) return;
-    const role = user?.role;
-    if (['app_owner', 'super_admin', 'admin', 'compound_admin'].includes(role)) {
+    if (isAdmin) {
       axios.get(`${API}/users?compound_id=${compoundId}&role=resident`).then((r) => {
         const list = r.data?.users || r.data || [];
         setResidents(Array.isArray(list) ? list : []);
       }).catch(() => setResidents([]));
     }
-  }, [compoundId, user]);
+  }, [compoundId, isAdmin]);
 
   const downloadReport = async (report) => {
     if (report.needs === 'unit' && !residentId) {
@@ -136,7 +153,6 @@ export default function PdfReportsPage() {
   };
 
   const role = user?.role;
-  const isAdmin = ['app_owner', 'super_admin', 'admin', 'compound_admin'].includes(role);
 
   const triggerMonthlyNow = async () => {
     if (!window.confirm(`سيتم توليد وإرسال تقارير شهر ${month} بالبريد الإلكتروني لجميع السكان ومدراء المجمعات. هل تريد المتابعة؟`)) return;
@@ -196,7 +212,7 @@ export default function PdfReportsPage() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Building2 className="inline w-4 h-4 ms-1" /> المجمع
                 </label>
-                {role === 'app_owner' || role === 'super_admin' ? (
+                {(isAppOwner || isSuperAdmin || isCompanyAdmin) ? (
                   <select
                     value={compoundId}
                     onChange={(e) => setCompoundId(e.target.value)}

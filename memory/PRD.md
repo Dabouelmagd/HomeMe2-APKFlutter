@@ -4,6 +4,30 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 88: PDF Reports Page Fix — Feb 5, 2026 ✅
+
+**🐛 المشكلة:** User شكي أن صفحة `/app/reports` "لا تعمل" لشركة الإدارة — كان يظهر تقرير واحد فقط "كشف حساب الوحدة" ويطلب "اختر الساكن أولاً".
+
+**🔍 السبب الجذري (4 bugs في `PdfReportsPage.js`):**
+1. `isAdmin` كان يستخدم `['app_owner','super_admin','admin','compound_admin']` — `compound_admin` بالـ underscore **غير موجود** في النظام، والقيمة الصحيحة `company_admin`. شركة الإدارة لا تُعتبر admin → ترى تقريراً واحداً فقط.
+2. `useEffect` لجلب المجمعات: `role === 'app_owner' || role === 'super_admin'` فقط → company_admin لا يجلب قائمة مجمعاته.
+3. `useEffect` لجلب السكان: نفس القائمة المعطلة.
+4. Compound dropdown: فقط يظهر لـ owner/super_admin → company_admin لا يمكنه تغيير المجمع.
+
+**🛠️ الإصلاح:**
+- استخدام `usePermissions()` hook: `{ isAdmin, isAppOwner, isSuperAdmin, isCompanyAdmin }`.
+- جلب المجمعات من `/api/company-admin/compounds` لـ `isCompanyAdmin`.
+- إظهار compound dropdown لـ `isAppOwner || isSuperAdmin || isCompanyAdmin`.
+- Pre-fill `compoundId` من `localStorage.selectedCompoundId` أولاً، ثم `user.compound_id` (مع تجاهل "default-compound").
+- حذف `isAdmin` الـ inline القديم (المُعطل).
+
+**🧪 Manual E2E:**
+- ✅ `/app/reports`: 4 بطاقات تظهر (statement, occupancy, invoices, summary).
+- ✅ Compound dropdown يعرض 3 مجمعات (مدينتي، الرحاب، رويال سيتي).
+- ✅ بطاقة الجدولة الشهرية `monthly-scheduler-card` ظاهرة.
+
+
+
 ### Iter 87: usePermissions Hook — Unified RBAC (Feb 5, 2026) ✅
 
 **🎯 الهدف:** منع تكرار bug `user?.role === 'admin'` المستقبلي بإنشاء مصدر واحد موحّد لفحوص الصلاحيات.

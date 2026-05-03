@@ -20,6 +20,13 @@ const PaymentPage = () => {
     return (r === 'company_admin' || r === 'app_owner' || r === 'super_admin') ? 'company' : 'residential';
   });
 
+  // Billing cycle — 'monthly' or 'yearly'. Yearly = 10× monthly price (i.e.
+  // 2 months free) and maps to backend duration "1_year".
+  const [billingCycle, setBillingCycle] = useState('monthly');
+  const YEARLY_MULTIPLIER = 10;
+  const cycleSuffix = billingCycle === 'yearly' ? 'سنوياً' : 'شهرياً';
+  const cycleMultiplier = billingCycle === 'yearly' ? YEARLY_MULTIPLIER : 1;
+
   useEffect(() => {
     loadPaymentPackages();
     loadUserTransactions();
@@ -198,7 +205,7 @@ const PaymentPage = () => {
 
       const requestBody = {
         plan: selectedPackage,
-        duration: '1_month',
+        duration: billingCycle === 'yearly' ? '1_year' : '1_month',
         currency: 'egp',
       };
 
@@ -320,6 +327,35 @@ const PaymentPage = () => {
                 </button>
               </div>
 
+              {/* Billing cycle toggle — monthly / yearly (yearly = 2 months free) */}
+              <div className="flex items-center justify-center" data-testid="billing-cycle-toggle">
+                <div className="inline-flex bg-gray-100 rounded-full p-1 gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setBillingCycle('monthly')}
+                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition ${
+                      billingCycle === 'monthly' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'
+                    }`}
+                    data-testid="billing-monthly"
+                  >
+                    شهرياً
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBillingCycle('yearly')}
+                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 ${
+                      billingCycle === 'yearly' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-800'
+                    }`}
+                    data-testid="billing-yearly"
+                  >
+                    <span>سنوياً</span>
+                    <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500 text-white whitespace-nowrap">
+                      🎁 وفّري شهرين
+                    </span>
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
                   {t('select_payment_type', 'اختر الخطة المناسبة')}
@@ -365,10 +401,15 @@ const PaymentPage = () => {
                           )}
                           <div className="flex items-baseline gap-1">
                             <span className={`text-2xl font-extrabold ${accentText}`}>
-                              {Number(pkg.amount).toLocaleString('ar-EG')}
+                              {Number(pkg.amount * cycleMultiplier).toLocaleString('ar-EG')}
                             </span>
-                            <span className="text-xs text-gray-500">ج.م / شهرياً</span>
+                            <span className="text-xs text-gray-500">ج.م / {cycleSuffix}</span>
                           </div>
+                          {billingCycle === 'yearly' && pkg.amount > 0 && (
+                            <div className="text-[10px] text-emerald-700 font-bold -mt-1">
+                              ≈ {Number(pkg.amount).toLocaleString('ar-EG')} ج.م/شهر · وفّرتِ {Number(pkg.amount * 2).toLocaleString('ar-EG')} ج.م
+                            </div>
+                          )}
                           {(pkg.features || []).length > 0 && (
                             <ul className="space-y-1 mt-1 text-[11px] text-gray-700" data-testid={`plan-features-${key}`}>
                               {pkg.features.map((f, i) => (

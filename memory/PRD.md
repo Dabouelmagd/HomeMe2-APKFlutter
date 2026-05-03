@@ -1301,6 +1301,15 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - Auto-renewal: `enabled:false` (safe default)
 - Test users: see `/app/memory/test_credentials.md`
 
+### Iter 88: Yearly billing toggle ✅ (2026-05-02)
+- **Frontend `PaymentPage.js`**:
+  - New `billingCycle` state ('monthly' | 'yearly') with a centered pill toggle between scope tabs and plan cards.
+  - Yearly button shows a green **"🎁 وفّري شهرين"** badge.
+  - Yearly price = `monthly × 10` (2 months free, matching backend `multiplier: 10` in `1_year` duration).
+  - Card price now reads **"X ج.م / سنوياً"** with a subtle emerald sub-line: **"≈ Y ج.م/شهر · وفّرتِ Z ج.م"** when yearly is active.
+  - Checkout payload sends `duration: '1_year'` when yearly is selected, otherwise `'1_month'`.
+- **Verified ✅ via Playwright**: monthly default → company_business shows ٧٬٥٠٠/شهرياً → toggle yearly → ٧٥٬٠٠٠/سنوياً + savings note + خصم ١٥٬٠٠٠ ج.م → toggle back → reverts cleanly.
+
 ### Iter 87: Plan Comparison Cards — visual upgrade ✅ (2026-05-02)
 - **Backend `routes/payments.py`**: enriched `/api/payments/plans` with per-plan `features` arrays (5–7 user-facing benefits each, AR) + `popular: true` flag on `pro` (residential) and `company_business` (companies).
 - **Frontend `PaymentPage.js`**: replaced the dropdown with a 3-column responsive grid of comparison cards:

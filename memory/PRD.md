@@ -3,6 +3,28 @@
 ## Product
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
+
+### Iter 83: Voting/Polls — Create Button + Payload Fix (Feb 5, 2026) ✅
+
+**🐛 المشكلة:** المستخدم (`testcompany2`/`company_admin`) يفتح صفحة التصويت ولا يجد زر "إنشاء استطلاع".
+
+**🔍 السبب الجذري:**
+1. `VotingSystem.js` كان يفحص `user?.role === 'admin'` فقط، فيخفي الزر عن `company_admin` و`super_admin` و`app_owner`.
+2. الـ payload الذي يُرسل لـ `/api/polls` لم يكن متطابقًا مع `PollCreate` schema:
+   - frontend يرسل `type`, `voting_end_date`, `is_anonymous`, `min_participation`, `options: ['str']`.
+   - backend يتوقع `vote_type`, `start_date`+`end_date`, `allow_anonymous_voting`, `min_participation_rate (0–1)`, `options: [{text}]`.
+3. الـ backend route كان مقيّد بـ `current_user.role != "admin"` فيرفض شركات الإدارة.
+
+**🛠️ الإصلاح:**
+- Frontend (`VotingSystem.js`): أضفت `isAdminRole` يشمل `admin`, `manager`, `company_admin`, `super_admin`, `app_owner`. زر CTA إضافي داخل الـ empty-state. `handleCreatePoll` الآن يُحول الـ payload لتتوافق مع `PollCreate`. كل مراجع `poll.type` → `poll.vote_type`، و`votes_count`/`eligible_voters_count` → fallbacks (`total_votes`, `total_eligible_voters`).
+- Backend (`routes/polls.py`): `current_user.role not in ["admin", "manager", "company_admin", "super_admin", "app_owner"]`.
+
+**🧪 Manual E2E:**
+- ✅ Login `testcompany2` → `/app/voting` → الزر يظهر (`data-testid="create-poll-btn"`).
+- ✅ `POST /api/polls` بـ payload الجديد يُرجع `{poll_id}` (HTTP 200).
+- ✅ تبويب "مسودات استطلاعات" يعرض التصويت الجديد مع زر "نشر".
+
+
 ## Latest Fixes (Feb 2026 — iterations 26-65)
 
 ### Iter 82: Monthly Revenue vs Expenses Bar Chart (May 3, 2026) ✅

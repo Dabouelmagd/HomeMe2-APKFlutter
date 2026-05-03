@@ -39,6 +39,8 @@ const API = `${BACKEND_URL}/api`;
 const VotingSystem = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const activeRole = user?.active_role || user?.role;
+  const isAdminRole = ['admin', 'manager', 'company_admin', 'super_admin', 'app_owner'].includes(activeRole);
   const [activeTab, setActiveTab] = useTabState('active');
   const [polls, setPolls] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,19 +118,50 @@ const VotingSystem = () => {
   const handleCreatePoll = async (e) => {
     e.preventDefault();
     try {
-      const formData = {
-        ...pollForm,
-        options: pollForm.options.filter(option => option.trim() !== '')
+      // Build options matching backend PollOption schema (List[Dict] with text)
+      const cleanedOptions = pollForm.options
+        .map(o => (o || '').trim())
+        .filter(o => o !== '');
+
+      const optionsPayload = pollForm.type === 'yes_no'
+        ? [{ text: t('yes', 'نعم') }, { text: t('no', 'لا') }]
+        : cleanedOptions.map(text => ({ text }));
+
+      // Map frontend "type" to backend "vote_type"
+      const vote_type = pollForm.type;
+
+      // Backend expects start_date and end_date
+      const now = new Date();
+      const start_date = now.toISOString();
+      const end_date = pollForm.voting_end_date
+        ? new Date(pollForm.voting_end_date).toISOString()
+        : new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+      const payload = {
+        title: pollForm.title,
+        description: pollForm.description,
+        vote_type,
+        options: optionsPayload,
+        require_family_head_only: pollForm.eligible_voters === 'family_heads',
+        allow_anonymous_voting: !!pollForm.is_anonymous,
+        require_comment: !!pollForm.require_justification,
+        start_date,
+        end_date,
+        eligible_families: [],
+        min_participation_rate: pollForm.min_participation
+          ? Number(pollForm.min_participation) / 100
+          : null,
       };
 
-      const response = await axios.post(`${API}/polls`, formData);
+      await axios.post(`${API}/polls`, payload);
 
-      toast.success('Poll created successfully!');
+      toast.success(t('poll_created_successfully', 'تم إنشاء التصويت بنجاح'));
       setShowCreateModal(false);
       resetPollForm();
       fetchVotingData();
     } catch (error) {
-      toast.error('Failed to create poll');
+      const msg = error?.response?.data?.detail || t('failed_to_create_poll', 'فشل إنشاء التصويت');
+      toast.error(typeof msg === 'string' ? msg : t('failed_to_create_poll', 'فشل إنشاء التصويت'));
       console.error('Create poll error:', error);
     }
   };
@@ -231,28 +264,38 @@ const VotingSystem = () => {
     );
   };
 
+  const getEndDate = (poll) => poll.end_date || poll.voting_end_date;
+
+  const getVotesCount = (poll) => poll.total_votes ?? poll.votes_count ?? 0;
+  const getEligibleCount = (poll) =>
+    poll.total_eligible_voters ?? poll.eligible_voters_count ?? 0;
+
   const getParticipationRate = (poll) => {
-    if (!poll.eligible_voters_count || poll.eligible_voters_count === 0) return 0;
-    return Math.round((poll.votes_count / poll.eligible_voters_count) * 100);
+    const eligible = getEligibleCount(poll);
+    if (!eligible) return 0;
+    return Math.round((getVotesCount(poll) / eligible) * 100);
   };
 
   const hasUserVoted = (poll) => {
+    if (poll.user_has_voted) return true;
     return poll.user_votes && poll.user_votes.some(vote => vote.user_id === user?.id);
   };
 
+  const isPollClosed = (poll) =>
+    ['ended', 'closed', 'cancelled'].includes(poll.status);
+
   const canUserVote = (poll) => {
-    return poll.status === 'active' && !hasUserVoted(poll) && new Date(poll.voting_end_date) > new Date();
+    return poll.status === 'active' && !hasUserVoted(poll) && new Date(getEndDate(poll)) > new Date();
   };
 
   const filteredPolls = polls.filter(poll => {
     if (activeTab === 'active' && poll.status !== 'active') return false;
-    if (activeTab === 'ended' && poll.status !== 'ended') return false;
+    if (activeTab === 'ended' && !isPollClosed(poll)) return false;
     if (activeTab === 'draft' && poll.status !== 'draft') return false;
-    
-    if (filters.category !== 'all' && poll.category !== filters.category) return false;
+
     if (filters.status !== 'all' && poll.status !== filters.status) return false;
-    if (filters.search && !poll.title.toLowerCase().includes(filters.search.toLowerCase())) return false;
-    
+    if (filters.search && !poll.title?.toLowerCase().includes(filters.search.toLowerCase())) return false;
+
     return true;
   });
 
@@ -271,14 +314,14 @@ const VotingSystem = () => {
         badge={t('polls_badge', 'التصويت والاستطلاعات')}
         title={t('voting_system')}
         subtitle={t('voting_system_description')}
-        actions={user?.role === 'admin' && (
+        actions={isAdminRole && (
           <button
             onClick={() => setShowCreateModal(true)}
             className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
             data-testid="create-poll-btn"
           >
             <PlusIcon className="w-5 h-5 mr-2" />
-            {t('create_poll')}
+            {t('create_poll', 'إنشاء تصويت جديد')}
           </button>
         )}
       />
@@ -415,7 +458,7 @@ const VotingSystem = () => {
           >
             {t('completed_polls')}
           </button>
-          {user?.role === 'admin' && (
+          {isAdminRole && (
             <button
               onClick={() => setActiveTab('draft')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
@@ -437,6 +480,16 @@ const VotingSystem = () => {
             <HandRaisedIcon className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900 text-center">{t('no_polls_found')}</h3>
             <p className="mt-1 text-sm text-gray-500">{t('no_polls_found_description')}</p>
+            {isAdminRole && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="mt-4 inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+                data-testid="create-poll-empty-btn"
+              >
+                <PlusIcon className="w-5 h-5 mr-2" />
+                {t('create_poll', 'إنشاء تصويت جديد')}
+              </button>
+            )}
           </div>
         ) : (
           filteredPolls.map((poll) => (
@@ -446,7 +499,6 @@ const VotingSystem = () => {
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
                       <h3 className="text-xl font-semibold text-center text-center text-gray-900 text-center">{poll.title}</h3>
-                      {getCategoryBadge(poll.category)}
                       {getStatusBadge(poll.status)}
                     </div>
                     
@@ -455,11 +507,11 @@ const VotingSystem = () => {
                     <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
                       <span className="flex items-center">
                         <CalendarDaysIcon className="w-4 h-4 mr-1" />
-                        {t('ends')}: {formatDate(poll.voting_end_date)}
+                        {t('ends')}: {formatDate(getEndDate(poll))}
                       </span>
                       <span className="flex items-center">
                         <UsersIcon className="w-4 h-4 mr-1" />
-                        {poll.votes_count || 0} {t('votes')}
+                        {getVotesCount(poll)} {t('votes')}
                       </span>
                       <span className="flex items-center">
                         <ChartBarIcon className="w-4 h-4 mr-1" />
@@ -474,17 +526,23 @@ const VotingSystem = () => {
                     </div>
 
                     {/* Quick Vote for Simple Polls */}
-                    {canUserVote(poll) && poll.type === 'yes_no' && (
+                    {canUserVote(poll) && poll.vote_type === 'yes_no' && (
                       <div className="flex space-x-3 mb-4">
                         <button
-                          onClick={() => handleVote(poll.id, ['yes'])}
+                          onClick={() => {
+                            const yesOpt = poll.options?.find(o => o.text === t('yes', 'نعم') || o.text?.toLowerCase() === 'yes');
+                            handleVote(poll.id, [yesOpt?.id || (poll.options?.[0]?.id)]);
+                          }}
                           className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                         >
                           <CheckCircleIcon className="w-4 h-4 mr-2" />
                           {t('yes')}
                         </button>
                         <button
-                          onClick={() => handleVote(poll.id, ['no'])}
+                          onClick={() => {
+                            const noOpt = poll.options?.find(o => o.text === t('no', 'لا') || o.text?.toLowerCase() === 'no');
+                            handleVote(poll.id, [noOpt?.id || (poll.options?.[1]?.id)]);
+                          }}
                           className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                         >
                           <XCircleIcon className="w-4 h-4 mr-2" />
@@ -496,17 +554,17 @@ const VotingSystem = () => {
                 </div>
 
                 {/* Progress Bar */}
-                {poll.min_participation > 0 && (
+                {poll.min_participation_rate > 0 && (
                   <div className="mb-4">
                     <div className="flex justify-between text-sm text-gray-600 mb-1">
-                      <span>{t('minimum_participation')}: {poll.min_participation}%</span>
+                      <span>{t('minimum_participation')}: {Math.round((poll.min_participation_rate || 0) * 100)}%</span>
                       <span>{getParticipationRate(poll)}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
+                      <div
                         className={`h-2 rounded-full ${
-                          getParticipationRate(poll) >= poll.min_participation 
-                            ? 'bg-green-500' 
+                          getParticipationRate(poll) >= (poll.min_participation_rate || 0) * 100
+                            ? 'bg-green-500'
                             : 'bg-orange-500'
                         }`}
                         style={{ width: `${Math.min(getParticipationRate(poll), 100)}%` }}
@@ -529,7 +587,7 @@ const VotingSystem = () => {
                       <span>{t('view_details')}</span>
                     </button>
                     
-                    {canUserVote(poll) && poll.type !== 'yes_no' && (
+                    {canUserVote(poll) && poll.vote_type !== 'yes_no' && (
                       <button
                         onClick={() => {
                           setSelectedPoll(poll);
@@ -543,7 +601,7 @@ const VotingSystem = () => {
                     )}
                   </div>
 
-                  {user?.role === 'admin' && (
+                  {isAdminRole && (
                     <div className="flex items-center space-x-2">
                       {poll.status === 'draft' && (
                         <button
@@ -783,7 +841,6 @@ const VotingSystem = () => {
               <div className="space-y-6">
                 <div>
                   <div className="flex items-center space-x-3 mb-3">
-                    {getCategoryBadge(selectedPoll.category)}
                     {getStatusBadge(selectedPoll.status)}
                   </div>
                   <p className="text-gray-700">{selectedPoll.description}</p>
@@ -791,7 +848,7 @@ const VotingSystem = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-2xl font-bold text-gray-900 text-center">{selectedPoll.votes_count || 0}</p>
+                    <p className="text-2xl font-bold text-gray-900 text-center">{getVotesCount(selectedPoll)}</p>
                     <p className="text-sm text-gray-600">{t('total_votes')}</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
@@ -799,7 +856,7 @@ const VotingSystem = () => {
                     <p className="text-sm text-gray-600">{t('participation_rate')}</p>
                   </div>
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-2xl font-bold text-blue-600">{selectedPoll.eligible_voters_count || 0}</p>
+                    <p className="text-2xl font-bold text-blue-600">{getEligibleCount(selectedPoll)}</p>
                     <p className="text-sm text-gray-600">{t('eligible_voters')}</p>
                   </div>
                 </div>
@@ -807,26 +864,28 @@ const VotingSystem = () => {
                 {/* Voting Options and Results */}
                 <div>
                   <h3 className="text-lg font-medium text-center text-center text-gray-900 mb-4">
-                    {selectedPoll.status === 'ended' ? t('results') : t('voting_options')}
+                    {isPollClosed(selectedPoll) ? t('results') : t('voting_options')}
                   </h3>
                   <div className="space-y-3">
                     {selectedPoll.options?.map((option, index) => {
-                      const voteCount = selectedPoll.results?.[option] || 0;
-                      const percentage = selectedPoll.votes_count > 0 
-                        ? Math.round((voteCount / selectedPoll.votes_count) * 100) 
+                      const optionId = option.id || option.text;
+                      const voteCount = option.vote_count ?? selectedPoll.results?.[optionId] ?? 0;
+                      const total = getVotesCount(selectedPoll);
+                      const percentage = total > 0
+                        ? Math.round((voteCount / total) * 100)
                         : 0;
-                      
+
                       return (
-                        <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div key={optionId || index} className="border border-gray-200 rounded-lg p-4">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-gray-900">{option}</span>
+                            <span className="font-medium text-gray-900">{option.text || option}</span>
                             <span className="text-sm text-gray-600">
                               {voteCount} {t('votes')} ({percentage}%)
                             </span>
                           </div>
-                          {selectedPoll.status === 'ended' && (
+                          {isPollClosed(selectedPoll) && (
                             <div className="w-full bg-gray-200 rounded-full h-2">
-                              <div 
+                              <div
                                 className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                                 style={{ width: `${percentage}%` }}
                               />

@@ -69,7 +69,7 @@ async def create_poll(
     """Create a new poll (admin only)"""
     try:
         db = get_db()
-        if current_user.role != "admin":
+        if current_user.role not in ["admin", "manager", "company_admin", "super_admin", "app_owner"]:
             raise HTTPException(status_code=403, detail="Admin access required")
         
         # Convert options to PollOption objects

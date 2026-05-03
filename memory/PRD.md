@@ -4,6 +4,29 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 93: GET /api/messages Fix for company_admin — Feb 5, 2026 ✅
+
+**🐛 المشكلة:** Toast "Failed to load messages" يظهر في `/app/messages` لـ company_admin مع HTTP 500 من backend.
+
+**🔍 السبب الجذري (2 bugs):**
+1. **MongoDB serialization:** `db.messages.find({...})` بدون `{"_id": 0}` projection → `ObjectId` not JSON serializable → 500.
+2. **RBAC ضيق:** الـ branching كان `if role == "admin": ... else: filter by sender_id` — company_admin لا يطابق `admin` ولا يكون `sender_id` فأصبح لا يرى أي شيء.
+
+**🛠️ الإصلاح في `routes/families_msgs.py /messages`:**
+- إضافة `{"_id": 0}` للـ projection.
+- توسيع الـ branching:
+  - `admin` → compound من user.compound_id.
+  - `company_admin` → جمع كل مجمعات الشركة (DB linkage + legacy compound_ids); لو `active_compound_id` ضمنها → فلتر عليه؛ غير ذلك → all owned.
+  - `super_admin / app_owner` → كل الرسائل (filter فارغ).
+  - `resident / غيرها` → `sender_id` فقط.
+
+**🧪 Manual E2E:**
+- ✅ `curl GET /api/messages` HTTP 200 → 3 رسائل تُرجع لـ company_admin (988 bytes JSON).
+- ✅ Screenshot: صفحة الرسائل تعرض "اختبار UI" مع badges (open) + ID + تاريخ. لا "Failed to load" toast.
+- ✅ Sidebar badges تعمل بالتوازي (1 على التقييمات + 1 على الإدارة المالية).
+
+
+
 ### Iter 92: Dynamic Sidebar Badges + 11-File usePermissions Migration — Feb 5, 2026 ✅
 
 **🎯 الميزة 1 - Sidebar Badges ديناميكية:**

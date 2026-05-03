@@ -231,11 +231,34 @@ async def create_message(
 @router.get("/messages")
 async def get_messages(current_user: dict = Depends(get_current_user)):
     db = get_db()
-    if current_user.get('role','') == "admin":
-        messages = await db.messages.find({"compound_id": current_user.get('compound_id','')}).sort("created_at", -1).limit(200).to_list(200)
+    role = current_user.get('role', '')
+    user_id = current_user.get('id') or current_user.get('user_id')
+
+    # Admins see messages within their scope; residents see only their sent items.
+    if role == "admin":
+        flt = {"compound_id": current_user.get('compound_id', '')}
+    elif role == "company_admin":
+        # Aggregate messages across all compounds owned by this management company
+        company_id = current_user.get('company_id')
+        if not company_id:
+            return []
+        cpds = await db.compounds.find({"company_id": company_id}, {"_id": 0, "id": 1}).to_list(length=500)
+        company = await db.companies.find_one({"id": company_id}, {"_id": 0, "compound_ids": 1}) or {}
+        legacy = [x for x in (company.get("compound_ids") or []) if x not in {c["id"] for c in cpds}]
+        if legacy:
+            extras = await db.compounds.find({"id": {"$in": legacy}}, {"_id": 0, "id": 1}).to_list(length=500)
+            cpds.extend(extras)
+        ids = [c["id"] for c in cpds]
+        active = current_user.get('compound_id')
+        flt = {"compound_id": active} if (active and active in ids) else (
+            {"compound_id": {"$in": ids}} if ids else {"compound_id": "__none__"}
+        )
+    elif role in ("super_admin", "app_owner"):
+        flt = {}
     else:
-        messages = await db.messages.find({"sender_id": current_user['id']}).sort("created_at", -1).limit(200).to_list(200)
-    
+        flt = {"sender_id": user_id}
+
+    messages = await db.messages.find(flt, {"_id": 0}).sort("created_at", -1).limit(200).to_list(200)
     return messages
 
 # Notification Routes

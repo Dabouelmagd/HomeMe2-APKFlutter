@@ -17,14 +17,22 @@ router = APIRouter(prefix="/api")
 @router.get("/analytics/dashboard")
 async def get_analytics_dashboard(
     date_range: str = "last_30_days",
+    compound_id: Optional[str] = None,
+    time_range: Optional[str] = None,
     current_user: dict = Depends(require_admin)
 ):
     """Live analytics aggregated from MongoDB.
-    Scope: if user has compound_id, restrict to that compound; app_owner/super_admin see all."""
+    Scope: explicit `compound_id` query param wins; otherwise auto-aggregate
+    across the user's company (company_admin) or globally (app_owner/super_admin).
+    `time_range` is accepted as alias for `date_range` for compatibility."""
     try:
         db = get_db()
         now = datetime.now(timezone.utc)
         # date_range -> days
+        if time_range and not date_range:
+            date_range = time_range
+        elif time_range:
+            date_range = time_range
         days_map = {"last_7_days": 7, "last_30_days": 30, "last_90_days": 90, "last_year": 365}
         days = days_map.get(date_range, 30)
         start = now - timedelta(days=days)
@@ -35,8 +43,22 @@ async def get_analytics_dashboard(
         prev_end_iso = prev_end.isoformat()
 
         role = current_user.get("role", "")
-        compound_id = current_user.get("compound_id") if role not in ("app_owner", "super_admin") else None
-        scope = {"compound_id": compound_id} if compound_id else {}
+        cu_compound = current_user.get("compound_id")
+        # Resolve scope identical strategy to balance-sheet
+        if compound_id:
+            scope = {"compound_id": compound_id}
+        elif role in ("app_owner", "super_admin"):
+            scope = {}
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+            company_id = current_user["company_id"]
+            owned = await db.compounds.find(
+                {"$or": [{"company_id": company_id}, {"management_company_id": company_id}]},
+                {"_id": 0, "id": 1}
+            ).to_list(500)
+            cids = [c["id"] for c in owned if c.get("id")]
+            scope = {"compound_id": {"$in": cids}} if cids else {"compound_id": "__never__"}
+        else:
+            scope = {"compound_id": cu_compound} if cu_compound else {}
 
         def _delta(curr: float, prev: float) -> float:
             if prev == 0:

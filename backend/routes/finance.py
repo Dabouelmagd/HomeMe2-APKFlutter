@@ -62,11 +62,22 @@ async def get_expenses(compound_id: Optional[str] = None, start_date: Optional[s
     db = get_db()
     try:
         query = {}
-        # Default-scope to user's compound if no override and they aren't a global admin
+        role = current_user.get("role")
+        cu_compound = current_user.get("compound_id")
+        # Resolve scope: explicit query param > active compound > company-wide aggregation
         if compound_id:
             query["compound_id"] = compound_id
-        elif current_user.get("role") not in ("app_owner", "super_admin") and current_user.get("compound_id"):
-            query["compound_id"] = current_user["compound_id"]
+        elif role in ("app_owner", "super_admin"):
+            pass  # global
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+            owned = await db.compounds.find(
+                {"$or": [{"company_id": current_user["company_id"]}, {"management_company_id": current_user["company_id"]}]},
+                {"_id": 0, "id": 1}
+            ).to_list(500)
+            cids = [c["id"] for c in owned if c.get("id")]
+            query["compound_id"] = {"$in": cids} if cids else "__never__"
+        elif cu_compound:
+            query["compound_id"] = cu_compound
         if category:
             query["category"] = category
         if start_date and end_date:
@@ -118,10 +129,21 @@ async def get_revenue(compound_id: Optional[str] = None, start_date: Optional[st
     db = get_db()
     try:
         query = {}
+        role = current_user.get("role")
+        cu_compound = current_user.get("compound_id")
         if compound_id:
             query["compound_id"] = compound_id
-        elif current_user.get("role") not in ("app_owner", "super_admin") and current_user.get("compound_id"):
-            query["compound_id"] = current_user["compound_id"]
+        elif role in ("app_owner", "super_admin"):
+            pass
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+            owned = await db.compounds.find(
+                {"$or": [{"company_id": current_user["company_id"]}, {"management_company_id": current_user["company_id"]}]},
+                {"_id": 0, "id": 1}
+            ).to_list(500)
+            cids = [c["id"] for c in owned if c.get("id")]
+            query["compound_id"] = {"$in": cids} if cids else "__never__"
+        elif cu_compound:
+            query["compound_id"] = cu_compound
         if source:
             query["source"] = source
         if start_date and end_date:
@@ -378,24 +400,45 @@ async def notify_unpaid_units(obligation_id: str = "", month: Optional[int] = No
 
 
 @router.get("/financial/balance-sheet")
-async def get_balance_sheet(year: Optional[int] = None, current_user: dict = Depends(require_admin)):
+async def get_balance_sheet(year: Optional[int] = None, compound_id: Optional[str] = None, current_user: dict = Depends(require_admin)):
     db = get_db()
     try:
-        compound_id = current_user["compound_id"]
+        role = current_user.get("role")
+        cu_compound = current_user.get("compound_id")
+        # Resolve scope: explicit query → active compound (X-Active-Compound-Id) → company-wide aggregation
+        if compound_id:
+            scope = {"compound_id": compound_id}
+            label_compound = compound_id
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+            # Aggregate across ALL company's compounds when no specific compound is active
+            company_id = current_user["company_id"]
+            owned = await db.compounds.find(
+                {"$or": [{"company_id": company_id}, {"management_company_id": company_id}]},
+                {"_id": 0, "id": 1}
+            ).to_list(500)
+            cids = [c["id"] for c in owned if c.get("id")]
+            scope = {"compound_id": {"$in": cids}} if cids else {"compound_id": "__never__"}
+            label_compound = f"company:{company_id}"
+        elif role in ("app_owner", "super_admin") and not cu_compound:
+            scope = {}  # global
+            label_compound = "all"
+        else:
+            scope = {"compound_id": cu_compound or "default-compound"}
+            label_compound = cu_compound or "default-compound"
         current_year = year or datetime.now().year
-        expenses = await db.expenses.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+        expenses = await db.expenses.find(scope, {"_id": 0}).to_list(2000)
         total_expenses = sum(float(e.get("amount", 0)) for e in expenses)
         exp_by_cat = {}
         for e in expenses:
             cat = e.get("category", "other")
             exp_by_cat[cat] = exp_by_cat.get(cat, 0) + float(e.get("amount", 0))
-        revenues = await db.revenue.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+        revenues = await db.revenue.find(scope, {"_id": 0}).to_list(2000)
         total_revenue = sum(float(r.get("amount", 0)) for r in revenues)
         rev_by_src = {}
         for r in revenues:
             src = r.get("source", "other")
             rev_by_src[src] = rev_by_src.get(src, 0) + float(r.get("amount", 0))
-        all_charges = await db.unit_charges.find({"compound_id": compound_id}, {"_id": 0}).to_list(1000)
+        all_charges = await db.unit_charges.find(scope, {"_id": 0}).to_list(5000)
         total_charged = sum(float(c.get("amount", 0)) for c in all_charges)
         total_collected = sum(float(c.get("amount", 0)) for c in all_charges if c.get("status") == "paid")
         monthly = {}
@@ -414,7 +457,7 @@ async def get_balance_sheet(year: Optional[int] = None, current_user: dict = Dep
                     monthly[m] = {"expenses": 0, "revenue": 0}
                 monthly[m]["revenue"] += float(r.get("amount", 0))
         return {
-            "compound_id": compound_id, "year": current_year,
+            "compound_id": label_compound, "year": current_year,
             "total_expenses": round(total_expenses, 2), "total_revenue": round(total_revenue, 2),
             "net_balance": round(total_revenue - total_expenses, 2),
             "expenses_by_category": exp_by_cat, "revenue_by_source": rev_by_src,

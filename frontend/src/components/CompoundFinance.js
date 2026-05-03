@@ -22,6 +22,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, 
 import useTabState from '../hooks/useTabState';
 import HowToPayButton from './HowToPayButton';
 import PaymentProofsPanel from './PaymentProofsPanel';
+import CompoundSwitcher from './CompoundSwitcher';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -199,6 +200,9 @@ const CompoundFinance = () => {
             </select>
           </div>
         </div>
+
+        {/* Compound switcher (chips) */}
+        <CompoundSwitcher onChange={() => fetchAll()} className="mb-4" />
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" data-testid="finance-summary">

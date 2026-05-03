@@ -26,6 +26,7 @@ import {
   CursorArrowRaysIcon,
 } from '@heroicons/react/24/outline';
 import { formatDate } from '../utils/dateUtils';
+import CompoundSwitcher from './CompoundSwitcher';
 
 // Chart Colors
 const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4'];
@@ -387,6 +388,9 @@ const AdvancedAnalytics = () => {
           subtitle={`${analytics.engagement?.active_users || 0} ${t('active_users')}`}
         />
       </div>
+
+      {/* Compound switcher */}
+      <CompoundSwitcher onChange={() => fetchAnalytics()} className="mb-4" />
 
       {/* Tabs */}
       <div className="border-b border-gray-200 mb-6">

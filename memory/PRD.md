@@ -4,6 +4,45 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 96: Unified Design System — Shared Components (Option B) — Feb 5, 2026 ✅
+
+**🎯 الهدف:** توحيد شكل الصفحات عبر design system خفيف بـ shared components قابلة لإعادة الاستخدام — بحيث أي صفحة جديدة تورث نفس المظهر الاحترافي تلقائياً.
+
+**🎨 الهوية البصرية (Color Strategy - خيار c):**
+- **Headers/Hero:** indigo→purple gradient (هادئ SaaS-appropriate)
+- **CTAs/Accents:** orange (حارّ للـ conversion)
+- **KPI tones:** indigo/emerald/purple/amber/rose/pink (soft backgrounds + matching borders)
+
+**🧩 Shared Components المنشأة/المستخدمة:**
+
+1. **`PageHero.js` (جديد):**
+   - خلفية gradient indigo→purple مع glass-morphism orbs (blur-3xl)
+   - يقبل `icon` (emoji) + `title` + `subtitle` + `actions` + `accent` (indigo/emerald/rose/amber)
+   - `data-testid="page-hero"` للاختبار.
+
+2. **`StatCard.js` (موجود - استُخدم):**
+   - 9 ألوان (indigo/rose/emerald/amber/blue/purple/pink/slate/red)
+   - 2 variants: `dark` (للخلفيات الغامقة) + `light` (للخلفيات البيضاء)
+   - Props: `icon / label / value / hint / onClick`
+
+3. **`SectionCard.js` (موجود):** rounded-2xl container مع title+icon+actions+subtitle optional.
+
+**📝 Proof of Concept - صفحة `CompoundsManagement`:**
+- استبدال عنوان H1 + زر + paragraph → `<PageHero>` واحد
+- استبدال 4 stat cards قديمة (80 سطر) بـ 4 `<StatCard>` (~20 سطر)
+- تقليل الكود بنسبة **75%** مع مظهر أفضل بكثير.
+
+**🧪 Manual E2E:**
+- ✅ PageHero يظهر بـ gradient indigo+glass morphism + عنوان + subtitle + زر "إضافة مجمع جديد" أبيض بـ gradient reverse.
+- ✅ 4 StatCards بـ ألوان متجانسة (indigo/emerald/purple/amber) بأيقونات emoji + values كبيرة.
+- ✅ Lint نظيف.
+
+**📌 المرحلة القادمة (pending user confirmation):**
+- 🔄 تطبيق نفس الـ components على: Dashboard, Finances, Analytics, Residents, Complaints, Maintenance...
+- المعدل المتوقع: **~3 صفحات/iter**.
+
+
+
 ### Iter 95: Edit Compound + Create Compound Admin — Feb 5, 2026 ✅
 
 **🎯 الميزة 1 - Edit Compound Modal:**

@@ -3,6 +3,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from './shared/PageHero';
+import StatCard from './shared/StatCard';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -236,97 +238,64 @@ const CompoundsManagement = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            🏘️ {t('compounds_management', 'Compounds Management')}
-          </h1>
-          <p className="text-gray-600">
-            {t('compounds_management_desc', 'Manage all residential compounds and assign subscription codes')}
-          </p>
-        </div>
-        {canAddCompound && (
+    <div className="container mx-auto px-4 py-6 sm:py-8">
+      {/* Unified Page Hero */}
+      <PageHero
+        icon="🏘️"
+        title={t('compounds_management', 'إدارة المجمعات السكنية')}
+        subtitle={t('compounds_management_desc', 'إدارة جميع المجمعات وتعيين أكواد الاشتراك ومديري المجمعات')}
+        accent="indigo"
+        actions={canAddCompound && (
           <button
             onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold shadow-md hover:shadow-lg hover:from-emerald-600 hover:to-teal-700 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-indigo-700 font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all text-sm"
             data-testid="add-compound-btn"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             {t('add_new_compound', 'إضافة مجمع جديد')}
           </button>
         )}
-      </div>
+      />
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-blue-600 text-sm font-medium">{t('total_compounds', 'Total Compounds')}</p>
-              <p className="text-3xl font-bold text-blue-800">{compounds.length}</p>
-            </div>
-            <div className="bg-blue-100 p-3 rounded-lg">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-green-50 rounded-xl p-6 border border-green-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-600 text-sm font-medium">{t('active_compounds', 'Active Compounds')}</p>
-              <p className="text-3xl font-bold text-green-800">
-                {compounds.filter(c => c.is_active).length}
-              </p>
-            </div>
-            <div className="bg-green-100 p-3 rounded-lg">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-600 text-sm font-medium">{t('total_units', 'Total Units')}</p>
-              <p className="text-3xl font-bold text-purple-800">
-                {compounds.reduce((sum, c) => sum + (c.total_units || 0), 0)}
-              </p>
-            </div>
-            <div className="bg-purple-100 p-3 rounded-lg">
-              <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-orange-50 rounded-xl p-6 border border-orange-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-orange-600 text-sm font-medium">
-                {canManageCodes ? t('available_codes', 'Available Codes') : t('total_residents', 'إجمالي السكان')}
-              </p>
-              <p className="text-3xl font-bold text-orange-800">
-                {canManageCodes
-                  ? subscriptionCodes.filter(c => c.is_active).length
-                  : compounds.reduce((sum, c) => sum + (c.users_count || c.residents_count || 0), 0)}
-              </p>
-            </div>
-            <div className="bg-orange-100 p-3 rounded-lg">
-              <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-              </svg>
-            </div>
-          </div>
-        </div>
+      {/* Unified Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <StatCard
+          label={t('total_compounds', 'إجمالي المجمعات')}
+          value={compounds.length}
+          icon="🏘️"
+          color="indigo"
+          variant="light"
+          testId="stat-total-compounds"
+        />
+        <StatCard
+          label={t('active_compounds', 'المجمعات النشطة')}
+          value={compounds.filter(c => c.is_active).length}
+          icon="✅"
+          color="emerald"
+          variant="light"
+          testId="stat-active-compounds"
+        />
+        <StatCard
+          label={t('total_units', 'إجمالي الوحدات')}
+          value={compounds.reduce((sum, c) => sum + (c.total_units || 0), 0)}
+          icon="🏢"
+          color="purple"
+          variant="light"
+          testId="stat-total-units"
+        />
+        <StatCard
+          label={canManageCodes ? t('available_codes', 'أكواد متاحة') : t('total_residents', 'إجمالي السكان')}
+          value={canManageCodes
+            ? subscriptionCodes.filter(c => c.is_active).length
+            : compounds.reduce((sum, c) => sum + (c.users_count || c.residents_count || 0), 0)}
+          icon={canManageCodes ? '🎟️' : '👥'}
+          color="amber"
+          variant="light"
+          testId="stat-available-codes"
+        />
       </div>
 
       {/* Compounds Table */}

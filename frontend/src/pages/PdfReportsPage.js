@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from '../components/shared/PageHero';
 import {
   FileText,
   Building2,
@@ -191,15 +192,12 @@ export default function PdfReportsPage() {
   return (
     <div className="min-h-screen p-6" data-testid="pdf-reports-page">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            تقارير PDF
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300">
-            توليد تقارير احترافية بصيغة PDF مع دعم كامل للعربية وRTL
-          </p>
-        </div>
+        <PageHero
+          icon="📄"
+          title="تقارير PDF"
+          subtitle="توليد تقارير احترافية بصيغة PDF مع دعم كامل للعربية وRTL"
+          accent="rose"
+        />
 
         {/* Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md mb-6 border border-gray-100 dark:border-gray-700">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from './shared/PageHero';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import {
@@ -162,26 +163,23 @@ const Newsletter = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 text-center">{t('community_newsletter')}</h1>
-              <p className="text-gray-600 mt-2">{t('newsletter.subtitle')}</p>
-            </div>
-            {isAdmin && (
-              <button
-                onClick={handleCreateNewsletter}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
-              >
-                <PlusIcon className="h-5 w-5" />
-                <span>Create Newsletter</span>
-              </button>
-            )}
-          </div>
-        </div>
+        <PageHero
+          icon="📰"
+          title={t('community_newsletter')}
+          subtitle={t('newsletter.subtitle')}
+          accent="purple"
+          actions={isAdmin && (
+            <button
+              onClick={handleCreateNewsletter}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-purple-700 font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all text-sm"
+            >
+              <PlusIcon className="h-4 w-4" />
+              <span>{t('newsletter.create', 'إنشاء نشرة')}</span>
+            </button>
+          )}
+        />
 
         {/* Search and Filters */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">

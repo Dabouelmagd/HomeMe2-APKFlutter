@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from './shared/PageHero';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
@@ -277,31 +278,26 @@ const UserManagement = () => {
 
   return (
     <div className={`min-h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`}>
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <UserGroupIcon className="h-8 w-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{t('user_management')}</h1>
-                <p className="text-sm text-gray-500">{t('add_manage_user_accounts')}</p>
-              </div>
-            </div>
-            
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <PageHero
+          icon="👥"
+          title={t('user_management')}
+          subtitle={t('add_manage_user_accounts')}
+          accent="indigo"
+          actions={(
             <button
               onClick={() => setShowAddUser(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-indigo-700 font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all text-sm"
             >
-              <UserPlusIcon className="h-5 w-5" />
+              <UserPlusIcon className="h-4 w-4" />
               <span>{t('add_new_user')}</span>
             </button>
-          </div>
-        </div>
+          )}
+        />
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
         
         {/* Search and Filters */}
         <div className="mb-6 flex flex-col sm:flex-row gap-4">

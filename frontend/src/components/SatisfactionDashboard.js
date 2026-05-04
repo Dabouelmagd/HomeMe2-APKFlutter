@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageHero from './shared/PageHero';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -72,17 +73,12 @@ const SatisfactionDashboard = () => {
 
   return (
     <div className="space-y-5" dir={isRTL ? 'rtl' : 'ltr'} data-testid="satisfaction-dashboard">
-      {/* Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 rounded-2xl p-6 text-white shadow-xl">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/15 via-transparent to-transparent"></div>
-        <div className="relative">
-          <h1 className="text-xl font-black flex items-center gap-2" data-testid="sat-title">
-            <StarSolid className="w-6 h-6 text-amber-200" />
-            {t('sat_title', 'لوحة رضا العملاء')}
-          </h1>
-          <p className="text-amber-100 text-xs mt-1">{t('sat_subtitle', 'متابعة مستوى رضا السكان عن الخدمات والصيانة')}</p>
-        </div>
-      </div>
+      <PageHero
+        icon="⭐"
+        title={t('sat_title', 'لوحة رضا العملاء')}
+        subtitle={t('sat_subtitle', 'متابعة مستوى رضا السكان عن الخدمات والصيانة')}
+        accent="amber"
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" data-testid="rating-summary">

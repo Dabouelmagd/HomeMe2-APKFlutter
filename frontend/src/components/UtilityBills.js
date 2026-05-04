@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from './shared/PageHero';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
@@ -569,34 +570,25 @@ const UtilityBills = () => {
         </small>
       </div>
       
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 text-center">
-          {t('government_utility_gateway')}
-        </h1>
-        <p className="text-gray-600 mt-2 text-center">
-          {t('manage_government_utility_bills')}
-        </p>
-        
-        {/* Country Selector */}
-        <div className="mt-4 flex justify-center">
-          <div className="bg-white rounded-lg border border-gray-300 px-4 py-2 min-w-64">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {t('select_country')}:
-            </label>
-            <select
-              value={selectedCountry}
-              onChange={(e) => setSelectedCountry(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="EG">🇪🇬 {t('egypt')}</option>
-              <option value="AE">🇦🇪 {t('uae')}</option>
-              <option value="SA">🇸🇦 {t('saudi_arabia')}</option>
-              <option value="KW">🇰🇼 {t('kuwait')}</option>
-              <option value="QA">🇶🇦 {t('qatar')}</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      <PageHero
+        icon="⚡"
+        title={t('government_utility_gateway')}
+        subtitle={t('manage_government_utility_bills')}
+        accent="amber"
+        actions={(
+          <select
+            value={selectedCountry}
+            onChange={(e) => setSelectedCountry(e.target.value)}
+            className="bg-white/15 backdrop-blur-sm ring-1 ring-white/20 text-white rounded-xl px-3 py-2 text-xs [&>option]:text-gray-900"
+          >
+            <option value="EG">🇪🇬 {t('egypt')}</option>
+            <option value="AE">🇦🇪 {t('uae')}</option>
+            <option value="SA">🇸🇦 {t('saudi_arabia')}</option>
+            <option value="KW">🇰🇼 {t('kuwait')}</option>
+            <option value="QA">🇶🇦 {t('qatar')}</option>
+          </select>
+        )}
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

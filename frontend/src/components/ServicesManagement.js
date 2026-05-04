@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
 import axios from 'axios';
 import OwnerPageHeader from './shared/OwnerPageHeader';
+import PageHero from './shared/PageHero';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import { toast } from 'sonner';
@@ -921,14 +922,14 @@ const ServicesManagement = () => {
   }
 
   return (
-    <div>
-      <OwnerPageHeader
-        iconEmoji="🛎️"
-        badge={t('services_badge', 'الخدمات والمرافق')}
+    <div className="p-6 max-w-7xl mx-auto">
+      <PageHero
+        icon="🛎️"
         title={t('services_management')}
         subtitle={isAdmin ? t('manage_compound_services_bookings') : t('view_available_services')}
+        accent="purple"
       />
-      <div className="p-6">
+      <div>
 
       {/* Services Page Ad */}
       <div className="mb-6">

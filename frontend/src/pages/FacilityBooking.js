@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import OwnerPageHeader from '../components/shared/OwnerPageHeader';
+import PageHero from '../components/shared/PageHero';
 import { toast } from 'sonner';
 import { format, addDays, startOfWeek, isSameDay } from 'date-fns';
 import { ar, enUS } from 'date-fns/locale';
@@ -320,13 +321,13 @@ const FacilityBooking = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900" dir={isRTL ? 'rtl' : 'ltr'}>
-      <OwnerPageHeader
-        iconEmoji="🏟️"
-        badge={t('facility_booking_badge', 'حجز المرافق المشتركة')}
-        title={t('facility_booking')}
-        subtitle={t('facility_booking_description')}
-      />
       <div className="max-w-7xl mx-auto p-6">
+        <PageHero
+          icon="🏟️"
+          title={t('facility_booking')}
+          subtitle={t('facility_booking_description')}
+          accent="rose"
+        />
 
         {/* Tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from './shared/PageHero';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -116,43 +117,30 @@ const MessageCenter = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Enhanced Header Section */}
-      <div className="bg-white shadow-lg">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-6">
-              <div className="bg-gradient-to-br from-blue-600 to-purple-600 p-4 rounded-2xl shadow-xl">
-                <ChatBubbleLeftEllipsisIcon className="h-12 w-12 text-white" />
-              </div>
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              {t('message_center')}
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              {isAdmin 
-                ? `${t('communicate_with').replace('{role}', t('residents'))}` 
-                : `${t('communicate_with').replace('{role}', t('management'))}`}
-            </p>
-          </div>
-          
-          {/* Enhanced Action Button */}
-          <div className="flex justify-center">
+    <div className="min-h-screen bg-gray-50">
+      {/* Unified Header */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+        <PageHero
+          icon="💬"
+          title={t('message_center')}
+          subtitle={isAdmin
+            ? `${t('communicate_with').replace('{role}', t('residents'))}`
+            : `${t('communicate_with').replace('{role}', t('management'))}`}
+          accent="indigo"
+          actions={(
             <button
               onClick={() => setShowNewMessage(true)}
-              className="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-3 rtl:space-x-reverse"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-indigo-700 font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all text-sm"
             >
-              <div className="bg-white/20 p-2 rounded-xl group-hover:bg-white/30 transition-colors">
-                <PlusIcon className="h-6 w-6" />
-              </div>
-              <span className="text-lg">{t('new_message')}</span>
+              <PlusIcon className="h-4 w-4" />
+              <span>{t('new_message')}</span>
             </button>
-          </div>
-        </div>
+          )}
+        />
       </div>
 
       {/* Enhanced Messages Section */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
         {messages.length > 0 ? (
           <div className="space-y-6">
             {/* Messages Grid */}

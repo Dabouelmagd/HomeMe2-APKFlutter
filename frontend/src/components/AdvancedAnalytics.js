@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import PageHero from './shared/PageHero';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -310,43 +311,40 @@ const AdvancedAnalytics = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 text-center">{t('advanced_analytics')}</h1>
-            <p className="text-gray-600 mt-2">{t('analytics_description')}</p>
-          </div>
-          <div className="mt-4 sm:mt-0 flex items-center space-x-3">
+      <PageHero
+        icon="📊"
+        title={t('advanced_analytics')}
+        subtitle={t('analytics_description')}
+        accent="indigo"
+        actions={(
+          <div className="flex items-center gap-2 flex-wrap">
             <select
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
-              className="border border-gray-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+              className="bg-white/15 backdrop-blur-sm ring-1 ring-white/20 text-white rounded-xl px-3 py-2 text-xs [&>option]:text-gray-900"
             >
               {dateRanges.map(range => (
-                <option key={range.value} value={range.value}>
-                  {range.label}
-                </option>
+                <option key={range.value} value={range.value}>{range.label}</option>
               ))}
             </select>
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+              className="p-2 rounded-xl bg-white/15 hover:bg-white/25 ring-1 ring-white/20 text-white backdrop-blur-sm transition-all disabled:opacity-50"
+              title={t('refresh')}
             >
-              <ArrowPathIcon className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              {t('refresh')}
+              <ArrowPathIcon className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={() => exportData('csv')}
-              className="inline-flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-white text-indigo-700 hover:shadow-md text-xs font-semibold transition-all"
             >
-              <ArrowDownTrayIcon className="w-4 h-4 mr-2" />
+              <ArrowDownTrayIcon className="w-4 h-4" />
               {t('export')}
             </button>
           </div>
-        </div>
-      </div>
+        )}
+      />
 
       {/* Key Metrics */}
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-${isSuperAdminOnly ? '3' : '4'} gap-6 mb-8`}>

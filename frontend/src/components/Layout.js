@@ -584,33 +584,49 @@ const Layout = ({ children, isTrialMode = false }) => {
     },
   ];
 
-  // Super Admin = Operations Manager (no financial, no owner settings)
+  // Super Admin = Operations Manager (mirrors Owner sidebar minus owner-only items: budget, app-branding, changelog)
   const superAdminNavigationSections = [
     {
       title: t('sa_operations', 'العمليات والإدارة'),
       items: [
-        { name: t('owner_dashboard', 'لوحة التحكم'), href: 'dashboard', icon: HomeIcon, show: true },
+        { name: t('owner_dashboard', 'لوحة التحكم الرئيسية'), href: 'dashboard', icon: HomeIcon, show: true },
+        { name: t('alerts_center', 'لوحة التنبيهات'), href: 'alerts', icon: BellIcon, show: true },
         { name: t('sa_compounds', 'المجمعات السكنية'), href: 'super-admin?tab=compounds', icon: BuildingOfficeIcon, show: true },
-        { name: t('owner_companies_management', 'إدارة الشركات والمجمعات'), href: 'super-admin?tab=companies', icon: BuildingOffice2Icon, show: true },
         { name: t('sa_users', 'إدارة المستخدمين'), href: 'super-admin?tab=users', icon: UsersIcon, show: true },
-        { name: t('od_mgmt_companies', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
-        { name: t('satisfaction_ratings', 'رضا العملاء'), href: 'satisfaction', icon: StarIcon, show: true },
-      ]
-    },
-    {
-      title: t('sa_ads_section', 'الإعلانات والحملات'),
-      items: [
         { name: t('sa_ads', 'إدارة الإعلانات'), href: 'super-admin?tab=ads', icon: SpeakerWaveIcon, show: true },
-        { name: t('ad_realtime_analytics', 'تقارير الإعلانات'), href: 'ad-analytics', icon: SignalIcon, show: true },
-      ]
-    },
-    {
-      title: t('sa_communication', 'التواصل والتقارير'),
-      items: [
-        { name: t('advanced_analytics', 'تحليلات المجمعات'), href: 'analytics', icon: ChartPieIcon, show: true },
+        { name: t('sa_referrals', 'الإحالات'), href: 'super-admin?tab=referrals', icon: UserGroupIcon, show: true },
+        { name: t('advanced_analytics', 'تحليلات متقدمة'), href: 'analytics', icon: ChartPieIcon, show: true },
+        { name: t('ad_realtime_analytics', 'تحليلات الإعلانات'), href: 'ad-analytics', icon: SignalIcon, show: true },
+        { name: t('satisfaction_ratings', 'رضا العملاء'), href: 'satisfaction', icon: StarIcon, show: true },
         { name: t('owner_translations', 'إدارة الترجمات'), href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
         { name: t('sa_support_tickets_nav', 'تذاكر الدعم الفني'), href: 'super-admin?tab=support_tickets', icon: LifebuoyIcon, show: true },
+        { name: 'فحص صحة المسارات', href: 'system-health', icon: ShieldCheckIcon, show: true },
+        { name: 'سجل التدقيق', href: 'audit-log', icon: ClipboardDocumentListIcon, show: true },
+        { name: 'لوحة المؤشرات', href: 'owner-kpis', icon: ChartBarIcon, show: true },
+        { name: 'تقارير PDF', href: 'reports', icon: DocumentTextIcon, show: true },
+        { name: 'المصادقة الثنائية', href: 'two-factor', icon: ShieldCheckIcon, show: true },
+        { name: 'صحة SMTP', href: 'smtp-health', icon: EnvelopeIcon, show: true },
+        { name: 'صحة الوسائط والنسخ الاحتياطي', href: 'media-health', icon: ShieldCheckIcon, show: true },
+        { name: 'تخصيص قالب التقارير', href: 'branding', icon: SwatchIcon, show: true },
+        { name: 'قوالب البريد', href: 'email-templates', icon: EnvelopeIcon, show: true },
         { name: t('settings_nav', 'الإعدادات'), href: 'settings', icon: Cog6ToothIcon, show: true },
+      ]
+    },
+    {
+      title: t('owner_company_control', 'تحكم في حسابات شركات الإدارة'),
+      items: [
+        { name: t('owner_companies_management', 'إدارة الشركات والمجمعات'), href: 'super-admin?tab=companies', icon: BuildingOffice2Icon, show: true },
+        { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
+        { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: 'subscription-reminders', icon: BellIcon, show: true },
+      ]
+    },
+    {
+      title: t('owner_compound_control', 'تحكم في اشتراكات الكمبوند'),
+      items: [
+        { name: t('sa_subscription_codes', 'أكواد الاشتراك'), href: 'super-admin?tab=codes', icon: KeyIcon, show: true },
+        { name: t('sa_discount_coupons', 'كوبونات الخصم'), href: 'super-admin?tab=coupons', icon: TicketIcon, show: true },
+        { name: t('sa_user_subs', 'اشتراكات المستخدمين'), href: 'super-admin?tab=user_subs', icon: UsersIcon, show: true },
+        { name: t('sa_analytics', 'تحليلات الاشتراكات'), href: 'super-admin?tab=analytics', icon: ChartBarIcon, show: true },
       ]
     },
   ];

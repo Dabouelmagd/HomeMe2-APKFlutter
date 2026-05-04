@@ -4,6 +4,25 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 99: Super Admin Sidebar Parity with Owner — Feb 6, 2026 ✅
+
+**🎯 الهدف:** صفحة سوبر أدمن لم تكن متصلة بالتعديلات الجديدة، السلايدر كان ناقص (6 عناصر فقط).
+
+**التغيير في `Layout.js`:**
+- استبدال `superAdminNavigationSections` (3 أقسام × ~6 عناصر) بهيكل مرآة لـ `ownerNavigationSections`.
+- 3 أقسام جديدة بإجمالي **28 عنصر**:
+  - **العمليات والإدارة (21):** Dashboard, Alerts Center, Compounds, Users, Ads, Referrals, Advanced Analytics, Ad Analytics, Satisfaction, Translations, Support Tickets, System Health, Audit Log, Owner KPIs, PDF Reports, 2FA, SMTP Health, Media Health, Branding, Email Templates, Settings.
+  - **تحكم في حسابات شركات الإدارة (3):** Companies Mgmt, Company Subscriptions, Subscription Reminders.
+  - **تحكم في اشتراكات الكمبوند (4):** Subscription Codes, Discount Coupons, User Subs, Subscription Analytics.
+- استثنى عناصر خاصة بالـ owner فقط: `owner-budget`, `app-branding`, `changelog`.
+
+**🧪 Verification:**
+- ✅ تأكيد أن جميع API endpoints متاحة لـ super_admin (audit-logs, owner-kpis, route-health, smtp-health, media-health, referrals, 2fa) → كلها 200.
+- ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
+- ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
+
+
+
 ### Iter 98: PageHero Applied to 17 Pages (COMPLETE) — Feb 5, 2026 ✅
 
 **🎯 الهدف:** إكمال توحيد شكل كل الصفحات الإدارية الرئيسية.

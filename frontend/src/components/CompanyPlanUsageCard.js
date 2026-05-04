@@ -385,7 +385,7 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
                   value={couponInput}
                   onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponPreview(null); }}
                   placeholder="مثال: WELCOME20"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 font-mono uppercase"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono uppercase focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   data-testid="plan-coupon-input"
                 />
               </div>
@@ -424,7 +424,7 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
                   value={codeInput}
                   onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
                   placeholder="مثال: HOMEME-PRO-2026"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 font-mono uppercase tracking-wider"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono uppercase tracking-wider focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                   data-testid="plan-code-input"
                 />
               </div>

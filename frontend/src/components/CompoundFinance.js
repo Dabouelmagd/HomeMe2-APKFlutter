@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import PageHero from './shared/PageHero';
 import {
   BanknotesIcon,
   ArrowTrendingUpIcon,
@@ -161,71 +162,72 @@ const CompoundFinance = () => {
   return (
     <div className="min-h-screen bg-gray-50" data-testid="compound-finance">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('financial_management', t('cf_title', 'الإدارة المالية'))}</h1>
-            <p className="text-sm text-gray-500">{t('compound_budget_desc', t('cf_subtitle', 'إدارة ميزانية المجمع والالتزامات والمصروفات'))}</p>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={async () => {
-                try {
-                  toast.info('جارٍ إنشاء PDF...');
-                  const res = await axios.get(`${API}/financial/balance-sheet/export-pdf?year=${filterYear}`, {
-                    ...getToken(), responseType: 'blob'
-                  });
-                  const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
-                  const link = document.createElement('a');
-                  link.href = url;
-                  link.setAttribute('download', `balance_sheet_${filterYear}.pdf`);
-                  document.body.appendChild(link);
-                  link.click();
-                  link.remove();
-                  setTimeout(() => window.URL.revokeObjectURL(url), 1500);
-                  toast.success('تم تصدير الـ PDF بنجاح');
-                } catch (err) {
-                  toast.error('فشل في تصدير PDF');
-                }
-              }}
-              className="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 text-sm font-medium"
-              data-testid="export-pdf-btn"
-            >
-              <ArrowDownTrayIcon className="h-4 w-4" />
-              تصدير PDF
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  const res = await axios.get(`${API}/financial/export-excel?year=${filterYear}&month=${filterMonth}`, {
-                    ...getToken(), responseType: 'blob'
-                  });
-                  const url = window.URL.createObjectURL(new Blob([res.data]));
-                  const link = document.createElement('a');
-                  link.href = url;
-                  link.setAttribute('download', `financial_report_${filterYear}.xlsx`);
-                  document.body.appendChild(link);
-                  link.click();
-                  link.remove();
-                  toast.success(t('excel_exported', 'تم تصدير ملف Excel بنجاح'));
-                } catch (err) {
-                  toast.error(t('failed_export_excel', 'فشل في تصدير Excel'));
-                }
-              }}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
-              data-testid="export-excel-btn"
-            >
-              <ArrowDownTrayIcon className="h-4 w-4" />
-              {t('export_excel', 'تصدير Excel')}
-            </button>
-            <select value={filterMonth} onChange={e => setFilterMonth(+e.target.value)} className="border rounded-lg px-3 py-2 text-sm" data-testid="filter-month">
-              {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
-            </select>
-            <select value={filterYear} onChange={e => setFilterYear(+e.target.value)} className="border rounded-lg px-3 py-2 text-sm" data-testid="filter-year">
-              {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
-            </select>
-          </div>
-        </div>
+        <PageHero
+          icon="💰"
+          title={t('financial_management', t('cf_title', 'الإدارة المالية'))}
+          subtitle={t('compound_budget_desc', t('cf_subtitle', 'إدارة ميزانية المجمع والالتزامات والمصروفات'))}
+          accent="emerald"
+          actions={(
+            <div className="flex gap-2 flex-wrap items-center">
+              <button
+                onClick={async () => {
+                  try {
+                    toast.info('جارٍ إنشاء PDF...');
+                    const res = await axios.get(`${API}/financial/balance-sheet/export-pdf?year=${filterYear}`, {
+                      ...getToken(), responseType: 'blob'
+                    });
+                    const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', `balance_sheet_${filterYear}.pdf`);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(() => window.URL.revokeObjectURL(url), 1500);
+                    toast.success('تم تصدير الـ PDF بنجاح');
+                  } catch (err) {
+                    toast.error('فشل في تصدير PDF');
+                  }
+                }}
+                className="flex items-center gap-2 px-3 py-2 bg-white/15 backdrop-blur-sm ring-1 ring-white/20 hover:bg-white/25 text-white rounded-xl text-xs font-semibold transition-all"
+                data-testid="export-pdf-btn"
+              >
+                <ArrowDownTrayIcon className="h-4 w-4" />
+                PDF
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await axios.get(`${API}/financial/export-excel?year=${filterYear}&month=${filterMonth}`, {
+                      ...getToken(), responseType: 'blob'
+                    });
+                    const url = window.URL.createObjectURL(new Blob([res.data]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', `financial_report_${filterYear}.xlsx`);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    toast.success(t('excel_exported', 'تم تصدير ملف Excel بنجاح'));
+                  } catch (err) {
+                    toast.error(t('failed_export_excel', 'فشل في تصدير Excel'));
+                  }
+                }}
+                className="flex items-center gap-2 px-3 py-2 bg-white/15 backdrop-blur-sm ring-1 ring-white/20 hover:bg-white/25 text-white rounded-xl text-xs font-semibold transition-all"
+                data-testid="export-excel-btn"
+              >
+                <ArrowDownTrayIcon className="h-4 w-4" />
+                Excel
+              </button>
+              <select value={filterMonth} onChange={e => setFilterMonth(+e.target.value)} className="bg-white/15 backdrop-blur-sm ring-1 ring-white/20 text-white rounded-xl px-2.5 py-2 text-xs [&>option]:text-gray-900" data-testid="filter-month">
+                {months.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
+              </select>
+              <select value={filterYear} onChange={e => setFilterYear(+e.target.value)} className="bg-white/15 backdrop-blur-sm ring-1 ring-white/20 text-white rounded-xl px-2.5 py-2 text-xs [&>option]:text-gray-900" data-testid="filter-year">
+                {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
+          )}
+        />
 
         {/* Compound switcher (chips) */}
         <CompoundSwitcher onChange={() => fetchAll()} className="mb-4" />

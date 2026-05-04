@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import OwnerPageHeader from './shared/OwnerPageHeader';
+import PageHero from './shared/PageHero';
 import { useAuth } from '../App';
 import { usePermissions } from '../hooks/usePermissions';
 import { useTranslation } from 'react-i18next';
@@ -257,33 +258,33 @@ const EventsAnnouncements = () => {
 
   return (
     <div>
-      <OwnerPageHeader
-        iconEmoji="📣"
-        badge={t('events_badge', 'الأحداث والإعلانات')}
+      <div className="p-6 max-w-7xl mx-auto">
+      <PageHero
+        icon="📣"
         title={t('events_announcements')}
         subtitle={t('events_announcements_description')}
+        accent="rose"
         actions={isAdmin && (
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => { setCreateType('announcement'); setShowCreateModal(true); }}
-              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-rose-700 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all text-sm"
               data-testid="new-announcement-btn"
             >
-              <MegaphoneIcon className="w-5 h-5 mr-2" />
+              <MegaphoneIcon className="w-4 h-4" />
               {t('new_announcement')}
             </button>
             <button
               onClick={() => { setCreateType('event'); setShowCreateModal(true); }}
-              className="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg transition-all font-semibold text-sm backdrop-blur-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/15 hover:bg-white/25 ring-1 ring-white/20 text-white rounded-xl transition-all font-semibold text-sm backdrop-blur-sm"
               data-testid="new-event-btn"
             >
-              <CalendarDaysIcon className="w-5 h-5 mr-2" />
+              <CalendarDaysIcon className="w-4 h-4" />
               {t('new_event')}
             </button>
           </div>
         )}
       />
-      <div className="p-6 max-w-7xl mx-auto">
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import OwnerPageHeader from './shared/OwnerPageHeader';
+import PageHero from './shared/PageHero';
 import { useAuth } from '../App';
 import { usePermissions } from '../hooks/usePermissions';
 import { useTranslation } from 'react-i18next';
@@ -309,23 +310,23 @@ const VotingSystem = () => {
 
   return (
     <div>
-      <OwnerPageHeader
-        iconEmoji="🗳️"
-        badge={t('polls_badge', 'التصويت والاستطلاعات')}
+      <div className="p-6 max-w-7xl mx-auto">
+      <PageHero
+        icon="🗳️"
         title={t('voting_system')}
         subtitle={t('voting_system_description')}
+        accent="purple"
         actions={isAdminRole && (
           <button
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-semibold"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-purple-700 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all text-sm"
             data-testid="create-poll-btn"
           >
-            <PlusIcon className="w-5 h-5 mr-2" />
+            <PlusIcon className="w-4 h-4" />
             {t('create_poll', 'إنشاء تصويت جديد')}
           </button>
         )}
       />
-      <div className="p-6 max-w-7xl mx-auto">
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

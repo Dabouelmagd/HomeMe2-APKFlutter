@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from './shared/PageHero';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -100,18 +101,22 @@ const ComplaintsSystem = () => {
   return (
     <div className="min-h-screen bg-gray-50" data-testid="complaints-system">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('complaints_suggestions', 'الشكاوى والاقتراحات')}</h1>
-            <p className="text-sm text-gray-500">{t('complaints_desc', 'تقديم شكاوى واقتراحات ومتابعة حالتها')}</p>
-          </div>
-          <button onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium"
-            data-testid="new-complaint-btn">
-            <PlusIcon className="h-4 w-4" />{t('new_complaint', 'شكوى/اقتراح جديد')}
-          </button>
-        </div>
+        <PageHero
+          icon="📢"
+          title={t('complaints_suggestions', 'الشكاوى والاقتراحات')}
+          subtitle={t('complaints_desc', 'تقديم شكاوى واقتراحات ومتابعة حالتها')}
+          accent="rose"
+          actions={(
+            <button
+              onClick={() => setShowCreate(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white text-rose-700 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all text-sm"
+              data-testid="new-complaint-btn"
+            >
+              <PlusIcon className="h-4 w-4" />
+              {t('new_complaint', 'شكوى/اقتراح جديد')}
+            </button>
+          )}
+        />
 
         {/* Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" data-testid="complaints-summary">

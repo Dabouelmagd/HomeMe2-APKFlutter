@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from './shared/PageHero';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -105,41 +106,23 @@ const FinancialManagement = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
       {/* Enhanced Header Section */}
-      <div className="mb-8">
-        <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <div className="flex flex-col lg:flex-row lg:items-center">
-            <div className="mb-6 lg:mb-0 lg:flex-1">
-              <div className="flex items-center space-x-3 rtl:space-x-reverse mb-2">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-3 rounded-xl">
-                  <svg className="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">{t('financial_management')}</h1>
-                  <p className="text-gray-600 mt-1">
-                    {isAdmin ? 
-                      t('admin_view_manage_payments_invoices') : 
-                      t('resident_view_manage_payments_invoices')
-                    }
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Currency Selector */}
-            <div className="lg:ms-auto">
-              <div className="text-center">
-                <p className="text-sm font-medium text-gray-600 mb-2">{t('currency_display')}</p>
-                <CurrencySelector 
-                  selectedCurrency={selectedCurrency}
-                  onCurrencyChange={setSelectedCurrency}
-                />
-              </div>
-            </div>
+      <PageHero
+        icon="💰"
+        title={t('financial_management')}
+        subtitle={isAdmin
+          ? t('admin_view_manage_payments_invoices')
+          : t('resident_view_manage_payments_invoices')}
+        accent="emerald"
+        actions={(
+          <div className="bg-white/15 backdrop-blur-sm rounded-xl px-3 py-2 ring-1 ring-white/20">
+            <p className="text-[11px] font-medium text-white/80 mb-1">{t('currency_display')}</p>
+            <CurrencySelector
+              selectedCurrency={selectedCurrency}
+              onCurrencyChange={setSelectedCurrency}
+            />
           </div>
-        </div>
-      </div>
+        )}
+      />
 
       {/* Enhanced Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

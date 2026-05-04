@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from './shared/PageHero';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -264,25 +265,13 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50" data-testid="admin-dashboard">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 mb-8">
-          <div className="flex items-center justify-between">
-            <div className="text-center flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                <TransliteratedText>
-                  {t('welcome_back_name', { name: user?.full_name })}
-                </TransliteratedText> 👋
-              </h1>
-              <p className="text-lg text-gray-600">
-                <TransliteratedText>
-                  {t('dashboard_welcome_subtitle', 'إليك ما يحدث في مجمعك اليوم')}
-                </TransliteratedText>
-              </p>
-              <p className="text-sm text-gray-500 mt-2">{t('current_time', 'الوقت الحالي')}</p>
-              <p className="text-lg font-semibold text-gray-900">
-                {new Date().toLocaleTimeString()}
-              </p>
-            </div>
+        {/* Unified Page Hero */}
+        <PageHero
+          icon="👋"
+          title={t('welcome_back_name', { name: user?.full_name })}
+          subtitle={t('dashboard_welcome_subtitle', 'إليك ما يحدث في مجمعك اليوم')}
+          accent="indigo"
+          actions={(
             <div className="flex gap-2">
               <button
                 onClick={async () => {
@@ -295,23 +284,23 @@ const AdminDashboard = () => {
                     toast.error(t('daily_report_failed', 'فشل إرسال التقرير - تأكد من إعداد البريد الإلكتروني'));
                   }
                 }}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-50 hover:bg-green-100 text-green-700 transition-colors text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors text-sm font-semibold backdrop-blur-sm ring-1 ring-white/20"
                 data-testid="send-daily-report"
               >
-                <EnvelopeIcon className="h-5 w-5" />
+                <EnvelopeIcon className="h-4 w-4" />
                 {t('send_daily_report', 'إرسال تقرير يومي')}
               </button>
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
+                className="p-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white transition-colors backdrop-blur-sm ring-1 ring-white/20"
                 data-testid="refresh-dashboard"
               >
-                <ArrowPathIcon className={`h-6 w-6 ${refreshing ? 'animate-spin' : ''}`} />
+                <ArrowPathIcon className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
               </button>
             </div>
-          </div>
-        </div>
+          )}
+        />
 
         {/* Trial Status (shows only during active trial) */}
         <div className="mb-4">

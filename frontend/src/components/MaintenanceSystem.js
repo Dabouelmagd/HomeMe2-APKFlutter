@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
+import PageHero from './shared/PageHero';
 import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
@@ -192,22 +193,21 @@ const MaintenanceSystem = () => {
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 text-center">{t('maintenance_system')}</h1>
-            <p className="text-gray-600 mt-2">{t('maintenance_system_description')}</p>
-          </div>
+      <PageHero
+        icon="🔧"
+        title={t('maintenance_system')}
+        subtitle={t('maintenance_system_description')}
+        accent="amber"
+        actions={(
           <button
             onClick={() => setShowCreateModal(true)}
-            className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-amber-700 font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all text-sm"
           >
-            <PlusIcon className="w-5 h-5 mr-2" />
+            <PlusIcon className="w-4 h-4" />
             {t('create_request')}
           </button>
-        </div>
-      </div>
+        )}
+      />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

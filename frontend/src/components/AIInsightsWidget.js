@@ -7,7 +7,9 @@ import {
   ArrowRightCircleIcon,
   ChevronUpIcon,
   ChevronDownIcon,
+  BoltIcon,
 } from '@heroicons/react/24/outline';
+import AIActionModal from './AIActionModal';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -42,6 +44,9 @@ const SEVERITY_STYLES = {
   },
 };
 
+// Insights that support automated AI actions (must match backend ACTION_CATALOG keys)
+const ACTIONABLE_INSIGHTS = new Set(['late_invoices', 'old_maintenance', 'negative_ratings']);
+
 const AIInsightsWidget = () => {
   const navigate = useNavigate();
   const [insights, setInsights] = useState([]);
@@ -50,6 +55,8 @@ const AIInsightsWidget = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [activeAction, setActiveAction] = useState(null); // { insightId, compoundId }
+  const [compoundIdState, setCompoundIdState] = useState(null);
 
   const fetchInsights = async (refresh = false) => {
     if (refresh) setRefreshing(true);
@@ -60,6 +67,7 @@ const AIInsightsWidget = () => {
       setInsights(res.data?.insights || []);
       setGeneratedAt(res.data?.generated_at);
       setCached(res.data?.cached);
+      setCompoundIdState(res.data?.compound_id);
     } catch { /* silent */ } finally {
       setLoading(false);
       setRefreshing(false);
@@ -143,8 +151,7 @@ const AIInsightsWidget = () => {
         <div className="space-y-2.5">
           {insights.map((insight) => {
             const style = SEVERITY_STYLES[insight.severity] || SEVERITY_STYLES.low;
-            return (
-              <div
+            return (              <div
                 key={insight.id}
                 className={`relative ${style.bg} ${style.border} border rounded-xl p-3.5 transition-all hover:shadow-sm`}
                 data-testid={`ai-insight-${insight.id}`}
@@ -175,12 +182,35 @@ const AIInsightsWidget = () => {
                         {insight.action_label}
                       </button>
                     )}
+                    {ACTIONABLE_INSIGHTS.has(insight.id) && compoundIdState && (
+                      <button
+                        onClick={() => setActiveAction({ insightId: insight.id, compoundId: compoundIdState })}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 px-3 py-1 rounded-md transition-colors mr-2 shadow-sm"
+                        data-testid={`ai-insight-execute-${insight.id}`}
+                      >
+                        <BoltIcon className="w-3.5 h-3.5" />
+                        تنفيذ بالـ AI
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
+      )}
+
+      {/* AI Action Modal */}
+      {activeAction && (
+        <AIActionModal
+          insightId={activeAction.insightId}
+          compoundId={activeAction.compoundId}
+          onClose={() => setActiveAction(null)}
+          onComplete={() => {
+            // Refresh insights after successful action (cache was invalidated server-side)
+            fetchInsights(true);
+          }}
+        />
       )}
     </div>
   );

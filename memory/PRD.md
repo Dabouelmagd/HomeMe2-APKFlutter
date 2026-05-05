@@ -21,6 +21,42 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 103: AI Action Buttons — From Advisor to Executor — Feb 6, 2026 ✅
+
+**🎯 الهدف:** زر "تنفيذ بالـ AI" داخل insights — AI يكتب الرسالة + يبعتها للمستلمين بضغطة واحدة.
+
+**Backend:** `/app/backend/routes/ai_actions.py`
+- `POST /api/ai-actions/draft` → يحل المستلمين + يولّد رسالة عربية احترافية بـ Gemini 3 Flash. يدعم 3 أنواع actions:
+  - `late_invoices` → سكان عليهم فواتير متأخرة (مع المبلغ المستحق)
+  - `old_maintenance` → admins/managers (متابعة الصيانة)
+  - `negative_ratings` → السكان الذين أعطوا تقييماً ≤2 (رسالة اعتذار)
+- `POST /api/ai-actions/execute` → يبعت emails للمستلمين عبر SMTP، يدعم تخصيص `{name}` و`{extra}` لكل مستلم.
+- **حماية:**
+  - Rate limit: **5 executes/ساعة** لكل أدمن.
+  - Re-resolve المستلمين server-side (مفيش spoofing).
+  - يرفض HTML خبيث (`<script>`, `<iframe>`).
+  - كل action مسجل في `ai_action_log` collection (audit trail).
+- **Fallback:** لو LLM فشل، يستخدم template ثابت بنفس الجودة.
+
+**Frontend:** `/app/frontend/src/components/AIActionModal.js`
+- Modal من 4 خطوات: loading → preview → sending → done.
+- **Preview:**
+  - Subject editable (input)
+  - Message editable (toggle "تعديل النص")
+  - Recipients list مع checkboxes + Select All
+  - Safety note + ملاحظة عن audit log
+- **Done:** badge أخضر "تم إرسال X رسالة" + قائمة الفشل لو وُجدت.
+
+**Integration:**
+- `AIInsightsWidget.js` يعرض زر **"⚡ تنفيذ بالـ AI"** بنفسجي/فوشي بجانب deep-link لكل insight قابل للتنفيذ.
+- بعد إرسال ناجح → invalidates cache + refreshes insights.
+
+**🧪 E2E Verification:**
+- ✅ Backend `/draft` returns 3 recipients + AI Arabic message (verified via curl).
+- ✅ Frontend modal opens, displays subject + message + 3 checked recipients with avatars + email + extra badge.
+- ✅ Lint نظيف.
+
+
 ### Iter 102: useFeatureFlag + Email Credentials + AI Insights — Feb 6, 2026 ✅
 
 **🎯 ٣ مهام كبرى مكتملة في iter واحد:**

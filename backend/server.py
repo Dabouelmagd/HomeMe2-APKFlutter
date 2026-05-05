@@ -2595,6 +2595,8 @@ from routes.feature_flags import router as feature_flags_router
 app.include_router(feature_flags_router)
 from routes.ai_insights import router as ai_insights_router
 app.include_router(ai_insights_router)
+from routes.ai_actions import router as ai_actions_router
+app.include_router(ai_actions_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

@@ -69,6 +69,7 @@ import PaymentCancel from './pages/PaymentCancel';
 import AppVersionGuard from './components/AppVersionGuard';
 import ChangelogModal from './components/ChangelogModal';
 import PdfReportsPage from './pages/PdfReportsPage';
+import AIAutoPilotPage from './components/AIAutoPilotPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
 import BrandingSettingsPage from './pages/BrandingSettingsPage';
@@ -728,6 +729,10 @@ function App() {
                 
                 <Route path="reports" element={
                   <PdfReportsPage />
+                } />
+
+                <Route path="ai-autopilot" element={
+                  <AIAutoPilotPage />
                 } />
                 
                 <Route path="two-factor" element={

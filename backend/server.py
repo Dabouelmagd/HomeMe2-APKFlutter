@@ -2597,6 +2597,8 @@ from routes.ai_insights import router as ai_insights_router
 app.include_router(ai_insights_router)
 from routes.ai_actions import router as ai_actions_router
 app.include_router(ai_actions_router)
+from routes.ai_autopilot import router as ai_autopilot_router
+app.include_router(ai_autopilot_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)
@@ -2676,6 +2678,15 @@ async def start_smtp_alerts_loop():
     from smtp_alerts import smtp_alert_loop
     _asyncio.create_task(smtp_alert_loop())
     logging.info("SMTP alert loop started (hourly check)")
+
+
+@app.on_event("startup")
+async def start_autopilot_loop():
+    """AI Auto-Pilot scheduler — wakes every 15 min to check enabled configs."""
+    import asyncio as _asyncio
+    from routes.ai_autopilot import autopilot_loop
+    _asyncio.create_task(autopilot_loop())
+    logging.info("AI Auto-Pilot scheduler started (15-min interval)")
 
 
 @app.on_event("startup")

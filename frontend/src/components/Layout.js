@@ -36,6 +36,7 @@ import {
   CommandLineIcon,
   DocumentTextIcon,
   HandRaisedIcon,
+  SparklesIcon,
   HomeModernIcon,
   EnvelopeIcon,
   SwatchIcon,
@@ -697,6 +698,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('document_management'), href: 'documents', icon: DocumentTextIcon, show: true },
         { name: t('voting_system'), href: 'voting', icon: HandRaisedIcon, show: true },
         { name: 'تقارير PDF', href: 'reports', icon: DocumentTextIcon, show: isStaffRole },
+        { name: '🤖 AI Auto-Pilot', href: 'ai-autopilot', icon: SparklesIcon, show: isStaffRole },
       ]
     },
     {

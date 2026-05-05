@@ -21,6 +21,41 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 104: AI Auto-Pilot Mode — Scheduled AI Actions — Feb 6, 2026 ✅
+
+**🎯 الهدف:** نظام مجدول ينفذ AI Actions تلقائياً بدون تدخل الأدمن — يوفر ساعات من المتابعة اليدوية.
+
+**Backend:** `/app/backend/routes/ai_autopilot.py`
+- **Endpoints:**
+  - `GET /api/ai-autopilot/configs?compound_id=X` — قائمة configs (3 insight types) مع defaults
+  - `PUT /api/ai-autopilot/configs/{insight_id}?compound_id=X` — تفعيل/تعطيل + جدولة (frequency, day_of_week, hour_utc)
+  - `GET /api/ai-autopilot/runs?compound_id=X&limit=20` — سجل التنفيذ
+  - `POST /api/ai-autopilot/run-now/{insight_id}?compound_id=X` — تنفيذ يدوي للاختبار
+- **Background Loop:** `autopilot_loop()` يصحى كل 15 دقيقة، يفحص كل configs مفعّلة:
+  - Daily: ينفذ لو الساعة الحالية = hour_utc وما تنفذش اليوم
+  - Weekly: ينفذ لو يوم الأسبوع = day_of_week + الساعة = hour_utc وما تنفذش الأسبوع
+  - Throttle ضد double-runs.
+- **Reuses:** `routes/ai_actions.py` (`_resolve_recipients`, `_generate_message`, `ACTION_CATALOG`) + `email_service`.
+- **Audit:** كل run مسجّل في `ai_autopilot_runs` + mirror في `ai_action_log` بـ `actor_id="auto_pilot"`.
+- **Cache invalidation:** بعد كل run ناجح يمسح `ai_insights_cache`.
+- **Server.py:** أضيف `start_autopilot_loop` startup event.
+
+**Frontend:** `/app/frontend/src/components/AIAutoPilotPage.js`
+- صفحة كاملة في `/app/ai-autopilot` (سايدبار: "🤖 AI Auto-Pilot" تحت "تقارير PDF").
+- **3 Insight Cards** مع:
+  - Toggle مفعّل/معطّل (animated peer)
+  - Schedule controls: التكرار (يومي/أسبوعي) + يوم الأسبوع + الساعة UTC مع تحويل بتوقيت مصر
+  - "آخر تنفيذ: ..." + status badge + سنت count
+  - زر "تنفيذ الآن" للاختبار اليدوي
+- **سجل التنفيذ** جدول 6 أعمدة (الوقت/النوع/المصدر/المستلمين/تم الإرسال/الحالة) — مع badge "👤 يدوي" أو "🤖 تلقائي".
+
+**🧪 E2E Verification:**
+- ✅ Backend: GET configs (3 defaults) + PUT enable + GET runs (empty initially) — كلها 200.
+- ✅ Background scheduler started (logged on startup).
+- ✅ Frontend: page loads, 3 cards visible, toggle reveals schedule controls, run history table renders.
+- ✅ Lint نظيف.
+
+
 ### Iter 103: AI Action Buttons — From Advisor to Executor — Feb 6, 2026 ✅
 
 **🎯 الهدف:** زر "تنفيذ بالـ AI" داخل insights — AI يكتب الرسالة + يبعتها للمستلمين بضغطة واحدة.

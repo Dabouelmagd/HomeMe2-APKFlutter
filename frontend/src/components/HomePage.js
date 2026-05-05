@@ -1089,6 +1089,19 @@ const HomePage = () => {
             </div>
             <p className="text-xs">&copy; {new Date().getFullYear()} HomeMe - {t('hp_all_rights', 'جميع الحقوق محفوظة')}</p>
           </div>
+
+          {/* Legal Links Row */}
+          <div className="mt-6 pt-4 border-t border-gray-800 flex flex-wrap justify-center items-center gap-x-5 gap-y-2 text-xs">
+            <Link to="/legal/about" className="hover:text-white transition-colors" data-testid="footer-legal-about">من نحن</Link>
+            <span className="opacity-50">·</span>
+            <Link to="/legal/privacy" className="hover:text-white transition-colors" data-testid="footer-legal-privacy">سياسة الخصوصية</Link>
+            <span className="opacity-50">·</span>
+            <Link to="/legal/terms" className="hover:text-white transition-colors" data-testid="footer-legal-terms">شروط الاستخدام</Link>
+            <span className="opacity-50">·</span>
+            <Link to="/legal/contact" className="hover:text-white transition-colors" data-testid="footer-legal-contact">اتصل بنا</Link>
+            <span className="opacity-50">·</span>
+            <span className="text-gray-500">Powered by Data Life AI</span>
+          </div>
         </div>
       </footer>
     </div>

@@ -71,6 +71,7 @@ import ChangelogModal from './components/ChangelogModal';
 import PdfReportsPage from './pages/PdfReportsPage';
 import AIAutoPilotPage from './components/AIAutoPilotPage';
 import SubscriptionAnalyticsPage from './pages/SubscriptionAnalyticsPage';
+import LegalPage from './pages/LegalPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
 import BrandingSettingsPage from './pages/BrandingSettingsPage';
@@ -668,7 +669,10 @@ function App() {
                 
                 {/* Root redirects to homepage */}
                 <Route path="/" element={<HomePage />} />
-                
+
+                {/* Public legal/info pages */}
+                <Route path="/legal/:slug" element={<LegalPage />} />
+
                 <Route path="/app" element={
                   <ProtectedRoute>
                     <Layout />

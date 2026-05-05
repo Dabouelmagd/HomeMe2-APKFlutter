@@ -21,6 +21,42 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 109: Legal Pages (About / Privacy / Terms / Contact) — Feb 6, 2026 ✅
+
+**🎯 الهدف:** 4 صفحات إلزامية للامتثال القانوني والـ Trust.
+
+**Backend:** `/app/backend/routes/legal_pages.py`
+- `GET /api/legal/pages` → list all available pages with metadata.
+- `GET /api/legal/{slug}` → returns markdown content + title/subtitle/icon.
+- Markdown files in `/app/memory/legal/{slug}.md` (read fresh each request → no redeploy needed for content edits).
+
+**Markdown Files Created:**
+- `about.md` — Data Life company info + HomeMe vision/mission/products + numbers (100+ مجمع، 30+ شركة، 5,000+ ساكن).
+- `privacy.md` — 10 sections (data collection, usage, sharing, security, cookies, user rights, retention, contact).
+- `terms.md` — 13 sections (eligibility, account, allowed/prohibited use, plans/billing/refund, IP rights, liability, termination, governing law).
+- `contact.md` — Full contact details + response times + alternative channels + bug report template.
+
+**Frontend:** `/app/frontend/src/pages/LegalPage.js`
+- Single dynamic page component, route `/legal/:slug`.
+- **Custom Markdown renderer** (no external deps) — supports h1/h2/h3, **bold**, *italic*, lists, ordered lists, tables, blockquotes, hr, links, inline code.
+- Beautiful violet/purple/fuchsia gradient hero with icon + title + subtitle.
+- Top nav (HomeMe logo + back button).
+- Dark footer with full contact info + cross-page legal links.
+
+**Public Routes** in App.js: `/legal/:slug` (no auth required — important for Stripe webhook compliance and SEO).
+
+**Footer Links Added in:**
+- `HomePage.js` — full legal links row + "Powered by Data Life AI" tag.
+- `Login.js` — bottom-of-card divider + 4 cross-links.
+
+**🧪 E2E Verification:**
+- ✅ All 4 pages load without auth.
+- ✅ Backend `/api/legal/pages` returns 4 entries with proper Arabic titles.
+- ✅ Backend `/api/legal/about` returns full markdown content.
+- ✅ Frontend renders RTL Arabic with custom markdown styling (h2 with violet underline, lists, tables).
+- ✅ Lint clean on 6 files (1 backend + 5 frontend).
+
+
 ### Iter 108: Ad Banner Sizing + Changelog Refresh — Feb 6, 2026 ✅
 
 **🐛 إصلاحان من screenshots المستخدم:**

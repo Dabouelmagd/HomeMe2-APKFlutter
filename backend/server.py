@@ -2605,6 +2605,8 @@ from routes.subscription_migration import router as sub_migration_router
 app.include_router(sub_migration_router)
 from routes.subscription_analytics import router as sub_analytics_router
 app.include_router(sub_analytics_router)
+from routes.legal_pages import router as legal_pages_router
+app.include_router(legal_pages_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

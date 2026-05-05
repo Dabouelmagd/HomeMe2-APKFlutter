@@ -404,6 +404,17 @@ const Login = () => {
         <div className="mt-4">
           <InternalAdBanner position="login_page" maxAds={1} variant="slim" />
         </div>
+
+        {/* Legal Links Footer */}
+        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-gray-500">
+          <Link to="/legal/about" className="hover:text-violet-600 hover:underline" data-testid="legal-link-about">من نحن</Link>
+          <span>·</span>
+          <Link to="/legal/privacy" className="hover:text-violet-600 hover:underline" data-testid="legal-link-privacy">سياسة الخصوصية</Link>
+          <span>·</span>
+          <Link to="/legal/terms" className="hover:text-violet-600 hover:underline" data-testid="legal-link-terms">شروط الاستخدام</Link>
+          <span>·</span>
+          <Link to="/legal/contact" className="hover:text-violet-600 hover:underline" data-testid="legal-link-contact">اتصل بنا</Link>
+        </div>
       </div>
 
       {/* 2FA Challenge Modal */}

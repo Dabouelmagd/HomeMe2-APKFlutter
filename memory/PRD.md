@@ -21,6 +21,35 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 108: Ad Banner Sizing + Changelog Refresh — Feb 6, 2026 ✅
+
+**🐛 إصلاحان من screenshots المستخدم:**
+
+#### Fix 1 — Ad Banner Sizing
+- **المشكلة:** الإعلانات في dashboard تظهر بحجم ضخم (`maxHeight: 250px` + `h-auto` يسمح للصورة بأن تكون طويلة جداً).
+- **الحل:** `InternalAdBanner.js` الآن يفرض `aspect-ratio: 6/1` + `maxHeight: 160px` + `minHeight: 80px` + `object-cover` على img/video.
+- النتيجة: banner منسجم دائماً بدون تكسير حتى لو الصورة المرفوعة بنسبة عرض/ارتفاع مختلفة.
+
+#### Fix 2 — Changelog Modal Showing Stale Updates
+- **المشكلة:** `CHANGELOG_LATEST.md` يحتوي تحديثات قديمة (رفع السكان من Excel، رسوم بيانية).
+- **الحل:** أعيد كتابة الملف بـ 8 تحديثات حديثة:
+  1. 📊 لوحة تحليلات الاشتراكات (MRR/Churn/Trial→Paid)
+  2. 🔁 Stripe Auto-Renewal
+  3. 🤖 AI Auto-Pilot + ملخص أسبوعي
+  4. ✨ مساعد HomeMe الذكي
+  5. 🧠 مستشار AI استباقي
+  6. 📨 إرسال بيانات الدخول تلقائياً
+  7. 🔍 بار بحث + Recent Compounds
+  8. 🎨 لوحة Super Admin (28 رابط)
+- Backend restart نفّذ `Changelog auto-sync from file: 8 entries refreshed`.
+- `/api/version` الآن يرجع _VERSION جديد + 8 تحديثات → AppVersionGuard هيكشف التغيير ويعرض ChangelogModal للمستخدمين.
+
+**🧪 Verification:**
+- ✅ `curl /api/version` → 8 entries عربية بترتيب صحيح.
+- ✅ Backend log: "Changelog auto-sync from file: 8 entries refreshed".
+- ✅ Banner aspect-ratio محدد 6:1 (لن يكسر أي layout).
+
+
 ### Iter 107: Complaints AutoPilot + Migration + Subscription Analytics — Feb 6, 2026 ✅
 
 **🎯 ٣ مهام في iteration واحد:**

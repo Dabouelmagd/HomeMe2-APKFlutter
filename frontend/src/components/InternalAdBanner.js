@@ -111,11 +111,11 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
         {visibleAds.map(ad => (
           <div key={ad.id} className="relative group rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl hover:scale-[1.01] transition-all" onClick={() => handleClick(ad)} title={ad.link_url ? ad.link_url : ''}>
             {ad.image_url ? (
-              // صورة نظيفة بدون أي نص فوقها
+              // صورة بحجم banner منضبط (aspect 6:1)
               (ad.media_type === 'video') || /\.(mp4|webm|mov)(\?|$)/i.test(ad.image_url) ? (
-                <video src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} muted loop autoPlay playsInline />
+                <video src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} className="w-full block object-cover bg-gray-100" style={{ aspectRatio: '6 / 1', maxHeight: '160px', minHeight: '80px' }} muted loop autoPlay playsInline />
               ) : (
-                <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} alt={ad.title} className="w-full h-auto object-cover block" style={{ maxHeight: '250px' }} />
+                <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} alt={ad.title} className="w-full block object-cover bg-gray-100" style={{ aspectRatio: '6 / 1', maxHeight: '160px', minHeight: '80px' }} />
               )
             ) : (() => {
               // بدون صورة: نعرض القالب المُختار (أو القالب الافتراضي)

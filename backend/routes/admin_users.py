@@ -194,6 +194,23 @@ async def create_user(request: Request, user_data: UserCreate, current_user: dic
         result = await db.users.insert_one(user_doc)
 
         if result.inserted_id:
+            # Send credentials email (fire-and-forget; failures don't block creation)
+            if user_data.email:
+                try:
+                    from services.credentials_email import send_credentials_email
+                    compound = await db.compounds.find_one(
+                        {"id": target_compound}, {"_id": 0, "name": 1}
+                    )
+                    await send_credentials_email(
+                        to_email=user_data.email,
+                        full_name=user_data.full_name,
+                        username=user_data.username,
+                        password=user_data.password,
+                        compound_name=(compound or {}).get("name"),
+                        role=user_data.role,
+                    )
+                except Exception as e:
+                    logging.warning(f"Credentials email skipped for new user {user_data.username}: {e}")
             return {"message": "تم إنشاء الساكن بنجاح", "user_id": user_doc["id"]}
         else:
             raise HTTPException(status_code=500, detail="Failed to create user")

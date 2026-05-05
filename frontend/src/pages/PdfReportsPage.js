@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { usePermissions } from '../hooks/usePermissions';
 import PageHero from '../components/shared/PageHero';
+import FeatureGate from '../components/shared/FeatureGate';
 import {
   FileText,
   Building2,
@@ -199,6 +200,7 @@ export default function PdfReportsPage() {
           accent="rose"
         />
 
+        <FeatureGate feature="pdf_excel_exports">
         {/* Filters */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md mb-6 border border-gray-100 dark:border-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -437,6 +439,7 @@ export default function PdfReportsPage() {
             )}
           </div>
         )}
+        </FeatureGate>
       </div>
     </div>
   );

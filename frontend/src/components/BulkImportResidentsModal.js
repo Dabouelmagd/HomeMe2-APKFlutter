@@ -83,7 +83,12 @@ const BulkImportResidentsModal = ({ onClose, onImported }) => {
       });
       setResults(res.data);
       setStep(3);
-      toast.success(`تم إنشاء ${res.data.created} ساكن بنجاح`);
+      const emailsSent = res.data.emails_sent || 0;
+      if (emailsSent > 0) {
+        toast.success(`تم إنشاء ${res.data.created} ساكن بنجاح • تم إرسال ${emailsSent} بريد ترحيب 📧`);
+      } else {
+        toast.success(`تم إنشاء ${res.data.created} ساكن بنجاح`);
+      }
       onImported?.();
     } catch (err) {
       toast.error(err?.response?.data?.detail || 'فشل الحفظ');
@@ -283,6 +288,14 @@ const BulkImportResidentsModal = ({ onClose, onImported }) => {
                 <Stat label="مُتجاهلون (أخطاء)" value={results.skipped} color="amber" />
                 <Stat label="فشل" value={results.failed} color="red" />
               </div>
+
+              {results.emails_sent > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-center" data-testid="bulk-emails-sent">
+                  <p className="text-sm text-blue-800">
+                    📧 تم إرسال <strong>{results.emails_sent}</strong> بريد ترحيب تلقائياً للسكان الذين لديهم بريد إلكتروني
+                  </p>
+                </div>
+              )}
 
               {results.credentials?.length > 0 && (
                 <div className="bg-amber-50 border border-amber-300 rounded-xl p-4">

@@ -339,7 +339,14 @@ async def commit_bulk_import(
     failed = 0
     failed_rows: List[Dict] = []
     credentials: List[Dict] = []
+    emails_sent = 0
     now = datetime.now(timezone.utc)
+
+    # Pre-fetch compound name for credentials email
+    compound_doc = await db.compounds.find_one(
+        {"id": target_compound}, {"_id": 0, "name": 1}
+    )
+    compound_name = (compound_doc or {}).get("name")
 
     for rec in val["valid"]:
         try:
@@ -371,6 +378,23 @@ async def commit_bulk_import(
                 "unit_number": rec["unit_number"],
             })
             created += 1
+            # Send credentials email (only if user provided an email)
+            user_email = rec.get("email")
+            if user_email:
+                try:
+                    from services.credentials_email import send_credentials_email
+                    sent = await send_credentials_email(
+                        to_email=user_email,
+                        full_name=rec["full_name"],
+                        username=rec["username"],
+                        password=rec["password"],
+                        compound_name=compound_name,
+                        role=rec.get("role", "resident"),
+                    )
+                    if sent:
+                        emails_sent += 1
+                except Exception as e:
+                    logger.warning(f"Bulk credentials email skipped for {user_email}: {e}")
         except Exception as e:
             failed += 1
             failed_rows.append({"row": rec["_row"], "name": rec.get("full_name", ""), "error": str(e)})
@@ -383,4 +407,5 @@ async def commit_bulk_import(
         "total": val["summary"]["total"],
         "failed_rows": failed_rows,
         "credentials": credentials,  # one-time access for admin to share with residents
+        "emails_sent": emails_sent,  # how many got the welcome email automatically
     }

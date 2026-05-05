@@ -21,6 +21,42 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 102: useFeatureFlag + Email Credentials + AI Insights — Feb 6, 2026 ✅
+
+**🎯 ٣ مهام كبرى مكتملة في iter واحد:**
+
+#### Task 1 — useFeatureFlag Hook (P1)
+- **Backend:** `/app/backend/routes/feature_flags.py` — `GET /api/feature-flags/me` يرجع المصفوفة الكاملة من `_PLAN_FEATURES` الموجودة بالفعل.
+- **Frontend Hook:** `/app/frontend/src/hooks/useFeatureFlag.js` — singleton cache + `showUpgradeToast()` helper.
+- **Component:** `/app/frontend/src/components/shared/FeatureGate.js` — 3 modes: `block` (full upgrade page), `badge` (overlay), `hide`.
+- **Applied to:** AdvancedAnalytics (advanced_dashboard) + PdfReportsPage (pdf_excel_exports).
+- **Plans:** starter / company_startup / company_business / company_enterprise.
+- **Owner/Super Admin** يحصلون تلقائياً على company_enterprise (unlimited).
+
+#### Task 2 — Email Credentials لكل مستخدم جديد (P1)
+- **New Service:** `/app/backend/services/credentials_email.py` — قالب HTML عربي/RTL مع لوجو، اسم المستخدم، كلمة المرور المؤقتة، زر "تسجيل دخول".
+- **Integrated in:**
+  - `routes/admin_users.py` — إنشاء مستخدم فردي (يرسل إيميل تلقائياً لو الإيميل موجود).
+  - `routes/bulk_import_residents.py` — Bulk import يرسل إيميل لكل ساكن وأرجع `emails_sent` count.
+- **Frontend:** `BulkImportResidentsModal.js` يعرض شارة جديدة "تم إرسال X بريد ترحيب".
+- **Failure-safe:** فشل الإيميل لا يكسر إنشاء المستخدم (silent log).
+
+#### Task 3 — AI Insights Widget (Proactive Advisor) 🧠
+- **Backend:** `/app/backend/routes/ai_insights.py` — `GET /api/ai-insights/me?compound_id=X` يحلل 6 إشارات:
+  - Late invoices (>30d) • Old maintenance (>7d) • Negative ratings (last 7d) • Pending payment proofs • Open complaints • Total residents.
+- **Rule-based generator** (لا تستخدم LLM لتقليل التكلفة) ينتج 6 insights كحد أقصى مع severity (high/medium/low).
+- **Cache:** 1 ساعة لكل compound في `ai_insights_cache` collection.
+- **Frontend:** `AIInsightsWidget.js` — gradient بنفسجي/فوشي، collapsible، badge "X عاجل" مع pulse، أزرار deep-link.
+- **Mounted in:** `AdminDashboard.js` لـ admin/manager/company_admin/super_admin/app_owner.
+
+**🧪 E2E Verification:**
+- ✅ `GET /api/feature-flags/me` → 200 مع feature matrix كامل.
+- ✅ `GET /api/ai-insights/me?compound_id=...` → "6 شكوى مفتوحة" insight حقيقي.
+- ✅ Screenshot: AI Insights widget يعرض "مستشار HomeMe الذكي" + 1 تنبيه + زر "عرض الشكاوى".
+- ✅ Lint نظيف على كل الملفات الجديدة.
+
+
+
 ### Iter 101: AI Assistant Chatbot — Feb 6, 2026 ✅
 
 **🎯 الهدف:** مساعد ذكي يجاوب على المستخدمين ويوجههم لصفحات التطبيق.

@@ -28,6 +28,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { formatDate } from '../utils/dateUtils';
 import CompoundSwitcher from './CompoundSwitcher';
+import FeatureGate from './shared/FeatureGate';
 
 // Chart Colors
 const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4'];
@@ -310,8 +311,9 @@ const AdvancedAnalytics = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <PageHero
+    <FeatureGate feature="advanced_dashboard">
+      <div className="p-6 max-w-7xl mx-auto">
+        <PageHero
         icon="📊"
         title={t('advanced_analytics')}
         subtitle={t('analytics_description')}
@@ -805,6 +807,7 @@ const AdvancedAnalytics = () => {
         <AdsAnalyticsTab data={adAnalytics} t={t} hideRevenue={isSuperAdminOnly} />
       )}
     </div>
+    </FeatureGate>
   );
 };
 

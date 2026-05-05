@@ -12,6 +12,7 @@ import CompoundSubscriptionCard from './CompoundSubscriptionCard';
 import PaymentAnalyticsCard from './PaymentAnalyticsCard';
 import CompanyPlanUsageCard from './CompanyPlanUsageCard';
 import SuperAdminQuickStats from './SuperAdminQuickStats';
+import AIInsightsWidget from './AIInsightsWidget';
 import { TransliteratedText } from './TransliterationToggle';
 import {
   UsersIcon,
@@ -311,6 +312,11 @@ const AdminDashboard = () => {
         {/* Super Admin / App Owner Quick Stats — pulse widget */}
         {(user?.role === 'super_admin' || user?.role === 'app_owner') && (
           <SuperAdminQuickStats />
+        )}
+
+        {/* AI Insights Widget — proactive advisor for admin/manager/company_admin */}
+        {(['admin', 'manager', 'company_admin', 'super_admin', 'app_owner'].includes(user?.role)) && (
+          <AIInsightsWidget />
         )}
 
         {/* Compound Subscription — always visible for compound admins */}

@@ -21,6 +21,23 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 105: Account Selector Search Bar — Feb 6, 2026 ✅
+
+**🎯 الهدف:** بار بحث في صفحة "اختر الحساب" للبحث عن الكمبوند بسهولة لما يكون عند المستخدم 5+ حسابات.
+
+**التغيير في `AccountSelector.js`:**
+- State جديد: `search`.
+- `filteredAccounts` derived من `accounts` + `search` (يطابق على compound_name + description + label).
+- Search bar مع MagnifyingGlassIcon + autoFocus + زر ✕ لمسح البحث + counter "X نتيجة".
+- يظهر فقط عند `accounts.length >= 5` (لو أقل، الكروت قليلة ومش محتاجين بحث).
+- الـ Grid responsive (يتأقلم على عدد النتائج).
+
+**🧪 E2E Verification:**
+- ✅ Login as super_admin → 5+ كمبوندات → search bar ظاهر مع autoFocus.
+- ✅ كتابة "روي" → فلتر فوري → كرت واحد فقط ("رويال سيتي") + "1 نتيجة".
+- ✅ Lint نظيف.
+
+
 ### Iter 104: AI Auto-Pilot Mode — Scheduled AI Actions — Feb 6, 2026 ✅
 
 **🎯 الهدف:** نظام مجدول ينفذ AI Actions تلقائياً بدون تدخل الأدمن — يوفر ساعات من المتابعة اليدوية.

@@ -14,6 +14,7 @@ import {
   ArrowRightIcon,
   ArrowLeftIcon,
   StarIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -83,6 +84,7 @@ const AccountSelector = () => {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const [rememberChoice, setRememberChoice] = useState(false);
+  const [search, setSearch] = useState('');
 
   const roleLabels = {
     app_owner: t('as_role_app_owner', 'مالك التطبيق'),
@@ -287,6 +289,19 @@ const AccountSelector = () => {
     return null;
   }
 
+  // Filter accounts by search (matches compound name OR role label)
+  const normalizedSearch = search.trim().toLowerCase();
+  const filteredAccounts = !normalizedSearch
+    ? accounts
+    : accounts.filter((acc) => {
+        const haystack = [
+          acc.compound_name,
+          acc.description,
+          acc.label,
+        ].filter(Boolean).join(' ').toLowerCase();
+        return haystack.includes(normalizedSearch);
+      });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex items-center justify-center p-4"
       dir={isRTL ? 'rtl' : 'ltr'} data-testid="account-selector">
@@ -308,9 +323,43 @@ const AccountSelector = () => {
           </p>
         </div>
 
+        {/* Search Bar — visible when 5+ accounts */}
+        {accounts.length >= 5 && (
+          <div className="max-w-md mx-auto mb-6">
+            <div className="relative">
+              <MagnifyingGlassIcon className={`w-5 h-5 text-gray-400 absolute top-1/2 -translate-y-1/2 ${isRTL ? 'right-3' : 'left-3'}`} />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('as_search_placeholder', 'ابحث باسم الكمبوند أو الحساب...')}
+                className={`w-full bg-white/5 backdrop-blur border border-gray-700/50 rounded-xl py-3 ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                data-testid="account-search-input"
+                autoFocus
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className={`absolute top-1/2 -translate-y-1/2 ${isRTL ? 'left-3' : 'right-3'} text-gray-400 hover:text-white text-xs`}
+                  data-testid="account-search-clear"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+            {search && (
+              <p className="text-[11px] text-gray-400 mt-2 text-center">
+                {filteredAccounts.length === 0
+                  ? t('as_search_no_results', 'لا توجد نتائج مطابقة')
+                  : `${filteredAccounts.length} ${t('as_search_match', 'نتيجة')}`}
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Account Cards */}
-        <div className={`grid gap-4 mb-6 ${accounts.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : accounts.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
-          {accounts.map(acc => {
+        <div className={`grid gap-4 mb-6 ${filteredAccounts.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : filteredAccounts.length === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
+          {filteredAccounts.map(acc => {
             const config = ROLE_CONFIG[acc.role] || ROLE_CONFIG.resident;
             const IconComponent = config.icon;
             const isSelected = selected === acc.id;

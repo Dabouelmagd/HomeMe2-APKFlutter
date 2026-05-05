@@ -154,6 +154,38 @@ const AIAutoPilotPage = () => {
         accent="violet"
       />
 
+      {/* Weekly Digest CTA */}
+      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-2xl p-4 mb-6 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-lg">
+            📬
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-gray-900">ملخص أسبوعي بالبريد</h3>
+            <p className="text-xs text-gray-600 mt-0.5">يصلك كل يوم اثنين 11 صباحاً ملخص بكل إجراءات AutoPilot الأسبوع.</p>
+          </div>
+        </div>
+        <button
+          onClick={async () => {
+            if (!window.confirm('سيتم إرسال الملخص الآن لكل admins/managers في المجمع. متابعة؟')) return;
+            try {
+              await axios.post(
+                `${API}/ai-autopilot/digest/send-now?compound_id=${compoundId}`,
+                {},
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+              );
+              toast.success('✅ تم إرسال الملخص للأدمن');
+            } catch (e) {
+              toast.error(e?.response?.data?.detail || 'فشل الإرسال');
+            }
+          }}
+          className="text-xs font-bold text-indigo-700 hover:text-indigo-900 hover:bg-white px-3 py-2 rounded-lg border border-indigo-300 bg-white/60 transition-colors flex-shrink-0"
+          data-testid="autopilot-digest-now"
+        >
+          📨 إرسال الملخص الآن
+        </button>
+      </div>
+
       {/* Configs */}
       <div className="space-y-3 mb-8">
         {loading ? (

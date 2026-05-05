@@ -2599,6 +2599,8 @@ from routes.ai_actions import router as ai_actions_router
 app.include_router(ai_actions_router)
 from routes.ai_autopilot import router as ai_autopilot_router
 app.include_router(ai_autopilot_router)
+from routes.stripe_subscriptions import router as stripe_subs_router
+app.include_router(stripe_subs_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)
@@ -2687,6 +2689,15 @@ async def start_autopilot_loop():
     from routes.ai_autopilot import autopilot_loop
     _asyncio.create_task(autopilot_loop())
     logging.info("AI Auto-Pilot scheduler started (15-min interval)")
+
+
+@app.on_event("startup")
+async def start_autopilot_digest_loop():
+    """Weekly AutoPilot digest — Monday 08:00 UTC."""
+    import asyncio as _asyncio
+    from services.autopilot_digest import autopilot_digest_loop
+    _asyncio.create_task(autopilot_digest_loop())
+    logging.info("AI AutoPilot Weekly Digest scheduler started (Mondays 08:00 UTC)")
 
 
 @app.on_event("startup")

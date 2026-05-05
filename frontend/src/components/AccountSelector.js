@@ -255,6 +255,14 @@ const AccountSelector = () => {
     localStorage.setItem('selectedRole', acc.role);
     localStorage.setItem('rememberedAccount', JSON.stringify(acc));
 
+    // Track recent accounts (last 3 used) — keyed by account id
+    try {
+      const recent = JSON.parse(localStorage.getItem('recentAccounts') || '[]')
+        .filter((r) => r.id !== acc.id);
+      recent.unshift({ id: acc.id, used_at: new Date().toISOString() });
+      localStorage.setItem('recentAccounts', JSON.stringify(recent.slice(0, 3)));
+    } catch { /* swallow */ }
+
     if (rememberChoice) {
       localStorage.setItem('rememberCompound', 'true');
     }
@@ -291,7 +299,7 @@ const AccountSelector = () => {
 
   // Filter accounts by search (matches compound name OR role label)
   const normalizedSearch = search.trim().toLowerCase();
-  const filteredAccounts = !normalizedSearch
+  const filtered = !normalizedSearch
     ? accounts
     : accounts.filter((acc) => {
         const haystack = [
@@ -301,6 +309,22 @@ const AccountSelector = () => {
         ].filter(Boolean).join(' ').toLowerCase();
         return haystack.includes(normalizedSearch);
       });
+
+  // Recent accounts ranking — sort accounts so recently-used ones appear first
+  let recentMap = {};
+  try {
+    const recent = JSON.parse(localStorage.getItem('recentAccounts') || '[]');
+    recent.forEach((r, idx) => { recentMap[r.id] = idx; }); // 0 = most recent
+  } catch { /* ignore */ }
+
+  const filteredAccounts = [...filtered].sort((a, b) => {
+    const ra = recentMap[a.id];
+    const rb = recentMap[b.id];
+    if (ra != null && rb != null) return ra - rb;
+    if (ra != null) return -1;
+    if (rb != null) return 1;
+    return 0;
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 flex items-center justify-center p-4"
@@ -363,6 +387,7 @@ const AccountSelector = () => {
             const config = ROLE_CONFIG[acc.role] || ROLE_CONFIG.resident;
             const IconComponent = config.icon;
             const isSelected = selected === acc.id;
+            const isRecent = recentMap[acc.id] != null;
 
             return (
               <button
@@ -378,6 +403,13 @@ const AccountSelector = () => {
                 {isSelected && (
                   <div className="absolute top-3 end-3">
                     <CheckCircleIcon className="w-6 h-6 text-green-400" />
+                  </div>
+                )}
+
+                {isRecent && !isSelected && (
+                  <div className="absolute top-3 end-3 bg-amber-500/20 backdrop-blur border border-amber-400/40 px-2 py-0.5 rounded-full flex items-center gap-1" data-testid={`recent-badge-${acc.id}`}>
+                    <span className="text-[10px]">🕒</span>
+                    <span className="text-[10px] font-bold text-amber-300">{t('as_recent', 'آخر استخدام')}</span>
                   </div>
                 )}
 

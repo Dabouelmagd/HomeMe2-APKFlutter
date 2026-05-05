@@ -21,6 +21,47 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 106: Recent Compounds + Weekly Digest + Stripe Auto-Renewal — Feb 6, 2026 ✅
+
+**🎯 ٣ مهام دفعة واحدة:**
+
+#### Task 1 — Recent Compounds في AccountSelector
+- localStorage `recentAccounts` يحفظ آخر 3 حسابات استُخدمت + timestamps.
+- AccountSelector يرتّب الكروت بحيث الـ recent يظهر أولاً + badge "🕒 آخر استخدام" أصفر.
+
+#### Task 2 — AutoPilot Weekly Digest 📬
+- **New Service:** `/app/backend/services/autopilot_digest.py` — `autopilot_digest_loop` يصحى كل 30 دقيقة، Mondays 08:00 UTC = 11:00 Cairo، يبعت ملخص أسبوعي لكل compound فيه AutoPilot configs مفعّلة.
+- **HTML Email** عربي/RTL مع: header gradient + 3 stat tiles (totals لكل insight) + جدول تفاصيل + CTA button.
+- **DB:** `autopilot_digest_meta` لتتبع `last_sent_at` (يمنع double-sends).
+- **New endpoint:** `POST /api/ai-autopilot/digest/send-now?compound_id=X` للإرسال الفوري.
+- **Frontend:** زر "📨 إرسال الملخص الآن" في AIAutoPilotPage.
+- **Server.py:** `start_autopilot_digest_loop` startup event.
+
+#### Task 3 — Stripe Auto-Renewal 💳
+- **New File:** `/app/backend/routes/stripe_subscriptions.py` (true recurring billing).
+- **Endpoints:**
+  - `GET /api/stripe-subscriptions/plans` (public) — 3 plans × 2 cycles مع savings %.
+  - `POST /checkout` — ينشئ Stripe Customer + Recurring Price + Checkout Session في mode='subscription'.
+  - `GET /status` — حالة الاشتراك الحالية.
+  - `POST /portal` — Stripe Customer Portal URL.
+  - `POST /cancel` / `POST /resume` — إيقاف/استئناف auto-renew.
+  - `POST /webhook` — handles `invoice.payment_succeeded`, `payment_failed`, `subscription.deleted/updated`.
+- **Plan Catalogue:**
+  - Startup: 3,500 EGP/شهر، 35,000 EGP/سنة (-17%)
+  - Business: 7,500 EGP/شهر، 75,000 EGP/سنة (-17%)
+  - Enterprise: 20,000 EGP/شهر، 200,000 EGP/سنة (-17%)
+- **DB Collections:** `stripe_price_cache` (caches Product/Price IDs), `stripe_invoice_log`, `payment_transactions` (يستفيد من البنية الموجودة).
+- **Frontend:** `StripeAutoRenewCard.js` — toggle شهري/سنوي + 3 plan picker + زر اشترك + customer portal/cancel/resume للمشتركين الحاليين.
+- **Mounted in:** `CompanyPlanUsageCard.js` (شركة الإدارة dashboard).
+
+**🧪 E2E Verification:**
+- ✅ `GET /api/stripe-subscriptions/plans` → 3 plans + savings 17%.
+- ✅ `GET /status` → 200 (no active sub yet).
+- ✅ `POST /digest/send-now` → 200.
+- ✅ Frontend: company_admin login → ترقية الخطة card → AutoRenew card تحته → toggle شهري/سنوي + savings badge -17% + 3 plans.
+- ✅ Lint نظيف على كل الملفات.
+
+
 ### Iter 105: Account Selector Search Bar — Feb 6, 2026 ✅
 
 **🎯 الهدف:** بار بحث في صفحة "اختر الحساب" للبحث عن الكمبوند بسهولة لما يكون عند المستخدم 5+ حسابات.

@@ -160,6 +160,18 @@ async def run_now(
     return result
 
 
+@router.post("/digest/send-now")
+async def send_digest_now_endpoint(
+    compound_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """Manually fire the weekly digest email — useful for testing/preview."""
+    _require_admin(current_user)
+    from services.autopilot_digest import send_digest_now
+    await send_digest_now(compound_id)
+    return {"ok": True, "message": "تم إرسال ملخص AutoPilot الأسبوعي"}
+
+
 # ============================================================================
 # Core: execute one auto-pilot run
 # ============================================================================

@@ -10,6 +10,7 @@ import {
   XMarkIcon,
   LockClosedIcon,
 } from '@heroicons/react/24/outline';
+import StripeAutoRenewCard from './StripeAutoRenewCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -105,6 +106,11 @@ export const CompanyPlanUsageCard = () => {
             testid="usage-residents"
           />
         </div>
+      </div>
+
+      {/* Stripe Auto-Renewal — shown below the current plan card */}
+      <div className="mt-4">
+        <StripeAutoRenewCard />
       </div>
 
       {showUpgrade && (

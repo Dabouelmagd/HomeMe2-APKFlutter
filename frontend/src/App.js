@@ -72,6 +72,7 @@ import PdfReportsPage from './pages/PdfReportsPage';
 import AIAutoPilotPage from './components/AIAutoPilotPage';
 import SubscriptionAnalyticsPage from './pages/SubscriptionAnalyticsPage';
 import LegalPage from './pages/LegalPage';
+import LegalEditorPage from './pages/LegalEditorPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
 import BrandingSettingsPage from './pages/BrandingSettingsPage';
@@ -742,6 +743,10 @@ function App() {
 
                 <Route path="subscription-analytics" element={
                   <SubscriptionAnalyticsPage />
+                } />
+
+                <Route path="legal-editor" element={
+                  <LegalEditorPage />
                 } />
                 
                 <Route path="two-factor" element={

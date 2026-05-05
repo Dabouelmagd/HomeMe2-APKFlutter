@@ -85,10 +85,22 @@ async def sync_changelog_from_file(db) -> int:
       1. Soft-disable previous auto entries (source='auto') so file fully drives the modal.
       2. Insert/update each new file bullet ordered top-to-bottom.
       3. Manual entries (source='manual') are preserved untouched.
+      4. Auto-translate AR → EN + FR via Gemini (cached so re-syncs are fast).
     """
     items = _parse_changelog_file(_CHANGELOG_FILE)
     if not items:
         return 0
+
+    # Auto-translate AR bullets into EN+FR (cached per version)
+    ar_lines = [it["ar"] for it in items]
+    en_lines = ar_lines
+    fr_lines = ar_lines
+    try:
+        from services.translation_service import translate_changelog_cached
+        en_lines = await translate_changelog_cached(ar_lines, _VERSION, "en")
+        fr_lines = await translate_changelog_cached(ar_lines, _VERSION, "fr")
+    except Exception as e:
+        logging.warning(f"changelog auto-translate skipped: {e}")
 
     now = datetime.now(timezone.utc).isoformat()
     await db.changelog_entries.update_many(
@@ -101,8 +113,8 @@ async def sync_changelog_from_file(db) -> int:
         )
         doc = {
             "ar": it["ar"],
-            "en": it.get("en") or it["ar"],
-            "fr": it.get("fr") or it["ar"],
+            "en": en_lines[idx] if idx < len(en_lines) else it["ar"],
+            "fr": fr_lines[idx] if idx < len(fr_lines) else it["ar"],
             "order": idx + 1,
             "is_active": True,
             "source": "auto",

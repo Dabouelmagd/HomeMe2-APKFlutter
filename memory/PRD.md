@@ -21,6 +21,56 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 110: Multi-lang Legal + Auto-Translate Changelog + Owner Editor — Feb 6, 2026 ✅
+
+**🎯 ٣ مهام مترابطة:**
+
+#### Task 1 — Multi-lang Legal Pages (AR/EN/FR)
+- **Backend `legal_pages.py` rewritten:**
+  - Files: `/app/memory/legal/{slug}_{lang}.md` (ar/en/fr)
+  - Backwards compat: legacy `{slug}.md` treated as AR.
+  - `GET /api/legal/{slug}?lang=X` returns content + `lang_served` + `fallback_used` flag.
+  - `PAGE_META` titles/subtitles localized in 3 languages.
+- **Frontend `LegalPage.js` updated:**
+  - Reads `i18n.language`, fetches matching version.
+  - Lang switcher (عربي · English · Français) at top.
+  - Yellow "fallback" notice when EN/FR missing → shows AR.
+
+#### Task 2 — Translation Service (Gemini-powered)
+- **New file `/app/backend/services/translation_service.py`:**
+  - `translate_markdown(content, src, tgt)` — full markdown translation preserving structure.
+  - `translate_short_lines(lines, src, tgt)` — batch translate using numbered format.
+  - `translate_changelog_cached(entries, version, lang)` — caches in `translation_cache` Mongo collection.
+- **System prompt** preserves: HomeMe/Stripe/Data Life proper nouns, emojis, markdown structure, links/emails/phones.
+- **Cost:** ~2.4s for 1,651 chars AR→EN; cached so same version doesn't re-translate.
+
+#### Task 3 — Auto-Translate Changelog
+- Updated `routes/app_version.py::sync_changelog_from_file` to call `translate_changelog_cached` for EN+FR.
+- Both translations cached in `translation_cache` keyed by `version+lang`.
+- `/api/version` now returns 3 languages per entry automatically — ChangelogModal localizes based on user locale.
+
+#### Task 4 — Owner Legal Editor
+- **New page `LegalEditorPage.js`** at `/app/legal-editor` (owner-only).
+- **Features:**
+  - 4 page tabs (about/privacy/terms/contact) + 3 lang tabs (ar/en/fr) with ✓ check on filled versions.
+  - Side-by-side Markdown editor + live preview (toggle-able).
+  - **"ترجم من AR بـ AI"** button on EN/FR tabs → calls Gemini, saves result, switches to that tab.
+  - Save button disabled when no changes (`isDirty`).
+  - Markdown tips card at bottom.
+- **Sidebar:** "✏️ محرّر الصفحات القانونية" تحت "تحليلات الإيرادات".
+- **Backend endpoints used:**
+  - `GET /api/legal/{slug}/raw` (owner-only) — returns all 3 versions in one call.
+  - `PUT /api/legal/{slug}?lang=X` — save markdown.
+  - `POST /api/legal/{slug}/translate?source_lang=ar&target_lang=en|fr` — AI translation.
+
+**🧪 E2E Verification:**
+- ✅ Backend: pages list (en) returns localized titles, fallback flag works.
+- ✅ Translation: about (1,651 chars AR) → 1,999 chars EN in 2.4 seconds via Gemini, structure preserved.
+- ✅ Frontend: Editor loads with 4 page tabs + 3 lang tabs + AI translate button + live preview.
+- ✅ EN tab shows already-translated content with "✓ محفوظ".
+- ✅ Lint clean on all 6 files (3 backend + 3 frontend).
+
+
 ### Iter 109: Legal Pages (About / Privacy / Terms / Contact) — Feb 6, 2026 ✅
 
 **🎯 الهدف:** 4 صفحات إلزامية للامتثال القانوني والـ Trust.

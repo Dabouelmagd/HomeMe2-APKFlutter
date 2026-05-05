@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { ArrowLeftIcon, EnvelopeIcon, PhoneIcon, MapPinIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 
@@ -150,6 +151,9 @@ const renderMarkdown = (md) => {
 
 const LegalPage = () => {
   const { slug } = useParams();
+  const { i18n } = useTranslation();
+  const lang = ['ar', 'en', 'fr'].includes(i18n.language) ? i18n.language : 'ar';
+  const isRTL = lang === 'ar';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -158,14 +162,14 @@ const LegalPage = () => {
     setLoading(true);
     setData(null);
     setError(null);
-    axios.get(`${API}/legal/${slug}`)
+    axios.get(`${API}/legal/${slug}?lang=${lang}`)
       .then((res) => setData(res.data))
       .catch((e) => setError(e?.response?.data?.detail || 'فشل تحميل الصفحة'))
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [slug, lang]);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Top Nav */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
@@ -174,11 +178,34 @@ const LegalPage = () => {
             <span className="text-lg font-black text-gray-900 group-hover:text-violet-600 transition-colors">HomeMe</span>
           </Link>
           <Link to="/" className="text-sm text-violet-700 hover:text-violet-900 font-semibold inline-flex items-center gap-1">
-            <ArrowLeftIcon className="w-4 h-4 rtl:rotate-180" />
-            العودة للرئيسية
+            <ArrowLeftIcon className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} />
+            {lang === 'ar' ? 'العودة للرئيسية' : lang === 'fr' ? "Retour à l'accueil" : 'Back to home'}
           </Link>
         </div>
       </header>
+
+      {/* Language switcher */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-5xl mx-auto px-6 py-2 flex items-center justify-end gap-2 text-xs">
+          <span className="text-gray-400">🌐</span>
+          {[
+            { code: 'ar', label: 'عربي' },
+            { code: 'en', label: 'English' },
+            { code: 'fr', label: 'Français' },
+          ].map((l) => (
+            <button
+              key={l.code}
+              onClick={() => i18n.changeLanguage(l.code)}
+              className={`px-2 py-0.5 rounded font-semibold transition-colors ${
+                lang === l.code ? 'bg-violet-100 text-violet-700' : 'text-gray-500 hover:bg-gray-100'
+              }`}
+              data-testid={`legal-lang-${l.code}`}
+            >
+              {l.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Hero */}
       {data && (
@@ -193,6 +220,13 @@ const LegalPage = () => {
 
       {/* Content */}
       <main className="max-w-3xl mx-auto px-6 py-10" data-testid={`legal-page-${slug}`}>
+        {data?.fallback_used && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-xs text-amber-800 flex items-center gap-2" data-testid="fallback-notice">
+            ℹ️ {lang === 'fr'
+              ? 'Cette page n\'est pas encore traduite — affichage de la version arabe.'
+              : 'This page is not yet translated — showing the Arabic version.'}
+          </div>
+        )}
         {loading && (
           <div className="bg-white rounded-2xl p-12 text-center text-gray-400 shadow-sm">...جاري التحميل</div>
         )}

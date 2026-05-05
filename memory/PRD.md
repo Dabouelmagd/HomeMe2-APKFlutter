@@ -21,6 +21,38 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 101: AI Assistant Chatbot — Feb 6, 2026 ✅
+
+**🎯 الهدف:** مساعد ذكي يجاوب على المستخدمين ويوجههم لصفحات التطبيق.
+
+**Backend:** `/app/backend/routes/ai_assistant.py`
+- LLM: **Gemini 3 Flash** (`gemini-3-flash-preview`) عبر Emergent LLM Key.
+- Endpoints:
+  - `POST /api/ai-assistant/chat` — رسالة + multi-turn context (آخر 6 رسائل)
+  - `GET /api/ai-assistant/usage` — العداد اليومي
+  - `GET /api/ai-assistant/history` — تاريخ المحادثة
+  - `DELETE /api/ai-assistant/history` — مسح المحادثة
+- **Rate Limit:** 20 رسالة/يوم لكل مستخدم (Plan A).
+- **System Prompt:** خبير HomeMe — يعرف 25+ صفحة ومسارها، يضيف `ROUTE: /app/...` في آخر الرد للـ deep linking.
+- **DB Collection:** `ai_chat_messages` (user_id, session_id, role, text, suggested_route, day, created_at).
+
+**Frontend:** `/app/frontend/src/components/AIAssistantBubble.js`
+- Floating bubble بنفسجي/فوشي بأيقونة Sparkles + شارة "AI" في الزاوية.
+- Panel 600px height يفتح من الزاوية مع:
+  - Counter "متبقي اليوم: X/20"
+  - 5 أسئلة شائعة مقترحة في البداية.
+  - Typing indicator (3 dots animation).
+  - زر "افتح الصفحة" يظهر على رد المساعد لو فيه `suggested_route`.
+  - مسح المحادثة + إغلاق الـ panel.
+- Mounted in `Layout.js` → ظاهر في كل الصفحات الداخلية لكل المستخدمين.
+
+**🧪 E2E Verification:**
+- ✅ Backend: USAGE returns 20/20, CHAT returns reply + suggested_route `/app/payments`.
+- ✅ Frontend: Bubble visible → Panel opens → Send "إزاي أحجز نادي؟" → Reply with deep-link button → Click → Navigate to `/app/facility-booking`.
+- ✅ Rate limit decrements (20 → 19 → 18 بعد 2 رسائل).
+- ✅ Lint نظيف.
+
+
 ### Iter 100: Super Admin & Owner Quick Stats Widget — Feb 6, 2026 ✅
 
 **🎯 الهدف:** widget "نبض التطبيق" يعرض 8 مؤشرات فورية في dashboard الـ owner/super_admin.

@@ -65,6 +65,7 @@ import { TransliterationToggle } from './TransliterationToggle';
 import ThemeToggle from './ThemeToggle';
 import BackButton from './BackButton';
 import InternalAdBanner from './InternalAdBanner';
+import AIAssistantBubble from './AIAssistantBubble';
 // import AdvancedSearchModal from './AdvancedSearchModal';
 
 const Layout = ({ children, isTrialMode = false }) => {
@@ -1339,6 +1340,8 @@ const Layout = ({ children, isTrialMode = false }) => {
           <PopupAdOverlay />
         </main>
       </div>
+      {/* AI Assistant Floating Bubble - appears on all internal pages */}
+      <AIAssistantBubble />
     </div>
   );
 };

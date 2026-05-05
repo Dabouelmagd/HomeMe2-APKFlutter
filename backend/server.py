@@ -2589,6 +2589,8 @@ from routes.owner_budget import router as owner_budget_router
 app.include_router(owner_budget_router, tags=["owner"])
 from routes.owner_reminders import router as owner_reminders_router
 app.include_router(owner_reminders_router, tags=["owner"])
+from routes.ai_assistant import router as ai_assistant_router
+app.include_router(ai_assistant_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

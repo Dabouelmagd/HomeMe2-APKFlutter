@@ -49,6 +49,11 @@ ACTION_CATALOG = {
         "tone": "متعاطف ومهني، نعتذر للساكن ونعده بتحسين الخدمة",
         "subject": "نقدّر ملاحظاتك ونعمل على تحسين الخدمة - HomeMe",
     },
+    "open_complaints": {
+        "title": "تنبيه الإدارة بالشكاوى المفتوحة",
+        "tone": "احترافي ومحفّز لتنبيه فريق الإدارة بمتابعة الشكاوى المفتوحة والرد عليها",
+        "subject": "متابعة الشكاوى المفتوحة - HomeMe",
+    },
 }
 
 
@@ -63,7 +68,7 @@ class Recipient(BaseModel):
 
 
 class DraftRequest(BaseModel):
-    insight_id: Literal["late_invoices", "old_maintenance", "negative_ratings"]
+    insight_id: Literal["late_invoices", "old_maintenance", "negative_ratings", "open_complaints"]
     compound_id: str = Field(..., min_length=1)
 
 
@@ -76,7 +81,7 @@ class DraftResponse(BaseModel):
 
 
 class ExecuteRequest(BaseModel):
-    insight_id: Literal["late_invoices", "old_maintenance", "negative_ratings"]
+    insight_id: Literal["late_invoices", "old_maintenance", "negative_ratings", "open_complaints"]
     compound_id: str = Field(..., min_length=1)
     subject: str = Field(..., min_length=3, max_length=200)
     message: str = Field(..., min_length=10, max_length=5000)
@@ -159,7 +164,6 @@ async def _resolve_recipients(db, insight_id: str, compound_id: str) -> List[Rec
         ]
 
     if insight_id == "negative_ratings":
-        # Users who rated ≤2 in last 7 days
         ratings = await db.ratings.find(
             {
                 "compound_id": compound_id,
@@ -189,6 +193,32 @@ async def _resolve_recipients(db, insight_id: str, compound_id: str) -> List[Rec
                 name=u.get("full_name") or "ساكن",
                 email=u.get("email") or "",
                 extra=f"تقييم: {per_user[u['id']]['rating']} نجوم",
+            )
+            for u in users
+            if u.get("email")
+        ]
+
+    if insight_id == "open_complaints":
+        # Recipients = admins/managers (they need to respond to complaints).
+        # Extra context = count of currently-open complaints.
+        users = await db.users.find(
+            {
+                "compound_id": compound_id,
+                "role": {"$in": ["admin", "manager"]},
+                "is_active": True,
+            },
+            {"_id": 0, "id": 1, "full_name": 1, "email": 1},
+        ).to_list(length=50)
+        open_count = await db.complaints.count_documents({
+            "compound_id": compound_id,
+            "status": {"$in": ["open", "pending", "new"]},
+        })
+        return [
+            Recipient(
+                user_id=u["id"],
+                name=u.get("full_name") or "مدير",
+                email=u.get("email") or "",
+                extra=f"{open_count} شكوى مفتوحة",
             )
             for u in users
             if u.get("email")
@@ -259,6 +289,13 @@ def _fallback_message(insight_id: str, count: int, compound_name: Optional[str])
             "عزيزي الساكن {name},\n\n"
             "وصلنا تقييمكم وتعليقكم، ونعتذر إن لم تكن الخدمة بمستوى توقعاتكم. نأخذ ملاحظاتكم بجدية ونعمل على تحسين الخدمة.\n"
             "نرحّب بأي تفاصيل إضافية لمساعدتنا في الوصول للحل الأفضل لكم.\n"
+            f"{suffix}"
+        )
+    if insight_id == "open_complaints":
+        return (
+            "تحية طيبة {name},\n\n"
+            "نلاحظ وجود {extra} في النظام تنتظر الرد. نرجو منكم تخصيص بعض الوقت اليوم لمراجعتها والرد عليها بأقصى سرعة لدعم رضا السكان.\n"
+            "كل شكوى يتم الرد عليها خلال 24 ساعة تساعد في رفع تقييم رضا السكان وثقتهم في إدارة المجمع.\n"
             f"{suffix}"
         )
     return "رسالة من إدارة HomeMe."

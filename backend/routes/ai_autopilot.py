@@ -30,11 +30,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/ai-autopilot", tags=["ai-autopilot"])
 
 
-SUPPORTED_INSIGHTS = ("late_invoices", "old_maintenance", "negative_ratings")
+SUPPORTED_INSIGHTS = ("late_invoices", "old_maintenance", "negative_ratings", "open_complaints")
 
 
 class AutoPilotConfig(BaseModel):
-    insight_id: Literal["late_invoices", "old_maintenance", "negative_ratings"]
+    insight_id: Literal["late_invoices", "old_maintenance", "negative_ratings", "open_complaints"]
     compound_id: str
     enabled: bool = False
     frequency: Literal["daily", "weekly"] = "weekly"

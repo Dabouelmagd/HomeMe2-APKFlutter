@@ -2601,6 +2601,10 @@ from routes.ai_autopilot import router as ai_autopilot_router
 app.include_router(ai_autopilot_router)
 from routes.stripe_subscriptions import router as stripe_subs_router
 app.include_router(stripe_subs_router)
+from routes.subscription_migration import router as sub_migration_router
+app.include_router(sub_migration_router)
+from routes.subscription_analytics import router as sub_analytics_router
+app.include_router(sub_analytics_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

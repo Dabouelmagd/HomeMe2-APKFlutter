@@ -21,6 +21,41 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 107: Complaints AutoPilot + Migration + Subscription Analytics — Feb 6, 2026 ✅
+
+**🎯 ٣ مهام في iteration واحد:**
+
+#### Task 1 — AI Auto-Pilot للشكاوى 📢
+- إضافة `open_complaints` كـ 4th supported insight في `ai_actions.py` + `ai_autopilot.py`.
+- Resolver: المستلمون = admins/managers في الكمبوند، extra context = "X شكوى مفتوحة".
+- Fallback message عربي احترافي + Gemini-generated dynamic message.
+- Frontend: `ACTIONABLE_INSIGHTS` Set + `INSIGHT_LABELS` تحدّثت في AIAutoPilotPage و AIInsightsWidget و autopilot_digest.
+
+#### Task 2 — Migration Tooling للقدامى 🔁
+- **New Backend:** `/app/backend/routes/subscription_migration.py`
+  - `GET /candidates` — يلقى الشركات النشطة بدون `stripe_subscription_id`.
+  - `GET /stats` — total_active, on_auto_renew, legacy_one_time, invited counts, migration %.
+  - `POST /invite {company_ids[]}` — يبعت email opt-in بـ HTML عربي/RTL مع CTA لـ `/app/my-subscription`.
+- يتتبع `auto_renew_invite_count` و `auto_renew_invite_last_at` في `company_subscriptions`.
+- audit log في `subscription_migration_log`.
+
+#### Task 3 — Subscription Analytics Dashboard 📊
+- **New Backend:** `/app/backend/routes/subscription_analytics.py`
+  - `GET /summary` — MRR (normalized monthly), ARR, paying_count, trial_count, on_auto_renew, churn_rate_30d, trial_to_paid_30d, mrr_by_plan, expiring_soon (7d), canceling_soon.
+- **New Frontend Page:** `/app/frontend/src/pages/SubscriptionAnalyticsPage.js` (route `/app/subscription-analytics`)
+  - 3 hero tiles: MRR (emerald), ARR (indigo), Auto-Renew share (amber)
+  - 4 secondary metrics (churn, trial→paid, trials, legacy)
+  - MRR by Plan progress bars
+  - Expiring Soon (7d) + Canceling Soon side-by-side
+  - **Migration Tool inline:** جدول قابل للتحديد بـ checkboxes + bulk "Send invites" button
+- Sidebar: "📊 تحليلات الإيرادات (MRR/Churn)" أضيف لـ Owner sidebar تحت "اشتراكات شركات الإدارة".
+
+**🧪 E2E Verification:**
+- ✅ Backend: stats=124 active, MRR=31,000 EGP, ARR=372,000 EGP — كلها 200.
+- ✅ Frontend: page renders perfectly with 3 hero tiles + 100 migration rows + sidebar entry.
+- ✅ Lint نظيف على 4 ملفات جديدة (3 backend + 1 frontend).
+
+
 ### Iter 106: Recent Compounds + Weekly Digest + Stripe Auto-Renewal — Feb 6, 2026 ✅
 
 **🎯 ٣ مهام دفعة واحدة:**

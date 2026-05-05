@@ -45,7 +45,7 @@ const SEVERITY_STYLES = {
 };
 
 // Insights that support automated AI actions (must match backend ACTION_CATALOG keys)
-const ACTIONABLE_INSIGHTS = new Set(['late_invoices', 'old_maintenance', 'negative_ratings']);
+const ACTIONABLE_INSIGHTS = new Set(['late_invoices', 'old_maintenance', 'negative_ratings', 'open_complaints']);
 
 const AIInsightsWidget = () => {
   const navigate = useNavigate();

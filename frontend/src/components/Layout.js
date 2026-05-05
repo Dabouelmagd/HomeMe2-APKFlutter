@@ -572,6 +572,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('owner_companies_management', 'إدارة الشركات والمجمعات'), href: 'super-admin?tab=companies', icon: BuildingOffice2Icon, show: true },
         { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
+        { name: '📊 تحليلات الإيرادات (MRR/Churn)', href: 'subscription-analytics', icon: ChartPieIcon, show: true },
         { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: 'subscription-reminders', icon: BellIcon, show: true },
       ]
     },
@@ -619,6 +620,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('owner_companies_management', 'إدارة الشركات والمجمعات'), href: 'super-admin?tab=companies', icon: BuildingOffice2Icon, show: true },
         { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
+        { name: '📊 تحليلات الإيرادات (MRR/Churn)', href: 'subscription-analytics', icon: ChartPieIcon, show: true },
         { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: 'subscription-reminders', icon: BellIcon, show: true },
       ]
     },

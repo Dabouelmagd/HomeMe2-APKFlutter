@@ -70,6 +70,7 @@ import AppVersionGuard from './components/AppVersionGuard';
 import ChangelogModal from './components/ChangelogModal';
 import PdfReportsPage from './pages/PdfReportsPage';
 import AIAutoPilotPage from './components/AIAutoPilotPage';
+import SubscriptionAnalyticsPage from './pages/SubscriptionAnalyticsPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
 import BrandingSettingsPage from './pages/BrandingSettingsPage';
@@ -733,6 +734,10 @@ function App() {
 
                 <Route path="ai-autopilot" element={
                   <AIAutoPilotPage />
+                } />
+
+                <Route path="subscription-analytics" element={
+                  <SubscriptionAnalyticsPage />
                 } />
                 
                 <Route path="two-factor" element={

@@ -24,6 +24,7 @@ INSIGHT_LABELS = {
     "late_invoices": ("💰", "تذكيرات الدفع المتأخر"),
     "old_maintenance": ("🔧", "تنبيهات الصيانة"),
     "negative_ratings": ("⭐", "رسائل اعتذار للتقييمات السلبية"),
+    "open_complaints": ("📢", "تنبيهات الشكاوى المفتوحة"),
 }
 
 DIGEST_HOUR_UTC = 8  # Mondays 08:00 UTC

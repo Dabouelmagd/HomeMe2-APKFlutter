@@ -11,6 +11,7 @@ import TrialStatus from './TrialStatus';
 import CompoundSubscriptionCard from './CompoundSubscriptionCard';
 import PaymentAnalyticsCard from './PaymentAnalyticsCard';
 import CompanyPlanUsageCard from './CompanyPlanUsageCard';
+import SuperAdminQuickStats from './SuperAdminQuickStats';
 import { TransliteratedText } from './TransliterationToggle';
 import {
   UsersIcon,
@@ -306,6 +307,11 @@ const AdminDashboard = () => {
         <div className="mb-4">
           <TrialStatus showFull={true} />
         </div>
+
+        {/* Super Admin / App Owner Quick Stats — pulse widget */}
+        {(user?.role === 'super_admin' || user?.role === 'app_owner') && (
+          <SuperAdminQuickStats />
+        )}
 
         {/* Compound Subscription — always visible for compound admins */}
         {user?.compound_id && (

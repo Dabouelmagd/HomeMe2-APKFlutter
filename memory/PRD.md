@@ -21,6 +21,30 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 100: Super Admin & Owner Quick Stats Widget — Feb 6, 2026 ✅
+
+**🎯 الهدف:** widget "نبض التطبيق" يعرض 8 مؤشرات فورية في dashboard الـ owner/super_admin.
+
+**ملف جديد:** `/app/frontend/src/components/SuperAdminQuickStats.js`
+- 8 بطاقات (4×2 grid) قابلة للنقر، تنقل لصفحة التفاصيل.
+- Pulse animation على البطاقات ذات القيم الحرجة (تذاكر مفتوحة، تنبيهات عاجلة، عقود تنتهي).
+- Auto-refresh كل 60 ثانية + refresh button يدوي.
+- مصادر البيانات (parallel via Promise.allSettled):
+  - `/api/sidebar-alerts/companies` → active_companies, urgent, expiring_contracts, empty_companies
+  - `/api/sidebar-alerts/support-tickets` → open, in_progress
+  - `/api/super-admin/dashboard` → total_compounds, total_users
+  - `/api/owner-kpis` → engagement (DAU/MAU/stickiness)
+
+**Mounted in:**
+- `AdminDashboard.js` (مرئي فقط لـ super_admin/app_owner — تحت TrialStatus وقبل StatCards)
+- `OwnerDashboard.js` (تحت Welcome Header مباشرةً)
+
+**🧪 Verification:**
+- ✅ Lint نظيف.
+- ✅ Screenshot E2E: الـ 8 tiles تظهر بالأرقام الفعلية + pulse على البطاقات الحرجة.
+- ✅ كل البطاقات لها testid فريد (`quick-stat-{id}`).
+
+
 
 
 ### Iter 98: PageHero Applied to 17 Pages (COMPLETE) — Feb 5, 2026 ✅

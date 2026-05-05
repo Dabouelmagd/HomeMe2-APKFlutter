@@ -25,6 +25,7 @@ import {
   ExclamationTriangleIcon,
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
+import SuperAdminQuickStats from './SuperAdminQuickStats';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -90,6 +91,9 @@ const OwnerDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* App Pulse — Quick Stats Widget */}
+      <SuperAdminQuickStats />
 
       {/* Financial Row - Revenue, Expenses, Profit on ONE line */}
       <div className="grid grid-cols-3 gap-3">

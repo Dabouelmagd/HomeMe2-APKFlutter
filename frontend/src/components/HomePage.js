@@ -118,6 +118,21 @@ const HomePage = () => {
     { icon: ShieldCheckIcon, title: t('sys_roles', 'أدوار وصلاحيات'), desc: t('sys_roles_d', '6 أدوار: مالك، شركة، مدير، إداري، أمن، مقيم'), color: 'from-gray-600 to-gray-800' },
     { icon: ChatBubbleLeftEllipsisIcon, title: t('sys_comms', 'مركز التواصل'), desc: t('sys_comms_d', 'رسائل، إعلانات، أحداث، إشعارات للمجتمع'), color: 'from-sky-500 to-blue-600' },
     { icon: ArrowDownTrayIcon, title: t('sys_export', 'تصدير وطباعة'), desc: t('sys_export_d', 'PDF عربي احترافي، Excel بـ 5 أوراق، طباعة مباشرة'), color: 'from-teal-500 to-emerald-600' },
+    { icon: QrCodeIcon, title: t('sys_visitors', 'إدارة الزوار + QR'), desc: t('sys_visitors_d', 'دعوات الزوار، QR Code، مسح الأمن، سجل دخول/خروج كامل'), color: 'from-fuchsia-500 to-pink-600' },
+    { icon: ClipboardDocumentCheckIcon, title: t('sys_polls', 'الاستطلاعات والتصويت'), desc: t('sys_polls_d', 'تصويت ديمقراطي على القرارات، استطلاعات رأي، نتائج فورية'), color: 'from-lime-500 to-green-600' },
+    { icon: PresentationChartBarIcon, title: t('sys_pdf_reports', 'تقارير PDF متقدمة'), desc: t('sys_pdf_reports_d', 'Portfolio Report للشركات، تقارير شهرية تلقائية، تخصيص قالب'), color: 'from-rose-500 to-red-600' },
+
+    // ✨ NEW AI Systems
+    { icon: SparklesIcon, title: '✨ ' + t('sys_ai_chat', 'مساعد HomeMe الذكي'), desc: t('sys_ai_chat_d', 'شات AI عائم بـ Gemini يجاوب فوراً ويوجّه المستخدمين لصفحات التطبيق'), color: 'from-violet-500 to-purple-600', isAI: true },
+    { icon: LightBulbIcon, title: '🧠 ' + t('sys_ai_advisor', 'مستشار AI استباقي'), desc: t('sys_ai_advisor_d', 'يحلل البيانات يومياً ويكتشف 6 مشاكل + يقترح إجراءات تنفيذية'), color: 'from-purple-500 to-fuchsia-600', isAI: true },
+    { icon: ClockIcon, title: '🤖 ' + t('sys_autopilot', 'AI Auto-Pilot'), desc: t('sys_autopilot_d', 'جدولة تنفيذ الإجراءات تلقائياً (يومي/أسبوعي) + ملخص أسبوعي بالبريد'), color: 'from-fuchsia-500 to-pink-600', isAI: true },
+    { icon: EnvelopeIcon, title: '📨 ' + t('sys_auto_credentials', 'إرسال بيانات الدخول تلقائياً'), desc: t('sys_auto_credentials_d', 'كل ساكن جديد (فردي أو bulk) يحصل على بريد ترحيب RTL تلقائياً'), color: 'from-indigo-500 to-violet-600', isAI: true },
+    { icon: ArrowPathIcon, title: '🔁 ' + t('sys_stripe_recurring', 'Stripe Auto-Renewal'), desc: t('sys_stripe_recurring_d', 'اشتراك يجدد نفسه تلقائياً + خصم 17% للسنوي + Customer Portal'), color: 'from-emerald-500 to-teal-600', isAI: true },
+    { icon: PresentationChartBarIcon, title: '📊 ' + t('sys_sub_analytics', 'تحليلات الاشتراكات'), desc: t('sys_sub_analytics_d', 'MRR + ARR + Churn + Trial→Paid + Migration Tool للأدمن'), color: 'from-cyan-500 to-blue-600', isAI: true },
+    { icon: GlobeAltIcon, title: '🌐 ' + t('sys_multilang', '3 لغات + ترجمة AI'), desc: t('sys_multilang_d', 'AR/EN/FR + Owner Editor مع زر "ترجم بـ AI" عبر Gemini'), color: 'from-blue-500 to-indigo-600', isAI: true },
+
+    // Smart devices (coming soon)
+    { icon: BoltIcon, title: t('sys_smart', 'الأجهزة الذكية'), desc: t('sys_smart_d', 'تحكم بالإضاءة + التكييف + الكاميرات + الأقفال (قريباً)'), color: 'from-amber-500 to-yellow-600', comingSoon: true },
   ];
 
   const accountTypes = [
@@ -170,7 +185,7 @@ const HomePage = () => {
     {
       name: t('plan_starter', 'مجاني'),
       nameEn: 'Starter',
-      residents: t('plan_5_residents', 'حتى 5 سكان'),
+      residents: t('plan_30_residents', 'حتى 30 ساكن'),
       monthly: 0,
       color: 'border-gray-300',
       badge: '',
@@ -182,13 +197,13 @@ const HomePage = () => {
     {
       name: t('plan_basic', 'أساسي'),
       nameEn: 'Basic',
-      residents: t('plan_unlimited_residents', 'عدد غير محدود من السكان'),
-      monthly: 500,
+      residents: t('plan_100_residents', 'حتى 100 ساكن'),
+      monthly: 800,
       color: 'border-sky-400',
       badge: '',
       features: [
         t('f_all_starter', 'كل مميزات المجاني'),
-        t('f_unlimited_residents', 'عدد غير محدود من السكان'),
+        t('plan_100_residents', 'حتى 100 ساكن'),
         t('f_full_residents', 'إدارة المقيمين الكاملة'),
         t('f_maintenance', 'طلبات الصيانة'),
         t('f_full_finance', 'النظام المالي الكامل'),
@@ -198,6 +213,7 @@ const HomePage = () => {
         t('f_satisfaction', 'تقييمات الرضا'),
         t('f_facility_booking', 'حجز المرافق'),
         t('f_email_notif', 'إشعارات البريد'),
+        '✨ ' + t('cf_ai_assistant_5', 'مساعد AI ذكي (5 رسائل/يوم)'),
         t('f_email_support', 'دعم فني بالبريد')
       ],
       excluded: [],
@@ -208,7 +224,7 @@ const HomePage = () => {
       name: t('plan_pro', 'احترافي'),
       nameEn: 'Pro',
       residents: t('plan_unlimited_residents'),
-      monthly: 1200,
+      monthly: 1500,
       color: 'border-blue-500 ring-2 ring-blue-500/20',
       badge: t('hp_most_popular'),
       features: [
@@ -242,7 +258,7 @@ const HomePage = () => {
       name: t('plan_premium', 'متقدم'),
       nameEn: 'Premium',
       residents: t('plan_unlimited_all', 'عدد غير محدود - كل شيء'),
-      monthly: 2200,
+      monthly: 2800,
       color: 'border-violet-500',
       badge: '',
       features: [
@@ -285,7 +301,7 @@ const HomePage = () => {
       name: t('cp_startup', 'شركة ناشئة'),
       nameEn: 'Startup',
       compounds: t('cp_up_to_3', 'حتى 3 مجتمعات'),
-      monthly: 3500,
+      monthly: 4000,
       color: 'border-amber-400',
       features: [
         t('cf_manage_3', 'إدارة حتى 3 مجتمعات سكنية'),
@@ -310,12 +326,12 @@ const HomePage = () => {
     {
       name: t('cp_business', 'شركة متوسطة'),
       nameEn: 'Business',
-      compounds: t('cp_up_to_5', '1 - 5 مجتمعات'),
-      monthly: 7500,
+      compounds: t('cp_up_to_8', '1 - 8 مجتمعات'),
+      monthly: 9500,
       color: 'border-orange-500 ring-2 ring-orange-500/20',
       badge: t('hp_best_for_companies'),
       features: [
-        t('cf_manage_5', 'إدارة حتى 5 مجتمعات'),
+        t('cf_manage_8', 'إدارة حتى 8 مجتمعات'),
         t('cf_adv_dashboard', 'لوحة تحكم مركزية متقدمة'),
         t('f_unlimited_residents'),
         t('cf_all_premium_each', 'كل مميزات المتقدم لكل مجتمع'),
@@ -343,7 +359,7 @@ const HomePage = () => {
       name: t('cp_enterprise', 'شركة كبرى'),
       nameEn: 'Enterprise',
       compounds: t('plan_unlimited_all'),
-      monthly: 20000,
+      monthly: 25000,
       isCustom: false,
       color: 'border-red-500',
       features: [
@@ -375,7 +391,7 @@ const HomePage = () => {
   ];
 
   const companyComparisonFeatures = [
-    { name: t('cf_num_compounds', 'عدد المجتمعات'), startup: t('cp_up_to_3_short', 'حتى 3'), business: t('cp_up_to_5_short', 'حتى 5'), enterprise: t('cf_unlimited_short', 'غير محدود') },
+    { name: t('cf_num_compounds', 'عدد المجتمعات'), startup: t('cp_up_to_3_short', 'حتى 3'), business: t('cp_up_to_8_short', 'حتى 8'), enterprise: t('cf_unlimited_short', 'غير محدود') },
     { name: t('f_unlimited_residents'), startup: true, business: true, enterprise: true },
     { name: t('cf_central_dashboard', 'لوحة تحكم مركزية'), startup: true, business: true, enterprise: true },
     { name: t('f_full_finance'), startup: true, business: true, enterprise: true },
@@ -671,22 +687,34 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 15 Systems */}
+      {/* 22 Systems */}
       <section className="py-16" id="systems" data-testid="systems-section">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_15_systems')}</h2>
-            <p className="text-gray-500">{t('hp_systems_desc')}</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_22_systems', '22 نظام متكامل')}</h2>
+            <p className="text-gray-500">{t('hp_systems_desc', 'كل الأدوات التي تحتاجها لإدارة مجتمعك السكني باحترافية + ميزات AI متقدمة')}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {systems.map((sys, i) => {
               const Icon = sys.icon;
               return (
-                <div key={i} className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all group">
+                <div key={i} className={`bg-white rounded-xl border p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all group relative ${
+                  sys.isAI ? 'border-violet-200 bg-gradient-to-br from-violet-50/40 to-fuchsia-50/30' : 'border-gray-100'
+                }`}>
+                  {sys.isAI && (
+                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md">
+                      جديد ✨
+                    </span>
+                  )}
+                  {sys.comingSoon && (
+                    <span className="absolute -top-2 -right-2 bg-amber-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md">
+                      قريباً
+                    </span>
+                  )}
                   <div className={`inline-flex p-2.5 rounded-lg bg-gradient-to-r ${sys.color} mb-3 group-hover:scale-110 transition-transform`}>
                     <Icon className="h-5 w-5 text-white" />
                   </div>
-                  <h4 className="font-bold text-gray-900 mb-1">{sys.title}</h4>
+                  <h4 className={`font-bold mb-1 ${sys.isAI ? 'text-violet-900' : 'text-gray-900'}`}>{sys.title}</h4>
                   <p className="text-xs text-gray-500 leading-relaxed">{sys.desc}</p>
                 </div>
               );
@@ -1045,6 +1073,97 @@ const HomePage = () => {
           <InternalAdBanner position="homepage_mid" maxAds={1} variant="full" className="" />
         </div>
       </div>
+
+      {/* ❓ FAQ Section */}
+      <section className="py-16 bg-white" id="faq" data-testid="faq-section">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-100 text-amber-700 rounded-full text-sm font-bold mb-3">
+              ❓ {t('hp_faq_badge', 'الأسئلة الشائعة')}
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>
+              {t('hp_faq_title', 'إجابات سريعة لأكثر الأسئلة شيوعاً')}
+            </h2>
+            <p className="text-gray-500">{t('hp_faq_desc', 'لو سؤالك مش هنا، تقدر تتواصل معانا في "اتصل بنا"')}</p>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              {
+                q: 'هل يوجد فترة تجريبية مجانية؟',
+                a: 'نعم! تجربة مجانية 14 يوم لكل الخطط بدون الحاجة لبطاقة ائتمان. تقدر تختبر كل الميزات بحرية، وتلغي في أي وقت بدون أي رسوم.',
+              },
+              {
+                q: 'كيف يعمل التجديد التلقائي عبر Stripe؟',
+                a: 'بعد ما تشترك، Stripe يحفظ بيانات كارتك بأمان (مش بنحفظها عندنا). كل دورة جديدة (شهر/سنة)، Stripe يخصم تلقائياً ويرسل لك إيصال. تقدر تلغي التجديد التلقائي في أي وقت من إعدادات الحساب — والخدمة تستمر حتى نهاية الفترة المدفوعة.',
+              },
+              {
+                q: 'ماذا لو ألغيت اشتراكي؟',
+                a: 'بتفضل تستفيد من الخدمة لآخر يوم في الدورة المدفوعة، وبعدها الحساب يدخل وضع "محدود" (تقدر تشوف بياناتك بس مش تعدّل). البيانات بتفضل محفوظة 90 يوم، تقدر ترجع تشترك تاني وتسترجع كل شيء.',
+              },
+              {
+                q: 'هل تدعمون WhatsApp والـ SMS؟',
+                a: 'نعم! إشعارات WhatsApp و SMS متاحة لكل الخطط المدفوعة. الخطة الـ Enterprise تشمل WhatsApp Business API كامل + قوالب رسائل مخصصة + معدلات إرسال أعلى.',
+              },
+              {
+                q: 'كيف أرقّي خطتي؟',
+                a: 'تروح لـ "إعدادات → خطتي" واختار الخطة الأعلى. الفرق بين الخطتين بيتحسب pro-rata (نسبي) للأيام المتبقية في دورتك الحالية. الميزات الجديدة تتفعّل فوراً.',
+              },
+              {
+                q: 'كيف يعمل المساعد الذكي (AI Assistant)؟',
+                a: 'هتلاقي زرار عائم بنفسجي ✨ في الزاوية في كل صفحة. اضغطي عليه واسألي أي سؤال بالعربي عن استخدام التطبيق (إزاي أرفع إيصال؟ إزاي أحجز نادي؟). المساعد يجاوب فوراً + يديك زر "افتح الصفحة" ينقلك للمكان المطلوب. مدعوم بـ Gemini AI.',
+              },
+              {
+                q: 'ما هو AI Auto-Pilot وكيف يفيدني؟',
+                a: 'نظام جدولة ذكي يعمل نيابة عنك: مثلاً كل أحد 9 الصبح، يبعت تذكير دفع تلقائي للسكان المتأخرين 30+ يوم. تختاري الإجراء + اليوم + الساعة، والباقي على AI. توفر ساعات أسبوعياً + ملخص أسبوعي بالبريد بكل الإجراءات اللي تمت.',
+              },
+              {
+                q: 'هل بياناتي آمنة؟',
+                a: 'بياناتك مشفرة TLS 1.3 أثناء النقل + bcrypt للباسوردات. نسخ احتياطي يومي مستقل. لا نبيع بياناتك أبداً ولا نشاركها مع طرف ثالث (إلا Stripe لمعالجة الدفع وGemini للذكاء الاصطناعي تحت اتفاقيات سرية صارمة). راجعي "سياسة الخصوصية" للتفاصيل.',
+              },
+              {
+                q: 'كم عدد المستخدمين والمجمعات في كل خطة؟',
+                a: 'الخطة المجانية: حتى 30 ساكن. الأساسي: حتى 100. الاحترافي والمتقدم: غير محدود. للشركات: ناشئة (3 مجمعات)، متوسطة (8 مجمعات)، كبرى (غير محدود). كل ذلك بدون قيود على عدد الأدمن.',
+              },
+              {
+                q: 'هل المنصة تدعم اللغة الإنجليزية والفرنسية؟',
+                a: 'نعم! المنصة بالكامل تدعم 3 لغات (عربي/إنجليزي/فرنسي) مع RTL/LTR تلقائي. كل مستخدم يختار لغته من الإعدادات. الصفحات القانونية كذلك مترجمة بالـ AI.',
+              },
+              {
+                q: 'كيف أبدأ بسرعة؟',
+                a: 'اشترك مجاناً في 60 ثانية: 1) اختاري الخطة المناسبة 2) املئي بيانات المجمع 3) ابدئي بإضافة السكان (يدوياً أو Bulk Import من Excel). كل ساكن جديد يحصل على بريد ترحيب تلقائياً ببيانات الدخول.',
+              },
+              {
+                q: 'هل في تكلفة إضافية لاستخدام AI؟',
+                a: 'لأ! ميزات AI (المساعد، المستشار، Auto-Pilot، الترجمة) كلها مشمولة في خطتك بدون أي تكلفة إضافية، مع حدود استخدام يومية حسب الخطة (Pro: 20/يوم، Premium: 50/يوم، Enterprise: غير محدود).',
+              },
+            ].map((faq, i) => (
+              <details
+                key={i}
+                className="group bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 hover:border-violet-300 transition-colors"
+                data-testid={`faq-item-${i}`}
+              >
+                <summary className="cursor-pointer p-4 list-none flex items-start justify-between gap-3">
+                  <span className="text-sm font-bold text-gray-900 leading-relaxed">{faq.q}</span>
+                  <ChevronDownIcon className="w-5 h-5 text-violet-600 flex-shrink-0 transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="px-4 pb-4 text-sm text-gray-700 leading-loose border-t border-gray-200 pt-3">
+                  {faq.a}
+                </div>
+              </details>
+            ))}
+          </div>
+
+          {/* Help CTA */}
+          <div className="mt-8 bg-gradient-to-r from-violet-50 to-fuchsia-50 border border-violet-200 rounded-xl p-5 text-center">
+            <p className="text-sm font-bold text-gray-900 mb-1">{t('hp_faq_more', 'سؤالك مش هنا؟')}</p>
+            <p className="text-xs text-gray-600 mb-3">{t('hp_faq_more_desc', 'فريق الدعم متاح 24/7 للإجابة على أسئلتك')}</p>
+            <Link to="/legal/contact" className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-lg transition-colors">
+              📞 اتصل بنا
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Subscription Plans - Residential */}
       <section className="py-20 bg-slate-950 text-white" id="pricing" data-testid="pricing-section">
@@ -1524,8 +1643,9 @@ const HomePage = () => {
             <div className="flex gap-6 text-sm">
               <a href="#guide" className="hover:text-white transition-colors">{t('hp_guide_btn')}</a>
               <a href="#pricing" className="hover:text-white transition-colors">{t('hp_sub_codes')}</a>
-              <a href="#systems" className="hover:text-white transition-colors">{t('hp_15_systems')}</a>
+              <a href="#systems" className="hover:text-white transition-colors">{t('hp_22_systems', '22 نظام متكامل')}</a>
               <a href="#ai-features" className="hover:text-white transition-colors">✨ {t('hp_whats_new', 'ما الجديد')}</a>
+              <a href="#faq" className="hover:text-white transition-colors">❓ {t('hp_faq', 'الأسئلة الشائعة')}</a>
               <Link to="/login" className="hover:text-white transition-colors">{t('sign_in', 'تسجيل الدخول')}</Link>
             </div>
             <p className="text-xs">&copy; {new Date().getFullYear()} HomeMe - {t('hp_all_rights', 'جميع الحقوق محفوظة')}</p>

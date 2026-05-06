@@ -21,6 +21,41 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 114: Pricing Refresh + 22 Systems + FAQ — Feb 6, 2026 ✅
+
+**🎯 ٣ تحسينات كبرى:**
+
+#### 1. Pricing Refresh (زيادة 25-30% + حدود السكان)
+- **Starter (مجاني):** حد 30 ساكن (كان غير محدود — كنا بنخسر فلوس).
+- **Basic:** 500 → **800 ج.م** + حد 100 ساكن + ✨ AI 5/يوم.
+- **Pro:** 1,200 → **1,500 ج.م** (غير محدود) + ✨ AI 20 + 🧠 + 📨.
+- **Premium:** 2,200 → **2,800 ج.م** + ✨ AI 50 + 🧠 + 🤖 Auto-Pilot + 📨.
+- **Company Startup:** 3,500 → **4,000 ج.م** (3 مجمعات).
+- **Company Business:** 7,500 → **9,500 ج.م** (5 → **8 مجمعات**) + Auto-Pilot + Analytics.
+- **Company Enterprise:** 20,000 → **25,000 ج.م** (غير محدود).
+- Stripe backend `PLAN_CATALOGUE` updated بنفس الأرقام.
+
+#### 2. "22 نظام متكامل" (محدّث من 15)
+- Section title: "15+ نظام" → **"22 نظام متكامل"**.
+- Description: "+ ميزات AI متقدمة".
+- 7 AI systems جديدة بـ violet/fuchsia gradient bg + شارة "جديد ✨":
+  - مساعد HomeMe • مستشار AI • Auto-Pilot • Auto-Credentials • Stripe Recurring • Subscription Analytics • Multi-lang.
+- 1 nostalgic "قريباً" badge على الأجهزة الذكية.
+
+#### 3. FAQ Section (جديد)
+- Section بـ ID `#faq` بين Guide و Pricing.
+- **12 سؤال** بـ accordion (`<details>/<summary>`):
+  - فترة تجريبية، Stripe، الإلغاء، WhatsApp/SMS، الترقية، AI Assistant، Auto-Pilot، الأمان، حدود السكان، 3 لغات، البدء السريع، تكلفة AI.
+- Hover بنفسجي + ChevronDownIcon يدور عند الفتح.
+- "اتصل بنا" CTA card في النهاية للأسئلة غير المُجابة.
+- Footer link "❓ الأسئلة الشائعة" أضيف.
+
+**🧪 E2E Verification:**
+- ✅ Stripe `/plans` يرجع: 4000 / 9500 / 25000 EGP بـ savings 17%.
+- ✅ Screenshots: 23 system cards + 12 FAQ items + Pricing الجديد + Comparison Table.
+- ✅ Lint نظيف (Frontend + Backend).
+
+
 ### Iter 113: Comprehensive Guide Update — 22 Cards with AI Highlights — Feb 6, 2026 ✅
 
 **🎯 الهدف:** تحديث "دليل التشغيل الشامل" بكل تفاصيل الميزات الجديدة + 7 بطاقات AI بارزة.

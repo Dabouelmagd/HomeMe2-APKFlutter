@@ -13,6 +13,7 @@ import {
   CheckBadgeIcon,
 } from '@heroicons/react/24/outline';
 import PageHero from '../components/shared/PageHero';
+import MRRTrendChart from '../components/MRRTrendChart';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -157,6 +158,9 @@ const SubscriptionAnalyticsPage = () => {
           <p className="text-[11px] opacity-90 mt-1">{summary.auto_renew_percent}% من المشتركين</p>
         </div>
       </div>
+
+      {/* MRR Trend Chart */}
+      <MRRTrendChart />
 
       {/* SECONDARY METRICS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">

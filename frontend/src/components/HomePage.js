@@ -19,6 +19,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 import InternalAdBanner from './InternalAdBanner';
+import CustomerTestimonialsCarousel from './CustomerTestimonialsCarousel';
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
@@ -177,6 +178,12 @@ const HomePage = () => {
   const yearlyOf = (monthly) => {
     const total = monthly * 10; // 10 months = yearly (2 months free)
     const val = currency === 'egp' ? total : Math.round(total * 0.02);
+    return val.toLocaleString();
+  };
+  // Savings if user pays yearly vs 12 separate monthly payments
+  const savingsOf = (monthly) => {
+    const saved = monthly * 2; // 2 months free per year
+    const val = currency === 'egp' ? saved : Math.round(saved * 0.02);
     return val.toLocaleString();
   };
   const isYearly = billingPeriod === 'yearly';
@@ -1074,6 +1081,9 @@ const HomePage = () => {
         </div>
       </div>
 
+      {/* ⭐ Customer Testimonials */}
+      <CustomerTestimonialsCarousel />
+
       {/* ❓ FAQ Section */}
       <section className="py-16 bg-white" id="faq" data-testid="faq-section">
         <div className="max-w-4xl mx-auto px-4">
@@ -1212,7 +1222,15 @@ const HomePage = () => {
                         <span className="text-xs text-gray-400">{sym} / {isYearly ? t('hp_per_year') : t('hp_per_month')}</span>
                       </div>
                       {isYearly && plan.monthly > 0 && (
-                        <p className="text-[10px] text-gray-500 mt-1 line-through">{priceOf(plan.monthly * 12)} {sym} / {t('hp_yearly_no_disc', 'سنوياً بدون خصم')}</p>
+                        <div className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-black shadow-lg" data-testid={`savings-badge-${plan.nameEn.toLowerCase()}`}>
+                          <span>💰</span>
+                          <span>وفّر {savingsOf(plan.monthly)} {sym}</span>
+                        </div>
+                      )}
+                      {!isYearly && plan.monthly > 0 && (
+                        <p className="text-[10px] text-emerald-400 mt-1 font-bold">
+                          💡 {t('hp_save_yearly', `وفّر ${savingsOf(plan.monthly)} ${sym} مع التجديد السنوي`)}
+                        </p>
                       )}
                     </div>
                   )}
@@ -1349,7 +1367,15 @@ const HomePage = () => {
                           <span className="text-xs text-gray-400">{sym} / {isYearly ? t('hp_per_year') : t('hp_per_month')}</span>
                         </div>
                         {isYearly && (
-                          <p className="text-[10px] text-gray-500 mt-1 line-through">{priceOf(plan.monthly * 12)} {sym} / {t('hp_yearly_no_disc', 'سنوياً بدون خصم')}</p>
+                          <div className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-black shadow-lg" data-testid={`company-savings-${plan.nameEn.toLowerCase()}`}>
+                            <span>💰</span>
+                            <span>وفّر {savingsOf(plan.monthly)} {sym}</span>
+                          </div>
+                        )}
+                        {!isYearly && (
+                          <p className="text-[10px] text-emerald-400 mt-1 font-bold">
+                            💡 وفّر {savingsOf(plan.monthly)} {sym} مع التجديد السنوي
+                          </p>
                         )}
                       </div>
                     )}
@@ -1645,6 +1671,7 @@ const HomePage = () => {
               <a href="#pricing" className="hover:text-white transition-colors">{t('hp_sub_codes')}</a>
               <a href="#systems" className="hover:text-white transition-colors">{t('hp_22_systems', '22 نظام متكامل')}</a>
               <a href="#ai-features" className="hover:text-white transition-colors">✨ {t('hp_whats_new', 'ما الجديد')}</a>
+              <a href="#testimonials" className="hover:text-white transition-colors">⭐ شهادات</a>
               <a href="#faq" className="hover:text-white transition-colors">❓ {t('hp_faq', 'الأسئلة الشائعة')}</a>
               <Link to="/login" className="hover:text-white transition-colors">{t('sign_in', 'تسجيل الدخول')}</Link>
             </div>

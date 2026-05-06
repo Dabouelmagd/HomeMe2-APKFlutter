@@ -50,6 +50,40 @@ const HomePage = () => {
   const [codeStatus, setCodeStatus] = useState(null); // {type:'success'|'error', msg:'...'}
   const [codeLoading, setCodeLoading] = useState(false);
 
+  // 🎯 Scroll Spy — track active section based on scroll position
+  const [activeSection, setActiveSection] = useState('top');
+
+  useEffect(() => {
+    const NAV_SECTIONS = ['systems', 'ai-features', 'live-demo', 'guide', 'testimonials', 'faq', 'pricing'];
+    const HEADER_OFFSET = 200; // px allowance for sticky header
+
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      // If at the very top, activate "home"
+      if (scrollY < 300) {
+        setActiveSection('top');
+        return;
+      }
+      // Find the section whose top is closest above the threshold
+      let current = 'top';
+      for (const id of NAV_SECTIONS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.top - HEADER_OFFSET <= 0) {
+          current = id;
+        } else {
+          break;
+        }
+      }
+      setActiveSection(current);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Persist user's currency choice across visits
   useEffect(() => {
     try { localStorage.setItem('preferred_currency', currency); } catch (e) { /* ignore */ }
@@ -519,29 +553,41 @@ const HomePage = () => {
           {/* Center Navigation — desktop only */}
           <nav className="hidden lg:!flex items-center gap-1 flex-1 justify-center" data-testid="homepage-nav" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
             {[
-              { href: '#top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home' },
-              { href: '#systems', label: t('nav_features', 'المميزات'), testid: 'nav-features' },
-              { href: '#ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new' },
-              { href: '#pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing' },
-              { href: '#guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide' },
-              { href: '#testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials' },
-              { href: '#faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq' },
-            ].map((item, i) => (
-              <a
-                key={i}
-                href={item.href}
-                onClick={(e) => {
-                  if (item.href === '#top') {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }
-                }}
-                className="px-3 py-2 text-sm font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap"
-                data-testid={item.testid}
-              >
-                {item.label}
-              </a>
-            ))}
+              { href: '#top', sectionId: 'top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home' },
+              { href: '#systems', sectionId: 'systems', label: t('nav_features', 'المميزات'), testid: 'nav-features' },
+              { href: '#ai-features', sectionId: 'ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new' },
+              { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing' },
+              { href: '#guide', sectionId: 'guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide' },
+              { href: '#testimonials', sectionId: 'testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials' },
+              { href: '#faq', sectionId: 'faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq' },
+            ].map((item, i) => {
+              const isActive = activeSection === item.sectionId;
+              return (
+                <a
+                  key={i}
+                  href={item.href}
+                  onClick={(e) => {
+                    if (item.href === '#top') {
+                      e.preventDefault();
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`relative px-3 py-2 text-sm font-semibold rounded-lg transition-all whitespace-nowrap ${
+                    isActive
+                      ? 'text-blue-700 bg-blue-50'
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
+                  data-testid={item.testid}
+                  data-active={isActive ? 'true' : 'false'}
+                >
+                  {item.label}
+                  {isActive && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full" aria-hidden="true" />
+                  )}
+                </a>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -567,29 +613,38 @@ const HomePage = () => {
         <nav className="lg:!hidden border-t border-gray-100 bg-gray-50/50 overflow-x-auto" data-testid="homepage-nav-mobile" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
           <div className="flex items-center gap-0.5 px-2 py-1.5 min-w-max">
             {[
-              { href: '#top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home-m' },
-              { href: '#systems', label: t('nav_features', 'المميزات'), testid: 'nav-features-m' },
-              { href: '#ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new-m' },
-              { href: '#pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing-m' },
-              { href: '#guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide-m' },
-              { href: '#testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials-m' },
-              { href: '#faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq-m' },
-            ].map((item, i) => (
-              <a
-                key={i}
-                href={item.href}
-                onClick={(e) => {
-                  if (item.href === '#top') {
-                    e.preventDefault();
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }
-                }}
-                className="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:text-blue-600 hover:bg-white rounded-lg transition-all whitespace-nowrap"
-                data-testid={item.testid}
-              >
-                {item.label}
-              </a>
-            ))}
+              { href: '#top', sectionId: 'top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home-m' },
+              { href: '#systems', sectionId: 'systems', label: t('nav_features', 'المميزات'), testid: 'nav-features-m' },
+              { href: '#ai-features', sectionId: 'ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new-m' },
+              { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing-m' },
+              { href: '#guide', sectionId: 'guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide-m' },
+              { href: '#testimonials', sectionId: 'testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials-m' },
+              { href: '#faq', sectionId: 'faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq-m' },
+            ].map((item, i) => {
+              const isActive = activeSection === item.sectionId;
+              return (
+                <a
+                  key={i}
+                  href={item.href}
+                  onClick={(e) => {
+                    if (item.href === '#top') {
+                      e.preventDefault();
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
+                    isActive
+                      ? 'text-blue-700 bg-blue-100 shadow-sm'
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-white'
+                  }`}
+                  data-testid={item.testid}
+                  data-active={isActive ? 'true' : 'false'}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
           </div>
         </nav>
       </header>

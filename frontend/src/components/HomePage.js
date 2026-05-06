@@ -382,6 +382,14 @@ const HomePage = () => {
     { name: t('f_newsletters'), startup: true, business: true, enterprise: true },
     { name: t('f_adv_analytics'), startup: true, business: true, enterprise: true },
     { name: t('cf_unified_reports'), startup: true, business: true, enterprise: true },
+    // ✨ NEW AI Features for Companies
+    { name: '✨ ' + t('cmp_ai_chat', 'مساعد HomeMe الذكي (شات AI)'), startup: '20/يوم', business: '50/يوم', enterprise: 'غير محدود', highlight: true },
+    { name: '🧠 ' + t('cmp_ai_advisor', 'مستشار AI استباقي'), startup: true, business: true, enterprise: true, highlight: true },
+    { name: '🤖 ' + t('cmp_autopilot', 'AI Auto-Pilot (مجدول)'), startup: false, business: true, enterprise: true, highlight: true },
+    { name: '📨 ' + t('cmp_auto_credentials', 'إرسال بيانات الدخول تلقائياً'), startup: true, business: true, enterprise: true, highlight: true },
+    { name: '🔁 ' + t('cmp_stripe_autorenew', 'تجديد تلقائي عبر Stripe'), startup: true, business: true, enterprise: true, highlight: true },
+    { name: '📊 ' + t('cmp_subscription_analytics', 'تحليلات اشتراكات (MRR/Churn)'), startup: false, business: true, enterprise: true, highlight: true },
+    { name: '📬 ' + t('cmp_weekly_digest', 'ملخص AutoPilot أسبوعي بالبريد'), startup: false, business: true, enterprise: true, highlight: true },
     { name: t('f_smart_devices'), startup: false, business: true, enterprise: true },
     { name: t('f_custom_api'), startup: false, business: true, enterprise: true },
     { name: t('cf_compare_analytics'), startup: false, business: true, enterprise: true },
@@ -414,6 +422,11 @@ const HomePage = () => {
     { name: t('f_announcements', 'إعلانات وأحداث'), starter: false, basic: false, pro: true, premium: true },
     { name: t('f_newsletters', 'نشرات إخبارية'), starter: false, basic: false, pro: true, premium: true },
     { name: t('f_adv_analytics', 'تحليلات متقدمة + رسوم بيانية'), starter: false, basic: false, pro: true, premium: true },
+    // ✨ NEW AI Features
+    { name: '✨ ' + t('cmp_ai_chat', 'مساعد HomeMe الذكي (شات AI)'), starter: false, basic: false, pro: '20/يوم', premium: '50/يوم', highlight: true },
+    { name: '🧠 ' + t('cmp_ai_advisor', 'مستشار AI استباقي'), starter: false, basic: false, pro: true, premium: true, highlight: true },
+    { name: '🤖 ' + t('cmp_autopilot', 'AI Auto-Pilot (تلقائي مجدول)'), starter: false, basic: false, pro: false, premium: true, highlight: true },
+    { name: '📨 ' + t('cmp_auto_credentials', 'إرسال بيانات الدخول تلقائياً'), starter: false, basic: false, pro: true, premium: true, highlight: true },
     { name: t('f_smart_devices', 'الأجهزة الذكية والأتمتة (قريباً)'), starter: false, basic: false, pro: false, premium: true },
     { name: t('f_custom_api', 'API مخصص للتكامل'), starter: false, basic: false, pro: false, premium: true },
     { name: t('f_custom_reports', 'تقارير مخصصة'), starter: false, basic: false, pro: false, premium: true },
@@ -774,6 +787,183 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* 🎬 Live Demo Section — interactive previews */}
+      <section className="py-16 bg-gradient-to-b from-gray-50 to-white" id="live-demo" data-testid="live-demo-section">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold mb-4">
+              🎬 {t('hp_live_demo_badge', 'عرض حي تفاعلي')}
+            </div>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>
+              {t('hp_live_demo_title', 'شوف الميزات الجديدة في العمل')}
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto">
+              {t('hp_live_demo_desc', 'استكشف الميزات قبل الاشتراك — تصاميم محاكاة لأهم ٣ ميزات AI')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Demo 1 — AI Chat Mock */}
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all" data-testid="demo-ai-chat">
+              <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 px-4 py-3 text-white">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">✨</div>
+                  <div>
+                    <p className="text-sm font-bold">مساعد HomeMe</p>
+                    <p className="text-[10px] opacity-80">Gemini AI · يجاوب فوراً</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 space-y-2 bg-gray-50 min-h-[260px]">
+                {/* User msg */}
+                <div className="flex justify-end">
+                  <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-2xl rounded-br-sm px-3 py-2 text-xs max-w-[85%] shadow">
+                    إزاي أحجز نادي رياضي؟
+                  </div>
+                </div>
+                {/* AI msg */}
+                <div className="flex justify-start">
+                  <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-3 py-2 text-xs max-w-[90%] shadow-sm">
+                    <p className="text-gray-800 leading-relaxed">يمكنك حجز النادي من صفحة "حجز المرافق". اختر التاريخ والوقت ثم اضغط تأكيد ✨</p>
+                    <button className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded bg-violet-50 text-violet-700 border border-violet-200">
+                      → افتح الصفحة
+                    </button>
+                  </div>
+                </div>
+                {/* Typing indicator */}
+                <div className="flex justify-start">
+                  <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-2.5 shadow-sm">
+                    <div className="flex gap-1">
+                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" />
+                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{animationDelay:'150ms'}} />
+                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{animationDelay:'300ms'}} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 bg-white border-t border-gray-100">
+                <h4 className="text-sm font-bold text-gray-900 mb-1">شات AI ذكي + Deep Links</h4>
+                <p className="text-[11px] text-gray-500">يجاوب فوراً + ينقلك للصفحة المطلوبة بضغطة</p>
+              </div>
+            </div>
+
+            {/* Demo 2 — AI Insights Mock */}
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all" data-testid="demo-ai-insights">
+              <div className="bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-600 px-4 py-3 text-white">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">🧠</div>
+                  <div>
+                    <p className="text-sm font-bold">مستشار AI استباقي</p>
+                    <p className="text-[10px] opacity-80">يكتشف المشاكل تلقائياً</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-3 space-y-2 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 min-h-[260px]">
+                {/* Insight 1 */}
+                <div className="bg-rose-50 border border-rose-200 rounded-xl p-2.5">
+                  <div className="flex items-start gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-base animate-pulse">💰</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-xs font-bold text-gray-900">5 فواتير متأخرة</p>
+                        <span className="bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded">عاجل</span>
+                      </div>
+                      <p className="text-[10px] text-gray-600 leading-snug mt-0.5">سكان لم يدفعوا منذ 30+ يوم</p>
+                      <button className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2 py-1 rounded">
+                        ⚡ تنفيذ بالـ AI
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                {/* Insight 2 */}
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5">
+                  <div className="flex items-start gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-base">🔧</div>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-gray-900">3 طلبات صيانة معلقة</p>
+                      <p className="text-[10px] text-gray-600 leading-snug mt-0.5">لم يتم البت فيها منذ أسبوع+</p>
+                    </div>
+                  </div>
+                </div>
+                {/* Insight 3 */}
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5">
+                  <div className="flex items-start gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-base">⭐</div>
+                    <div className="flex-1">
+                      <p className="text-xs font-bold text-gray-900">2 تقييم سلبي اليوم</p>
+                      <p className="text-[10px] text-gray-600 leading-snug mt-0.5">راجع الملاحظات لتحسين الخدمة</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 bg-white border-t border-gray-100">
+                <h4 className="text-sm font-bold text-gray-900 mb-1">يكتشف + ينفذ بضغطة</h4>
+                <p className="text-[11px] text-gray-500">AI يحلل البيانات يومياً ويقترح إجراءات فورية</p>
+              </div>
+            </div>
+
+            {/* Demo 3 — Subscription Analytics Mock */}
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all" data-testid="demo-analytics">
+              <div className="bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-3 text-white">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">📊</div>
+                  <div>
+                    <p className="text-sm font-bold">تحليلات الاشتراكات</p>
+                    <p className="text-[10px] opacity-80">MRR · ARR · Churn</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-3 space-y-2 bg-gradient-to-br from-emerald-50 via-white to-teal-50 min-h-[260px]">
+                {/* Stat tile */}
+                <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-3 text-white">
+                  <p className="text-[10px] font-bold opacity-90">إيراد شهري متكرر</p>
+                  <p className="text-2xl font-black mt-1">31,000 <span className="text-xs opacity-75">ج.م</span></p>
+                  <p className="text-[10px] opacity-80 mt-0.5">↗ +18% عن الشهر الماضي</p>
+                </div>
+                {/* Mini bars */}
+                <div className="bg-white rounded-xl p-3 border border-gray-200">
+                  <p className="text-[10px] font-bold text-gray-700 mb-2">MRR حسب الخطة</p>
+                  <div className="space-y-1">
+                    {[
+                      { name: 'كبرى', pct: 65, val: '20K' },
+                      { name: 'متوسطة', pct: 25, val: '7.5K' },
+                      { name: 'ناشئة', pct: 10, val: '3.5K' },
+                    ].map((b, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <span className="text-[9px] w-10 text-gray-600">{b.name}</span>
+                        <div className="flex-1 bg-gray-100 rounded h-3 overflow-hidden">
+                          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 h-full transition-all" style={{width:`${b.pct}%`}} />
+                        </div>
+                        <span className="text-[9px] font-bold text-gray-700 w-8 text-left">{b.val}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Churn / Trial */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-white rounded-xl p-2.5 border border-gray-200 text-center">
+                    <p className="text-[9px] font-bold text-gray-500">Churn</p>
+                    <p className="text-base font-black text-rose-600">2.3%</p>
+                  </div>
+                  <div className="bg-white rounded-xl p-2.5 border border-gray-200 text-center">
+                    <p className="text-[9px] font-bold text-gray-500">Trial → Paid</p>
+                    <p className="text-base font-black text-emerald-600">42%</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 bg-white border-t border-gray-100">
+                <h4 className="text-sm font-bold text-gray-900 mb-1">صحة الإيراد بنظرة سريعة</h4>
+                <p className="text-[11px] text-gray-500">MRR / ARR / Churn / Trial Conversion في dashboard واحد</p>
+              </div>
+            </div>
+          </div>
+
+          <p className="text-center text-xs text-gray-400 mt-6">
+            * عرض محاكاة — البيانات الحقيقية تظهر بعد تسجيل الدخول
+          </p>
+        </div>
+      </section>
+
       {/* Comprehensive Guide */}
       <section className="py-16 bg-gradient-to-b from-slate-50 to-white" id="guide" data-testid="guide-section">
         <div className="max-w-7xl mx-auto px-4">
@@ -926,17 +1116,22 @@ const HomePage = () => {
                 </thead>
                 <tbody>
                   {comparisonFeatures.map((feat, i) => (
-                    <tr key={i} className={i % 2 === 0 ? 'bg-white/[0.02]' : ''}>
-                      <td className="py-2.5 px-4 text-gray-300 text-xs">{feat.name}</td>
-                      {['starter', 'basic', 'pro', 'premium'].map(tier => (
-                        <td key={tier} className="text-center py-2.5 px-3">
-                          {feat[tier] ? (
-                            <CheckCircleIcon className="h-4 w-4 text-green-400 mx-auto" />
-                          ) : (
-                            <span className="text-gray-600 text-xs">—</span>
-                          )}
-                        </td>
-                      ))}
+                    <tr key={i} className={`${i % 2 === 0 ? 'bg-white/[0.02]' : ''} ${feat.highlight ? 'bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10' : ''}`}>
+                      <td className={`py-2.5 px-4 text-xs ${feat.highlight ? 'text-violet-200 font-semibold' : 'text-gray-300'}`}>{feat.name}</td>
+                      {['starter', 'basic', 'pro', 'premium'].map(tier => {
+                        const val = feat[tier];
+                        return (
+                          <td key={tier} className="text-center py-2.5 px-3">
+                            {val === true ? (
+                              <CheckCircleIcon className="h-4 w-4 text-green-400 mx-auto" />
+                            ) : typeof val === 'string' ? (
+                              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">{val}</span>
+                            ) : (
+                              <span className="text-gray-600 text-xs">—</span>
+                            )}
+                          </td>
+                        );
+                      })}
                     </tr>
                   ))}
                   {/* Price row */}
@@ -1052,12 +1247,12 @@ const HomePage = () => {
                 </thead>
                 <tbody>
                   {companyComparisonFeatures.map((feat, i) => (
-                    <tr key={i} className={i % 2 === 0 ? 'bg-white/[0.02]' : ''}>
-                      <td className="py-2.5 px-4 text-gray-300 text-xs">{feat.name}</td>
+                    <tr key={i} className={`${i % 2 === 0 ? 'bg-white/[0.02]' : ''} ${feat.highlight ? 'bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10' : ''}`}>
+                      <td className={`py-2.5 px-4 text-xs ${feat.highlight ? 'text-violet-200 font-semibold' : 'text-gray-300'}`}>{feat.name}</td>
                       {['startup', 'business', 'enterprise'].map(tier => (
                         <td key={tier} className="text-center py-2.5 px-3">
                           {typeof feat[tier] === 'string' ? (
-                            <span className="text-xs font-bold text-amber-300">{feat[tier]}</span>
+                            <span className={`text-[10px] font-bold ${feat.highlight ? 'text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded' : 'text-amber-300'}`}>{feat[tier]}</span>
                           ) : feat[tier] ? (
                             <CheckCircleIcon className="h-4 w-4 text-green-400 mx-auto" />
                           ) : (
@@ -1111,21 +1306,124 @@ const HomePage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_6_roles')}</h2>
             <p className="text-gray-500">{t('hp_roles_desc')}</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[
-              { icon: KeyIcon, title: t('role_super_admin', 'مالك التطبيق'), desc: t('role_super_desc', 'تحكم كامل'), color: 'bg-purple-50 text-purple-700 border-purple-200' },
-              { icon: BuildingOffice2Icon, title: t('role_company_admin', 'إدارة شركة'), desc: t('role_company_desc', 'عدة مجتمعات'), color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
-              { icon: HomeModernIcon, title: t('role_admin', 'مدير مجتمع'), desc: t('role_admin_desc', 'إدارة كاملة'), color: 'bg-blue-50 text-blue-700 border-blue-200' },
-              { icon: ClipboardDocumentCheckIcon, title: t('role_manager', 'إداري'), desc: t('role_manager_desc', 'متابعة يومية'), color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-              { icon: ShieldCheckIcon, title: t('role_security', 'أمن'), desc: t('role_security_desc', 'بوابات وزوار'), color: 'bg-amber-50 text-amber-700 border-amber-200' },
-              { icon: UserIcon, title: t('role_resident', 'مقيم'), desc: t('role_resident_desc', 'خدمات وصيانة'), color: 'bg-teal-50 text-teal-700 border-teal-200' },
+              {
+                icon: KeyIcon,
+                title: t('role_super_admin', 'مالك التطبيق'),
+                desc: t('role_super_desc_full', 'تحكم كامل بكل المنصة على مستوى الـ Owner.'),
+                color: 'from-purple-500 to-indigo-600',
+                bg: 'bg-purple-50 border-purple-200',
+                text: 'text-purple-700',
+                permissions: [
+                  '✅ إدارة الشركات والمجمعات (CRUD كامل)',
+                  '✅ تحليلات الإيرادات (MRR / ARR / Churn)',
+                  '✅ إدارة الاشتراكات والكوبونات',
+                  '✅ محرّر الصفحات القانونية + الترجمة',
+                  '✅ سجل التدقيق والصحة العامة',
+                  '✅ إدارة الترجمات والقوالب',
+                ],
+              },
+              {
+                icon: BuildingOffice2Icon,
+                title: t('role_company_admin', 'إدارة شركة عقارية'),
+                desc: t('role_company_desc_full', 'إدارة عدة مجتمعات سكنية تابعة لشركتها.'),
+                color: 'from-indigo-500 to-blue-600',
+                bg: 'bg-indigo-50 border-indigo-200',
+                text: 'text-indigo-700',
+                permissions: [
+                  '✅ إدارة كل المجمعات التابعة للشركة',
+                  '✅ تقارير Portfolio PDF موحّدة',
+                  '✅ إنشاء مدراء مجمعات جدد',
+                  '✅ تفعيل التجديد التلقائي عبر Stripe',
+                  '✅ AI Auto-Pilot لكل المجمعات',
+                  '🔒 لا يصل لميزات Owner-only',
+                ],
+              },
+              {
+                icon: HomeModernIcon,
+                title: t('role_admin', 'مدير مجمع'),
+                desc: t('role_admin_desc_full', 'مسؤول كامل عن مجمع واحد محدد.'),
+                color: 'from-blue-500 to-cyan-600',
+                bg: 'bg-blue-50 border-blue-200',
+                text: 'text-blue-700',
+                permissions: [
+                  '✅ إدارة السكان والوحدات والعقود',
+                  '✅ النظام المالي (فواتير، إيصالات، مصروفات)',
+                  '✅ الصيانة + حجز المرافق + الزوار',
+                  '✅ مستشار AI + AI Auto-Pilot للمجمع',
+                  '✅ الإعلانات والاستطلاعات والشكاوى',
+                  '🔒 لا يصل للمجمعات الأخرى',
+                ],
+              },
+              {
+                icon: ClipboardDocumentCheckIcon,
+                title: t('role_manager', 'إداري / Manager'),
+                desc: t('role_manager_desc_full', 'متابعة يومية مع صلاحيات محدودة.'),
+                color: 'from-emerald-500 to-teal-600',
+                bg: 'bg-emerald-50 border-emerald-200',
+                text: 'text-emerald-700',
+                permissions: [
+                  '✅ متابعة طلبات الصيانة والشكاوى',
+                  '✅ مراجعة إيصالات الدفع',
+                  '✅ إدارة الزوار والحجوزات',
+                  '✅ استقبال إشعارات AI Auto-Pilot',
+                  '🔒 لا يقدر يعدّل الفواتير المالية',
+                  '🔒 لا يقدر يحذف سكان',
+                ],
+              },
+              {
+                icon: ShieldCheckIcon,
+                title: t('role_security', 'موظف أمن'),
+                desc: t('role_security_desc_full', 'تحكم في البوابات والزوار.'),
+                color: 'from-amber-500 to-orange-600',
+                bg: 'bg-amber-50 border-amber-200',
+                text: 'text-amber-700',
+                permissions: [
+                  '✅ مسح QR Code للزوار',
+                  '✅ تسجيل دخول/خروج المركبات',
+                  '✅ إدارة قائمة الزوار اليومية',
+                  '✅ تنبيهات أمنية فورية',
+                  '🔒 لا يصل للنظام المالي',
+                  '🔒 لا يصل لبيانات شخصية حساسة',
+                ],
+              },
+              {
+                icon: UserIcon,
+                title: t('role_resident', 'ساكن / Resident'),
+                desc: t('role_resident_desc_full', 'استخدام خدمات المجمع وتسديد المستحقات.'),
+                color: 'from-teal-500 to-cyan-600',
+                bg: 'bg-teal-50 border-teal-200',
+                text: 'text-teal-700',
+                permissions: [
+                  '✅ عرض الفواتير ورفع إيصالات الدفع',
+                  '✅ طلب صيانة + حجز المرافق',
+                  '✅ دعوة زوار + توليد QR لهم',
+                  '✅ شات AI لأسئلة الاستخدام',
+                  '✅ المشاركة في الاستطلاعات',
+                  '🔒 يصل لبياناته الشخصية فقط',
+                ],
+              },
             ].map((role, i) => {
               const Icon = role.icon;
               return (
-                <div key={i} className={`rounded-xl p-4 text-center border ${role.color} hover:shadow-md transition-all`}>
-                  <Icon className="h-8 w-8 mx-auto mb-2" />
-                  <h4 className="font-bold text-sm mb-0.5">{role.title}</h4>
-                  <p className="text-xs opacity-70">{role.desc}</p>
+                <div key={i} className={`rounded-2xl p-5 border-2 ${role.bg} hover:shadow-xl transition-all group`} data-testid={`role-card-${i}`}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${role.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
+                      <Icon className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-base ${role.text}`}>{role.title}</h4>
+                      <p className="text-[11px] text-gray-500 leading-tight">{role.desc}</p>
+                    </div>
+                  </div>
+                  <ul className="space-y-1.5 mt-3">
+                    {role.permissions.map((perm, idx) => (
+                      <li key={idx} className="text-[11px] text-gray-700 leading-relaxed flex items-start gap-1">
+                        <span>{perm}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               );
             })}

@@ -21,6 +21,48 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 112: Live Demo + Updated Comparison Tables + 6 Roles Section — Feb 6, 2026 ✅
+
+**🎯 ٤ تحسينات كبرى في صفحة HomePage:**
+
+#### 1. Live Demo Section (جديد كلياً)
+- Section بـ ID `#live-demo` بعد AI Features.
+- **3 interactive demo cards** تحاكي الميزات الحقيقية:
+  - **AI Chat Mock:** chat bubbles بتنسيق صحيح، typing dots animated، deep-link button.
+  - **AI Insights Mock:** 3 insight cards (late_invoices/maintenance/ratings) بـ severity colors + "⚡ تنفيذ بالـ AI" button.
+  - **Subscription Analytics Mock:** MRR tile + progress bars (MRR by plan) + Churn/Trial stats.
+- Disclaimer "* عرض محاكاة — البيانات الحقيقية تظهر بعد تسجيل الدخول".
+
+#### 2. مقارنة تفصيلية Users (محدّثة)
+- إضافة 4 صفوف جديدة بـ background gradient violet/fuchsia:
+  - ✨ مساعد AI: Pro=20/يوم badge، Premium=50/يوم badge.
+  - 🧠 مستشار AI استباقي: ✓ Pro+Premium.
+  - 🤖 AI Auto-Pilot: ✓ Premium only.
+  - 📨 Auto-Credentials: ✓ Pro+Premium.
+- Renderer support للـ string values + highlight prop.
+
+#### 3. مقارنة تفصيلية Companies (محدّثة)
+- إضافة 7 صفوف جديدة:
+  - ✨ AI Chat: Startup=20/يوم، Business=50/يوم، Enterprise=غير محدود.
+  - 🧠 AI Advisor: ✓ كل الخطط.
+  - 🤖 AI Auto-Pilot: ✓ Business+Enterprise.
+  - 📨 Auto-Credentials + 🔁 Stripe Auto-Renew: ✓ كل الخطط.
+  - 📊 Subscription Analytics + 📬 Weekly Digest: ✓ Business+Enterprise.
+
+#### 4. 6 Roles Section (إعادة تصميم كاملة)
+- **Layout جديد:** 3×2 grid بدلاً من 6 in-a-row.
+- كل role card يحتوي:
+  - Icon ضخم بـ gradient + name + brief description.
+  - **6 صلاحيات بالتفصيل** لكل دور (✅ مسموح، 🔒 محظور).
+- مثلاً Super Admin: إدارة الشركات، تحليلات الإيرادات، الكوبونات، محرر القانوني، سجل التدقيق، الترجمات.
+- Company Admin: إدارة المجمعات التابعة، Portfolio PDF، إنشاء مدراء، Stripe، Auto-Pilot — لا يصل لـ Owner-only.
+- وهكذا لكل دور.
+
+**🧪 E2E Verification:**
+- ✅ Lint نظيف.
+- ✅ 4 screenshots: User comparison + Company comparison + Live Demo + Roles — كلها تظهر بشكل احترافي.
+
+
 ### Iter 111: HomePage Pricing & AI Features Showcase — Feb 6, 2026 ✅
 
 **🎯 الهدف:** عكس كل التحديثات الجديدة (AI Assistant، Auto-Pilot، Stripe Auto-Renewal، Subscription Analytics، Auto-Credentials) في صفحة الويب الرئيسية والخطط التسعيرية.

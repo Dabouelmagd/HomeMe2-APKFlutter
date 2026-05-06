@@ -542,7 +542,7 @@ const HomePage = () => {
             <img
               src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
               alt="HomeMe"
-              className="h-14 lg:h-20 w-auto rounded-2xl shadow-lg"
+              className="h-20 lg:h-28 w-auto rounded-2xl shadow-lg"
               data-testid="homepage-logo"
             />
             <div>

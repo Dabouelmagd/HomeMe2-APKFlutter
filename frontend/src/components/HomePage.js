@@ -1292,9 +1292,9 @@ const HomePage = () => {
                   <tr className="bg-white/5 border-t border-white/10">
                     <td className="py-3 px-4 font-bold text-white text-xs">{t('hp_price_label')} {isYearly ? t('hp_yearly_price') : t('hp_monthly_price')}</td>
                     <td className="text-center py-3 px-3 text-xs font-bold text-gray-300">{t('hp_free')}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-sky-300">{isYearly ? yearlyOf(500) : priceOf(500)} {sym}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-blue-300">{isYearly ? yearlyOf(1200) : priceOf(1200)} {sym}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-violet-300">{isYearly ? yearlyOf(2200) : priceOf(2200)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-sky-300">{isYearly ? yearlyOf(800) : priceOf(800)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-blue-300">{isYearly ? yearlyOf(1500) : priceOf(1500)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-violet-300">{isYearly ? yearlyOf(2800) : priceOf(2800)} {sym}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1346,7 +1346,24 @@ const HomePage = () => {
                 {t('hp_for_companies')}
               </div>
               <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_company_plans_title')}</h3>
-              <p className="text-gray-400 text-sm max-w-lg mx-auto">{t('hp_company_plans_desc')}</p>
+              <p className="text-gray-400 text-sm max-w-lg mx-auto mb-6">{t('hp_company_plans_desc')}</p>
+
+              {/* Toggles Row (Companies) */}
+              <div className="flex flex-wrap items-center justify-center gap-4 mb-2">
+                {/* Billing Period Toggle */}
+                <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
+                  <button onClick={() => setBillingPeriod('monthly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${billingPeriod === 'monthly' ? 'bg-amber-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="company-toggle-monthly">{t('hp_monthly')}</button>
+                  <button onClick={() => setBillingPeriod('yearly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all relative ${billingPeriod === 'yearly' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="company-toggle-yearly">
+                    {t('hp_yearly')}
+                    <span className="absolute -top-2.5 -left-2 px-1.5 py-0.5 bg-green-500 text-[9px] font-bold rounded-full text-white">{t('hp_2months_free')}</span>
+                  </button>
+                </div>
+                {/* Currency Toggle */}
+                <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
+                  <button onClick={() => setCurrency('egp')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'egp' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="company-toggle-egp">{t('hp_egp', 'ج.م EGP')}</button>
+                  <button onClick={() => setCurrency('usd')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'usd' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="company-toggle-usd">$ USD</button>
+                </div>
+              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {companyPlans.map((plan, i) => (
@@ -1427,9 +1444,9 @@ const HomePage = () => {
                   {/* Price row */}
                   <tr className="bg-white/5 border-t border-white/10">
                     <td className="py-3 px-4 font-bold text-white text-xs">{t('hp_price_label')} {isYearly ? t('hp_yearly_price') : t('hp_monthly_price')}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-amber-300">{isYearly ? yearlyOf(3500) : priceOf(3500)} {sym}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-orange-300">{isYearly ? yearlyOf(7500) : priceOf(7500)} {sym}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-red-300">{isYearly ? yearlyOf(20000) : priceOf(20000)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-amber-300">{isYearly ? yearlyOf(4000) : priceOf(4000)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-orange-300">{isYearly ? yearlyOf(9500) : priceOf(9500)} {sym}</td>
+                    <td className="text-center py-3 px-3 text-xs font-bold text-red-300">{isYearly ? yearlyOf(25000) : priceOf(25000)} {sym}</td>
                   </tr>
                 </tbody>
               </table>

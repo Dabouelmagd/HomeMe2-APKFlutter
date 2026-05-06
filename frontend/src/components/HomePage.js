@@ -219,6 +219,9 @@ const HomePage = () => {
         t('f_announcements', 'إعلانات وأحداث'),
         t('f_newsletters', 'نشرات إخبارية'),
         t('f_adv_analytics', 'تحليلات متقدمة + رسوم بيانية'),
+        '✨ ' + t('cf_ai_assistant_20', 'مساعد HomeMe الذكي (شات AI 20 رسالة/يوم)'),
+        '🧠 ' + t('cf_ai_advisor', 'مستشار AI استباقي يكتشف المشاكل ويقترح حلول'),
+        '📨 ' + t('cf_auto_credentials', 'إرسال بيانات الدخول تلقائياً للسكان الجدد'),
         t('f_priority_support', 'دعم فني أولوية')
       ],
       excluded: [],
@@ -253,6 +256,10 @@ const HomePage = () => {
         t('f_smart_devices', 'الأجهزة الذكية والأتمتة (قريباً)'),
         t('f_custom_api', 'API مخصص للتكامل'),
         t('f_custom_reports', 'تقارير مخصصة'),
+        '✨ ' + t('cf_ai_assistant_50', 'مساعد HomeMe الذكي (50 رسالة/يوم)'),
+        '🧠 ' + t('cf_ai_advisor', 'مستشار AI استباقي يكتشف المشاكل ويقترح حلول'),
+        '🤖 ' + t('cf_ai_autopilot', 'AI Auto-Pilot — جدولة الإجراءات تلقائياً + ملخص أسبوعي'),
+        '📨 ' + t('cf_auto_credentials', 'إرسال بيانات الدخول تلقائياً للسكان الجدد'),
         t('f_24_7_support', 'دعم فني مخصص 24/7'),
         t('f_team_training', 'تدريب الفريق'),
         t('f_account_manager', 'مدير حساب مخصص')
@@ -281,6 +288,10 @@ const HomePage = () => {
         t('f_polls'), t('f_announcements'), t('f_newsletters'), t('f_adv_analytics'),
         t('cf_unified_reports', 'تقارير موحدة لكل المجتمعات'),
         t('cf_single_team', 'فريق إدارة واحد'),
+        '✨ ' + t('cf_ai_assistant', 'مساعد HomeMe الذكي (شات AI 20 رسالة/يوم لكل مستخدم)'),
+        '🧠 ' + t('cf_ai_advisor', 'مستشار AI استباقي يكتشف المشاكل ويقترح حلول'),
+        '📨 ' + t('cf_auto_credentials', 'إرسال بيانات الدخول تلقائياً للسكان الجدد'),
+        '🔁 ' + t('cf_stripe_autorenew', 'تجديد تلقائي عبر Stripe (شهري/سنوي مع خصم 17%)'),
         t('f_email_support')
       ],
       cta: t('hp_subscribe_now'),
@@ -307,6 +318,12 @@ const HomePage = () => {
         t('cf_multi_teams', 'إدارة فرق متعددة'),
         t('cf_adv_permissions', 'نظام صلاحيات متقدم'),
         t('cf_company_reports', 'تقارير أداء الشركة'),
+        '✨ ' + t('cf_ai_assistant_50', 'مساعد HomeMe الذكي (50 رسالة/يوم)'),
+        '🧠 ' + t('cf_ai_advisor', 'مستشار AI استباقي يكتشف المشاكل ويقترح حلول'),
+        '🤖 ' + t('cf_ai_autopilot', 'AI Auto-Pilot — جدولة الإجراءات تلقائياً + ملخص أسبوعي'),
+        '📨 ' + t('cf_auto_credentials', 'إرسال بيانات الدخول تلقائياً للسكان الجدد'),
+        '📊 ' + t('cf_subscription_analytics', 'تحليلات اشتراكات مفصّلة (MRR / Churn)'),
+        '🔁 ' + t('cf_stripe_autorenew', 'تجديد تلقائي عبر Stripe (شهري/سنوي مع خصم 17%)'),
         t('cf_priority_whatsapp', 'دعم فني أولوية + واتساب')
       ],
       cta: t('hp_subscribe_now'),
@@ -330,6 +347,12 @@ const HomePage = () => {
         t('f_smart_devices'),
         t('cf_full_api', 'تكامل API كامل مع أنظمتكم'),
         t('cf_compare_analytics'), t('cf_multi_teams'), t('cf_adv_permissions'), t('cf_company_reports'),
+        '✨ ' + t('cf_ai_assistant_unlimited', 'مساعد HomeMe الذكي بدون حدود'),
+        '🧠 ' + t('cf_ai_advisor', 'مستشار AI استباقي يكتشف المشاكل ويقترح حلول'),
+        '🤖 ' + t('cf_ai_autopilot_full', 'AI Auto-Pilot كامل + ملخصات أسبوعية مخصّصة'),
+        '📊 ' + t('cf_full_revenue_analytics', 'تحليلات إيرادات كاملة (MRR / ARR / Churn / Forecasts)'),
+        '🔁 ' + t('cf_stripe_autorenew', 'تجديد تلقائي عبر Stripe (شهري/سنوي مع خصم 17%)'),
+        '📨 ' + t('cf_auto_credentials', 'إرسال بيانات الدخول تلقائياً'),
         t('cf_private_hosting', 'استضافة خاصة (اختياري)'),
         t('cf_white_label', 'تخصيص العلامة التجارية'),
         t('f_account_manager'), t('cf_full_training', 'تدريب شامل للفريق'),
@@ -645,6 +668,108 @@ const HomePage = () => {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* ✨ What's New — AI & Auto-Pilot Features Banner */}
+      <section className="py-16 bg-gradient-to-br from-violet-950 via-purple-900 to-fuchsia-900 text-white relative overflow-hidden" id="ai-features" data-testid="ai-features-section">
+        {/* Decorative gradient blobs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-violet-500/30 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-fuchsia-500/30 rounded-full blur-3xl" />
+
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur border border-white/20 rounded-full text-sm font-medium mb-4">
+              ✨ {t('hp_whats_new', 'ما الجديد في 2026')}
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>
+              {t('hp_ai_powered', 'مدعوم بالذكاء الاصطناعي')}
+            </h2>
+            <p className="text-violet-200 max-w-2xl mx-auto text-base">
+              {t('hp_ai_desc', 'وفّر ساعات أسبوعياً مع AI Auto-Pilot والمستشار الذكي والتجديد التلقائي عبر Stripe')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* Feature 1 — AI Assistant */}
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-[1.02] transition-all">
+              <div className="text-4xl mb-3">✨</div>
+              <h3 className="text-xl font-bold mb-2">{t('hp_feat_ai_assistant', 'مساعد HomeMe الذكي')}</h3>
+              <p className="text-sm text-violet-200 leading-relaxed">
+                {t('hp_feat_ai_assistant_desc', 'شات AI عائم متاح في كل صفحة، يجاوب على أسئلة المستخدمين فوراً ويوجّههم للصفحات الصحيحة. مدعوم بـ Gemini 3 Flash.')}
+              </p>
+              <div className="mt-3 inline-block bg-emerald-500/20 text-emerald-300 text-xs px-2 py-0.5 rounded font-bold">
+                ⚡ Gemini 3 Flash
+              </div>
+            </div>
+
+            {/* Feature 2 — AI Advisor */}
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-[1.02] transition-all">
+              <div className="text-4xl mb-3">🧠</div>
+              <h3 className="text-xl font-bold mb-2">{t('hp_feat_ai_advisor', 'مستشار AI استباقي')}</h3>
+              <p className="text-sm text-violet-200 leading-relaxed">
+                {t('hp_feat_ai_advisor_desc', 'يحلل بيانات الكمبوند يومياً ويكتشف المشاكل قبل ما تتفاقم: فواتير متأخرة، صيانة معلقة، تقييمات سلبية. مع زر "تنفيذ بالـ AI" لإرسال جماعي.')}
+              </p>
+              <div className="mt-3 inline-block bg-rose-500/20 text-rose-300 text-xs px-2 py-0.5 rounded font-bold">
+                🤖 Auto-Detect
+              </div>
+            </div>
+
+            {/* Feature 3 — AI Auto-Pilot */}
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-[1.02] transition-all">
+              <div className="text-4xl mb-3">🤖</div>
+              <h3 className="text-xl font-bold mb-2">{t('hp_feat_autopilot', 'AI Auto-Pilot')}</h3>
+              <p className="text-sm text-violet-200 leading-relaxed">
+                {t('hp_feat_autopilot_desc', 'جدولة تنفيذ الإجراءات تلقائياً (تذكير الدفع، الشكاوى، الصيانة) كل أسبوع/شهر. ملخص أسبوعي مفصّل بالبريد كل اثنين الصبح.')}
+              </p>
+              <div className="mt-3 inline-block bg-amber-500/20 text-amber-300 text-xs px-2 py-0.5 rounded font-bold">
+                ⏰ Scheduled
+              </div>
+            </div>
+
+            {/* Feature 4 — Stripe Auto-Renew */}
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-[1.02] transition-all">
+              <div className="text-4xl mb-3">🔁</div>
+              <h3 className="text-xl font-bold mb-2">{t('hp_feat_stripe', 'تجديد تلقائي عبر Stripe')}</h3>
+              <p className="text-sm text-violet-200 leading-relaxed">
+                {t('hp_feat_stripe_desc', 'اشتراكك يجدد نفسه تلقائياً (شهري/سنوي) — لا تنشغل بمواعيد التجديد. خصم 17% للسنوي + إمكانية الإلغاء في أي وقت.')}
+              </p>
+              <div className="mt-3 inline-block bg-emerald-500/20 text-emerald-300 text-xs px-2 py-0.5 rounded font-bold">
+                💰 -17% سنوي
+              </div>
+            </div>
+
+            {/* Feature 5 — Subscription Analytics */}
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-[1.02] transition-all">
+              <div className="text-4xl mb-3">📊</div>
+              <h3 className="text-xl font-bold mb-2">{t('hp_feat_analytics', 'تحليلات اشتراكات متقدمة')}</h3>
+              <p className="text-sm text-violet-200 leading-relaxed">
+                {t('hp_feat_analytics_desc', 'لوحة Owner لتتبع MRR + ARR + Churn Rate + Trial→Paid Conversion. مع قائمة الشركات اللي على وشك التجديد أو الإلغاء.')}
+              </p>
+              <div className="mt-3 inline-block bg-indigo-500/20 text-indigo-300 text-xs px-2 py-0.5 rounded font-bold">
+                💎 Enterprise
+              </div>
+            </div>
+
+            {/* Feature 6 — Auto Credentials */}
+            <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:scale-[1.02] transition-all">
+              <div className="text-4xl mb-3">📨</div>
+              <h3 className="text-xl font-bold mb-2">{t('hp_feat_credentials', 'إرسال بيانات الدخول تلقائياً')}</h3>
+              <p className="text-sm text-violet-200 leading-relaxed">
+                {t('hp_feat_credentials_desc', 'كل ساكن جديد (فردي أو Bulk Import) يحصل على بريد ترحيب جميل بتفاصيل دخوله — بدون أي تدخل من الأدمن.')}
+              </p>
+              <div className="mt-3 inline-block bg-cyan-500/20 text-cyan-300 text-xs px-2 py-0.5 rounded font-bold">
+                ✉️ Auto SMTP
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="text-center mt-10">
+            <a href="#pricing" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white font-bold rounded-xl shadow-2xl hover:scale-105 transition-all text-base">
+              {t('hp_explore_plans', '🚀 استكشف الخطط')}
+            </a>
           </div>
         </div>
       </section>
@@ -1085,6 +1210,7 @@ const HomePage = () => {
               <a href="#guide" className="hover:text-white transition-colors">{t('hp_guide_btn')}</a>
               <a href="#pricing" className="hover:text-white transition-colors">{t('hp_sub_codes')}</a>
               <a href="#systems" className="hover:text-white transition-colors">{t('hp_15_systems')}</a>
+              <a href="#ai-features" className="hover:text-white transition-colors">✨ {t('hp_whats_new', 'ما الجديد')}</a>
               <Link to="/login" className="hover:text-white transition-colors">{t('sign_in', 'تسجيل الدخول')}</Link>
             </div>
             <p className="text-xs">&copy; {new Date().getFullYear()} HomeMe - {t('hp_all_rights', 'جميع الحقوق محفوظة')}</p>

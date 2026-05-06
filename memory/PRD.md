@@ -21,6 +21,32 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 111: HomePage Pricing & AI Features Showcase — Feb 6, 2026 ✅
+
+**🎯 الهدف:** عكس كل التحديثات الجديدة (AI Assistant، Auto-Pilot، Stripe Auto-Renewal، Subscription Analytics، Auto-Credentials) في صفحة الويب الرئيسية والخطط التسعيرية.
+
+**1. خطط Pro/Premium (للمستخدمين الأفراد) — `HomePage.js`:**
+- **Pro (1,200 ج.م):** + ✨ مساعد AI 20 رسالة/يوم + 🧠 مستشار AI + 📨 إرسال بيانات الدخول
+- **Premium (2,200 ج.م):** + ✨ مساعد AI 50 رسالة/يوم + 🧠 مستشار AI + 🤖 AI Auto-Pilot + 📨 إرسال بيانات الدخول
+
+**2. خطط الشركات (Company Plans):**
+- **Startup (3,500 ج.م):** + ✨ مساعد AI + 🧠 مستشار AI + 📨 إرسال بيانات الدخول + 🔁 Stripe Auto-Renewal
+- **Business (7,500 ج.م):** + ✨ مساعد AI 50 رسالة + 🧠 مستشار AI + 🤖 Auto-Pilot + 📨 + 📊 Subscription Analytics + 🔁 Stripe
+- **Enterprise (20,000 ج.م):** + ✨ مساعد AI **بدون حدود** + 🤖 Auto-Pilot كامل + 📊 Full Revenue Analytics + 🔁 Stripe
+
+**3. قسم "مدعوم بالذكاء الاصطناعي" (جديد كلياً):**
+- Section بـ ID `#ai-features` بتصميم violet/purple/fuchsia gradient + decorative blur blobs.
+- 6 feature cards (3×2 grid) كل واحد بـ: emoji ضخم، عنوان، وصف، badge ملوّن.
+- Hero header "ما الجديد في 2026" + "مدعوم بالذكاء الاصطناعي"
+- CTA button "🚀 استكشف الخطط" يربط لقسم #pricing.
+
+**4. Footer link:** أضيف "✨ ما الجديد" للروابط.
+
+**🧪 Verification:**
+- ✅ Lint نظيف.
+- ✅ Screenshots E2E: AI Features section + Pricing مع كل الميزات الجديدة ظاهرة بشكل بارز.
+
+
 ### Iter 110: Multi-lang Legal + Auto-Translate Changelog + Owner Editor — Feb 6, 2026 ✅
 
 **🎯 ٣ مهام مترابطة:**

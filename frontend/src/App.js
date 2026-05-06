@@ -73,6 +73,8 @@ import AIAutoPilotPage from './components/AIAutoPilotPage';
 import SubscriptionAnalyticsPage from './pages/SubscriptionAnalyticsPage';
 import LegalPage from './pages/LegalPage';
 import LegalEditorPage from './pages/LegalEditorPage';
+import TestimonialSubmitPage from './pages/TestimonialSubmitPage';
+import TestimonialModerationPage from './pages/TestimonialModerationPage';
 import TwoFactorSettingsPage from './pages/TwoFactorSettingsPage';
 import SmtpHealthPage from './pages/SmtpHealthPage';
 import BrandingSettingsPage from './pages/BrandingSettingsPage';
@@ -674,6 +676,9 @@ function App() {
                 {/* Public legal/info pages */}
                 <Route path="/legal/:slug" element={<LegalPage />} />
 
+                {/* Public testimonial submission */}
+                <Route path="/testimonials/submit" element={<TestimonialSubmitPage />} />
+
                 <Route path="/app" element={
                   <ProtectedRoute>
                     <Layout />
@@ -747,6 +752,10 @@ function App() {
 
                 <Route path="legal-editor" element={
                   <LegalEditorPage />
+                } />
+
+                <Route path="testimonials-moderation" element={
+                  <TestimonialModerationPage />
                 } />
                 
                 <Route path="two-factor" element={

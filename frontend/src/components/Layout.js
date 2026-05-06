@@ -574,6 +574,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
         { name: '📊 تحليلات الإيرادات (MRR/Churn)', href: 'subscription-analytics', icon: ChartPieIcon, show: true },
         { name: '✏️ محرّر الصفحات القانونية', href: 'legal-editor', icon: DocumentTextIcon, show: true },
+        { name: '⭐ مراجعة شهادات العملاء', href: 'testimonials-moderation', icon: StarIcon, show: true },
         { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: 'subscription-reminders', icon: BellIcon, show: true },
       ]
     },
@@ -623,6 +624,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
         { name: '📊 تحليلات الإيرادات (MRR/Churn)', href: 'subscription-analytics', icon: ChartPieIcon, show: true },
         { name: '✏️ محرّر الصفحات القانونية', href: 'legal-editor', icon: DocumentTextIcon, show: true },
+        { name: '⭐ مراجعة شهادات العملاء', href: 'testimonials-moderation', icon: StarIcon, show: true },
         { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: 'subscription-reminders', icon: BellIcon, show: true },
       ]
     },

@@ -2608,7 +2608,9 @@ app.include_router(sub_analytics_router)
 from routes.subscription_trend import router as sub_trend_router
 app.include_router(sub_trend_router)
 from routes.legal_pages import router as legal_pages_router
+from routes.testimonials import router as testimonials_router
 app.include_router(legal_pages_router)
+app.include_router(testimonials_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

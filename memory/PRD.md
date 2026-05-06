@@ -4,6 +4,24 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 118: Scroll Spy Active Section Highlighting — Feb 6, 2026 ✅
+
+**🎯 الطلب:** تمييز الرابط النشط في الـ Nav Bar تلقائياً حسب القسم الحالي اللي المستخدم بيتصفحه.
+
+**التنفيذ في `HomePage.js`:**
+- إضافة `useState('top')` لـ `activeSection` + `useEffect` يستمع لـ `scroll event` (passive listener).
+- خوارزمية: تدور على المعرفات `['systems', 'ai-features', 'live-demo', 'guide', 'testimonials', 'faq', 'pricing']` بالترتيب، تختار آخر قسم `top` بتاعه ≤ HEADER_OFFSET (200px).
+- لو `scrollY < 300` → activeSection = 'top' (الرئيسية).
+- كل nav link يستخدم `aria-current="page"` + class diff: زر الـ active بـ `bg-blue-50` + `text-blue-700` + خط تحته متدرج زرقاوي.
+- نسخة Mobile و Desktop Synchronized — كلاهما يحدّث في نفس اللحظة.
+
+**🧪 Verification:**
+- ✅ بداية الصفحة: `nav-home` نشط ✓
+- ✅ تمرير لـ pricing: `nav-pricing` نشط ✓
+- ✅ تمرير لـ FAQ: `nav-faq` نشط ✓
+- ✅ عودة لأعلى: `nav-home` نشط ✓
+- ✅ Visual: الرابط النشط له خلفية زرقاء فاتحة + خط تحت العنوان متدرج.
+
 ### Iter 117: Top Navigation Bar — Feb 6, 2026 ✅
 
 **🎯 الطلب:** إضافة شريط تنقل (Nav Bar) في الهيدر للوصول السريع لأقسام الصفحة الرئيسية.

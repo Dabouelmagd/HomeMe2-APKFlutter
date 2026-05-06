@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { BellAlertIcon, ArrowPathIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import PageHeader from '../components/shared/PageHeader';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -57,19 +59,41 @@ const AlertsDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-gray-900 to-indigo-950 p-6" dir="rtl" data-testid="alerts-dashboard">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-rose-950 to-gray-900 p-6" dir="rtl" data-testid="alerts-dashboard">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-3xl font-bold text-white">🔔 لوحة التنبيهات المركزية</h1>
-            <p className="text-sm text-gray-400 mt-1">كل الأمور العاجلة في مكان واحد — اتخذ الإجراء المناسب مباشرة</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setRefreshKey(k => k + 1)} className="px-3 py-2 text-xs bg-gray-800 hover:bg-gray-700 text-white rounded-lg font-semibold" data-testid="alerts-refresh">↻ تحديث</button>
-            <button onClick={() => navigate(-1)} className="px-3 py-2 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg">← رجوع</button>
-          </div>
-        </div>
+        {/* Unified Page Header */}
+        <PageHeader
+          theme="rose"
+          icon={BellAlertIcon}
+          badge="🔔 لوحة التنبيهات المركزية"
+          title="كل الأمور العاجلة في مكان واحد"
+          subtitle="اتخذ الإجراء المناسب مباشرة من هنا"
+          meta={
+            summary.critical > 0 ? <span className="bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-bold">🔴 {summary.critical} حرج</span> :
+            summary.high > 0 ? <span className="bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded font-bold">🟠 {summary.high} مرتفع</span> :
+            <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold">✨ كل شيء تحت السيطرة</span>
+          }
+          actions={
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setRefreshKey(k => k + 1)}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg font-bold transition-all"
+                data-testid="alerts-refresh"
+              >
+                <ArrowPathIcon className="h-4 w-4" />
+                تحديث
+              </button>
+              <button
+                onClick={() => navigate(-1)}
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg font-bold transition-all"
+              >
+                <ArrowLeftIcon className="h-4 w-4 rtl:rotate-180" />
+                رجوع
+              </button>
+            </div>
+          }
+          testId="alerts-page-header"
+        />
 
         {/* Summary cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">

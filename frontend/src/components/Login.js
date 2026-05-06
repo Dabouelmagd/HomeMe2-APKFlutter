@@ -402,7 +402,7 @@ const Login = () => {
 
         {/* Login Page Ad */}
         <div className="mt-4">
-          <InternalAdBanner position="login_page" maxAds={1} variant="slim" />
+          <InternalAdBanner position="login_page" maxAds={1} variant="card" />
         </div>
 
         {/* Legal Links Footer */}

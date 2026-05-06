@@ -171,7 +171,7 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
     <div className={`space-y-3 ${className}`} dir={isRTL ? 'rtl' : 'ltr'} data-testid={`ad-banner-${position}`}>
       {visibleAds.map(ad => (
         <div key={ad.id} onClick={() => handleClick(ad)} className="relative group bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md transition-all">
-          {ad.image_url && <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} alt={ad.title} className="w-full h-32 object-cover" />}
+          {ad.image_url && <img src={ad.image_url.startsWith('/') ? `${process.env.REACT_APP_BACKEND_URL}${ad.image_url}` : ad.image_url} alt={ad.title} className="w-full block object-contain bg-gray-50" style={{ maxHeight: '280px', minHeight: '120px' }} />}
           <div className="p-3">
             <h3 className="font-bold text-sm text-gray-900">{ad.title}</h3>
             {ad.description && <p className="text-xs text-gray-500 mt-1">{ad.description}</p>}

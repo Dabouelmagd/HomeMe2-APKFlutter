@@ -620,7 +620,7 @@ const HomePage = () => {
               data-testid="homepage-logo"
             />
             <div>
-              <span className="text-2xl lg:text-3xl font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
+              <span className="text-3xl lg:text-5xl font-black text-gray-900 block leading-tight tracking-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
               <span className="text-[10px] lg:text-xs text-gray-500 font-medium block">{t('hp_subtitle')}</span>
             </div>
           </div>

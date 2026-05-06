@@ -1,16 +1,35 @@
-# آخر التحديثات (Latest Changes)
+# Latest Changelog
 
-> هذا الملف يُقرأ تلقائياً عند كل إقلاع للسيرفر، ويملأ نافذة "ما الجديد؟" داخل التطبيق.
-> كل سطر يبدأ بـ `- ` يُعرض كنقطة منفصلة في نافذة التحديث.
-> أحدث التحديثات في الأعلى. الحد الأقصى 8 نقاط للعرض.
+## Iter 116 — Feb 6, 2026
 
-## v2026.05.06
+**Title:** Pricing Fixes + GeoIP Currency + HomePage Refactor + Portfolio PDF Auto-Schedule
 
-- 📊 جديد: لوحة تحليلات الاشتراكات للـ Owner — MRR + ARR + Churn + Trial→Paid + قائمة الشركات اللي على وشك التجديد
-- 🔁 جديد: ترقية Stripe Auto-Renewal — اشتراك يجدد نفسه تلقائياً (شهري/سنوي) مع خصم 17% للسنوي
-- 🤖 جديد: AI Auto-Pilot — جدولة تنفيذ الإجراءات تلقائياً (تذكير الدفع، تنبيه الفنيين، الشكاوى) + ملخص أسبوعي بالبريد
-- ✨ جديد: مساعد HomeMe الذكي — شات AI عائم يجاوب أسئلتك ويوجهك لصفحات التطبيق مباشرة
-- 🧠 جديد: مستشار AI استباقي — يكتشف المشاكل في dashboard ويقترح إجراءات (مع زر "تنفيذ بالـ AI" لإرسال جماعي)
-- 📨 جديد: إرسال بيانات الدخول تلقائياً بالبريد للسكان الجدد (فردي + Bulk Import)
-- 🔍 تحسين: بار بحث في صفحة اختيار الحساب + ترتيب آخر الكمبوندات المستخدمة في الأعلى
-- 🎨 تحسين: لوحة Super Admin مكتملة بـ 28 رابط في 3 أقسام (مطابقة لـ Owner)
+**Changes:**
+1. ✅ Fixed old pricing in residential & company comparison tables (now match actual plan prices).
+2. ✅ Added EGP/USD + Monthly/Yearly toggles to the company plans section (was hidden).
+3. ✅ Removed fake stats from CustomerTestimonialsCarousel (+30/+100/+5,000/4.9 → all gone).
+4. ✅ Added GeoIP-based currency auto-detection via timezone (`Intl.DateTimeFormat`):
+   - Africa/Cairo or Egypt → EGP
+   - Anywhere else → USD
+   - User preference cached in localStorage.
+5. ✅ Refactored HomePage.js from 1717 → 1064 lines by extracting:
+   - `homepage/FAQSection.js`
+   - `homepage/LiveDemoSection.js`
+   - `homepage/RolesSection.js`
+   - `homepage/PricingSection.js`
+6. ✅ Added Company Portfolio PDF auto-generation to monthly_reports_scheduler:
+   - Runs alongside existing summaries + statements on the 1st of each month at 02:00 UTC.
+   - Emails to all `company_admin` + `app_owner`/`super_admin` accounts.
+   - Idempotent via `report_runs` collection (kind="portfolio").
+   - On-demand trigger via `POST /api/reports/run-monthly-now` works.
+   - Tested manually: 40 portfolios sent successfully, 0 failures.
+
+**Files modified:**
+- `frontend/src/components/HomePage.js` (heavy)
+- `frontend/src/components/CustomerTestimonialsCarousel.js`
+- `frontend/src/components/homepage/*` (4 new files)
+- `backend/routes/monthly_reports_scheduler.py`
+
+**Tests:** Frontend smoke screenshots ✅. Backend curl + scheduler/status endpoint ✅.
+
+---

@@ -21,6 +21,7 @@ from email_service import EmailService
 from services.pdf_report_service import (
     render_unit_statement,
     render_summary_report,
+    render_company_portfolio_report,
 )
 from services.branding import get_compound_branding
 from routes.email_templates import get_template_or_default, render_template
@@ -99,6 +100,84 @@ async def _build_unit_statement(db, user: dict, label: str, compound_name: str, 
         payments=payments,
         currency="EGP",
         branding=branding,
+    )
+
+
+async def _build_company_portfolio(db, company: dict, label: str) -> bytes:
+    """Build the multi-compound Portfolio PDF for a management company."""
+    start, end = _month_bounds(label)
+    start_iso, end_iso = start.isoformat(), end.isoformat()
+    start_date_str = start.strftime("%Y-%m-01")
+    end_date_str = end.strftime("%Y-%m-%d")
+
+    company_id = company.get("id")
+    company_name = company.get("name") or company.get("company_name") or "شركة الإدارة"
+
+    # Compounds linked via DB or legacy company.compound_ids
+    compounds = await db.compounds.find({"company_id": company_id}, {"_id": 0}).to_list(length=500)
+    legacy_ids = [x for x in (company.get("compound_ids") or []) if x not in {c["id"] for c in compounds}]
+    if legacy_ids:
+        extras = await db.compounds.find({"id": {"$in": legacy_ids}}, {"_id": 0}).to_list(length=500)
+        compounds.extend(extras)
+
+    compounds_data = []
+    for cpd in compounds:
+        cid = cpd["id"]
+
+        residents = await db.users.find({"compound_id": cid, "role": "resident"}, {"_id": 0, "unit_number": 1}).to_list(length=20000)
+        units = {r.get("unit_number") for r in residents if r.get("unit_number")}
+        total_units = cpd.get("total_units") or len(units)
+        occupied = len(units)
+        vacant = max(total_units - occupied, 0)
+        occupancy_rate = (occupied / total_units * 100) if total_units else 0
+
+        revenue = 0.0
+        async for p in db.resident_payments.find({
+            "compound_id": cid,
+            "$or": [
+                {"payment_date": {"$gte": start_date_str, "$lte": end_date_str}},
+                {"created_at": {"$gte": start_iso, "$lte": end_iso}},
+            ],
+        }):
+            revenue += p.get("amount", 0) or 0
+
+        expenses = 0.0
+        async for e in db.expenses.find({"compound_id": cid, "date": {"$gte": start_iso, "$lte": end_iso}}):
+            expenses += e.get("amount", 0) or 0
+
+        outstanding = 0.0
+        async for c in db.resident_charges.find({"compound_id": cid, "status": {"$in": ["pending", "overdue"]}}):
+            outstanding += c.get("amount", 0) or 0
+
+        complaints_count = await db.complaints.count_documents({
+            "compound_id": cid,
+            "created_at": {"$gte": start_iso, "$lte": end_iso},
+        })
+        maintenance_count = await db.maintenance_requests.count_documents({
+            "compound_id": cid,
+            "created_at": {"$gte": start_iso, "$lte": end_iso},
+        })
+
+        compounds_data.append({
+            "name": cpd.get("name", "—"),
+            "total_units": total_units,
+            "occupied": occupied,
+            "vacant": vacant,
+            "occupancy_rate": occupancy_rate,
+            "revenue": revenue,
+            "expenses": expenses,
+            "outstanding": outstanding,
+            "residents": len(residents),
+            "complaints": complaints_count,
+            "maintenance": maintenance_count,
+        })
+
+    return render_company_portfolio_report(
+        company_name=company_name,
+        period=label,
+        compounds_data=compounds_data,
+        currency="EGP",
+        branding=None,
     )
 
 
@@ -186,7 +265,7 @@ async def run_monthly_reports(month_label: str = None) -> dict:
         month_label = _previous_month_label(datetime.now(timezone.utc))
 
     email_svc = EmailService()
-    stats = {"month": month_label, "summaries_sent": 0, "statements_sent": 0, "skipped": 0, "failed": 0}
+    stats = {"month": month_label, "summaries_sent": 0, "statements_sent": 0, "portfolios_sent": 0, "skipped": 0, "failed": 0}
 
     # 1) Compound summaries → admins + app_owners
     async for compound in db.compounds.find({}):
@@ -266,6 +345,46 @@ async def run_monthly_reports(month_label: str = None) -> dict:
             stats["failed"] += 1
             await _mark_sent(db, "statement", uid, month_label, False, str(e))
 
+    # 3) Company Portfolio PDFs → company admins + app owner
+    async for company in db.companies.find({}):
+        cmp_id = company.get("id")
+        if not cmp_id:
+            continue
+        if await _already_sent(db, "portfolio", cmp_id, month_label):
+            stats["skipped"] += 1
+            continue
+        try:
+            pdf_bytes = await _build_company_portfolio(db, company, month_label)
+            recipients = set()
+            async for u in db.users.find({"company_id": cmp_id, "role": "company_admin", "is_active": True}, {"email": 1}):
+                if u.get("email"):
+                    recipients.add(u["email"])
+            async for u in db.users.find({"role": {"$in": ["app_owner", "super_admin"]}, "is_active": True}, {"email": 1}):
+                if u.get("email"):
+                    recipients.add(u["email"])
+            if not recipients:
+                await _mark_sent(db, "portfolio", cmp_id, month_label, False, "no recipients")
+                continue
+            company_name = company.get("name") or company.get("company_name") or "شركة الإدارة"
+            body = f"يسعدنا إرسال <strong>تقرير محفظة الأداء الشامل</strong> لشركة <strong>{company_name}</strong> عن شهر <strong>{month_label}</strong>. يضم التقرير ملخص مالي وتشغيلي لكل مجمع تابع للشركة في صفحة موحّدة."
+            html = _email_html("📊 تقرير محفظة الشركة الشهري", body)
+            for to in recipients:
+                ok = await email_svc.send_email(
+                    to_email=to,
+                    subject=f"📊 تقرير محفظة الشركة - {month_label}",
+                    html_content=html,
+                    attachments=[{"filename": f"portfolio-{cmp_id[:8]}-{month_label}.pdf", "content": pdf_bytes, "mime_type": "application/pdf"}],
+                )
+                if ok:
+                    stats["portfolios_sent"] += 1
+                else:
+                    stats["failed"] += 1
+            await _mark_sent(db, "portfolio", cmp_id, month_label, True, f"recipients={len(recipients)}")
+        except Exception as e:
+            logger.exception(f"portfolio failed for company {cmp_id}: {e}")
+            stats["failed"] += 1
+            await _mark_sent(db, "portfolio", cmp_id, month_label, False, str(e))
+
     logger.info(f"monthly reports run complete: {stats}")
     return stats
 
@@ -334,7 +453,7 @@ async def scheduler_status(current_user: dict = Depends(get_current_user)):
     success = await db.report_runs.count_documents({"ok": True})
     failed = total - success
     by_kind = {}
-    for kind in ("summary", "statement"):
+    for kind in ("summary", "statement", "portfolio"):
         t = await db.report_runs.count_documents({"kind": kind})
         s = await db.report_runs.count_documents({"kind": kind, "ok": True})
         by_kind[kind] = {"total": t, "success": s, "failed": t - s, "rate": round((s / t) if t else 1.0, 4)}

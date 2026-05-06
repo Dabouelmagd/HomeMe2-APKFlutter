@@ -95,7 +95,6 @@ const CustomerTestimonialsCarousel = () => {
           <h2 className="text-3xl font-black text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>
             ماذا يقول عملاؤنا؟
           </h2>
-          <p className="text-gray-500">+30 شركة إدارة و+100 مجمع يثقون بمنصة HomeMe يومياً</p>
         </div>
 
         {/* Main testimonial card */}
@@ -175,26 +174,6 @@ const CustomerTestimonialsCarousel = () => {
               aria-label={`عرض الشهادة رقم ${i + 1}`}
             />
           ))}
-        </div>
-
-        {/* Trust strip */}
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div>
-            <p className="text-3xl font-black bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">+30</p>
-            <p className="text-xs text-gray-500 mt-1">شركة إدارة</p>
-          </div>
-          <div>
-            <p className="text-3xl font-black bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">+100</p>
-            <p className="text-xs text-gray-500 mt-1">مجمع سكني</p>
-          </div>
-          <div>
-            <p className="text-3xl font-black bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">+5,000</p>
-            <p className="text-xs text-gray-500 mt-1">ساكن نشط</p>
-          </div>
-          <div>
-            <p className="text-3xl font-black bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">4.9/5</p>
-            <p className="text-xs text-gray-500 mt-1">متوسط التقييم</p>
-          </div>
         </div>
       </div>
     </section>

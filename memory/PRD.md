@@ -4,6 +4,65 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 116: Pricing Fixes + GeoIP + HomePage Refactor + Portfolio PDF Auto-Schedule — Feb 6, 2026 ✅
+
+**🎯 4 تحسينات بناءً على ملاحظات المستخدم:**
+
+#### 1. إصلاح الأسعار في جداول المقارنة
+- جدول مقارنة المجمعات السكنية: 500/1200/2200 → **800/1500/2800 ج.م**
+- جدول مقارنة شركات الإدارة: 3500/7500/20000 → **4000/9500/25000 ج.م**
+- إضافة زر تبديل العملة (EGP/USD) + المدة (شهري/سنوي) في قسم خطط الشركات (لم يكن مرئياً قبل ذلك)
+
+#### 2. إزالة الإحصائيات الوهمية
+- شيلت كاملاً من `CustomerTestimonialsCarousel.js`: `+30 شركة / +100 مجمع / +5,000 ساكن / 4.9/5`.
+- شيلت السطر الفرعي تحت "ماذا يقول عملاؤنا" + شيلت من الـ guide overview text.
+- المنطق: زوار جدد يشوفون موقع أصدق + بدون أرقام مضخّمة.
+
+#### 3. كشف العملة تلقائياً (GeoIP via Timezone)
+- `useState` initialiser في `HomePage.js` يستخدم `Intl.DateTimeFormat().resolvedOptions().timeZone`:
+  - `Africa/Cairo` أو `Egypt` → EGP افتراضياً.
+  - أي منطقة أخرى → USD افتراضياً.
+- يحفظ اختيار المستخدم في `localStorage` (`preferred_currency`) ويستخدمه في الزيارات اللاحقة.
+- خصوصية: لا يوجد API call خارجي، فوري، مجاني.
+- متوقع رفع نسبة التحويل العالمية (الزوار من الخليج/أوروبا/أمريكا يشوفون الدولار مباشرةً).
+
+#### 4. تقسيم HomePage.js (1717 → 1064 سطر)
+- إنشاء مجلد جديد `/app/frontend/src/components/homepage/` يضم 4 مكونات فرعية:
+  - `FAQSection.js` (104 سطر) — قسم الأسئلة الشائعة + 12 سؤال + Help CTA.
+  - `LiveDemoSection.js` (177 سطر) — 3 mockups تفاعلية (AI Chat، AI Insights، Subscription Analytics).
+  - `RolesSection.js` (147 سطر) — 6 أدوار مع الصلاحيات المفصلة.
+  - `PricingSection.js` (331 سطر) — Residential plans + Comparison + Codes + Company plans + Company comparison + Payment methods. ياخذ state و helpers كـ props من الـ parent.
+- HomePage.js انخفض **38%** (44KB أقل) → أسهل في القراءة والصيانة المستقبلية.
+- ✅ Lint passed, all data-testids preserved, smoke screenshots confirm visual parity.
+
+#### 5. جدولة شهرية تلقائية لتقارير Portfolio PDF (P2)
+- تعديل `routes/monthly_reports_scheduler.py`:
+  - إضافة helper `_build_company_portfolio()` يجمع أداء كل المجمعات تحت شركة الإدارة (نفس منطق `/api/reports/company/portfolio` لكن بدون HTTPException).
+  - Loop ثالث في `run_monthly_reports()` يدور على كل الشركات → يولّد Portfolio PDF → يبعته للـ company_admin + app_owner/super_admin.
+  - Idempotent: `kind="portfolio"` في `report_runs` collection.
+  - Subject عربي: `📊 تقرير محفظة الشركة - YYYY-MM`.
+- Endpoint موجود بالفعل: `POST /api/reports/run-monthly-now` (تم اختباره بنجاح، 40 portfolio successfully).
+- `GET /api/reports/scheduler/status` الآن يضم portfolio في `by_kind`.
+
+**🧪 Verification:**
+- ✅ Lint passed (Python + JavaScript).
+- ✅ Backend reload successful, no errors.
+- ✅ Manual test: `run-monthly-now` triggered → portfolio kind = 40 successful, 0 failed.
+- ✅ Screenshot smoke test: hero, live-demo, faq, pricing, roles, testimonials all visible.
+- ✅ Currency auto-detection working (test pod outside Cairo → USD selected by default).
+- ✅ Stats removed from page (verified with text search).
+
+**📊 Impact:**
+- HomePage maintainability: 38% reduction in main file size, 4 reusable extracted components.
+- Global conversion: GeoIP currency detection should improve checkout rate for non-Egyptian visitors.
+- Trust: Removing fake stats improves credibility for transparency-conscious customers.
+- Companies value-add: Auto-monthly Portfolio PDFs in inboxes = high stickiness for Business/Enterprise tiers.
+
+
+### Iter 115: Pricing Display Fix in Comparison Tables — Feb 6, 2026 ✅
+*(Subsumed by Iter 116 — kept for historical record only)*
+
+
 ### Iter 99: Super Admin Sidebar Parity with Owner — Feb 6, 2026 ✅
 
 **🎯 الهدف:** صفحة سوبر أدمن لم تكن متصلة بالتعديلات الجديدة، السلايدر كان ناقص (6 عناصر فقط).

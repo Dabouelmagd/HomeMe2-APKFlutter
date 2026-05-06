@@ -20,6 +20,10 @@ import {
 
 import InternalAdBanner from './InternalAdBanner';
 import CustomerTestimonialsCarousel from './CustomerTestimonialsCarousel';
+import { FAQSection } from './homepage/FAQSection';
+import { LiveDemoSection } from './homepage/LiveDemoSection';
+import { RolesSection } from './homepage/RolesSection';
+import { PricingSection } from './homepage/PricingSection';
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
@@ -28,10 +32,28 @@ const HomePage = () => {
   const isRTL = i18n.language === 'ar';
   const [openGuide, setOpenGuide] = useState(null);
   const [billingPeriod, setBillingPeriod] = useState('monthly');
-  const [currency, setCurrency] = useState('egp');
+  const [currency, setCurrency] = useState(() => {
+    // 🌍 GeoIP via timezone — Egyptian timezone → EGP, otherwise → USD
+    // Privacy-friendly: no external API calls, instant detection.
+    try {
+      const saved = localStorage.getItem('preferred_currency');
+      if (saved === 'egp' || saved === 'usd') return saved;
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      // Egyptian timezone variants
+      const isEgypt = tz === 'Africa/Cairo' || tz === 'Egypt';
+      return isEgypt ? 'egp' : 'usd';
+    } catch {
+      return 'egp';
+    }
+  });
   const [subCode, setSubCode] = useState('');
   const [codeStatus, setCodeStatus] = useState(null); // {type:'success'|'error', msg:'...'}
   const [codeLoading, setCodeLoading] = useState(false);
+
+  // Persist user's currency choice across visits
+  useEffect(() => {
+    try { localStorage.setItem('preferred_currency', currency); } catch (e) { /* ignore */ }
+  }, [currency]);
 
   useEffect(() => {
     // ملاحظة: سابقاً كان هذا يعيد التوجيه التلقائي إلى /app/dashboard للمستخدمين المسجلين دخول.
@@ -143,7 +165,7 @@ const HomePage = () => {
   ];
 
   const guideItems = [
-    { id: 'overview', icon: HomeModernIcon, title: t('gd_overview', 'نظرة عامة على المنصة'), content: t('gd_overview_d', 'منصة سحابية متكاملة لإدارة المجتمعات السكنية تضم 25+ نظام. تدعم العربية بالكامل (RTL)، 3 لغات (AR/EN/FR)، تطبيق PWA، ومدعومة بالذكاء الاصطناعي. تخدم +100 مجمع و+30 شركة إدارة.') },
+    { id: 'overview', icon: HomeModernIcon, title: t('gd_overview', 'نظرة عامة على المنصة'), content: t('gd_overview_d', 'منصة سحابية متكاملة لإدارة المجتمعات السكنية تضم 25+ نظام. تدعم العربية بالكامل (RTL)، 3 لغات (AR/EN/FR)، تطبيق PWA، ومدعومة بالذكاء الاصطناعي.') },
     { id: 'registration', icon: UserIcon, title: t('gd_registration', 'التسجيل وإنشاء الحساب'), content: t('gd_registration_d', '3 أنواع حسابات: مدير مجتمع (ساكن/أدمن)، شركة إدارة (1-غير محدود مجمعات)، أو ساكن. تجربة مجانية 14 يوم بدون بطاقة ائتمان مع كل ميزات الخطة المختارة. تسجيل بـ Email أو رقم جوال.') },
     { id: 'financial', icon: CurrencyDollarIcon, title: t('gd_financial', 'النظام المالي والمحاسبي'), content: t('gd_financial_d', 'ميزانية شاملة، 4 طرق لتوزيع المصروفات (بالتساوي/بالنسبة/مخصص/لكل شقة)، متابعة السداد بالألوان (أخضر/أصفر/أحمر)، رسوم بيانية شهرية، تصدير Excel بـ 5 أوراق + PDF. دعم Stripe + PayPal + Vodafone Cash + InstaPay.') },
     { id: 'maintenance', icon: WrenchScrewdriverIcon, title: t('gd_maintenance', 'إدارة الصيانة والخدمات'), content: t('gd_maintenance_d', 'تقديم طلبات مع صور وفيديو وأولوية (عادي/مستعجل/طارئ). إشعارات فورية للمدراء والفنيين. تقييم 5 نجوم بعد الإنجاز. AI Auto-Pilot ينبّه الفنيين تلقائياً عن الطلبات المعلقة لأكثر من 7 أيام.') },
@@ -832,182 +854,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 🎬 Live Demo Section — interactive previews */}
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white" id="live-demo" data-testid="live-demo-section">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm font-bold mb-4">
-              🎬 {t('hp_live_demo_badge', 'عرض حي تفاعلي')}
-            </div>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>
-              {t('hp_live_demo_title', 'شوف الميزات الجديدة في العمل')}
-            </h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">
-              {t('hp_live_demo_desc', 'استكشف الميزات قبل الاشتراك — تصاميم محاكاة لأهم ٣ ميزات AI')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Demo 1 — AI Chat Mock */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all" data-testid="demo-ai-chat">
-              <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 px-4 py-3 text-white">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">✨</div>
-                  <div>
-                    <p className="text-sm font-bold">مساعد HomeMe</p>
-                    <p className="text-[10px] opacity-80">Gemini AI · يجاوب فوراً</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 space-y-2 bg-gray-50 min-h-[260px]">
-                {/* User msg */}
-                <div className="flex justify-end">
-                  <div className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-2xl rounded-br-sm px-3 py-2 text-xs max-w-[85%] shadow">
-                    إزاي أحجز نادي رياضي؟
-                  </div>
-                </div>
-                {/* AI msg */}
-                <div className="flex justify-start">
-                  <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-3 py-2 text-xs max-w-[90%] shadow-sm">
-                    <p className="text-gray-800 leading-relaxed">يمكنك حجز النادي من صفحة "حجز المرافق". اختر التاريخ والوقت ثم اضغط تأكيد ✨</p>
-                    <button className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded bg-violet-50 text-violet-700 border border-violet-200">
-                      → افتح الصفحة
-                    </button>
-                  </div>
-                </div>
-                {/* Typing indicator */}
-                <div className="flex justify-start">
-                  <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-2.5 shadow-sm">
-                    <div className="flex gap-1">
-                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" />
-                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{animationDelay:'150ms'}} />
-                      <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{animationDelay:'300ms'}} />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 bg-white border-t border-gray-100">
-                <h4 className="text-sm font-bold text-gray-900 mb-1">شات AI ذكي + Deep Links</h4>
-                <p className="text-[11px] text-gray-500">يجاوب فوراً + ينقلك للصفحة المطلوبة بضغطة</p>
-              </div>
-            </div>
-
-            {/* Demo 2 — AI Insights Mock */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all" data-testid="demo-ai-insights">
-              <div className="bg-gradient-to-r from-rose-500 via-pink-500 to-fuchsia-600 px-4 py-3 text-white">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">🧠</div>
-                  <div>
-                    <p className="text-sm font-bold">مستشار AI استباقي</p>
-                    <p className="text-[10px] opacity-80">يكتشف المشاكل تلقائياً</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-3 space-y-2 bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 min-h-[260px]">
-                {/* Insight 1 */}
-                <div className="bg-rose-50 border border-rose-200 rounded-xl p-2.5">
-                  <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-base animate-pulse">💰</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-xs font-bold text-gray-900">5 فواتير متأخرة</p>
-                        <span className="bg-rose-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded">عاجل</span>
-                      </div>
-                      <p className="text-[10px] text-gray-600 leading-snug mt-0.5">سكان لم يدفعوا منذ 30+ يوم</p>
-                      <button className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 px-2 py-1 rounded">
-                        ⚡ تنفيذ بالـ AI
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                {/* Insight 2 */}
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5">
-                  <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-base">🔧</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-bold text-gray-900">3 طلبات صيانة معلقة</p>
-                      <p className="text-[10px] text-gray-600 leading-snug mt-0.5">لم يتم البت فيها منذ أسبوع+</p>
-                    </div>
-                  </div>
-                </div>
-                {/* Insight 3 */}
-                <div className="bg-amber-50 border border-amber-200 rounded-xl p-2.5">
-                  <div className="flex items-start gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center text-base">⭐</div>
-                    <div className="flex-1">
-                      <p className="text-xs font-bold text-gray-900">2 تقييم سلبي اليوم</p>
-                      <p className="text-[10px] text-gray-600 leading-snug mt-0.5">راجع الملاحظات لتحسين الخدمة</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 bg-white border-t border-gray-100">
-                <h4 className="text-sm font-bold text-gray-900 mb-1">يكتشف + ينفذ بضغطة</h4>
-                <p className="text-[11px] text-gray-500">AI يحلل البيانات يومياً ويقترح إجراءات فورية</p>
-              </div>
-            </div>
-
-            {/* Demo 3 — Subscription Analytics Mock */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all" data-testid="demo-analytics">
-              <div className="bg-gradient-to-r from-emerald-500 to-teal-600 px-4 py-3 text-white">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">📊</div>
-                  <div>
-                    <p className="text-sm font-bold">تحليلات الاشتراكات</p>
-                    <p className="text-[10px] opacity-80">MRR · ARR · Churn</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-3 space-y-2 bg-gradient-to-br from-emerald-50 via-white to-teal-50 min-h-[260px]">
-                {/* Stat tile */}
-                <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-3 text-white">
-                  <p className="text-[10px] font-bold opacity-90">إيراد شهري متكرر</p>
-                  <p className="text-2xl font-black mt-1">31,000 <span className="text-xs opacity-75">ج.م</span></p>
-                  <p className="text-[10px] opacity-80 mt-0.5">↗ +18% عن الشهر الماضي</p>
-                </div>
-                {/* Mini bars */}
-                <div className="bg-white rounded-xl p-3 border border-gray-200">
-                  <p className="text-[10px] font-bold text-gray-700 mb-2">MRR حسب الخطة</p>
-                  <div className="space-y-1">
-                    {[
-                      { name: 'كبرى', pct: 65, val: '20K' },
-                      { name: 'متوسطة', pct: 25, val: '7.5K' },
-                      { name: 'ناشئة', pct: 10, val: '3.5K' },
-                    ].map((b, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <span className="text-[9px] w-10 text-gray-600">{b.name}</span>
-                        <div className="flex-1 bg-gray-100 rounded h-3 overflow-hidden">
-                          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 h-full transition-all" style={{width:`${b.pct}%`}} />
-                        </div>
-                        <span className="text-[9px] font-bold text-gray-700 w-8 text-left">{b.val}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                {/* Churn / Trial */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white rounded-xl p-2.5 border border-gray-200 text-center">
-                    <p className="text-[9px] font-bold text-gray-500">Churn</p>
-                    <p className="text-base font-black text-rose-600">2.3%</p>
-                  </div>
-                  <div className="bg-white rounded-xl p-2.5 border border-gray-200 text-center">
-                    <p className="text-[9px] font-bold text-gray-500">Trial → Paid</p>
-                    <p className="text-base font-black text-emerald-600">42%</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-4 bg-white border-t border-gray-100">
-                <h4 className="text-sm font-bold text-gray-900 mb-1">صحة الإيراد بنظرة سريعة</h4>
-                <p className="text-[11px] text-gray-500">MRR / ARR / Churn / Trial Conversion في dashboard واحد</p>
-              </div>
-            </div>
-          </div>
-
-          <p className="text-center text-xs text-gray-400 mt-6">
-            * عرض محاكاة — البيانات الحقيقية تظهر بعد تسجيل الدخول
-          </p>
-        </div>
-      </section>
+            <LiveDemoSection />
 
       {/* Comprehensive Guide */}
       <section className="py-16 bg-gradient-to-b from-slate-50 to-white" id="guide" data-testid="guide-section">
@@ -1084,531 +931,32 @@ const HomePage = () => {
       {/* ⭐ Customer Testimonials */}
       <CustomerTestimonialsCarousel />
 
-      {/* ❓ FAQ Section */}
-      <section className="py-16 bg-white" id="faq" data-testid="faq-section">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-100 text-amber-700 rounded-full text-sm font-bold mb-3">
-              ❓ {t('hp_faq_badge', 'الأسئلة الشائعة')}
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>
-              {t('hp_faq_title', 'إجابات سريعة لأكثر الأسئلة شيوعاً')}
-            </h2>
-            <p className="text-gray-500">{t('hp_faq_desc', 'لو سؤالك مش هنا، تقدر تتواصل معانا في "اتصل بنا"')}</p>
-          </div>
+            <FAQSection />
 
-          <div className="space-y-3">
-            {[
-              {
-                q: 'هل يوجد فترة تجريبية مجانية؟',
-                a: 'نعم! تجربة مجانية 14 يوم لكل الخطط بدون الحاجة لبطاقة ائتمان. تقدر تختبر كل الميزات بحرية، وتلغي في أي وقت بدون أي رسوم.',
-              },
-              {
-                q: 'كيف يعمل التجديد التلقائي عبر Stripe؟',
-                a: 'بعد ما تشترك، Stripe يحفظ بيانات كارتك بأمان (مش بنحفظها عندنا). كل دورة جديدة (شهر/سنة)، Stripe يخصم تلقائياً ويرسل لك إيصال. تقدر تلغي التجديد التلقائي في أي وقت من إعدادات الحساب — والخدمة تستمر حتى نهاية الفترة المدفوعة.',
-              },
-              {
-                q: 'ماذا لو ألغيت اشتراكي؟',
-                a: 'بتفضل تستفيد من الخدمة لآخر يوم في الدورة المدفوعة، وبعدها الحساب يدخل وضع "محدود" (تقدر تشوف بياناتك بس مش تعدّل). البيانات بتفضل محفوظة 90 يوم، تقدر ترجع تشترك تاني وتسترجع كل شيء.',
-              },
-              {
-                q: 'هل تدعمون WhatsApp والـ SMS؟',
-                a: 'نعم! إشعارات WhatsApp و SMS متاحة لكل الخطط المدفوعة. الخطة الـ Enterprise تشمل WhatsApp Business API كامل + قوالب رسائل مخصصة + معدلات إرسال أعلى.',
-              },
-              {
-                q: 'كيف أرقّي خطتي؟',
-                a: 'تروح لـ "إعدادات → خطتي" واختار الخطة الأعلى. الفرق بين الخطتين بيتحسب pro-rata (نسبي) للأيام المتبقية في دورتك الحالية. الميزات الجديدة تتفعّل فوراً.',
-              },
-              {
-                q: 'كيف يعمل المساعد الذكي (AI Assistant)؟',
-                a: 'هتلاقي زرار عائم بنفسجي ✨ في الزاوية في كل صفحة. اضغطي عليه واسألي أي سؤال بالعربي عن استخدام التطبيق (إزاي أرفع إيصال؟ إزاي أحجز نادي؟). المساعد يجاوب فوراً + يديك زر "افتح الصفحة" ينقلك للمكان المطلوب. مدعوم بـ Gemini AI.',
-              },
-              {
-                q: 'ما هو AI Auto-Pilot وكيف يفيدني؟',
-                a: 'نظام جدولة ذكي يعمل نيابة عنك: مثلاً كل أحد 9 الصبح، يبعت تذكير دفع تلقائي للسكان المتأخرين 30+ يوم. تختاري الإجراء + اليوم + الساعة، والباقي على AI. توفر ساعات أسبوعياً + ملخص أسبوعي بالبريد بكل الإجراءات اللي تمت.',
-              },
-              {
-                q: 'هل بياناتي آمنة؟',
-                a: 'بياناتك مشفرة TLS 1.3 أثناء النقل + bcrypt للباسوردات. نسخ احتياطي يومي مستقل. لا نبيع بياناتك أبداً ولا نشاركها مع طرف ثالث (إلا Stripe لمعالجة الدفع وGemini للذكاء الاصطناعي تحت اتفاقيات سرية صارمة). راجعي "سياسة الخصوصية" للتفاصيل.',
-              },
-              {
-                q: 'كم عدد المستخدمين والمجمعات في كل خطة؟',
-                a: 'الخطة المجانية: حتى 30 ساكن. الأساسي: حتى 100. الاحترافي والمتقدم: غير محدود. للشركات: ناشئة (3 مجمعات)، متوسطة (8 مجمعات)، كبرى (غير محدود). كل ذلك بدون قيود على عدد الأدمن.',
-              },
-              {
-                q: 'هل المنصة تدعم اللغة الإنجليزية والفرنسية؟',
-                a: 'نعم! المنصة بالكامل تدعم 3 لغات (عربي/إنجليزي/فرنسي) مع RTL/LTR تلقائي. كل مستخدم يختار لغته من الإعدادات. الصفحات القانونية كذلك مترجمة بالـ AI.',
-              },
-              {
-                q: 'كيف أبدأ بسرعة؟',
-                a: 'اشترك مجاناً في 60 ثانية: 1) اختاري الخطة المناسبة 2) املئي بيانات المجمع 3) ابدئي بإضافة السكان (يدوياً أو Bulk Import من Excel). كل ساكن جديد يحصل على بريد ترحيب تلقائياً ببيانات الدخول.',
-              },
-              {
-                q: 'هل في تكلفة إضافية لاستخدام AI؟',
-                a: 'لأ! ميزات AI (المساعد، المستشار، Auto-Pilot، الترجمة) كلها مشمولة في خطتك بدون أي تكلفة إضافية، مع حدود استخدام يومية حسب الخطة (Pro: 20/يوم، Premium: 50/يوم، Enterprise: غير محدود).',
-              },
-            ].map((faq, i) => (
-              <details
-                key={i}
-                className="group bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-200 hover:border-violet-300 transition-colors"
-                data-testid={`faq-item-${i}`}
-              >
-                <summary className="cursor-pointer p-4 list-none flex items-start justify-between gap-3">
-                  <span className="text-sm font-bold text-gray-900 leading-relaxed">{faq.q}</span>
-                  <ChevronDownIcon className="w-5 h-5 text-violet-600 flex-shrink-0 transition-transform group-open:rotate-180" />
-                </summary>
-                <div className="px-4 pb-4 text-sm text-gray-700 leading-loose border-t border-gray-200 pt-3">
-                  {faq.a}
-                </div>
-              </details>
-            ))}
-          </div>
+            <PricingSection
+        billingPeriod={billingPeriod}
+        setBillingPeriod={setBillingPeriod}
+        currency={currency}
+        setCurrency={setCurrency}
+        isYearly={isYearly}
+        priceOf={priceOf}
+        yearlyOf={yearlyOf}
+        savingsOf={savingsOf}
+        sym={sym}
+        residentialPlans={residentialPlans}
+        companyPlans={companyPlans}
+        comparisonFeatures={comparisonFeatures}
+        companyComparisonFeatures={companyComparisonFeatures}
+        paymentMethods={paymentMethods}
+        subCode={subCode}
+        setSubCode={setSubCode}
+        codeStatus={codeStatus}
+        codeLoading={codeLoading}
+        handleCodeActivate={handleCodeActivate}
+        handleSubscribe={handleSubscribe}
+      />
 
-          {/* Help CTA */}
-          <div className="mt-8 bg-gradient-to-r from-violet-50 to-fuchsia-50 border border-violet-200 rounded-xl p-5 text-center">
-            <p className="text-sm font-bold text-gray-900 mb-1">{t('hp_faq_more', 'سؤالك مش هنا؟')}</p>
-            <p className="text-xs text-gray-600 mb-3">{t('hp_faq_more_desc', 'فريق الدعم متاح 24/7 للإجابة على أسئلتك')}</p>
-            <Link to="/legal/contact" className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold rounded-lg transition-colors">
-              📞 اتصل بنا
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Subscription Plans - Residential */}
-      <section className="py-20 bg-slate-950 text-white" id="pricing" data-testid="pricing-section">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_residential_plans')}</h2>
-            <p className="text-gray-400 max-w-xl mx-auto mb-8">{t('hp_residential_plans_desc')}</p>
-
-            {/* Toggles Row */}
-            <div className="flex flex-wrap items-center justify-center gap-4 mb-2">
-              {/* Billing Period Toggle */}
-              <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
-                <button onClick={() => setBillingPeriod('monthly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${billingPeriod === 'monthly' ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-monthly">{t('hp_monthly')}</button>
-                <button onClick={() => setBillingPeriod('yearly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all relative ${billingPeriod === 'yearly' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-yearly">
-                  {t('hp_yearly')}
-                  <span className="absolute -top-2.5 -left-2 px-1.5 py-0.5 bg-green-500 text-[9px] font-bold rounded-full text-white">{t('hp_2months_free')}</span>
-                </button>
-              </div>
-              {/* Currency Toggle */}
-              <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
-                <button onClick={() => setCurrency('egp')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'egp' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-egp">{t('hp_egp', 'ج.م EGP')}</button>
-                <button onClick={() => setCurrency('usd')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'usd' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="toggle-usd">$ USD</button>
-              </div>
-            </div>
-            {isYearly && <p className="text-xs text-green-400 mb-2">{t('hp_yearly_note')}</p>}
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-16">
-            {residentialPlans.map((plan, i) => (
-              <div key={i} className={`relative rounded-2xl border-2 bg-white/5 backdrop-blur-sm p-6 transition-all hover:-translate-y-1 hover:shadow-2xl ${plan.color}`} data-testid={`plan-${plan.nameEn.toLowerCase()}`}>
-                {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-500 text-white text-xs font-bold rounded-full whitespace-nowrap">{plan.badge}</div>
-                )}
-                <div className="text-center mb-5">
-                  <h3 className="text-lg font-bold mb-0.5">{plan.name}</h3>
-                  <p className="text-[10px] text-gray-400 mb-1">{plan.nameEn}</p>
-                  <p className="text-xs text-blue-300 font-medium mb-3">{plan.residents}</p>
-                  {plan.monthly === 0 ? (
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-3xl font-black">{t('hp_free')}</span>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="flex items-baseline justify-center gap-1">
-                        <span className="text-3xl font-black">{isYearly ? yearlyOf(plan.monthly) : priceOf(plan.monthly)}</span>
-                        <span className="text-xs text-gray-400">{sym} / {isYearly ? t('hp_per_year') : t('hp_per_month')}</span>
-                      </div>
-                      {isYearly && plan.monthly > 0 && (
-                        <div className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-black shadow-lg" data-testid={`savings-badge-${plan.nameEn.toLowerCase()}`}>
-                          <span>💰</span>
-                          <span>وفّر {savingsOf(plan.monthly)} {sym}</span>
-                        </div>
-                      )}
-                      {!isYearly && plan.monthly > 0 && (
-                        <p className="text-[10px] text-emerald-400 mt-1 font-bold">
-                          💡 {t('hp_save_yearly', `وفّر ${savingsOf(plan.monthly)} ${sym} مع التجديد السنوي`)}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-                <ul className="space-y-2 mb-5 text-sm">
-                  {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-start gap-2">
-                      <CheckCircleIcon className="h-4 w-4 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-200 text-xs">{f}</span>
-                    </li>
-                  ))}
-                  {plan.excluded.map((f, j) => (
-                    <li key={`x-${j}`} className="flex items-start gap-2 opacity-30">
-                      <span className="h-4 w-4 flex-shrink-0 flex items-center justify-center text-[10px] mt-0.5">✕</span>
-                      <span className="text-gray-400 line-through text-xs">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button onClick={() => handleSubscribe(plan.nameEn.toLowerCase())} className={`w-full py-2.5 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>{plan.cta}</button>
-              </div>
-            ))}
-          </div>
-
-          {/* Feature Comparison Table */}
-          <div className="mb-16">
-            <h3 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_comparison_title')}</h3>
-            <div className="overflow-x-auto rounded-2xl border border-white/10">
-              <table className="w-full text-sm" data-testid="comparison-table">
-                <thead>
-                  <tr className="bg-white/10">
-                    <th className="text-right py-3 px-4 font-bold text-gray-300">{t('hp_feature')}</th>
-                    <th className="text-center py-3 px-3 font-bold text-gray-400">{t('plan_starter')}</th>
-                    <th className="text-center py-3 px-3 font-bold text-sky-400">{t('plan_basic')}</th>
-                    <th className="text-center py-3 px-3 font-bold text-blue-400">{t('plan_pro')}</th>
-                    <th className="text-center py-3 px-3 font-bold text-violet-400">{t('plan_premium')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonFeatures.map((feat, i) => (
-                    <tr key={i} className={`${i % 2 === 0 ? 'bg-white/[0.02]' : ''} ${feat.highlight ? 'bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10' : ''}`}>
-                      <td className={`py-2.5 px-4 text-xs ${feat.highlight ? 'text-violet-200 font-semibold' : 'text-gray-300'}`}>{feat.name}</td>
-                      {['starter', 'basic', 'pro', 'premium'].map(tier => {
-                        const val = feat[tier];
-                        return (
-                          <td key={tier} className="text-center py-2.5 px-3">
-                            {val === true ? (
-                              <CheckCircleIcon className="h-4 w-4 text-green-400 mx-auto" />
-                            ) : typeof val === 'string' ? (
-                              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">{val}</span>
-                            ) : (
-                              <span className="text-gray-600 text-xs">—</span>
-                            )}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                  {/* Price row */}
-                  <tr className="bg-white/5 border-t border-white/10">
-                    <td className="py-3 px-4 font-bold text-white text-xs">{t('hp_price_label')} {isYearly ? t('hp_yearly_price') : t('hp_monthly_price')}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-gray-300">{t('hp_free')}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-sky-300">{isYearly ? yearlyOf(800) : priceOf(800)} {sym}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-blue-300">{isYearly ? yearlyOf(1500) : priceOf(1500)} {sym}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-violet-300">{isYearly ? yearlyOf(2800) : priceOf(2800)} {sym}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Subscription Codes */}
-          <div className="mb-20 max-w-3xl mx-auto" data-testid="subscription-codes-section">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500/10 text-green-400 rounded-full text-sm font-medium mb-3 border border-green-500/20">
-                <KeyIcon className="h-4 w-4" />
-                {t('hp_sub_codes')}
-              </div>
-              <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_have_code')}</h3>
-              <p className="text-gray-400 text-sm">{t('hp_code_desc')}</p>
-            </div>
-            <div className="grid grid-cols-5 gap-3 mb-6">
-              {[
-                { label: t('dur_3m', '3 شهور'), icon: '3m', color: 'border-cyan-500/30 bg-cyan-500/5 hover:bg-cyan-500/10' },
-                { label: t('dur_6m', '6 شهور'), icon: '6m', color: 'border-blue-500/30 bg-blue-500/5 hover:bg-blue-500/10' },
-                { label: t('dur_9m', '9 شهور'), icon: '9m', color: 'border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/10' },
-                { label: t('dur_1y', 'سنة'), icon: '1Y', color: 'border-green-500/30 bg-green-500/5 hover:bg-green-500/10' },
-                { label: t('dur_lifetime', 'مدى الحياة'), icon: '∞', color: 'border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10' },
-              ].map((d, i) => (
-                <div key={i} className={`rounded-xl border text-center py-3 px-2 transition-all ${d.color}`}>
-                  <p className="text-lg font-black text-white mb-0.5">{d.icon}</p>
-                  <p className="text-[10px] text-gray-300">{d.label}</p>
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-3">
-              <input type="text" placeholder={t("hp_enter_code")} value={subCode} onChange={e => setSubCode(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleCodeActivate()} className="flex-1 bg-white/5 border border-white/10 rounded-xl px-5 py-3 text-white text-sm placeholder-gray-500 focus:outline-none focus:border-green-500/50 focus:ring-1 focus:ring-green-500/30" data-testid="subscription-code-input" />
-              <button onClick={handleCodeActivate} disabled={codeLoading || !subCode.trim()} className="px-6 py-3 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-500 transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed" data-testid="activate-code-btn">
-                {codeLoading ? '...' : t('hp_activate_code')}
-              </button>
-            </div>
-            {codeStatus && (
-              <div className={`mt-3 text-sm font-medium text-center py-2 px-4 rounded-lg ${codeStatus.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`} data-testid="code-status-message">
-                {codeStatus.msg}
-              </div>
-            )}
-          </div>
-
-          {/* Company Plans */}
-          <div className="mb-16">
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-500/10 text-amber-400 rounded-full text-sm font-medium mb-4 border border-amber-500/20">
-                <BuildingOffice2Icon className="h-4 w-4" />
-                {t('hp_for_companies')}
-              </div>
-              <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_company_plans_title')}</h3>
-              <p className="text-gray-400 text-sm max-w-lg mx-auto mb-6">{t('hp_company_plans_desc')}</p>
-
-              {/* Toggles Row (Companies) */}
-              <div className="flex flex-wrap items-center justify-center gap-4 mb-2">
-                {/* Billing Period Toggle */}
-                <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
-                  <button onClick={() => setBillingPeriod('monthly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${billingPeriod === 'monthly' ? 'bg-amber-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="company-toggle-monthly">{t('hp_monthly')}</button>
-                  <button onClick={() => setBillingPeriod('yearly')} className={`px-5 py-2 rounded-lg text-sm font-bold transition-all relative ${billingPeriod === 'yearly' ? 'bg-green-600 text-white shadow-lg' : 'text-gray-400 hover:text-white'}`} data-testid="company-toggle-yearly">
-                    {t('hp_yearly')}
-                    <span className="absolute -top-2.5 -left-2 px-1.5 py-0.5 bg-green-500 text-[9px] font-bold rounded-full text-white">{t('hp_2months_free')}</span>
-                  </button>
-                </div>
-                {/* Currency Toggle */}
-                <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
-                  <button onClick={() => setCurrency('egp')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'egp' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="company-toggle-egp">{t('hp_egp', 'ج.م EGP')}</button>
-                  <button onClick={() => setCurrency('usd')} className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${currency === 'usd' ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`} data-testid="company-toggle-usd">$ USD</button>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {companyPlans.map((plan, i) => (
-                <div key={i} className={`relative rounded-2xl border-2 bg-white/5 backdrop-blur-sm p-7 transition-all hover:-translate-y-1 hover:shadow-2xl ${plan.color}`} data-testid={`company-plan-${plan.nameEn.toLowerCase()}`}>
-                  {plan.badge && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-orange-500 text-white text-xs font-bold rounded-full whitespace-nowrap">{plan.badge}</div>
-                  )}
-                  <div className="text-center mb-5">
-                    <h3 className="text-xl font-bold mb-0.5">{plan.name}</h3>
-                    <p className="text-[10px] text-gray-400 mb-1">{plan.nameEn}</p>
-                    <p className="text-xs text-amber-300 font-medium mb-3">{plan.compounds}</p>
-                    {plan.isCustom ? (
-                      <span className="text-2xl font-black">{t('hp_custom_price', 'سعر مخصص')}</span>
-                    ) : (
-                      <div>
-                        <div className="flex items-baseline justify-center gap-1">
-                          <span className="text-3xl font-black">{isYearly ? yearlyOf(plan.monthly) : priceOf(plan.monthly)}</span>
-                          <span className="text-xs text-gray-400">{sym} / {isYearly ? t('hp_per_year') : t('hp_per_month')}</span>
-                        </div>
-                        {isYearly && (
-                          <div className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-black shadow-lg" data-testid={`company-savings-${plan.nameEn.toLowerCase()}`}>
-                            <span>💰</span>
-                            <span>وفّر {savingsOf(plan.monthly)} {sym}</span>
-                          </div>
-                        )}
-                        {!isYearly && (
-                          <p className="text-[10px] text-emerald-400 mt-1 font-bold">
-                            💡 وفّر {savingsOf(plan.monthly)} {sym} مع التجديد السنوي
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <ul className="space-y-2 mb-6">
-                    {plan.features.map((f, j) => (
-                      <li key={j} className="flex items-start gap-2 text-sm">
-                        <CheckCircleIcon className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-200 text-xs">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <button onClick={() => handleSubscribe(`company_${plan.nameEn.toLowerCase()}`)} className={`w-full py-3 rounded-xl font-bold text-sm transition-all ${plan.ctaStyle}`}>{plan.cta}</button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Company Comparison Table */}
-          <div className="mb-16">
-            <h3 className="text-2xl font-bold text-center mb-8" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_company_comparison')}</h3>
-            <div className="overflow-x-auto rounded-2xl border border-white/10">
-              <table className="w-full text-sm" data-testid="company-comparison-table">
-                <thead>
-                  <tr className="bg-white/10">
-                    <th className="text-right py-3 px-4 font-bold text-gray-300">{t('hp_feature')}</th>
-                    <th className="text-center py-3 px-3 font-bold text-amber-400">{t('cp_startup')}</th>
-                    <th className="text-center py-3 px-3 font-bold text-orange-400">{t('cp_business')}</th>
-                    <th className="text-center py-3 px-3 font-bold text-red-400">{t('cp_enterprise')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {companyComparisonFeatures.map((feat, i) => (
-                    <tr key={i} className={`${i % 2 === 0 ? 'bg-white/[0.02]' : ''} ${feat.highlight ? 'bg-gradient-to-r from-violet-500/10 to-fuchsia-500/10' : ''}`}>
-                      <td className={`py-2.5 px-4 text-xs ${feat.highlight ? 'text-violet-200 font-semibold' : 'text-gray-300'}`}>{feat.name}</td>
-                      {['startup', 'business', 'enterprise'].map(tier => (
-                        <td key={tier} className="text-center py-2.5 px-3">
-                          {typeof feat[tier] === 'string' ? (
-                            <span className={`text-[10px] font-bold ${feat.highlight ? 'text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded' : 'text-amber-300'}`}>{feat[tier]}</span>
-                          ) : feat[tier] ? (
-                            <CheckCircleIcon className="h-4 w-4 text-green-400 mx-auto" />
-                          ) : (
-                            <span className="text-gray-600 text-xs">—</span>
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                  {/* Price row */}
-                  <tr className="bg-white/5 border-t border-white/10">
-                    <td className="py-3 px-4 font-bold text-white text-xs">{t('hp_price_label')} {isYearly ? t('hp_yearly_price') : t('hp_monthly_price')}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-amber-300">{isYearly ? yearlyOf(4000) : priceOf(4000)} {sym}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-orange-300">{isYearly ? yearlyOf(9500) : priceOf(9500)} {sym}</td>
-                    <td className="text-center py-3 px-3 text-xs font-bold text-red-300">{isYearly ? yearlyOf(25000) : priceOf(25000)} {sym}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Payment Methods */}
-          <div className="text-center">
-            <h3 className="text-lg font-bold text-gray-300 mb-6" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_payment_methods')}</h3>
-            <div className="flex flex-wrap justify-center gap-3">
-              {paymentMethods.map((method, i) => {
-                const Icon = method.icon;
-                return (
-                  <div key={i} className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-5 py-3 hover:border-white/25 transition-all" data-testid={`payment-method-${i}`}>
-                    <Icon className="h-5 w-5 text-blue-400" />
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-white">{method.name}</p>
-                      <p className="text-[10px] text-gray-400">{method.desc}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <p className="text-xs text-gray-500 mt-6">
-              <LockClosedIcon className="h-3.5 w-3.5 inline-block -mt-0.5 ml-1" />
-              {t('hp_payments_secure')}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Roles Section */}
-      <section className="py-16 bg-gradient-to-b from-gray-50 to-white" data-testid="roles-section">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_6_roles')}</h2>
-            <p className="text-gray-500">{t('hp_roles_desc')}</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              {
-                icon: KeyIcon,
-                title: t('role_super_admin', 'مالك التطبيق'),
-                desc: t('role_super_desc_full', 'تحكم كامل بكل المنصة على مستوى الـ Owner.'),
-                color: 'from-purple-500 to-indigo-600',
-                bg: 'bg-purple-50 border-purple-200',
-                text: 'text-purple-700',
-                permissions: [
-                  '✅ إدارة الشركات والمجمعات (CRUD كامل)',
-                  '✅ تحليلات الإيرادات (MRR / ARR / Churn)',
-                  '✅ إدارة الاشتراكات والكوبونات',
-                  '✅ محرّر الصفحات القانونية + الترجمة',
-                  '✅ سجل التدقيق والصحة العامة',
-                  '✅ إدارة الترجمات والقوالب',
-                ],
-              },
-              {
-                icon: BuildingOffice2Icon,
-                title: t('role_company_admin', 'إدارة شركة عقارية'),
-                desc: t('role_company_desc_full', 'إدارة عدة مجتمعات سكنية تابعة لشركتها.'),
-                color: 'from-indigo-500 to-blue-600',
-                bg: 'bg-indigo-50 border-indigo-200',
-                text: 'text-indigo-700',
-                permissions: [
-                  '✅ إدارة كل المجمعات التابعة للشركة',
-                  '✅ تقارير Portfolio PDF موحّدة',
-                  '✅ إنشاء مدراء مجمعات جدد',
-                  '✅ تفعيل التجديد التلقائي عبر Stripe',
-                  '✅ AI Auto-Pilot لكل المجمعات',
-                  '🔒 لا يصل لميزات Owner-only',
-                ],
-              },
-              {
-                icon: HomeModernIcon,
-                title: t('role_admin', 'مدير مجمع'),
-                desc: t('role_admin_desc_full', 'مسؤول كامل عن مجمع واحد محدد.'),
-                color: 'from-blue-500 to-cyan-600',
-                bg: 'bg-blue-50 border-blue-200',
-                text: 'text-blue-700',
-                permissions: [
-                  '✅ إدارة السكان والوحدات والعقود',
-                  '✅ النظام المالي (فواتير، إيصالات، مصروفات)',
-                  '✅ الصيانة + حجز المرافق + الزوار',
-                  '✅ مستشار AI + AI Auto-Pilot للمجمع',
-                  '✅ الإعلانات والاستطلاعات والشكاوى',
-                  '🔒 لا يصل للمجمعات الأخرى',
-                ],
-              },
-              {
-                icon: ClipboardDocumentCheckIcon,
-                title: t('role_manager', 'إداري / Manager'),
-                desc: t('role_manager_desc_full', 'متابعة يومية مع صلاحيات محدودة.'),
-                color: 'from-emerald-500 to-teal-600',
-                bg: 'bg-emerald-50 border-emerald-200',
-                text: 'text-emerald-700',
-                permissions: [
-                  '✅ متابعة طلبات الصيانة والشكاوى',
-                  '✅ مراجعة إيصالات الدفع',
-                  '✅ إدارة الزوار والحجوزات',
-                  '✅ استقبال إشعارات AI Auto-Pilot',
-                  '🔒 لا يقدر يعدّل الفواتير المالية',
-                  '🔒 لا يقدر يحذف سكان',
-                ],
-              },
-              {
-                icon: ShieldCheckIcon,
-                title: t('role_security', 'موظف أمن'),
-                desc: t('role_security_desc_full', 'تحكم في البوابات والزوار.'),
-                color: 'from-amber-500 to-orange-600',
-                bg: 'bg-amber-50 border-amber-200',
-                text: 'text-amber-700',
-                permissions: [
-                  '✅ مسح QR Code للزوار',
-                  '✅ تسجيل دخول/خروج المركبات',
-                  '✅ إدارة قائمة الزوار اليومية',
-                  '✅ تنبيهات أمنية فورية',
-                  '🔒 لا يصل للنظام المالي',
-                  '🔒 لا يصل لبيانات شخصية حساسة',
-                ],
-              },
-              {
-                icon: UserIcon,
-                title: t('role_resident', 'ساكن / Resident'),
-                desc: t('role_resident_desc_full', 'استخدام خدمات المجمع وتسديد المستحقات.'),
-                color: 'from-teal-500 to-cyan-600',
-                bg: 'bg-teal-50 border-teal-200',
-                text: 'text-teal-700',
-                permissions: [
-                  '✅ عرض الفواتير ورفع إيصالات الدفع',
-                  '✅ طلب صيانة + حجز المرافق',
-                  '✅ دعوة زوار + توليد QR لهم',
-                  '✅ شات AI لأسئلة الاستخدام',
-                  '✅ المشاركة في الاستطلاعات',
-                  '🔒 يصل لبياناته الشخصية فقط',
-                ],
-              },
-            ].map((role, i) => {
-              const Icon = role.icon;
-              return (
-                <div key={i} className={`rounded-2xl p-5 border-2 ${role.bg} hover:shadow-xl transition-all group`} data-testid={`role-card-${i}`}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${role.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
-                      <Icon className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h4 className={`font-bold text-base ${role.text}`}>{role.title}</h4>
-                      <p className="text-[11px] text-gray-500 leading-tight">{role.desc}</p>
-                    </div>
-                  </div>
-                  <ul className="space-y-1.5 mt-3">
-                    {role.permissions.map((perm, idx) => (
-                      <li key={idx} className="text-[11px] text-gray-700 leading-relaxed flex items-start gap-1">
-                        <span>{perm}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+            <RolesSection />
 
       {/* Referral Program */}
       <section className="py-16 bg-gradient-to-br from-emerald-50 to-teal-50" data-testid="referral-section">

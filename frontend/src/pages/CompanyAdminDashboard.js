@@ -47,9 +47,60 @@ const CompanyAdminDashboard = () => {
   const [inviteFor, setInviteFor] = useState(null);
   const [crmUser, setCrmUser] = useState(null);
   const [error, setError] = useState(null);
+  const [logoUploading, setLogoUploading] = useState(false);
   const [onboardingSkipped, setOnboardingSkipped] = useState(() => {
     return localStorage.getItem('cad_onboarding_skipped') === '1';
   });
+
+  const uploadCompanyLogo = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('الملف يجب أن يكون صورة'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('حجم الصورة يتجاوز 5MB'); return; }
+    setLogoUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await axios.put(`${API}/company-admin/logo`, fd, {
+        ...getToken(),
+        headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' },
+      });
+      toast.success('تم رفع لوجو الشركة');
+      setMe(prev => prev ? { ...prev, company: { ...prev.company, logo_url: res.data.logo_url } } : prev);
+    } catch (err) {
+      toast.error(errMsg(err, 'فشل رفع اللوجو'));
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
+  const removeCompanyLogo = async () => {
+    if (!window.confirm('حذف لوجو الشركة؟')) return;
+    try {
+      await axios.delete(`${API}/company-admin/logo`, getToken());
+      toast.success('تم حذف اللوجو');
+      setMe(prev => prev ? { ...prev, company: { ...prev.company, logo_url: undefined } } : prev);
+    } catch (err) {
+      toast.error(errMsg(err, 'فشل حذف اللوجو'));
+    }
+  };
+
+  const uploadCompoundLogo = async (compoundId, file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('الملف يجب أن يكون صورة'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('حجم الصورة يتجاوز 5MB'); return; }
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await axios.put(`${API}/company-admin/compounds/${compoundId}/logo`, fd, {
+        ...getToken(),
+        headers: { ...getToken().headers, 'Content-Type': 'multipart/form-data' },
+      });
+      toast.success('تم رفع لوجو المجمع');
+      setCompounds(prev => prev.map(c => c.id === compoundId ? { ...c, logo_url: res.data.logo_url } : c));
+    } catch (err) {
+      toast.error(errMsg(err, 'فشل رفع اللوجو'));
+    }
+  };
 
   useEffect(() => {
     let alive = true;
@@ -160,6 +211,7 @@ const CompanyAdminDashboard = () => {
         <PageHeader
           theme="indigo"
           iconEmoji="🏢"
+          logoUrl={company.logo_url}
           badge="Co./Admin — شركة إدارة"
           title={company.name || '—'}
           subtitle={company.description || undefined}
@@ -169,9 +221,34 @@ const CompanyAdminDashboard = () => {
             {company.company_code && <span className="bg-indigo-900/40 text-indigo-200 px-2 py-0.5 rounded">#{company.company_code}</span>}
           </>}
           actions={
-            <div className="text-[11px] text-gray-400 text-end">
-              <div>مرحباً</div>
-              <div className="text-white font-semibold text-sm">{user?.full_name || user?.username}</div>
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-1.5">
+                <label className={`cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg text-xs font-bold transition ${logoUploading ? 'opacity-60 cursor-wait' : ''}`} data-testid="cad-upload-logo-btn">
+                  📷 {company.logo_url ? 'تغيير اللوجو' : 'رفع اللوجو'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    disabled={logoUploading}
+                    onChange={(e) => uploadCompanyLogo(e.target.files?.[0])}
+                    data-testid="cad-logo-file-input"
+                  />
+                </label>
+                {company.logo_url && (
+                  <button
+                    onClick={removeCompanyLogo}
+                    className="p-1.5 bg-red-500/20 hover:bg-red-500/40 border border-red-500/30 text-red-200 rounded-lg text-xs transition"
+                    title="حذف اللوجو"
+                    data-testid="cad-delete-logo-btn"
+                  >
+                    🗑
+                  </button>
+                )}
+              </div>
+              <div className="text-[11px] text-gray-400 text-end">
+                <div>مرحباً</div>
+                <div className="text-white font-semibold text-sm">{user?.full_name || user?.username}</div>
+              </div>
             </div>
           }
           testId="cad-page-header"
@@ -205,13 +282,28 @@ const CompanyAdminDashboard = () => {
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-3xl">🏘️</span>
+                      {c.logo_url ? (
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-white shadow-md flex-shrink-0 ring-1 ring-white/10" data-testid={`cad-compound-logo-${c.id}`}>
+                          <img src={c.logo_url} alt={c.name} className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <span className="text-3xl">🏘️</span>
+                      )}
                       <div className="min-w-0">
                         <h3 className="text-lg font-bold text-white truncate">{c.name}</h3>
                         <p className="text-[11px] text-gray-400 truncate">{c.location || 'بدون موقع'}</p>
                       </div>
                     </div>
                   </div>
+                  <label className="cursor-pointer p-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white rounded-lg text-xs transition flex-shrink-0" title={c.logo_url ? 'تغيير لوجو المجمع' : 'رفع لوجو المجمع'} data-testid={`cad-compound-logo-upload-${c.id}`}>
+                    📷
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => uploadCompoundLogo(c.id, e.target.files?.[0])}
+                    />
+                  </label>
                 </div>
 
                 <div className="grid grid-cols-4 gap-1 text-center">

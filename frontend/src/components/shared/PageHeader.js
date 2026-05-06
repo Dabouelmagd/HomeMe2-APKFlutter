@@ -28,6 +28,7 @@ const PageHeader = ({
   theme = 'indigo',
   icon: Icon,
   iconEmoji,
+  logoUrl,
   badge,
   title,
   subtitle,
@@ -50,7 +51,11 @@ const PageHeader = ({
       />
       <div className="relative px-6 py-5 flex items-start justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4 min-w-0">
-          {(Icon || iconEmoji) && (
+          {logoUrl ? (
+            <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white shadow-lg flex-shrink-0 ring-2 ring-white/20" data-testid={`${testId}-logo`}>
+              <img src={logoUrl} alt="logo" className="w-full h-full object-cover" />
+            </div>
+          ) : (Icon || iconEmoji) && (
             <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${t.iconBg} flex items-center justify-center shadow-lg flex-shrink-0`}>
               {Icon ? <Icon className="w-8 h-8 text-white" /> : <span className="text-3xl">{iconEmoji}</span>}
             </div>

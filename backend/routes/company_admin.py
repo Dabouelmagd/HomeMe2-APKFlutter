@@ -7,10 +7,11 @@ They can:
   - GET/POST/PUT/DELETE compounds inside their company
   - GET/POST users (residents/managers/security) inside any compound under their company
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 import uuid
+import base64
 import bcrypt
 
 from database import get_db
@@ -65,6 +66,103 @@ async def company_admin_me(current_user: dict = Depends(_require_company_admin),
             "total_users": total_users,
         }
     }
+
+
+@router.put("/company-admin/logo")
+async def company_admin_upload_logo(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """رفع لوجو الشركة (يُحفظ كـ data:image/...;base64 داخل companies.logo_url)."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="الملف يجب أن يكون صورة")
+    raw = await file.read()
+    # 5MB hard cap to keep documents small
+    if len(raw) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="حجم الصورة يتجاوز 5MB")
+    mime = file.content_type or "image/png"
+    logo_url = f"data:{mime};base64,{base64.b64encode(raw).decode('utf-8')}"
+
+    await db.companies.update_one(
+        {"id": cid},
+        {"$set": {"logo_url": logo_url, "logo_updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"message": "تم رفع اللوجو بنجاح", "logo_url": logo_url}
+
+
+@router.delete("/company-admin/logo")
+async def company_admin_delete_logo(
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """حذف لوجو الشركة."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    await db.companies.update_one(
+        {"id": cid},
+        {"$unset": {"logo_url": "", "logo_updated_at": ""}}
+    )
+    return {"message": "تم حذف اللوجو"}
+
+
+@router.put("/company-admin/compounds/{compound_id}/logo")
+async def company_admin_upload_compound_logo(
+    compound_id: str,
+    file: UploadFile = File(...),
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """رفع لوجو لمجمع تابع للشركة."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    compound = await db.compounds.find_one({"id": compound_id})
+    if not compound:
+        raise HTTPException(status_code=404, detail="المجمع غير موجود")
+    # Check ownership: either compound.company_id matches, or compound is in legacy company.compound_ids
+    company = await db.companies.find_one({"id": cid}, {"_id": 0, "compound_ids": 1})
+    legacy_ids = company.get("compound_ids") or [] if company else []
+    if compound.get("company_id") != cid and compound_id not in legacy_ids:
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية على هذا المجمع")
+
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="الملف يجب أن يكون صورة")
+    raw = await file.read()
+    if len(raw) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="حجم الصورة يتجاوز 5MB")
+    mime = file.content_type or "image/png"
+    logo_url = f"data:{mime};base64,{base64.b64encode(raw).decode('utf-8')}"
+
+    await db.compounds.update_one(
+        {"id": compound_id},
+        {"$set": {"logo_url": logo_url, "logo_updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"message": "تم رفع لوجو المجمع", "logo_url": logo_url}
+
+
+@router.delete("/company-admin/compounds/{compound_id}/logo")
+async def company_admin_delete_compound_logo(
+    compound_id: str,
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    compound = await db.compounds.find_one({"id": compound_id})
+    if not compound:
+        raise HTTPException(status_code=404, detail="المجمع غير موجود")
+    company = await db.companies.find_one({"id": cid}, {"_id": 0, "compound_ids": 1})
+    legacy_ids = company.get("compound_ids") or [] if company else []
+    if compound.get("company_id") != cid and compound_id not in legacy_ids:
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية على هذا المجمع")
+    await db.compounds.update_one(
+        {"id": compound_id},
+        {"$unset": {"logo_url": "", "logo_updated_at": ""}}
+    )
+    return {"message": "تم حذف لوجو المجمع"}
 
 
 @router.get("/company-admin/compounds")

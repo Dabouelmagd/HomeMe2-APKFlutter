@@ -301,7 +301,7 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
                   تجربة مجانية ١٤ يوم
                 </div>
                 <div className="text-[11px] text-emerald-700/80 dark:text-emerald-300/80 mb-2">
-                  جربي الخطة المتوسطة أو الكبرى بدون دفع
+                  جربي أي خطة مدفوعة بدون دفع
                 </div>
                 <div className="flex items-center gap-1.5">
                   <select
@@ -311,8 +311,9 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
                     className="flex-1 min-w-0 text-[11px] font-semibold rounded-lg border border-emerald-300 bg-white dark:bg-gray-900 px-2 py-1 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                     data-testid="plan-trial-plan-select"
                   >
-                    <option value="company_business">الخطة المتوسطة (7,500 ج.م)</option>
-                    <option value="company_enterprise">الخطة الكبرى (20,000 ج.م)</option>
+                    <option value="company_startup">الخطة الناشئة (4,000 ج.م)</option>
+                    <option value="company_business">الخطة المتوسطة (9,500 ج.م)</option>
+                    <option value="company_enterprise">الخطة الكبرى (25,000 ج.م)</option>
                   </select>
                   <button
                     type="button"

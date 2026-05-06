@@ -685,12 +685,12 @@ async def company_admin_activate_trial(
         raise HTTPException(status_code=400, detail="هذا الإجراء متاح لمدير الشركة فقط")
 
     # Validate requested plan
-    ALLOWED_TRIAL_PLANS = {"company_business", "company_enterprise"}
+    ALLOWED_TRIAL_PLANS = {"company_startup", "company_business", "company_enterprise"}
     requested_plan = (payload.plan_key if payload else None) or "company_business"
     if requested_plan not in ALLOWED_TRIAL_PLANS:
         raise HTTPException(
             status_code=400,
-            detail="التجربة المجانية متاحة فقط على الخطة المتوسطة أو الخطة الكبرى",
+            detail="التجربة المجانية متاحة على الخطة الناشئة أو المتوسطة أو الكبرى",
         )
 
     sub = await db.company_subscriptions.find_one({"company_id": cid}) or {}
@@ -714,7 +714,12 @@ async def company_admin_activate_trial(
         {"$set": update, "$setOnInsert": {"id": str(uuid.uuid4()), "created_at": now.isoformat()}},
         upsert=True,
     )
-    plan_label = "المتوسطة" if requested_plan == "company_business" else "الكبرى"
+    plan_labels = {
+        "company_startup": "الناشئة",
+        "company_business": "المتوسطة",
+        "company_enterprise": "الكبرى",
+    }
+    plan_label = plan_labels.get(requested_plan, requested_plan)
     return {
         "success": True,
         "plan_key": requested_plan,

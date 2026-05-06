@@ -30,7 +30,7 @@ COMPANY_PLANS_CATALOGUE = [
         "name_en": "Free",
         "monthly_egp": 0,
         "max_compounds": 1,
-        "max_residents": 50,
+        "max_residents": 30,
         "feature_flags": {
             "billing_payments": False,
             "ads_campaigns": False,
@@ -60,9 +60,9 @@ COMPANY_PLANS_CATALOGUE = [
         "key": "company_startup",
         "name_ar": "شركة ناشئة",
         "name_en": "Startup",
-        "monthly_egp": 3500,
+        "monthly_egp": 4000,
         "max_compounds": 3,
-        "max_residents": 500,
+        "max_residents": -1,
         "feature_flags": {
             "billing_payments": True,
             "ads_campaigns": True,
@@ -96,9 +96,9 @@ COMPANY_PLANS_CATALOGUE = [
         "key": "company_business",
         "name_ar": "شركة متوسطة",
         "name_en": "Business",
-        "monthly_egp": 7500,
-        "max_compounds": 5,
-        "max_residents": 2000,
+        "monthly_egp": 9500,
+        "max_compounds": 8,
+        "max_residents": -1,
         "popular": True,
         "feature_flags": {
             "billing_payments": True,
@@ -111,7 +111,7 @@ COMPANY_PLANS_CATALOGUE = [
             "priority_support": True,
         },
         "features_ar": [
-            "1 - 5 مجتمعات سكنية",
+            "1 - 8 مجتمعات سكنية",
             "جميع مزايا الباقة الناشئة",
             "لوحة تحكم متقدمة",
             "تحليلات مالية ذكية (AI)",
@@ -123,7 +123,7 @@ COMPANY_PLANS_CATALOGUE = [
             "API مخصص للتكامل",
         ],
         "features_en": [
-            "1-5 compounds",
+            "1-8 compounds",
             "Everything in Startup",
             "Advanced dashboard",
             "AI-powered financial insights",
@@ -139,7 +139,7 @@ COMPANY_PLANS_CATALOGUE = [
         "key": "company_enterprise",
         "name_ar": "شركة كبرى",
         "name_en": "Enterprise",
-        "monthly_egp": 20000,
+        "monthly_egp": 25000,
         "max_compounds": -1,
         "max_residents": -1,
         "feature_flags": {

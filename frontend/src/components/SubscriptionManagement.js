@@ -121,13 +121,13 @@ export default function SubscriptionManagement() {
   const isCompanyRole = ['company_admin', 'app_owner', 'super_admin'].includes(user?.role);
 
   const upgradePlans = isCompanyRole ? [
-    { id: 'company_startup', name: t('cp_startup', 'شركة ناشئة'), price: 3500 },
-    { id: 'company_business', name: t('cp_business', 'شركة متوسطة'), price: 7500 },
-    { id: 'company_enterprise', name: t('cp_enterprise', 'شركة كبرى'), price: 20000 },
+    { id: 'company_startup', name: t('cp_startup', 'شركة ناشئة'), price: 4000 },
+    { id: 'company_business', name: t('cp_business', 'شركة متوسطة'), price: 9500 },
+    { id: 'company_enterprise', name: t('cp_enterprise', 'شركة كبرى'), price: 25000 },
   ] : [
-    { id: 'basic', name: t('plan_basic'), price: 500 },
-    { id: 'pro', name: t('plan_pro'), price: 1200 },
-    { id: 'premium', name: t('plan_premium'), price: 2200 },
+    { id: 'basic', name: t('plan_basic'), price: 800 },
+    { id: 'pro', name: t('plan_pro'), price: 1500 },
+    { id: 'premium', name: t('plan_premium'), price: 2800 },
   ];
 
   return (

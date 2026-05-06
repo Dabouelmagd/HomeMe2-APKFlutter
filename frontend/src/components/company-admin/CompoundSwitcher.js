@@ -139,7 +139,7 @@ const CompoundSwitcher = () => {
       </button>
 
       {open && (
-        <div className="absolute end-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden" data-testid="compound-switcher-menu">
+        <div className="absolute end-0 mt-2 w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-[100] overflow-hidden" data-testid="compound-switcher-menu">
           <div className="px-3 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold flex items-center justify-between">
             <span>كمبوندات شركتك ({compounds.length})</span>
             {selectedId && (

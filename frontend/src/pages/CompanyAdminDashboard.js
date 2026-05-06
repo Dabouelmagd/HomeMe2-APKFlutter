@@ -177,44 +177,7 @@ const CompanyAdminDashboard = () => {
           testId="cad-page-header"
         />
 
-        {/* Plan Usage + Upgrade CTA */}
-        <CompanyPlanUsageCard />
-
-        {/* Aggregated Stats Panel — إحصائيات شاملة + drill-down per-compound */}
-        <AggregatedStatsPanel refreshKey={refreshKey} onSelectCompound={(c) => {
-          // Select this compound and navigate to the shared admin dashboard (same UX as Owner/Admin)
-          localStorage.setItem('selectedCompoundId', c.id);
-          localStorage.setItem('selectedCompoundName', c.name || '');
-          navigate('/app/dashboard');
-        }} />
-
-        {/* CRM / Retention Panel — VIP + Late Payers cross-compound */}
-        <SectionCard
-          title="🧠 CRM & الاحتفاظ بالعملاء"
-          subtitle="تاغات وملاحظات السكان عبر كل المجمعات"
-          variant="light"
-          testId="cad-crm-section"
-        >
-          <CrmRetentionPanel
-            refreshKey={refreshKey}
-            onUserClick={(u) => setCrmUser(u)}
-          />
-        </SectionCard>
-
-        {/* Referral Panel — viral loop, earn free months by inviting other companies */}
-        <SectionCard
-          title="🚀 برنامج الإحالة"
-          subtitle="ادعُ شركات صديقة، اربح أشهر مجانية"
-          variant="light"
-          testId="cad-referral-section"
-        >
-          <CompanyReferralPanel
-            refreshKey={refreshKey}
-            onRefresh={() => setRefreshKey(k => k + 1)}
-          />
-        </SectionCard>
-
-        {/* Action bar */}
+        {/* Compounds Section — moved to top per user request */}
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-white">🏘️ مجمعاتي</h2>
           <button onClick={() => setCreateOpen(true)} className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold shadow-lg hover:shadow-indigo-500/30 transition" data-testid="cad-create-compound-btn">
@@ -270,6 +233,43 @@ const CompanyAdminDashboard = () => {
             ))}
           </div>
         )}
+
+        {/* Plan Usage + Upgrade CTA */}
+        <CompanyPlanUsageCard />
+
+        {/* Aggregated Stats Panel — إحصائيات شاملة + drill-down per-compound */}
+        <AggregatedStatsPanel refreshKey={refreshKey} onSelectCompound={(c) => {
+          // Select this compound and navigate to the shared admin dashboard (same UX as Owner/Admin)
+          localStorage.setItem('selectedCompoundId', c.id);
+          localStorage.setItem('selectedCompoundName', c.name || '');
+          navigate('/app/dashboard');
+        }} />
+
+        {/* CRM / Retention Panel — VIP + Late Payers cross-compound */}
+        <SectionCard
+          title="🧠 CRM & الاحتفاظ بالعملاء"
+          subtitle="تاغات وملاحظات السكان عبر كل المجمعات"
+          variant="light"
+          testId="cad-crm-section"
+        >
+          <CrmRetentionPanel
+            refreshKey={refreshKey}
+            onUserClick={(u) => setCrmUser(u)}
+          />
+        </SectionCard>
+
+        {/* Referral Panel — viral loop, earn free months by inviting other companies */}
+        <SectionCard
+          title="🚀 برنامج الإحالة"
+          subtitle="ادعُ شركات صديقة، اربح أشهر مجانية"
+          variant="light"
+          testId="cad-referral-section"
+        >
+          <CompanyReferralPanel
+            refreshKey={refreshKey}
+            onRefresh={() => setRefreshKey(k => k + 1)}
+          />
+        </SectionCard>
       </div>
 
       {createOpen && <CompoundFormModal title="➕ إضافة مجمع جديد" initial={{}} onClose={() => setCreateOpen(false)} onSave={createCompound} saveLabel="إضافة" />}

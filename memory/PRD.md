@@ -21,6 +21,45 @@ Multi-tenant Compound Management SaaS with Arabic-first localization, role-based
 - ✅ Screenshot login as super_admin → الـ 3 أقسام تظهر بالأعداد الصحيحة (21/3/4).
 - ✅ Backend `ProtectedRoute adminOnly` يشمل `super_admin` بالفعل في `App.js`.
 
+### Iter 113: Comprehensive Guide Update — 22 Cards with AI Highlights — Feb 6, 2026 ✅
+
+**🎯 الهدف:** تحديث "دليل التشغيل الشامل" بكل تفاصيل الميزات الجديدة + 7 بطاقات AI بارزة.
+
+**التغييرات في `HomePage.js`:**
+
+#### 15 بطاقة قديمة → موسّعة بتفاصيل أعمق:
+- نظرة عامة (25+ نظام، 3 لغات، +100 مجمع، +30 شركة)
+- التسجيل (3 أنواع، تجربة 14 يوم بدون كارت)
+- النظام المالي (4 طرق توزيع، Stripe + PayPal + Vodafone Cash + InstaPay، Excel 5 أوراق)
+- الصيانة (أولويات، Auto-Pilot للمعلق)
+- إدارة الزوار (QR Code، قائمة سوداء)
+- العقود (تنبيهات 60/30/7 أيام)
+- التواصل (WebSocket، WhatsApp + SMS + Email)
+- الشكاوى (5 تصنيفات، AI ردود)
+- التقييمات (AI ينبّه ويولّد اعتذار)
+- المرافق، الاستطلاعات، التقارير، الاشتراكات (Stripe Auto-Renewal جديد)، 6 أدوار، الأجهزة الذكية.
+
+#### 7 بطاقات AI جديدة (مع شارة "جديد" violet/fuchsia):
+- **✨ مساعد HomeMe الذكي:** Gemini 3 Flash، Deep Links، حدود يومية Pro/Premium/Enterprise
+- **🧠 مستشار AI استباقي:** يكتشف 6 أنواع مشاكل + زر "⚡ تنفيذ بالـ AI"
+- **🤖 AI Auto-Pilot:** جدولة يومي/أسبوعي + ملخص كل اثنين 11AM
+- **📨 Auto-Credentials:** بريد ترحيب RTL تلقائي للسكان الجدد
+- **📊 Subscription Analytics:** MRR/ARR/Churn/Trial→Paid + Migration Tool
+- **🔁 Stripe Auto-Renewal:** شهري/سنوي بـ خصم 17% + Customer Portal
+- **🌐 3 لغات + ترجمة AI:** AR/EN/FR + زر ترجمة بـ Gemini خلال ثواني
+
+**Visual Enhancements:**
+- Grid responsive: 2/3/4/5/6 cols حسب الشاشة (يستوعب 22 بطاقة).
+- AI cards: gradient bg violet/fuchsia + شارة "جديد" بارزة + violet accents لما تتفتح.
+- Details panel ديناميكي: violet gradient للـ AI / blue للقديمة.
+- Lazy details on click: نص كامل + icon + close button.
+
+**🧪 E2E Verified:**
+- ✅ 22 بطاقة rendering correctly.
+- ✅ Click على بطاقة AI → يفتح details panel بـ violet gradient + النص الكامل.
+- ✅ Lint نظيف (BoltIcon + EnvelopeIcon + ArrowPathIcon imports جديدة).
+
+
 ### Iter 112: Live Demo + Updated Comparison Tables + 6 Roles Section — Feb 6, 2026 ✅
 
 **🎯 ٤ تحسينات كبرى في صفحة HomePage:**

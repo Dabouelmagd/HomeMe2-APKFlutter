@@ -14,7 +14,8 @@ import {
   PhoneIcon, GlobeAltIcon, DevicePhoneMobileIcon, ChevronDownIcon,
   ChevronUpIcon, CommandLineIcon, Cog6ToothIcon, FolderIcon,
   NewspaperIcon, LightBulbIcon, HomeModernIcon, FingerPrintIcon,
-  QrCodeIcon, ClockIcon, PresentationChartBarIcon
+  QrCodeIcon, ClockIcon, PresentationChartBarIcon,
+  BoltIcon, EnvelopeIcon, ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 import InternalAdBanner from './InternalAdBanner';
@@ -126,21 +127,30 @@ const HomePage = () => {
   ];
 
   const guideItems = [
-    { id: 'overview', icon: HomeModernIcon, title: t('gd_overview', 'نظرة عامة على المنصة'), content: t('gd_overview_d', 'منصة متكاملة لإدارة المجتمعات السكنية تضم 20+ نظام. تدعم العربية بالكامل مع واجهة RTL احترافية.') },
-    { id: 'registration', icon: UserIcon, title: t('gd_registration', 'التسجيل وإنشاء الحساب'), content: t('gd_registration_d', '3 أنواع حسابات: مدير مجتمع، شركة إدارة، مقيم. تجربة مجانية 14 يوم بدون بطاقة ائتمان.') },
-    { id: 'financial', icon: CurrencyDollarIcon, title: t('gd_financial', 'النظام المالي والمحاسبي'), content: t('gd_financial_d', 'ميزانية شاملة، 4 طرق لتوزيع المصروفات، متابعة السداد بالألوان، رسوم بيانية، تصدير Excel بـ 5 أوراق.') },
-    { id: 'maintenance', icon: WrenchScrewdriverIcon, title: t('gd_maintenance', 'إدارة الصيانة والخدمات'), content: t('gd_maintenance_d', 'تقديم طلبات مع صور وأولوية. إشعارات فورية للمدراء. تقييم 5 نجوم بعد الإنجاز.') },
-    { id: 'visitors', icon: QrCodeIcon, title: t('gd_visitors', 'إدارة الزوار + QR Code'), content: t('gd_visitors_d', 'طلب زيارة ← موافقة ← QR Code ← مسح عند الدخول/الخروج. سجل كامل للزوار.') },
-    { id: 'contracts', icon: DocumentTextIcon, title: t('gd_contracts', 'إدارة العقود والمزودين'), content: t('gd_contracts_d', 'تسجيل عقود المزودين مع تنبيهات انتهاء تلقائية (30 يوم، 7 أيام). تجديد وأرشيف كامل.') },
-    { id: 'communication', icon: ChatBubbleLeftEllipsisIcon, title: t('gd_comms', 'التواصل والإعلانات'), content: t('gd_comms_d', 'رسائل فورية WebSocket، إعلانات عامة وطوارئ، أحداث، نشرات إخبارية، مرفقات وصوتيات.') },
-    { id: 'complaints', icon: ExclamationTriangleIcon, title: t('gd_complaints', 'الشكاوى والاقتراحات'), content: t('gd_complaints_d', 'تقديم شكوى بتصنيف وصور. متابعة الحالة بالإشعارات. اقتراحات لتحسين المجتمع.') },
-    { id: 'ratings', icon: StarIcon, title: t('gd_ratings', 'تقييمات الرضا'), content: t('gd_ratings_d', 'تقييم الخدمات 1-5 نجوم. إحصائيات رضا شاملة ومتوسط تقييم لكل خدمة.') },
-    { id: 'facilities', icon: CalendarDaysIcon, title: t('gd_facilities', 'حجز المرافق'), content: t('gd_facilities_d', 'حجز الصالة، الملعب، المسبح. تقويم متاح، إلغاء قبل 24 ساعة.') },
-    { id: 'polls', icon: ClipboardDocumentCheckIcon, title: t('gd_polls', 'استطلاعات الرأي'), content: t('gd_polls_d', 'استطلاعات مجتمعية وتصويت على قرارات. نتائج فورية بعد الإغلاق.') },
-    { id: 'reports', icon: PresentationChartBarIcon, title: t('gd_reports', 'التقارير والتحليلات'), content: t('gd_reports_d', 'تقارير يومية تلقائية بالبريد. تصدير PDF وExcel. مقارنة أداء المجتمعات.') },
-    { id: 'subscription', icon: CreditCardIcon, title: t('gd_subscription', 'الاشتراكات وطرق الدفع'), content: t('gd_subscription_d', '4 خطط سكنية + 3 للشركات. Stripe، PayPal، انستاباي، فودافون كاش. أكواد وكوبونات خصم.') },
-    { id: 'roles', icon: ShieldCheckIcon, title: t('gd_roles', '6 أدوار وصلاحيات'), content: t('gd_roles_d', 'مالك التطبيق، شركة إدارة، مدير مجتمع، إداري، أمن، مقيم - كل بصلاحيات مخصصة.') },
-    { id: 'smart', icon: LightBulbIcon, title: t('gd_smart', 'الأجهزة الذكية (قريباً)'), content: t('gd_smart_d', 'تحكم ذكي بالإضاءة، التكييف، الكاميرات، الأقفال. أوامر عربية بالذكاء الاصطناعي.') },
+    { id: 'overview', icon: HomeModernIcon, title: t('gd_overview', 'نظرة عامة على المنصة'), content: t('gd_overview_d', 'منصة سحابية متكاملة لإدارة المجتمعات السكنية تضم 25+ نظام. تدعم العربية بالكامل (RTL)، 3 لغات (AR/EN/FR)، تطبيق PWA، ومدعومة بالذكاء الاصطناعي. تخدم +100 مجمع و+30 شركة إدارة.') },
+    { id: 'registration', icon: UserIcon, title: t('gd_registration', 'التسجيل وإنشاء الحساب'), content: t('gd_registration_d', '3 أنواع حسابات: مدير مجتمع (ساكن/أدمن)، شركة إدارة (1-غير محدود مجمعات)، أو ساكن. تجربة مجانية 14 يوم بدون بطاقة ائتمان مع كل ميزات الخطة المختارة. تسجيل بـ Email أو رقم جوال.') },
+    { id: 'financial', icon: CurrencyDollarIcon, title: t('gd_financial', 'النظام المالي والمحاسبي'), content: t('gd_financial_d', 'ميزانية شاملة، 4 طرق لتوزيع المصروفات (بالتساوي/بالنسبة/مخصص/لكل شقة)، متابعة السداد بالألوان (أخضر/أصفر/أحمر)، رسوم بيانية شهرية، تصدير Excel بـ 5 أوراق + PDF. دعم Stripe + PayPal + Vodafone Cash + InstaPay.') },
+    { id: 'maintenance', icon: WrenchScrewdriverIcon, title: t('gd_maintenance', 'إدارة الصيانة والخدمات'), content: t('gd_maintenance_d', 'تقديم طلبات مع صور وفيديو وأولوية (عادي/مستعجل/طارئ). إشعارات فورية للمدراء والفنيين. تقييم 5 نجوم بعد الإنجاز. AI Auto-Pilot ينبّه الفنيين تلقائياً عن الطلبات المعلقة لأكثر من 7 أيام.') },
+    { id: 'visitors', icon: QrCodeIcon, title: t('gd_visitors', 'إدارة الزوار + QR Code'), content: t('gd_visitors_d', 'الساكن يطلب زيارة → موافقة الأدمن → توليد QR Code فريد → الأمن يمسح عند الدخول/الخروج بالموبايل. سجل زوار يومي كامل + قائمة سوداء + تنبيهات أمنية فورية.') },
+    { id: 'contracts', icon: DocumentTextIcon, title: t('gd_contracts', 'إدارة العقود والمزودين'), content: t('gd_contracts_d', 'تسجيل عقود المزودين (نظافة/أمن/صيانة/إلخ) مع تواريخ ومرفقات. تنبيهات انتهاء تلقائية (60/30/7 أيام). تجديد بضغطة واحدة + أرشيف كامل بـ PDF.') },
+    { id: 'communication', icon: ChatBubbleLeftEllipsisIcon, title: t('gd_comms', 'التواصل والإعلانات'), content: t('gd_comms_d', 'رسائل فورية WebSocket بين السكان والإدارة، إعلانات عامة + طوارئ، أحداث ومناسبات، نشرات إخبارية شهرية، مرفقات صور وفيديو وصوتيات. دعم WhatsApp + SMS + Email.') },
+    { id: 'complaints', icon: ExclamationTriangleIcon, title: t('gd_complaints', 'الشكاوى والاقتراحات'), content: t('gd_complaints_d', 'تقديم شكوى بتصنيف (ضوضاء/أمن/نظافة/مالي/أخرى) مع صور وأولوية. متابعة الحالة بالإشعارات (مفتوحة/قيد المعالجة/محلولة). AI Auto-Pilot يذكّر الإدارة بالشكاوى المعلقة + يقترح ردود.') },
+    { id: 'ratings', icon: StarIcon, title: t('gd_ratings', 'تقييمات الرضا'), content: t('gd_ratings_d', 'تقييم الخدمات 1-5 نجوم بتعليقات. إحصائيات رضا شاملة + متوسط تقييم لكل خدمة. AI ينبّه الإدارة بالتقييمات السلبية تلقائياً + يولّد رسائل اعتذار وتحسين.') },
+    { id: 'facilities', icon: CalendarDaysIcon, title: t('gd_facilities', 'حجز المرافق'), content: t('gd_facilities_d', 'حجز الصالة الرياضية، الملعب، حمام السباحة، قاعة الاحتفالات. تقويم تفاعلي يعرض الفترات المتاحة. إلغاء قبل 24 ساعة. حجوزات متكررة أسبوعياً للمنتظمين.') },
+    { id: 'polls', icon: ClipboardDocumentCheckIcon, title: t('gd_polls', 'استطلاعات الرأي'), content: t('gd_polls_d', 'استطلاعات مجتمعية بأسئلة متعددة الاختيارات (يس/لا، 1-5، اختيار واحد، متعدد). تصويت على قرارات إدارية مهمة. نتائج فورية بعد الإغلاق + تصدير PDF.') },
+    { id: 'reports', icon: PresentationChartBarIcon, title: t('gd_reports', 'التقارير والتحليلات'), content: t('gd_reports_d', 'تقارير يومية تلقائية بالبريد للأدمن. Portfolio PDF Report للشركات (مقارنة بين المجمعات). تصدير Excel/PDF لكل قسم. تحليلات متقدمة بـ Recharts (إيرادات، مصروفات، رضا، إلخ).') },
+    { id: 'subscription', icon: CreditCardIcon, title: t('gd_subscription', 'الاشتراكات وطرق الدفع'), content: t('gd_subscription_d', '4 خطط سكنية (مجاني/أساسي/احترافي/متقدم) + 3 شركات (ناشئة/متوسطة/كبرى). Stripe Auto-Renewal (شهري/سنوي مع خصم 17%)، Customer Portal لإدارة الكارت، أكواد وكوبونات خصم، فوترة أوتوماتيكية، إيصالات PDF.') },
+    { id: 'roles', icon: ShieldCheckIcon, title: t('gd_roles', '6 أدوار وصلاحيات'), content: t('gd_roles_d', 'مالك التطبيق (Owner)، شركة إدارة (Company Admin)، مدير مجتمع (Admin)، إداري (Manager)، موظف أمن (Security)، ساكن (Resident). نظام RBAC متقدم + كل دور بصلاحيات مخصصة + 2FA للأدمن.') },
+
+    // ✨ NEW AI Features
+    { id: 'ai_chat', icon: SparklesIcon, title: '✨ ' + t('gd_ai_chat', 'مساعد HomeMe الذكي'), content: t('gd_ai_chat_d', 'شات AI عائم متاح في كل صفحة، مدعوم بـ Gemini 3 Flash. يجاوب على أسئلة المستخدمين بالعربي فوراً، ويوجّههم للصفحات الصحيحة بزر "افتح الصفحة" Deep Link. حدود يومية: Pro=20، Premium=50، Enterprise=غير محدود.') },
+    { id: 'ai_advisor', icon: LightBulbIcon, title: '🧠 ' + t('gd_ai_advisor', 'مستشار AI استباقي'), content: t('gd_ai_advisor_d', 'يحلل بيانات الكمبوند يومياً ويكتشف 6 أنواع مشاكل تلقائياً: فواتير متأخرة (>30 يوم)، صيانة معلقة (>7 أيام)، تقييمات سلبية (≤2 نجوم)، إيصالات بانتظار، شكاوى مفتوحة، عقود تنتهي قريباً. زر "⚡ تنفيذ بالـ AI" يولّد رسالة عربية احترافية ويرسلها بضغطة.') },
+    { id: 'ai_autopilot', icon: ClockIcon, title: '🤖 ' + t('gd_autopilot', 'AI Auto-Pilot'), content: t('gd_autopilot_d', 'جدولة تنفيذ AI Actions تلقائياً (يومياً/أسبوعياً): تذكير الدفع، تنبيه الفنيين، الردود على التقييمات السلبية، الشكاوى. تختار اليوم والساعة (مع تحويل بتوقيت مصر). ملخص أسبوعي بالبريد كل اثنين 11 صباحاً + سجل تنفيذ كامل.') },
+    { id: 'auto_credentials', icon: EnvelopeIcon, title: '📨 ' + t('gd_credentials', 'إرسال بيانات الدخول تلقائياً'), content: t('gd_credentials_d', 'كل ساكن جديد يُضاف (فردي أو Bulk Import من Excel) يحصل تلقائياً على بريد ترحيب جميل بالعربي/RTL يحتوي: اسم المستخدم، كلمة المرور المؤقتة، اسم المجمع، رابط مباشر للدخول. لا تدخل من الأدمن مطلوب — Failure-safe.') },
+    { id: 'subscription_analytics', icon: ChartBarIcon, title: '📊 ' + t('gd_sub_analytics', 'تحليلات الاشتراكات'), content: t('gd_sub_analytics_d', 'لوحة Owner متكاملة: MRR (الإيراد الشهري المتكرر) + ARR (السنوي) + Churn Rate + Trial→Paid Conversion + MRR by Plan. قائمة الشركات تنتهي خلال 7 أيام + اللي ألغوا. أداة Migration Tool لإرسال دعوات الترقية لـ Auto-Renewal بالجملة.') },
+    { id: 'stripe_recurring', icon: ArrowPathIcon, title: '🔁 ' + t('gd_stripe_auto', 'Stripe Auto-Renewal'), content: t('gd_stripe_auto_d', 'اشتراك يجدد نفسه تلقائياً (شهري أو سنوي) عبر Stripe Subscriptions. خصم 17% عند اختيار السنوي. Customer Portal لإدارة الكارت / الفواتير / الإلغاء في أي وقت. Webhook يحدث DB تلقائياً عند نجاح/فشل التجديد.') },
+    { id: 'multilang', icon: GlobeAltIcon, title: '🌐 ' + t('gd_multilang', '3 لغات + ترجمة AI'), content: t('gd_multilang_d', 'الواجهة بالكامل بالعربي + الإنجليزي + الفرنسي. صفحات قانونية (من نحن/الخصوصية/الشروط/اتصل بنا) قابلة للتعديل من Owner Editor مع زر "ترجم بـ AI" ينشئ النسخ الأخرى تلقائياً عبر Gemini خلال ثوانٍ.') },
+    { id: 'smart', icon: BoltIcon, title: t('gd_smart', 'الأجهزة الذكية (قريباً)'), content: t('gd_smart_d', 'تحكم ذكي بالإضاءة، التكييف، الكاميرات، الأقفال الذكية، أنظمة الأمان. أوامر عربية بالذكاء الاصطناعي. تكامل مع Google Home + Apple HomeKit + Alexa.') },
   ];
 
   const fx = currency === 'egp' ? 1 : 0.02; // 1 EGP ≈ 0.02 USD
@@ -975,50 +985,57 @@ const HomePage = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_guide_title')}</h2>
             <p className="text-gray-500 max-w-2xl mx-auto">{t('hp_guide_desc')}</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {guideItems.map((item) => {
               const Icon = item.icon;
               const isOpen = openGuide === item.id;
+              const isAI = ['ai_chat', 'ai_advisor', 'ai_autopilot', 'auto_credentials', 'subscription_analytics', 'stripe_recurring', 'multilang'].includes(item.id);
               return (
                 <button
                   key={item.id}
                   onClick={() => setOpenGuide(isOpen ? null : item.id)}
-                  className={`rounded-xl p-4 text-center border transition-all hover:shadow-md ${isOpen ? 'border-blue-400 bg-blue-50 shadow-md ring-1 ring-blue-200' : 'border-gray-200 bg-white hover:border-blue-200'}`}
+                  className={`rounded-xl p-4 text-center border transition-all hover:shadow-md relative ${
+                    isOpen
+                      ? (isAI ? 'border-violet-400 bg-violet-50 shadow-md ring-1 ring-violet-200' : 'border-blue-400 bg-blue-50 shadow-md ring-1 ring-blue-200')
+                      : (isAI ? 'border-violet-200 bg-gradient-to-br from-violet-50/40 to-fuchsia-50/40 hover:border-violet-400' : 'border-gray-200 bg-white hover:border-blue-200')
+                  }`}
                   data-testid={`guide-item-${item.id}`}
                 >
-                  <div className={`mx-auto w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${isOpen ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                  {isAI && !isOpen && (
+                    <span className="absolute top-1 left-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white text-[8px] font-black px-1 py-0.5 rounded">جديد</span>
+                  )}
+                  <div className={`mx-auto w-10 h-10 rounded-lg flex items-center justify-center mb-2 ${
+                    isOpen ? (isAI ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600 text-white' : 'bg-blue-600 text-white') : (isAI ? 'bg-violet-100 text-violet-600' : 'bg-gray-100 text-gray-600')
+                  }`}>
                     <Icon className="h-5 w-5" />
                   </div>
-                  <h3 className={`font-bold text-xs leading-tight ${isOpen ? 'text-blue-700' : 'text-gray-800'}`}>{item.title}</h3>
+                  <h3 className={`font-bold text-xs leading-tight ${isOpen ? (isAI ? 'text-violet-700' : 'text-blue-700') : 'text-gray-800'}`}>{item.title}</h3>
                 </button>
               );
             })}
           </div>
-          {openGuide && (
-            <div className="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-5 animate-in fade-in">
-              <div className="flex items-start gap-3">
-                {(() => {
-                  const selected = guideItems.find(g => g.id === openGuide);
-                  if (!selected) return null;
-                  const SelIcon = selected.icon;
-                  return (
-                    <>
-                      <div className="bg-blue-600 text-white p-2.5 rounded-lg flex-shrink-0">
-                        <SelIcon className="h-5 w-5" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-blue-900 mb-1">{selected.title}</h3>
-                        <p className="text-gray-700 text-sm leading-relaxed">{selected.content}</p>
-                      </div>
-                      <button onClick={() => setOpenGuide(null)} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
-                        <ChevronUpIcon className="h-5 w-5" />
-                      </button>
-                    </>
-                  );
-                })()}
+          {openGuide && (() => {
+            const selected = guideItems.find(g => g.id === openGuide);
+            if (!selected) return null;
+            const SelIcon = selected.icon;
+            const isAI = ['ai_chat', 'ai_advisor', 'ai_autopilot', 'auto_credentials', 'subscription_analytics', 'stripe_recurring', 'multilang'].includes(selected.id);
+            return (
+              <div className={`mt-4 border rounded-xl p-5 animate-in fade-in ${isAI ? 'bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 border-violet-200' : 'bg-blue-50 border-blue-200'}`}>
+                <div className="flex items-start gap-3">
+                  <div className={`text-white p-2.5 rounded-lg flex-shrink-0 ${isAI ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600' : 'bg-blue-600'}`}>
+                    <SelIcon className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className={`font-bold mb-1 ${isAI ? 'text-violet-900' : 'text-blue-900'}`}>{selected.title}</h3>
+                    <p className="text-gray-700 text-sm leading-relaxed">{selected.content}</p>
+                  </div>
+                  <button onClick={() => setOpenGuide(null)} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
+                    <ChevronUpIcon className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       </section>
 

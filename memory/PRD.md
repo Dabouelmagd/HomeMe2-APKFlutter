@@ -4,6 +4,29 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 117: Top Navigation Bar — Feb 6, 2026 ✅
+
+**🎯 الطلب:** إضافة شريط تنقل (Nav Bar) في الهيدر للوصول السريع لأقسام الصفحة الرئيسية.
+
+**التنفيذ في `HomePage.js`:**
+- **Desktop Nav (≥1024px):** 7 روابط على نفس السطر مع الـ logo والـ CTAs، تُمرّر بسلاسة لأقسامها (`scrollIntoView`):
+  - 🏠 الرئيسية → `#top` (Smooth Scroll لأعلى الصفحة)
+  - 💎 المميزات → `#systems` (الـ 25+ نظام)
+  - ✨ الجديد → `#ai-features` (AI Features Banner)
+  - 💰 الأسعار → `#pricing` (Subscription Plans)
+  - 📖 الدليل → `#guide` (Comprehensive Guide)
+  - ⭐ آراء العملاء → `#testimonials`
+  - ❓ الأسئلة → `#faq`
+- **Mobile/Tablet Nav (<1024px):** شريط أفقي قابل للتمرير (`overflow-x-auto`) أسفل الهيدر، نفس الروابط بـ data-testids مختلفة (`-m` suffix).
+- 14 روابط جديدة بـ data-testids كاملة + `aria-label` + responsive sizes.
+
+**🐛 Bug fix:** اكتشفت أثناء الاختبار أن `.hidden { display: none }` معرّفة مرتين في الـ CSS bundle (مرة في Tailwind base ومرة في PostCSS layer لاحق)، فالمرة الثانية كانت تطغى على `lg:flex` رغم وجود الـ media query. الحل: استخدام `lg:!flex` و `lg:!hidden` (`!important` modifier) لضمان الأولوية.
+
+**🧪 Verification:**
+- ✅ Desktop (1920px): 7 روابط ظاهرة، الضغط على "الأسعار" يمرّر فوراً لقسم Pricing.
+- ✅ Mobile (414px): الـ desktop nav `display:none`، الـ mobile nav strip ظاهر بـ scrollable.
+- ✅ كل الـ section IDs موجودة: `#systems`, `#ai-features`, `#guide`, `#testimonials`, `#faq`, `#pricing`.
+
 ### Iter 116: Pricing Fixes + GeoIP + HomePage Refactor + Portfolio PDF Auto-Schedule — Feb 6, 2026 ✅
 
 **🎯 4 تحسينات بناءً على ملاحظات المستخدم:**

@@ -502,20 +502,49 @@ const HomePage = () => {
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: "'Cairo', 'Tajawal', sans-serif" }}>
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-100 shadow-sm" data-testid="homepage-header">
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center">
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center gap-4">
+          <div className="flex items-center gap-4 flex-shrink-0">
             <img
               src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
               alt="HomeMe"
-              className="h-20 w-auto rounded-2xl shadow-lg"
+              className="h-14 lg:h-20 w-auto rounded-2xl shadow-lg"
               data-testid="homepage-logo"
             />
-            <div>
-              <span className="text-3xl font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
-              <span className="text-xs text-gray-500 font-medium">{t('hp_subtitle')}</span>
+            <div className="hidden sm:block">
+              <span className="text-2xl lg:text-3xl font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
+              <span className="text-[10px] lg:text-xs text-gray-500 font-medium hidden lg:block">{t('hp_subtitle')}</span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Center Navigation — desktop only */}
+          <nav className="hidden lg:!flex items-center gap-1 flex-1 justify-center" data-testid="homepage-nav" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
+            {[
+              { href: '#top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home' },
+              { href: '#systems', label: t('nav_features', 'المميزات'), testid: 'nav-features' },
+              { href: '#ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new' },
+              { href: '#pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing' },
+              { href: '#guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide' },
+              { href: '#testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials' },
+              { href: '#faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq' },
+            ].map((item, i) => (
+              <a
+                key={i}
+                href={item.href}
+                onClick={(e) => {
+                  if (item.href === '#top') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                className="px-3 py-2 text-sm font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap"
+                data-testid={item.testid}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => navigate('/login?owner_only=1')}
               className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all group relative"
@@ -525,14 +554,44 @@ const HomePage = () => {
               <KeyIcon className="h-5 w-5" />
             </button>
             <LanguageSwitcher />
-            <Link to="/login" className="px-4 py-2 text-blue-600 border-2 border-blue-600 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-all" data-testid="header-login">
+            <Link to="/login" className="hidden sm:inline-flex px-4 py-2 text-blue-600 border-2 border-blue-600 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-all" data-testid="header-login">
               {t('login', 'تسجيل الدخول')}
             </Link>
-            <Link to="/register" className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-sm hover:shadow-lg transition-all" data-testid="header-register">
+            <Link to="/register" className="px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-xs sm:text-sm hover:shadow-lg transition-all whitespace-nowrap" data-testid="header-register">
               {t('register_now', 'إنشاء حساب')}
             </Link>
           </div>
         </div>
+
+        {/* Mobile/Tablet Nav — horizontal scrollable strip */}
+        <nav className="lg:!hidden border-t border-gray-100 bg-gray-50/50 overflow-x-auto" data-testid="homepage-nav-mobile" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
+          <div className="flex items-center gap-0.5 px-2 py-1.5 min-w-max">
+            {[
+              { href: '#top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home-m' },
+              { href: '#systems', label: t('nav_features', 'المميزات'), testid: 'nav-features-m' },
+              { href: '#ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new-m' },
+              { href: '#pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing-m' },
+              { href: '#guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide-m' },
+              { href: '#testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials-m' },
+              { href: '#faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq-m' },
+            ].map((item, i) => (
+              <a
+                key={i}
+                href={item.href}
+                onClick={(e) => {
+                  if (item.href === '#top') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+                className="px-3 py-1.5 text-xs font-semibold text-gray-600 hover:text-blue-600 hover:bg-white rounded-lg transition-all whitespace-nowrap"
+                data-testid={item.testid}
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
+        </nav>
       </header>
 
       {/* Hero */}

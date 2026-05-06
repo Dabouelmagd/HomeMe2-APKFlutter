@@ -17,6 +17,7 @@ import {
   ChevronRightIcon,
   DocumentDuplicateIcon
 } from '@heroicons/react/24/outline';
+import PageHeader from './shared/PageHeader';
 
 const DocumentManagement = () => {
   const { t } = useTranslation();
@@ -240,37 +241,36 @@ const DocumentManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 text-center">
-                {t('documents.title', 'Document Management')}
-              </h1>
-              <p className="mt-2 text-gray-600">
-                {t('documents.subtitle', 'Organize and share compound documents')}
-              </p>
-            </div>
-            <div className="flex space-x-3">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-emerald-950 to-gray-900 p-6" dir="rtl" data-testid="document-management">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <PageHeader
+          theme="emerald"
+          icon={DocumentTextIcon}
+          badge={t('documents_badge', 'الوثائق والملفات')}
+          title={t('documents.title', 'إدارة الوثائق')}
+          subtitle={t('documents.subtitle', 'تنظيم ومشاركة وثائق المجمع بسهولة')}
+          actions={
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setShowCreateFolderModal(true)}
-                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg text-xs font-bold transition-all"
+                data-testid="new-folder-btn"
               >
-                <FolderIcon className="h-4 w-4 mr-2" />
-                {t('documents.create_folder', 'New Folder')}
+                <FolderIcon className="h-4 w-4" />
+                {t('documents.create_folder', 'مجلد جديد')}
               </button>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:shadow-lg text-white rounded-lg text-xs font-bold transition-all"
+                data-testid="upload-doc-btn"
               >
-                <CloudArrowUpIcon className="h-4 w-4 mr-2" />
-                {t('documents.upload', 'Upload Document')}
+                <CloudArrowUpIcon className="h-4 w-4" />
+                {t('documents.upload', 'رفع وثيقة')}
               </button>
             </div>
-          </div>
-        </div>
+          }
+          testId="documents-page-header"
+        />
 
         {/* Filters */}
         <div className="bg-white p-4 rounded-lg shadow mb-6">

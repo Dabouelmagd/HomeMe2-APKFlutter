@@ -3,6 +3,7 @@ import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'sonner';
+import PageHeader from './shared/PageHeader';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -131,8 +132,16 @@ export default function SubscriptionManagement() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6" data-testid="subscription-management">
-      <h1 className="text-2xl font-bold text-gray-900">{t('sub_management', 'إدارة الاشتراك')}</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 p-6" dir="rtl" data-testid="subscription-management">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <PageHeader
+          theme="indigo"
+          iconEmoji="💳"
+          badge={t('sub_management_badge', 'الاشتراكات')}
+          title={t('sub_management', 'إدارة الاشتراك')}
+          subtitle={t('sub_management_desc', 'تحكم بخطتك الحالية، فعّل أكواد الاشتراك، أو رقّي خطتك بدفع آمن')}
+          testId="sub-mgmt-header"
+        />
 
       {/* Current Subscription Status */}
       <div className={`rounded-2xl border-2 p-6 ${isActive ? 'border-green-200 bg-green-50/50' : 'border-red-200 bg-red-50/50'}`} data-testid="sub-status-card">
@@ -367,6 +376,7 @@ export default function SubscriptionManagement() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

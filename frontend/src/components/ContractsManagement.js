@@ -16,6 +16,7 @@ import {
   EnvelopeIcon,
   BanknotesIcon
 } from '@heroicons/react/24/outline';
+import PageHeader from './shared/PageHeader';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getToken = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -109,19 +110,23 @@ const ContractsManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" data-testid="contracts-management">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('contracts_management', t('ct_title', 'إدارة العقود والتعاقدات'))}</h1>
-            <p className="text-sm text-gray-500">{t('contracts_desc', t('ct_subtitle', 'متابعة عقود مزودي الخدمات والصيانة'))}</p>
-          </div>
-          <button onClick={() => { setEditingContract(null); setForm(emptyForm); setShowModal(true); }}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium"
-            data-testid="add-contract-btn">
-            <PlusIcon className="h-4 w-4" />{t('add_contract', t('ct_add', 'إضافة عقد'))}
-          </button>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 p-6" dir="rtl" data-testid="contracts-management">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <PageHeader
+          theme="indigo"
+          icon={DocumentTextIcon}
+          badge={t('contracts_badge', 'العقود والتعاقدات')}
+          title={t('contracts_management', t('ct_title', 'إدارة العقود والتعاقدات'))}
+          subtitle={t('contracts_desc', t('ct_subtitle', 'متابعة عقود مزودي الخدمات والصيانة'))}
+          actions={
+            <button onClick={() => { setEditingContract(null); setForm(emptyForm); setShowModal(true); }}
+              className="flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 border border-white/20 text-white rounded-lg text-sm font-bold transition-all"
+              data-testid="add-contract-btn">
+              <PlusIcon className="h-4 w-4" />{t('add_contract', t('ct_add', 'إضافة عقد'))}
+            </button>
+          }
+          testId="contracts-page-header"
+        />
 
         {/* Summary */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6" data-testid="contracts-summary">

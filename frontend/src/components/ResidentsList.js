@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
 import CreateResidentModal from './CreateResidentModal';
+import PageHeader from './shared/PageHeader';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -111,49 +112,26 @@ const ResidentsList = () => {
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${isRTL ? 'rtl' : 'ltr'}`}>
-      {/* Enhanced Header with Gradient */}
-      <div className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-4 rounded-2xl shadow-xl">
-                  <UserGroupIcon className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    {t('residents_list')}
-                  </h1>
-                  <p className="text-gray-600 mt-1">
-                    {t('view_all_residential')}
-                  </p>
-                </div>
-              </div>
-              
-              <button
-                onClick={() => setShowCreateModal(true)}
-                data-testid="open-create-resident-modal"
-                className="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl flex items-center space-x-3 rtl:space-x-reverse transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                <UserPlusIcon className="h-6 w-6 group-hover:rotate-12 transition-transform" />
-                <span className="font-semibold text-lg">{t('add_resident_family', 'إضافة ساكن جديد')}</span>
-              </button>
-            </div>
-            
-            {/* Subtitle Banner */}
-            <div className="mt-6 bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200 rounded-xl p-4">
-              <p className="text-blue-800 text-center font-medium">
-                {t('create_new_resident')}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+    <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-6 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'} data-testid="residents-list-page">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <PageHeader
+          theme="blue"
+          icon={UserGroupIcon}
+          badge={t('residents_management', 'إدارة السكان')}
+          title={t('residents_list')}
+          subtitle={t('view_all_residential')}
+          actions={
+            <button
+              onClick={() => setShowCreateModal(true)}
+              data-testid="open-create-resident-modal"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:shadow-xl text-sm font-bold"
+            >
+              <UserPlusIcon className="h-5 w-5" />
+              <span>{t('add_resident_family', 'إضافة ساكن جديد')}</span>
+            </button>
+          }
+          testId="residents-page-header"
+        />
         {/* Enhanced Search and Filters */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
 import { useNavigate, Link } from 'react-router-dom';
@@ -25,6 +26,8 @@ import { FAQSection } from './homepage/FAQSection';
 import { LiveDemoSection } from './homepage/LiveDemoSection';
 import { RolesSection } from './homepage/RolesSection';
 import { PricingSection } from './homepage/PricingSection';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const HomePage = () => {
   const { t, i18n } = useTranslation();
@@ -89,6 +92,77 @@ const HomePage = () => {
   useEffect(() => {
     try { localStorage.setItem('preferred_currency', currency); } catch (e) { /* ignore */ }
   }, [currency]);
+
+  // 🌐 Schema.org structured data — boosts Google rich-snippets (stars + ratings).
+  useEffect(() => {
+    let cancelled = false;
+    const SCRIPT_ID = 'homeme-jsonld-schema';
+    axios.get(`${API}/testimonials/published?limit=12`).then((res) => {
+      if (cancelled) return;
+      const reviews = res.data?.testimonials || [];
+      const reviewCount = reviews.length;
+      const avg = reviewCount
+        ? reviews.reduce((s, r) => s + (Number(r.stars) || 5), 0) / reviewCount
+        : 0;
+      const ratingValue = avg ? Math.round(avg * 10) / 10 : null;
+
+      const ld = {
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'HomeMe',
+        applicationCategory: 'BusinessApplication',
+        operatingSystem: 'Web, iOS, Android (PWA)',
+        description: 'منصة إدارة المجتمعات السكنية المتكاملة مع AI Assistant و Stripe Auto-Renewal و+25 نظام',
+        url: typeof window !== 'undefined' ? window.location.origin : 'https://homemeapp.net',
+        inLanguage: ['ar', 'en', 'fr'],
+        offers: {
+          '@type': 'AggregateOffer',
+          priceCurrency: 'EGP',
+          lowPrice: 0,
+          highPrice: 25000,
+        },
+        ...(ratingValue
+          ? {
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: ratingValue,
+                bestRating: 5,
+                worstRating: 1,
+                ratingCount: reviewCount,
+                reviewCount: reviewCount,
+              },
+              review: reviews.slice(0, 5).map((r) => ({
+                '@type': 'Review',
+                reviewRating: {
+                  '@type': 'Rating',
+                  ratingValue: r.stars || 5,
+                  bestRating: 5,
+                  worstRating: 1,
+                },
+                author: { '@type': 'Person', name: r.name || 'عميل' },
+                reviewBody: r.comment || '',
+                ...(r.published_at ? { datePublished: r.published_at } : {}),
+              })),
+            }
+          : {}),
+      };
+
+      let el = document.getElementById(SCRIPT_ID);
+      if (!el) {
+        el = document.createElement('script');
+        el.id = SCRIPT_ID;
+        el.type = 'application/ld+json';
+        document.head.appendChild(el);
+      }
+      el.textContent = JSON.stringify(ld);
+    }).catch(() => { /* silent — don't break page */ });
+
+    return () => {
+      cancelled = true;
+      const el = document.getElementById(SCRIPT_ID);
+      if (el) el.remove();
+    };
+  }, []);
 
   useEffect(() => {
     // ملاحظة: سابقاً كان هذا يعيد التوجيه التلقائي إلى /app/dashboard للمستخدمين المسجلين دخول.

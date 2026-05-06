@@ -21,6 +21,7 @@ import {
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import FamilyInvitesPanel from './family/FamilyInvitesPanel';
+import PageHeader from './shared/PageHeader';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -214,29 +215,29 @@ const FamilyManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{t('family_management')}</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              {subtitleText}
-            </p>
-          </div>
-          <div className="mt-4 flex justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-6" dir="rtl" data-testid="family-management">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <PageHeader
+          theme="blue"
+          icon={UsersIcon}
+          badge={t('family_badge', 'إدارة العائلة')}
+          title={t('family_management')}
+          subtitle={subtitleText}
+          actions={
             <button
               onClick={() => setShowAddMember(true)}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 border border-white/20 text-white rounded-lg font-bold text-sm transition-all"
+              data-testid="add-family-member-btn"
             >
-              <UserPlusIcon className="h-5 w-5 mr-2" />
+              <UserPlusIcon className="h-5 w-5" />
               {t('add_family_member')}
             </button>
-          </div>
-        </div>
+          }
+          testId="family-page-header"
+        />
 
         {/* Family Invite Links — Phase 3 of hierarchical invitations */}
-        <div className="mb-6 bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
           <FamilyInvitesPanel />
         </div>
 

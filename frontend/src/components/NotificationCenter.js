@@ -16,6 +16,7 @@ import {
   EllipsisVerticalIcon
 } from '@heroicons/react/24/outline';
 import InternalAdBanner from './InternalAdBanner';
+import PageHeader from './shared/PageHeader';
 import { formatRelativeTime } from '../utils/dateUtils';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -158,64 +159,50 @@ const NotificationCenter = () => {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Notification Page Ad */}
-      <div className="max-w-6xl mx-auto px-6 pt-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-rose-950 to-gray-900 p-6" dir="rtl" data-testid="notification-center">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Notification Page Ad */}
         <InternalAdBanner position="notification" maxAds={1} variant="slim" />
-      </div>
-      {/* Owner-themed Header */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-gray-900 via-rose-950 to-gray-900 text-white shadow-xl">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(244,63,94,0.4), transparent 50%), radial-gradient(circle at 80% 50%, rgba(168,85,247,0.3), transparent 50%)' }}></div>
-        <div className="relative max-w-6xl mx-auto px-6 py-8">
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-4">
-              <div className="bg-gradient-to-br from-rose-500 to-pink-600 p-4 rounded-2xl shadow-xl relative">
-                <BellIcon className="h-12 w-12 text-white" />
-                {unreadCount > 0 && (
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full min-w-[1.5rem] h-6 flex items-center justify-center border-2 border-gray-900">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </div>
-                )}
-              </div>
-            </div>
-            <p className="text-rose-300 text-xs font-medium tracking-wider mb-1">{t('notifications_badge', 'مركز الإشعارات')}</p>
-            <h1 className="text-3xl font-bold text-white mb-2">
-              {t('notifications')}
-            </h1>
-            <p className="text-sm text-gray-300 max-w-3xl mx-auto">
-              {t('manage_your_notifications')}
-            </p>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row justify-center gap-3">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className={`group px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-3 rtl:space-x-reverse ${
-                showFilters 
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-xl' 
-                  : 'bg-white/10 hover:bg-white/20 border border-white/20 text-white backdrop-blur-sm'
-              }`}
-            >
-              <FunnelIcon className="h-5 w-5" />
-              <span>{t('filters')}</span>
-            </button>
-            
-            {unreadCount > 0 && (
-              <button
-                onClick={handleMarkAllAsRead}
-                disabled={loading}
-                className="group bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-3 rtl:space-x-reverse disabled:opacity-50"
-              >
-                <CheckIcon className="h-5 w-5" />
-                <span>{t('mark_all_read')} ({unreadCount})</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+        {/* Unified Page Header */}
+        <PageHeader
+          theme="rose"
+          iconEmoji="🔔"
+          badge={t('notifications_badge', 'مركز الإشعارات')}
+          title={t('notifications')}
+          subtitle={t('manage_your_notifications')}
+          meta={unreadCount > 0 ? <span className="bg-red-500/20 text-red-300 px-2 py-0.5 rounded">🔴 {unreadCount > 99 ? '99+' : unreadCount} {t('unread', 'غير مقروءة')}</span> : null}
+          actions={
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all flex items-center gap-2 ${
+                  showFilters
+                    ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-lg'
+                    : 'bg-white/10 hover:bg-white/20 border border-white/20 text-white'
+                }`}
+                data-testid="toggle-filters-btn"
+              >
+                <FunnelIcon className="h-4 w-4" />
+                <span>{t('filters')}</span>
+              </button>
+              {unreadCount > 0 && (
+                <button
+                  onClick={handleMarkAllAsRead}
+                  disabled={loading}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-4 py-2 rounded-xl font-semibold text-sm shadow-lg transition-all flex items-center gap-2 disabled:opacity-50"
+                  data-testid="mark-all-read-btn"
+                >
+                  <CheckIcon className="h-4 w-4" />
+                  <span>{t('mark_all_read')} ({unreadCount})</span>
+                </button>
+              )}
+            </div>
+          }
+          testId="notif-page-header"
+        />
+
+        <div>
         {/* Enhanced Filters Section */}
         {showFilters && (
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-8">
@@ -506,6 +493,7 @@ const NotificationCenter = () => {
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 };

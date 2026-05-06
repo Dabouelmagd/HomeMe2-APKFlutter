@@ -18,6 +18,7 @@ import {
   ArrowLeftIcon,
   SparklesIcon
 } from '@heroicons/react/24/outline';
+import PageHeader from './shared/PageHeader';
 
 // Import settings components
 import {
@@ -229,44 +230,37 @@ const Settings = () => {
   // Main settings list view
   if (!activeTab) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        {/* Header — Owner theme (dark gradient with rose accents) */}
-        <div className="relative overflow-hidden bg-gradient-to-r from-gray-900 via-rose-950 to-gray-900 text-white shadow-xl">
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(244,63,94,0.4), transparent 50%), radial-gradient(circle at 80% 50%, rgba(168,85,247,0.3), transparent 50%)' }}></div>
-          <div className="relative max-w-5xl mx-auto px-6 py-8">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center shadow-lg">
-                  <Cog6ToothIcon className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <p className="text-rose-300 text-xs font-medium tracking-wider mb-1">{t('settings_badge', 'إعدادات الحساب والنظام')}</p>
-                  <h1 className="text-3xl font-bold">{t('settings_title', 'الإعدادات')}</h1>
-                  <p className="text-sm text-gray-300 mt-1">{t('settings_subtitle', 'إدارة حسابك وتفضيلاتك')}</p>
-                </div>
-              </div>
-              <button 
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-rose-950 to-gray-900 p-6" dir="rtl" data-testid="settings-page">
+        <div className="max-w-5xl mx-auto space-y-6">
+          <PageHeader
+            theme="rose"
+            icon={Cog6ToothIcon}
+            badge={t('settings_badge', 'إعدادات الحساب والنظام')}
+            title={t('settings_title', 'الإعدادات')}
+            subtitle={t('settings_subtitle', 'إدارة حسابك وتفضيلاتك')}
+            actions={
+              <button
                 onClick={goBackHome}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-colors text-sm font-semibold backdrop-blur-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-colors text-sm font-semibold"
                 data-testid="settings-back-btn"
               >
                 <ArrowLeftIcon className="w-4 h-4 rtl:rotate-180" />
                 {t('back', 'رجوع')}
               </button>
-            </div>
-          </div>
-        </div>
+            }
+            testId="settings-page-header"
+          />
 
-        {/* Settings List */}
-        <div className="max-w-5xl mx-auto px-4 py-6 space-y-8">
-          {settingsCategories.map((category) => (
-            <div key={category.id} className="space-y-3">
-              {/* Category Title — Owner theme */}
-              <div className="flex items-center gap-2 px-1">
-                <div className="w-1 h-5 bg-gradient-to-b from-rose-500 to-pink-600 rounded-full"></div>
-                <h2 className="text-sm font-bold text-gray-700 dark:text-gray-200 tracking-wide">
-                  {category.title}
-                </h2>
+          {/* Settings List */}
+          <div className="space-y-8">
+            {settingsCategories.map((category) => (
+              <div key={category.id} className="space-y-3">
+                {/* Category Title — Owner theme */}
+                <div className="flex items-center gap-2 px-1">
+                  <div className="w-1 h-5 bg-gradient-to-b from-rose-500 to-pink-600 rounded-full"></div>
+                  <h2 className="text-sm font-bold text-gray-100 tracking-wide">
+                    {category.title}
+                  </h2>
               </div>
               
               {/* Category Items — Grid of cards matching Owner dashboard style */}
@@ -278,18 +272,18 @@ const Settings = () => {
                       key={item.id}
                       data-testid={`settings-item-${item.id}`}
                       onClick={() => setActiveTab(item.id)}
-                      className="group relative bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 p-4 shadow-sm hover:shadow-lg hover:border-rose-200 dark:hover:border-rose-800 transition-all duration-200 text-start"
+                      className="group relative bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 hover:border-rose-300/40 p-4 shadow-sm hover:shadow-lg transition-all duration-200 text-start"
                     >
                       <div className="flex items-center gap-4">
                         {/* Icon */}
                         <div className={`${item.lightColor} p-3 rounded-xl transition-transform duration-200 group-hover:scale-110 group-hover:rotate-3 flex-shrink-0`}>
                           <IconComponent className={`w-6 h-6 ${item.textColor}`} />
                         </div>
-                        
+
                         {/* Text */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <h3 className="font-bold text-gray-900 dark:text-white">
+                            <h3 className="font-bold text-white">
                               {item.name}
                             </h3>
                             {item.badge && (
@@ -298,13 +292,13 @@ const Settings = () => {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                          <p className="text-xs text-gray-300 mt-1 line-clamp-2">
                             {item.description}
                           </p>
                         </div>
-                        
+
                         {/* Arrow with rose tint on hover */}
-                        <ChevronRightIcon className="w-5 h-5 text-gray-300 dark:text-gray-600 rtl:rotate-180 transition-all duration-200 group-hover:text-rose-500 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 flex-shrink-0" />
+                        <ChevronRightIcon className="w-5 h-5 text-gray-500 rtl:rotate-180 transition-all duration-200 group-hover:text-rose-300 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 flex-shrink-0" />
                       </div>
                     </button>
                   );
@@ -314,55 +308,43 @@ const Settings = () => {
           ))}
 
           {/* App Info — Owner style */}
-          <div className="text-center py-8 border-t border-gray-200 dark:border-gray-700 mt-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 rounded-full text-rose-600 dark:text-rose-400 text-sm font-semibold">
+          <div className="text-center py-8 border-t border-white/10 mt-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-rose-500/20 to-pink-500/20 rounded-full text-rose-300 text-sm font-semibold">
               <SparklesIcon className="w-4 h-4" />
               <span>HomeMe v2.0 · Powered by DataLife AI</span>
             </div>
           </div>
         </div>
       </div>
+    </div>
     );
   }
 
   // Detail view for selected setting
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header — Owner theme */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-gray-900 via-rose-950 to-gray-900 text-white shadow-xl sticky top-0 z-10">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(244,63,94,0.4), transparent 50%)' }}></div>
-        <div className="relative max-w-5xl mx-auto px-6 py-5">
-          <div className="flex items-center gap-4">
-            <button 
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-rose-950 to-gray-900 p-6" dir="rtl">
+      <div className="max-w-5xl mx-auto space-y-6">
+        <PageHeader
+          theme="rose"
+          icon={activeItemData?.icon || Cog6ToothIcon}
+          title={activeItemData?.name || t('settings_title', 'الإعدادات')}
+          subtitle={activeItemData?.description || ''}
+          actions={
+            <button
               onClick={() => setActiveTab(null)}
-              className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-colors backdrop-blur-sm"
+              className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
               data-testid="settings-detail-back"
             >
               <ArrowLeftIcon className="w-5 h-5 text-white rtl:rotate-180" />
             </button>
-            
-            {activeItemData && (
-              <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-br from-rose-500 to-pink-600 p-2.5 rounded-xl shadow-lg">
-                  <activeItemData.icon className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-white">
-                    {activeItemData.name}
-                  </h1>
-                  <p className="text-xs text-rose-200">
-                    {activeItemData.description}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+          }
+          testId="settings-detail-header"
+        />
 
-      {/* Content */}
-      <div className="max-w-5xl mx-auto px-4 py-6">
-        {renderContent()}
+        {/* Content */}
+        <div>
+          {renderContent()}
+        </div>
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ import {
   ArrowDownTrayIcon,
   CalendarIcon
 } from '@heroicons/react/24/outline';
+import PageHeader from './shared/PageHeader';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -116,30 +117,20 @@ const FileGallery = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
-      {/* Enhanced Header Section */}
-      <div className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-6">
-              <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-4 rounded-2xl shadow-xl">
-                <PhotoIcon className="h-12 w-12 text-white" />
-              </div>
-            </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">
-              {t('gallery.title')}
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              {t('gallery.description')}
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-950 to-gray-900 p-6" dir="rtl" data-testid="file-gallery">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <PageHeader
+          theme="purple"
+          icon={PhotoIcon}
+          badge={t('gallery_badge', 'المعرض والملفات')}
+          title={t('gallery.title')}
+          subtitle={t('gallery.description')}
+          testId="gallery-page-header"
+        />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Enhanced Stats Overview */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">{t('gallery.fileTypes')}</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-6 text-center">{t('gallery.fileTypes')}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {fileTypeCategories.map((category, index) => {
               const gradients = [

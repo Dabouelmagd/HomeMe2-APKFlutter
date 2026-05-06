@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { formatDate as formatDateUtil } from '../utils/dateUtils';
+import { CreditCardIcon } from '@heroicons/react/24/outline';
+import PageHeader from '../components/shared/PageHeader';
 
 const PaymentPage = () => {
   const { t, i18n } = useTranslation();
@@ -277,25 +279,26 @@ const PaymentPage = () => {
 
   return (
     <>
-      <div className={`max-w-4xl mx-auto p-6 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {t('payment_center', 'مركز المدفوعات')}
-          </h1>
-          <p className="text-gray-600">
-            {t('manage_payments_description', 'إدارة مدفوعاتك وعرض سجل المعاملات')}
-          </p>
-        </div>
+      <div className={`min-h-screen bg-gradient-to-br from-gray-900 via-emerald-950 to-gray-900 p-6 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'} data-testid="payment-center">
+        <div className="max-w-7xl mx-auto space-y-6">
+          <PageHeader
+            theme="emerald"
+            icon={CreditCardIcon}
+            badge={t('payment_center_badge', 'الدفع والمعاملات')}
+            title={t('payment_center', 'مركز المدفوعات')}
+            subtitle={t('manage_payments_description', 'إدارة مدفوعاتك وعرض سجل المعاملات')}
+            testId="payment-page-header"
+          />
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-700">{error}</p>
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
+            <p className="text-red-300">{error}</p>
           </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Payment Section */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="bg-white/95 rounded-2xl shadow-xl border border-white/10 p-6">
             <h2 className="text-xl font-semibold mb-4">{t('make_payment', 'إجراء دفع')}</h2>
             
             <div className="space-y-4">
@@ -521,6 +524,7 @@ const PaymentPage = () => {
               </p>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </>

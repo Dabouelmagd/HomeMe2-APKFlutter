@@ -99,8 +99,8 @@ const ComplaintsSystem = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" data-testid="complaints-system">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-rose-950 to-gray-900 p-6" dir="rtl" data-testid="complaints-system">
+      <div className="max-w-7xl mx-auto space-y-6">
         <PageHero
           icon="📢"
           title={t('complaints_suggestions', 'الشكاوى والاقتراحات')}
@@ -109,7 +109,7 @@ const ComplaintsSystem = () => {
           actions={(
             <button
               onClick={() => setShowCreate(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white text-rose-700 rounded-xl font-semibold shadow-md hover:shadow-lg hover:scale-[1.02] transition-all text-sm"
+              className="flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 border border-white/20 text-white rounded-xl font-semibold text-sm transition-all"
               data-testid="new-complaint-btn"
             >
               <PlusIcon className="h-4 w-4" />
@@ -119,22 +119,22 @@ const ComplaintsSystem = () => {
         />
 
         {/* Summary */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" data-testid="complaints-summary">
-          <div className="bg-white rounded-xl border p-4 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4" data-testid="complaints-summary">
+          <div className="bg-white/95 rounded-xl border border-white/10 p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-gray-900">{summary.total || 0}</p>
             <p className="text-xs text-gray-500">{t('total', 'الإجمالي')}</p>
           </div>
-          <div className="bg-red-50 rounded-xl border border-red-200 p-4 text-center">
-            <p className="text-2xl font-bold text-red-600">{summary.open || 0}</p>
-            <p className="text-xs text-red-600">{t('open', 'مفتوحة')}</p>
+          <div className="bg-rose-50 rounded-xl border border-rose-200 p-4 text-center shadow-sm">
+            <p className="text-2xl font-bold text-rose-600">{summary.open || 0}</p>
+            <p className="text-xs text-rose-600">{t('open', 'مفتوحة')}</p>
           </div>
-          <div className="bg-amber-50 rounded-xl border border-amber-200 p-4 text-center">
+          <div className="bg-amber-50 rounded-xl border border-amber-200 p-4 text-center shadow-sm">
             <p className="text-2xl font-bold text-amber-600">{summary.in_progress || 0}</p>
             <p className="text-xs text-amber-600">{t('in_progress', 'قيد المراجعة')}</p>
           </div>
-          <div className="bg-green-50 rounded-xl border border-green-200 p-4 text-center">
-            <p className="text-2xl font-bold text-green-600">{summary.resolved || 0}</p>
-            <p className="text-xs text-green-600">{t('resolved', 'تم الحل')}</p>
+          <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-4 text-center shadow-sm">
+            <p className="text-2xl font-bold text-emerald-600">{summary.resolved || 0}</p>
+            <p className="text-xs text-emerald-600">{t('resolved', 'تم الحل')}</p>
           </div>
         </div>
 

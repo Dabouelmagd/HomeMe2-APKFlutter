@@ -201,7 +201,8 @@ const SecurityDashboard = () => {
   }
 
   return (
-    <div className="space-y-5" dir={isRTL ? 'rtl' : 'ltr'} data-testid="security-dashboard">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-6" dir={isRTL ? 'rtl' : 'ltr'} data-testid="security-dashboard">
+      <div className="max-w-7xl mx-auto space-y-5">
       {/* Header — Unified */}
       <PageHeader
         theme="blue"
@@ -584,6 +585,7 @@ const SecurityDashboard = () => {
         </div>
       )}
 
+      </div>
     </div>
   );
 };

@@ -15,7 +15,8 @@ import {
   ChevronUpIcon, CommandLineIcon, Cog6ToothIcon, FolderIcon,
   NewspaperIcon, LightBulbIcon, HomeModernIcon, FingerPrintIcon,
   QrCodeIcon, ClockIcon, PresentationChartBarIcon,
-  BoltIcon, EnvelopeIcon, ArrowPathIcon
+  BoltIcon, EnvelopeIcon, ArrowPathIcon,
+  ArrowRightOnRectangleIcon, Squares2X2Icon
 } from '@heroicons/react/24/outline';
 
 import InternalAdBanner from './InternalAdBanner';
@@ -28,7 +29,7 @@ import { PricingSection } from './homepage/PricingSection';
 const HomePage = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const isRTL = i18n.language === 'ar';
   const [openGuide, setOpenGuide] = useState(null);
   const [billingPeriod, setBillingPeriod] = useState('monthly');
@@ -544,9 +545,9 @@ const HomePage = () => {
               className="h-14 lg:h-20 w-auto rounded-2xl shadow-lg"
               data-testid="homepage-logo"
             />
-            <div className="hidden sm:block">
+            <div>
               <span className="text-2xl lg:text-3xl font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
-              <span className="text-[10px] lg:text-xs text-gray-500 font-medium hidden lg:block">{t('hp_subtitle')}</span>
+              <span className="text-[10px] lg:text-xs text-gray-500 font-medium block">{t('hp_subtitle')}</span>
             </div>
           </div>
 
@@ -600,12 +601,37 @@ const HomePage = () => {
               <KeyIcon className="h-5 w-5" />
             </button>
             <LanguageSwitcher />
-            <Link to="/login" className="hidden sm:inline-flex px-4 py-2 text-blue-600 border-2 border-blue-600 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-all" data-testid="header-login">
-              {t('login', 'تسجيل الدخول')}
-            </Link>
-            <Link to="/register" className="px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-xs sm:text-sm hover:shadow-lg transition-all whitespace-nowrap" data-testid="header-register">
-              {t('register_now', 'إنشاء حساب')}
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  to="/app/dashboard"
+                  className="hidden sm:!inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-xs sm:text-sm hover:shadow-lg transition-all whitespace-nowrap"
+                  data-testid="header-dashboard"
+                  title={t('hp_dashboard', 'لوحة التحكم')}
+                >
+                  <Squares2X2Icon className="h-4 w-4" />
+                  <span>{t('hp_dashboard', 'لوحة التحكم')}</span>
+                </Link>
+                <button
+                  onClick={() => { logout(); }}
+                  className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 text-red-600 border-2 border-red-200 hover:bg-red-50 hover:border-red-400 rounded-xl font-semibold text-xs sm:text-sm transition-all whitespace-nowrap"
+                  data-testid="header-logout"
+                  title={t('logout', 'تسجيل الخروج')}
+                >
+                  <ArrowRightOnRectangleIcon className="h-4 w-4" />
+                  <span className="hidden sm:!inline">{t('logout', 'تسجيل الخروج')}</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="hidden sm:!inline-flex px-4 py-2 text-blue-600 border-2 border-blue-600 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-all" data-testid="header-login">
+                  {t('login', 'تسجيل الدخول')}
+                </Link>
+                <Link to="/register" className="px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-xs sm:text-sm hover:shadow-lg transition-all whitespace-nowrap" data-testid="header-register">
+                  {t('register_now', 'إنشاء حساب')}
+                </Link>
+              </>
+            )}
           </div>
         </div>
 

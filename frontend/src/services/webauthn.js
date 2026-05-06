@@ -106,7 +106,12 @@ export const registerBiometric = async (userId, username) => {
     });
     
     if (!verifyResponse.ok) {
-      throw new Error('Failed to verify registration');
+      let serverMsg = '';
+      try {
+        const j = await verifyResponse.json();
+        serverMsg = j.detail || j.error || '';
+      } catch { /* ignore */ }
+      throw new Error(serverMsg || 'Failed to verify registration');
     }
     
     return { success: true, message: 'تم تسجيل البصمة بنجاح' };
@@ -165,7 +170,12 @@ export const authenticateWithBiometric = async (username) => {
     });
     
     if (!verifyResponse.ok) {
-      throw new Error('Failed to verify authentication');
+      let serverMsg = '';
+      try {
+        const j = await verifyResponse.json();
+        serverMsg = j.detail || j.error || '';
+      } catch { /* ignore */ }
+      throw new Error(serverMsg || 'Failed to verify authentication');
     }
     
     const result = await verifyResponse.json();

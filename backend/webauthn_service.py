@@ -3,9 +3,32 @@ import os
 import base64
 import hashlib
 import json
+import logging
+from urllib.parse import urlparse
 from datetime import datetime, timezone
 from typing import Optional
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
+
+
+def _extract_rp_id(origin: str) -> str:
+    """Robustly extract the WebAuthn Relying Party ID (host) from any URL/header.
+
+    Handles `Origin` (host only) and `Referer` (full URL with path), plus an
+    optional override via the WEBAUTHN_RP_ID environment variable.
+    """
+    forced = os.environ.get("WEBAUTHN_RP_ID")
+    if forced:
+        return forced.strip().lower()
+
+    raw = (origin or "https://localhost").strip()
+    if not raw.startswith(("http://", "https://")):
+        raw = "https://" + raw
+
+    parsed = urlparse(raw)
+    host = parsed.hostname or "localhost"
+    return host.lower()
 
 # WebAuthn Models
 class WebAuthnRegisterOptions(BaseModel):
@@ -54,18 +77,21 @@ class WebAuthnService:
     async def get_register_options(self, user_id: str, username: str, origin: str):
         """Generate registration options for WebAuthn"""
         challenge = generate_challenge()
-        
+
         # Store challenge temporarily
-        await self.db.webauthn_challenges.insert_one({
-            "user_id": user_id,
-            "challenge": challenge,
-            "type": "register",
-            "created_at": datetime.now(timezone.utc),
-            "expires_at": datetime.now(timezone.utc)
-        })
-        
-        # Extract RP ID from origin
-        rp_id = origin.replace('https://', '').replace('http://', '').split(':')[0]
+        await self.db.webauthn_challenges.update_one(
+            {"user_id": user_id, "type": "register"},
+            {"$set": {
+                "user_id": user_id,
+                "challenge": challenge,
+                "type": "register",
+                "created_at": datetime.now(timezone.utc),
+            }},
+            upsert=True,
+        )
+
+        rp_id = _extract_rp_id(origin)
+        logger.info(f"webauthn register: user={username} rp_id={rp_id}")
         
         return {
             "challenge": challenge,
@@ -149,8 +175,9 @@ class WebAuthnService:
             upsert=True
         )
         
-        rp_id = origin.replace('https://', '').replace('http://', '').split(':')[0]
-        
+        rp_id = _extract_rp_id(origin)
+        logger.info(f"webauthn login options: user={username} rp_id={rp_id}")
+
         return {
             "challenge": challenge,
             "rpId": rp_id,
@@ -169,16 +196,22 @@ class WebAuthnService:
             # Find user
             user = await self.db.users.find_one({"username": username})
             if not user:
+                logger.warning(f"webauthn verify: user not found username={username}")
                 return None, "User not found"
-            
-            # Find credential
+
+            # Find credential — try both with and without trailing padding
+            normalized_id = (credential_id or "").rstrip("=")
             credential = await self.db.webauthn_credentials.find_one({
                 "user_id": user["id"],
-                "credential_id": credential_id
+                "credential_id": {"$in": [credential_id, normalized_id]}
             })
-            
+
             if not credential:
-                return None, "Invalid credential"
+                logger.warning(
+                    f"webauthn verify: invalid credential username={username} "
+                    f"submitted_id_len={len(credential_id or '')}"
+                )
+                return None, "Invalid credential — re-register your biometric"
             
             # Verify challenge exists
             challenge_doc = await self.db.webauthn_challenges.find_one({
@@ -204,6 +237,7 @@ class WebAuthnService:
             
             return user, None
         except Exception as e:
+            logger.exception(f"webauthn verify_login exception: {e}")
             return None, str(e)
     
     async def has_biometric(self, username: str) -> bool:

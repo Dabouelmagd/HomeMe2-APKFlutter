@@ -19,6 +19,7 @@ import {
   SparklesIcon,
   ChartPieIcon
 } from '@heroicons/react/24/outline';
+import PageHeader from './shared/PageHeader';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -125,25 +126,30 @@ const MonitoringDashboard = () => {
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('monitoring_dashboard')}</h1>
-          <p className="text-gray-600 mt-1">{t('system_monitoring_overview')}</p>
-        </div>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="btn btn-primary flex items-center space-x-2"
-        >
-          <ArrowPathIcon className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
-          <span>{t('refresh')}</span>
-        </button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-6" dir="rtl" data-testid="monitoring-dashboard">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <PageHeader
+          theme="blue"
+          icon={ChartBarIcon}
+          badge={t('monitoring_badge', '📊 المراقبة الحية')}
+          title={t('monitoring_dashboard', 'لوحة المراقبة')}
+          subtitle={t('system_monitoring_overview', 'نظرة شاملة على حالة النظام')}
+          actions={
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 hover:bg-white/25 border border-white/20 text-white rounded-xl font-bold text-sm transition-all disabled:opacity-50"
+              data-testid="monitoring-refresh"
+            >
+              <ArrowPathIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <span>{t('refresh')}</span>
+            </button>
+          }
+          testId="monitoring-page-header"
+        />
 
       {/* System Health Status */}
-      <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
+      <div className="bg-white rounded-xl shadow-sm border p-6">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">{t('system_health')}</h2>
@@ -377,6 +383,7 @@ const MonitoringDashboard = () => {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 };

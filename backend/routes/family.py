@@ -7,8 +7,12 @@ from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 import uuid
 import json
+import io
+import base64
 import logging
 import os
+
+import qrcode
 
 from database import get_db
 from auth_deps import get_current_user, require_admin, require_super_admin
@@ -17,6 +21,39 @@ from shared_models import *
 
 
 router = APIRouter(prefix="/api")
+
+
+def generate_qr_code(data: str) -> Optional[str]:
+    """Generate QR code and return as base64-encoded data URL."""
+    try:
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(data)
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return f"data:image/png;base64,{base64.b64encode(buf.getvalue()).decode()}"
+    except Exception as e:
+        logging.error(f"Error generating QR code: {e}")
+        return None
+
+
+def create_gate_access_token(family_member_id: str, unit_id: str, compound_id: str, expires_at: datetime) -> str:
+    """Create a base64-encoded gate access token."""
+    payload = {
+        "family_member_id": family_member_id,
+        "unit_id": unit_id,
+        "compound_id": compound_id,
+        "expires_at": expires_at.isoformat(),
+        "issued_at": datetime.now(timezone.utc).isoformat(),
+    }
+    return base64.b64encode(json.dumps(payload).encode()).decode()
+
 
 @router.post("/family-members")
 async def create_family_member(
@@ -339,33 +376,40 @@ async def generate_member_qr_code(
     """Generate QR code for family member gate access"""
     try:
         db = get_db()
-        # Find the family member
-        family_member = await db.family_members.find_one({
-            "id": member_id,
-            "primary_resident_id": current_user.id,
-            "is_active": True
-        })
-        
+        uid = current_user.get("id")
+        cid = current_user.get("compound_id")
+        role = current_user.get("role")
+
+        # Owners/Admins can generate QR for ANY family member in their compound;
+        # Residents can only generate for their own family.
+        query = {"id": member_id, "is_active": True}
+        if role not in ("admin", "company_admin", "app_owner", "super_admin"):
+            query["primary_resident_id"] = uid
+        family_member = await db.family_members.find_one(query)
+
         if not family_member:
             raise HTTPException(status_code=404, detail="Family member not found")
-        
+
+        # Resolve compound_id from the family member if the actor doesn't have one
+        compound_id = cid or family_member.get("compound_id")
+
         # Set expiration time
         expires_at = datetime.now(timezone.utc) + timedelta(hours=qr_request.expires_in_hours)
-        
+
         # Create access token
         access_token = create_gate_access_token(
             family_member_id=member_id,
-            unit_id=family_member["unit_id"],
-            compound_id=current_user.compound_id,
+            unit_id=family_member.get("unit_id", ""),
+            compound_id=compound_id or "",
             expires_at=expires_at
         )
-        
+
         # Generate QR code with the access token
         qr_code_data = generate_qr_code(access_token)
-        
+
         if not qr_code_data:
             raise HTTPException(status_code=500, detail="Failed to generate QR code")
-        
+
         # Update family member with QR code
         await db.family_members.update_one(
             {"id": member_id},
@@ -377,19 +421,19 @@ async def generate_member_qr_code(
                 }
             }
         )
-        
+
         return {
             "message": "QR code generated successfully",
             "qr_code": qr_code_data,
             "expires_at": expires_at.isoformat(),
             "access_token": access_token
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
-        logging.error(f"Error generating QR code: {e}")
-        raise HTTPException(status_code=500, detail="Failed to generate QR code")
+        logging.exception(f"Error generating QR code for member={member_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate QR code: {e}")
 
 @router.post("/gate-access/verify")
 async def verify_gate_access(

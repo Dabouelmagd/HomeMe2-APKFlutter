@@ -158,7 +158,8 @@ const FamilyManagement = () => {
       toast.success('QR code generated successfully');
     } catch (error) {
       console.error('Failed to generate QR code:', error);
-      toast.error('Failed to generate QR code');
+      const detail = error.response?.data?.detail || t('failed_generate_qr', 'فشل توليد رمز QR');
+      toast.error(typeof detail === 'string' ? detail : t('failed_generate_qr', 'فشل توليد رمز QR'));
     }
   };
 

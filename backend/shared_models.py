@@ -830,7 +830,8 @@ class TrialStatusResponse(BaseModel):
 
 
 class QRCodeRequest(BaseModel):
-    family_member_id: str
+    # `family_member_id` is redundant — it's already in the URL path. Optional for backward-compat.
+    family_member_id: Optional[str] = None
     expires_in_hours: int = 24  # Default 24 hours validity
 
 

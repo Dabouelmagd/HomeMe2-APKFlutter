@@ -8,16 +8,22 @@ import {
   ClockIcon,
   PaperAirplaneIcon,
 } from '@heroicons/react/24/outline';
+import PageHeader from '../components/shared/PageHeader';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const auth = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
 
 const _extractToken = (input) => {
-  if (!input) return '';
+  if (!input) return { token: '', type: 'unknown' };
   const v = input.trim();
-  // Handle full URLs, just paste token, etc.
-  const m = v.match(/\/visitor\/([A-Za-z0-9_-]+)/);
-  return m ? m[1] : v;
+  // Visitor pass URL: /visitor/<token>
+  const visitorMatch = v.match(/\/visitor\/([A-Za-z0-9_-]+)/);
+  if (visitorMatch) return { token: visitorMatch[1], type: 'visitor' };
+  // Family invite URL: /join-family/<token> — NOT scannable by security
+  const familyMatch = v.match(/\/join-family\/([A-Za-z0-9_-]+)/);
+  if (familyMatch) return { token: familyMatch[1], type: 'family_invite' };
+  // Plain token (no URL prefix) — assume visitor pass
+  return { token: v, type: 'visitor' };
 };
 
 const SecurityScanPage = () => {
@@ -26,8 +32,17 @@ const SecurityScanPage = () => {
   const [result, setResult] = useState(null);
 
   const submit = async () => {
-    const tok = _extractToken(input);
+    const { token: tok, type } = _extractToken(input);
     if (!tok) { toast.error('الصق الرابط أو الرمز'); return; }
+
+    // Reject family invitation links — those are for residents, not security
+    if (type === 'family_invite') {
+      const errMsg = '⚠️ هذا رابط دعوة عائلة (للسكان فقط)، وليس تذكرة زائر. أطلب من الساكن إنشاء تذكرة زائر من حسابه عبر "تذاكر الزوار"';
+      toast.error(errMsg);
+      setResult({ success: false, message: errMsg });
+      return;
+    }
+
     setBusy(true);
     setResult(null);
     try {
@@ -39,23 +54,25 @@ const SecurityScanPage = () => {
         toast.warning(r.data?.message || 'الرابط غير صالح');
       }
     } catch (e) {
-      const msg = e?.response?.data?.detail || 'فشل التفعيل';
-      setResult({ success: false, message: msg });
-      toast.error(msg);
+      const msg = e?.response?.data?.detail || 'فشل التفعيل — تحقق من صحة الرابط أو الكود';
+      setResult({ success: false, message: typeof msg === 'string' ? msg : 'فشل التفعيل' });
+      toast.error(typeof msg === 'string' ? msg : 'فشل التفعيل');
     } finally { setBusy(false); }
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen" data-testid="security-scan-page">
-      <div className="max-w-md mx-auto">
-        <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
-          <div className="text-center mb-5">
-            <div className="bg-gradient-to-br from-emerald-500 to-green-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <QrCodeIcon className="w-9 h-9 text-white" />
-            </div>
-            <h1 className="text-xl font-bold text-gray-900">مسح تذكرة زائر</h1>
-            <p className="text-xs text-gray-500 mt-1">الصق رابط الزائر أو الكود اليدوي</p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-emerald-950 to-gray-900 p-6" dir="rtl" data-testid="security-scan-page">
+      <div className="max-w-md mx-auto space-y-6">
+        <PageHeader
+          theme="emerald"
+          icon={QrCodeIcon}
+          badge="🛡️ نقطة الأمن"
+          title="مسح تذكرة زائر"
+          subtitle="الصق رابط الزائر أو الكود اليدوي"
+          testId="security-scan-header"
+        />
+
+        <div className="bg-white/95 rounded-2xl shadow-xl border border-white/10 p-6">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -77,7 +94,7 @@ const SecurityScanPage = () => {
         </div>
 
         {result && (
-          <div className={`bg-white rounded-2xl shadow-sm p-5 border-r-4 ${result.success ? 'border-emerald-500' : 'border-rose-500'}`} data-testid="security-scan-result">
+          <div className={`bg-white rounded-2xl shadow-xl p-5 border-r-4 ${result.success ? 'border-emerald-500' : 'border-rose-500'}`} data-testid="security-scan-result">
             <div className="flex items-start gap-3">
               {result.success ? <CheckCircleIcon className="w-10 h-10 text-emerald-500 flex-shrink-0" /> : <XCircleIcon className="w-10 h-10 text-rose-500 flex-shrink-0" />}
               <div className="flex-1">

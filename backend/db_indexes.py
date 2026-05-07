@@ -47,6 +47,9 @@ async def ensure_indexes():
         # Users — used everywhere
         ("users", [("compound_id", 1), ("role", 1)]),
         ("users", [("family_id", 1)]),
+        # 🔑 Critical for /api/auth/login speed — eliminates collection scan
+        ("users", [("username", 1)]),
+        ("users", [("email", 1)]),
 
         # Audit logs — admin queries
         ("audit_logs", [("timestamp", -1)]),

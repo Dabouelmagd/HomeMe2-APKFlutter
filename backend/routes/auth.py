@@ -258,7 +258,12 @@ async def login(user_data: UserLogin, request: Request):
     db = get_db()
     from audit_logger import audit_log
     user = await db.users.find_one({"username": user_data.username})
-    if not user or not verify_password(user_data.password, user["password_hash"]):
+    # Run bcrypt in a thread pool — verify_password is CPU-bound and would
+    # otherwise block the asyncio event loop (~250ms per call on prod CPUs).
+    password_ok = bool(user) and await asyncio.to_thread(
+        verify_password, user_data.password, user["password_hash"]
+    )
+    if not user or not password_ok:
         # Log failed login attempt
         await ActivityLogger.log_activity(
             action_type="login",

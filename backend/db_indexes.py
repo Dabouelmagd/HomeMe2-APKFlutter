@@ -51,6 +51,9 @@ async def ensure_indexes():
         ("users", [("username", 1)]),
         ("users", [("email", 1)]),
 
+        # Saved searches — used in /api/search/saved
+        ("saved_searches", [("user_id", 1), ("updated_at", -1)]),
+
         # Audit logs — admin queries
         ("audit_logs", [("timestamp", -1)]),
         ("audit_logs", [("user_id", 1), ("timestamp", -1)]),

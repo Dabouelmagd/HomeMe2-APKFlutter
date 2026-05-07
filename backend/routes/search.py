@@ -132,12 +132,14 @@ async def get_saved_searches(current_user: dict = Depends(get_current_user)):
     """Get user's saved searches"""
     try:
         db = get_db()
+        # current_user is a dict — handle both dict-style and attribute-style for safety
+        uid = current_user.get("id") if isinstance(current_user, dict) else getattr(current_user, "id", None)
         saved_searches = await db.saved_searches.find({
-            "user_id": current_user.id
-        }).sort("updated_at", -1).to_list(length=10000)
-        
+            "user_id": uid
+        }, {"_id": 0}).sort("updated_at", -1).to_list(length=200)
+
         return {"saved_searches": serialize_datetime(saved_searches)}
-        
+
     except Exception as e:
         logging.error(f"Error getting saved searches: {e}")
         raise HTTPException(status_code=500, detail="Failed to get saved searches")

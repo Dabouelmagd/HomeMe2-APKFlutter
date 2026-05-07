@@ -226,7 +226,37 @@ async def get_analytics_dashboard(
                 "net": round(rev_amt - exp_amt, 2),
             })
 
-        # Activity trend — last 5 days (weekday names)
+        # Action code → Arabic label translator
+        ACTION_AR = {
+            "add_family_member": "إضافة فرد عائلة",
+            "remove_family_member": "حذف فرد عائلة",
+            "create_user": "إنشاء حساب",
+            "update_user": "تحديث حساب",
+            "delete_user": "حذف حساب",
+            "create_resident": "إضافة ساكن",
+            "create_payment": "تسجيل دفعة",
+            "update_payment": "تحديث دفعة",
+            "create_invoice": "إنشاء فاتورة",
+            "create_complaint": "تسجيل شكوى",
+            "resolve_complaint": "حل شكوى",
+            "maintenance_request": "طلب صيانة",
+            "complete_maintenance": "إنجاز صيانة",
+            "create_announcement": "إعلان جديد",
+            "login": "تسجيل دخول",
+            "logout": "تسجيل خروج",
+            "create_compound": "إنشاء مجمع",
+            "create_visit": "تسجيل زيارة",
+            "checkin": "دخول زائر",
+            "checkout": "خروج زائر",
+            "upload_document": "رفع وثيقة",
+            "create_booking": "حجز جديد",
+            "cancel_booking": "إلغاء حجز",
+        }
+        def _tr(action: str) -> str:
+            return ACTION_AR.get(action, action.replace("_", " "))
+
+        # Activity trend — last 5 days (Arabic weekday names)
+        WEEKDAY_AR = {0: 'الإثنين', 1: 'الثلاثاء', 2: 'الأربعاء', 3: 'الخميس', 4: 'الجمعة', 5: 'السبت', 6: 'الأحد'}
         activity_trend = []
         for i in range(4, -1, -1):
             d_start = (now - timedelta(days=i)).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -236,7 +266,7 @@ async def get_analytics_dashboard(
                 cnt = await db.activity_logs.count_documents({**scope, "timestamp": {"$gte": d_start.isoformat(), "$lt": d_end.isoformat()}})
             except Exception:
                 cnt = 0
-            activity_trend.append({"label": d_start.strftime("%a"), "value": cnt})
+            activity_trend.append({"label": WEEKDAY_AR.get(d_start.weekday(), d_start.strftime("%a")), "value": cnt})
 
         # Recent activity (5 latest, prefer activity_logs, fallback audit_logs)
         recent_activity = []
@@ -244,7 +274,7 @@ async def get_analytics_dashboard(
             cursor = db.activity_logs.find(scope, {"_id": 0}).sort("timestamp", -1).limit(5)
             async for a in cursor:
                 recent_activity.append({
-                    "title": a.get("action", "Activity"),
+                    "title": _tr(a.get("action", "نشاط")),
                     "description": a.get("description") or a.get("details", ""),
                     "timestamp": a.get("timestamp"),
                 })
@@ -254,39 +284,39 @@ async def get_analytics_dashboard(
             cursor = db.audit_logs.find(scope, {"_id": 0}).sort("timestamp", -1).limit(5)
             async for a in cursor:
                 recent_activity.append({
-                    "title": a.get("action", "Activity"),
+                    "title": _tr(a.get("action", "نشاط")),
                     "description": f"{a.get('user_name','—')} • {a.get('target_type','')}",
                     "timestamp": a.get("timestamp"),
                 })
 
-        # Summary copy (data-driven)
+        # Summary copy (data-driven, Arabic)
         achievements = []
         if _delta(new_now, new_prev) > 0:
-            achievements.append(f"{_delta(new_now, new_prev)}% increase in new resident registrations")
+            achievements.append(f"زيادة {_delta(new_now, new_prev)}٪ في تسجيلات السكان الجدد")
         if collection_rate >= 80:
-            achievements.append(f"{collection_rate}% payment collection rate achieved")
+            achievements.append(f"تحقيق نسبة تحصيل {collection_rate}٪ للمدفوعات")
         if engagement_rate >= 50:
-            achievements.append(f"{engagement_rate}% user engagement maintained")
+            achievements.append(f"الحفاظ على معدل تفاعل {engagement_rate}٪ من المستخدمين")
         if not achievements:
-            achievements = ["Building activity baseline — first reporting period"]
+            achievements = ["بناء خط أساس النشاط — أول فترة تقارير"]
 
         improvements = []
         if pending_maint > 0:
-            improvements.append(f"{pending_maint} pending maintenance request(s)")
+            improvements.append(f"{pending_maint} طلب صيانة قيد الانتظار")
         if collection_rate < 80 and total_charges > 0:
-            improvements.append(f"Collection rate at {collection_rate}% — needs follow-up")
+            improvements.append(f"معدل التحصيل {collection_rate}٪ — يحتاج متابعة")
         if not improvements:
-            improvements = ["No critical operational gaps detected"]
+            improvements = ["لا توجد فجوات تشغيلية حرجة"]
 
         recommendations = []
         if pending_maint > 5:
-            recommendations.append("Reduce maintenance backlog — consider adding service providers")
+            recommendations.append("قلّل تراكم طلبات الصيانة — فكّر بإضافة مزودي خدمة")
         if engagement_rate < 50:
-            recommendations.append("Run engagement campaigns to activate inactive residents")
+            recommendations.append("شغّل حملات تفاعل لتنشيط السكان غير النشطين")
         if collection_rate < 90 and total_charges > 0:
-            recommendations.append("Send payment reminders for outstanding charges")
+            recommendations.append("أرسل تذكيرات دفع للمستحقات المتأخرة")
         if not recommendations:
-            recommendations = ["Operations are healthy — keep monitoring KPIs weekly"]
+            recommendations = ["العمليات صحية — استمر بمتابعة KPIs أسبوعياً"]
 
         analytics = {
             "scope": "compound" if compound_id else "global",

@@ -19,6 +19,11 @@ const ChangelogModal = () => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
+      // Read-once pattern: clear immediately so that any re-mount
+      // (route change, tab focus, React StrictMode double-mount, etc.)
+      // doesn't re-trigger the modal. The user's "close" button click
+      // will simply hide the React state.
+      localStorage.removeItem(STORAGE_KEY);
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
         setItems(parsed.slice(0, 6));
@@ -34,7 +39,7 @@ const ChangelogModal = () => {
   }, []);
 
   const close = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    // Already cleared on read; just hide the modal.
     setItems(null);
   };
 

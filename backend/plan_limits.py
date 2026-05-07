@@ -11,9 +11,9 @@ from database import get_db
 # Mirrors COMPANY_PLANS_CATALOGUE in routes/owner_subscriptions.py.
 # Keeping a copy here avoids a circular import at module-load time.
 _PLAN_LIMITS = {
-    "starter":            {"max_compounds": 1,  "max_residents": 50},
-    "company_startup":    {"max_compounds": 3,  "max_residents": 500},
-    "company_business":   {"max_compounds": 5,  "max_residents": 2000},
+    "starter":            {"max_compounds": 1,  "max_residents": 30},
+    "company_startup":    {"max_compounds": 3,  "max_residents": -1},
+    "company_business":   {"max_compounds": 8,  "max_residents": -1},
     "company_enterprise": {"max_compounds": -1, "max_residents": -1},
 }
 

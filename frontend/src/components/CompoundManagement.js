@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import DateInput from './DateInput';
 import { formatDate, formatRelativeTime } from '../utils/dateUtils';
 import TestUpdate from './TestUpdate';
+import PageHeader from './shared/PageHeader';
 import LanguageSwitcher from './LanguageSwitcher';
 import {
   BuildingOfficeIcon,
@@ -1111,24 +1112,20 @@ const CompoundManagement = () => {
   }
 
   return (
-    <div className="p-6">
-      <TestUpdate />
-      <div className="mb-8">
-        <div className="flex justify-between items-center">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-red-600 text-center">🔴 {t('updated_compound_management')}</h1>
-            <p className="text-gray-600 mt-2 text-center">
-              🚀 {t('new_features_added')}
-            </p>
-          </div>
-          <div className="ml-4">
-            <LanguageSwitcher />
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 p-6" dir="rtl" data-testid="compound-management">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <PageHeader
+          theme="blue"
+          icon={HomeIcon}
+          badge={t('compound_mgmt_badge', 'إدارة المجمع')}
+          title={t('updated_compound_management', 'إدارة المجمع')}
+          subtitle={t('new_features_added', 'كل أدوات إدارة الوحدات والسكان في مكان واحد')}
+          actions={<LanguageSwitcher />}
+          testId="compound-mgmt-header"
+        />
 
       {/* Enhanced Tab Navigation with Icons */}
-      <div className="mb-8 bg-white rounded-2xl shadow-lg border border-gray-200 p-2">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-2">
         <nav className="flex flex-wrap gap-2" aria-label="Tabs">
           <button
             onClick={() => setActiveTab('overview')}
@@ -3607,6 +3604,7 @@ const CompoundManagement = () => {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };

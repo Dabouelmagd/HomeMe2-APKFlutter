@@ -17,7 +17,7 @@ import {
   NewspaperIcon, LightBulbIcon, HomeModernIcon, FingerPrintIcon,
   QrCodeIcon, ClockIcon, PresentationChartBarIcon,
   BoltIcon, EnvelopeIcon, ArrowPathIcon,
-  ArrowRightOnRectangleIcon, Squares2X2Icon
+  ArrowRightOnRectangleIcon, Squares2X2Icon, XMarkIcon
 } from '@heroicons/react/24/outline';
 
 import InternalAdBanner from './InternalAdBanner';
@@ -92,6 +92,19 @@ const HomePage = () => {
   useEffect(() => {
     try { localStorage.setItem('preferred_currency', currency); } catch (e) { /* ignore */ }
   }, [currency]);
+
+  // Guide Modal — close on ESC + lock body scroll while open
+  useEffect(() => {
+    if (!openGuide) return;
+    const handleKey = (e) => { if (e.key === 'Escape') setOpenGuide(null); };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [openGuide]);
 
   // 🌐 Schema.org structured data — boosts Google rich-snippets (stars + ratings).
   useEffect(() => {
@@ -1116,18 +1129,58 @@ const HomePage = () => {
             const SelIcon = selected.icon;
             const isAI = ['ai_chat', 'ai_advisor', 'ai_autopilot', 'auto_credentials', 'subscription_analytics', 'stripe_recurring', 'multilang'].includes(selected.id);
             return (
-              <div className={`mt-4 border rounded-xl p-5 animate-in fade-in ${isAI ? 'bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 border-violet-200' : 'bg-blue-50 border-blue-200'}`}>
-                <div className="flex items-start gap-3">
-                  <div className={`text-white p-2.5 rounded-lg flex-shrink-0 ${isAI ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600' : 'bg-blue-600'}`}>
-                    <SelIcon className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className={`font-bold mb-1 ${isAI ? 'text-violet-900' : 'text-blue-900'}`}>{selected.title}</h3>
-                    <p className="text-gray-700 text-sm leading-relaxed">{selected.content}</p>
-                  </div>
-                  <button onClick={() => setOpenGuide(null)} className="text-gray-400 hover:text-gray-600 flex-shrink-0">
-                    <ChevronUpIcon className="h-5 w-5" />
+              <div
+                className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
+                onClick={() => setOpenGuide(null)}
+                data-testid="guide-modal-overlay"
+                role="dialog"
+                aria-modal="true"
+              >
+                <div
+                  className={`relative max-w-lg w-full rounded-2xl shadow-2xl p-6 md:p-8 ${isAI ? 'bg-gradient-to-br from-violet-50 via-white to-fuchsia-50 border-2 border-violet-300' : 'bg-white border-2 border-blue-300'}`}
+                  onClick={(e) => e.stopPropagation()}
+                  data-testid={`guide-modal-${selected.id}`}
+                >
+                  {/* Close Button — top corner */}
+                  <button
+                    onClick={() => setOpenGuide(null)}
+                    className="absolute top-3 left-3 w-9 h-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 flex items-center justify-center transition-all shadow-sm"
+                    aria-label="إغلاق"
+                    data-testid="guide-modal-close"
+                  >
+                    <XMarkIcon className="h-5 w-5" />
                   </button>
+
+                  {/* Header */}
+                  <div className="flex items-center gap-4 mb-5">
+                    <div className={`text-white p-3.5 rounded-2xl flex-shrink-0 shadow-lg ${isAI ? 'bg-gradient-to-br from-violet-600 to-fuchsia-600' : 'bg-gradient-to-br from-blue-600 to-indigo-600'}`}>
+                      <SelIcon className="h-7 w-7" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className={`font-black text-xl md:text-2xl leading-tight ${isAI ? 'text-violet-900' : 'text-blue-900'}`} style={{ fontFamily: "'Cairo', sans-serif" }}>
+                        {selected.title}
+                      </h3>
+                      {isAI && (
+                        <span className="inline-block mt-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white text-[10px] font-black px-2 py-0.5 rounded">
+                          ✨ ميزة جديدة
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Body */}
+                  <p className="text-gray-700 text-base leading-loose">{selected.content}</p>
+
+                  {/* Footer Action */}
+                  <div className="mt-6 pt-4 border-t border-gray-200 flex justify-end">
+                    <button
+                      onClick={() => setOpenGuide(null)}
+                      className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all hover:shadow-lg ${isAI ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white' : 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'}`}
+                      data-testid="guide-modal-confirm-close"
+                    >
+                      فهمت ✓
+                    </button>
+                  </div>
                 </div>
               </div>
             );

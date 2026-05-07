@@ -136,10 +136,11 @@ const MaintenanceSystem = () => {
       await axios.patch(`${API}/maintenance/requests/${requestId}/status`, {
         status: newStatus
       });
-      toast.success('Request status updated successfully!');
+      toast.success(t('status_updated_success', 'تم تحديث حالة الطلب بنجاح'));
       fetchMaintenanceData();
     } catch (error) {
-      toast.error('Failed to update request status');
+      const detail = error.response?.data?.detail || t('failed_update_status', 'فشل تحديث حالة الطلب');
+      toast.error(typeof detail === 'string' ? detail : t('failed_update_status', 'فشل تحديث حالة الطلب'));
       console.error('Status update error:', error);
     }
   };

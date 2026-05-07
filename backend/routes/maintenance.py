@@ -2,6 +2,7 @@
 Maintenance Request routes
 """
 from fastapi import APIRouter, HTTPException, Depends, Form, File, UploadFile
+from pydantic import BaseModel
 from datetime import datetime, timezone
 from typing import Optional, List
 from pathlib import Path
@@ -116,10 +117,21 @@ async def get_maintenance_stats(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Failed to fetch maintenance stats")
 
 
+class StatusUpdate(BaseModel):
+    status: str
+    notes: Optional[str] = None
+
+
 @router.patch("/maintenance/requests/{request_id}/status")
-async def update_maintenance_status(request_id: str, status: str = Form(...), notes: str = Form(None), current_user: dict = Depends(require_admin)):
+async def update_maintenance_status(
+    request_id: str,
+    payload: StatusUpdate,
+    current_user: dict = Depends(require_admin),
+):
     db = get_db()
     try:
+        status = payload.status
+        notes = payload.notes
         valid_statuses = ["pending", "assigned", "in_progress", "completed", "cancelled"]
         if status not in valid_statuses:
             raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
@@ -130,10 +142,22 @@ async def update_maintenance_status(request_id: str, status: str = Form(...), no
         if status == "completed":
             update_data["completed_at"] = datetime.now(timezone.utc)
         if notes:
-            note = {"author_id": current_user["id"], "author_name": current_user.get("full_name", ""), "note": notes, "timestamp": datetime.now(timezone.utc), "is_internal": False}
-            await db.maintenance_requests.update_one({"id": request_id}, {"$set": update_data, "$push": {"notes": note}})
+            note = {
+                "author_id": current_user["id"],
+                "author_name": current_user.get("full_name", ""),
+                "note": notes,
+                "timestamp": datetime.now(timezone.utc),
+                "is_internal": False,
+            }
+            await db.maintenance_requests.update_one(
+                {"id": request_id},
+                {"$set": update_data, "$push": {"notes": note}},
+            )
         else:
-            await db.maintenance_requests.update_one({"id": request_id}, {"$set": update_data})
+            await db.maintenance_requests.update_one(
+                {"id": request_id},
+                {"$set": update_data},
+            )
         return {"message": "Maintenance request status updated successfully"}
     except HTTPException:
         raise

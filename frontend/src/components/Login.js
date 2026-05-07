@@ -405,6 +405,57 @@ const Login = () => {
           <InternalAdBanner position="login_page" maxAds={1} variant="card" />
         </div>
 
+        {/* Why HomeMe — trust signals + key features */}
+        <div className="mt-6 bg-gradient-to-br from-indigo-50 via-white to-violet-50 border border-indigo-100 rounded-xl p-5" data-testid="login-why-homeme">
+          <div className="text-center mb-4">
+            <h3 className="text-base font-black text-gray-900 mb-1" style={{ fontFamily: "'Cairo', sans-serif" }}>
+              لماذا HomeMe؟
+            </h3>
+            <p className="text-xs text-gray-500">منصة سحابية متكاملة لإدارة المجتمعات السكنية</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            {[
+              { icon: '🏢', label: '25+ نظام', desc: 'متكامل في منصة واحدة' },
+              { icon: '🤖', label: 'AI Assistant', desc: 'مدعوم بـ Gemini' },
+              { icon: '🌍', label: '3 لغات', desc: 'AR / EN / FR' },
+              { icon: '🔒', label: 'آمن 100%', desc: 'TLS 1.3 + bcrypt' },
+              { icon: '📱', label: 'PWA Mobile', desc: 'يعمل على كل الأجهزة' },
+              { icon: '⚡', label: 'سريع جداً', desc: 'استجابة فورية' },
+            ].map((feat, i) => (
+              <div key={i} className="bg-white border border-gray-100 rounded-lg p-2.5 text-center hover:border-indigo-200 hover:shadow-sm transition-all">
+                <div className="text-xl mb-0.5">{feat.icon}</div>
+                <p className="text-xs font-bold text-gray-900">{feat.label}</p>
+                <p className="text-[10px] text-gray-500 leading-tight">{feat.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA: explore the homepage */}
+          <Link
+            to="/"
+            className="block w-full text-center px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:shadow-lg hover:shadow-indigo-500/30 text-white rounded-xl font-bold text-sm transition-all"
+            data-testid="explore-homepage-btn"
+          >
+            🚀 استكشف كل المميزات والأسعار
+          </Link>
+        </div>
+
+        {/* Quick contact / support */}
+        <div className="mt-4 bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center" data-testid="login-support-card">
+          <p className="text-xs text-gray-600 mb-2">
+            <span className="font-bold text-emerald-700">محتاج مساعدة؟</span> فريق الدعم متاح 24/7
+          </p>
+          <div className="flex items-center justify-center gap-3 flex-wrap text-xs">
+            <Link to="/legal/contact" className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-emerald-200 rounded-lg font-bold text-emerald-700 hover:bg-emerald-100 transition" data-testid="login-contact-link">
+              📞 اتصل بنا
+            </Link>
+            <Link to="/testimonials/submit" className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-violet-200 rounded-lg font-bold text-violet-700 hover:bg-violet-100 transition" data-testid="login-review-link">
+              ⭐ شارك تقييمك
+            </Link>
+          </div>
+        </div>
+
         {/* Legal Links Footer */}
         <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-gray-500">
           <Link to="/legal/about" className="hover:text-violet-600 hover:underline" data-testid="legal-link-about">من نحن</Link>

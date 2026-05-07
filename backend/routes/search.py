@@ -187,10 +187,11 @@ async def update_saved_search(
     """Update a saved search"""
     try:
         db = get_db()
+        uid = current_user.get("id") if isinstance(current_user, dict) else getattr(current_user, "id", None)
         # Check if search exists and belongs to user
         existing = await db.saved_searches.find_one({
             "id": search_id,
-            "user_id": current_user.id
+            "user_id": uid
         })
         
         if not existing:
@@ -198,7 +199,7 @@ async def update_saved_search(
         
         # Check if new name conflicts with other searches
         name_conflict = await db.saved_searches.find_one({
-            "user_id": current_user.id,
+            "user_id": uid,
             "name": save_request.name,
             "id": {"$ne": search_id}
         })
@@ -216,7 +217,7 @@ async def update_saved_search(
         }
         
         await db.saved_searches.update_one(
-            {"id": search_id, "user_id": current_user.id},
+            {"id": search_id, "user_id": uid},
             {"$set": update_data}
         )
         
@@ -236,9 +237,10 @@ async def delete_saved_search(
     """Delete a saved search"""
     try:
         db = get_db()
+        uid = current_user.get("id") if isinstance(current_user, dict) else getattr(current_user, "id", None)
         result = await db.saved_searches.delete_one({
             "id": search_id,
-            "user_id": current_user.id
+            "user_id": uid
         })
         
         if result.deleted_count == 0:

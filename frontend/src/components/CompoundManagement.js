@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import DateInput from './DateInput';
 import { formatDate, formatRelativeTime } from '../utils/dateUtils';
-import TestUpdate from './TestUpdate';
 import PageHeader from './shared/PageHeader';
 import LanguageSwitcher from './LanguageSwitcher';
 import {
@@ -1118,8 +1117,8 @@ const CompoundManagement = () => {
           theme="blue"
           icon={HomeIcon}
           badge={t('compound_mgmt_badge', 'إدارة المجمع')}
-          title={t('updated_compound_management', 'إدارة المجمع')}
-          subtitle={t('new_features_added', 'كل أدوات إدارة الوحدات والسكان في مكان واحد')}
+          title={t('compound_management_title', 'إدارة المجمع')}
+          subtitle={t('compound_management_subtitle', 'كل أدوات إدارة الوحدات والسكان في مكان واحد')}
           actions={<LanguageSwitcher />}
           testId="compound-mgmt-header"
         />

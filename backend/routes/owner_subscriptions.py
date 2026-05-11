@@ -248,13 +248,14 @@ async def get_company_subscriptions(
     per_page: int = 20,
     current_user: dict = Depends(get_current_user)
 ):
-    """Get all company subscriptions for app owner"""
+    """Get all company subscriptions for app owner — OPTIMIZED batch version."""
     if current_user.get("role") not in ["app_owner", "super_admin"]:
         raise HTTPException(403, "App Owner access required")
 
     db = get_db()
+    now = datetime.now(timezone.utc)
 
-    # Get all companies
+    # 1) Companies (cap to 1000 — sane upper bound for the dashboard)
     query = {}
     if search:
         query["$or"] = [
@@ -262,10 +263,47 @@ async def get_company_subscriptions(
             {"company_code": {"$regex": search, "$options": "i"}},
             {"contact_email": {"$regex": search, "$options": "i"}},
         ]
+    companies = await db.companies.find(query, {"_id": 0}).to_list(length=1000)
+    company_ids = [c.get("id", "") for c in companies if c.get("id")]
 
-    companies = await db.companies.find(query, {"_id": 0}).to_list(length=10000)
+    # 2) Subscriptions — 1 query for all
+    subs_cursor = db.company_subscriptions.find({"company_id": {"$in": company_ids}}, {"_id": 0})
+    subs_by_company = {}
+    async for s in subs_cursor:
+        subs_by_company[s.get("company_id")] = s
 
-    # Enrich with subscription and compound data
+    # 3) Compounds — 1 query for all
+    compounds_cursor = db.compound_companies.find(
+        {"company_id": {"$in": company_ids}, "status": "active"}, {"_id": 0}
+    )
+    compounds_by_company = {}
+    all_compound_ids = []
+    async for c in compounds_cursor:
+        cid = c.get("company_id")
+        compounds_by_company.setdefault(cid, []).append(c)
+        cmp_id = c.get("id") or c.get("compound_id")
+        if cmp_id:
+            all_compound_ids.append(cmp_id)
+
+    # 4) Aggregate residents/families counts per compound — 2 aggregations total
+    residents_by_compound = {}
+    families_by_compound = {}
+    if all_compound_ids:
+        pipeline_residents = [
+            {"$match": {"compound_id": {"$in": all_compound_ids}, "role": "resident", "is_active": True}},
+            {"$group": {"_id": "$compound_id", "count": {"$sum": 1}}},
+        ]
+        async for r in db.users.aggregate(pipeline_residents):
+            residents_by_compound[r["_id"]] = r["count"]
+
+        pipeline_families = [
+            {"$match": {"compound_id": {"$in": all_compound_ids}}},
+            {"$group": {"_id": "$compound_id", "count": {"$sum": 1}}},
+        ]
+        async for r in db.families.aggregate(pipeline_families):
+            families_by_compound[r["_id"]] = r["count"]
+
+    # 5) Build results
     results = []
     total_revenue = 0
     active_count = 0
@@ -273,30 +311,12 @@ async def get_company_subscriptions(
 
     for company in companies:
         cid = company.get("id", "")
-
-        # Get subscription
-        sub = await db.company_subscriptions.find_one(
-            {"company_id": cid}, {"_id": 0}
-        )
-
-        # Get compounds
-        compounds = await db.compound_companies.find(
-            {"company_id": cid, "status": "active"}, {"_id": 0}
-        ).to_list(length=10000)
-
-        # Count residents across all compounds
+        sub = subs_by_company.get(cid)
+        compounds = compounds_by_company.get(cid, [])
         compound_ids = [c.get("id", c.get("compound_id", "")) for c in compounds]
-        total_residents = 0
-        total_families = 0
-        if compound_ids:
-            total_residents = await db.users.count_documents({
-                "compound_id": {"$in": compound_ids},
-                "role": "resident",
-                "is_active": True
-            })
-            total_families = await db.families.count_documents({
-                "compound_id": {"$in": compound_ids}
-            })
+
+        total_residents = sum(residents_by_compound.get(cmp_id, 0) for cmp_id in compound_ids)
+        total_families = sum(families_by_compound.get(cmp_id, 0) for cmp_id in compound_ids)
 
         # Determine status
         is_active = True
@@ -314,7 +334,7 @@ async def get_company_subscriptions(
                     if isinstance(end_date, datetime):
                         if end_date.tzinfo is None:
                             end_date = end_date.replace(tzinfo=timezone.utc)
-                        is_active = end_date > datetime.now(timezone.utc)
+                        is_active = end_date > now
 
         if is_active:
             active_count += 1
@@ -324,7 +344,6 @@ async def get_company_subscriptions(
         plan_price = sub.get("plan_price", 0) if sub else 0
         total_revenue += plan_price
 
-        # Attach plan catalogue metadata (features, limits) for this company
         plan_key = sub.get("plan", "starter") if sub else "starter"
         plan_meta = next((p for p in COMPANY_PLANS_CATALOGUE if p["key"] == plan_key), None)
 
@@ -337,7 +356,7 @@ async def get_company_subscriptions(
             "created_at": company.get("created_at"),
             "plan": plan_key,
             "plan_price": plan_price,
-            "plan_meta": plan_meta,  # full catalogue entry with features
+            "plan_meta": plan_meta,
             "subscription_start": sub.get("current_period_start") if sub else None,
             "subscription_end": sub.get("current_period_end") if sub else None,
             "is_active": is_active,

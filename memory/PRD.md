@@ -4,7 +4,30 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
-### Iter 119: CompoundManagement UI Unification — Feb 11, 2026 ✅
+### Iter 120: CompoundManagement Modular Refactor (Phase 1: Modals) — Feb 11, 2026 ✅
+
+**🎯 الطلب:** البدء بتقسيم `CompoundManagement.js` (3612 سطر) إلى مكوّنات فرعية أصغر، مماثل لما فُعل سابقاً مع `HomePage.js`.
+
+**Phase 1 — Modal Extraction (الإنجاز):**
+استخراج 7 مودالات من `CompoundManagement.js` إلى مجلد مخصص:
+- `compound/modals/EditUnitModal.js` (147 سطر)
+- `compound/modals/EditMemberModal.js` (183 سطر)
+- `compound/modals/DeleteConfirmModal.js` (74 سطر)
+- `compound/modals/AddAdminModal.js` (151 سطر)
+- `compound/modals/AddRegistrationLinkModal.js` (137 سطر)
+- `compound/modals/AddNewResidenceModal.js` (139 سطر)
+- `compound/modals/CompoundSelectionModal.js` (114 سطر)
+
+كل مودال تم تحويله إلى مكوّن presentational يستقبل props (state + handlers) من الـ parent. أُضيف لكل عنصر `data-testid` لتسهيل الاختبار التلقائي.
+
+**📊 النتيجة:**
+- 🔻 `CompoundManagement.js`: من **3612 سطر → 2841 سطر** (تقليل 771 سطر = 21%).
+- ✅ Lint نظيف على كل الملفات الجديدة والـ parent.
+- ✅ Smoke test مرّ: الصفحة تُحمَّل صحيحاً، الـ tabs تعمل، فتح/إغلاق `AddAdminModal` يعمل بكفاءة كاملة.
+
+**Phase 2 (متبقي):** استخراج الـ Comprehensive Family Creation Modal (~543 سطر) والـ 6 tabs.
+
+
 
 **🎯 الطلب:** توحيد واجهة صفحة `إدارة المجمع` لتتطابق مع باقي الـ 15+ لوحة تحكم الموحدة سابقاً، وإزالة بانر الاختبار الأحمر (`🔴 تم تحديث الواجهة الأمامية بنجاح`).
 

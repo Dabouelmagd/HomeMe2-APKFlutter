@@ -25,13 +25,21 @@ import {
   PlusIcon,
 } from '@heroicons/react/24/outline';
 
-// Lazy-loaded tab components — reduce initial bundle size & speed up first paint
-const OverviewTab = React.lazy(() => import('./compound/tabs/OverviewTab'));
-const ResidencesTab = React.lazy(() => import('./compound/tabs/ResidencesTab'));
-const RegistrationLinksTab = React.lazy(() => import('./compound/tabs/RegistrationLinksTab'));
-const ManageUsersTab = React.lazy(() => import('./compound/tabs/ManageUsersTab'));
-const AddAdminTab = React.lazy(() => import('./compound/tabs/AddAdminTab'));
-const SettingsTab = React.lazy(() => import('./compound/tabs/SettingsTab'));
+// Lazy-loaded tab components with hover/focus preloading — reduce initial bundle size
+// and start fetching a tab's chunk the moment the user shows intent (mouseenter / focus).
+// `preload()` triggers the dynamic import; bundler de-duplicates so calling it many times is safe.
+const lazyWithPreload = (importFn) => {
+  const Component = React.lazy(importFn);
+  Component.preload = importFn;
+  return Component;
+};
+
+const OverviewTab = lazyWithPreload(() => import('./compound/tabs/OverviewTab'));
+const ResidencesTab = lazyWithPreload(() => import('./compound/tabs/ResidencesTab'));
+const RegistrationLinksTab = lazyWithPreload(() => import('./compound/tabs/RegistrationLinksTab'));
+const ManageUsersTab = lazyWithPreload(() => import('./compound/tabs/ManageUsersTab'));
+const AddAdminTab = lazyWithPreload(() => import('./compound/tabs/AddAdminTab'));
+const SettingsTab = lazyWithPreload(() => import('./compound/tabs/SettingsTab'));
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -1118,6 +1126,9 @@ const CompoundManagement = () => {
         <nav className="flex flex-wrap gap-2" aria-label="Tabs">
           <button
             onClick={() => setActiveTab('overview')}
+            onMouseEnter={() => OverviewTab.preload()}
+            onFocus={() => OverviewTab.preload()}
+            data-testid="tab-overview"
             className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
               activeTab === 'overview'
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
@@ -1130,6 +1141,9 @@ const CompoundManagement = () => {
           
           <button
             onClick={() => setActiveTab('residences')}
+            onMouseEnter={() => ResidencesTab.preload()}
+            onFocus={() => ResidencesTab.preload()}
+            data-testid="tab-residences"
             className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
               activeTab === 'residences'
                 ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
@@ -1148,6 +1162,9 @@ const CompoundManagement = () => {
           {isAdmin && (
             <button
               onClick={() => setActiveTab('registration-links')}
+              onMouseEnter={() => RegistrationLinksTab.preload()}
+              onFocus={() => RegistrationLinksTab.preload()}
+              data-testid="tab-registration-links"
               className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
                 activeTab === 'registration-links'
                   ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
@@ -1168,6 +1185,9 @@ const CompoundManagement = () => {
             <button
               id="manage-users-tab-v2"
               onClick={() => setActiveTab('manage-users')}
+              onMouseEnter={() => ManageUsersTab.preload()}
+              onFocus={() => ManageUsersTab.preload()}
+              data-testid="tab-manage-users"
               className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
                 activeTab === 'manage-users'
                   ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white shadow-lg'
@@ -1183,6 +1203,9 @@ const CompoundManagement = () => {
             <button
               id="add-admin-tab-v2"
               onClick={() => setActiveTab('add-admin')}
+              onMouseEnter={() => AddAdminTab.preload()}
+              onFocus={() => AddAdminTab.preload()}
+              data-testid="tab-add-admin"
               className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
                 activeTab === 'add-admin'
                   ? 'bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg'
@@ -1196,6 +1219,9 @@ const CompoundManagement = () => {
           
           <button
             onClick={() => setActiveTab('settings')}
+            onMouseEnter={() => SettingsTab.preload()}
+            onFocus={() => SettingsTab.preload()}
+            data-testid="tab-settings"
             className={`flex items-center gap-2 py-3 px-6 rounded-xl font-semibold text-sm transition-all duration-200 ${
               activeTab === 'settings'
                 ? 'bg-gradient-to-r from-gray-600 to-slate-600 text-white shadow-lg'

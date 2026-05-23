@@ -4,7 +4,25 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
-### Iter 121: CompoundManagement Modular Refactor (Phases 2+3 + Lazy Loading) — Feb 11, 2026 ✅
+### Iter 122: Smart Tab Preloading (Hover-Triggered) — Feb 11, 2026 ✅
+
+**🎯 الطلب:** إضافة intelligent preloading للـ tabs — لما المستخدم يعمل hover على tab، يبدأ تحميل الـ chunk في الخلفية قبل ما يضغط.
+
+**التنفيذ:**
+- 🧰 Helper `lazyWithPreload(importFn)` في `CompoundManagement.js` يلفّ `React.lazy` ويُرفق دالة `.preload()` بالـ component.
+- 🖱️ كل tab button بقى يحوي `onMouseEnter={() => Tab.preload()}` و `onFocus={() => Tab.preload()}` (للـ keyboard accessibility).
+- 📦 الـ bundler يعمل de-duplication تلقائي — استدعاء `preload()` عدة مرات آمن ومجاني.
+- 🆔 إضافة `data-testid` لكل tab button (tab-overview, tab-residences, tab-registration-links, tab-manage-users, tab-add-admin, tab-settings).
+
+**📊 النتيجة المُثبتة بالاختبار:**
+- ✅ **Initial load:** 1 chunk فقط (OverviewTab الافتراضي).
+- ✅ **Hover Settings → بدون click:** `SettingsTab.chunk.js` اتنزّل في الخلفية.
+- ✅ **Hover Residences:** `ResidencesTab.chunk.js` اتنزّل في الخلفية.
+- ✅ **Click Settings:** فُتح فوراً (Suspense ما عرضش spinner لأن الـ chunk بالفعل cached).
+
+**👀 تجربة المستخدم:** التنقل بين الـ tabs الآن feels instant، بدون استهلاك bandwidth على الـ tabs اللي مش هيدخلها.
+
+
 
 **🎯 الطلب:** إكمال refactor الـ `CompoundManagement.js` بالكامل + إضافة Lazy Loading للـ tabs.
 

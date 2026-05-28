@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api")
 async def get_facilities(compound_id: str = None, current_user: dict = Depends(get_current_user)):
     db = get_db()
     if not compound_id:
-        compound_id = current_user["compound_id"]
+        compound_id = current_user.get("compound_id") or ""
     facility_service = FacilityBookingService(db)
     facilities = await facility_service.get_facilities(compound_id)
     return {"facilities": facilities}
@@ -101,7 +101,7 @@ async def get_facility_bookings(facility_id: str = None, date: str = None, statu
     user_id = None
     if user_only or current_user.get("role") == "resident":
         user_id = str(current_user["id"])
-    bookings = await facility_service.get_bookings(compound_id=current_user["compound_id"], user_id=user_id, facility_id=facility_id, date=date, status=status, limit=limit)
+    bookings = await facility_service.get_bookings(compound_id=current_user.get("compound_id") or "", user_id=user_id, facility_id=facility_id, date=date, status=status, limit=limit)
     return {"bookings": bookings}
 
 

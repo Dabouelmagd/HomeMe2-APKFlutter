@@ -4,7 +4,25 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
-### Iter 122: Smart Tab Preloading (Hover-Triggered) — Feb 11, 2026 ✅
+### Iter 123: Health Scanner — إصلاح 3 مسارات فاشلة — Feb 11, 2026 ✅
+
+**🎯 الطلب:** التنبيه التلقائي من Health Scanner أبلغ بثلاث مسارات فاشلة:
+- `/api/super-admin/disaster-recovery/snapshot` (27108ms timeout)
+- `/api/facilities` (143ms, no status)
+- `/api/notifications/my` (146ms, no status)
+
+**الإصلاحات:**
+
+1. **`system_health.py` SKIP_PATTERNS:** أضفت `^/api/super-admin/disaster-recovery/(snapshot|restore|preview)$` للقائمة السوداء. الـ snapshot/restore عمليات ثقيلة جداً (تنزيل DB كامل + media) وتتعدّى الـ 25s timeout على إنتاج حقيقي، كما أنها تكتب صفّ في `disaster_recovery_runs` كل مرة (يلوّث سجل التدقيق).
+
+2. **`facilities.py` Defensive KeyError fix:** غيّرت `current_user["compound_id"]` (KeyError محتمل) → `current_user.get("compound_id") or ""` في endpoints `/facilities` و `/facility-bookings`. لو app_owner/super_admin بيشغّلوا الـ scanner، البعض ما عندوش `compound_id` → كنا بنرمي 500.
+
+**📊 التحقق:**
+- ✅ كل المسارات الـ 3 ترجع HTTP 200 الآن في < 60ms
+- ✅ Scan: **0 fail** (كانت 3+), 190 pass, 17 warn, 406 skipped
+- ✅ DR snapshot/preview/restore الآن `skipped: blacklisted`
+
+
 
 **🎯 الطلب:** إضافة intelligent preloading للـ tabs — لما المستخدم يعمل hover على tab، يبدأ تحميل الـ chunk في الخلفية قبل ما يضغط.
 

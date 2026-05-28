@@ -41,6 +41,10 @@ SKIP_PATTERNS = [
     r"^/api/ws",                         # websocket upgrade
     r"^/api/invite-drip/run",            # POST anyway, but defense-in-depth
     r"^/api/.*\.css$|^/api/.*\.js$",     # static
+    # Heavy/destructive admin operations — never exercise these in a health scan.
+    # Snapshot streams the whole DB + media (can exceed 25s timeout on prod) and
+    # writes a row to disaster_recovery_runs each call, polluting audit history.
+    r"^/api/super-admin/disaster-recovery/(snapshot|restore|preview)$",
 ]
 
 PATH_PARAM_RE = re.compile(r"\{([^}]+)\}")

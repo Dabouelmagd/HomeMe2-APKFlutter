@@ -79,7 +79,14 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
   // Check settings for this position
   const posSettings = adSettings?.positions?.[position] || { mode: 'internal_first', adsense_enabled: true, internal_enabled: true };
   const globalAdsenseEnabled = adSettings?.adsense_global_enabled !== false;
-  const showAdsense = globalAdsenseEnabled && posSettings.adsense_enabled && visibleAds.length === 0;
+
+  // AdSense Policy compliance: positions that historically appear on screens
+  // with little/no publisher content (auth, slim notifications widget, etc.)
+  // never get AdSense fallback — only manually-curated internal ads.
+  const LOW_CONTENT_POSITIONS = new Set(['login_page', 'notification', 'sidebar']);
+  const adsenseAllowedForPosition = !LOW_CONTENT_POSITIONS.has(position);
+
+  const showAdsense = globalAdsenseEnabled && posSettings.adsense_enabled && adsenseAllowedForPosition && visibleAds.length === 0;
   const showInternal = posSettings.internal_enabled !== false;
 
   // Nothing to show

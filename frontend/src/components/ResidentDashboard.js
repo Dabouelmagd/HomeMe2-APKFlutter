@@ -95,9 +95,6 @@ const ResidentDashboard = () => {
         </div>
       )}
 
-      {/* Dashboard Banner Ad */}
-      <InternalAdBanner position="dashboard" maxAds={1} variant="full" className="" />
-
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[

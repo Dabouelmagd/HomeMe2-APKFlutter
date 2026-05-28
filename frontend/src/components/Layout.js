@@ -1288,8 +1288,8 @@ const Layout = ({ children, isTrialMode = false }) => {
 
         {/* Page content - Scrollable */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden page-scroll">
-          {/* Top Banner Ad - only for residents */}
-          {!isAppOwner && !isAdminRole && (
+          {/* Top Banner Ad - only for residents, never on low-content routes */}
+          {!isAppOwner && !isAdminRole && !isLowContentRoute && (
             <div className="max-w-7xl mx-auto px-4 pt-3">
               <InternalAdBanner position="banner" maxAds={1} variant="full" />
             </div>

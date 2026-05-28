@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /blog
+Allow: /blog/
+Allow: /legal/
+
+# Disallow private/app routes — no need for search engines
+Disallow: /app/
+Disallow: /api/
+Disallow: /select-account
+Disallow: /select-compound
+Disallow: /onboarding/
+Disallow: /admin/
+Disallow: /super-admin/
+
+Sitemap: https://homemeapp.net/sitemap.xml

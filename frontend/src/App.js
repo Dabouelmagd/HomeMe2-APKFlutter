@@ -38,6 +38,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import DebugLogin from './components/DebugLogin';
 import HomePage from './components/HomePage';
+const BlogIndex = React.lazy(() => import('./pages/BlogIndex'));
+const BlogPost = React.lazy(() => import('./pages/BlogPost'));
 import OwnerDashboard from './components/OwnerDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import ResidentDashboard from './components/ResidentDashboard';
@@ -678,6 +680,24 @@ function App() {
 
                 {/* Public testimonial submission */}
                 <Route path="/testimonials/submit" element={<TestimonialSubmitPage />} />
+
+                {/* Blog / Content Hub — AdSense compliance + SEO + content marketing */}
+                <Route
+                  path="/blog"
+                  element={
+                    <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>}>
+                      <BlogIndex />
+                    </React.Suspense>
+                  }
+                />
+                <Route
+                  path="/blog/:slug"
+                  element={
+                    <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>}>
+                      <BlogPost />
+                    </React.Suspense>
+                  }
+                />
 
                 <Route path="/app" element={
                   <ProtectedRoute>

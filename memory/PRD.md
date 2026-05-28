@@ -4,7 +4,47 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
-### Iter 123: Health Scanner — إصلاح 3 مسارات فاشلة — Feb 11, 2026 ✅
+### Iter 124: AdSense Policy Fix + Content Hub — Feb 11, 2026 ✅
+
+**🎯 الطلب:** رسالة من Google AdSense على `homemeapp.net` تفيد بـ "Google-served ads on screens without publisher-content" + "Low value content". اختار المستخدم خيار 🅾️ (الاتنين معاً: إخفاء + بناء Content Hub).
+
+**Phase 1 — إخفاء الإعلانات من الصفحات الـ low-content:**
+1. **`Login.js`** — إزالة `<InternalAdBanner>` بالكامل + إزالة الـ import (شاشة auth بدون محتوى نشر).
+2. **`NotificationCenter.js`** — الإعلان يُعرض فقط لو `notifications.length > 0` (محتوى موجود).
+3. **`ResidentDashboard.js`** — إزالة الـ top banner ad قبل الـ stats grid (كان يظهر في صفحة فاضية).
+4. **`Layout.js`** — `LOW_CONTENT_ROUTES` array يُخفي sidebar/banner ads على `/select-account`, `/onboarding`, `/wizard`, `/register`, إلخ.
+5. **`InternalAdBanner.js`** — Defense-in-depth: AdSense fallback ممنوع على positions `login_page`, `notification`, `sidebar`.
+6. **`Layout.js`** — تنظيف 525 byte من orphaned code بعد `export default`.
+
+**Phase 2 — Content Hub / Blog:**
+- 📝 **`content/blogPosts.js`** (5 مقالات عربية، **~5,000 كلمة إجمالي**):
+  - الدليل الشامل لإدارة المجمعات السكنية (1013 كلمة)
+  - حساب رسوم الصيانة بشكل عادل (9 دقائق)
+  - أمن المجمعات السكنية في 2026 (11 دقيقة)
+  - 3 أسرار لرفع رضا السكان من 60% إلى 95% (7 دقائق)
+  - لماذا يحتاج كل مجمع تطبيقاً للموبايل (8 دقائق)
+- 📄 **`pages/BlogIndex.js`** — listing page بـ category filter + Schema.org `Blog` markup.
+- 📄 **`pages/BlogPost.js`** — article view بـ Schema.org `Article` markup + 2 ad slots **داخل** المحتوى (compliant) + related posts + CTA.
+- 🪝 **`hooks/useSEO.js`** — lightweight SEO hook (title + meta + JSON-LD + OG + Twitter) بدون react-helmet-async dep.
+- 📑 **Custom markdown renderer** — H2/H3/bold/lists/tables/blockquotes بدون مكتبة خارجية.
+- 🗺️ **`public/sitemap.xml`** + **`public/robots.txt`** — Google يكتشف كل المقالات و legal pages.
+- 🔗 **HomePage footer** — لينك "المدوّنة" مضاف للـ navigation.
+
+**Routes الجديدة (lazy-loaded):**
+- `/blog` → `BlogIndex`
+- `/blog/:slug` → `BlogPost`
+
+**📊 التحقق:**
+- ✅ `/login` — 0 ads مرئية، الـ "Why HomeMe" trust signals باقية.
+- ✅ `/blog` — 5 cards بتصنيفات وصور، JSON-LD موجود في الـ HTML head.
+- ✅ `/blog/idarat-mojama3at-sakaniyya-shamil` — 1013 كلمة، 9 H2، 2 ad slots داخل المحتوى، Schema.org Article markup.
+- ✅ Lint نظيف على كل ملف جديد (BlogIndex, BlogPost, useSEO, blogPosts).
+
+**Files Created/Modified:**
+- ✏️ `Login.js`, `NotificationCenter.js`, `ResidentDashboard.js`, `Layout.js`, `InternalAdBanner.js`, `HomePage.js`, `App.js`
+- 🆕 `content/blogPosts.js`, `pages/BlogIndex.js`, `pages/BlogPost.js`, `hooks/useSEO.js`, `public/sitemap.xml`, `public/robots.txt`
+
+
 
 **🎯 الطلب:** التنبيه التلقائي من Health Scanner أبلغ بثلاث مسارات فاشلة:
 - `/api/super-admin/disaster-recovery/snapshot` (27108ms timeout)

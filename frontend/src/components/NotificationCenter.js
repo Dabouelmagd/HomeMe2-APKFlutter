@@ -161,8 +161,10 @@ const NotificationCenter = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-rose-950 to-gray-900 p-6" dir="rtl" data-testid="notification-center">
       <div className="max-w-6xl mx-auto space-y-6">
-        {/* Notification Page Ad */}
-        <InternalAdBanner position="notification" maxAds={1} variant="slim" />
+        {/* Notification Page Ad — only when the user actually has content (notifications) */}
+        {notifications.length > 0 && (
+          <InternalAdBanner position="notification" maxAds={1} variant="slim" />
+        )}
 
         {/* Unified Page Header */}
         <PageHeader

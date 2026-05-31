@@ -2465,8 +2465,10 @@ from routes.compound_subscription import router as compound_subscription_router
 from routes.linked_accounts import router as linked_accounts_router
 from routes.payment_analytics import router as payment_analytics_router
 from routes.alerts import router as alerts_router
+from routes.blog import router as blog_router
 
 app.include_router(monitoring_router)
+app.include_router(blog_router)
 app.include_router(finance_router)
 app.include_router(ratings_router2)
 app.include_router(contracts_router)

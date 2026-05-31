@@ -4,7 +4,91 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
-### Iter 124: AdSense Policy Fix + Content Hub — Feb 11, 2026 ✅
+### Iter 126: AI SEO Suggester في الـ CMS — Feb 11, 2026 ✅
+
+**🎯 الطلب:** إضافة "تحسين SEO تلقائي" للـ CMS — لما السوبر-أدمن يكتب مقال، AI يقترح عنوان أفضل، ملخّص جذّاب، وكلمات مفتاحية باستخدام Gemini 3 Flash.
+
+**🤖 Backend (`routes/blog.py`):**
+- `POST /api/super-admin/blog/ai-seo-suggest` — يستقبل `{title, body, category?}` ويرجّع `{title, excerpt, keywords[], category, reading_minutes}`.
+- يستخدم `emergentintegrations.LlmChat` مع `gemini-3-flash-preview` و `EMERGENT_LLM_KEY`.
+- Prompt مُهندس بالعربية ليرجّع JSON فقط، مع validation لتصنيف ضمن قائمة مسموحة.
+- Defensive parsing: يستخرج JSON من ردّ AI حتى لو لُفّ في ```markdown fences.
+
+**🎨 Frontend (`BlogManagementTab.js`):**
+- زرّ gradient (purple/pink) "✨ تحسين SEO بالـ AI" في رأس الـ modal.
+- يدفع `{title, body, category}` للـ API ويعرض panel نتائج بنفسجي تحت الزرّ.
+- لكل اقتراح زرّ "طبّق" مستقل + زرّ "✨ طبّق كل الاقتراحات" دفعة واحدة.
+- Validation: يطلب 50+ حرف في الـ body قبل إرسال الطلب.
+- Disabled state أثناء التحليل + توست نجاح/فشل.
+
+**🧪 التحقق E2E:**
+- ✅ API ترجّع JSON صحيح في ~5s.
+- ✅ Modal يفتح بـ form فاضي → "مقال عن الصيانة" + body 280 حرف.
+- ✅ ضغط زرّ AI → loading → panel ظهر باقتراحات Gemini.
+- ✅ Apply all → عنوان+ملخص+keywords+category+reading_minutes اتطبّقوا تلقائياً.
+- ✅ Lint نظيف على FE+BE.
+
+**📝 مثال على جودة الـ AI:**
+- **Input:** "مقال عن الصيانة" (4 كلمات)
+- **AI Output:** "5 فوائد للصيانة الوقائية للمصاعد في المجمعات السكنية لتقليل التكاليف" (يبدأ برقم، يحتوي keyword أساسي، طول مثالي للـ SEO)
+
+**Files Modified:**
+- ✏️ `backend/routes/blog.py` (+1 endpoint, +~80 lines)
+- ✏️ `frontend/src/components/super-admin/BlogManagementTab.js` (+AI button, +panel, +state, +handlers)
+
+
+
+**🎯 الطلب:** بناء 3 تعزيزات لـ Content Hub: (1) مقالات إضافية، (2) نظام تعليقات، (3) CMS بسيط في super-admin.
+
+**📝 الجزء 1 — 5 مقالات إضافية (إجمالي 10):**
+1. **المسؤولية القانونية لمدير المجمع السكني** (10 دقائق) - قانون
+2. **10 تحديات جديدة تواجه مديري المجمعات في 2026** (11 دقيقة) - إدارة
+3. **كيف تتصرف الإدارة في الأزمات؟ 5 سيناريوهات حقيقية** (9 دقائق) - أمن
+4. **العقد الذكي بين المجمع والساكن: 12 بنداً لا غنى عنها** (8 دقائق) - إدارة
+5. **لجان السكان: السر الذي يحوّل المجمع لمجتمع** (7 دقائق) - تجربة مستخدم
+
+إجمالي 10 مقالات، ~10,000 كلمة محتوى عربي أصيل. تم تحديث `sitemap.xml` بكل الـ URLs.
+
+**💬 الجزء 2 — نظام التعليقات:**
+- **Backend** (`routes/blog.py`): 
+  - `POST /api/blog/comments` — submission عام مع rate-limit (5 تعليقات / 10 دقائق / IP).
+  - `GET /api/blog/posts/{slug}/comments` — يرجّع المعتمدة فقط للقرّاء.
+  - `GET/PATCH/DELETE /api/super-admin/blog/comments` — moderation للسوبر-أدمن.
+- **Frontend** (`CommentSection.js`):
+  - يظهر تحت كل مقال مع form ولاينج + قائمة معتمدة.
+  - Spam guard server-side + UX clear بـ "تخضع للمراجعة قبل النشر".
+
+**📊 الجزء 3 — CMS في السوبر-أدمن:**
+- **Backend** (`routes/blog.py`):
+  - `GET /api/blog/posts` (public) — يرجّع المقالات من DB.
+  - `POST/PATCH/DELETE /api/super-admin/blog/posts` — CRUD كامل، slug auto-generated، cascade delete للتعليقات.
+- **Frontend** (`super-admin/BlogManagementTab.js`):
+  - Tab جديد "📝 إدارة المدوّنة" في `SuperAdminPanel`.
+  - Sub-tab الأول "المقالات": list + form modal (Markdown editor + cover + keywords + draft/published).
+  - Sub-tab الثاني "التعليقات": queue بـ status filter (pending/approved/rejected/all) + 3 actions (اعتمد/ارفض/احذف).
+- **BlogIndex.js**: يدمج المقالات الـ DB-backed مع الـ hardcoded، de-dup by slug.
+- **BlogPost.js**: لو المقال مش في hardcoded، يحاول الـ DB قبل الـ redirect.
+
+**🧪 التحقق E2E:**
+- ✅ 10 cards تظهر على `/blog`.
+- ✅ Comment submit يرجّع toast "تم استلام تعليقك" + form يُمسح.
+- ✅ Comment يدخل moderation queue، السوبر-أدمن يشوفه ويعتمده.
+- ✅ بعد الاعتماد، يظهر للقرّاء على المقال.
+- ✅ CMS tab يفتح، sub-tabs شغّالة، actions موجودة لكل عنصر.
+- ✅ Backend routes: 200 OK، لا أخطاء، Lint نظيف على FE + BE.
+
+**Files Created/Modified:**
+- 🆕 `backend/routes/blog.py` (collection: `blog_comments`, `blog_posts`)
+- 🆕 `frontend/src/components/CommentSection.js`
+- 🆕 `frontend/src/components/super-admin/BlogManagementTab.js`
+- ✏️ `backend/server.py` (register router)
+- ✏️ `frontend/src/content/blogPosts.js` (+5 articles)
+- ✏️ `frontend/src/pages/BlogIndex.js` (merge DB + hardcoded)
+- ✏️ `frontend/src/pages/BlogPost.js` (CommentSection + DB fallback)
+- ✏️ `frontend/src/components/SuperAdminPanel.js` (new tab)
+- ✏️ `frontend/public/sitemap.xml` (+5 URLs)
+
+
 
 **🎯 الطلب:** رسالة من Google AdSense على `homemeapp.net` تفيد بـ "Google-served ads on screens without publisher-content" + "Low value content". اختار المستخدم خيار 🅾️ (الاتنين معاً: إخفاء + بناء Content Hub).
 

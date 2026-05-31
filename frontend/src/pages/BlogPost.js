@@ -1,9 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
+import axios from 'axios';
 import useSEO from '../hooks/useSEO';
 import { findPostBySlug, BLOG_POSTS } from '../content/blogPosts';
 import InternalAdBanner from '../components/InternalAdBanner';
+import CommentSection from '../components/CommentSection';
 import { ArrowLongRightIcon, CalendarIcon, ClockIcon, UserIcon, TagIcon } from '@heroicons/react/24/outline';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /**
  * Lightweight markdown-to-React renderer.
@@ -146,13 +150,43 @@ const renderMarkdown = (md, midAd) => {
 
 const BlogPost = () => {
   const { slug } = useParams();
-  const post = findPostBySlug(slug);
+  const [dbPost, setDbPost] = useState(null);
+  const [loadingDb, setLoadingDb] = useState(false);
+  const hardcodedPost = findPostBySlug(slug);
 
+  // If not in hardcoded list, try the DB.
+  useEffect(() => {
+    if (hardcodedPost) return; // already found
+    setLoadingDb(true);
+    axios
+      .get(`${API}/blog/posts/${slug}`)
+      .then((res) => {
+        setDbPost({
+          ...res.data,
+          readingMinutes: res.data.reading_minutes || 5,
+        });
+      })
+      .catch(() => setDbPost(null))
+      .finally(() => setLoadingDb(false));
+  }, [slug, hardcodedPost]);
+
+  const post = hardcodedPost || dbPost;
+
+  if (!post && !loadingDb && !hardcodedPost) {
+    // Wait for fetch to complete before redirecting
+    if (dbPost === null && !loadingDb) {
+      return <Navigate to="/blog" replace />;
+    }
+  }
   if (!post) {
-    return <Navigate to="/blog" replace />;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+      </div>
+    );
   }
 
-  // Related posts (same category, exclude current)
+  // Related posts (same category, exclude current) — from hardcoded only
   const related = BLOG_POSTS.filter((p) => p.category === post.category && p.slug !== post.slug).slice(0, 3);
 
   // Schema.org Article
@@ -269,6 +303,9 @@ const BlogPost = () => {
           <div className="my-10">
             <InternalAdBanner position="blog_footer" maxAds={1} variant="card" adsenseSlot="article-bottom" />
           </div>
+
+          {/* Reader Comments — adds engagement signals */}
+          <CommentSection postSlug={post.slug} />
         </div>
       </article>
 

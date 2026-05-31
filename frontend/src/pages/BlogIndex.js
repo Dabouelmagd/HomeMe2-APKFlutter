@@ -1,16 +1,51 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import useSEO from '../hooks/useSEO';
 import { BLOG_POSTS, BLOG_CATEGORIES } from '../content/blogPosts';
 import { CalendarIcon, ClockIcon, UserIcon, TagIcon } from '@heroicons/react/24/outline';
 
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
 const BlogIndex = () => {
   const [category, setCategory] = useState('all');
+  const [dbPosts, setDbPosts] = useState([]);
+
+  // Fetch DB-stored posts and merge with hardcoded.
+  useEffect(() => {
+    let cancelled = false;
+    axios
+      .get(`${API}/blog/posts`)
+      .then((res) => {
+        if (cancelled) return;
+        const normalized = (res.data?.posts || []).map((p) => ({
+          ...p,
+          readingMinutes: p.reading_minutes || 5,
+        }));
+        setDbPosts(normalized);
+      })
+      .catch(() => setDbPosts([]));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const allPosts = useMemo(() => {
+    // DB posts first (newest), then hardcoded (already sorted desc by date)
+    const merged = [...dbPosts, ...BLOG_POSTS];
+    // De-dup by slug — DB takes priority
+    const seen = new Set();
+    return merged.filter((p) => {
+      if (seen.has(p.slug)) return false;
+      seen.add(p.slug);
+      return true;
+    });
+  }, [dbPosts]);
 
   const filtered = useMemo(() => {
-    if (category === 'all') return BLOG_POSTS;
-    return BLOG_POSTS.filter((p) => p.category === category);
-  }, [category]);
+    if (category === 'all') return allPosts;
+    return allPosts.filter((p) => p.category === category);
+  }, [category, allPosts]);
 
   // Structured data for the blog listing
   const blogLd = useMemo(() => ({
@@ -23,7 +58,7 @@ const BlogIndex = () => {
       name: 'HomeMe',
       url: 'https://homemeapp.net',
     },
-    blogPost: BLOG_POSTS.map((p) => ({
+    blogPost: allPosts.map((p) => ({
       '@type': 'BlogPosting',
       headline: p.title,
       datePublished: p.date,
@@ -32,7 +67,7 @@ const BlogIndex = () => {
       image: p.cover,
       description: p.excerpt,
     })),
-  }), []);
+  }), [allPosts]);
 
   useSEO({
     title: 'المدوّنة — HomeMe | دليلك في إدارة المجمعات السكنية',

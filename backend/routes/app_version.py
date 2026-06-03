@@ -23,7 +23,7 @@ from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 from typing import Optional, List
 import os
-import time
+import hashlib
 import uuid
 import logging
 
@@ -33,9 +33,26 @@ from auth_deps import require_app_owner
 router = APIRouter(prefix="/api", tags=["version"])
 
 _STARTED_AT = datetime.now(timezone.utc).isoformat()
-_VERSION = str(int(time.time()))
 _RUNTIME_ENV = os.environ.get("APP_ENV", "production")
 _CHANGELOG_FILE = "/app/memory/CHANGELOG_LATEST.md"
+
+
+def _compute_version() -> str:
+    """Content-derived build version.
+
+    Returns the first 12 hex chars of sha1(CHANGELOG_LATEST.md). This way the
+    version only changes when the changelog itself changes — restarts/redeploys
+    alone do NOT re-trigger the "App updated" popup. Missing file falls back
+    to a stable sentinel.
+    """
+    try:
+        with open(_CHANGELOG_FILE, "rb") as f:
+            return hashlib.sha1(f.read()).hexdigest()[:12]
+    except Exception:
+        return "no-changelog"
+
+
+_VERSION = _compute_version()
 
 _FALLBACK_CHANGELOG = [
     {
@@ -160,11 +177,16 @@ async def _read_active_changelog(db) -> List[dict]:
 
 @router.get("/version")
 async def get_version():
-    """Public — process build-stamp + active changelog. No auth."""
+    """Public — process build-stamp + active changelog. No auth.
+
+    Version is computed on-the-fly from the current CHANGELOG_LATEST.md hash
+    so editing the file (and re-syncing) updates the popup version even
+    without a process restart.
+    """
     db = get_db()
     changelog = await _read_active_changelog(db)
     return {
-        "version": _VERSION,
+        "version": _compute_version(),
         "started_at": _STARTED_AT,
         "env": _RUNTIME_ENV,
         "changelog": changelog,
@@ -176,7 +198,7 @@ async def manual_sync_from_file(current_user: dict = Depends(require_app_owner))
     """Force-re-read CHANGELOG_LATEST.md and refresh modal entries."""
     db = get_db()
     n = await sync_changelog_from_file(db)
-    return {"synced": n, "version_tag": _VERSION}
+    return {"synced": n, "version_tag": _compute_version()}
 
 
 @router.get("/owner/changelog")

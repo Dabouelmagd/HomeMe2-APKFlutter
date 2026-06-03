@@ -32,6 +32,9 @@ def _doc_to_log(doc: dict) -> dict:
     ts = doc.get("timestamp")
     if isinstance(ts, datetime):
         ts = ts.isoformat()
+    bdt = doc.get("bounce_detected_at")
+    if isinstance(bdt, datetime):
+        bdt = bdt.isoformat()
     return {
         "id": doc.get("id") or str(doc.get("_id", "")),
         "timestamp": ts,
@@ -45,6 +48,8 @@ def _doc_to_log(doc: dict) -> dict:
         "duration_ms": doc.get("duration_ms"),
         "has_attachment": bool(doc.get("has_attachment")),
         "related_user_id": doc.get("related_user_id"),
+        "bounce_reason": doc.get("bounce_reason"),
+        "bounce_detected_at": bdt,
     }
 
 
@@ -180,3 +185,13 @@ async def resend_email(log_id: str, current_user: dict = Depends(get_current_use
         400,
         f"تعذّر إعادة الإرسال التلقائي لرسائل من نوع '{email_type}'. أعد توليدها يدويًا من المكان الأصلي (مثلاً صفحة المستخدم).",
     )
+
+
+@router.post("/check-bounces")
+async def check_bounces_now(current_user: dict = Depends(get_current_user)):
+    """Trigger an immediate IMAP bounce scan. Useful for the dashboard
+    'check now' button so super-admins don't wait for the 15-minute poll."""
+    _ensure_super_admin(current_user)
+    from bounce_detector import scan_bounces
+    result = await scan_bounces(limit=200)
+    return result

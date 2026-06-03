@@ -2739,6 +2739,38 @@ async def start_smtp_alerts_loop():
 
 
 @app.on_event("startup")
+async def start_bounce_scanner_loop():
+    """Poll the SMTP sender inbox every 15 minutes for delivery-failure
+    (bounce) notifications and update smtp_health.status='bounced'.
+
+    Safe if IMAP isn't configured — scan_bounces just logs and returns.
+    """
+    import asyncio as _asyncio
+
+    async def _loop():
+        # First scan after 90s warm-up so the rest of the boot finishes.
+        await _asyncio.sleep(90)
+        while True:
+            try:
+                from bounce_detector import scan_bounces
+                result = await scan_bounces(limit=100)
+                if result.get("matched_outbound"):
+                    logging.info(
+                        f"Bounce scan: marked {result['matched_outbound']} email(s) as bounced "
+                        f"(processed {result['bounce_messages_seen']} bounce notifications)"
+                    )
+                elif result.get("errors"):
+                    logging.debug(f"Bounce scan errors: {result['errors'][:3]}")
+            except Exception as e:
+                logging.debug(f"Bounce scan exception: {e}")
+            # Re-poll every 15 minutes.
+            await _asyncio.sleep(15 * 60)
+
+    _asyncio.create_task(_loop())
+    logging.info("Bounce scanner loop started (every 15 min)")
+
+
+@app.on_event("startup")
 async def start_autopilot_loop():
     """AI Auto-Pilot scheduler — wakes every 15 min to check enabled configs."""
     import asyncio as _asyncio

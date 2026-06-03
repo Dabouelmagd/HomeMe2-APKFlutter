@@ -4,7 +4,38 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
-### Iter 128: Email Delivery Dashboard + comprehensive user-creation audit — Feb 11, 2026 ✅
+### Iter 129: Email Bounce Detection (IMAP poll) — Feb 11, 2026 ✅
+
+**🎯 الطلب:** التقاط async bounces تلقائياً بدل ما المستخدم يكتشفها من إيميل الـ sender يدوياً.
+
+**🔧 Backend (`bounce_detector.py` + integration):**
+- **IMAP poll** كل 15 دقيقة على inbox الـ SMTP sender (`SMTP_USER` fallback).
+- Search: SINCE last 7 days + sender ∈ {MAILER-DAEMON, postmaster, Mail Delivery System} أو subject = "Mail delivery failed" / "Undelivered Mail".
+- Parse: 3 استراتيجيات استخراج الـ failed recipient (RFC 3464 `Final-Recipient`, generic patterns مع SMTP codes 550/552/554، `failed: <addr>`).
+- Match: يدوّر على آخر `smtp_health` doc للـ recipient ده ويعدّله `status=bounced` + `bounce_reason` + `bounce_detected_at`.
+- Idempotent: `processed_bounce_uids` collection يخزن كل UID مفحوص (no double-counting).
+- Stdlib only (`imaplib` + `email` + `re`) — مفيش deps جديدة.
+
+**⚡ Endpoint + UI:**
+- `POST /api/super-admin/email-logs/check-bounces` للفحص الفوري.
+- زرّ "🔍 فحص الـ Bounces الآن" في الـ EmailLogsTab مع loading state + toast بنتائج التفصيلية.
+- Badge "Bounced" برتقالي في الـ table بدل "فشل" العام لما الـ status = bounced.
+- Failure details panel يعرض `bounce_reason` (مع badge BOUNCED للـ bounced) للـ diagnostics.
+
+**📊 النتيجة الفعلية على Production data:**
+- أول scan: **594 رسالة inbox** → **11 bounce notifications اكتُشفت** → **11 smtp_health rows اتعدّلت** لـ `status=bounced`.
+- Stats updated: 30-day success rate = 38% (3✓ / 5✗) — يعكس الـ bounces الموجودة فعلياً.
+- ضمن الـ bounces القديمة كان الـ bounce اللي ابتدت بيه الـ feature (`m.mokhtar@datalifeai.com`) — دلوقتي ظاهر في الـ dashboard مباشرة.
+
+**Files Created:**
+- 🆕 `backend/bounce_detector.py`
+
+**Files Modified:**
+- ✏️ `backend/routes/email_logs.py` (+ /check-bounces endpoint + bounce_reason in API)
+- ✏️ `backend/server.py` (+ 15-min background scanner loop)
+- ✏️ `frontend/src/components/super-admin/EmailLogsTab.js` (+ scan button + Bounced badge + reason display)
+
+
 
 **🎯 الطلب:** (1) بناء داشبورد لتتبع حالة كل إيميل مُرسل من المنصة، (2) audit شامل يضمن كل أنواع تسجيل المستخدمين والاشتراكات بتشتغل من غير شاشات بيضاء.
 

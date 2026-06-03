@@ -15,7 +15,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const STATUS_OPTIONS = [
   { id: 'all', label: 'الكل', color: 'bg-gray-700' },
   { id: 'delivered', label: '✓ تم التسليم', color: 'bg-green-700' },
-  { id: 'failed', label: '✗ فشل', color: 'bg-red-700' },
+  { id: 'failed', label: '✗ فشل/Bounced', color: 'bg-red-700' },
 ];
 
 const TYPE_LABELS = {
@@ -37,8 +37,26 @@ const EmailLogsTab = ({ token }) => {
   const [typeFilter, setTypeFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [resendingId, setResendingId] = useState(null);
+  const [scanningBounces, setScanningBounces] = useState(false);
 
   const headers = { Authorization: `Bearer ${token}` };
+
+  const scanBouncesNow = async () => {
+    setScanningBounces(true);
+    try {
+      const res = await axios.post(`${API}/super-admin/email-logs/check-bounces`, {}, { headers });
+      const r = res.data;
+      toast.success(
+        `تم الفحص: ${r.matched_outbound} رسالة مُحدّثة كـ bounced من ${r.bounce_messages_seen} إشعار وصل (${r.scanned} رسالة إجمالاً)`
+      );
+      fetchAll();
+    } catch (err) {
+      const msg = err.response?.data?.detail || err.response?.data?.errors?.join('، ') || 'فشل الفحص';
+      toast.error(`فحص الـ bounces فشل: ${msg}`);
+    } finally {
+      setScanningBounces(false);
+    }
+  };
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -95,6 +113,13 @@ const EmailLogsTab = ({ token }) => {
         </span>
       );
     }
+    if (status === 'bounced') {
+      return (
+        <span className="inline-flex items-center gap-1 bg-orange-900 text-orange-200 px-2 py-0.5 rounded-full text-xs font-medium">
+          <XCircleIcon className="w-3 h-3" /> Bounced
+        </span>
+      );
+    }
     return (
       <span className="inline-flex items-center gap-1 bg-red-900 text-red-200 px-2 py-0.5 rounded-full text-xs font-medium">
         <XCircleIcon className="w-3 h-3" /> فشل
@@ -119,6 +144,16 @@ const EmailLogsTab = ({ token }) => {
         >
           <ArrowPathIcon className="w-4 h-4" />
           تحديث
+        </button>
+        <button
+          onClick={scanBouncesNow}
+          disabled={scanningBounces}
+          data-testid="scan-bounces-button"
+          className="flex items-center gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow"
+          title="افحص بريد الإرجاع الآن (IMAP)"
+        >
+          <EnvelopeIcon className="w-4 h-4" />
+          {scanningBounces ? 'جاري الفحص…' : '🔍 فحص الـ Bounces الآن'}
         </button>
       </div>
 
@@ -259,17 +294,22 @@ const EmailLogsTab = ({ token }) => {
         )}
       </div>
 
-      {/* Failure Details (last 5 failed) */}
-      {logs.some((l) => !l.success && l.error) && (
+      {/* Failure Details (last 5 failed/bounced) */}
+      {logs.some((l) => !l.success && (l.error || l.status === 'bounced')) && (
         <div className="bg-red-950/30 border border-red-800/50 rounded-xl p-4">
           <h4 className="font-bold text-red-300 mb-2 flex items-center gap-2 text-sm">
-            <XCircleIcon className="w-4 h-4" /> أحدث الأخطاء (للتشخيص)
+            <XCircleIcon className="w-4 h-4" /> أحدث الأخطاء و الـ Bounces (للتشخيص)
           </h4>
           <div className="space-y-2 text-xs">
-            {logs.filter((l) => !l.success && l.error).slice(0, 5).map((l, i) => (
+            {logs.filter((l) => !l.success).slice(0, 5).map((l, i) => (
               <div key={i} className="bg-gray-900/60 rounded p-2">
-                <div className="text-gray-400 mb-1">{l.to_email} · {new Date(l.timestamp).toLocaleString('ar-EG')}</div>
-                <div className="text-red-300 font-mono text-[11px] break-all">{l.error}</div>
+                <div className="text-gray-400 mb-1">
+                  {l.to_email} · {new Date(l.timestamp).toLocaleString('ar-EG')}
+                  {l.status === 'bounced' && (
+                    <span className="ml-2 bg-orange-900 text-orange-200 px-1.5 py-0.5 rounded text-[10px]">BOUNCED</span>
+                  )}
+                </div>
+                <div className="text-red-300 font-mono text-[11px] break-all">{l.bounce_reason || l.error || '(no detail)'}</div>
               </div>
             ))}
           </div>

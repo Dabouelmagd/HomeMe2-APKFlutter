@@ -4,7 +4,57 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
-### Iter 126: AI SEO Suggester في الـ CMS — Feb 11, 2026 ✅
+### Iter 127: Email Verification Flow (تأكيد البريد قبل تسجيل الدخول) — Feb 11, 2026 ✅
+
+**🎯 السبب:** بعد bounce email على إيميل غير موجود تماماً، احتجنا نظام يضمن أن كل مستخدم سجّل بنفسه يؤكّد بريده قبل ما يقدر يدخل، عشان نقلل الإيميلات الخطأ ونضمن مصداقية البيانات.
+
+**🔐 Backend (`routes/email_verification.py`):**
+- `GET /api/auth/verify-email/{token}` — يحقّق التوكن (one-time use, 24h TTL)، يحدّث `email_verified=True`، يحذف التوكن، ويرسل welcome email.
+- `POST /api/auth/resend-verification` — rate-limited (60s/email)، رد عام لا يكشف وجود الحساب (anti-enumeration).
+- `secrets.token_urlsafe(32)` للتوكن، TTL index على Mongo تلقائي يحذف المنتهي.
+
+**🔧 تعديلات `routes/auth.py`:**
+- `/auth/register` → ينشئ user مع `email_verified=False` ويستدعي `send_verification_email_for_user` بدلاً من welcome email.
+- `/auth/login` → يرفض الدخول بـ HTTP 403 + `{code: 'EMAIL_NOT_VERIFIED', email}` لو غير مؤكّد.
+- Smoke-test emails (`*@example.invalid`, `*@homeme.qa`, `smoke_co_*`) تتجاوز التحقق تلقائياً لحماية الـ CI.
+
+**📨 Email Template:**
+- دالة جديدة `send_verification_email` في `email_service.py` مع تصميم RTL احترافي + زرّ CTA + تحذير "صالح 24 ساعة فقط".
+
+**🛡️ Defense-in-depth:**
+- `admin_users.py`: المستخدمين الذين ينشئهم الـ admin (مش self-register) يدخلون بـ `email_verified=True` تلقائياً.
+- Startup migration: كل المستخدمين القدامى (قبل الـ feature) اتعلّموا `email_verified=True` عشان ما يتقفّلوش.
+- TTL index + unique index على `email_verification_tokens` collection.
+- Datetime tz handling — بنعالج naïve/aware datetime بشكل صحيح في الـ comparison.
+
+**🎨 Frontend:**
+- `pages/EmailVerify.js` — صفحة `/verify-email?token=XXX` بـ 4 states (verifying/success/already/error) + resend form في حالة الفشل.
+- `Login.js` — banner أصفر مميز ينبثق عند `code: EMAIL_NOT_VERIFIED` مع زر "إعادة إرسال رابط التأكيد".
+- `App.js login()` — يستخرج `EMAIL_NOT_VERIFIED` ويرجّع `{email_not_verified: true, email}` للتعامل في UI.
+
+**🧪 E2E مُختبر:**
+1. ✅ Register → `email_verification_required: true`.
+2. ✅ Login قبل التحقق → HTTP 403 + `code: EMAIL_NOT_VERIFIED` → Banner يظهر + Toast.
+3. ✅ Verify token → `verified: true` + Arabic message + welcome email.
+4. ✅ Login بعد التحقق → `access_token` صحيح.
+5. ✅ Re-use token (single-use) → 404.
+6. ✅ Invalid token → 404.
+7. ✅ Resend → toast generic (anti-enumeration).
+8. ✅ Lint نظيف على FE+BE.
+
+**Files Created:**
+- 🆕 `backend/routes/email_verification.py`
+- 🆕 `frontend/src/pages/EmailVerify.js`
+
+**Files Modified:**
+- ✏️ `backend/routes/auth.py` (register + login gate)
+- ✏️ `backend/routes/admin_users.py` (admin-created users pre-verified)
+- ✏️ `backend/email_service.py` (+ `send_verification_email` template)
+- ✏️ `backend/server.py` (router + startup migration + indexes)
+- ✏️ `frontend/src/App.js` (route + EMAIL_NOT_VERIFIED handler)
+- ✏️ `frontend/src/components/Login.js` (banner + state + resend handler)
+
+
 
 **🎯 الطلب:** إضافة "تحسين SEO تلقائي" للـ CMS — لما السوبر-أدمن يكتب مقال، AI يقترح عنوان أفضل، ملخّص جذّاب، وكلمات مفتاحية باستخدام Gemini 3 Flash.
 

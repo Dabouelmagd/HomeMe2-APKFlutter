@@ -24,6 +24,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [savedUsername, setSavedUsername] = useState('');
+  const [unverifiedEmail, setUnverifiedEmail] = useState(null);
+  const [resendingVerification, setResendingVerification] = useState(false);
   const [showBiometricLogin, setShowBiometricLogin] = useState(false);
   
   const { login, verifyTwoFactor, user: currentUser } = useAuth();
@@ -159,6 +161,10 @@ const Login = () => {
       } else if (result.two_factor_required) {
         // Open 2FA challenge modal
         setTwoFa({ pending: true, tempToken: result.temp_token, code: '' });
+      } else if (result.email_not_verified) {
+        // Show actionable inline UI: prompt to check inbox + resend link
+        setUnverifiedEmail(result.email || username);
+        toast.error(result.error || 'يرجى تأكيد بريدك الإلكتروني أولاً');
       } else {
         toast.error(result.error);
       }
@@ -244,6 +250,42 @@ const Login = () => {
               >
                 {t('switch_account', '🔄 تسجيل دخول بحساب آخر')}
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Email verification banner — appears when login is blocked by unverified email */}
+        {unverifiedEmail && (
+          <div className="mb-4 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl" data-testid="email-not-verified-banner">
+            <div className="flex items-start gap-3">
+              <div className="text-2xl">📧</div>
+              <div className="flex-1">
+                <h4 className="font-bold text-amber-900 mb-1">يرجى تأكيد بريدك الإلكتروني</h4>
+                <p className="text-sm text-amber-800 mb-3">
+                  أرسلنا رابط التأكيد إلى صندوق بريدك. تحقّق من البريد (ومجلد البريد المزعج) ثم اضغط على الرابط لتفعيل حسابك.
+                </p>
+                <button
+                  type="button"
+                  disabled={resendingVerification}
+                  data-testid="login-resend-verification-button"
+                  onClick={async () => {
+                    setResendingVerification(true);
+                    try {
+                      const axios = (await import('axios')).default;
+                      const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+                      const r = await axios.post(`${API}/auth/resend-verification`, { email: unverifiedEmail });
+                      toast.success(r.data?.message || 'تم إرسال رابط جديد');
+                    } catch (_err) {
+                      toast.error('تعذّر الإرسال — حاول مرة أخرى لاحقاً');
+                    } finally {
+                      setResendingVerification(false);
+                    }
+                  }}
+                  className="bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold px-4 py-2 rounded-lg disabled:opacity-50"
+                >
+                  {resendingVerification ? 'جاري الإرسال…' : 'إعادة إرسال رابط التأكيد'}
+                </button>
+              </div>
             </div>
           </div>
         )}

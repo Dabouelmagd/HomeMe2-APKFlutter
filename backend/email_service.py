@@ -149,6 +149,68 @@ class EmailService:
     
     # ==================== RESIDENT NOTIFICATIONS ====================
     
+    async def send_verification_email(self, to_email: str, full_name: str, verification_url: str) -> bool:
+        """Send email-verification link required to activate a newly registered account."""
+        subject = "🔐 تأكيد بريدك الإلكتروني - HomeMe"
+
+        html_content = f"""
+        <!DOCTYPE html>
+        <html dir="rtl">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{ font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }}
+                .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
+                .header {{ background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; padding: 30px; text-align: center; }}
+                .header h1 {{ margin: 0; font-size: 26px; }}
+                .header p {{ margin-top: 8px; font-size: 14px; opacity: 0.95; }}
+                .content {{ padding: 30px; color: #333; line-height: 1.8; }}
+                .btn {{ display: inline-block; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white !important; padding: 14px 36px; text-decoration: none; border-radius: 999px; margin-top: 16px; font-weight: bold; font-size: 16px; }}
+                .small {{ font-size: 12px; color: #888; word-break: break-all; }}
+                .footer {{ background: #f8f9fa; padding: 18px; text-align: center; color: #666; font-size: 12px; }}
+                .warn {{ background: #fff7ed; border-right: 4px solid #f97316; padding: 14px; border-radius: 6px; color: #9a3412; font-size: 13px; margin-top: 18px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🏠 HomeMe</h1>
+                    <p>منصة إدارة المجمعات السكنية الذكية</p>
+                </div>
+                <div class="content">
+                    <h2>أهلاً {full_name}! 👋</h2>
+                    <p>تم استلام طلب تسجيلك في HomeMe.</p>
+                    <p>للتأكد من صحة بريدك الإلكتروني، اضغط على الزر التالي:</p>
+                    <center>
+                        <a href="{verification_url}" class="btn">✅ تأكيد بريدي الإلكتروني</a>
+                    </center>
+                    <p style="margin-top:24px;">لو الزر لا يعمل، انسخ هذا الرابط والصقه في المتصفح:</p>
+                    <p class="small">{verification_url}</p>
+                    <div class="warn">
+                        ⏱️ <strong>هذا الرابط صالح لـ 24 ساعة فقط.</strong> بعدها ستحتاج طلب رابط جديد من شاشة تسجيل الدخول.
+                    </div>
+                    <p style="margin-top:18px; font-size:13px; color:#666;">لن تتمكن من تسجيل الدخول إلى حسابك قبل تأكيد بريدك. هذه خطوة أمنية لحماية بياناتك.</p>
+                </div>
+                <div class="footer">
+                    <p>إذا لم تطلب هذا التسجيل، يمكنك تجاهل الرسالة بأمان.</p>
+                    <p>© 2025 HomeMe — جميع الحقوق محفوظة</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+
+        text_content = (
+            f"أهلاً {full_name}!\n\n"
+            f"اضغط على الرابط التالي لتأكيد بريدك الإلكتروني وتفعيل حسابك في HomeMe:\n\n"
+            f"{verification_url}\n\n"
+            f"الرابط صالح لـ 24 ساعة فقط.\n\n"
+            f"إذا لم تطلب هذا التسجيل، يمكنك تجاهل الرسالة.\n\n"
+            f"— فريق HomeMe"
+        )
+
+        return await self.send_email(to_email, subject, html_content, text_content)
+
     async def send_welcome_email(self, to_email: str, full_name: str, username: str, compound_name: str = None) -> bool:
         """Send welcome email to new residents"""
         subject = "مرحباً بك في HomeMe - Welcome to HomeMe"

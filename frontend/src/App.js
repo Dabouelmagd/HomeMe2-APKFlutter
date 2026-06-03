@@ -40,6 +40,7 @@ import DebugLogin from './components/DebugLogin';
 import HomePage from './components/HomePage';
 const BlogIndex = React.lazy(() => import('./pages/BlogIndex'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
+const EmailVerify = React.lazy(() => import('./pages/EmailVerify'));
 import OwnerDashboard from './components/OwnerDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import ResidentDashboard from './components/ResidentDashboard';
@@ -357,6 +358,15 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       const detail = error?.response?.data?.detail;
       let msg;
+      // Email verification gate: backend returns {code:'EMAIL_NOT_VERIFIED', message, email}
+      if (detail && typeof detail === 'object' && detail.code === 'EMAIL_NOT_VERIFIED') {
+        return {
+          success: false,
+          email_not_verified: true,
+          email: detail.email,
+          error: detail.message,
+        };
+      }
       if (typeof detail === 'string') msg = detail;
       else if (Array.isArray(detail) && detail.length > 0) {
         msg = detail.map(d => d.msg || d.message || '').filter(Boolean).join(' • ');
@@ -695,6 +705,14 @@ function App() {
                   element={
                     <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>}>
                       <BlogPost />
+                    </React.Suspense>
+                  }
+                />
+                <Route
+                  path="/verify-email"
+                  element={
+                    <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div></div>}>
+                      <EmailVerify />
                     </React.Suspense>
                   }
                 />

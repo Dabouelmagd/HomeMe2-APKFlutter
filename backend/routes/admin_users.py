@@ -187,6 +187,11 @@ async def create_user(request: Request, user_data: UserCreate, current_user: dic
             "unit_number": user_data.unit_number,
             "is_family_head": False,
             "is_active": True,
+            # Admin-created accounts are pre-verified — admin has already vetted them.
+            # End-user self-registration goes through `/api/auth/register` which sets this to False
+            # and triggers the email verification flow.
+            "email_verified": True,
+            "email_verified_at": datetime.now(timezone.utc),
             "created_at": datetime.now(timezone.utc),
             "profile_picture_url": None
         }

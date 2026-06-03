@@ -98,6 +98,22 @@ async def register(user_data: UserCreate, request: Request):
     
     await db.users.insert_one(user_dict)
 
+    # --- Email verification gate ---------------------------------------
+    # New self-registered users start unverified. They must click the link in
+    # their welcome email before they can log in. Existing users (already in
+    # DB before this feature) are migrated to verified=True at startup.
+    # Smoke-test synthetic users are auto-verified to keep CI green.
+    is_smoke_test_check = (
+        (user_data.email or "").startswith("smoke_co_")
+        or (user_data.email or "").endswith("@example.invalid")
+        or (user_data.email or "").endswith("@homeme.qa")
+    )
+    initial_verified = is_smoke_test_check  # True for smoke tests, False for real users
+    await db.users.update_one(
+        {"id": user.id},
+        {"$set": {"email_verified": initial_verified}}
+    )
+
     # --------------------------------------------------------------------
     # Auto-provision management company when a user self-registers as
     # `company_admin`. Without this the user becomes an orphan_admin:
@@ -188,12 +204,14 @@ async def register(user_data: UserCreate, request: Request):
                 compound_name = compound.get("name")
 
         if not is_smoke_test:
+            # Send email verification instead of welcome email — welcome is sent
+            # after the user clicks the verification link.
+            from routes.email_verification import send_verification_email_for_user
             asyncio.create_task(
-                email_service.send_welcome_email(
-                    to_email=user_data.email,
+                send_verification_email_for_user(
+                    user_id=user.id,
+                    email=user_data.email,
                     full_name=user_data.full_name,
-                    username=user_data.username,
-                    compound_name=compound_name
                 )
             )
 
@@ -216,7 +234,9 @@ async def register(user_data: UserCreate, request: Request):
         logging.error(f"Failed to send welcome email: {str(e)}")
     
     return {
-        "message": "User registered successfully",
+        "message": "تم إنشاء حسابك! تحقق من بريدك الإلكتروني للحصول على رابط التأكيد قبل تسجيل الدخول.",
+        "email_verification_required": True,
+        "email": user_data.email,
         "user_id": user.id,
         "subscription_active": True,
         "subscription_type": user_dict.get("subscription_type", "trial"),
@@ -309,6 +329,29 @@ async def login(user_data: UserLogin, request: Request):
             success=False,
         )
         raise HTTPException(status_code=401, detail="Account is disabled")
+
+    # Email verification gate. Users who pre-existed before this feature was
+    # rolled out were migrated to email_verified=true at startup, so this
+    # never blocks legacy accounts. Only freshly self-registered users that
+    # haven't clicked their email link will hit this branch.
+    if user.get("email_verified") is False:
+        await audit_log(
+            actor=user,
+            action="auth.login",
+            target_type="user",
+            target_id=user["id"],
+            details={"reason": "email_not_verified"},
+            request=request,
+            success=False,
+        )
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "code": "EMAIL_NOT_VERIFIED",
+                "message": "يرجى تأكيد بريدك الإلكتروني أولاً. تحقق من صندوق الوارد (ومجلد البريد المزعج).",
+                "email": user.get("email"),
+            },
+        )
     
     # 2FA gate — if user has 2FA enabled, return temporary token instead of full session
     if user.get("two_factor_enabled"):

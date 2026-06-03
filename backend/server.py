@@ -2466,9 +2466,11 @@ from routes.linked_accounts import router as linked_accounts_router
 from routes.payment_analytics import router as payment_analytics_router
 from routes.alerts import router as alerts_router
 from routes.blog import router as blog_router
+from routes.email_verification import router as email_verification_router
 
 app.include_router(monitoring_router)
 app.include_router(blog_router)
+app.include_router(email_verification_router)
 app.include_router(finance_router)
 app.include_router(ratings_router2)
 app.include_router(contracts_router)
@@ -2637,6 +2639,46 @@ async def ensure_db_indexes():
         logging.info(f"DB indexes ensured ({n} applied)")
     except Exception as e:
         logging.warning(f"ensure_indexes failed: {e}")
+
+
+@app.on_event("startup")
+async def setup_email_verification():
+    """One-shot migration + TTL index for email verification.
+
+    - Backfills every existing user with email_verified=True so the new login
+      gate doesn't lock anyone out who registered before this feature shipped.
+    - Creates a TTL index on email_verification_tokens.expires_at so expired
+      tokens auto-purge.
+    """
+    try:
+        from database import get_db
+        db_local = get_db()
+        # Mark every existing user that doesn't yet have the field as verified.
+        # New self-registrations explicitly set the field, so this only catches
+        # legacy accounts.
+        result = await db_local.users.update_many(
+            {"email_verified": {"$exists": False}},
+            {"$set": {"email_verified": True}},
+        )
+        if result.modified_count:
+            logging.info(f"Email verification migration: {result.modified_count} legacy users marked verified")
+
+        # TTL index: Mongo will drop documents once expires_at < now.
+        await db_local.email_verification_tokens.create_index(
+            "expires_at",
+            expireAfterSeconds=0,
+            name="email_verif_ttl",
+        )
+        # Uniqueness on token (defense in depth — secrets.token_urlsafe collisions are astronomical).
+        await db_local.email_verification_tokens.create_index("token", unique=True, name="email_verif_token_uniq")
+        # Lookup helper for resend cooldown queries.
+        await db_local.email_verification_tokens.create_index(
+            [("email", 1), ("created_at", -1)],
+            name="email_verif_email_created",
+        )
+        logging.info("Email verification indexes ensured")
+    except Exception as e:
+        logging.warning(f"setup_email_verification failed: {e}")
 
 
 @app.on_event("startup")

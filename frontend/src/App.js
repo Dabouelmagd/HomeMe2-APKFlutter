@@ -1,6 +1,6 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
 import { attachRewriteToAxios } from './api/sameOriginRewrite';
 import io from 'socket.io-client';
@@ -1106,7 +1106,7 @@ function App() {
                       <div className="text-6xl mb-4">🔍</div>
                       <h1 className="text-2xl font-black text-gray-900 mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>الصفحة غير موجودة</h1>
                       <p className="text-gray-600 mb-6">المسار اللي حاولت تفتحه غير متاح. ربما تم نقله أو إعادة تسميته.</p>
-                      <a href="/" className="inline-block bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold px-6 py-3 rounded-xl hover:shadow-lg">العودة للوحة التحكم ←</a>
+                      <Link to="/" className="inline-block bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold px-6 py-3 rounded-xl hover:shadow-lg">العودة للوحة التحكم ←</Link>
                     </div>
                   </div>
                 } />

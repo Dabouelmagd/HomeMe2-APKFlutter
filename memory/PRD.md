@@ -4,7 +4,44 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
-### Iter 127: Email Verification Flow (تأكيد البريد قبل تسجيل الدخول) — Feb 11, 2026 ✅
+### Iter 128: Email Delivery Dashboard + comprehensive user-creation audit — Feb 11, 2026 ✅
+
+**🎯 الطلب:** (1) بناء داشبورد لتتبع حالة كل إيميل مُرسل من المنصة، (2) audit شامل يضمن كل أنواع تسجيل المستخدمين والاشتراكات بتشتغل من غير شاشات بيضاء.
+
+**📧 Phase 1 — Email Delivery Dashboard:**
+- **Backend (`routes/email_logs.py`):**
+  - `GET /api/super-admin/email-logs` — list مع فلاتر (status, email_type, search by recipient).
+  - `GET /api/super-admin/email-logs/stats` — stats كاملة (7d, 30d، success rate, by type).
+  - `POST /api/super-admin/email-logs/{id}/resend` — إعادة إرسال smart (verification/welcome يعيد توليد من جديد).
+- **Email service enrichment:** `_send_email_sync` بقى يستقبل `email_type` و `related_user_id` ويسجّلهم في `smtp_health` (بقى يستخدم datetime object + UUID للـ id بدل isoformat string).
+- **Frontend (`super-admin/EmailLogsTab.js`):**
+  - 3 stats cards (آخر 7 / 30 / معدّل النجاح).
+  - Filters: status (all/delivered/failed) + type dropdown + search bar.
+  - Table بكل التفاصيل + زرّ "أعد إرسال" للـ verification/welcome/failed.
+  - Failure details panel للـ debugging (آخر 5 أخطاء).
+  - Tab جديد "📧 سجل البريد" في `SuperAdminPanel`.
+
+**🐛 Phase 2 — Audit Fixes (من iteration_67.json):**
+1. **🔴 KeyError 500 في `/api/auth/register`:** لما role=resident + unit_number لكن compound_id=None، الـ Family model بيرمي validation error. الإصلاح: استخدام الـ local `compound_id` (مع fallback لـ 'default-compound') بدل `user_data.compound_id`.
+2. **⚪ White Screen على unknown `/app/*` routes:** أضيف catch-all `Route path="*"` داخل الـ /app/* layout بيعرض Arabic 404 page مع زرّ "العودة للوحة التحكم" يستخدم `<Link>` (SPA navigation، بدون reload).
+
+**🧪 التحقق:**
+- ✅ iteration_68: **100% pass** على الـ 2 fixes (5/5 backend pytest + frontend 404 verified visually).
+- ✅ iteration_67: **معظم الـ flows passed** قبل الـ fixes — Owner/SuperAdmin/CompoundAdmin logins، 6 tabs في CompoundManagement، email verification E2E، Blog CMS، AI SEO.
+- ✅ Lint نظيف على FE+BE.
+
+**Files Created:**
+- 🆕 `backend/routes/email_logs.py`
+- 🆕 `frontend/src/components/super-admin/EmailLogsTab.js`
+
+**Files Modified:**
+- ✏️ `backend/email_service.py` (+ email_type + related_user_id tracking)
+- ✏️ `backend/server.py` (register email_logs router)
+- ✏️ `backend/routes/auth.py` line 178 (compound_id fix)
+- ✏️ `frontend/src/components/SuperAdminPanel.js` (+ email_logs tab)
+- ✏️ `frontend/src/App.js` (+ catch-all 404 route + Link import)
+
+
 
 **🎯 السبب:** بعد bounce email على إيميل غير موجود تماماً، احتجنا نظام يضمن أن كل مستخدم سجّل بنفسه يؤكّد بريده قبل ما يقدر يدخل، عشان نقلل الإيميلات الخطأ ونضمن مصداقية البيانات.
 

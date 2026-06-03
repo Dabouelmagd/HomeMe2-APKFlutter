@@ -2,10 +2,13 @@ from datetime import datetime, timezone, timedelta
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import time
+from dotenv import load_dotenv
 
-# Database connection
-MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
-DB_NAME = os.environ.get('DB_NAME', 'homeme_db')
+load_dotenv()
+
+# Database connection — no fallback; missing env vars must fail fast.
+MONGO_URL = os.environ['MONGO_URL']
+DB_NAME = os.environ['DB_NAME']
 
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
@@ -195,24 +198,34 @@ class MonitoringService:
     
     @staticmethod
     async def health_check():
-        """Perform system health check"""
+        """Lightweight liveness probe.
+
+        Primary signal: database connectivity (Mongo ping). Collection
+        presence is advisory only — collections are created lazily on
+        first write, so a fresh install or a clean DB shouldn't trip the
+        overall ``status`` to ``unhealthy``.
+        """
         try:
-            # Check database connection
             await db.command('ping')
             db_healthy = True
-        except:
+        except Exception:
             db_healthy = False
-        
-        # Check collections exist
-        collections = await db.list_collection_names()
-        required_collections = ['users', 'compounds', 'residences', 'activity_logs', 'error_logs']
-        collections_healthy = all(col in collections for col in required_collections)
-        
-        overall_status = "healthy" if (db_healthy and collections_healthy) else "unhealthy"
-        
+
+        # Advisory check: list collections and report which (if any) of the
+        # core collections are missing. Does NOT affect the top-level status.
+        missing = []
+        try:
+            collections = await db.list_collection_names()
+            for col in ('users', 'compounds', 'residences', 'activity_logs', 'error_logs'):
+                if col not in collections:
+                    missing.append(col)
+        except Exception:
+            collections = []
+
         return {
-            "status": overall_status,
+            "ok": db_healthy,
+            "status": "healthy" if db_healthy else "unhealthy",
             "database": "connected" if db_healthy else "disconnected",
-            "collections": "ok" if collections_healthy else "missing",
+            "collections_missing": missing,  # informational; empty most of the time
             "timestamp": datetime.now(timezone.utc).isoformat()
         }

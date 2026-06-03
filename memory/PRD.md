@@ -4,6 +4,45 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 130: Health Endpoint Hardening + Post-Iter129 Regression Audit — Feb 11, 2026 ✅
+
+**🎯 الطلب:** Audit شامل بعد iter129 (bounce detection) + إصلاح الـ false-positives من testing agent.
+
+**🔍 Audit Results (iteration_69.json):**
+- ✅ 16/18 backend test cases PASSED (auth/email-logs/bounce-scan/email-verify/sidebar-badges/AI-assistant/AI-insights/blog/Stripe-plans/AI-autopilot)
+- 🟡 2 findings flagged: (1) `/api/health` returns `unhealthy` with `collections=missing` (2) `/api/blog/posts` empty list
+
+**🔧 Fixes:**
+
+1. **`monitoring.py` health_check rewrite:**
+   - Top-level `status` now driven ONLY by Mongo ping (db connectivity).
+   - `collections_missing` is now an advisory **list** (informational, not a status flip).
+   - Added `ok=true|false` field for K8s/uptime probes that expect boolean.
+   - **Root cause:** old code required 5 specific collections to exist; but Mongo doesn't list empty collections in `list_collection_names()`, so `residences`/`error_logs` (zero docs) appeared "missing" → false alarm.
+
+2. **`monitoring.py` env-var hardening:**
+   - Removed silent fallbacks: `os.environ['MONGO_URL']` / `os.environ['DB_NAME']` (fail-fast per system rules).
+   - Added `load_dotenv()` to module top so it works when imported in isolation.
+   - **Root cause:** module had `os.environ.get('DB_NAME', 'homeme_db')` which fell back to wrong DB when dotenv hadn't loaded, causing `compounds` to also appear missing.
+
+3. **`/api/blog/posts` empty list — NOT a bug:**
+   - By design: backend returns only DB-stored posts; frontend merges with hardcoded `BLOG_POSTS` array in `content/blogPosts.js` (10 articles).
+   - Confirmed in `frontend/src/pages/BlogIndex.js` line 35 (`merged = [...dbPosts, ...BLOG_POSTS]`).
+
+4. **Field-name divergences — NOT bugs:**
+   - `ai-assistant/usage`, `ai-insights/me`, `ai-autopilot/configs`, `blog/comments POST` use field names (`used_today`, `action_route`, `insight_id`, `post_slug+content`) that exactly match what the frontend already consumes. Testing agent's spec doc divergence only — no code change needed.
+
+**📊 Verification:**
+- ✅ `/api/health` → `{ok:true, status:"healthy", database:"connected", collections_missing:["residences","error_logs"]}` (informational only)
+- ✅ Bounce-scan POST → scanned=594, bounces=0, errs=0 (idempotent — already processed in iter129)
+- ✅ Email logs stats endpoint 200
+- ✅ All 3 auth roles (owner/super_admin/company_admin) login OK
+- ✅ Lint: pre-existing E722 on line 57 (different function, not from my edits)
+
+**Files Modified:**
+- ✏️ `backend/monitoring.py` (health_check rewrite + env hardening)
+
+
 ### Iter 129: Email Bounce Detection (IMAP poll) — Feb 11, 2026 ✅
 
 **🎯 الطلب:** التقاط async bounces تلقائياً بدل ما المستخدم يكتشفها من إيميل الـ sender يدوياً.

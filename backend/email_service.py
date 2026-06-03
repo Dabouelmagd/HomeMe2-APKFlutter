@@ -4,6 +4,7 @@ Handles all email notifications for residents and administrators
 """
 import smtplib
 import ssl
+import uuid
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -64,9 +65,12 @@ class EmailService:
     def _get_mailbox(self, mailbox: str = 'main') -> dict:
         return self.mailboxes.get(mailbox) or self.mailboxes['main']
     
-    def _send_email_sync(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main', attachments: list = None) -> bool:
+    def _send_email_sync(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main', attachments: list = None, email_type: str = None, related_user_id: str = None) -> bool:
         """Synchronous email sending function. `mailbox` picks which From account to use: main | security | support.
-        attachments: optional list of dicts {filename, content (bytes), mime_type (e.g. 'application/pdf')}."""
+        attachments: optional list of dicts {filename, content (bytes), mime_type (e.g. 'application/pdf')}.
+        email_type: tag for the dashboard (verification, welcome, credentials, password_reset, etc.).
+        related_user_id: optional FK to users.id so the dashboard can link entries to accounts.
+        """
         import time as _time
         from datetime import datetime as _dt, timezone as _tz
         start_ts = _time.time()
@@ -119,21 +123,25 @@ class EmailService:
                 _mc = MongoClient(os.environ['MONGO_URL'], serverSelectionTimeoutMS=500)
                 _db = _mc[os.environ['DB_NAME']]
                 _db.smtp_health.insert_one({
-                    "timestamp": _dt.now(_tz.utc).isoformat(),
+                    "id": str(uuid.uuid4()),
+                    "timestamp": _dt.now(_tz.utc),
                     "mailbox": mailbox,
                     "to_email": to_email,
                     "subject": subject[:160],
                     "success": success,
+                    "status": "delivered" if success else "failed",
                     "error": err_msg,
                     "duration_ms": duration_ms,
                     "has_attachment": bool(attachments),
+                    "email_type": email_type or "generic",
+                    "related_user_id": related_user_id,
                 })
                 _mc.close()
             except Exception:
                 pass
         return success
     
-    async def send_email(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main', attachments: list = None) -> bool:
+    async def send_email(self, to_email: str, subject: str, html_content: str, text_content: str = None, mailbox: str = 'main', attachments: list = None, email_type: str = None, related_user_id: str = None) -> bool:
         """Async wrapper for email sending. `mailbox`: main | security | support."""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(
@@ -145,6 +153,8 @@ class EmailService:
             text_content,
             mailbox,
             attachments,
+            email_type,
+            related_user_id,
         )
     
     # ==================== RESIDENT NOTIFICATIONS ====================
@@ -209,7 +219,7 @@ class EmailService:
             f"— فريق HomeMe"
         )
 
-        return await self.send_email(to_email, subject, html_content, text_content)
+        return await self.send_email(to_email, subject, html_content, text_content, email_type="verification")
 
     async def send_welcome_email(self, to_email: str, full_name: str, username: str, compound_name: str = None) -> bool:
         """Send welcome email to new residents"""

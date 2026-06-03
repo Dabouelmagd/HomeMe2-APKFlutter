@@ -2467,10 +2467,12 @@ from routes.payment_analytics import router as payment_analytics_router
 from routes.alerts import router as alerts_router
 from routes.blog import router as blog_router
 from routes.email_verification import router as email_verification_router
+from routes.email_logs import router as email_logs_router
 
 app.include_router(monitoring_router)
 app.include_router(blog_router)
 app.include_router(email_verification_router)
+app.include_router(email_logs_router)
 app.include_router(finance_router)
 app.include_router(ratings_router2)
 app.include_router(contracts_router)

@@ -26,6 +26,7 @@ import AdvertiserAdsTab from './super-admin/AdvertiserAdsTab';
 import SupportTicketsTab from './super-admin/SupportTicketsTab';
 import DisasterRecoveryTab from './super-admin/DisasterRecoveryTab';
 import BlogManagementTab from './super-admin/BlogManagementTab';
+import EmailLogsTab from './super-admin/EmailLogsTab';
 import PaymentAnalyticsCard from './PaymentAnalyticsCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -451,6 +452,7 @@ const SuperAdminPanel = () => {
             { id: 'translations', label: t('sa_translations', 'إدارة الترجمات') },
             { id: 'support_tickets', label: t('sa_support_tickets', '🎧 تذاكر الدعم') },
             { id: 'blog', label: t('sa_blog_management', '📝 إدارة المدوّنة') },
+            { id: 'email_logs', label: '📧 سجل البريد' },
             ...(!isSuperAdminOnly ? [
               { id: 'disaster_recovery', label: '💾 النسخ الاحتياطي' },
             ] : []),
@@ -915,6 +917,10 @@ const SuperAdminPanel = () => {
 
         {activeTab === 'blog' && (
           <BlogManagementTab token={localStorage.getItem('token')} />
+        )}
+
+        {activeTab === 'email_logs' && (
+          <EmailLogsTab token={localStorage.getItem('token')} />
         )}
 
       </div>

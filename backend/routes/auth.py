@@ -175,7 +175,7 @@ async def register(user_data: UserCreate, request: Request):
     # Create family if resident
     if user_data.role == "resident" and user_data.unit_number:
         family = Family(
-            compound_id=user_data.compound_id,
+            compound_id=compound_id,  # use the resolved local var (with "default-compound" fallback)
             unit_number=user_data.unit_number,
             head_user_id=user.id,
             members=[user.id]

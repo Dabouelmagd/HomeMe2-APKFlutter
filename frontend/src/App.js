@@ -1098,6 +1098,18 @@ function App() {
                 <Route path="enterprise-dashboard" element={
                   <EnterpriseDashboard />
                 } />
+
+                {/* 404 fallback for any unknown /app/* route — prevents WHITE SCREEN */}
+                <Route path="*" element={
+                  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-6" dir="rtl">
+                    <div className="max-w-md text-center bg-white rounded-3xl shadow-2xl p-8">
+                      <div className="text-6xl mb-4">🔍</div>
+                      <h1 className="text-2xl font-black text-gray-900 mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>الصفحة غير موجودة</h1>
+                      <p className="text-gray-600 mb-6">المسار اللي حاولت تفتحه غير متاح. ربما تم نقله أو إعادة تسميته.</p>
+                      <a href="/" className="inline-block bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold px-6 py-3 rounded-xl hover:shadow-lg">العودة للوحة التحكم ←</a>
+                    </div>
+                  </div>
+                } />
               </Route>
               </Routes>
             </RouteChangeHandler>

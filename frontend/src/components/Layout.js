@@ -149,6 +149,19 @@ const Layout = ({ children, isTrialMode = false }) => {
   const navigate = useNavigate();
   const isRTL = i18n.language === 'ar';
 
+  // Low-content / pre-onboarding routes where we suppress sidebar/banner ads
+  // to comply with AdSense "Google-served ads on screens without publisher-content" policy.
+  const LOW_CONTENT_ROUTES = [
+    '/select-account',
+    '/onboarding',
+    '/wizard',
+    '/register',
+    '/verify-email',
+  ];
+  const isLowContentRoute = LOW_CONTENT_ROUTES.some((r) =>
+    location.pathname === r || location.pathname.startsWith(r + '/')
+  );
+
   // Restore sidebar scroll position after navigation (so clicking a sub-item doesn't jump to top)
   useEffect(() => {
     const nav = sidebarNavRef.current;

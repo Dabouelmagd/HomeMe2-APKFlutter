@@ -37,18 +37,13 @@ const HomePage = () => {
   const [openGuide, setOpenGuide] = useState(null);
   const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [currency, setCurrency] = useState(() => {
-    // 🌍 GeoIP via timezone — Egyptian timezone → EGP, otherwise → USD
-    // Privacy-friendly: no external API calls, instant detection.
+    // 💰 EGP is the primary currency for HomeMe. Users can opt into USD via the
+    // toggle and we persist their preference in localStorage.
     try {
       const saved = localStorage.getItem('preferred_currency');
       if (saved === 'egp' || saved === 'usd') return saved;
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-      // Egyptian timezone variants
-      const isEgypt = tz === 'Africa/Cairo' || tz === 'Egypt';
-      return isEgypt ? 'egp' : 'usd';
-    } catch {
-      return 'egp';
-    }
+    } catch { /* localStorage may be unavailable */ }
+    return 'egp';
   });
   const [subCode, setSubCode] = useState('');
   const [codeStatus, setCodeStatus] = useState(null); // {type:'success'|'error', msg:'...'}
@@ -320,13 +315,14 @@ const HomePage = () => {
     return val.toLocaleString();
   };
   const yearlyOf = (monthly) => {
-    const total = monthly * 10; // 10 months = yearly (2 months free)
+    // 20% annual discount: 12 × monthly × 0.80 = 9.6 × monthly
+    const total = Math.round(monthly * 9.6);
     const val = currency === 'egp' ? total : Math.round(total * 0.02);
     return val.toLocaleString();
   };
-  // Savings if user pays yearly vs 12 separate monthly payments
+  // Savings if user pays yearly vs 12 separate monthly payments (20% off)
   const savingsOf = (monthly) => {
-    const saved = monthly * 2; // 2 months free per year
+    const saved = Math.round(monthly * 2.4); // 20% of 12 months
     const val = currency === 'egp' ? saved : Math.round(saved * 0.02);
     return val.toLocaleString();
   };

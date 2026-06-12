@@ -1068,9 +1068,6 @@ const Layout = ({ children, isTrialMode = false }) => {
             {/* Account Switcher — switch between linked accounts without re-login */}
             <SidebarAccountSwitcher isSuperAdmin={isSuperAdmin} />
 
-            <LanguageSwitcher className="w-full justify-start" />
-            <TransliterationToggle className="px-2 py-1" />
-            
             <button
               onClick={handleLogout}
               className={`group flex items-center w-full px-3 py-2 text-sm font-medium rounded-md ${isSuperAdmin ? 'text-gray-400 hover:bg-purple-900/30 hover:text-red-400' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'}`}

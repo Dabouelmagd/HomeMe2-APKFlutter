@@ -61,6 +61,7 @@ import {
 import LanguageSwitcher from './LanguageSwitcher';
 import SessionSwitcher from './SessionSwitcher';
 import QuickAccountSwitcher from './QuickAccountSwitcher';
+import SidebarAccountSwitcher from './SidebarAccountSwitcher';
 import PlanLimitBadge from './PlanLimitBadge';
 import { TransliterationToggle } from './TransliterationToggle';
 import ThemeToggle from './ThemeToggle';
@@ -1064,6 +1065,9 @@ const Layout = ({ children, isTrialMode = false }) => {
           </div>
 
           <div className="mt-2 space-y-1">
+            {/* Account Switcher — switch between linked accounts without re-login */}
+            <SidebarAccountSwitcher isSuperAdmin={isSuperAdmin} />
+
             <LanguageSwitcher className="w-full justify-start" />
             <TransliterationToggle className="px-2 py-1" />
             

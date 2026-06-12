@@ -14,7 +14,10 @@ import {
   CheckCircleIcon,
   ClockIcon,
   XCircleIcon,
-  FunnelIcon
+  FunnelIcon,
+  HeartIcon,
+  UserCircleIcon,
+  EyeSlashIcon
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -26,9 +29,10 @@ const ComplaintsSystem = () => {
   const { t } = useTranslation();
 
   const typeConfig = {
-    complaint: { label: t('cs_complaint', 'شكوى'), icon: ExclamationTriangleIcon, color: 'text-red-600 bg-red-100' },
-    suggestion: { label: t('cs_suggestion', 'اقتراح'), icon: LightBulbIcon, color: 'text-amber-600 bg-amber-100' },
-    inquiry: { label: t('cs_inquiry', 'استفسار'), icon: QuestionMarkCircleIcon, color: 'text-blue-600 bg-blue-100' }
+    complaint:  { label: t('cs_complaint', 'شكوى'),     icon: ExclamationTriangleIcon, color: 'text-red-600 bg-red-100', emoji: '⚠️' },
+    suggestion: { label: t('cs_suggestion', 'اقتراح'),  icon: LightBulbIcon,           color: 'text-amber-600 bg-amber-100', emoji: '💡' },
+    inquiry:    { label: t('cs_inquiry', 'استفسار'),    icon: QuestionMarkCircleIcon,  color: 'text-blue-600 bg-blue-100', emoji: '❓' },
+    praise:     { label: t('cs_praise', 'إطراء'),       icon: HeartIcon,               color: 'text-pink-600 bg-pink-100', emoji: '💖' },
   };
 
   const statusConfig = {
@@ -47,7 +51,7 @@ const ComplaintsSystem = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const [form, setForm] = useState({
-    type: 'complaint', category: 'general', title: '', description: '', priority: 'normal'
+    type: 'complaint', category: 'general', title: '', description: '', priority: 'normal', is_anonymous: false
   });
   const [respondForm, setRespondForm] = useState({ response: '', status: 'in_progress' });
 
@@ -71,10 +75,13 @@ const ComplaintsSystem = () => {
     if (!form.title || !form.description) return;
     setSubmitting(true);
     try {
-      await axios.post(`${API}/complaints`, { ...form, unit_number: user?.unit_number || '' }, getToken());
+      await axios.post(`${API}/complaints`, {
+        ...form,
+        unit_number: form.is_anonymous ? '' : (user?.unit_number || '')
+      }, getToken());
       toast.success(t('complaint_sent', 'تم إرسال الشكوى/الاقتراح بنجاح'));
       setShowCreate(false);
-      setForm({ type: 'complaint', category: 'general', title: '', description: '', priority: 'normal' });
+      setForm({ type: 'complaint', category: 'general', title: '', description: '', priority: 'normal', is_anonymous: false });
       fetchComplaints();
     } catch (err) { toast.error(t('send_failed', 'فشل في الإرسال')); }
     finally { setSubmitting(false); }
@@ -145,6 +152,7 @@ const ComplaintsSystem = () => {
             <option value="complaint">{t('complaints_only', 'شكاوى فقط')}</option>
             <option value="suggestion">{t('suggestions_only', 'اقتراحات فقط')}</option>
             <option value="inquiry">{t('inquiries_only', 'استفسارات فقط')}</option>
+            <option value="praise">{t('praise_only', 'إطراء فقط')}</option>
           </select>
           <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="border rounded-lg px-3 py-2 text-sm" data-testid="filter-status">
             <option value="">{t('all_statuses', 'كل الحالات')}</option>
@@ -176,10 +184,19 @@ const ComplaintsSystem = () => {
                         </span>
                         <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">{typeConf.label}</span>
                         {c.priority === 'urgent' && <span className="px-2 py-0.5 rounded text-xs font-bold bg-red-600 text-white">{t('urgent', 'عاجل')}</span>}
+                        {c.is_anonymous && (
+                          <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700 flex items-center gap-1" title={t('anonymous_complaint', 'تم الإرسال بشكل مجهول')}>
+                            <EyeSlashIcon className="h-3 w-3" /> {t('anonymous', 'مجهول')}
+                          </span>
+                        )}
                       </div>
                       <p className="text-sm text-gray-600 mb-2">{c.description}</p>
                       <div className="flex gap-4 text-xs text-gray-400">
-                        <span>{c.user_name} {c.unit_number ? `| ${t('unit', 'وحدة')} ${c.unit_number}` : ''}</span>
+                        <span className="flex items-center gap-1">
+                          <UserCircleIcon className="h-3.5 w-3.5" />
+                          {c.is_anonymous ? t('anonymous', 'مجهول') : (c.user_name || '—')}
+                          {!c.is_anonymous && c.unit_number ? ` | ${t('unit', 'وحدة')} ${c.unit_number}` : ''}
+                        </span>
                         <span>{formatDate(c.created_at)}</span>
                       </div>
                       {c.admin_response && (
@@ -216,7 +233,7 @@ const ComplaintsSystem = () => {
               <form onSubmit={handleCreate} className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium mb-1">{t('type', 'النوع')}</label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {Object.entries(typeConfig).map(([key, conf]) => {
                       const Icon = conf.icon;
                       return (
@@ -261,6 +278,25 @@ const ComplaintsSystem = () => {
                     <option value="urgent">{t('urgent', 'عاجلة')}</option>
                   </select>
                 </div>
+                {/* 🕶️ Anonymous submission — staff will see "مجهول" instead of the submitter's identity */}
+                <label className={`flex items-start gap-2.5 p-3 rounded-lg border-2 cursor-pointer transition ${form.is_anonymous ? 'border-purple-400 bg-purple-50' : 'border-gray-200 bg-gray-50/50 hover:border-gray-300'}`}>
+                  <input
+                    type="checkbox"
+                    checked={form.is_anonymous}
+                    onChange={(e) => setForm((p) => ({ ...p, is_anonymous: e.target.checked }))}
+                    className="mt-0.5 h-4 w-4 rounded text-purple-600 focus:ring-purple-500"
+                    data-testid="complaint-anonymous-checkbox"
+                  />
+                  <div className="flex-1">
+                    <div className="text-sm font-bold text-gray-800 flex items-center gap-1.5">
+                      <EyeSlashIcon className="h-4 w-4 text-purple-600" />
+                      {t('submit_anonymously', 'إرسال بشكل مجهول')}
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      {t('submit_anonymously_hint', 'لن يظهر اسمك ولا رقم وحدتك للإدارة. يظهر اسم "مجهول" بدلاً منه.')}
+                    </p>
+                  </div>
+                </label>
                 <div className="flex gap-3 pt-2">
                   <button type="submit" disabled={submitting} className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium disabled:opacity-50">{submitting ? '...' : t('send', 'إرسال')}</button>
                   <button type="button" onClick={() => setShowCreate(false)} className="flex-1 bg-gray-200 text-gray-700 py-2.5 rounded-lg font-medium">{t('cancel', 'إلغاء')}</button>

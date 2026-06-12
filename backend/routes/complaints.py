@@ -16,24 +16,31 @@ router = APIRouter(prefix="/api")
 
 
 class ComplaintCreate(BaseModel):
-    type: str = "complaint"
+    type: str = "complaint"   # complaint | suggestion | inquiry | praise
     category: str = "general"
     title: str
     description: str
     priority: str = "normal"
     unit_number: str = ""
+    is_anonymous: bool = False
 
 
 @router.post("/complaints")
 async def create_complaint(data: ComplaintCreate, current_user: dict = Depends(get_current_user)):
     db = get_db()
     try:
+        # When the resident chooses to submit anonymously, blank out
+        # personally-identifying fields. The user_id is kept on the document
+        # so the resident can still see their own submission in "My
+        # complaints" — but it is never exposed to admins.
+        anon = bool(data.is_anonymous)
         complaint = {
             "id": str(uuid.uuid4()),
             "compound_id": current_user["compound_id"],
             "user_id": current_user["id"],
-            "user_name": current_user.get("full_name", ""),
-            "unit_number": data.unit_number or current_user.get("unit_number", ""),
+            "user_name": "" if anon else current_user.get("full_name", ""),
+            "unit_number": "" if anon else (data.unit_number or current_user.get("unit_number", "")),
+            "is_anonymous": anon,
             "type": data.type,
             "category": data.category,
             "title": data.title,
@@ -47,11 +54,17 @@ async def create_complaint(data: ComplaintCreate, current_user: dict = Depends(g
         }
         await db.complaints.insert_one(complaint)
 
-        type_label = {"complaint": "شكوى", "suggestion": "اقتراح", "inquiry": "استفسار"}.get(data.type, data.type)
+        type_label = {
+            "complaint": "شكوى",
+            "suggestion": "اقتراح",
+            "inquiry": "استفسار",
+            "praise": "إطراء",
+        }.get(data.type, data.type)
+        notify_from = "مجهول" if anon else current_user.get("full_name", "")
         await notify_compound_admins(
             compound_id=current_user["compound_id"],
             title=f"{type_label} جديدة",
-            content=f"{type_label} من {current_user.get('full_name', '')}: {data.title}",
+            content=f"{type_label} من {notify_from}: {data.title}",
             action_type=f"new_{data.type}",
             exclude_user_id=None
         )
@@ -79,6 +92,17 @@ async def get_complaints(
             query["status"] = status
 
         complaints = await db.complaints.find(query, {"_id": 0}).sort("created_at", -1).to_list(200)
+
+        # Scrub PII for anonymous complaints when the requester is staff.
+        # The complaint's own author may still see their submission identifiers.
+        is_staff = current_user.get("role") in ["admin", "super_admin"]
+        if is_staff:
+            requester_id = current_user["id"]
+            for c in complaints:
+                if c.get("is_anonymous") and c.get("user_id") != requester_id:
+                    c["user_name"] = "مجهول"
+                    c["unit_number"] = ""
+                    c["user_id"] = ""  # mask to prevent client-side correlation
 
         total = len(complaints)
         open_count = len([c for c in complaints if c.get("status") == "open"])

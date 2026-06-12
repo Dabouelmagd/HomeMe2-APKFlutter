@@ -27,6 +27,7 @@ import { FAQSection } from './homepage/FAQSection';
 import { LiveDemoSection } from './homepage/LiveDemoSection';
 import { RolesSection } from './homepage/RolesSection';
 import { PricingSection } from './homepage/PricingSection';
+import useSEO from '../hooks/useSEO';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -49,6 +50,68 @@ const HomePage = () => {
   const [subCode, setSubCode] = useState('');
   const [codeStatus, setCodeStatus] = useState(null); // {type:'success'|'error', msg:'...'}
   const [codeLoading, setCodeLoading] = useState(false);
+
+  // 🔍 Filter for the 30 Systems grid
+  const [systemFilter, setSystemFilter] = useState('all');
+
+  // 🔍 SEO — fully managed via useSEO hook (Arabic-first, OG + Twitter + JSON-LD)
+  useSEO({
+    title: t(
+      'hp_seo_title',
+      'HomeMe — نظام إدارة الكمبوندات السكنية بالذكاء الاصطناعي'
+    ),
+    description: t(
+      'hp_seo_desc',
+      'منصة سحابية متكاملة لإدارة المجمعات السكنية: محاسبة، صيانة، شكاوى، حجوزات، إدارة زوار QR، تقارير PDF، ومساعد ذكاء اصطناعي. تجربة مجانية 14 يوماً.'
+    ),
+    canonical: 'https://homemeapp.net/',
+    keywords:
+      'كمبوند, إدارة كمبوند, إدارة مجمع سكني, نظام كمبوندات, compound management, residential compound software, إدارة الصيانة, شكاوى السكان, خدمات سكنية, AI compound assistant, HomeMe',
+    og: {
+      title: 'HomeMe — نظام إدارة الكمبوندات السكنية بالذكاء الاصطناعي',
+      description:
+        'منصة عربية متكاملة لإدارة المجمعات السكنية مع 30+ نظام: محاسبة، صيانة، شكاوى، حجوزات، تقارير PDF، ومساعد AI. تجربة مجانية 14 يوماً.',
+      type: 'website',
+      url: 'https://homemeapp.net/',
+      image: 'https://homemeapp.net/og-cover.png',
+      site_name: 'HomeMe',
+      locale: 'ar_EG',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'HomeMe — إدارة كمبوندات السكنية',
+      description:
+        'منصة عربية لإدارة المجمعات السكنية مدعومة بالذكاء الاصطناعي. تجربة مجانية 14 يوماً.',
+      image: 'https://homemeapp.net/og-cover.png',
+    },
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'HomeMe',
+      operatingSystem: 'Web, iOS, Android',
+      applicationCategory: 'BusinessApplication',
+      url: 'https://homemeapp.net/',
+      inLanguage: ['ar', 'en', 'fr'],
+      offers: {
+        '@type': 'AggregateOffer',
+        priceCurrency: 'EGP',
+        lowPrice: '0',
+        highPrice: '25000',
+        offerCount: '7',
+      },
+      featureList: [
+        'إدارة المقيمين',
+        'النظام المالي والمحاسبي',
+        'الصيانة والخدمات',
+        'الشكاوى والمقترحات',
+        'حجز المرافق',
+        'إدارة الزوار QR',
+        'مساعد AI ذكي',
+        'تقارير PDF',
+      ],
+    },
+    jsonLdId: 'homepage-app',
+  });
 
   // 🎯 Scroll Spy — track active section based on scroll position
   const [activeSection, setActiveSection] = useState('top');
@@ -247,43 +310,61 @@ const HomePage = () => {
   };
 
   const systems = [
-    { icon: UserGroupIcon, title: t('sys_residents', 'إدارة المقيمين'), desc: t('sys_residents_d', 'ملف شامل لكل مقيم مع العائلة والوحدة وتصدير PDF'), color: 'from-blue-500 to-blue-600' },
-    { icon: CurrencyDollarIcon, title: t('sys_finance', 'النظام المالي'), desc: t('sys_finance_d', 'ميزانية عمومية، 4 طرق توزيع مصروفات، رسوم بيانية، تصدير Excel'), color: 'from-emerald-500 to-green-600' },
-    { icon: WrenchScrewdriverIcon, title: t('sys_maintenance', 'الصيانة والخدمات'), desc: t('sys_maintenance_d', 'طلبات صيانة، حجز خدمات، تقييم بعد الإنجاز'), color: 'from-amber-500 to-orange-600' },
-    { icon: DocumentTextIcon, title: t('sys_contracts', 'إدارة العقود'), desc: t('sys_contracts_d', 'عقود المزودين مع تنبيهات تلقائية قبل الانتهاء'), color: 'from-indigo-500 to-purple-600' },
-    { icon: StarIcon, title: t('sys_ratings', 'تقييمات الرضا'), desc: t('sys_ratings_d', 'تقييم 5 نجوم مع تنبيه ذكي عند انخفاض الرضا'), color: 'from-yellow-500 to-amber-600' },
-    { icon: ExclamationTriangleIcon, title: t('sys_complaints', 'الشكاوى والاقتراحات'), desc: t('sys_complaints_d', 'تقديم شكاوى واقتراحات مع متابعة حالتها ورد الإدارة'), color: 'from-red-500 to-rose-600' },
-    { icon: CalendarDaysIcon, title: t('sys_facilities', 'حجز المرافق'), desc: t('sys_facilities_d', 'حجز صالات، ملاعب، مسبح، قاعات اجتماعات بتقويم ذكي'), color: 'from-cyan-500 to-teal-600' },
-    { icon: BellIcon, title: t('sys_notifications', 'إشعارات ذكية'), desc: t('sys_notifications_d', 'تنبيهات فورية للمدراء عند كل حدث مهم في المجتمع'), color: 'from-pink-500 to-rose-600' },
-    { icon: ChartBarIcon, title: t('sys_analytics', 'تحليلات وتقارير'), desc: t('sys_analytics_d', 'لوحة تحكم حية، مقارنة شهرية، تقرير يومي تلقائي بالبريد'), color: 'from-violet-500 to-purple-600' },
-    { icon: ShieldCheckIcon, title: t('sys_roles', 'أدوار وصلاحيات'), desc: t('sys_roles_d', '6 أدوار: مالك، شركة، مدير، إداري، أمن، مقيم'), color: 'from-gray-600 to-gray-800' },
-    { icon: ChatBubbleLeftEllipsisIcon, title: t('sys_comms', 'مركز التواصل'), desc: t('sys_comms_d', 'رسائل، إعلانات، أحداث، إشعارات للمجتمع'), color: 'from-sky-500 to-blue-600' },
-    { icon: ArrowDownTrayIcon, title: t('sys_export', 'تصدير وطباعة'), desc: t('sys_export_d', 'PDF عربي احترافي، Excel بـ 5 أوراق، طباعة مباشرة'), color: 'from-teal-500 to-emerald-600' },
-    { icon: QrCodeIcon, title: t('sys_visitors', 'إدارة الزوار + QR'), desc: t('sys_visitors_d', 'دعوات الزوار، QR Code، مسح الأمن، سجل دخول/خروج كامل'), color: 'from-fuchsia-500 to-pink-600' },
-    { icon: ClipboardDocumentCheckIcon, title: t('sys_polls', 'الاستطلاعات والتصويت'), desc: t('sys_polls_d', 'تصويت ديمقراطي على القرارات، استطلاعات رأي، نتائج فورية'), color: 'from-lime-500 to-green-600' },
-    { icon: PresentationChartBarIcon, title: t('sys_pdf_reports', 'تقارير PDF متقدمة'), desc: t('sys_pdf_reports_d', 'Portfolio Report للشركات، تقارير شهرية تلقائية، تخصيص قالب'), color: 'from-rose-500 to-red-600' },
+    { icon: UserGroupIcon, category: 'admin', title: t('sys_residents', 'إدارة المقيمين'), desc: t('sys_residents_d', 'ملف شامل لكل مقيم مع العائلة والوحدة وتصدير PDF'), color: 'from-blue-500 to-blue-600' },
+    { icon: CurrencyDollarIcon, category: 'finance', title: t('sys_finance', 'النظام المالي'), desc: t('sys_finance_d', 'ميزانية عمومية، 4 طرق توزيع مصروفات، رسوم بيانية، تصدير Excel'), color: 'from-emerald-500 to-green-600' },
+    { icon: WrenchScrewdriverIcon, category: 'maintenance', title: t('sys_maintenance', 'الصيانة والخدمات'), desc: t('sys_maintenance_d', 'طلبات صيانة، حجز خدمات، تقييم بعد الإنجاز'), color: 'from-amber-500 to-orange-600' },
+    { icon: DocumentTextIcon, category: 'maintenance', title: t('sys_contracts', 'إدارة العقود'), desc: t('sys_contracts_d', 'عقود المزودين مع تنبيهات تلقائية قبل الانتهاء'), color: 'from-indigo-500 to-purple-600' },
+    { icon: StarIcon, category: 'comms', title: t('sys_ratings', 'تقييمات الرضا'), desc: t('sys_ratings_d', 'تقييم 5 نجوم مع تنبيه ذكي عند انخفاض الرضا'), color: 'from-yellow-500 to-amber-600' },
+    { icon: ExclamationTriangleIcon, category: 'comms', title: t('sys_complaints', 'الشكاوى والاقتراحات'), desc: t('sys_complaints_d', 'تقديم شكاوى واقتراحات مع متابعة حالتها ورد الإدارة'), color: 'from-red-500 to-rose-600' },
+    { icon: CalendarDaysIcon, category: 'maintenance', title: t('sys_facilities', 'حجز المرافق'), desc: t('sys_facilities_d', 'حجز صالات، ملاعب، مسبح، قاعات اجتماعات بتقويم ذكي'), color: 'from-cyan-500 to-teal-600' },
+    { icon: BellIcon, category: 'comms', title: t('sys_notifications', 'إشعارات ذكية'), desc: t('sys_notifications_d', 'تنبيهات فورية للمدراء عند كل حدث مهم في المجتمع'), color: 'from-pink-500 to-rose-600' },
+    { icon: ChartBarIcon, category: 'finance', title: t('sys_analytics', 'تحليلات وتقارير'), desc: t('sys_analytics_d', 'لوحة تحكم حية، مقارنة شهرية، تقرير يومي تلقائي بالبريد'), color: 'from-violet-500 to-purple-600' },
+    { icon: ShieldCheckIcon, category: 'security', title: t('sys_roles', 'أدوار وصلاحيات'), desc: t('sys_roles_d', '6 أدوار: مالك، شركة، مدير، إداري، أمن، مقيم'), color: 'from-gray-600 to-gray-800' },
+    { icon: ChatBubbleLeftEllipsisIcon, category: 'comms', title: t('sys_comms', 'مركز التواصل'), desc: t('sys_comms_d', 'رسائل، إعلانات، أحداث، إشعارات للمجتمع'), color: 'from-sky-500 to-blue-600' },
+    { icon: ArrowDownTrayIcon, category: 'finance', title: t('sys_export', 'تصدير وطباعة'), desc: t('sys_export_d', 'PDF عربي احترافي، Excel بـ 5 أوراق، طباعة مباشرة'), color: 'from-teal-500 to-emerald-600' },
+    { icon: QrCodeIcon, category: 'security', title: t('sys_visitors', 'إدارة الزوار + QR'), desc: t('sys_visitors_d', 'دعوات الزوار، QR Code، مسح الأمن، سجل دخول/خروج كامل'), color: 'from-fuchsia-500 to-pink-600' },
+    { icon: ClipboardDocumentCheckIcon, category: 'comms', title: t('sys_polls', 'الاستطلاعات والتصويت'), desc: t('sys_polls_d', 'تصويت ديمقراطي على القرارات، استطلاعات رأي، نتائج فورية'), color: 'from-lime-500 to-green-600' },
+    { icon: PresentationChartBarIcon, category: 'finance', title: t('sys_pdf_reports', 'تقارير PDF متقدمة'), desc: t('sys_pdf_reports_d', 'Portfolio Report للشركات، تقارير شهرية تلقائية، تخصيص قالب'), color: 'from-rose-500 to-red-600' },
 
     // ✨ NEW AI Systems
-    { icon: SparklesIcon, title: '✨ ' + t('sys_ai_chat', 'مساعد HomeMe الذكي'), desc: t('sys_ai_chat_d', 'شات AI عائم بـ Gemini يجاوب فوراً ويوجّه المستخدمين لصفحات التطبيق'), color: 'from-violet-500 to-purple-600', isAI: true },
-    { icon: LightBulbIcon, title: '🧠 ' + t('sys_ai_advisor', 'مستشار AI استباقي'), desc: t('sys_ai_advisor_d', 'يحلل البيانات يومياً ويكتشف 6 مشاكل + يقترح إجراءات تنفيذية'), color: 'from-purple-500 to-fuchsia-600', isAI: true },
-    { icon: ClockIcon, title: '🤖 ' + t('sys_autopilot', 'AI Auto-Pilot'), desc: t('sys_autopilot_d', 'جدولة تنفيذ الإجراءات تلقائياً (يومي/أسبوعي) + ملخص أسبوعي بالبريد'), color: 'from-fuchsia-500 to-pink-600', isAI: true },
-    { icon: EnvelopeIcon, title: '📨 ' + t('sys_auto_credentials', 'إرسال بيانات الدخول تلقائياً'), desc: t('sys_auto_credentials_d', 'كل ساكن جديد (فردي أو bulk) يحصل على بريد ترحيب RTL تلقائياً'), color: 'from-indigo-500 to-violet-600', isAI: true },
-    { icon: ArrowPathIcon, title: '🔁 ' + t('sys_stripe_recurring', 'Stripe Auto-Renewal'), desc: t('sys_stripe_recurring_d', 'اشتراك يجدد نفسه تلقائياً + خصم 17% للسنوي + Customer Portal'), color: 'from-emerald-500 to-teal-600', isAI: true },
-    { icon: PresentationChartBarIcon, title: '📊 ' + t('sys_sub_analytics', 'تحليلات الاشتراكات'), desc: t('sys_sub_analytics_d', 'MRR + ARR + Churn + Trial→Paid + Migration Tool للأدمن'), color: 'from-cyan-500 to-blue-600', isAI: true },
-    { icon: GlobeAltIcon, title: '🌐 ' + t('sys_multilang', '3 لغات + ترجمة AI'), desc: t('sys_multilang_d', 'AR/EN/FR + Owner Editor مع زر "ترجم بـ AI" عبر Gemini'), color: 'from-blue-500 to-indigo-600', isAI: true },
+    { icon: SparklesIcon, category: 'ai', title: '✨ ' + t('sys_ai_chat', 'مساعد HomeMe الذكي'), desc: t('sys_ai_chat_d', 'شات AI عائم بـ Gemini يجاوب فوراً ويوجّه المستخدمين لصفحات التطبيق'), color: 'from-violet-500 to-purple-600', isAI: true },
+    { icon: LightBulbIcon, category: 'ai', title: '🧠 ' + t('sys_ai_advisor', 'مستشار AI استباقي'), desc: t('sys_ai_advisor_d', 'يحلل البيانات يومياً ويكتشف 6 مشاكل + يقترح إجراءات تنفيذية'), color: 'from-purple-500 to-fuchsia-600', isAI: true },
+    { icon: ClockIcon, category: 'ai', title: '🤖 ' + t('sys_autopilot', 'AI Auto-Pilot'), desc: t('sys_autopilot_d', 'جدولة تنفيذ الإجراءات تلقائياً (يومي/أسبوعي) + ملخص أسبوعي بالبريد'), color: 'from-fuchsia-500 to-pink-600', isAI: true },
+    { icon: EnvelopeIcon, category: 'comms', title: '📨 ' + t('sys_auto_credentials', 'إرسال بيانات الدخول تلقائياً'), desc: t('sys_auto_credentials_d', 'كل ساكن جديد (فردي أو bulk) يحصل على بريد ترحيب RTL تلقائياً'), color: 'from-indigo-500 to-violet-600', isAI: true },
+    { icon: ArrowPathIcon, category: 'finance', title: '🔁 ' + t('sys_stripe_recurring', 'Stripe Auto-Renewal'), desc: t('sys_stripe_recurring_d', 'اشتراك يجدد نفسه تلقائياً + خصم 17% للسنوي + Customer Portal'), color: 'from-emerald-500 to-teal-600', isAI: true },
+    { icon: PresentationChartBarIcon, category: 'finance', title: '📊 ' + t('sys_sub_analytics', 'تحليلات الاشتراكات'), desc: t('sys_sub_analytics_d', 'MRR + ARR + Churn + Trial→Paid + Migration Tool للأدمن'), color: 'from-cyan-500 to-blue-600', isAI: true },
+    { icon: GlobeAltIcon, category: 'ai', title: '🌐 ' + t('sys_multilang', '3 لغات + ترجمة AI'), desc: t('sys_multilang_d', 'AR/EN/FR + Owner Editor مع زر "ترجم بـ AI" عبر Gemini'), color: 'from-blue-500 to-indigo-600', isAI: true },
 
     // ✨ NEW Systems (Iter 127-133)
-    { icon: AdjustmentsHorizontalIcon, title: '🔔 ' + t('sys_notif_prefs', 'تفضيلات الإشعارات'), desc: t('sys_notif_prefs_d', 'كل مستخدم يتحكم في قنوات تنبيهاته (Email/Push/SMS) لكل نوع حدث'), color: 'from-orange-500 to-amber-600', isNew: true },
-    { icon: MapIcon, title: '🗺️ ' + t('sys_compound_map', 'خريطة الكمبوند التفاعلية'), desc: t('sys_compound_map_d', 'عرض جغرافي بصري لكل المباني والوحدات مع ربط مباشر لملف الساكن'), color: 'from-green-500 to-emerald-600', isNew: true },
-    { icon: ArrowUpTrayIcon, title: '📋 ' + t('sys_csv_import', 'استيراد السكان CSV'), desc: t('sys_csv_import_d', 'رفع ملف Excel/CSV لإضافة مئات السكان دفعة واحدة مع التحقق الذكي من الأخطاء'), color: 'from-teal-500 to-cyan-600', isNew: true },
-    { icon: EnvelopeIcon, title: '📧 ' + t('sys_email_logs', 'سجل البريد الإلكتروني'), desc: t('sys_email_logs_d', 'لوحة super-admin: نجاح/فشل/Bounce + إعادة إرسال + كشف الـ bounces تلقائياً'), color: 'from-indigo-500 to-blue-600', isNew: true },
-    { icon: NewspaperIcon, title: '📝 ' + t('sys_content_hub', 'مدوّنة Content Hub'), desc: t('sys_content_hub_d', '10+ مقالات عربية + تعليقات + CMS مع اقتراح SEO بالـ AI'), color: 'from-rose-500 to-pink-600', isNew: true },
-    { icon: CheckCircleIcon, title: '✅ ' + t('sys_email_verify', 'تأكيد البريد الإلكتروني'), desc: t('sys_email_verify_d', 'حماية ضد الحسابات الوهمية: لازم تفعيل الإيميل قبل أول تسجيل دخول'), color: 'from-emerald-500 to-green-600', isNew: true },
-    { icon: FingerPrintIcon, title: '🔐 ' + t('sys_biometric', 'تسجيل دخول بالبصمة'), desc: t('sys_biometric_d', 'WebAuthn: Face ID / Touch ID للموبايل، Windows Hello للديسكتوب'), color: 'from-violet-500 to-purple-600', isNew: true },
+    { icon: AdjustmentsHorizontalIcon, category: 'comms', title: '🔔 ' + t('sys_notif_prefs', 'تفضيلات الإشعارات'), desc: t('sys_notif_prefs_d', 'كل مستخدم يتحكم في قنوات تنبيهاته (Email/Push/SMS) لكل نوع حدث'), color: 'from-orange-500 to-amber-600', isNew: true },
+    { icon: MapIcon, category: 'admin', title: '🗺️ ' + t('sys_compound_map', 'خريطة الكمبوند التفاعلية'), desc: t('sys_compound_map_d', 'عرض جغرافي بصري لكل المباني والوحدات مع ربط مباشر لملف الساكن'), color: 'from-green-500 to-emerald-600', isNew: true },
+    { icon: ArrowUpTrayIcon, category: 'admin', title: '📋 ' + t('sys_csv_import', 'استيراد السكان CSV'), desc: t('sys_csv_import_d', 'رفع ملف Excel/CSV لإضافة مئات السكان دفعة واحدة مع التحقق الذكي من الأخطاء'), color: 'from-teal-500 to-cyan-600', isNew: true },
+    { icon: EnvelopeIcon, category: 'comms', title: '📧 ' + t('sys_email_logs', 'سجل البريد الإلكتروني'), desc: t('sys_email_logs_d', 'لوحة super-admin: نجاح/فشل/Bounce + إعادة إرسال + كشف الـ bounces تلقائياً'), color: 'from-indigo-500 to-blue-600', isNew: true },
+    { icon: NewspaperIcon, category: 'comms', title: '📝 ' + t('sys_content_hub', 'مدوّنة Content Hub'), desc: t('sys_content_hub_d', '10+ مقالات عربية + تعليقات + CMS مع اقتراح SEO بالـ AI'), color: 'from-rose-500 to-pink-600', isNew: true },
+    { icon: CheckCircleIcon, category: 'security', title: '✅ ' + t('sys_email_verify', 'تأكيد البريد الإلكتروني'), desc: t('sys_email_verify_d', 'حماية ضد الحسابات الوهمية: لازم تفعيل الإيميل قبل أول تسجيل دخول'), color: 'from-emerald-500 to-green-600', isNew: true },
+    { icon: FingerPrintIcon, category: 'security', title: '🔐 ' + t('sys_biometric', 'تسجيل دخول بالبصمة'), desc: t('sys_biometric_d', 'WebAuthn: Face ID / Touch ID للموبايل، Windows Hello للديسكتوب'), color: 'from-violet-500 to-purple-600', isNew: true },
 
     // Smart devices (coming soon)
-    { icon: BoltIcon, title: t('sys_smart', 'الأجهزة الذكية'), desc: t('sys_smart_d', 'تحكم بالإضاءة + التكييف + الكاميرات + الأقفال (قريباً)'), color: 'from-amber-500 to-yellow-600', comingSoon: true },
+    { icon: BoltIcon, category: 'admin', title: t('sys_smart', 'الأجهزة الذكية'), desc: t('sys_smart_d', 'تحكم بالإضاءة + التكييف + الكاميرات + الأقفال (قريباً)'), color: 'from-amber-500 to-yellow-600', comingSoon: true },
   ];
+
+  // Filter categories for the 30-systems grid
+  const SYSTEM_FILTERS = [
+    { id: 'all',         label: t('hp_filter_all', 'الكل'),         emoji: '📚' },
+    { id: 'ai',          label: t('hp_filter_ai', 'AI'),            emoji: '✨' },
+    { id: 'new',         label: t('hp_filter_new', 'جديد'),         emoji: '🎉' },
+    { id: 'finance',     label: t('hp_filter_finance', 'مالي'),     emoji: '💰' },
+    { id: 'maintenance', label: t('hp_filter_maintenance', 'صيانة'),emoji: '🔧' },
+    { id: 'security',    label: t('hp_filter_security', 'أمن'),     emoji: '🛡️' },
+    { id: 'comms',       label: t('hp_filter_comms', 'تواصل'),      emoji: '💬' },
+  ];
+  // Apply the active filter
+  const filteredSystems = systems.filter((s) => {
+    if (systemFilter === 'all') return true;
+    if (systemFilter === 'ai') return s.isAI === true;
+    if (systemFilter === 'new') return s.isNew === true;
+    return s.category === systemFilter;
+  });
 
   const accountTypes = [
     { id: 'compound_admin', icon: BuildingOfficeIcon, title: t('hp_reg_compound'), desc: t('hp_reg_compound_desc'), color: 'from-blue-500 to-indigo-600', bg: 'bg-blue-50/80 border-blue-200 hover:border-blue-400', features: [t('feat_create_compound', 'إنشاء المجتمع'), t('feat_add_residents', 'إضافة السكان'), t('feat_assign_roles', 'تعيين الأمن والإداريين'), t('feat_manage_budget', 'إدارة الميزانية')] },
@@ -960,15 +1041,43 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 22 Systems */}
+      {/* 30 Systems */}
       <section className="py-16" id="systems" data-testid="systems-section">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_30_systems', '30 نظام متكامل')}</h2>
             <p className="text-gray-500">{t('hp_systems_desc', 'كل الأدوات التي تحتاجها لإدارة مجتمعك السكني باحترافية + ميزات AI متقدمة')}</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {systems.map((sys, i) => {
+
+          {/* 🔍 Filter Bar — narrows the systems grid to the chosen category */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-8" data-testid="systems-filter-bar">
+            {SYSTEM_FILTERS.map((f) => {
+              const active = systemFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setSystemFilter(f.id)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold border transition-all ${
+                    active
+                      ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white border-transparent shadow-md scale-105'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-violet-300 hover:text-violet-700 hover:bg-violet-50'
+                  }`}
+                  data-testid={`systems-filter-${f.id}`}
+                >
+                  <span className="ml-1">{f.emoji}</span> {f.label}
+                  {active && (
+                    <span className={`ms-1.5 px-1.5 py-0.5 rounded-full text-[9px] bg-white/25`}>
+                      {filteredSystems.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" data-testid="systems-grid">
+            {filteredSystems.map((sys, i) => {
               const Icon = sys.icon;
               return (
                 <div key={i} className={`bg-white rounded-xl border p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all group relative ${

@@ -41,6 +41,7 @@ const SidebarAccountSwitcher = ({ isSuperAdmin = false }) => {
   const [accounts, setAccounts] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [showLink, setShowLink] = useState(false);
+  const [showAddCta, setShowAddCta] = useState(false); // surface "+ add" even with 0 accounts on hover
   const fetchedOnceRef = useRef(false);
 
   const fetchAccounts = async () => {
@@ -118,6 +119,37 @@ const SidebarAccountSwitcher = ({ isSuperAdmin = false }) => {
     : 'bg-gray-50 hover:bg-white border-gray-200';
   const labelCls = isSuperAdmin ? 'text-gray-200' : 'text-gray-800';
   const subLabelCls = isSuperAdmin ? 'text-gray-500' : 'text-gray-500';
+
+  // 💡 UX: when the user has no linked accounts yet, surface a compact
+  // "+ ربط حساب" inline link only. This keeps the sidebar uncluttered until
+  // there is something to switch to. Once a first account is linked,
+  // `expanded` is auto-set to true so the user immediately sees the new card.
+  if (!hasLinked && !showAddCta) {
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => { setShowAddCta(true); setShowLink(true); }}
+          className={`w-full flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-medium transition ${
+            isSuperAdmin
+              ? 'text-gray-500 hover:text-purple-300 hover:bg-purple-900/20'
+              : 'text-gray-500 hover:text-blue-700 hover:bg-blue-50'
+          }`}
+          data-testid="sidebar-account-add-empty"
+          title={t('link_first_account_hint', 'اربط حساب آخر للتبديل السريع')}
+        >
+          <UserPlusIcon className="w-3.5 h-3.5" />
+          <span>{t('link_first_account', 'ربط حساب آخر')}</span>
+        </button>
+        {showLink && (
+          <LinkAccountDialog
+            onClose={() => { setShowLink(false); setShowAddCta(false); }}
+            onLinked={() => { setShowLink(false); fetchAccounts(); setExpanded(true); }}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>

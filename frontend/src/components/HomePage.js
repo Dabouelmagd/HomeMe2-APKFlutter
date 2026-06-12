@@ -17,7 +17,8 @@ import {
   NewspaperIcon, LightBulbIcon, HomeModernIcon, FingerPrintIcon,
   QrCodeIcon, ClockIcon, PresentationChartBarIcon,
   BoltIcon, EnvelopeIcon, ArrowPathIcon,
-  ArrowRightOnRectangleIcon, Squares2X2Icon, XMarkIcon
+  ArrowRightOnRectangleIcon, Squares2X2Icon, XMarkIcon,
+  MapIcon, ArrowUpTrayIcon, AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
 
 import InternalAdBanner from './InternalAdBanner';
@@ -271,6 +272,15 @@ const HomePage = () => {
     { icon: PresentationChartBarIcon, title: '📊 ' + t('sys_sub_analytics', 'تحليلات الاشتراكات'), desc: t('sys_sub_analytics_d', 'MRR + ARR + Churn + Trial→Paid + Migration Tool للأدمن'), color: 'from-cyan-500 to-blue-600', isAI: true },
     { icon: GlobeAltIcon, title: '🌐 ' + t('sys_multilang', '3 لغات + ترجمة AI'), desc: t('sys_multilang_d', 'AR/EN/FR + Owner Editor مع زر "ترجم بـ AI" عبر Gemini'), color: 'from-blue-500 to-indigo-600', isAI: true },
 
+    // ✨ NEW Systems (Iter 127-133)
+    { icon: AdjustmentsHorizontalIcon, title: '🔔 ' + t('sys_notif_prefs', 'تفضيلات الإشعارات'), desc: t('sys_notif_prefs_d', 'كل مستخدم يتحكم في قنوات تنبيهاته (Email/Push/SMS) لكل نوع حدث'), color: 'from-orange-500 to-amber-600', isNew: true },
+    { icon: MapIcon, title: '🗺️ ' + t('sys_compound_map', 'خريطة الكمبوند التفاعلية'), desc: t('sys_compound_map_d', 'عرض جغرافي بصري لكل المباني والوحدات مع ربط مباشر لملف الساكن'), color: 'from-green-500 to-emerald-600', isNew: true },
+    { icon: ArrowUpTrayIcon, title: '📋 ' + t('sys_csv_import', 'استيراد السكان CSV'), desc: t('sys_csv_import_d', 'رفع ملف Excel/CSV لإضافة مئات السكان دفعة واحدة مع التحقق الذكي من الأخطاء'), color: 'from-teal-500 to-cyan-600', isNew: true },
+    { icon: EnvelopeIcon, title: '📧 ' + t('sys_email_logs', 'سجل البريد الإلكتروني'), desc: t('sys_email_logs_d', 'لوحة super-admin: نجاح/فشل/Bounce + إعادة إرسال + كشف الـ bounces تلقائياً'), color: 'from-indigo-500 to-blue-600', isNew: true },
+    { icon: NewspaperIcon, title: '📝 ' + t('sys_content_hub', 'مدوّنة Content Hub'), desc: t('sys_content_hub_d', '10+ مقالات عربية + تعليقات + CMS مع اقتراح SEO بالـ AI'), color: 'from-rose-500 to-pink-600', isNew: true },
+    { icon: CheckCircleIcon, title: '✅ ' + t('sys_email_verify', 'تأكيد البريد الإلكتروني'), desc: t('sys_email_verify_d', 'حماية ضد الحسابات الوهمية: لازم تفعيل الإيميل قبل أول تسجيل دخول'), color: 'from-emerald-500 to-green-600', isNew: true },
+    { icon: FingerPrintIcon, title: '🔐 ' + t('sys_biometric', 'تسجيل دخول بالبصمة'), desc: t('sys_biometric_d', 'WebAuthn: Face ID / Touch ID للموبايل، Windows Hello للديسكتوب'), color: 'from-violet-500 to-purple-600', isNew: true },
+
     // Smart devices (coming soon)
     { icon: BoltIcon, title: t('sys_smart', 'الأجهزة الذكية'), desc: t('sys_smart_d', 'تحكم بالإضاءة + التكييف + الكاميرات + الأقفال (قريباً)'), color: 'from-amber-500 to-yellow-600', comingSoon: true },
   ];
@@ -305,6 +315,17 @@ const HomePage = () => {
     { id: 'subscription_analytics', icon: ChartBarIcon, title: '📊 ' + t('gd_sub_analytics', 'تحليلات الاشتراكات'), content: t('gd_sub_analytics_d', 'لوحة Owner متكاملة: MRR (الإيراد الشهري المتكرر) + ARR (السنوي) + Churn Rate + Trial→Paid Conversion + MRR by Plan. قائمة الشركات تنتهي خلال 7 أيام + اللي ألغوا. أداة Migration Tool لإرسال دعوات الترقية لـ Auto-Renewal بالجملة.') },
     { id: 'stripe_recurring', icon: ArrowPathIcon, title: '🔁 ' + t('gd_stripe_auto', 'Stripe Auto-Renewal'), content: t('gd_stripe_auto_d', 'اشتراك يجدد نفسه تلقائياً (شهري أو سنوي) عبر Stripe Subscriptions. خصم 17% عند اختيار السنوي. Customer Portal لإدارة الكارت / الفواتير / الإلغاء في أي وقت. Webhook يحدث DB تلقائياً عند نجاح/فشل التجديد.') },
     { id: 'multilang', icon: GlobeAltIcon, title: '🌐 ' + t('gd_multilang', '3 لغات + ترجمة AI'), content: t('gd_multilang_d', 'الواجهة بالكامل بالعربي + الإنجليزي + الفرنسي. صفحات قانونية (من نحن/الخصوصية/الشروط/اتصل بنا) قابلة للتعديل من Owner Editor مع زر "ترجم بـ AI" ينشئ النسخ الأخرى تلقائياً عبر Gemini خلال ثوانٍ.') },
+
+    // ✨ NEW Features (Iter 127-133)
+    { id: 'notif_prefs', icon: AdjustmentsHorizontalIcon, title: '🔔 ' + t('gd_notif_prefs', 'تفضيلات الإشعارات'), content: t('gd_notif_prefs_d', 'صفحة "الإشعارات والتفضيلات" تتيح لكل مستخدم اختيار كيف يستقبل كل نوع تنبيه: بريد، Push، SMS، أو داخل التطبيق فقط. تحكم دقيق بـ 12 نوع حدث (شكوى، فاتورة، صيانة، إعلان، إلخ) — مفيش تنبيهات غير مرغوبة.') },
+    { id: 'compound_map', icon: MapIcon, title: '🗺️ ' + t('gd_compound_map', 'خريطة الكمبوند'), content: t('gd_compound_map_d', 'عرض جغرافي تفاعلي لكل المباني والوحدات داخل المجمع. اضغط على أي وحدة لرؤية ملف الساكن مباشرة. مفيد للأمن (تحديد موقع البلاغ) وللإدارة (نظرة بصرية شاملة).') },
+    { id: 'csv_import', icon: ArrowUpTrayIcon, title: '📋 ' + t('gd_csv_import', 'استيراد السكان CSV'), content: t('gd_csv_import_d', 'ارفع ملف Excel أو CSV فيه قائمة السكان (اسم، إيميل، رقم وحدة، تليفون). النظام يتحقق من الأخطاء، يستثني التكرارات، ويرسل لكل واحد بيانات دخوله تلقائياً. يوفّر ساعات من العمل اليدوي.') },
+    { id: 'email_logs', icon: EnvelopeIcon, title: '📧 ' + t('gd_email_logs', 'سجل البريد الإلكتروني'), content: t('gd_email_logs_d', 'لوحة Super-Admin لتتبع كل إيميل صدر من النظام: نجاح / فشل / Bounce. إحصائيات 7 أيام و30 يوم + معدّل النجاح. زرّ "أعد الإرسال" + كشف الـ bounces تلقائياً عبر IMAP poll كل 15 دقيقة.') },
+    { id: 'content_hub', icon: NewspaperIcon, title: '📝 ' + t('gd_content_hub', 'مدوّنة Content Hub'), content: t('gd_content_hub_d', 'بوابة محتوى عربية ضمن الموقع: 10+ مقالات أصيلة عن إدارة المجمعات + نظام تعليقات (مع موافقة الأدمن) + CMS كامل في Super-Admin لإضافة وتعديل المقالات. زرّ "اقترح SEO بالـ AI" يولّد عنوان وملخّص وكلمات مفتاحية تلقائياً.') },
+    { id: 'email_verify', icon: CheckCircleIcon, title: '✅ ' + t('gd_email_verify', 'تأكيد البريد الإلكتروني'), content: t('gd_email_verify_d', 'كل مستخدم جديد لازم يفعّل إيميله من خلال رابط يصله أول مرة قبل ما يقدر يسجّل دخول. حماية من الحسابات الوهمية والـ spam، وضمان إن كل بريد دخول هو ملك صاحبه فعلاً. زرّ "إعادة إرسال رمز التحقق" موجود.') },
+    { id: 'biometric', icon: FingerPrintIcon, title: '🔐 ' + t('gd_biometric', 'تسجيل دخول بالبصمة'), content: t('gd_biometric_d', 'دعم WebAuthn الكامل: استخدم بصمة الموبايل (Face ID / Touch ID) أو Windows Hello في الديسكتوب للدخول السريع بدون كلمة مرور. مفعّل من إعدادات الأمان لكل مستخدم.') },
+    { id: 'account_switcher', icon: ArrowRightOnRectangleIcon, title: '🔄 ' + t('gd_account_switcher', 'تبديل الحسابات بدون Logout'), content: t('gd_account_switcher_d', 'لو عندك أكثر من حساب (مثلاً Owner + Resident في نفس المجمع)، اربطهم مرة واحدة من القائمة الجانبية ثم بدّل بينهم بضغطة واحدة بدون تسجيل خروج. تجربة سلسة لمن يدير أكثر من دور.') },
+
     { id: 'smart', icon: BoltIcon, title: t('gd_smart', 'الأجهزة الذكية (قريباً)'), content: t('gd_smart_d', 'تحكم ذكي بالإضاءة، التكييف، الكاميرات، الأقفال الذكية، أنظمة الأمان. أوامر عربية بالذكاء الاصطناعي. تكامل مع Google Home + Apple HomeKit + Alexa.') },
   ];
 
@@ -943,7 +964,7 @@ const HomePage = () => {
       <section className="py-16" id="systems" data-testid="systems-section">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_22_systems', '22 نظام متكامل')}</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_30_systems', '30 نظام متكامل')}</h2>
             <p className="text-gray-500">{t('hp_systems_desc', 'كل الأدوات التي تحتاجها لإدارة مجتمعك السكني باحترافية + ميزات AI متقدمة')}</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -951,11 +972,18 @@ const HomePage = () => {
               const Icon = sys.icon;
               return (
                 <div key={i} className={`bg-white rounded-xl border p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all group relative ${
-                  sys.isAI ? 'border-violet-200 bg-gradient-to-br from-violet-50/40 to-fuchsia-50/30' : 'border-gray-100'
+                  sys.isAI ? 'border-violet-200 bg-gradient-to-br from-violet-50/40 to-fuchsia-50/30' :
+                  sys.isNew ? 'border-emerald-200 bg-gradient-to-br from-emerald-50/40 to-teal-50/30' :
+                  'border-gray-100'
                 }`}>
                   {sys.isAI && (
                     <span className="absolute -top-2 -right-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md">
                       جديد ✨
+                    </span>
+                  )}
+                  {sys.isNew && (
+                    <span className="absolute -top-2 -right-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full shadow-md">
+                      جديد 🎉
                     </span>
                   )}
                   {sys.comingSoon && (
@@ -966,7 +994,11 @@ const HomePage = () => {
                   <div className={`inline-flex p-2.5 rounded-lg bg-gradient-to-r ${sys.color} mb-3 group-hover:scale-110 transition-transform`}>
                     <Icon className="h-5 w-5 text-white" />
                   </div>
-                  <h4 className={`font-bold mb-1 ${sys.isAI ? 'text-violet-900' : 'text-gray-900'}`}>{sys.title}</h4>
+                  <h4 className={`font-bold mb-1 ${
+                    sys.isAI ? 'text-violet-900' :
+                    sys.isNew ? 'text-emerald-900' :
+                    'text-gray-900'
+                  }`}>{sys.title}</h4>
                   <p className="text-xs text-gray-500 leading-relaxed">{sys.desc}</p>
                 </div>
               );
@@ -1297,7 +1329,7 @@ const HomePage = () => {
             <div className="flex gap-6 text-sm">
               <a href="#guide" className="hover:text-white transition-colors">{t('hp_guide_btn')}</a>
               <a href="#pricing" className="hover:text-white transition-colors">{t('hp_sub_codes')}</a>
-              <a href="#systems" className="hover:text-white transition-colors">{t('hp_22_systems', '22 نظام متكامل')}</a>
+              <a href="#systems" className="hover:text-white transition-colors">{t('hp_30_systems', '30 نظام متكامل')}</a>
               <a href="#ai-features" className="hover:text-white transition-colors">✨ {t('hp_whats_new', 'ما الجديد')}</a>
               <a href="#testimonials" className="hover:text-white transition-colors">⭐ شهادات</a>
               <a href="#faq" className="hover:text-white transition-colors">❓ {t('hp_faq', 'الأسئلة الشائعة')}</a>

@@ -2,8 +2,9 @@
 Weekly Admin Digest
 ===================
 
-Every Monday at 06:00 UTC, send a concise summary email to each compound's
-admins covering activity from the previous Mon-Sun:
+Every Monday at 06:00 UTC (or each user's configured day/hour), send a
+concise summary email to each compound's admins covering activity from
+the previous Mon-Sun:
 
 - Maintenance requests (new / open / resolved)
 - Complaints (new / open / resolved) — including praise count
@@ -14,6 +15,8 @@ admins covering activity from the previous Mon-Sun:
 Idempotency: A document per ``(compound_id, week_iso)`` is recorded in
 ``weekly_digest_runs`` so the loop never double-sends after a restart.
 
+Per-admin overrides live in ``digest_preferences`` keyed by ``user_id``.
+
 On-demand: ``POST /api/reports/run-weekly-now`` (admin) for testing/manual.
 """
 from __future__ import annotations
@@ -21,12 +24,82 @@ import asyncio
 import logging
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
+from typing import Optional, Dict
 
 from database import get_db
 from auth_deps import get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["weekly-digest"])
+
+
+# --- Per-admin preferences ---------------------------------------------------
+
+# Default delivery window: Monday 06:00 UTC.
+DEFAULT_DIGEST_PREFS = {
+    "enabled": True,
+    "day_of_week": 0,    # Mon=0..Sun=6
+    "hour_utc": 6,
+    "sections": {        # which payload sections to include
+        "maintenance": True,
+        "complaints": True,
+        "praise": True,
+        "payments": True,
+        "occupancy": True,
+        "top_urgent": True,
+    },
+}
+
+
+class DigestPreferences(BaseModel):
+    enabled: Optional[bool] = None
+    day_of_week: Optional[int] = None
+    hour_utc: Optional[int] = None
+    sections: Optional[Dict[str, bool]] = None
+
+
+def _merge_prefs(stored: Optional[dict]) -> dict:
+    """Combine stored doc with defaults so callers always see all keys."""
+    out = {**DEFAULT_DIGEST_PREFS}
+    if stored:
+        for k in ("enabled", "day_of_week", "hour_utc"):
+            if k in stored and stored[k] is not None:
+                out[k] = stored[k]
+        if stored.get("sections"):
+            out["sections"] = {**DEFAULT_DIGEST_PREFS["sections"], **stored["sections"]}
+    return out
+
+
+@router.get("/digest/preferences")
+async def get_digest_prefs(current_user: dict = Depends(get_current_user)):
+    db = get_db()
+    doc = await db.digest_preferences.find_one(
+        {"user_id": current_user["id"]}, {"_id": 0}
+    )
+    return {"user_id": current_user["id"], **_merge_prefs(doc)}
+
+
+@router.put("/digest/preferences")
+async def update_digest_prefs(data: DigestPreferences, current_user: dict = Depends(get_current_user)):
+    db = get_db()
+    payload = data.model_dump(exclude_none=True)
+    if "day_of_week" in payload:
+        payload["day_of_week"] = max(0, min(6, int(payload["day_of_week"])))
+    if "hour_utc" in payload:
+        payload["hour_utc"] = max(0, min(23, int(payload["hour_utc"])))
+    await db.digest_preferences.update_one(
+        {"user_id": current_user["id"]},
+        {"$set": {**payload, "updated_at": datetime.now(timezone.utc)}},
+        upsert=True,
+    )
+    doc = await db.digest_preferences.find_one(
+        {"user_id": current_user["id"]}, {"_id": 0}
+    )
+    return {"user_id": current_user["id"], **_merge_prefs(doc), "saved": True}
+
+
+# --- Window helpers ----------------------------------------------------------
 
 
 def _previous_week_window(now: datetime) -> tuple[datetime, datetime, str]:
@@ -104,8 +177,8 @@ async def _gather_metrics(db, compound_id: str, start: datetime, end: datetime) 
     }
 
 
-def _render_html(compound_name: str, week_label: str, m: dict, lang_dir: str = "rtl") -> str:
-    """Inline-styled email body. Email clients don't reliably support CSS files."""
+def _render_html(compound_name: str, week_label: str, m: dict, sections: dict, lang_dir: str = "rtl") -> str:
+    """Inline-styled email body. Sections can be turned off per-recipient."""
     pay = m["payments"]
     mx = m["maintenance"]
     co = m["complaints"]
@@ -114,107 +187,142 @@ def _render_html(compound_name: str, week_label: str, m: dict, lang_dir: str = "
         f"<li style='margin:6px 0'>{x['emoji']} {x['label']}</li>" for x in m["top"]
     ) or "<li style='color:#999'>لا توجد أحداث عاجلة هذا الأسبوع 🎉</li>"
 
-    return f"""
-<div dir="{lang_dir}" style="font-family:'Cairo',Tahoma,Arial,sans-serif;max-width:640px;margin:0 auto;padding:20px;background:#f8fafc">
-  <div style="background:linear-gradient(135deg,#7c3aed,#ec4899);padding:24px;border-radius:14px;color:white;text-align:center">
-    <h1 style="margin:0;font-size:22px">📊 الملخص الأسبوعي</h1>
-    <div style="opacity:.85;margin-top:6px;font-size:13px">{compound_name} · {week_label}</div>
+    blocks = [
+        f"""
+<div style="background:linear-gradient(135deg,#7c3aed,#ec4899);padding:24px;border-radius:14px;color:white;text-align:center">
+  <h1 style="margin:0;font-size:22px">📊 الملخص الأسبوعي</h1>
+  <div style="opacity:.85;margin-top:6px;font-size:13px">{compound_name} · {week_label}</div>
+</div>"""
+    ]
+
+    if sections.get("maintenance", True):
+        blocks.append(f"""
+<div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+  <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">🔧 الصيانة</h3>
+  <div style="font-size:13px;color:#475569;line-height:1.9">
+    <div>طلبات جديدة هذا الأسبوع: <b style="color:#0f172a">{mx['new']}</b></div>
+    <div>قيد التنفيذ حالياً: <b style="color:#d97706">{mx['open']}</b></div>
+    <div>تم إنجازها: <b style="color:#16a34a">{mx['resolved']}</b></div>
   </div>
+</div>""")
 
-  <div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-    <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">🔧 الصيانة</h3>
-    <div style="font-size:13px;color:#475569;line-height:1.9">
-      <div>طلبات جديدة هذا الأسبوع: <b style="color:#0f172a">{mx['new']}</b></div>
-      <div>قيد التنفيذ حالياً: <b style="color:#d97706">{mx['open']}</b></div>
-      <div>تم إنجازها: <b style="color:#16a34a">{mx['resolved']}</b></div>
-    </div>
+    if sections.get("complaints", True):
+        praise_line = (
+            f"<div>إطراء جديد 💖: <b style='color:#ec4899'>{co['praise_new']}</b></div>"
+            if sections.get("praise", True) else ""
+        )
+        blocks.append(f"""
+<div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+  <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">⚠️ الشكاوى والمقترحات</h3>
+  <div style="font-size:13px;color:#475569;line-height:1.9">
+    <div>شكاوى/اقتراحات جديدة: <b style="color:#0f172a">{co['new']}</b></div>
+    <div>قيد المعالجة: <b style="color:#d97706">{co['open']}</b></div>
+    {praise_line}
   </div>
+</div>""")
 
-  <div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-    <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">⚠️ الشكاوى والمقترحات</h3>
-    <div style="font-size:13px;color:#475569;line-height:1.9">
-      <div>شكاوى/اقتراحات جديدة: <b style="color:#0f172a">{co['new']}</b></div>
-      <div>قيد المعالجة: <b style="color:#d97706">{co['open']}</b></div>
-      <div>إطراء جديد 💖: <b style="color:#ec4899">{co['praise_new']}</b></div>
-    </div>
+    if sections.get("payments", True):
+        blocks.append(f"""
+<div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+  <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">💰 المدفوعات المستلمة</h3>
+  <div style="font-size:13px;color:#475569;line-height:1.9">
+    <div>عدد العمليات: <b style="color:#0f172a">{pay['count']}</b></div>
+    <div>الإجمالي: <b style="color:#16a34a">{pay['total']:,.2f} ج.م</b></div>
   </div>
+</div>""")
 
-  <div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-    <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">💰 المدفوعات المستلمة</h3>
-    <div style="font-size:13px;color:#475569;line-height:1.9">
-      <div>عدد العمليات: <b style="color:#0f172a">{pay['count']}</b></div>
-      <div>الإجمالي: <b style="color:#16a34a">{pay['total']:,.2f} ج.م</b></div>
-    </div>
+    if sections.get("occupancy", True):
+        blocks.append(f"""
+<div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+  <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">🏠 إشغال الوحدات</h3>
+  <div style="font-size:13px;color:#475569;line-height:1.9">
+    <div>الإجمالي: <b>{occ['total_units']}</b> · مسكونة: <b style="color:#16a34a">{occ['occupied']}</b> · شاغرة: <b style="color:#dc2626">{occ['vacant']}</b></div>
   </div>
+</div>""")
 
-  <div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-    <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">🏠 إشغال الوحدات</h3>
-    <div style="font-size:13px;color:#475569;line-height:1.9">
-      <div>الإجمالي: <b>{occ['total_units']}</b> · مسكونة: <b style="color:#16a34a">{occ['occupied']}</b> · شاغرة: <b style="color:#dc2626">{occ['vacant']}</b></div>
-    </div>
-  </div>
+    if sections.get("top_urgent", True):
+        blocks.append(f"""
+<div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+  <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">🚨 يحتاج انتباهك</h3>
+  <ul style="font-size:13px;color:#475569;list-style:none;padding:0;margin:0">{top_items}</ul>
+</div>""")
 
-  <div style="background:white;border-radius:14px;padding:18px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-    <h3 style="margin:0 0 10px 0;color:#1e293b;font-size:14px">🚨 يحتاج انتباهك</h3>
-    <ul style="font-size:13px;color:#475569;list-style:none;padding:0;margin:0">{top_items}</ul>
-  </div>
+    blocks.append("""
+<p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:18px">
+  HomeMe · الملخصات الأسبوعية تصلك حسب جدولك المخصص<br/>
+  لتعديل الجدول أو إيقاف التقرير، افتح الإعدادات → التقرير الأسبوعي
+</p>""")
 
-  <p style="text-align:center;color:#94a3b8;font-size:11px;margin-top:18px">
-    HomeMe · الملخصات الأسبوعية تصلك كل يوم اثنين<br/>
-    لإلغاء الاشتراك في هذا التقرير، عدّل تفضيلات الإشعارات من الإعدادات
-  </p>
-</div>
-"""
+    body = "".join(blocks)
+    return (
+        f'<div dir="{lang_dir}" style="font-family:\'Cairo\',Tahoma,Arial,sans-serif;max-width:640px;'
+        f'margin:0 auto;padding:20px;background:#f8fafc">{body}</div>'
+    )
 
 
-async def _send_digest_for_compound(db, compound: dict, start: datetime, end: datetime, week_label: str) -> dict:
-    """Render + email digest to all admins of a single compound."""
+async def _send_digest_for_compound(db, compound: dict, start: datetime, end: datetime, week_label: str,
+                                    *, admin_filter_user_id: Optional[str] = None,
+                                    ignore_idempotency: bool = False) -> dict:
+    """Render + email digest to admins of a compound.
+
+    When ``admin_filter_user_id`` is set, only that admin is targeted (used by
+    per-user scheduling). When ``ignore_idempotency`` is True, we bypass the
+    week-already-sent guard (manual trigger / per-user scheduling).
+    """
     compound_id = compound["id"]
-    # Idempotency: short-circuit if we already sent this week
-    seen = await db.weekly_digest_runs.find_one({"compound_id": compound_id, "week": week_label})
-    if seen:
-        return {"compound_id": compound_id, "skipped": True, "reason": "already_sent"}
+    if not ignore_idempotency:
+        seen = await db.weekly_digest_runs.find_one({"compound_id": compound_id, "week": week_label})
+        if seen:
+            return {"compound_id": compound_id, "skipped": True, "reason": "already_sent"}
 
     metrics = await _gather_metrics(db, compound_id, start, end)
-    html = _render_html(compound.get("name") or "المجمع", week_label, metrics)
-    subject = f"📊 الملخص الأسبوعي — {compound.get('name','المجمع')} ({week_label})"
 
-    # Fan out via dispatcher so per-admin email pref is respected
-    from notification_dispatch import dispatch_notification
-    admins = await db.users.find(
-        {"compound_id": compound_id, "role": {"$in": ["admin", "compound_admin", "company_admin"]}},
-        {"id": 1, "_id": 0},
-    ).to_list(50)
+    # Resolve recipients
+    admin_query = {"compound_id": compound_id, "role": {"$in": ["admin", "compound_admin", "company_admin"]}}
+    if admin_filter_user_id:
+        admin_query = {"id": admin_filter_user_id}
+    admins = await db.users.find(admin_query, {"id": 1, "_id": 0}).to_list(50)
     admin_ids = [a["id"] for a in admins if a.get("id")]
     if not admin_ids:
         return {"compound_id": compound_id, "skipped": True, "reason": "no_admins"}
 
-    result = await dispatch_notification(
-        db,
-        admin_ids,
-        event_type="system",  # admin reports map to "system" channel
-        title=f"الملخص الأسبوعي — {compound.get('name','المجمع')}",
-        body=f"📈 {metrics['maintenance']['new']} طلب صيانة • {metrics['complaints']['new']} شكوى • {metrics['payments']['count']} دفعة",
-        in_app_payload={"compound_id": compound_id, "type": "weekly_digest"},
-        email_html=html,
-        email_subject=subject,
-    )
+    # Per-admin section preferences mean we may need to fan out individually
+    from notification_dispatch import dispatch_notification
 
-    await db.weekly_digest_runs.insert_one({
-        "compound_id": compound_id,
-        "week": week_label,
-        "sent_at": datetime.now(timezone.utc),
-        "result": result,
-    })
-    logger.info(f"[weekly_digest] sent for {compound_id} week={week_label} result={result}")
-    return {"compound_id": compound_id, "result": result}
+    sent_results = []
+    for uid in admin_ids:
+        pref_doc = await db.digest_preferences.find_one({"user_id": uid}, {"_id": 0})
+        prefs = _merge_prefs(pref_doc)
+        if not prefs["enabled"]:
+            sent_results.append({"user_id": uid, "skipped": True, "reason": "disabled"})
+            continue
+        html = _render_html(compound.get("name") or "المجمع", week_label, metrics, prefs["sections"])
+        subject = f"📊 الملخص الأسبوعي — {compound.get('name','المجمع')} ({week_label})"
+        result = await dispatch_notification(
+            db,
+            [uid],
+            event_type="system",
+            title=f"الملخص الأسبوعي — {compound.get('name','المجمع')}",
+            body=f"📈 {metrics['maintenance']['new']} طلب صيانة • {metrics['complaints']['new']} شكوى • {metrics['payments']['count']} دفعة",
+            in_app_payload={"compound_id": compound_id, "type": "weekly_digest"},
+            email_html=html,
+            email_subject=subject,
+        )
+        sent_results.append({"user_id": uid, "result": result})
+
+    if not ignore_idempotency:
+        await db.weekly_digest_runs.insert_one({
+            "compound_id": compound_id,
+            "week": week_label,
+            "sent_at": datetime.now(timezone.utc),
+            "result": sent_results,
+        })
+    logger.info(f"[weekly_digest] sent for {compound_id} week={week_label} count={len(sent_results)}")
+    return {"compound_id": compound_id, "sent_to": len(sent_results), "results": sent_results}
 
 
 async def run_weekly_digest_once() -> dict:
-    """Generate + email digests for *every* compound for the previous week.
-
-    Returns a summary dict ``{processed, skipped, errors}`` for observability.
-    """
+    """Generate + email digests for *every* compound for the previous week."""
     db = get_db()
     now = datetime.now(timezone.utc)
     start, end, week_label = _previous_week_window(now)
@@ -240,14 +348,59 @@ async def run_weekly_digest_once() -> dict:
 
 
 async def weekly_digest_loop() -> None:
-    """Background loop: wakes hourly, fires once per Mon 06:00-06:59 UTC."""
+    """Background loop: wakes hourly.
+
+    * Auto-fires the global per-compound digest at Mon 06:00 UTC.
+    * Also checks each user's custom (day_of_week, hour_utc) schedule and
+      delivers individually with their section preferences.
+    """
     while True:
         try:
             now = datetime.now(timezone.utc)
-            # weekday(): Mon=0
+            db = get_db()
+
+            # 1) Default global trigger (kept for compounds with admins on defaults)
             if now.weekday() == 0 and now.hour == 6:
-                logger.info("[weekly_digest] trigger window hit; running...")
+                logger.info("[weekly_digest] global trigger window hit; running...")
                 await run_weekly_digest_once()
+
+            # 2) Per-user custom schedules
+            prefs_cursor = db.digest_preferences.find(
+                {"enabled": {"$ne": False}, "day_of_week": now.weekday(), "hour_utc": now.hour},
+                {"user_id": 1, "_id": 0},
+            )
+            user_ids = [d["user_id"] async for d in prefs_cursor]
+            if user_ids:
+                start, end, week_label = _previous_week_window(now)
+                for uid in user_ids:
+                    try:
+                        # Avoid double-send if global block already fired
+                        marker = await db.weekly_digest_user_runs.find_one(
+                            {"user_id": uid, "week": week_label}
+                        )
+                        if marker:
+                            continue
+                        user = await db.users.find_one(
+                            {"id": uid}, {"compound_id": 1, "_id": 0}
+                        )
+                        if not user or not user.get("compound_id"):
+                            continue
+                        compound = await db.compounds.find_one(
+                            {"id": user["compound_id"]}, {"id": 1, "name": 1, "_id": 0}
+                        )
+                        if not compound:
+                            continue
+                        await _send_digest_for_compound(
+                            db, compound, start, end, week_label,
+                            admin_filter_user_id=uid, ignore_idempotency=True,
+                        )
+                        await db.weekly_digest_user_runs.insert_one({
+                            "user_id": uid,
+                            "week": week_label,
+                            "sent_at": datetime.now(timezone.utc),
+                        })
+                    except Exception as e:  # noqa: BLE001
+                        logger.warning(f"[weekly_digest] user {uid} schedule failed: {e}")
         except Exception as e:  # noqa: BLE001
             logger.exception(f"[weekly_digest] loop error: {e}")
         await asyncio.sleep(60 * 60)  # check hourly

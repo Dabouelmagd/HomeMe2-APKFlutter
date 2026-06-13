@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../App';
 import PushNotifications from './PushNotifications';
 import NotificationPreferencesPage from './NotificationPreferencesPage';
+import WeeklyDigestSettings from './WeeklyDigestSettings';
 import {
   Cog6ToothIcon,
   UserIcon,
@@ -118,6 +119,15 @@ const Settings = () => {
           textColor: 'text-purple-600 dark:text-purple-400'
         },
         {
+          id: 'weekly_digest',
+          name: t('weekly_digest', 'التقرير الأسبوعي'),
+          description: t('weekly_digest_desc', 'يوم/ساعة الإرسال + اختيار الأقسام'),
+          icon: BellIcon,
+          color: 'bg-emerald-500',
+          lightColor: 'bg-emerald-50 dark:bg-emerald-900/20',
+          textColor: 'text-emerald-600 dark:text-emerald-400'
+        },
+        {
           id: 'language',
           name: t('settings_language', 'اللغة'),
           description: t('language_desc', 'اختيار لغة التطبيق'),
@@ -226,6 +236,8 @@ const Settings = () => {
         return <PushNotifications />;
       case 'notif_channels':
         return <NotificationPreferencesPage />;
+      case 'weekly_digest':
+        return <WeeklyDigestSettings />;
       case 'profile':
         return <ProfileSettings />;
       case 'privacy':

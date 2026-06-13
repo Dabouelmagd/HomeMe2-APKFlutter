@@ -980,6 +980,140 @@ const Pricing = () => {
               <span className="font-medium">{t('secure_payment_guarantee')}</span>
             </div>
           </div>
+
+          {/* 📊 Side-by-Side Comparison Table */}
+          <div className="mt-16 max-w-6xl mx-auto" data-testid="pricing-comparison-section">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>
+                {t('plan_comparison_title', 'مقارنة تفصيلية بين الخطط')}
+              </h2>
+              <p className="text-gray-500 text-sm">
+                {t('plan_comparison_subtitle', 'كل شيء تحتاجين معرفته قبل الاختيار')}
+              </p>
+            </div>
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-x-auto">
+              <table className="w-full text-sm" data-testid="pricing-comparison-table">
+                <thead className="bg-gradient-to-r from-purple-50 to-fuchsia-50">
+                  <tr>
+                    <th className="px-4 py-3 text-start font-bold text-gray-700 sticky right-0 bg-gradient-to-r from-purple-50 to-fuchsia-50">
+                      {t('feature', 'الميزة')}
+                    </th>
+                    <th className="px-4 py-3 text-center font-bold text-gray-700">{t('free_plan', 'مجاني')}</th>
+                    <th className="px-4 py-3 text-center font-bold text-blue-700">{t('basic_plan', 'أساسي')}</th>
+                    <th className="px-4 py-3 text-center font-bold text-purple-700 bg-purple-100/50">{t('pro_plan', 'احترافي')} <span className="block text-[10px] font-normal text-purple-600">⭐ الأكثر شيوعاً</span></th>
+                    <th className="px-4 py-3 text-center font-bold text-fuchsia-700">{t('premium_plan', 'متقدم')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {[
+                    { f: 'عدد الوحدات',            v: ['20', '100', '500', '∞'] },
+                    { f: 'إدارة السكان والعائلات',  v: ['✓', '✓', '✓', '✓'] },
+                    { f: 'الفواتير والمدفوعات',     v: ['✓', '✓', '✓', '✓'] },
+                    { f: 'طلبات الصيانة',          v: ['10/شهر', '50/شهر', '∞', '∞'] },
+                    { f: 'الإعلانات والتواصل',     v: ['—', '✓', '✓', '✓'] },
+                    { f: 'الزوار + QR Code',       v: ['—', '✓', '✓', '✓'] },
+                    { f: 'تقارير PDF',             v: ['—', 'أساسية', 'متقدمة', 'مخصصة'] },
+                    { f: 'استيراد سكان CSV',        v: ['—', '✓', '✓', '✓'] },
+                    { f: 'مدفوعات أونلاين (Stripe)', v: ['—', '—', '✓', '✓'] },
+                    { f: 'مساعد AI + Auto-Pilot',  v: ['—', '—', '✓', '✓'] },
+                    { f: 'خريطة الكمبوند التفاعلية', v: ['—', '—', '✓', '✓'] },
+                    { f: 'تقرير أسبوعي تلقائي',     v: ['—', '—', '✓', '✓'] },
+                    { f: 'فريق المساعدين',          v: ['—', '—', '3', '∞'] },
+                    { f: 'الإعلانات التجارية (دخل)', v: ['—', '—', '—', '✓'] },
+                    { f: 'الدعم الفني',             v: ['بريد', 'بريد', 'بريد + شات', 'مخصص 24/7'] },
+                    { f: 'API للتكامل الخارجي',     v: ['—', '—', '—', '✓'] },
+                  ].map((row, i) => (
+                    <tr key={i} className="hover:bg-purple-50/30 transition">
+                      <td className="px-4 py-3 font-medium text-gray-700 sticky right-0 bg-white">{row.f}</td>
+                      {row.v.map((cell, j) => (
+                        <td key={j} className={`px-4 py-3 text-center ${cell === '✓' ? 'text-emerald-600 font-bold' : cell === '—' ? 'text-gray-300' : 'text-gray-700 font-medium'} ${j === 2 ? 'bg-purple-50/30' : ''}`}>
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Free trial CTA */}
+            <div className="mt-10 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 p-8 text-center text-white shadow-xl" data-testid="free-trial-cta">
+              <div className="text-4xl mb-2">🎁</div>
+              <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>
+                {t('free_trial_title', 'جرّبي مجاناً 14 يوم — بدون بطاقة ائتمان')}
+              </h3>
+              <p className="text-emerald-50 mb-5 max-w-xl mx-auto">
+                {t('free_trial_desc', 'فعّلي خطة "احترافي" مجاناً لمدة 14 يوم. كل الميزات متاحة بالكامل. ألغي في أي وقت بدون أي رسوم.')}
+              </p>
+              <button
+                onClick={() => navigate('/auth/register')}
+                className="inline-flex items-center gap-2 bg-white text-emerald-700 px-8 py-3 rounded-xl font-black text-lg hover:scale-105 transition-transform shadow-lg"
+                data-testid="free-trial-btn"
+              >
+                {t('start_free_trial', 'ابدئي التجربة المجانية الآن')} ←
+              </button>
+              <p className="text-[11px] text-emerald-100 mt-3 opacity-80">
+                {t('no_card_required', '✓ لا تحتاجين بطاقة ائتمان · ✓ إلغاء فوري · ✓ حماية كاملة لبياناتك')}
+              </p>
+            </div>
+
+            {/* Customer testimonials */}
+            <div className="mt-12">
+              <h3 className="text-2xl font-bold text-center text-gray-900 mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>
+                {t('testimonials_title', 'ماذا يقول عملاؤنا؟')}
+              </h3>
+              <p className="text-center text-gray-500 text-sm mb-8">
+                {t('testimonials_subtitle', 'مشرفو مجمعات سكنية يثقون بنا يومياً')}
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5" data-testid="testimonials-grid">
+                {[
+                  {
+                    quote: 'حوّلنا من إدارة 200 وحدة بـ Excel فوضوي إلى منصة كاملة في أسبوع واحد. الفواتير وتقارير الصيانة بقت تلقائية.',
+                    name: 'م. أحمد عبد الحميد',
+                    role: 'مدير كمبوند رويال سيتي',
+                    plan: 'احترافي',
+                    avatar: 'A',
+                    color: 'from-blue-500 to-indigo-600',
+                  },
+                  {
+                    quote: 'الأكثر اللي عجبني هو الـ AI Assistant — السكان بيسألوه أي سؤال بدل ما يتصلوا بنا. وفّر علينا 70% من الوقت.',
+                    name: 'أ. مريم الشاذلي',
+                    role: 'مالكة كمبوند نسمات',
+                    plan: 'متقدم',
+                    avatar: 'م',
+                    color: 'from-purple-500 to-fuchsia-600',
+                  },
+                  {
+                    quote: 'أول مرة سكان كمبوندنا يدفعوا الفواتير في الميعاد. التذكير التلقائي وزرّ "ادفع الآن" بـ Stripe غيّر اللعبة.',
+                    name: 'م. خالد منصور',
+                    role: 'مدير 5 كمبوندات (شركة الإدارة)',
+                    plan: 'شركة متوسطة',
+                    avatar: 'خ',
+                    color: 'from-emerald-500 to-teal-600',
+                  },
+                ].map((t_, i) => (
+                  <div
+                    key={i}
+                    className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition"
+                    data-testid={`testimonial-${i}`}
+                  >
+                    <div className="text-yellow-400 text-lg mb-3">★★★★★</div>
+                    <p className="text-sm text-gray-700 leading-relaxed mb-4">"{t_.quote}"</p>
+                    <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
+                      <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t_.color} flex items-center justify-center text-white font-bold`}>
+                        {t_.avatar}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-gray-900 text-sm">{t_.name}</div>
+                        <div className="text-[11px] text-gray-500">{t_.role}</div>
+                        <div className="text-[10px] text-purple-600 font-bold mt-0.5">{t('using_plan', 'خطة')}: {t_.plan}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

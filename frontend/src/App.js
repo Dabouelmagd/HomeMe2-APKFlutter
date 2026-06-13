@@ -146,6 +146,7 @@ import OwnerBudget from './components/OwnerBudget';
 import SubscriptionReminders from './components/SubscriptionReminders';
 import NotificationPreferencesPage from './components/NotificationPreferencesPage';
 import CompoundMap from './components/CompoundMap';
+import StaffManagement from './components/StaffManagement';
 import { GlobalUIProvider } from './providers/GlobalUIProvider';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -980,6 +981,11 @@ function App() {
                 } />
                 <Route path="compound-map" element={
                   <CompoundMap />
+                } />
+                <Route path="staff" element={
+                  <ProtectedRoute requiredRole="admin">
+                    <StaffManagement />
+                  </ProtectedRoute>
                 } />
                 
                 <Route path="gallery" element={

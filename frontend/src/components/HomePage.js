@@ -1458,6 +1458,9 @@ const HomePage = () => {
             <Link to="/legal/terms" className="hover:text-white transition-colors" data-testid="footer-legal-terms">شروط الاستخدام</Link>
             <span className="opacity-50">·</span>
             <Link to="/legal/contact" className="hover:text-white transition-colors" data-testid="footer-legal-contact">اتصل بنا</Link>
+            <Link to="/advertiser-register" className="hover:text-emerald-300 transition-colors font-bold text-emerald-400" data-testid="footer-advertise-link">
+              📢 أعلن في HomeMe
+            </Link>
             <span className="opacity-50">·</span>
             <span className="text-gray-500">Powered by Data Life AI</span>
           </div>

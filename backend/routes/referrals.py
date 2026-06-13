@@ -80,6 +80,45 @@ async def use_referral_code(data: ReferralUse, current_user: dict = Depends(get_
         }
     )
 
+    # 🎁 Double-sided referral (Iter 142): the referee — i.e. the person who
+    # *used* the code — gets a one-time 15% off coupon for their first paid
+    # subscription. The referrer's reward (free month every 5 invites) is
+    # unchanged below.
+    referee_coupon_code = f"WELCOME-{code[-4:]}-{current_user['id'][:6].upper()}"
+    try:
+        existing = await db.coupons.find_one({"code": referee_coupon_code})
+        if not existing:
+            await db.coupons.insert_one({
+                "id": str(uuid.uuid4()),
+                "code": referee_coupon_code,
+                "discount_type": "percentage",
+                "discount_value": 15,
+                "applicable_plans": [],          # all plans
+                "max_uses": 1,
+                "times_used": 0,
+                "is_active": True,
+                "expires_at": None,
+                "notes": f"خصم ترحيب 15% لمن استخدم كود إحالة {code}",
+                "created_by": "system",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "referral_reward": True,
+                "reward_for_user": current_user["id"],
+            })
+            await db.notifications.insert_one({
+                "id": str(uuid.uuid4()),
+                "user_id": current_user["id"],
+                "type": "referral_welcome",
+                "title": "🎁 مرحباً بك في HomeMe!",
+                "message": f"احصل على خصم 15% على أول اشتراك. الكود: {referee_coupon_code}",
+                "read": False,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            })
+            logging.info(
+                f"[referral] referee welcome coupon {referee_coupon_code} issued to {current_user['id']}"
+            )
+    except Exception as e:
+        logging.warning(f"[referral] failed to issue referee welcome coupon: {e}")
+
     coupon_generated = False
     if new_total % 5 == 0:
         coupon_code = f"GIFT-{ref['code'][-4:]}-{new_total}"

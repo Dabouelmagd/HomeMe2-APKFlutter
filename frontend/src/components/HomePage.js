@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher';
+import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../App';
 import {
   BuildingOfficeIcon, BuildingOffice2Icon, UserIcon, ShieldCheckIcon,
@@ -786,6 +787,7 @@ const HomePage = () => {
               <KeyIcon className="h-5 w-5" />
             </button>
             <LanguageSwitcher />
+            <ThemeToggle />
             {user ? (
               <>
                 <Link

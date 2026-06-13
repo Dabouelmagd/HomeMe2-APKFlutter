@@ -1,0 +1,46 @@
+{
+  "summary": "Iter142 verification — Double-sided Referral (#37), 6-month Compounds Trend Chart (#36), and Dark Mode toggle (#40). 8/8 backend pytest cases PASS. Frontend: ThemeToggle (homepage) works (toggle reversible, dark class + body bg switch, localStorage persists across reload). Compounds Trend Chart renders inside Company Admin Dashboard with heading 'اتجاهات الكمبوندات (6 أشهر)', all four metric-switcher testids present and switchable, 4 legend buttons (one per compound) that hide/show lines (opacity 1↔0.4, SVG paths 96↔94). 'مقارنة الكمبوندات' (compounds-comparison-view) renders above the trend chart as required.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "GET /api/company-admin/compounds-trend", "issue": "App-owner (Owner_homeme) token returns 400 'company_id query param مطلوب' instead of 403. Spec said 'reject non-company-admin with 403'. By design owner has cross-company access — this is RBAC-correct but doc says 403. Recommend clarifying spec OR returning 403 to non-company-admin tokens unless company_id provided."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "ThemeToggle (HomePage header)", "issue": "Missing data-testid='theme-toggle'. Identifiable only via aria-label='Switch to dark mode'/'Switch to light mode' (which changes on toggle, making stable selectors fragile). Add data-testid for reliable automation.", "selector": "button[aria-label*=\"mode\"]", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter142_double_referral.py",
+    "/app/backend/tests/test_iter142_compounds_trend.py",
+    "/app/test_reports/pytest/iter142_results.xml",
+    "/app/test_reports/pytest/iter142_trend_results.xml"
+  ],
+  "action_items": [
+    "Add data-testid=\"theme-toggle\" to /app/frontend/src/components/ThemeToggle.js for stable test selectors.",
+    "Clarify or align the /api/company-admin/compounds-trend RBAC contract: spec says 'reject non-company-admin with 403' but app_owner currently gets 400 (company_id missing). Either return 403 unless ?company_id= is provided, or update spec docs."
+  ],
+  "critical_code_review_comments": [
+    "Backend trend endpoint correctly enforces 6 entries per compound and cumulative residents (verified non-decreasing across 6 months for all 4 compounds of testcompany2).",
+    "Double-sided referral: registering with referral_code=CO-XXXX creates a WELCOME- coupon (15% percentage, max_uses=1, applicable_plans=[], reward_for_user set) AND a referral_welcome notification containing both '15%' and the coupon code. Registering without referral_code creates neither — clean conditional.",
+    "Synthetic @homeme.qa emails bypass SMTP welcome send (per spec) — pytest is fast and side-effect free.",
+    "ThemeToggle UX: aria-label updates dynamically (Switch to dark ↔ Switch to light) — accessible but the lack of data-testid is the only testability gap. Body background switches rgb(255,255,255) ↔ rgb(11,18,32) on toggle, html.dark class toggles, localStorage.darkMode persists ('true'/'false') and survives reload.",
+    "Compounds Trend Chart legend uses opacity (1 → 0.4) plus SVG path removal to indicate hidden state — works for sighted users; consider also adding aria-pressed for screen readers."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter142_compounds_trend.py (NEW — 6 test cases for the trend endpoint)"
+  ],
+  "success_rate": {
+    "backend": "100% (8/8 pytest cases pass: 2 double-referral + 6 compounds-trend)",
+    "frontend": "100% for the 3 features under review (Dark Mode toggle + reverse + persistence, all 4 trend-metric-* testids, all 4 trend-legend-* with toggle, compounds-comparison-view present above trend chart)"
+  },
+  "test_credentials": "Used unchanged from /app/memory/test_credentials.md (testcompany2 / Company123!, Owner_homeme / Dalia1234@, test / test123). All logged in successfully.",
+  "seed_data_creation": "Two test users created via /api/auth/register (refdbl_<ts>@homeme.qa and norefdbl_<ts>@homeme.qa) — synthetic @homeme.qa emails per spec, do not trigger SMTP. Welcome coupons and notifications left in DB (small volume).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 3 Iter142 features (Dark Mode #40, 6-month Compounds Trend Chart #36, Double-sided Referral #37) are functional and PASS. Reusable pytest at /app/backend/tests/test_iter142_compounds_trend.py covers the trend endpoint contract (6-month default, custom months, cumulative residents, RBAC for resident/unauthenticated). Combine with the pre-existing /app/backend/tests/test_iter142_double_referral.py for future regression. Only minor polish items: add data-testid='theme-toggle', clarify trend-endpoint RBAC for app_owner.",
+  "rca_of_the_issue": "No bugs found. Two minor polish items: (1) ThemeToggle has no data-testid — main agent's request stated it should be next to LanguageSwitcher; it is, but a data-testid would make the testing-agent contract explicit. (2) /api/company-admin/compounds-trend returns 400 (missing company_id) for app_owner instead of 403 — this is intentional RBAC (owner has cross-tenant access) but diverges from the literal spec wording. Neither is a functional bug."
+}

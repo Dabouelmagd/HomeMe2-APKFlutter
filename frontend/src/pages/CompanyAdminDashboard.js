@@ -8,6 +8,7 @@ import CompanyPlanUsageCard from '../components/CompanyPlanUsageCard';
 import CompoundOnboardingWizard from '../components/company-admin/CompoundOnboardingWizard';
 import AggregatedStatsPanel from '../components/company-admin/AggregatedStatsPanel';
 import CompoundsComparisonView from '../components/company-admin/CompoundsComparisonView';
+import CompoundsTrendChart from '../components/company-admin/CompoundsTrendChart';
 import CrmRetentionPanel from '../components/company-admin/CrmRetentionPanel';
 import CompanyReferralPanel from '../components/company-admin/CompanyReferralPanel';
 import UserTimelineModal from '../components/UserTimelineModal';
@@ -345,6 +346,15 @@ const CompanyAdminDashboard = () => {
           variant="dark"
         >
           <CompoundsComparisonView />
+        </SectionCard>
+
+        {/* 📈 Compounds 6-month Trend (Iter 142, Feature #36) */}
+        <SectionCard
+          title="📈 اتجاهات الكمبوندات (6 أشهر)"
+          subtitle="مخطط متعدد الخطوط — يكشف نمو أو تراجع كل مجمع في الإيرادات، السكان، الشكاوى والصيانة"
+          variant="dark"
+        >
+          <CompoundsTrendChart />
         </SectionCard>
 
         {/* CRM / Retention Panel — VIP + Late Payers cross-compound */}

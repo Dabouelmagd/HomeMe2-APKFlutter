@@ -159,7 +159,11 @@ async def register(user_data: UserCreate, request: Request):
         if getattr(user_data, "referral_code", None):
             try:
                 from routes.company_referrals import track_company_signup
-                await track_company_signup(new_company_id, user_data.referral_code)
+                await track_company_signup(
+                    new_company_id,
+                    user_data.referral_code,
+                    new_admin_user_id=user.id,
+                )
             except Exception as _re:
                 import logging as _lg
                 _lg.warning(f"referral tracking failed: {_re}")

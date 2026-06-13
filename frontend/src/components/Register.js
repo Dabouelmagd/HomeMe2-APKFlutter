@@ -173,8 +173,11 @@ const Register = () => {
               <div className="text-sm font-bold text-gray-900">
                 مرحباً! أنت مدعو من <span className="text-emerald-700">{refInfo.referrer_company_name}</span>
               </div>
+              <div className="text-[11px] text-gray-700 mt-1 leading-relaxed">
+                🎁 ستحصل على <span className="font-bold text-emerald-700">خصم 15%</span> تلقائياً على أول اشتراك مدفوع كهدية ترحيبية.
+              </div>
               <div className="text-[11px] text-gray-600 mt-0.5">
-                التسجيل سيتم تتبعه لحسابهم. الكود: <code className="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono">{refCode}</code>
+                الكود المُتتبَّع: <code className="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-mono">{refCode}</code>
               </div>
             </div>
           </div>

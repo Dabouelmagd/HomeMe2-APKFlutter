@@ -686,6 +686,200 @@ async def company_admin_aggregated_stats(current_user: dict = Depends(_require_c
 
 
 
+@router.get("/company-admin/compounds-trend")
+async def company_admin_compounds_trend(
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+    months: int = 6,
+):
+    """6-month KPI trend per compound (Iter 142 – Feature #36).
+
+    Returns a per-compound array of `{compound_id, name, points: [{month, label,
+    revenue, residents, complaints, maintenance}]}` so the frontend can render a
+    multi-line chart with one line per compound and a metric switcher.
+    """
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    months = max(1, min(int(months or 6), 12))
+
+    # Resolve compounds under this company
+    compounds = await db.compounds.find(
+        {"$or": [{"company_id": cid}, {"management_company_id": cid}]},
+        {"_id": 0, "id": 1, "name": 1}
+    ).to_list(length=500)
+    company = await db.companies.find_one({"id": cid}, {"_id": 0, "compound_ids": 1, "name": 1})
+    if company:
+        legacy_ids = [x for x in (company.get("compound_ids") or []) if x not in {c["id"] for c in compounds}]
+        if legacy_ids:
+            extras = await db.compounds.find(
+                {"id": {"$in": legacy_ids}}, {"_id": 0, "id": 1, "name": 1}
+            ).to_list(length=500)
+            compounds.extend(extras)
+    cids = [c["id"] for c in compounds]
+    if not cids:
+        return {"company_id": cid, "months": [], "compounds": []}
+
+    # Build month buckets: oldest → newest (inclusive of current month)
+    from datetime import datetime as _dt, timezone as _tz
+    now = _dt.now(_tz.utc)
+    bucket_starts = []  # list of (year, month, start_iso, end_iso, label)
+    for back in range(months - 1, -1, -1):
+        # compute month-start `back` months ago
+        y = now.year
+        m = now.month - back
+        while m <= 0:
+            m += 12
+            y -= 1
+        start = _dt(y, m, 1, tzinfo=_tz.utc)
+        # end = start of next month
+        if m == 12:
+            end = _dt(y + 1, 1, 1, tzinfo=_tz.utc)
+        else:
+            end = _dt(y, m + 1, 1, tzinfo=_tz.utc)
+        ar_months = [
+            "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+            "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
+        ]
+        label = f"{ar_months[m - 1]} {y % 100:02d}"
+        bucket_starts.append((y, m, start, end, label))
+
+    # Initialise per compound, per month
+    per = {
+        c["id"]: {
+            "compound_id": c["id"],
+            "name": c.get("name") or "—",
+            "points": [
+                {
+                    "month": f"{by}-{bm:02d}",
+                    "label": blabel,
+                    "revenue": 0.0,
+                    "residents": 0,
+                    "complaints": 0,
+                    "maintenance": 0,
+                }
+                for (by, bm, _s, _e, blabel) in bucket_starts
+            ],
+        }
+        for c in compounds
+    }
+
+    earliest_start = bucket_starts[0][2]
+    latest_end = bucket_starts[-1][3]
+
+    def _idx_for(dt_val):
+        """Find bucket index for a given datetime. Returns -1 if out of range."""
+        if not dt_val:
+            return -1
+        try:
+            if isinstance(dt_val, str):
+                d = _dt.fromisoformat(dt_val.replace("Z", "+00:00"))
+            else:
+                d = dt_val
+            if d.tzinfo is None:
+                d = d.replace(tzinfo=_tz.utc)
+        except Exception:
+            return -1
+        if d < earliest_start or d >= latest_end:
+            return -1
+        for i, (_y, _m, s, e, _l) in enumerate(bucket_starts):
+            if s <= d < e:
+                return i
+        return -1
+
+    # ---- Revenue: paid invoices per compound per month ----
+    try:
+        async for inv in db.invoices.find(
+            {
+                "compound_id": {"$in": cids},
+                "status": "paid",
+                "paid_at": {"$gte": earliest_start, "$lt": latest_end},
+            },
+            {"_id": 0, "compound_id": 1, "amount": 1, "paid_at": 1},
+        ):
+            pcid = inv.get("compound_id")
+            if pcid not in per:
+                continue
+            i = _idx_for(inv.get("paid_at"))
+            if i >= 0:
+                per[pcid]["points"][i]["revenue"] += float(inv.get("amount") or 0)
+    except Exception:
+        pass
+
+    # ---- Residents: cumulative count of users created up to end-of-month ----
+    # cheaper to fetch all residents once and bucket-cumulate
+    try:
+        all_residents = []
+        async for u in db.users.find(
+            {"compound_id": {"$in": cids}, "role": "resident"},
+            {"_id": 0, "compound_id": 1, "created_at": 1, "id": 1},
+        ):
+            all_residents.append(u)
+        # cumulative counts: for each compound, for each bucket, count residents
+        # whose created_at < bucket_end
+        for pcid, pdata in per.items():
+            rs = [u for u in all_residents if u.get("compound_id") == pcid]
+            for i, (_y, _m, _s, e, _l) in enumerate(bucket_starts):
+                cnt = 0
+                for u in rs:
+                    cdt = u.get("created_at")
+                    if not cdt:
+                        cnt += 1  # legacy users without created_at — assume pre-existing
+                        continue
+                    try:
+                        d = _dt.fromisoformat(str(cdt).replace("Z", "+00:00"))
+                        if d.tzinfo is None:
+                            d = d.replace(tzinfo=_tz.utc)
+                        if d < e:
+                            cnt += 1
+                    except Exception:
+                        cnt += 1
+                pdata["points"][i]["residents"] = cnt
+    except Exception:
+        pass
+
+    # ---- Complaints: count opened per month ----
+    try:
+        async for co in db.complaints.find(
+            {"compound_id": {"$in": cids}, "created_at": {"$gte": earliest_start, "$lt": latest_end}},
+            {"_id": 0, "compound_id": 1, "created_at": 1},
+        ):
+            pcid = co.get("compound_id")
+            if pcid not in per:
+                continue
+            i = _idx_for(co.get("created_at"))
+            if i >= 0:
+                per[pcid]["points"][i]["complaints"] += 1
+    except Exception:
+        pass
+
+    # ---- Maintenance: count opened per month ----
+    try:
+        async for mr in db.maintenance_requests.find(
+            {"compound_id": {"$in": cids}, "created_at": {"$gte": earliest_start, "$lt": latest_end}},
+            {"_id": 0, "compound_id": 1, "created_at": 1},
+        ):
+            pcid = mr.get("compound_id")
+            if pcid not in per:
+                continue
+            i = _idx_for(mr.get("created_at"))
+            if i >= 0:
+                per[pcid]["points"][i]["maintenance"] += 1
+    except Exception:
+        pass
+
+    months_list = [
+        {"month": f"{y}-{m:02d}", "label": label}
+        for (y, m, _s, _e, label) in bucket_starts
+    ]
+    return {
+        "company_id": cid,
+        "months": months_list,
+        "compounds": list(per.values()),
+    }
+
+
+
+
 @router.get("/company-admin/crm-summary")
 async def company_admin_crm_summary(current_user: dict = Depends(_require_company_admin), company_id: Optional[str] = None):
     """ملخص CRM لكل الكمبوندات تحت الشركة.

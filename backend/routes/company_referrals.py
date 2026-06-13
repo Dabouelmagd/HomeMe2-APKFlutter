@@ -291,11 +291,20 @@ async def public_lookup(code: str):
     }
 
 
-async def track_company_signup(new_company_id: str, ref_code: str) -> bool:
+async def track_company_signup(
+    new_company_id: str,
+    ref_code: str,
+    new_admin_user_id: Optional[str] = None,
+) -> bool:
     """Called from auth.py after a new company_admin registers with a ref code.
 
     - Records `referred_by_company_id` on the new company doc.
     - Increments `total_signups` on the referrer.
+    - 🎁 Issues a one-time 15% welcome coupon to the *referee* (the company who
+      just signed up). This is the **referee** half of the double-sided
+      referral program. The referrer half is handled later by
+      `award_referrer_credit` once the new company upgrades to a paid plan.
+
     Returns True on successful link, False otherwise.
     """
     db = get_db()
@@ -335,6 +344,55 @@ async def track_company_signup(new_company_id: str, ref_code: str) -> bool:
             }},
         },
     )
+
+    # 🎁 Referee welcome coupon — 15% off first paid subscription (one-time use).
+    # Falls back to the company admin lookup if `new_admin_user_id` wasn't passed.
+    try:
+        if not new_admin_user_id:
+            c = await db.companies.find_one(
+                {"id": new_company_id}, {"_id": 0, "admin_user_id": 1}
+            )
+            new_admin_user_id = (c or {}).get("admin_user_id")
+        if new_admin_user_id:
+            welcome_code = f"WELCOME-{code[-4:]}-{new_admin_user_id[:6].upper()}"
+            existing_coupon = await db.coupons.find_one({"code": welcome_code})
+            if not existing_coupon:
+                await db.coupons.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "code": welcome_code,
+                    "discount_type": "percentage",
+                    "discount_value": 15,
+                    "applicable_plans": [],   # all paid plans
+                    "max_uses": 1,
+                    "times_used": 0,
+                    "is_active": True,
+                    "expires_at": None,
+                    "notes": f"كوبون ترحيب 15% للشركة الجديدة عبر إحالة {code}",
+                    "created_by": "system_referral",
+                    "created_at": _now(),
+                    "referral_reward": True,
+                    "reward_for_user": new_admin_user_id,
+                    "reward_for_company": new_company_id,
+                })
+                await db.notifications.insert_one({
+                    "id": str(uuid.uuid4()),
+                    "user_id": new_admin_user_id,
+                    "type": "referral_welcome",
+                    "title": "🎁 مرحباً بك في HomeMe!",
+                    "message": (
+                        f"احصل على خصم 15% على أول اشتراك. الكود: {welcome_code}"
+                    ),
+                    "read": False,
+                    "created_at": _now(),
+                })
+                import logging as _lg
+                _lg.info(
+                    f"[referral] referee welcome coupon {welcome_code} issued to "
+                    f"user={new_admin_user_id} company={new_company_id}"
+                )
+    except Exception as _e:
+        import logging as _lg
+        _lg.warning(f"[referral] failed to issue referee welcome coupon: {_e}")
     return True
 
 

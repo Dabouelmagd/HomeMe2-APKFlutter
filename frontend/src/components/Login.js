@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
 import { toast } from 'sonner';
+import axios from 'axios';
 import LanguageSwitcher from './LanguageSwitcher';
 import { 
   isWebAuthnSupported, 
@@ -11,6 +12,8 @@ import {
   hasBiometricRegistered 
 } from '../services/webauthn';
 import { FingerPrintIcon } from '@heroicons/react/24/outline';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const Login = () => {
   const { t } = useTranslation();
@@ -21,6 +24,10 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotIdent, setForgotIdent] = useState('');
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
   const [savedUsername, setSavedUsername] = useState('');
@@ -361,7 +368,7 @@ const Login = () => {
             </label>
             <button
               type="button"
-              onClick={() => toast.info(t('forgot_password_msg', 'تواصل مع إدارة المجمع لإعادة تعيين كلمة المرور'))}
+              onClick={() => setShowForgot(true)}
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
               data-testid="forgot-password-btn"
             >
@@ -553,6 +560,93 @@ const Login = () => {
             >
               إلغاء
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* 🔑 Forgot Password modal */}
+      {showForgot && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => { setShowForgot(false); setForgotSent(false); }}
+          data-testid="forgot-password-modal"
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="bg-gradient-to-r from-violet-600 to-fuchsia-600 px-5 py-4 text-white">
+              <h3 className="font-bold text-lg">🔑 {t('forgot_password', 'نسيت كلمة المرور؟')}</h3>
+              <p className="text-xs text-white/80 mt-1">
+                {t('forgot_subtitle', 'أدخلي بريدك الإلكتروني أو اسم المستخدم وسنرسل لك رابط إعادة التعيين.')}
+              </p>
+            </div>
+            <div className="p-5">
+              {forgotSent ? (
+                <div className="text-center py-4" data-testid="forgot-sent-ok">
+                  <div className="inline-flex p-3 rounded-full bg-emerald-100 text-emerald-600 mb-3">
+                    <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/></svg>
+                  </div>
+                  <h4 className="font-bold text-gray-900 dark:text-white">{t('forgot_sent_title', 'تم الإرسال!')}</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+                    {t('forgot_sent_body', 'إذا كان البريد مسجلاً، ستصلك رسالة بها رابط إعادة التعيين خلال دقائق. تحقّقي من صندوق الوارد + الـ Spam.')}
+                  </p>
+                  <button
+                    onClick={() => { setShowForgot(false); setForgotSent(false); setForgotIdent(''); }}
+                    className="mt-4 px-4 py-2 rounded-lg bg-violet-600 text-white text-sm font-bold"
+                  >
+                    {t('ok', 'حسناً')}
+                  </button>
+                </div>
+              ) : (
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!forgotIdent.trim()) return;
+                    setForgotLoading(true);
+                    try {
+                      await axios.post(`${API}/auth/forgot-password`, { email_or_username: forgotIdent.trim() });
+                      setForgotSent(true);
+                    } catch (err) {
+                      toast.error(err.response?.data?.detail || t('forgot_failed', 'تعذّر الإرسال'));
+                    } finally {
+                      setForgotLoading(false);
+                    }
+                  }}
+                >
+                  <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    {t('email_or_username', 'البريد أو اسم المستخدم')}
+                  </label>
+                  <input
+                    autoFocus
+                    type="text"
+                    value={forgotIdent}
+                    onChange={(e) => setForgotIdent(e.target.value)}
+                    className="mt-1 w-full px-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white"
+                    data-testid="forgot-ident-input"
+                    required
+                  />
+                  <div className="flex gap-2 mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgot(false)}
+                      className="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-bold"
+                    >
+                      {t('cancel', 'إلغاء')}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={forgotLoading || !forgotIdent.trim()}
+                      className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-bold disabled:opacity-50 flex items-center justify-center gap-1.5"
+                      data-testid="forgot-submit"
+                    >
+                      {forgotLoading && <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                      {forgotLoading ? t('sending', 'يُرسل...') : t('send_reset_link', 'إرسال الرابط')}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       )}

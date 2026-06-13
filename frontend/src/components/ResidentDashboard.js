@@ -23,6 +23,7 @@ import {
 } from '@heroicons/react/24/outline';
 import InternalAdBanner from './InternalAdBanner';
 import PageHeader from './shared/PageHeader';
+import ResidentSummaryWidget from './ResidentSummaryWidget';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const getHeaders = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -94,6 +95,9 @@ const ResidentDashboard = () => {
           </button>
         </div>
       )}
+
+      {/* ✨ Resident Summary Widget (Iter 140) — 3 personal tiles at the top */}
+      <ResidentSummaryWidget />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

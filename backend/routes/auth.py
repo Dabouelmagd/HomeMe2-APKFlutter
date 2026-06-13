@@ -526,5 +526,156 @@ async def webauthn_remove(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=400, detail="Failed to remove biometric")
     return {"message": "Biometric removed successfully"}
 
+
+# ---------------------------------------------------------------------------
+# Password Reset (Forgot Password)
+# ---------------------------------------------------------------------------
+# Single-use tokens stored in ``password_reset_tokens`` with TTL on ``expires_at``.
+# Tokens are 32-byte url-safe strings (256-bit entropy). We never echo back
+# whether the email exists (to prevent user enumeration) — same 200 response
+# either way.
+
+class ForgotPasswordRequest(BaseModel):
+    email_or_username: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+
+@router.post("/auth/forgot-password")
+async def forgot_password(data: ForgotPasswordRequest, request: Request):
+    """Send a password-reset link to the user's registered email.
+
+    Always returns 200 with a generic message — never reveals whether the
+    identifier matched an account.
+    """
+    import secrets
+    db = get_db()
+    ident = (data.email_or_username or "").strip().lower()
+    if not ident:
+        raise HTTPException(status_code=400, detail="Identifier required")
+
+    user = await db.users.find_one(
+        {"$or": [{"username": ident}, {"email": ident}, {"username": data.email_or_username}, {"email": data.email_or_username}]},
+        {"id": 1, "email": 1, "full_name": 1, "_id": 0},
+    )
+
+    generic = {
+        "message": "إذا كان البريد مسجلاً، ستصلك رسالة بها رابط إعادة تعيين كلمة المرور خلال دقائق.",
+        "ok": True,
+    }
+
+    if not user or not user.get("email"):
+        # Do not leak existence
+        return generic
+
+    token = secrets.token_urlsafe(32)
+    expires = datetime.now(timezone.utc) + timedelta(hours=1)
+    await db.password_reset_tokens.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "email": user["email"],
+        "token": token,
+        "expires_at": expires,
+        "used": False,
+        "created_at": datetime.now(timezone.utc),
+        "ip": (request.client.host if request.client else "") or "",
+    })
+
+    # Build reset link — falls back to a sensible default if envs are missing
+    frontend = (
+        os.environ.get("FRONTEND_PUBLIC_URL")
+        or os.environ.get("PUBLIC_URL")
+        or "https://homemeapp.net"
+    )
+    reset_link = f"{frontend.rstrip('/')}/auth/reset-password?token={token}"
+
+    # Send email (RTL Arabic). Failure to deliver should not break the API —
+    # the token is already saved; we only log the issue.
+    try:
+        html = f"""
+<div dir='rtl' style='font-family:Cairo,Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:20px;background:#f8fafc'>
+  <div style='background:linear-gradient(135deg,#7c3aed,#ec4899);padding:24px;border-radius:14px;color:white;text-align:center'>
+    <h2 style='margin:0;font-size:20px'>🔑 إعادة تعيين كلمة المرور</h2>
+    <div style='opacity:.9;margin-top:6px;font-size:13px'>HomeMe</div>
+  </div>
+  <div style='background:white;padding:24px;border-radius:14px;margin-top:14px;box-shadow:0 1px 3px rgba(0,0,0,.06)'>
+    <p style='color:#1e293b;font-size:14px;line-height:1.8'>
+      مرحباً {user.get('full_name','عزيزي/تي')}،
+    </p>
+    <p style='color:#475569;font-size:13px;line-height:1.8'>
+      تلقّينا طلباً لإعادة تعيين كلمة المرور لحسابك. اضغطي الزر أدناه للاستمرار. الرابط صالح لمدة <b>ساعة واحدة</b> فقط.
+    </p>
+    <p style='text-align:center;margin:24px 0'>
+      <a href='{reset_link}' style='display:inline-block;background:linear-gradient(135deg,#7c3aed,#ec4899);color:white;padding:12px 28px;border-radius:10px;font-weight:bold;text-decoration:none'>
+        إعادة تعيين كلمة المرور
+      </a>
+    </p>
+    <p style='color:#94a3b8;font-size:11px;line-height:1.6'>
+      إذا لم تطلبي هذا، يمكنك تجاهل الرسالة وستظل كلمة المرور الحالية فعّالة.<br/>
+      الرابط المباشر: <a href='{reset_link}' style='color:#7c3aed;word-break:break-all'>{reset_link}</a>
+    </p>
+  </div>
+</div>"""
+        await email_service.send_email(
+            to_email=user["email"],
+            subject="إعادة تعيين كلمة المرور — HomeMe",
+            html_content=html,
+            email_type="password_reset",
+            related_user_id=user["id"],
+        )
+        logging.info(f"[forgot_password] reset link sent to user {user['id']}")
+    except Exception as e:
+        logging.warning(f"[forgot_password] email send failed for {user.get('email')}: {e}")
+
+    return generic
+
+
+@router.post("/auth/reset-password")
+async def reset_password(data: ResetPasswordRequest):
+    """Consume a reset token + set a new password."""
+    db = get_db()
+    if not data.token or not data.new_password:
+        raise HTTPException(status_code=400, detail="Token and new password required")
+
+    # Strength check (re-uses shared validator)
+    ok, msg = validate_password_strength(data.new_password)
+    if not ok:
+        raise HTTPException(status_code=400, detail=msg)
+
+    record = await db.password_reset_tokens.find_one({"token": data.token})
+    if not record:
+        raise HTTPException(status_code=400, detail="رمز إعادة التعيين غير صالح أو منتهي")
+    if record.get("used"):
+        raise HTTPException(status_code=400, detail="هذا الرمز تم استخدامه بالفعل — اطلبي رابطاً جديداً")
+
+    expires = record.get("expires_at")
+    if expires:
+        try:
+            exp_dt = expires if hasattr(expires, "tzinfo") else datetime.fromisoformat(str(expires))
+            if exp_dt.tzinfo is None:
+                exp_dt = exp_dt.replace(tzinfo=timezone.utc)
+            if datetime.now(timezone.utc) > exp_dt:
+                raise HTTPException(status_code=400, detail="انتهت صلاحية الرابط — اطلبي رابطاً جديداً")
+        except HTTPException:
+            raise
+        except Exception:
+            pass
+
+    user_id = record.get("user_id")
+    new_hash = hash_password(data.new_password)
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"password": new_hash, "password_updated_at": datetime.now(timezone.utc)}},
+    )
+    await db.password_reset_tokens.update_one(
+        {"token": data.token},
+        {"$set": {"used": True, "used_at": datetime.now(timezone.utc)}},
+    )
+    logging.info(f"[reset_password] password updated for user {user_id}")
+    return {"ok": True, "message": "تم تحديث كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن."}
+
+
 # Compound Management Routes
 # Compounds CRUD extracted to routes/

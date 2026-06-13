@@ -11,6 +11,7 @@ import {
   HomeIcon,
   BuildingOfficeIcon,
   MapIcon,
+  GiftIcon,
   BuildingOffice2Icon,
   UsersIcon,
   UserPlusIcon,
@@ -732,6 +733,7 @@ const Layout = ({ children, isTrialMode = false }) => {
           { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole },
         ] : []),
         { name: t('subscription_codes_management'), href: 'subscription-codes', icon: KeyIcon, show: activeRole === 'app_owner' },
+        { name: t('referral_program', '🎁 برنامج الإحالة'), href: 'referral', icon: GiftIcon, show: true, badge: 'جديد' },
       ].filter(i => i)
     },
     {

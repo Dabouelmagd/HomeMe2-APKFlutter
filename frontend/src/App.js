@@ -148,7 +148,9 @@ import NotificationPreferencesPage from './components/NotificationPreferencesPag
 import CompoundMap from './components/CompoundMap';
 import StaffManagement from './components/StaffManagement';
 import AboutUs from './components/AboutUs';
+import ReferralProgramPage from './components/ReferralProgramPage';
 import AIAssistantBubble from './components/AIAssistantBubble';
+import ResetPassword from './components/ResetPassword';
 import { GlobalUIProvider } from './providers/GlobalUIProvider';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -671,6 +673,7 @@ function App() {
               <RouteChangeHandler>
                 <Routes>
                 <Route path="/login" element={<Login />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
           <Route path="/terms-privacy" element={<TermsPrivacy />} />
           <Route path="/legal" element={<TermsPrivacy />} />
                 <Route path="/register" element={<Register />} />
@@ -990,6 +993,9 @@ function App() {
                   <ProtectedRoute requiredRole="admin">
                     <StaffManagement />
                   </ProtectedRoute>
+                } />
+                <Route path="referral" element={
+                  <ReferralProgramPage />
                 } />
                 
                 <Route path="gallery" element={

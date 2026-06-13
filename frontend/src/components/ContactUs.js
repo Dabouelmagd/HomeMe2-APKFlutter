@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import useSEO from '../hooks/useSEO';
 import {
   EnvelopeIcon,
   MapPinIcon,
@@ -10,6 +11,35 @@ import {
 
 const ContactUs = () => {
   const { t } = useTranslation();
+
+  // 🔍 SEO — high-intent inbound page; emit ContactPage JSON-LD for rich snippets
+  useSEO({
+    title: 'اتصل بنا — HomeMe | تواصل مع فريق الدعم',
+    description:
+      'تواصل مع فريق HomeMe لأي استفسار عن إدارة المجمعات السكنية — بريد، هاتف، أو نموذج اتصال. نرد خلال 24 ساعة.',
+    canonical: 'https://homemeapp.net/contact',
+    keywords: 'اتصل بنا HomeMe, دعم فني كمبوند, تواصل HomeMe, contact compound management',
+    og: {
+      title: 'اتصل بنا — HomeMe',
+      description: 'تواصل معنا — فريق دعم HomeMe جاهز للإجابة على استفساراتك خلال 24 ساعة.',
+      type: 'website',
+      url: 'https://homemeapp.net/contact',
+      locale: 'ar_EG',
+    },
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'ContactPage',
+      name: 'اتصل بنا — HomeMe',
+      url: 'https://homemeapp.net/contact',
+      mainEntity: {
+        '@type': 'Organization',
+        name: 'HomeMe',
+        email: 'info@datalifeai.com',
+        url: 'https://homemeapp.net',
+      },
+    },
+    jsonLdId: 'contact-page',
+  });
 
   const contactMethods = [
     {

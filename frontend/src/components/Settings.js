@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../App';
 import PushNotifications from './PushNotifications';
+import NotificationPreferencesPage from './NotificationPreferencesPage';
 import {
   Cog6ToothIcon,
   UserIcon,
@@ -101,11 +102,20 @@ const Settings = () => {
         {
           id: 'notifications',
           name: t('settings_notifications', 'الإشعارات'),
-          description: t('notifications_desc', 'إدارة إشعارات التطبيق'),
+          description: t('notifications_desc', 'تفعيل إشعارات المتصفح Push'),
           icon: BellIcon,
           color: 'bg-amber-500',
           lightColor: 'bg-amber-50 dark:bg-amber-900/20',
           textColor: 'text-amber-600 dark:text-amber-400'
+        },
+        {
+          id: 'notif_channels',
+          name: t('notif_channels', 'قنوات الإشعارات'),
+          description: t('notif_channels_desc', 'اختر Push/Email/SMS لكل نوع حدث'),
+          icon: BellIcon,
+          color: 'bg-purple-500',
+          lightColor: 'bg-purple-50 dark:bg-purple-900/20',
+          textColor: 'text-purple-600 dark:text-purple-400'
         },
         {
           id: 'language',
@@ -214,6 +224,8 @@ const Settings = () => {
         return <AddAdminSettings />;
       case 'notifications':
         return <PushNotifications />;
+      case 'notif_channels':
+        return <NotificationPreferencesPage />;
       case 'profile':
         return <ProfileSettings />;
       case 'privacy':

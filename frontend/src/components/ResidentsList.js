@@ -12,10 +12,12 @@ import {
   EyeIcon,
   PencilIcon,
   TrashIcon,
-  UserPlusIcon
+  UserPlusIcon,
+  ArrowUpTrayIcon
 } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
 import CreateResidentModal from './CreateResidentModal';
+import BulkImportResidentsModal from './BulkImportResidentsModal';
 import PageHeader from './shared/PageHeader';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -45,6 +47,7 @@ const ResidentsList = () => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState('');
   const [sortOrder, setSortOrder] = useState('newest');
   const [units] = useState([{ id: 'test-unit-1', unit_number: 'TEST001' }]);
@@ -121,14 +124,25 @@ const ResidentsList = () => {
           title={t('residents_list')}
           subtitle={t('view_all_residential')}
           actions={
-            <button
-              onClick={() => setShowCreateModal(true)}
-              data-testid="open-create-resident-modal"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:shadow-xl text-sm font-bold"
-            >
-              <UserPlusIcon className="h-5 w-5" />
-              <span>{t('add_resident_family', 'إضافة ساكن جديد')}</span>
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setShowBulkImport(true)}
+                data-testid="open-bulk-import-modal"
+                className="bg-white border-2 border-emerald-500 text-emerald-700 hover:bg-emerald-50 px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all text-sm font-bold"
+                title={t('bulk_import_residents_hint', 'استيراد مئات السكان من ملف Excel/CSV دفعة واحدة')}
+              >
+                <ArrowUpTrayIcon className="h-5 w-5" />
+                <span>{t('bulk_import_residents', 'استيراد CSV / Excel')}</span>
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                data-testid="open-create-resident-modal"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-lg hover:shadow-xl text-sm font-bold"
+              >
+                <UserPlusIcon className="h-5 w-5" />
+                <span>{t('add_resident_family', 'إضافة ساكن جديد')}</span>
+              </button>
+            </div>
           }
           testId="residents-page-header"
         />
@@ -292,6 +306,12 @@ const ResidentsList = () => {
         <CreateResidentModal
           onClose={() => setShowCreateModal(false)}
           onCreated={() => { setShowCreateModal(false); window.location.reload(); }}
+        />
+      )}
+      {showBulkImport && (
+        <BulkImportResidentsModal
+          onClose={() => setShowBulkImport(false)}
+          onImported={() => { setShowBulkImport(false); window.location.reload(); }}
         />
       )}
     </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import useSEO from '../hooks/useSEO';
 import { ArrowLeftIcon, EnvelopeIcon, PhoneIcon, MapPinIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -167,6 +168,36 @@ const LegalPage = () => {
       .catch((e) => setError(e?.response?.data?.detail || 'فشل تحميل الصفحة'))
       .finally(() => setLoading(false));
   }, [slug, lang]);
+
+  // 🔍 SEO — Drives indexing of legal/about pages with proper title + description.
+  // Title falls back to the slug-derived label until the API responds.
+  const slugLabel = {
+    about: 'من نحن',
+    privacy: 'سياسة الخصوصية',
+    terms: 'الشروط والأحكام',
+    contact: 'اتصل بنا',
+    refund: 'سياسة الاسترداد',
+    cookies: 'سياسة ملفات تعريف الارتباط',
+  };
+  const pageTitle = data?.title || slugLabel[slug] || slug;
+  useSEO({
+    title: `${pageTitle} — HomeMe`,
+    description:
+      data?.meta_description ||
+      data?.excerpt ||
+      `${pageTitle} لـ HomeMe — منصة إدارة المجمعات السكنية. اطّلع على التفاصيل الكاملة.`,
+    canonical: `https://homemeapp.net/legal/${slug}`,
+    og: {
+      title: `${pageTitle} — HomeMe`,
+      description:
+        data?.meta_description ||
+        data?.excerpt ||
+        `${pageTitle} لـ HomeMe — منصة إدارة المجمعات السكنية.`,
+      type: 'article',
+      url: `https://homemeapp.net/legal/${slug}`,
+      locale: lang === 'ar' ? 'ar_EG' : (lang === 'fr' ? 'fr_FR' : 'en_US'),
+    },
+  });
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

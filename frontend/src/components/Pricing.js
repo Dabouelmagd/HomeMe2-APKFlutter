@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
+import useSEO from '../hooks/useSEO';
 import {
   CheckIcon, 
   XMarkIcon,
@@ -26,6 +27,30 @@ const Pricing = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  // 🔍 SEO — pricing page targets high-intent users searching for plans/cost
+  useSEO({
+    title: 'الخطط والأسعار — HomeMe | إدارة كمبوند بسعر يناسبك',
+    description:
+      'خطط HomeMe لإدارة المجمعات السكنية: مجاني (0 ج.م)، أساسي (800 ج.م)، احترافي (1,500 ج.م)، متقدم (2,800 ج.م)، وخطط شركات الإدارة. خصم 20% على الدفع السنوي. تجربة مجانية 14 يوماً.',
+    canonical: 'https://homemeapp.net/pricing',
+    keywords:
+      'أسعار إدارة كمبوند, تكلفة نظام كمبوند, خطط كمبوند, اشتراك كمبوند, pricing compound, HomeMe pricing, خصم سنوي',
+    og: {
+      title: 'الخطط والأسعار — HomeMe',
+      description: 'اختر خطة إدارة المجمع السكني المناسبة لك بدءاً من 0 ج.م — مع خصم 20% على الدفع السنوي.',
+      type: 'website',
+      url: 'https://homemeapp.net/pricing',
+      image: 'https://homemeapp.net/og-cover.png',
+      locale: 'ar_EG',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'الخطط والأسعار — HomeMe',
+      description: 'خطط مرنة من مجاني لـ Enterprise. خصم 20% سنوي.',
+      image: 'https://homemeapp.net/og-cover.png',
+    },
+  });
   const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [currency, setCurrency] = useState('USD');
   const [showDiscountCode, setShowDiscountCode] = useState(false);

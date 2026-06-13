@@ -28,6 +28,12 @@ export default function SubscriptionManagement() {
   const [showHistory, setShowHistory] = useState(false);
   const [changelog, setChangelog] = useState([]);
 
+  // 🎟️ Coupon state — separate from `code` (owner-issued subscription codes)
+  const [couponCode, setCouponCode] = useState('');
+  const [couponInfo, setCouponInfo] = useState(null);  // {final_price, discount_amount, currency, ...}
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState('');
+
   const fetchSub = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/subscription/my`, getToken());
@@ -96,7 +102,9 @@ export default function SubscriptionManagement() {
   const handleStripe = async (plan) => {
     setPayLoading('stripe');
     try {
-      const res = await axios.post(`${API}/payments/subscribe`, { plan, duration: selectedDuration, currency: 'egp' }, getToken());
+      const payload = { plan, duration: selectedDuration, currency: 'egp' };
+      if (couponInfo?.coupon_code) payload.coupon_code = couponInfo.coupon_code;
+      const res = await axios.post(`${API}/payments/subscribe`, payload, getToken());
       if (res.data.checkout_url) window.location.href = res.data.checkout_url;
     } catch (err) {
       toast.error(err.response?.data?.detail || t('sm_error','فشل'));
@@ -107,13 +115,47 @@ export default function SubscriptionManagement() {
   const handlePayPal = async (plan) => {
     setPayLoading('paypal');
     try {
-      const res = await axios.post(`${API}/payments/paypal/create-order`, { plan, duration: selectedDuration, currency: 'usd' }, getToken());
+      const payload = { plan, duration: selectedDuration, currency: 'usd' };
+      if (couponInfo?.coupon_code) payload.coupon_code = couponInfo.coupon_code;
+      const res = await axios.post(`${API}/payments/paypal/create-order`, payload, getToken());
       if (res.data.approve_url) window.location.href = res.data.approve_url;
     } catch (err) {
       toast.error(err.response?.data?.detail || t('sm_error','فشل'));
     }
     setPayLoading('');
   };
+
+  // 🎟️ Validate coupon against backend without committing payment yet
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim() || !selectedPlan) {
+      setCouponError(t('coupon_select_plan_first', 'اختر خطة أولاً قبل تطبيق الكوبون'));
+      return;
+    }
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const res = await axios.post(
+        `${API}/coupons/apply`,
+        { code: couponCode.trim().toUpperCase(), plan: selectedPlan, duration: selectedDuration },
+        getToken()
+      );
+      setCouponInfo(res.data);
+      toast.success(t('coupon_applied', 'تم تطبيق الكوبون بنجاح'));
+    } catch (err) {
+      setCouponInfo(null);
+      setCouponError(err.response?.data?.detail || t('coupon_invalid', 'الكوبون غير صالح'));
+    }
+    setCouponLoading(false);
+  };
+
+  // Reset applied coupon whenever the plan/duration changes (price now stale)
+  useEffect(() => {
+    if (couponInfo) {
+      setCouponInfo(null);
+      setCouponCode('');
+      setCouponError('');
+    }
+  }, [selectedPlan, selectedDuration]); // eslint-disable-line
 
   const daysRemaining = sub?.subscription_end ? Math.max(0, Math.floor((new Date(sub.subscription_end) - new Date()) / 86400000)) : 0;
   const isActive = sub?.subscription_active;
@@ -227,6 +269,55 @@ export default function SubscriptionManagement() {
 
         {selectedPlan && (
           <div className="space-y-3">
+            {/* 🎟️ Coupon Input */}
+            <div className="rounded-xl border-2 border-dashed border-purple-200 bg-gradient-to-br from-purple-50 to-fuchsia-50 p-4">
+              <p className="text-sm font-bold text-purple-900 mb-2 flex items-center gap-1.5">
+                <span>🎟️</span>
+                {t('coupon_have', 'لديك كوبون خصم؟')}
+              </p>
+              {!couponInfo ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponError(''); }}
+                    placeholder={t('coupon_placeholder', 'أدخل كود الكوبون (مثل: WELCOME20)')}
+                    className="flex-1 px-3 py-2 rounded-lg border border-purple-300 bg-white focus:ring-2 focus:ring-purple-400 focus:border-transparent uppercase font-mono text-sm"
+                    data-testid="coupon-input"
+                    maxLength={32}
+                  />
+                  <button
+                    onClick={handleApplyCoupon}
+                    disabled={!couponCode.trim() || couponLoading}
+                    className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-bold whitespace-nowrap"
+                    data-testid="coupon-apply-btn"
+                  >
+                    {couponLoading ? '...' : t('apply', 'تطبيق')}
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between bg-white rounded-lg border border-emerald-300 p-3">
+                  <div>
+                    <div className="text-xs text-gray-500">{t('coupon_applied_label', 'كوبون مفعّل')}</div>
+                    <div className="font-mono font-bold text-emerald-700 text-sm">{couponInfo.coupon_code}</div>
+                    <div className="text-xs text-emerald-600 mt-0.5">
+                      {t('coupon_save', 'وفّرت')} {couponInfo.discount_amount?.toLocaleString()} {couponInfo.currency} ({couponInfo.original_price?.toLocaleString()} → <b>{couponInfo.final_price?.toLocaleString()}</b>)
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => { setCouponInfo(null); setCouponCode(''); setCouponError(''); }}
+                    className="text-xs text-gray-400 hover:text-red-600 px-2"
+                    data-testid="coupon-remove-btn"
+                  >
+                    × {t('remove', 'إزالة')}
+                  </button>
+                </div>
+              )}
+              {couponError && (
+                <p className="text-xs text-red-600 mt-2" data-testid="coupon-error">{couponError}</p>
+              )}
+            </div>
+
             <p className="text-sm font-medium text-gray-700">{t('sub_choose_payment', 'اختر طريقة الدفع:')}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button onClick={() => handleStripe(selectedPlan)} disabled={payLoading === 'stripe'}

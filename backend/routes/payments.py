@@ -246,6 +246,7 @@ class SubscriptionPaymentRequest(BaseModel):
     plan: str  # starter, basic, pro, premium, company_startup, company_business, company_enterprise
     duration: str = "1_month"  # 1_month, 3_months, 6_months, 9_months, 1_year, lifetime
     currency: str = "egp"
+    coupon_code: Optional[str] = None  # 🎟️ Discount coupon (validated server-side)
 
 
 PLAN_PRICES_EGP = {
@@ -294,6 +295,46 @@ async def create_subscription_payment(
             total = total_egp
             currency = "egp"
 
+        # 🎟️ Apply coupon discount (server-side validation — never trust client price).
+        # We log usage at webhook-confirmation time, not at intent time, so cancelled
+        # checkouts don't deplete the coupon's max_uses budget.
+        coupon_meta = {}
+        if data.coupon_code:
+            coupon = await db.coupons.find_one({
+                "code": data.coupon_code.upper().strip(),
+                "is_active": True,
+            })
+            if coupon and coupon.get("times_used", 0) < coupon.get("max_uses", 100):
+                # Expiry / plan-restriction / per-user reuse checks
+                applies = True
+                if coupon.get("expires_at"):
+                    try:
+                        exp = datetime.fromisoformat(str(coupon["expires_at"]).replace("Z", "+00:00"))
+                        if datetime.now(timezone.utc) > exp:
+                            applies = False
+                    except Exception:
+                        pass
+                if applies and coupon.get("applicable_plans") and data.plan not in coupon["applicable_plans"]:
+                    applies = False
+                if applies:
+                    used = await db.coupon_usage.find_one({"coupon_id": coupon["id"], "user_id": current_user["id"]})
+                    if used:
+                        applies = False
+                if applies:
+                    if coupon["discount_type"] == "percentage":
+                        discount = round(total * (coupon["discount_value"] / 100), 2)
+                    else:  # fixed amount — convert to current currency if needed
+                        disc_egp = coupon["discount_value"]
+                        discount = round(disc_egp * 0.02, 2) if data.currency == "usd" else disc_egp
+                        discount = min(discount, total)
+                    total = max(0.5, round(total - discount, 2))  # never go below Stripe minimum
+                    coupon_meta = {
+                        "coupon_code": coupon["code"],
+                        "coupon_id": coupon["id"],
+                        "discount_amount": discount,
+                    }
+                    logging.info(f"[coupon] applied {coupon['code']} -> {discount} {currency} discount for user {current_user['id']}")
+
         plan_names = {
             "basic": "أساسي", "pro": "احترافي", "premium": "متقدم",
             "company_startup": "شركة ناشئة", "company_business": "شركة متوسطة", "company_enterprise": "شركة كبرى"
@@ -319,7 +360,8 @@ async def create_subscription_payment(
                 "payment_type": "subscription",
                 "plan": data.plan,
                 "duration": data.duration,
-                "user_id": current_user['id']
+                "user_id": current_user['id'],
+                **coupon_meta,  # 🎟️ coupon_code + coupon_id + discount_amount (when applied)
             }
         )
 

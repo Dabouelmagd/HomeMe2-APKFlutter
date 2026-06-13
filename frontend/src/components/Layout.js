@@ -920,28 +920,48 @@ const Layout = ({ children, isTrialMode = false }) => {
                   {/* Section Items - Collapsible */}
                   {isExpanded && (
                     <div className="space-y-0.5 mt-0.5">
-                      {filteredItems.map((item) => (
+                      {filteredItems.map((item) => {
+                        const active = isActive(item.href);
+                        return (
                         <Link
                           key={item.name}
                           to={item.href}
-                          data-active={isActive(item.href) ? 'true' : 'false'}
+                          data-active={active ? 'true' : 'false'}
+                          data-testid={`sidebar-link-${item.href.replace(/\//g, '-')}`}
                           className={`
-                            group flex items-center px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200
-                            ${isActive(item.href)
-                              ? `bg-gradient-to-r ${theme.active} text-white shadow-sm`
+                            group relative flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200
+                            ${active
+                              ? `bg-gradient-to-r ${theme.active} text-white shadow-md scale-[1.02] font-bold`
                               : isSuperAdmin
-                                ? 'text-gray-300 hover:bg-purple-900/30 hover:text-purple-300'
-                                : `text-gray-700 ${theme.hover} hover:text-gray-900`
+                                ? 'text-gray-300 hover:bg-purple-900/30 hover:text-purple-300 hover:translate-x-[-2px]'
+                                : `text-gray-700 ${theme.hover} hover:text-gray-900 hover:translate-x-[-2px]`
                             }
                           `}
                           onClick={() => setSidebarOpen(false)}
                         >
+                          {/* Active indicator bar — strong visual cue on the
+                              leading edge (start in RTL = right side). */}
+                          {active && (
+                            <span
+                              aria-hidden="true"
+                              className={`absolute top-1 bottom-1 ${isRTL ? '-right-1' : '-left-1'} w-1 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)]`}
+                            />
+                          )}
                           <item.icon
-                            className={`${isRTL ? 'ml-2.5' : 'mr-2.5'} h-5 w-5 flex-shrink-0 transition-colors duration-200 ${
-                              isActive(item.href) ? 'text-white' : isSuperAdmin ? 'text-purple-500/70' : 'text-gray-400'
+                            className={`${isRTL ? 'ml-2.5' : 'mr-2.5'} h-5 w-5 flex-shrink-0 transition-all duration-200 ${
+                              active
+                                ? 'text-white drop-shadow-sm scale-110'
+                                : isSuperAdmin
+                                  ? 'text-purple-500/70 group-hover:text-purple-300'
+                                  : 'text-gray-400 group-hover:text-gray-700'
                             }`}
                           />
                           <span className="flex-1">{item.name}</span>
+                          {item.badge && (
+                            <span className={`${active ? 'bg-white text-violet-700' : 'bg-emerald-500 text-white'} text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase`}>
+                              {item.badge}
+                            </span>
+                          )}
                           {item.name === t('notifications_nav') && unreadCount > 0 && (
                             <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                               {unreadCount > 99 ? '99+' : unreadCount}
@@ -1012,7 +1032,8 @@ const Layout = ({ children, isTrialMode = false }) => {
                             </span>
                           )}
                         </Link>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

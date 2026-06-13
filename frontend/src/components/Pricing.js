@@ -1057,6 +1057,92 @@ const Pricing = () => {
               </p>
             </div>
 
+            {/* 💰 Ads Revenue Sharing Explainer — surfaces the income stream
+                feature that's gated behind the Premium plan. Helps justify
+                the upgrade for compounds that want monetization. */}
+            <div className="mt-12 rounded-3xl bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border-2 border-amber-200 p-8" data-testid="ads-revenue-explainer">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-black mb-3">
+                  💰 {t('ads_revenue_badge', 'ميزة Premium حصرية')}
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>
+                  {t('ads_revenue_title', 'الإعلانات التجارية: حوّل مجمعك إلى مصدر دخل إضافي')}
+                </h3>
+                <p className="text-sm text-gray-600 max-w-2xl mx-auto">
+                  {t('ads_revenue_subtitle', 'الشركات المحلية ترفع إعلاناتها، أنتِ توافقين، السكان يشاهدون، وأنتِ تكسبين 70% من كل إعلان. صفقة سهلة بدون جهد.')}
+                </p>
+              </div>
+
+              {/* Step-by-step flow */}
+              <div className="grid md:grid-cols-4 gap-4 mb-8" data-testid="ads-revenue-flow">
+                {[
+                  { num: '1', icon: '🏪', title: 'الشركات ترفع إعلانها', desc: 'مطاعم، عقارات، مدارس — أي شركة محلية ترفع تصميم الإعلان + المدة + الميزانية' },
+                  { num: '2', icon: '✅', title: 'أنتِ توافقين أو ترفضين', desc: 'مراجعة كل إعلان قبل النشر — تحكّم كامل في المحتوى الظاهر لسكانك' },
+                  { num: '3', icon: '📱', title: 'السكان يشاهدون', desc: 'الإعلان يظهر في أماكن غير مزعجة داخل التطبيق (Banner / Card) فقط للجمهور المستهدف' },
+                  { num: '4', icon: '💵', title: 'أنتِ تكسبين 70%', desc: 'HomeMe تأخذ 30% فقط — الباقي يُحوَّل لحسابك البنكي شهرياً' },
+                ].map((s, i) => (
+                  <div key={i} className="bg-white rounded-2xl border border-amber-200 p-4 relative shadow-sm">
+                    <div className="absolute -top-3 -right-3 rtl:right-auto rtl:-left-3 w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-black text-sm shadow-md">
+                      {s.num}
+                    </div>
+                    <div className="text-3xl mb-2">{s.icon}</div>
+                    <div className="font-bold text-gray-900 text-sm mb-1">{s.title}</div>
+                    <div className="text-xs text-gray-500 leading-relaxed">{s.desc}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Income projection */}
+              <div className="bg-white rounded-2xl border-2 border-amber-300 p-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-2xl">📊</span>
+                  <h4 className="font-bold text-gray-900">{t('ads_projection_title', 'مثال واقعي للدخل المتوقع')}</h4>
+                </div>
+                <p className="text-xs text-gray-500 mb-4">
+                  {t('ads_projection_hint', 'الأرقام أدناه تقديرية بناءً على متوسط مجمع 200 وحدة')}
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-center">
+                    <div className="text-[10px] text-gray-500 mb-1">{t('ads_per_month', 'إعلانات/شهر')}</div>
+                    <div className="text-2xl font-black text-amber-700">3-5</div>
+                  </div>
+                  <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-center">
+                    <div className="text-[10px] text-gray-500 mb-1">{t('ads_per_ad', 'متوسط/إعلان')}</div>
+                    <div className="text-2xl font-black text-amber-700">2,500 ج.م</div>
+                  </div>
+                  <div className="rounded-xl bg-emerald-50 border-2 border-emerald-300 p-3 text-center">
+                    <div className="text-[10px] text-emerald-700 mb-1 font-bold">{t('ads_your_share', 'حصتك (70%)')}</div>
+                    <div className="text-2xl font-black text-emerald-700">5,250 — 8,750 ج.م</div>
+                  </div>
+                </div>
+                <p className="text-[11px] text-center text-gray-500 mt-3">
+                  {t('ads_projection_note', '* الأرقام بدون احتساب مدخول التطبيق الأساسي — هذا دخل إضافي صافٍ')}
+                </p>
+              </div>
+
+              {/* CTA */}
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  onClick={() => {
+                    const el = document.querySelector('[data-testid="pricing-section"]') ||
+                               document.querySelector('[data-testid="pricing-comparison-section"]');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-3 rounded-xl font-black hover:scale-105 transition-transform shadow-lg"
+                  data-testid="ads-upgrade-btn"
+                >
+                  {t('ads_upgrade_cta', '⚡ ترقية لـ Premium وابدئي الكسب')}
+                </button>
+                <a
+                  href="/advertiser-register"
+                  className="inline-flex items-center gap-2 text-amber-700 px-4 py-2 rounded-xl font-bold border-2 border-amber-300 hover:bg-amber-100 transition"
+                  data-testid="ads-learn-more-link"
+                >
+                  {t('ads_for_advertisers', 'هل أنت شركة تريد الإعلان؟ ←')}
+                </a>
+              </div>
+            </div>
+
             {/* Customer testimonials */}
             <div className="mt-12">
               <h3 className="text-2xl font-bold text-center text-gray-900 mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>

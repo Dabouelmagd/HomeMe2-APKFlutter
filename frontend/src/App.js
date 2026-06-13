@@ -147,6 +147,8 @@ import SubscriptionReminders from './components/SubscriptionReminders';
 import NotificationPreferencesPage from './components/NotificationPreferencesPage';
 import CompoundMap from './components/CompoundMap';
 import StaffManagement from './components/StaffManagement';
+import AboutUs from './components/AboutUs';
+import AIAssistantBubble from './components/AIAssistantBubble';
 import { GlobalUIProvider } from './providers/GlobalUIProvider';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -690,6 +692,8 @@ function App() {
 
                 {/* Public legal/info pages */}
                 <Route path="/legal/:slug" element={<LegalPage />} />
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/contact" element={<ContactUs />} />
 
                 {/* Public testimonial submission */}
                 <Route path="/testimonials/submit" element={<TestimonialSubmitPage />} />
@@ -1130,6 +1134,10 @@ function App() {
             <GlobalUIProvider />
             <PwaInstallPrompt />
             <OnboardingWizard />
+            {/* 🤖 AI Assistant — globally available on every logged-in route
+                (component self-hides for guests). Iter 139 promotes the bubble
+                from /app/* layout to the whole app shell. */}
+            <GlobalAIAssistant />
             </TransliterationProvider>
           </NotificationProvider>
         </AuthProvider>
@@ -1138,6 +1146,17 @@ function App() {
     </div>
   );
 }
+
+// AI Assistant wrapper — renders the floating bubble only on routes outside
+// /app/* because Layout.js already mounts one for the dashboard shell. This
+// avoids duplicate bubbles while still making the assistant available on
+// HomePage, Pricing, About, Contact, and other public/logged-in pages.
+const GlobalAIAssistant = () => {
+  const location = useLocation();
+  const inAppShell = location.pathname.startsWith('/app/') || location.pathname === '/app';
+  if (inAppShell) return null;
+  return <AIAssistantBubble />;
+};
 
 // Dashboard Router Component
 const DashboardRouter = () => {

@@ -13,6 +13,7 @@ import PaymentAnalyticsCard from './PaymentAnalyticsCard';
 import CompanyPlanUsageCard from './CompanyPlanUsageCard';
 import SuperAdminQuickStats from './SuperAdminQuickStats';
 import AIInsightsWidget from './AIInsightsWidget';
+import DashboardKPIWidget from './DashboardKPIWidget';
 import { TransliteratedText } from './TransliterationToggle';
 import {
   UsersIcon,
@@ -341,6 +342,11 @@ const AdminDashboard = () => {
           <div className="mb-8">
             <CompanyPlanUsageCard />
           </div>
+        )}
+
+        {/* ✨ Top-of-page KPI Widget (Iter 139) — 4 quick KPIs + 6-month revenue chart + quick actions */}
+        {user?.compound_id && user?.role !== 'company_admin' && (
+          <DashboardKPIWidget compoundId={user.compound_id} />
         )}
 
         {/* Main Stats Grid */}

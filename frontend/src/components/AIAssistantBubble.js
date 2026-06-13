@@ -39,9 +39,6 @@ const AIAssistantBubble = () => {
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Don't show on login/register/public pages
-  if (!user) return null;
-
   const fetchUsage = async () => {
     try {
       const res = await axios.get(`${API}/ai-assistant/usage`, {
@@ -146,6 +143,11 @@ const AIAssistantBubble = () => {
     setOpen(false);
     navigate(route);
   };
+
+  // Don't show on login/register/public pages. Placed *after* all hooks so
+  // we never break the rules-of-hooks contract (the hooks above must run
+  // every render regardless of whether the bubble is visible).
+  if (!user) return null;
 
   return (
     <>

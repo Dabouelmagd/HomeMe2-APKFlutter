@@ -550,6 +550,10 @@ async def company_admin_aggregated_stats(current_user: dict = Depends(_require_c
         "unpaid_charges_amount": 0.0, "unpaid_charges_count": 0,
         "open_obligations_amount": 0.0, "open_obligations_count": 0,
         "open_complaints": 0, "pending_maintenance": 0,
+        # ✨ Iter 141 — revenue/occupancy for side-by-side compound comparison
+        "monthly_revenue": 0.0,
+        "total_units": c.get("total_units") or 0,
+        "occupied_units": 0,  # filled in from families count below
     } for c in compounds}
 
     totals = {
@@ -558,6 +562,9 @@ async def company_admin_aggregated_stats(current_user: dict = Depends(_require_c
         "unpaid_charges_amount": 0.0, "unpaid_charges_count": 0,
         "open_obligations_amount": 0.0, "open_obligations_count": 0,
         "open_complaints": 0, "pending_maintenance": 0,
+        "monthly_revenue": 0.0,
+        "total_units": sum(c.get("total_units") or 0 for c in compounds),
+        "occupied_units": 0,
     }
 
     if not cids:
@@ -640,6 +647,33 @@ async def company_admin_aggregated_stats(current_user: dict = Depends(_require_c
             if pcid in per:
                 per[pcid]["pending_maintenance"] += 1
             totals["pending_maintenance"] += 1
+    except Exception:
+        pass
+
+    # --- Monthly revenue (paid invoices this calendar month) — Iter 141 ---
+    try:
+        from datetime import datetime as _dt, timezone as _tz
+        _now = _dt.now(_tz.utc)
+        month_start = _dt(_now.year, _now.month, 1, tzinfo=_tz.utc)
+        async for inv in db.invoices.find(
+            {"compound_id": {"$in": cids}, "status": "paid", "paid_at": {"$gte": month_start}},
+            {"_id": 0, "compound_id": 1, "amount": 1}
+        ):
+            pcid = inv.get("compound_id")
+            amount = float(inv.get("amount") or 0)
+            if pcid in per:
+                per[pcid]["monthly_revenue"] += amount
+            totals["monthly_revenue"] += amount
+    except Exception:
+        pass
+
+    # --- Occupancy: occupied_units = families count per compound ---
+    try:
+        async for fam in db.families.find({"compound_id": {"$in": cids}}, {"_id": 0, "compound_id": 1}):
+            pcid = fam.get("compound_id")
+            if pcid in per:
+                per[pcid]["occupied_units"] += 1
+            totals["occupied_units"] += 1
     except Exception:
         pass
 

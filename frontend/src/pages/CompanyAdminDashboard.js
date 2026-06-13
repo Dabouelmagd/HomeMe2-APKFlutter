@@ -7,6 +7,7 @@ import InviteLinkModal from '../components/shared/InviteLinkModal';
 import CompanyPlanUsageCard from '../components/CompanyPlanUsageCard';
 import CompoundOnboardingWizard from '../components/company-admin/CompoundOnboardingWizard';
 import AggregatedStatsPanel from '../components/company-admin/AggregatedStatsPanel';
+import CompoundsComparisonView from '../components/company-admin/CompoundsComparisonView';
 import CrmRetentionPanel from '../components/company-admin/CrmRetentionPanel';
 import CompanyReferralPanel from '../components/company-admin/CompanyReferralPanel';
 import UserTimelineModal from '../components/UserTimelineModal';
@@ -336,6 +337,15 @@ const CompanyAdminDashboard = () => {
           localStorage.setItem('selectedCompoundName', c.name || '');
           navigate('/app/dashboard');
         }} />
+
+        {/* 📊 Cross-compound Comparison (Iter 141) — bar chart + sortable table + CSV/PDF export */}
+        <SectionCard
+          title="📊 مقارنة الكمبوندات"
+          subtitle="مقارنة جنباً إلى جنب: السكان، الإيرادات، الصيانة، الشكاوى — مع تصدير PDF و CSV"
+          variant="dark"
+        >
+          <CompoundsComparisonView />
+        </SectionCard>
 
         {/* CRM / Retention Panel — VIP + Late Payers cross-compound */}
         <SectionCard

@@ -4,6 +4,62 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 142: Double-Sided Referral (#37) + 6-Month Compounds Trend Chart (#36) + Dark Mode polish (#40) — Feb 13, 2026 ✅
+
+**🎯 الطلب:** إكمال ميزات #36، #37 و #40 من قائمة الـ 40 ميزة.
+
+**🔧 Backend:**
+
+1. **`routes/company_referrals.py` `track_company_signup(...)` extended (Feature #37):**
+   - الآن يصدر **كوبون ترحيب 15%** لمرة واحدة للشركة الجديدة (referee) فور تسجيلها بكود إحالة `CO-XXXX` صالح.
+   - الكوبون: `discount_type=percentage`, `discount_value=15`, `max_uses=1`, `applicable_plans=[]` (كل الخطط)، رمز فريد `WELCOME-{ref-suffix}-{user_id_prefix}`.
+   - يُرسل إشعار `referral_welcome` للمستخدم يحتوي الكود.
+   - `routes/auth.py` يمرر `new_admin_user_id=user.id` إلى `track_company_signup`.
+
+2. **`routes/company_admin.py` — endpoint جديد `/api/company-admin/compounds-trend?months=6` (Feature #36):**
+   - يُرجع تاريخ 6 أشهر (قابل للتعديل 1–12) من البيانات لكل كمبوند تحت الشركة.
+   - المقاييس المُعَدَّدة لكل شهر: `revenue` (إيرادات الفواتير المدفوعة)، `residents` (تراكمي)، `complaints` (شكاوى مفتوحة في الشهر)، `maintenance` (طلبات صيانة).
+   - تنسيق المُخرج: `{ company_id, months: [{month,label}], compounds: [{compound_id, name, points: [...]}] }`.
+
+**🎨 Frontend:**
+
+1. **`components/company-admin/CompoundsTrendChart.js` (NEW):**
+   - Multi-line `LineChart` (Recharts) بلون مختلف لكل كمبوند (لوحة من 12 لون متباين).
+   - مُبدِّل بين 4 مقاييس: الإيرادات / السكان / الشكاوى / الصيانة (`data-testid="trend-metric-*"`).
+   - Legend تفاعلي: نقر على اسم كمبوند يُخفي/يُظهر خطه (`data-testid="trend-legend-{compound_id}"`).
+   - مدمج في `CompanyAdminDashboard.js` تحت قسم "مقارنة الكمبوندات".
+
+2. **Dark Mode (#40) — استكمال البنية الموجودة:**
+   - الـ`ThemeProvider`/`ThemeToggle` كانا مُجَهَّزَين لكن غير مُعَرَّضين على الصفحات العامة.
+   - أضفت `<ThemeToggle data-testid="theme-toggle" />` في رأس `HomePage.js` بجانب `LanguageSwitcher`.
+   - أضفت قواعد CSS عامة في `index.css` تحت `html.dark` لتجاوز الفئات الخام (`bg-white`, `bg-gray-50`, `text-gray-900`, `bg-{color}-50` وإلخ) — هذا يجعل التبديل يعمل بدون إضافة `dark:` لكل عنصر.
+
+3. **`components/Register.js`:** Banner الإحالة الآن يذكر صراحةً "ستحصل على خصم 15%" كهدية ترحيبية.
+
+**🧪 Tests Added/Run:**
+- ✏️ `tests/test_iter142_double_referral.py` (2 cases — coupon issued + no coupon without ref) — PASS
+- ✏️ `tests/test_iter142_compounds_trend.py` (6 cases — schema, cumulative residents, RBAC) — PASS
+- ⚙️ `testing_agent_v3_fork` iteration_70: 8/8 backend pytest + 100% frontend (dark toggle persistence + 4 trend metrics + 4 legend toggles + comparison view above trend).
+
+**📊 Verification:**
+- ✅ كوبون 15% يُولَّد تلقائياً عند التسجيل بكود `CO-XXXX` صالح.
+- ✅ مخطط الاتجاهات يعرض 4 خطوط (كمبوند testcompany2) عبر 6 أشهر.
+- ✅ Dark Mode toggle قابل للعكس + يحفظ التفضيل في `localStorage` + يثبت بعد reload.
+
+**Files Modified:**
+- ✏️ `backend/routes/company_referrals.py` (welcome coupon logic)
+- ✏️ `backend/routes/auth.py` (passes user.id to track_company_signup)
+- ✏️ `backend/routes/company_admin.py` (`/compounds-trend` endpoint, ~150 LOC)
+- ➕ `frontend/src/components/company-admin/CompoundsTrendChart.js` (new)
+- ✏️ `frontend/src/pages/CompanyAdminDashboard.js` (mount trend chart)
+- ✏️ `frontend/src/components/HomePage.js` (ThemeToggle in header)
+- ✏️ `frontend/src/components/ThemeToggle.js` (data-testid)
+- ✏️ `frontend/src/components/Register.js` (banner mentions 15%)
+- ✏️ `frontend/src/index.css` (global `.dark` CSS overrides)
+- ➕ `backend/tests/test_iter142_double_referral.py`, `tests/test_iter142_compounds_trend.py`
+
+
+
 ### Iter 130: Health Endpoint Hardening + Post-Iter129 Regression Audit — Feb 11, 2026 ✅
 
 **🎯 الطلب:** Audit شامل بعد iter129 (bounce detection) + إصلاح الـ false-positives من testing agent.

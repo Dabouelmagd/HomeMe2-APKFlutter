@@ -8,6 +8,7 @@ const ThemeToggle = ({ className = '' }) => {
   return (
     <button
       onClick={toggleDarkMode}
+      data-testid="theme-toggle"
       className={`
         relative p-2 rounded-lg transition-all duration-300
         ${isDarkMode 

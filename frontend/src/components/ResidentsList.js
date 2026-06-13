@@ -146,6 +146,41 @@ const ResidentsList = () => {
           }
           testId="residents-page-header"
         />
+        {/* 💡 Onboarding tip — surface the bulk-import feature for admins
+            who haven't discovered it. Dismissible & per-user persistent. */}
+        {(() => {
+          const dismissed = (() => { try { return localStorage.getItem('residents_tip_csv_dismissed') === '1'; } catch { return false; } })();
+          if (dismissed) return null;
+          return (
+            <div className="mb-6 rounded-xl border-2 border-dashed border-emerald-300 bg-gradient-to-br from-emerald-50 to-teal-50 p-4 flex items-start gap-3" data-testid="bulk-import-tip-card">
+              <div className="text-2xl">💡</div>
+              <div className="flex-1">
+                <h3 className="font-bold text-emerald-900 text-sm mb-1">
+                  {t('csv_tip_title', 'هل عندك ملف Excel للسكان؟')}
+                </h3>
+                <p className="text-xs text-emerald-700 mb-2">
+                  {t('csv_tip_desc', 'استخدمي زرّ "استيراد CSV / Excel" أعلى الصفحة لإضافة مئات السكان دفعة واحدة بدلاً من إدخال كل واحد يدوياً. النظام يتحقق تلقائياً من التكرارات ويرسل بيانات الدخول لكل ساكن.')}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowBulkImport(true)}
+                    className="text-xs font-bold text-emerald-700 hover:text-emerald-900 underline"
+                    data-testid="bulk-import-tip-try"
+                  >
+                    {t('csv_tip_try', 'جرّب الاستيراد دلوقتي ←')}
+                  </button>
+                  <button
+                    onClick={() => { try { localStorage.setItem('residents_tip_csv_dismissed', '1'); } catch {} window.location.reload(); }}
+                    className="text-xs text-gray-500 hover:text-gray-700"
+                    data-testid="bulk-import-tip-dismiss"
+                  >
+                    {t('csv_tip_dismiss', 'فهمت، تخطي')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
         {/* Enhanced Search and Filters */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4">

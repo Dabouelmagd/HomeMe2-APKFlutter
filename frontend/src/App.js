@@ -145,6 +145,7 @@ import CompanySubscriptions from './components/CompanySubscriptions';
 import OwnerBudget from './components/OwnerBudget';
 import SubscriptionReminders from './components/SubscriptionReminders';
 import NotificationPreferencesPage from './components/NotificationPreferencesPage';
+import CompoundMap from './components/CompoundMap';
 import { GlobalUIProvider } from './providers/GlobalUIProvider';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -976,6 +977,9 @@ function App() {
                 } />
                 <Route path="notification-preferences" element={
                   <NotificationPreferencesPage />
+                } />
+                <Route path="compound-map" element={
+                  <CompoundMap />
                 } />
                 
                 <Route path="gallery" element={

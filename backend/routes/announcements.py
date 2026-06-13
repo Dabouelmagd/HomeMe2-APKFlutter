@@ -65,7 +65,42 @@ async def create_announcement(
         }
         
         await db.announcements.insert_one(announcement)
-        
+
+        # Fan out to all residents in the compound, honoring each user's
+        # announcement-channel preferences. The flags ``send_push`` and
+        # ``send_email`` from the form act as *additional* opt-outs by the
+        # admin — they cap what we'll try; user preferences narrow it further.
+        try:
+            from notification_dispatch import dispatch_notification
+            recipients_query = {"compound_id": current_user.compound_id, "role": {"$in": ["resident", "admin", "compound_admin"]}}
+            recipients = await db.users.find(recipients_query, {"id": 1, "_id": 0}).to_list(2000)
+            recipient_ids = [r["id"] for r in recipients if r.get("id") and r["id"] != current_user.id]
+
+            email_html = (
+                f"<div dir='rtl' style='font-family:Cairo,Tahoma,sans-serif;padding:12px'>"
+                f"<h3 style='color:#7c3aed;margin:0 0 8px 0'>{'🚨 ' if is_emergency else '📢 '}{title}</h3>"
+                f"<p style='color:#666;font-size:12px;margin:0 0 12px 0'>{category}</p>"
+                f"<div style='line-height:1.7'>{content}</div>"
+                f"<hr style='border:none;border-top:1px solid #eee;margin:18px 0'/>"
+                f"<p style='font-size:11px;color:#999'>أُرسل بواسطة: {current_user.full_name}</p>"
+                f"</div>"
+            ) if send_email else None
+            sms_text = f"📢 {title}: {content[:100]}" if is_emergency else None
+
+            await dispatch_notification(
+                db,
+                recipient_ids,
+                event_type="announcement",
+                title=title,
+                body=content[:200],
+                in_app_payload={"compound_id": current_user.compound_id, "type": "announcement", "announcement_id": announcement["id"], "is_emergency": is_emergency},
+                email_html=email_html,
+                email_subject=f"[{'عاجل' if is_emergency else 'إعلان'}] {title}",
+                sms_text=sms_text,  # only emergencies get SMS attempts
+            )
+        except Exception as fanout_err:
+            logging.warning(f"[announcements] fan-out failed (announcement saved): {fanout_err}")
+
         return {"message": "Announcement created successfully", "announcement_id": announcement["id"]}
         
     except Exception as e:

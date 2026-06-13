@@ -61,12 +61,33 @@ async def create_complaint(data: ComplaintCreate, current_user: dict = Depends(g
             "praise": "إطراء",
         }.get(data.type, data.type)
         notify_from = "مجهول" if anon else current_user.get("full_name", "")
-        await notify_compound_admins(
-            compound_id=current_user["compound_id"],
+        # Fan out via the preference-aware dispatcher: respects per-admin
+        # complaint-channel toggles (push/email/sms). In-app history is kept
+        # regardless.
+        from notification_dispatch import dispatch_notification
+        admins = await db.users.find(
+            {"compound_id": current_user["compound_id"], "role": {"$in": ["admin", "compound_admin", "company_admin"]}},
+            {"id": 1, "_id": 0},
+        ).to_list(50)
+        admin_ids = [a["id"] for a in admins if a.get("id")]
+        email_html_admin = (
+            f"<div dir='rtl' style='font-family:Cairo,Tahoma,sans-serif;padding:12px'>"
+            f"<h3>{type_label} جديدة في المجمع</h3>"
+            f"<p><b>العنوان:</b> {data.title}</p>"
+            f"<p><b>الوصف:</b> {data.description}</p>"
+            f"<p style='color:#666;font-size:12px'>المُرسل: {notify_from}</p>"
+            f"</div>"
+        )
+        await dispatch_notification(
+            db,
+            admin_ids,
+            event_type="complaint",
             title=f"{type_label} جديدة",
-            content=f"{type_label} من {notify_from}: {data.title}",
-            action_type=f"new_{data.type}",
-            exclude_user_id=None
+            body=f"{type_label} من {notify_from}: {data.title}",
+            in_app_payload={"compound_id": current_user["compound_id"], "type": f"new_{data.type}", "complaint_id": complaint["id"]},
+            email_html=email_html_admin,
+            email_subject=f"[{type_label}] {data.title}",
+            sms_text=f"{type_label} جديدة: {data.title}",
         )
 
         return {"message": "تم إرسال الشكوى/الاقتراح بنجاح", "complaint_id": complaint["id"]}

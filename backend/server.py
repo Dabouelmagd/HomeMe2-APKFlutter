@@ -2469,12 +2469,14 @@ from routes.blog import router as blog_router
 from routes.email_verification import router as email_verification_router
 from routes.email_logs import router as email_logs_router
 from routes.notification_preferences import router as notification_preferences_router
+from routes.weekly_digest import router as weekly_digest_router
 
 app.include_router(monitoring_router)
 app.include_router(blog_router)
 app.include_router(email_verification_router)
 app.include_router(email_logs_router)
 app.include_router(notification_preferences_router)
+app.include_router(weekly_digest_router)
 app.include_router(finance_router)
 app.include_router(ratings_router2)
 app.include_router(contracts_router)
@@ -2738,6 +2740,15 @@ async def start_smtp_alerts_loop():
     from smtp_alerts import smtp_alert_loop
     _asyncio.create_task(smtp_alert_loop())
     logging.info("SMTP alert loop started (hourly check)")
+
+
+@app.on_event("startup")
+async def start_weekly_digest_loop():
+    """Weekly admin digest — runs Mondays at 06:00 UTC."""
+    import asyncio as _asyncio
+    from routes.weekly_digest import weekly_digest_loop
+    _asyncio.create_task(weekly_digest_loop())
+    logging.info("Weekly admin-digest loop started (Mon 06:00 UTC)")
 
 
 @app.on_event("startup")

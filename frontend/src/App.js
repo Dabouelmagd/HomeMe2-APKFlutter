@@ -148,6 +148,7 @@ import NotificationPreferencesPage from './components/NotificationPreferencesPag
 import CompoundMap from './components/CompoundMap';
 import StaffManagement from './components/StaffManagement';
 import AboutUs from './components/AboutUs';
+import FAQPage from './pages/FAQPage';
 import ReferralProgramPage from './components/ReferralProgramPage';
 import AIAssistantBubble from './components/AIAssistantBubble';
 import ResetPassword from './components/ResetPassword';
@@ -698,6 +699,7 @@ function App() {
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/faq" element={<FAQPage />} />
 
                 {/* Public testimonial submission */}
                 <Route path="/testimonials/submit" element={<TestimonialSubmitPage />} />

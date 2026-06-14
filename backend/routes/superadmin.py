@@ -77,6 +77,163 @@ async def super_admin_dashboard(current_user: dict = Depends(require_super_admin
         raise HTTPException(status_code=500, detail="Failed to load dashboard")
 
 
+@router.get("/super-admin/security-insights")
+async def super_admin_security_insights(
+    current_user: dict = Depends(require_super_admin),
+    hours: int = 24,
+):
+    """Feature #49 — Security insights from login_attempts collection.
+
+    Returns:
+      - summary: {total_attempts, failed, success, failure_rate, unique_ips, suspicious_ips_count}
+      - top_failed_ips: IPs with 3+ failed attempts in the window
+      - top_targeted_users: usernames most attacked
+      - hourly_distribution: 24-hour rolling failed-attempt counts
+      - recent_failures: last 50 failed attempts
+      - currently_locked: usernames currently rate-limited (>=5 failures in last 15min)
+    """
+    db = get_db()
+    hours = max(1, min(int(hours or 24), 720))  # cap at 30 days
+    now = datetime.now(timezone.utc)
+    threshold = now - timedelta(hours=hours)
+    threshold_iso = threshold.isoformat()
+
+    base_filter = {"created_at": {"$gte": threshold_iso}}
+    total_attempts = await db.login_attempts.count_documents(base_filter)
+    total_failed = await db.login_attempts.count_documents({**base_filter, "success": False})
+    total_success = total_attempts - total_failed
+    failure_rate = (
+        round((total_failed / total_attempts) * 100, 1) if total_attempts else 0.0
+    )
+
+    # ── Top suspicious IPs (3+ failed in window) ──────────────────────────
+    pipeline_ips = [
+        {"$match": {**base_filter, "success": False}},
+        {"$group": {
+            "_id": "$ip",
+            "failed_attempts": {"$sum": 1},
+            "unique_usernames": {"$addToSet": "$username"},
+            "last_attempt": {"$max": "$created_at"},
+            "first_attempt": {"$min": "$created_at"},
+            "user_agents": {"$addToSet": "$user_agent"},
+        }},
+        {"$match": {"failed_attempts": {"$gte": 3}}},
+        {"$sort": {"failed_attempts": -1}},
+        {"$limit": 25},
+    ]
+    suspicious_ips = []
+    async for r in db.login_attempts.aggregate(pipeline_ips):
+        suspicious_ips.append({
+            "ip": r["_id"] or "unknown",
+            "failed_attempts": r["failed_attempts"],
+            "unique_usernames_attacked": len(r.get("unique_usernames", [])),
+            "usernames_sample": (r.get("unique_usernames") or [])[:5],
+            "last_attempt": r.get("last_attempt"),
+            "first_attempt": r.get("first_attempt"),
+            "user_agents_sample": [
+                (ua or "")[:120] for ua in (r.get("user_agents") or [])[:3]
+            ],
+        })
+
+    # ── Top targeted usernames ─────────────────────────────────────────────
+    pipeline_users = [
+        {"$match": {**base_filter, "success": False}},
+        {"$group": {
+            "_id": "$username",
+            "failed_attempts": {"$sum": 1},
+            "unique_ips": {"$addToSet": "$ip"},
+            "last_attempt": {"$max": "$created_at"},
+        }},
+        {"$sort": {"failed_attempts": -1}},
+        {"$limit": 15},
+    ]
+    top_targeted = []
+    async for r in db.login_attempts.aggregate(pipeline_users):
+        # Check if this user actually exists (useful for spotting account harvesting)
+        exists = await db.users.find_one({"username": r["_id"]}, {"_id": 1})
+        top_targeted.append({
+            "username": r["_id"] or "—",
+            "failed_attempts": r["failed_attempts"],
+            "unique_ips": len(r.get("unique_ips", [])),
+            "last_attempt": r.get("last_attempt"),
+            "user_exists": exists is not None,
+        })
+
+    # ── Currently locked-out users (>=5 failures in last 15 min) ──────────
+    lockout_threshold = (now - timedelta(minutes=15)).isoformat()
+    pipeline_locked = [
+        {"$match": {"created_at": {"$gte": lockout_threshold}, "success": False}},
+        {"$group": {"_id": "$username", "n": {"$sum": 1}}},
+        {"$match": {"n": {"$gte": 5}}},
+        {"$sort": {"n": -1}},
+    ]
+    currently_locked = []
+    async for r in db.login_attempts.aggregate(pipeline_locked):
+        currently_locked.append({
+            "username": r["_id"] or "—", "failed_attempts": r["n"]
+        })
+
+    # ── Hourly distribution (24 buckets backward from now) ────────────────
+    hourly = []
+    for back in range(23, -1, -1):
+        bucket_end = now - timedelta(hours=back)
+        bucket_start = bucket_end - timedelta(hours=1)
+        b_filter = {
+            "created_at": {
+                "$gte": bucket_start.isoformat(), "$lt": bucket_end.isoformat()
+            },
+            "success": False,
+        }
+        cnt = await db.login_attempts.count_documents(b_filter)
+        hourly.append({
+            "hour": bucket_end.strftime("%H:00"),
+            "failed": cnt,
+        })
+
+    # ── Last 50 failed attempts (for forensics) ───────────────────────────
+    recent_failures = []
+    async for r in db.login_attempts.find(
+        {**base_filter, "success": False},
+        {"_id": 0, "username": 1, "ip": 1, "user_agent": 1, "created_at": 1},
+    ).sort("created_at", -1).limit(50):
+        recent_failures.append({
+            "username": r.get("username", "—"),
+            "ip": r.get("ip", "—"),
+            "user_agent": (r.get("user_agent") or "")[:200],
+            "at": r.get("created_at"),
+        })
+
+    # ── Unique IPs count (regardless of success/fail) ─────────────────────
+    pipeline_unique = [
+        {"$match": base_filter},
+        {"$group": {"_id": "$ip"}},
+        {"$count": "n"},
+    ]
+    unique_ips_count = 0
+    async for r in db.login_attempts.aggregate(pipeline_unique):
+        unique_ips_count = r.get("n", 0)
+
+    return {
+        "generated_at": now.isoformat(),
+        "window_hours": hours,
+        "summary": {
+            "total_attempts": total_attempts,
+            "failed": total_failed,
+            "success": total_success,
+            "failure_rate_percent": failure_rate,
+            "unique_ips": unique_ips_count,
+            "suspicious_ips_count": len(suspicious_ips),
+        },
+        "top_failed_ips": suspicious_ips,
+        "top_targeted_users": top_targeted,
+        "hourly_distribution": hourly,
+        "recent_failures": recent_failures,
+        "currently_locked": currently_locked,
+    }
+
+
+
+
 @router.get("/super-admin/comprehensive-report")
 async def super_admin_comprehensive_report(
     current_user: dict = Depends(require_super_admin),

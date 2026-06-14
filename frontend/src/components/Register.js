@@ -13,6 +13,7 @@ import {
   ArrowLeftIcon
 } from '@heroicons/react/24/outline';
 import RegistrationPlanPicker from './RegistrationPlanPicker';
+import CompanyRegistrationWizard from './CompanyRegistrationWizard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -230,7 +231,23 @@ const Register = () => {
         )}
 
         {/* Step 2: Registration Form */}
-        {step === 'form' && (
+        {step === 'form' && accountType === 'company_admin' && (
+          <CompanyRegistrationWizard
+            formData={formData}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+            selectedPlan={selectedPlan}
+            setSelectedPlan={setSelectedPlan}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+            showConfirmPassword={showConfirmPassword}
+            setShowConfirmPassword={setShowConfirmPassword}
+            loading={loading}
+            onBackToAccountType={() => setStep('choose')}
+          />
+        )}
+
+        {step === 'form' && accountType !== 'company_admin' && (
           <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8" data-testid="register-form">
             {/* Header */}
             <div className="flex items-center gap-3 mb-6">

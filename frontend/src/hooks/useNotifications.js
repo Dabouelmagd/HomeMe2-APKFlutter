@@ -59,14 +59,21 @@ export const useNotifications = (user) => {
               setNotifications(prev => [data.notification, ...prev]);
               setUnreadCount(prev => prev + 1);
               
-              // Show toast notification
-              toast(data.notification.title, {
-                description: data.notification.message,
-                action: data.notification.action_url ? {
-                  label: 'View',
-                  onClick: () => window.location.href = data.notification.action_url
-                } : undefined
-              });
+              // Feature #51 — important notifications get a sticky toast with action
+              {
+                const n = data.notification || {};
+                const isHigh = n.priority === 'high' || ['payment_overdue', 'security', 'emergency'].includes(n.type);
+                toast(n.title, {
+                  description: n.message,
+                  duration: isHigh ? 15000 : 5000,
+                  important: isHigh,
+                  className: isHigh ? 'sonner-toast-high' : undefined,
+                  action: n.action_url ? {
+                    label: isHigh ? '🔔 افتح الآن' : 'فتح',
+                    onClick: () => window.location.href = n.action_url
+                  } : undefined
+                });
+              }
               break;
 
             case 'notification_read':

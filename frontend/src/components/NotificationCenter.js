@@ -158,6 +158,63 @@ const NotificationCenter = () => {
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
+  // Feature #51 — Smart grouping: collapse same-type notifications within
+  // a 24-hour window into a single "group" header with an expand/collapse toggle.
+  const [groupingEnabled, setGroupingEnabled] = useState(true);
+  const [expandedGroups, setExpandedGroups] = useState(new Set());
+  const toggleGroup = (key) => {
+    setExpandedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const groupedNotifications = (() => {
+    if (!groupingEnabled || filteredNotifications.length === 0) {
+      return filteredNotifications.map((n) => ({ kind: 'single', notification: n }));
+    }
+    const WINDOW_MS = 24 * 60 * 60 * 1000;
+    const out = [];
+    let buf = [];   // current group being assembled
+    const flush = () => {
+      if (buf.length === 0) return;
+      if (buf.length === 1) {
+        out.push({ kind: 'single', notification: buf[0] });
+      } else {
+        const first = buf[0];
+        const key = `${first.type}-${first.created_at}`;
+        out.push({
+          kind: 'group',
+          key,
+          type: first.type,
+          count: buf.length,
+          unreadCount: buf.filter((n) => !n.is_read).length,
+          latestAt: first.created_at,
+          children: [...buf],
+        });
+      }
+      buf = [];
+    };
+    // notifications are already sorted DESC by created_at
+    for (const n of filteredNotifications) {
+      if (buf.length === 0) { buf.push(n); continue; }
+      const head = buf[0];
+      const sameType = head.type === n.type;
+      const sameWindow =
+        Math.abs(new Date(head.created_at) - new Date(n.created_at)) < WINDOW_MS;
+      if (sameType && sameWindow) {
+        buf.push(n);
+      } else {
+        flush();
+        buf.push(n);
+      }
+    }
+    flush();
+    return out;
+  })();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-rose-950 to-gray-900 p-6" dir="rtl" data-testid="notification-center">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -364,7 +421,112 @@ const NotificationCenter = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredNotifications.map((notification) => (
+            {/* Feature #51 — Smart grouping toggle */}
+            {filteredNotifications.length > 0 && (
+              <div className="flex items-center justify-between bg-white/95 rounded-xl px-4 py-2 border border-gray-200">
+                <span className="text-xs text-gray-600">
+                  {groupingEnabled
+                    ? `📚 ${groupedNotifications.length} مجموعة · ${filteredNotifications.length} إشعار`
+                    : `${filteredNotifications.length} إشعار`}
+                </span>
+                <button
+                  onClick={() => setGroupingEnabled((v) => !v)}
+                  className={`text-xs font-bold px-3 py-1 rounded-lg transition ${
+                    groupingEnabled
+                      ? 'bg-violet-100 text-violet-700 hover:bg-violet-200'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                  data-testid="grouping-toggle"
+                >
+                  {groupingEnabled ? '📚 تجميع: مُفعَّل' : '📚 تجميع: مُعطَّل'}
+                </button>
+              </div>
+            )}
+
+            {groupedNotifications.map((node) => {
+              if (node.kind === 'group') {
+                const isOpen = expandedGroups.has(node.key);
+                const typeLabel = {
+                  maintenance: 'صيانة',
+                  payment: 'مدفوعات',
+                  system: 'النظام',
+                  community: 'المجتمع',
+                }[node.type] || node.type;
+                return (
+                  <div
+                    key={node.key}
+                    className="bg-gradient-to-br from-violet-50 via-white to-indigo-50 rounded-2xl shadow-md border border-violet-200 overflow-hidden"
+                    data-testid={`notification-group-${node.type}`}
+                  >
+                    <button
+                      onClick={() => toggleGroup(node.key)}
+                      className="w-full p-4 flex items-center justify-between gap-3 hover:bg-white/50 transition"
+                      data-testid={`notification-group-toggle-${node.type}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 bg-violet-100 rounded-2xl">
+                          {getNotificationIcon(node.type, 'medium')}
+                        </div>
+                        <div className="text-right">
+                          <div className="font-black text-gray-900 text-base">
+                            {node.count} إشعار {typeLabel}
+                          </div>
+                          <div className="text-xs text-gray-500 mt-0.5">
+                            {node.unreadCount > 0 && (
+                              <span className="font-bold text-rose-600">
+                                {node.unreadCount} غير مقروء ·{' '}
+                              </span>
+                            )}
+                            {formatRelativeTime(node.latestAt)}
+                          </div>
+                        </div>
+                      </div>
+                      <div className={`text-violet-600 text-xl transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+                        ▾
+                      </div>
+                    </button>
+                    {isOpen && (
+                      <div className="border-t border-violet-100 bg-white/70 px-4 py-3 space-y-2" data-testid={`notification-group-expanded-${node.type}`}>
+                        {node.children.map((n) => (
+                          <div
+                            key={n.id}
+                            className={`rounded-lg p-3 flex items-start justify-between gap-3 ${
+                              n.is_read ? 'bg-gray-50' : 'bg-white border border-rose-200'
+                            }`}
+                          >
+                            <div className="flex-1 min-w-0">
+                              <div className="font-bold text-sm text-gray-900 truncate">{n.title}</div>
+                              <div className="text-xs text-gray-600 line-clamp-2">{n.message}</div>
+                              <div className="text-[10px] text-gray-400 mt-1">{formatRelativeTime(n.created_at)}</div>
+                            </div>
+                            <div className="flex gap-1.5">
+                              {!n.is_read && (
+                                <button
+                                  onClick={() => handleMarkAsRead(n.id)}
+                                  className="p-1.5 rounded-lg hover:bg-emerald-100 text-emerald-600"
+                                  title={t('mark_as_read')}
+                                >
+                                  <CheckIcon className="w-4 h-4" />
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDeleteNotification(n.id)}
+                                className="p-1.5 rounded-lg hover:bg-rose-100 text-rose-500"
+                                title={t('delete')}
+                              >
+                                <TrashIcon className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+              // singleton renders below in the existing notification block
+              const notification = node.notification;
+              return (
               <div
                 key={notification.id}
                 className={`group bg-white rounded-2xl shadow-lg border hover:shadow-2xl transition-all duration-300 overflow-hidden ${
@@ -478,7 +640,8 @@ const NotificationCenter = () => {
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

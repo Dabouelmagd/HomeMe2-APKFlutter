@@ -1453,6 +1453,8 @@ const HomePage = () => {
           <div className="mt-6 pt-4 border-t border-gray-800 flex flex-wrap justify-center items-center gap-x-5 gap-y-2 text-xs">
             <Link to="/blog" className="hover:text-white transition-colors font-semibold" data-testid="footer-blog-link">المدوّنة</Link>
             <span className="opacity-50">·</span>
+            <Link to="/faq" className="hover:text-white transition-colors font-semibold" data-testid="footer-faq-link">الأسئلة الشائعة</Link>
+            <span className="opacity-50">·</span>
             <Link to="/legal/about" className="hover:text-white transition-colors" data-testid="footer-legal-about">من نحن</Link>
             <span className="opacity-50">·</span>
             <Link to="/legal/privacy" className="hover:text-white transition-colors" data-testid="footer-legal-privacy">سياسة الخصوصية</Link>

@@ -28,6 +28,7 @@ import DisasterRecoveryTab from './super-admin/DisasterRecoveryTab';
 import BlogManagementTab from './super-admin/BlogManagementTab';
 import EmailLogsTab from './super-admin/EmailLogsTab';
 import SuperAdminComprehensiveReport from './super-admin/SuperAdminComprehensiveReport';
+import SecurityInsights from './super-admin/SecurityInsights';
 import PaymentAnalyticsCard from './PaymentAnalyticsCard';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -450,6 +451,7 @@ const SuperAdminPanel = () => {
               { id: 'referrals', label: t('sa_referrals', 'الإحالات') },
               { id: 'analytics', label: t('sa_analytics', 'تحليلات الاشتراكات') },
               { id: 'executive_report', label: '📊 ' + t('sa_executive_report', 'تقرير تنفيذي شامل') },
+              { id: 'security_insights', label: '🛡️ ' + t('sa_security', 'الأمان') },
             ] : []),
             { id: 'translations', label: t('sa_translations', 'إدارة الترجمات') },
             { id: 'support_tickets', label: t('sa_support_tickets', '🎧 تذاكر الدعم') },
@@ -927,6 +929,10 @@ const SuperAdminPanel = () => {
 
         {activeTab === 'executive_report' && (
           <SuperAdminComprehensiveReport />
+        )}
+
+        {activeTab === 'security_insights' && (
+          <SecurityInsights />
         )}
 
       </div>

@@ -252,7 +252,7 @@ const FinancialManagement = () => {
 
         {invoices.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 responsive-card-table" data-testid="invoices-table">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -275,7 +275,7 @@ const FinancialManagement = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {invoices.map((invoice) => (
                   <tr key={invoice.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td data-label={t('description')} className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <DocumentTextIcon className="h-5 w-5 text-gray-400 mr-3" />
                         <div>
@@ -288,23 +288,23 @@ const FinancialManagement = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td data-label={t('amount')} className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-bold text-gray-900">
                         {formatCurrency(convertCurrency(invoice.amount, 'USD', selectedCurrency), selectedCurrency)}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td data-label={t('due_date')} className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
                         {new Date(invoice.due_date).toLocaleDateString()}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td data-label={t('status')} className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(invoice.status)}`}>
                         <span className="mr-1">{getStatusIcon(invoice.status)}</span>
                         {t(invoice.status)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <td data-label={t('actions')} className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       {invoice.status === 'pending' ? (
                         <button
                           onClick={() => handlePayment(invoice.id)}

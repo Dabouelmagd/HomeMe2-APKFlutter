@@ -4,6 +4,82 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 145: Security Insights (#49) + FAQ (#50) + Smart Notifications (#51) + Multi-step Company Registration (#52) + responsive-card-table (#48b) — Feb 14, 2026 ✅
+
+**🎯 الطلب:** 4 ميزات + تطبيق responsive-card-table على Invoices.
+
+**🔧 Backend:**
+
+1. **Security Insights (Feature #49):** `routes/superadmin.py` → `GET /api/super-admin/security-insights?hours=24` يُرجع:
+   - `summary`: failure_rate_percent, suspicious_ips_count, unique_ips
+   - `top_failed_ips`: IPs بـ3+ محاولات فاشلة + sample من الـusernames المستهدفة
+   - `top_targeted_users`: مع flag `user_exists` (للكشف عن account harvesting)
+   - `hourly_distribution`: 24 bucket للـ24 ساعة الماضية
+   - `recent_failures`: آخر 50 محاولة (forensic table)
+   - `currently_locked`: حسابات مقفولة الآن (5+ فشل في آخر 15 دقيقة)
+
+2. **🐛 Notifications fetch bug fix (مهم):** الـtesting agent اكتشف أن `/api/notifications` كان يبحث فقط على field `recipient_id`، بينما الـcode بكثير من الأماكن يكتب `user_id` أو `recipient_ids`. النتيجة: كل إشعارات الـreferrals/gifts/payments كانت مخفية. تم تعديل GET + PATCH + mark-all-read ليبحثوا على الـ3 fields. أيضاً عُدِّل `App.js` `NotificationProvider` ليجلب من API على mount (كان socket-only).
+
+**🎨 Frontend:**
+
+1. **`SecurityInsights.js` (NEW):** لوحة كاملة في تبويب جديد `security_insights` بـSuperAdminPanel:
+   - 4 KPI cards + Hourly bar chart
+   - جدولين: Top IPs / Top targeted users
+   - Banner تنبيه إذا كان هناك حسابات مقفولة
+   - Recent failures forensic table مع scroll
+   - Selector نافذة زمنية: ساعة / 6 / 24 / 7 أيام / 30 يوم
+
+2. **`FAQPage.js` (NEW):** صفحة `/faq` عامة مع:
+   - 15 سؤال × 5 sections (عام/الأسعار/تقني/الأمان/الحساب)
+   - Search bar realtime + Section filter pills
+   - Schema.org FAQPage JSON-LD لـSEO
+   - Footer link جديد في HomePage
+   - CTA للـ/contact
+
+3. **Smart Notifications (Feature #51):** `NotificationCenter.js`:
+   - تجميع تلقائي: إشعارات من نفس النوع خلال 24 ساعة → مجموعة واحدة قابلة للتوسيع/الطي
+   - Toggle `data-testid="grouping-toggle"` لتفعيل/إيقاف التجميع
+   - `useNotifications.js`: الـtoast للـpriority العالية مدته 15 ثانية (vs 5 ثواني للعادية) + className خاص + action button أبرز
+
+4. **`CompanyRegistrationWizard.js` (NEW, Feature #52):** 3 steps فقط لتسجيل الشركات:
+   - **Step 1**: اسم الشركة (validation: required)
+   - **Step 2**: الاسم/Username/Email/Phone/Password (validation: كل قواعد الـpassword)
+   - **Step 3**: اختيار الخطة
+   - Progress bar في الأعلى مع pills قابلة للنقر للقفز
+   - Next disabled حتى تمر الـstep validation
+   - يستخدم نفس `formData` و `handleSubmit` من `Register.js` (zero backend changes)
+
+5. **`FinancialManagement.js` (Feature #48b):** جدول الـinvoices الآن يستخدم class `responsive-card-table` + `data-label` على كل `<td>` → يتحول لـcards على viewport <640px.
+
+**🧪 Tests:**
+- ✏️ `tests/test_iter145_security_insights.py` — 5 cases (RBAC + suspicious IP + currently_locked + targeted_user_exists flag) — PASS.
+- ⚙️ `testing_agent_v3_fork` iteration_73: 100% backend + ~85% frontend (الـnotifications kept rendering empty حتى أصلحنا الـfetch bug — بعد الـfix الـgrouping ظهر صحيحاً بـ24 مجموعة و 88 إشعار).
+
+**📊 Verification:**
+- ✅ Pytest 5/5 PASS.
+- ✅ Security Insights: tabular data + chart عبر `/app/super-admin?tab=security_insights`.
+- ✅ FAQ: 15 سؤال + 6 sections + search.
+- ✅ Notifications: 88 visible / 86 unread / 24 مجموعة (كان 0 قبل الـfix).
+- ✅ Multi-step wizard: 3 خطوات + validation gates.
+- ✅ Invoices table: CSS class + data-label.
+
+**Files Modified:**
+- ➕ `backend/routes/superadmin.py` (`/security-insights` ~165 LOC)
+- ✏️ `backend/routes/notifications.py` (multi-field fix + read normalization)
+- ➕ `backend/tests/test_iter145_security_insights.py`
+- ➕ `frontend/src/components/super-admin/SecurityInsights.js`
+- ✏️ `frontend/src/components/SuperAdminPanel.js` (new tab)
+- ➕ `frontend/src/pages/FAQPage.js`
+- ✏️ `frontend/src/App.js` (route + NotificationProvider rewrite)
+- ✏️ `frontend/src/components/HomePage.js` (footer FAQ link)
+- ✏️ `frontend/src/components/NotificationCenter.js` (grouping)
+- ✏️ `frontend/src/hooks/useNotifications.js` (priority toast)
+- ➕ `frontend/src/components/CompanyRegistrationWizard.js`
+- ✏️ `frontend/src/components/Register.js` (route wizard for company_admin)
+- ✏️ `frontend/src/components/FinancialManagement.js` (responsive-card-table)
+
+
+
 ### Iter 144: Executive PDF (#44) + Dark Mode Polish (#45) + Testimonials Moderation Audit (#46) + Security (#47) + Mobile Bottom Nav (#48) — Feb 13, 2026 ✅
 
 **🎯 الطلب:** 5 ميزات بعد iter143.

@@ -16,10 +16,29 @@ router = APIRouter(prefix="/api")
 async def get_notifications(limit: int = 50, offset: int = 0, unread_only: bool = False, current_user: dict = Depends(get_current_user)):
     db = get_db()
     try:
-        query = {"$or": [{"recipient_id": current_user["id"]}, {"recipient_id": None, "compound_id": current_user["compound_id"]}]}
+        uid = current_user["id"]
+        cid = current_user.get("compound_id")
+        # Different parts of the codebase write notifications with one of
+        # three field names; the GET endpoint must surface all of them or
+        # users see a mysterious empty inbox.
+        or_filters = [
+            {"recipient_id": uid},
+            {"user_id": uid},
+            {"recipient_ids": uid},
+        ]
+        if cid:
+            or_filters.append({"recipient_id": None, "compound_id": cid})
+        query = {"$or": or_filters}
         if unread_only:
-            query["is_read"] = False
+            # support both `is_read` (legacy) and `read` (newer) field names
+            query["$and"] = [{
+                "$or": [{"is_read": {"$ne": True}}, {"read": {"$ne": True}}]
+            }]
         notifications = await db.notifications.find(query).sort("created_at", -1).skip(offset).limit(limit).to_list(length=10000)
+        # Normalise the read flag so the UI only has to look at one field
+        for n in notifications:
+            if "is_read" not in n:
+                n["is_read"] = bool(n.get("read", False))
         return {"notifications": serialize_datetime(notifications)}
     except Exception as e:
         logging.error(f"Error fetching notifications: {e}")
@@ -30,9 +49,14 @@ async def get_notifications(limit: int = 50, offset: int = 0, unread_only: bool 
 async def mark_notification_read(notification_id: str, current_user: dict = Depends(get_current_user)):
     db = get_db()
     try:
+        uid = current_user["id"]
+        cid = current_user.get("compound_id")
+        or_filters = [{"recipient_id": uid}, {"user_id": uid}, {"recipient_ids": uid}]
+        if cid:
+            or_filters.append({"recipient_id": None, "compound_id": cid})
         result = await db.notifications.update_one(
-            {"id": notification_id, "$or": [{"recipient_id": current_user["id"]}, {"recipient_id": None, "compound_id": current_user["compound_id"]}]},
-            {"$set": {"is_read": True, "read_at": datetime.now(timezone.utc)}}
+            {"id": notification_id, "$or": or_filters},
+            {"$set": {"is_read": True, "read": True, "read_at": datetime.now(timezone.utc)}}
         )
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Notification not found")
@@ -46,9 +70,17 @@ async def mark_notification_read(notification_id: str, current_user: dict = Depe
 async def mark_all_notifications_read(current_user: dict = Depends(get_current_user)):
     db = get_db()
     try:
+        uid = current_user["id"]
+        cid = current_user.get("compound_id")
+        or_filters = [{"recipient_id": uid}, {"user_id": uid}, {"recipient_ids": uid}]
+        if cid:
+            or_filters.append({"recipient_id": None, "compound_id": cid})
         result = await db.notifications.update_many(
-            {"$or": [{"recipient_id": current_user["id"]}, {"recipient_id": None, "compound_id": current_user["compound_id"]}], "is_read": False},
-            {"$set": {"is_read": True, "read_at": datetime.now(timezone.utc)}}
+            {
+                "$or": or_filters,
+                "$nor": [{"is_read": True}, {"read": True}],
+            },
+            {"$set": {"is_read": True, "read": True, "read_at": datetime.now(timezone.utc)}}
         )
         return {"message": f"Marked {result.modified_count} notifications as read"}
     except Exception as e:

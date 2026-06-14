@@ -503,6 +503,24 @@ const NotificationProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const { socket, user } = useAuth();
 
+  // Fetch the initial notification list from the REST API whenever the user logs in.
+  const fetchNotifications = React.useCallback(async () => {
+    if (!user) return;
+    try {
+      const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+      const r = await axios.get(`${API}/notifications?limit=100`);
+      const list = r.data?.notifications || [];
+      setNotifications(list);
+      setUnreadCount(list.filter((n) => !n.is_read).length);
+    } catch (e) {
+      // silent — fall back to socket-only mode
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
   useEffect(() => {
     if (socket && user) {
       socket.on('notification', (notification) => {
@@ -522,15 +540,35 @@ const NotificationProvider = ({ children }) => {
     }
   }, [socket, user]);
 
-  const markAsRead = (notificationId) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === notificationId 
-          ? { ...notif, read: true }
+  const markAsRead = async (notificationId) => {
+    try {
+      const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+      await axios.patch(`${API}/notifications/${notificationId}/read`);
+    } catch (e) {
+      // continue with optimistic update even if API fails
+    }
+    setNotifications(prev =>
+      prev.map(notif =>
+        notif.id === notificationId
+          ? { ...notif, read: true, is_read: true }
           : notif
       )
     );
     setUnreadCount(prev => Math.max(0, prev - 1));
+  };
+
+  const deleteNotification = async (notificationId) => {
+    try {
+      const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+      await axios.delete(`${API}/notifications/${notificationId}`);
+    } catch (e) {
+      // continue
+    }
+    setNotifications(prev => {
+      const n = prev.find((x) => x.id === notificationId);
+      if (n && !n.is_read) setUnreadCount((u) => Math.max(0, u - 1));
+      return prev.filter((x) => x.id !== notificationId);
+    });
   };
 
   const clearAll = () => {
@@ -543,6 +581,8 @@ const NotificationProvider = ({ children }) => {
       notifications,
       unreadCount,
       markAsRead,
+      deleteNotification,
+      fetchNotifications,
       clearAll
     }}>
       {children}

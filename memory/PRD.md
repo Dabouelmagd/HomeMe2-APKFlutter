@@ -4,6 +4,64 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 144: Executive PDF (#44) + Dark Mode Polish (#45) + Testimonials Moderation Audit (#46) + Security (#47) + Mobile Bottom Nav (#48) — Feb 13, 2026 ✅
+
+**🎯 الطلب:** 5 ميزات بعد iter143.
+
+**🔧 Backend:**
+
+1. **Executive Report PDF (Feature #44):**
+   - `services/pdf_report_service.py` → `render_executive_report(period, data)` يبني PDF احترافي مع غلاف + شريط KPI + جدول 12 شهر + Top 10 كمبوندات + جدول الـSubscriptions حسب الخطة + ملخص Churn.
+   - `routes/superadmin.py` تم استخراج البنية `build_comprehensive_report_data(months=12)` ليُعاد استخدامها من الـscheduler والـAPI.
+   - `routes/monthly_reports_scheduler.py` → `_send_executive_report_pdf(db, month, stats)` يولّد الـPDF + يُرسله بالإيميل لكل app_owner+super_admin + يُسجّل في `report_runs` (idempotent عبر key `kind=executive, target_id=global`).
+   - الـscheduler يُشغّل التقرير التنفيذي تلقائياً كل بداية شهر (02:00 UTC) بجانب التقارير الأخرى.
+
+2. **Login Rate Limiting (Feature #47):**
+   - `routes/auth.py` → checking `db.login_attempts` collection لآخر 15 دقيقة (per username only، لأن المنصة تستخدم load balancer يتشارك IPs). إذا >= 5 محاولات فاشلة → HTTP 429 برسالة عربية "تجاوزت الحد المسموح".
+   - كل محاولة تُسجَّل بـ `{username, ip (مع X-Forwarded-For), user_agent, success, created_at}`.
+   - إضافة 3 indexes على `login_attempts` في `db_indexes.py` للأداء.
+   - **Session timeout 24 ساعة**: مُفعَّل أصلاً عبر `JWT_EXPIRATION_HOURS = 24` في `auth_deps.py`.
+
+**🎨 Frontend:**
+
+1. **Mobile Bottom Nav (Feature #48):**
+   - `components/MobileBottomNav.js` — 5 أيقونات: الرئيسية، تقارير، الإشعارات (مع badge)، حسابي، المزيد.
+   - يظهر فقط في الشاشات الصغيرة (`lg:hidden`)، sticky، يدعم Dark Mode + safe-area-bottom للـiOS.
+   - "المزيد" يفتح الـsidebar.
+   - `index.css` — `padding-bottom: 5rem` على الشاشات `<1024px` بحيث لا يخفي الـnav الـcontent.
+   - `index.css` — class `.responsive-card-table` يحوّل أي جدول إلى cards على `<640px` (data-label inline + flex layout).
+
+2. **Dark Mode #45**: مُفعَّل أصلاً عبر الـCSS العام من iter142. التحقق فقط في هذه الجلسة:
+   - `/login`: input bg = #374151 (dark surface) ✓
+   - `/pricing`: testimonials section text = #e2e8f0 ✓
+   - `/blog`: article body = #e2e8f0 على bg داكن ✓
+
+3. **Feature #46**: صفحة `TestimonialModerationPage.js` موجودة مسبقاً وروبط في `App.js` route `/app/testimonials-moderation`. Sidebar link "⭐ مراجعة شهادات العملاء" موجود لمالكي الـapp. **تم التحقق فقط** — لا تغييرات.
+
+**🧪 Tests:**
+- ✏️ `tests/test_iter144.py` — 3 cases (Executive PDF + 2 rate-limit) — PASS.
+- ⚙️ `testing_agent_v3_fork` iteration_72: 100% backend + 100% frontend.
+
+**📊 Verification:**
+- ✅ PDF التنفيذي يبدأ بـ `%PDF`، حجم > 1KB، يُرسل بنجاح لـapp_owner.
+- ✅ بعد 5 محاولات فاشلة، المحاولة 6 ترجع HTTP 429.
+- ✅ Mobile Bottom Nav يظهر على viewport 400px (sticky bottom)، مخفي على ≥1024px.
+- ✅ Dark Mode يعمل على Login/Pricing/Blog بكفاءة.
+- ✅ صفحة Moderation: pending=1 → approved → ظهر على /pricing carousel.
+
+**Files Modified:**
+- ✏️ `backend/services/pdf_report_service.py` (+140 LOC executive report)
+- ✏️ `backend/routes/superadmin.py` (refactor for reuse)
+- ✏️ `backend/routes/monthly_reports_scheduler.py` (+60 LOC executive sender)
+- ✏️ `backend/routes/auth.py` (+50 LOC rate limit + IP via XFF)
+- ✏️ `backend/db_indexes.py` (login_attempts indexes)
+- ➕ `frontend/src/components/MobileBottomNav.js`
+- ✏️ `frontend/src/components/Layout.js` (mount MobileBottomNav)
+- ✏️ `frontend/src/index.css` (mobile + responsive-card-table CSS)
+- ➕ `backend/tests/test_iter144.py`
+
+
+
 ### Iter 143: WhatsApp Share (#41) + Blog (#38) + Resident Compound Ratings (#39) + Dark Mode Polish (#42) + Super-Admin Executive Report (#43) — Feb 13, 2026 ✅
 
 **🎯 الطلب:** 5 ميزات إضافية بعد iter142.

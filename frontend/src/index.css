@@ -353,3 +353,65 @@ html.dark .shadow-2xl {
 html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
   border-color: #1f2937 !important;
 }
+
+/* ──────────────────────────────────────────────────────────────────
+   Feature #48 — Mobile bottom-nav spacing
+   When the bottom nav is rendered (lg:hidden), main content must have
+   enough bottom padding so the last items aren't hidden behind it.
+   ────────────────────────────────────────────────────────────────── */
+@media (max-width: 1023px) {
+  main[data-layout-main],
+  body main {
+    padding-bottom: 5rem !important;
+  }
+}
+
+/* iOS safe-area */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   Feature #48 — Tables become cards on mobile
+   Tables with class `responsive-card-table` collapse to one card per row
+   on screens < 640px. Each <td> shows the column label inline via
+   `data-label` attribute.
+   ────────────────────────────────────────────────────────────────── */
+@media (max-width: 639px) {
+  .responsive-card-table thead { display: none; }
+  .responsive-card-table,
+  .responsive-card-table tbody,
+  .responsive-card-table tr,
+  .responsive-card-table td {
+    display: block;
+    width: 100%;
+  }
+  .responsive-card-table tr {
+    border: 1px solid rgb(229 231 235);
+    border-radius: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--bg-card, #ffffff);
+  }
+  html.dark .responsive-card-table tr {
+    border-color: #1f2937;
+    background-color: #111827;
+  }
+  .responsive-card-table td {
+    border: 0 !important;
+    padding: 0.35rem 0 !important;
+    text-align: start !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+  }
+  .responsive-card-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: rgb(107 114 128);
+    flex-shrink: 0;
+  }
+  html.dark .responsive-card-table td::before { color: #9ca3af; }
+}

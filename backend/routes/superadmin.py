@@ -90,6 +90,15 @@ async def super_admin_comprehensive_report(
       - top_compounds: top 10 by active users + recent activity
       - churn_rate_30d / churn_rate_90d: cancelled / (active+cancelled) over window
     """
+    return await build_comprehensive_report_data(months=months)
+
+
+async def build_comprehensive_report_data(months: int = 12) -> dict:
+    """Reusable data builder for the Executive Report (Iter 142 + 143).
+
+    Used by the dashboard endpoint AND the monthly PDF scheduler so the two
+    stay perfectly in sync.
+    """
     db = get_db()
     months = max(1, min(int(months or 12), 24))
     now = datetime.now(timezone.utc)

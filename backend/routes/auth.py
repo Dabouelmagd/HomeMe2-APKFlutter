@@ -288,12 +288,59 @@ async def create_admin_user():
 async def login(user_data: UserLogin, request: Request):
     db = get_db()
     from audit_logger import audit_log
+
+    # ── Feature #47: Rate limiting (5 attempts per 15 min per username) ──
+    # We rate-limit on username alone (not per-IP) because attackers behind
+    # NAT and the platform's own load balancer can rotate IPs. The X-Forwarded-For
+    # header (when present) is recorded for forensics.
+    raw_ip = (
+        request.headers.get("x-forwarded-for", "").split(",")[0].strip()
+        or (request.client.host if request.client else "unknown")
+    )
+    client_ip = raw_ip or "unknown"
+    rl_window_minutes = 15
+    rl_max_attempts = 5
+    rl_threshold = datetime.now(timezone.utc) - timedelta(minutes=rl_window_minutes)
+    rl_filter = {
+        "username": user_data.username,
+        "success": False,
+        "created_at": {"$gte": rl_threshold.isoformat()},
+    }
+    recent_failed = await db.login_attempts.count_documents(rl_filter)
+    if recent_failed >= rl_max_attempts:
+        await audit_log(
+            actor={"username": user_data.username},
+            action="auth.login.rate_limited",
+            target_type="user",
+            target_id=user_data.username,
+            details={"ip": client_ip, "failed_attempts": recent_failed},
+            request=request,
+            success=False,
+        )
+        raise HTTPException(
+            status_code=429,
+            detail=(
+                f"تجاوزت الحد المسموح ({rl_max_attempts} محاولات). "
+                f"يرجى الانتظار {rl_window_minutes} دقيقة قبل المحاولة مجدداً."
+            ),
+        )
+
     user = await db.users.find_one({"username": user_data.username})
     # Run bcrypt in a thread pool — verify_password is CPU-bound and would
     # otherwise block the asyncio event loop (~250ms per call on prod CPUs).
     password_ok = bool(user) and await asyncio.to_thread(
         verify_password, user_data.password, user["password_hash"]
     )
+
+    # Log every attempt (success or fail) to the rate-limit collection
+    await db.login_attempts.insert_one({
+        "username": user_data.username,
+        "ip": client_ip,
+        "user_agent": request.headers.get("user-agent", "")[:200],
+        "success": bool(user and password_ok and user.get("is_active")),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
     if not user or not password_ok:
         # Log failed login attempt
         await ActivityLogger.log_activity(

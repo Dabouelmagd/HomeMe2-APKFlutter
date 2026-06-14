@@ -71,6 +71,11 @@ async def ensure_indexes():
 
         # SMTP alerts dedupe
         ("smtp_alerts", [("timestamp", -1)]),
+
+        # Feature #47 — login_attempts: rate-limit query is on (username, ip, created_at)
+        ("login_attempts", [("username", 1), ("ip", 1), ("created_at", -1)]),
+        ("login_attempts", [("ip", 1), ("created_at", -1)]),
+        ("login_attempts", [("success", 1), ("created_at", -1)]),
     ]
 
     created = 0

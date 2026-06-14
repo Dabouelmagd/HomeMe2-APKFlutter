@@ -532,3 +532,132 @@ def render_balance_sheet(
     {_footer_html(branding)}
     </body></html>"""
     return _render_pdf(html_str, branding)
+
+
+
+def render_executive_report(
+    period: str,
+    report_data: dict,
+    branding: Optional[dict] = None,
+) -> bytes:
+    """Render the Super-Admin / App-Owner Executive Report PDF (Feature #44).
+
+    Consumes the same dict shape as `/api/super-admin/comprehensive-report` so the
+    PDF stays in sync with the dashboard. Layout: cover summary → KPI grid →
+    12-month revenue table → top compounds → subscriptions by plan.
+    """
+    subs = report_data.get("subscriptions", {}) or {}
+    rev = report_data.get("revenue", {}) or {}
+    ch = report_data.get("churn", {}) or {}
+    top_compounds = report_data.get("top_compounds", []) or []
+
+    by_plan = subs.get("by_plan", {}) or {}
+    plan_labels = {
+        "starter": "مجاني",
+        "basic": "أساسي",
+        "pro": "احترافي",
+        "premium": "متقدم",
+        "company_startup": "شركة ناشئة",
+        "company_business": "شركة متوسطة",
+        "company_enterprise": "شركة كبرى",
+    }
+
+    trend = rev.get("trend_months", []) or []
+    trend_rows = "".join(
+        f"<tr><td>{t.get('label','')}</td>"
+        f"<td style='text-align:start'>{_format_currency(t.get('revenue',0))}</td></tr>"
+        for t in trend
+    ) or "<tr><td colspan='2' class='empty'>لا توجد بيانات</td></tr>"
+
+    plan_rows = "".join(
+        f"<tr><td>{plan_labels.get(p,p)}</td>"
+        f"<td style='text-align:center'>{s.get('active',0)}</td>"
+        f"<td style='text-align:center'>{s.get('cancelled',0)}</td>"
+        f"<td style='text-align:center'>{s.get('pending_payment',0)}</td></tr>"
+        for p, s in by_plan.items()
+    ) or "<tr><td colspan='4' class='empty'>لا توجد بيانات</td></tr>"
+
+    top_rows = "".join(
+        f"<tr><td>{i + 1}. {c.get('compound_name','—')}<br/>"
+        f"<span style='font-size:8pt;color:#6b7280'>{c.get('company_name','—')}</span></td>"
+        f"<td style='text-align:center'>{c.get('residents',0)}</td>"
+        f"<td style='text-align:center'>{c.get('recent_complaints_30d',0)}</td>"
+        f"<td style='text-align:center'>{c.get('recent_maintenance_30d',0)}</td>"
+        f"<td style='text-align:center;font-weight:700;color:#4338ca'>{c.get('activity_score',0)}</td></tr>"
+        for i, c in enumerate(top_compounds)
+    ) or "<tr><td colspan='5' class='empty'>لا توجد بيانات</td></tr>"
+
+    generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    html_str = f"""<!doctype html><html lang='ar'><head><meta charset='utf-8'>
+    <style>{_branded_css(branding)}</style></head>
+    <body class='rtl'>
+    {_header_html('HomeMe — مالك التطبيق', 'التقرير التنفيذي الشامل', period, 'EXEC-' + period, branding)}
+
+    <div class='subtitle'>تم التوليد: {generated}</div>
+
+    <div class='kpis'>
+      <div class='kpi indigo'>
+        <div class='label'>شركات نشطة</div>
+        <div class='value'>{subs.get('total_active_companies', 0)}</div>
+      </div>
+      <div class='kpi green'>
+        <div class='label'>إيرادات هذا الشهر</div>
+        <div class='value'>{_format_currency(rev.get('this_month_egp', 0))}</div>
+      </div>
+      <div class='kpi indigo'>
+        <div class='label'>إيرادات مدى الحياة</div>
+        <div class='value'>{_format_currency(rev.get('lifetime_egp', 0))}</div>
+      </div>
+      <div class='kpi red'>
+        <div class='label'>معدل Churn (30 يوم)</div>
+        <div class='value'>{ch.get('rate_30d_percent', 0)}%</div>
+      </div>
+    </div>
+
+    <div class='section'>
+      <h2>📈 الإيرادات الشهرية — آخر 12 شهر</h2>
+      <table>
+        <thead><tr><th>الشهر</th><th>الإيرادات</th></tr></thead>
+        <tbody>{trend_rows}</tbody>
+      </table>
+    </div>
+
+    <div class='section'>
+      <h2>🎟️ الاشتراكات حسب الخطة</h2>
+      <table>
+        <thead>
+          <tr><th>الخطة</th><th>نشط</th><th>مُلغى</th><th>قيد الدفع</th></tr>
+        </thead>
+        <tbody>{plan_rows}</tbody>
+      </table>
+      <div style='margin-top:8px;font-size:9pt;color:#6b7280'>
+        إجمالي الشركات المدفوعة: <strong>{subs.get('total_paid_companies', 0)}</strong> ·
+        إجمالي الإلغاءات: <strong>{subs.get('total_cancelled', 0)}</strong>
+      </div>
+    </div>
+
+    <div class='section'>
+      <h2>🏆 أكثر 10 كمبوندات نشاطاً (آخر 30 يوم)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>الكمبوند</th><th>السكان</th><th>شكاوى</th><th>صيانة</th><th>نقاط النشاط</th>
+          </tr>
+        </thead>
+        <tbody>{top_rows}</tbody>
+      </table>
+    </div>
+
+    <div class='section'>
+      <h2>📉 تحليل الـ Churn</h2>
+      <div class='totals'>
+        <div class='row'><span>إلغاءات آخر 30 يوم</span><span>{ch.get('cancelled_30d', 0)}</span></div>
+        <div class='row'><span>إلغاءات آخر 90 يوم</span><span>{ch.get('cancelled_90d', 0)}</span></div>
+        <div class='row'><span>معدل Churn 30 يوم</span><span>{ch.get('rate_30d_percent', 0)}%</span></div>
+        <div class='row grand'><span>معدل Churn 90 يوم</span><span>{ch.get('rate_90d_percent', 0)}%</span></div>
+      </div>
+    </div>
+
+    {_footer_html(branding)}
+    </body></html>"""
+    return _render_pdf(html_str, branding)

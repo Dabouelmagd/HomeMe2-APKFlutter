@@ -22,6 +22,7 @@ from services.pdf_report_service import (
     render_unit_statement,
     render_summary_report,
     render_company_portfolio_report,
+    render_executive_report,
 )
 from services.branding import get_compound_branding
 from routes.email_templates import get_template_or_default, render_template
@@ -385,8 +386,68 @@ async def run_monthly_reports(month_label: str = None) -> dict:
             stats["failed"] += 1
             await _mark_sent(db, "portfolio", cmp_id, month_label, False, str(e))
 
+    # 4) Executive Report PDF → app owners (Feature #44)
+    await _send_executive_report_pdf(db, month_label, stats)
+
     logger.info(f"monthly reports run complete: {stats}")
     return stats
+
+
+# ── Feature #44: Executive Report PDF for App Owner ───────────────────────
+async def _send_executive_report_pdf(db, month_label: str, stats: dict) -> None:
+    """Build the 12-month Executive Report PDF and email it to all app_owners.
+
+    Idempotent via report_runs (kind='executive', target_id='global').
+    """
+    if await _already_sent(db, "executive", "global", month_label):
+        stats["skipped"] += 1
+        return
+    try:
+        from routes.superadmin import build_comprehensive_report_data
+        data = await build_comprehensive_report_data(months=12)
+        pdf_bytes = render_executive_report(period=month_label, report_data=data)
+
+        recipients = set()
+        async for u in db.users.find(
+            {"role": {"$in": ["app_owner", "super_admin"]}, "is_active": True},
+            {"email": 1},
+        ):
+            if u.get("email"):
+                recipients.add(u["email"])
+        if not recipients:
+            await _mark_sent(db, "executive", "global", month_label, False, "no recipients")
+            return
+
+        email_svc = EmailService()
+        body = (
+            f"يسعدنا إرسال <strong>التقرير التنفيذي الشامل</strong> لمنصة HomeMe "
+            f"عن شهر <strong>{month_label}</strong>.<br/>"
+            "يضم التقرير: إجمالي الشركات المشتركة، الإيرادات الشهرية، معدل Churn، "
+            "وأكثر 10 كمبوندات نشاطاً."
+        )
+        html = _email_html("📊 التقرير التنفيذي الشامل", body)
+        for to in recipients:
+            ok = await email_svc.send_email(
+                to_email=to,
+                subject=f"📊 التقرير التنفيذي الشامل - HomeMe - {month_label}",
+                html_content=html,
+                attachments=[{
+                    "filename": f"executive-report-{month_label}.pdf",
+                    "content": pdf_bytes,
+                    "mime_type": "application/pdf",
+                }],
+            )
+            if ok:
+                stats.setdefault("executive_sent", 0)
+                stats["executive_sent"] += 1
+            else:
+                stats["failed"] += 1
+        await _mark_sent(db, "executive", "global", month_label, True,
+                         f"recipients={len(recipients)}")
+    except Exception as e:
+        logger.exception(f"executive PDF failed: {e}")
+        stats["failed"] += 1
+        await _mark_sent(db, "executive", "global", month_label, False, str(e))
 
 
 async def monthly_reports_loop():

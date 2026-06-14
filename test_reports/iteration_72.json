@@ -1,0 +1,34 @@
+{
+  "summary": "Iter144 verification complete. All 5 features pass: #44 Executive PDF + report_runs row, #45 dark mode polish on /login /pricing /blog, #46 testimonials moderation (approve published & appears on /pricing), #47 login rate-limit 5/15min + login_attempts persistence, #48 mobile bottom nav (5 items, sticky, opens sidebar, hidden on desktop, no horizontal scroll, main padding-bottom=80px).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter144.py",
+    "/app/test_reports/pytest/iter144_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Console shows several 403/404 noise (assets/avatars) — not blocking but worth investigating in a future iteration."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "Used Owner_homeme/Dalia1234@ and test/test123 — both functional. pytest_rl_user used for rate-limit (synthetic).",
+  "seed_data_creation": "None — used the pre-existing pending testimonial submitted by `test` user (resident, compound رويال سيتي). After approval it is now visible on /pricing carousel.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All Iter144 deliverables verified end-to-end. Test #46 (testimonials moderation) actually approves the testimonial — if re-running, the previously-pending one is already published. Submit a fresh one from `test` user before re-validating moderation flow. Buttons on moderation page use Arabic labels 'نشر' (Approve) and 'رفض' (Hide), not 'اعتماد'/'إخفاء'. Mobile viewport 400x800 confirmed for bottom nav. Dark mode persists via localStorage so toggle once and subsequent navigations remain dark. /api/auth/login enforces lockout per username with 5/15min window — keys it on login_attempts collection with success=false filter, so successful login resets counter.",
+  "verification_evidence": {
+    "backend_pytest": "3/3 passed in 3.55s (TestExecutivePDF + TestLoginRateLimiting x2)",
+    "mobile_bottom_nav": "data-testid='mobile-bottom-nav' visible @ y=735 in 400x800 viewport; all 5 mnav-* testids present; mnav-more opens sidebar; lg:hidden confirmed (hidden at 1920px)",
+    "dark_mode": "/login body.bg=rgb(11,18,32) input.bg=rgb(55,65,81); /pricing pricing-testimonials color=rgb(226,232,240); /blog article text=rgb(226,232,240) on dark bg",
+    "testimonials_moderation": "Pending=1 → approved via نشر button → publish count=0 → /pricing carousel now shows 'رويال سيتي / Test User' testimonial",
+    "no_horizontal_scroll": "/app/dashboard @ 400px: scrollWidth=400, clientWidth=400; main padding-bottom=80px (= 5rem)"
+  }
+}

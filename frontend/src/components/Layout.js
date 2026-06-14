@@ -70,6 +70,7 @@ import ThemeToggle from './ThemeToggle';
 import BackButton from './BackButton';
 import InternalAdBanner from './InternalAdBanner';
 import AIAssistantBubble from './AIAssistantBubble';
+import MobileBottomNav from './MobileBottomNav';
 // import AdvancedSearchModal from './AdvancedSearchModal';
 
 const Layout = ({ children, isTrialMode = false }) => {
@@ -1390,6 +1391,14 @@ const Layout = ({ children, isTrialMode = false }) => {
       </div>
       {/* AI Assistant Floating Bubble - appears on all internal pages */}
       <AIAssistantBubble />
+      {/* Feature #48 — Mobile Bottom Nav (small screens only) */}
+      {!isLowContentRoute && user && (
+        <MobileBottomNav
+          user={user}
+          unreadCount={unreadCount}
+          onOpenSidebar={() => setSidebarOpen(true)}
+        />
+      )}
     </div>
   );
 };

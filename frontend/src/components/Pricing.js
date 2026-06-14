@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
 import useSEO from '../hooks/useSEO';
+import CustomerTestimonialsCarousel from './CustomerTestimonialsCarousel';
 import {
   CheckIcon, 
   XMarkIcon,
@@ -1143,61 +1144,9 @@ const Pricing = () => {
               </div>
             </div>
 
-            {/* Customer testimonials */}
-            <div className="mt-12">
-              <h3 className="text-2xl font-bold text-center text-gray-900 mb-2" style={{ fontFamily: "'Cairo', sans-serif" }}>
-                {t('testimonials_title', 'ماذا يقول عملاؤنا؟')}
-              </h3>
-              <p className="text-center text-gray-500 text-sm mb-8">
-                {t('testimonials_subtitle', 'مشرفو مجمعات سكنية يثقون بنا يومياً')}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5" data-testid="testimonials-grid">
-                {[
-                  {
-                    quote: 'حوّلنا من إدارة 200 وحدة بـ Excel فوضوي إلى منصة كاملة في أسبوع واحد. الفواتير وتقارير الصيانة بقت تلقائية.',
-                    name: 'م. أحمد عبد الحميد',
-                    role: 'مدير كمبوند رويال سيتي',
-                    plan: 'احترافي',
-                    avatar: 'A',
-                    color: 'from-blue-500 to-indigo-600',
-                  },
-                  {
-                    quote: 'الأكثر اللي عجبني هو الـ AI Assistant — السكان بيسألوه أي سؤال بدل ما يتصلوا بنا. وفّر علينا 70% من الوقت.',
-                    name: 'أ. مريم الشاذلي',
-                    role: 'مالكة كمبوند نسمات',
-                    plan: 'متقدم',
-                    avatar: 'م',
-                    color: 'from-purple-500 to-fuchsia-600',
-                  },
-                  {
-                    quote: 'أول مرة سكان كمبوندنا يدفعوا الفواتير في الميعاد. التذكير التلقائي وزرّ "ادفع الآن" بـ Stripe غيّر اللعبة.',
-                    name: 'م. خالد منصور',
-                    role: 'مدير 5 كمبوندات (شركة الإدارة)',
-                    plan: 'شركة متوسطة',
-                    avatar: 'خ',
-                    color: 'from-emerald-500 to-teal-600',
-                  },
-                ].map((t_, i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition"
-                    data-testid={`testimonial-${i}`}
-                  >
-                    <div className="text-yellow-400 text-lg mb-3">★★★★★</div>
-                    <p className="text-sm text-gray-700 leading-relaxed mb-4">"{t_.quote}"</p>
-                    <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
-                      <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t_.color} flex items-center justify-center text-white font-bold`}>
-                        {t_.avatar}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold text-gray-900 text-sm">{t_.name}</div>
-                        <div className="text-[11px] text-gray-500">{t_.role}</div>
-                        <div className="text-[10px] text-purple-600 font-bold mt-0.5">{t('using_plan', 'خطة')}: {t_.plan}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            {/* Customer testimonials — live, moderated reviews from real users (Feature #39) */}
+            <div className="mt-12" data-testid="pricing-testimonials">
+              <CustomerTestimonialsCarousel />
             </div>
           </div>
         </div>

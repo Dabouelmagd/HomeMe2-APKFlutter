@@ -77,6 +77,181 @@ async def super_admin_dashboard(current_user: dict = Depends(require_super_admin
         raise HTTPException(status_code=500, detail="Failed to load dashboard")
 
 
+@router.get("/super-admin/comprehensive-report")
+async def super_admin_comprehensive_report(
+    current_user: dict = Depends(require_super_admin),
+    months: int = 12,
+):
+    """Comprehensive Super-Admin executive report (Iter 142 — Feature #43).
+
+    Returns:
+      - subscriptions: total active companies + by plan + churned (cancelled)
+      - revenue: lifetime + this-month + last-month + 12-month trend (monthly buckets)
+      - top_compounds: top 10 by active users + recent activity
+      - churn_rate_30d / churn_rate_90d: cancelled / (active+cancelled) over window
+    """
+    db = get_db()
+    months = max(1, min(int(months or 12), 24))
+    now = datetime.now(timezone.utc)
+    month_start = datetime(now.year, now.month, 1, tzinfo=timezone.utc)
+    # build month buckets oldest → newest (12 months)
+    bucket_starts = []
+    for back in range(months - 1, -1, -1):
+        y = now.year
+        m = now.month - back
+        while m <= 0:
+            m += 12
+            y -= 1
+        start = datetime(y, m, 1, tzinfo=timezone.utc)
+        end = (datetime(y + 1, 1, 1, tzinfo=timezone.utc)
+               if m == 12 else datetime(y, m + 1, 1, tzinfo=timezone.utc))
+        ar = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+              "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
+        bucket_starts.append((y, m, start, end, f"{ar[m - 1]} {y % 100:02d}"))
+
+    earliest_start = bucket_starts[0][2]
+
+    # ── Subscriptions split by plan + churn ────────────────────────────────
+    subs_by_plan: dict = {}
+    total_active = 0
+    total_cancelled = 0
+    cancelled_30d = 0
+    cancelled_90d = 0
+    cancel_threshold_30 = now - timedelta(days=30)
+    cancel_threshold_90 = now - timedelta(days=90)
+    async for s in db.company_subscriptions.find(
+        {}, {"_id": 0, "plan": 1, "status": 1, "cancelled_at": 1, "activated_at": 1}
+    ):
+        plan = s.get("plan") or "starter"
+        status = s.get("status") or "unknown"
+        subs_by_plan.setdefault(plan, {"active": 0, "cancelled": 0, "pending_payment": 0})
+        if status == "active":
+            subs_by_plan[plan]["active"] += 1
+            total_active += 1
+        elif status == "cancelled":
+            subs_by_plan[plan]["cancelled"] += 1
+            total_cancelled += 1
+            ca = s.get("cancelled_at")
+            try:
+                dt = (datetime.fromisoformat(str(ca).replace("Z", "+00:00"))
+                      if ca else None)
+                if dt and dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                if dt and dt >= cancel_threshold_90:
+                    cancelled_90d += 1
+                    if dt >= cancel_threshold_30:
+                        cancelled_30d += 1
+            except Exception:
+                pass
+        elif status == "pending_payment":
+            subs_by_plan[plan]["pending_payment"] += 1
+    total_paid_companies = total_active - subs_by_plan.get("starter", {}).get("active", 0)
+
+    churn_30 = round((cancelled_30d / max(1, total_active + cancelled_30d)) * 100, 1)
+    churn_90 = round((cancelled_90d / max(1, total_active + cancelled_90d)) * 100, 1)
+
+    # ── Revenue: paid invoices ───────────────────────────────────────────
+    revenue_monthly = {f"{y}-{m:02d}": 0.0 for (y, m, _s, _e, _l) in bucket_starts}
+    total_lifetime = 0.0
+    revenue_this_month = 0.0
+    revenue_last_month = 0.0
+    last_month_start = bucket_starts[-2][2] if len(bucket_starts) >= 2 else month_start
+    last_month_end = month_start
+    async for inv in db.invoices.find(
+        {"status": "paid"}, {"_id": 0, "amount": 1, "paid_at": 1}
+    ):
+        amount = float(inv.get("amount") or 0)
+        total_lifetime += amount
+        pa = inv.get("paid_at")
+        try:
+            dt = (datetime.fromisoformat(str(pa).replace("Z", "+00:00"))
+                  if pa else None)
+            if dt and dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+        except Exception:
+            dt = None
+        if not dt:
+            continue
+        if dt >= month_start:
+            revenue_this_month += amount
+        elif last_month_start <= dt < last_month_end:
+            revenue_last_month += amount
+        if dt >= earliest_start:
+            key = f"{dt.year}-{dt.month:02d}"
+            if key in revenue_monthly:
+                revenue_monthly[key] += amount
+    revenue_trend = [
+        {"month": f"{y}-{m:02d}", "label": label,
+         "revenue": round(revenue_monthly.get(f"{y}-{m:02d}", 0.0), 2)}
+        for (y, m, _s, _e, label) in bucket_starts
+    ]
+
+    # ── Top compounds by activity (active residents + recent events) ─────
+    compounds = await db.compounds.find(
+        {}, {"_id": 0, "id": 1, "name": 1, "company_id": 1, "created_at": 1}
+    ).to_list(500)
+    activity_scores = []
+    last_30 = now - timedelta(days=30)
+    for c in compounds:
+        cid = c["id"]
+        residents = await db.users.count_documents({"compound_id": cid, "role": "resident"})
+        recent_complaints = await db.complaints.count_documents(
+            {"compound_id": cid, "created_at": {"$gte": last_30}}
+        )
+        recent_maint = await db.maintenance_requests.count_documents(
+            {"compound_id": cid, "created_at": {"$gte": last_30}}
+        )
+        # weighted activity: residents + 2*complaints + 1*maintenance
+        score = residents + (2 * recent_complaints) + recent_maint
+        activity_scores.append({
+            "compound_id": cid,
+            "compound_name": c.get("name", "—"),
+            "company_id": c.get("company_id"),
+            "residents": residents,
+            "recent_complaints_30d": recent_complaints,
+            "recent_maintenance_30d": recent_maint,
+            "activity_score": score,
+        })
+    activity_scores.sort(key=lambda x: x["activity_score"], reverse=True)
+    top_compounds = activity_scores[:10]
+
+    # Enrich with company name
+    cids = [t.get("company_id") for t in top_compounds if t.get("company_id")]
+    cmap = {}
+    if cids:
+        async for c in db.companies.find(
+            {"id": {"$in": cids}}, {"_id": 0, "id": 1, "name": 1}
+        ):
+            cmap[c["id"]] = c.get("name")
+    for t in top_compounds:
+        t["company_name"] = cmap.get(t.get("company_id")) or "—"
+
+    return {
+        "generated_at": now.isoformat(),
+        "subscriptions": {
+            "total_active_companies": total_active,
+            "total_paid_companies": total_paid_companies,
+            "total_cancelled": total_cancelled,
+            "by_plan": subs_by_plan,
+        },
+        "revenue": {
+            "lifetime_egp": round(total_lifetime, 2),
+            "this_month_egp": round(revenue_this_month, 2),
+            "last_month_egp": round(revenue_last_month, 2),
+            "trend_months": revenue_trend,
+        },
+        "churn": {
+            "rate_30d_percent": churn_30,
+            "rate_90d_percent": churn_90,
+            "cancelled_30d": cancelled_30d,
+            "cancelled_90d": cancelled_90d,
+        },
+        "top_compounds": top_compounds,
+    }
+
+
+
+
 @router.get("/super-admin/compounds")
 async def super_admin_get_compounds(current_user: dict = Depends(require_super_admin)):
     db = get_db()

@@ -64,6 +64,93 @@ async def submit_testimonial(payload: TestimonialSubmit):
     }
 
 
+class AuthenticatedTestimonialSubmit(BaseModel):
+    stars: int = Field(..., ge=1, le=5)
+    comment: str = Field(..., min_length=10, max_length=1000)
+
+
+@router.post("/testimonials/submit-authenticated")
+async def submit_testimonial_authenticated(
+    payload: AuthenticatedTestimonialSubmit,
+    current_user: dict = Depends(get_current_user),
+):
+    """Resident/Compound-admin testimonial submission about their compound.
+
+    Auto-fills `name`, `role`, and `compound_name` from the logged-in user
+    profile, so social-proof on /pricing has reliable identity attribution.
+    Goes through the same pending → published moderation flow.
+    """
+    db = get_db()
+    now = datetime.now(timezone.utc)
+    # Pull compound name if user belongs to one (used as "company_name" in card)
+    compound_name = None
+    if current_user.get("compound_id"):
+        c = await db.compounds.find_one(
+            {"id": current_user["compound_id"]}, {"_id": 0, "name": 1}
+        )
+        compound_name = (c or {}).get("name")
+    role_label_map = {
+        "resident": "ساكن",
+        "admin": "مدير مجتمع",
+        "manager": "مدير مجتمع",
+        "assistant_manager": "مدير مساعد",
+        "company_admin": "مدير شركة إدارة",
+        "security": "أمن",
+        "accountant": "محاسب",
+    }
+    role_label = role_label_map.get(current_user.get("role"), "عميل HomeMe")
+
+    # Prevent spam: one pending/published per user at a time
+    existing = await db.testimonials.find_one(
+        {"submitted_by": current_user["id"], "status": {"$in": ["pending", "published"]}},
+        {"_id": 0, "id": 1, "status": 1},
+    )
+    if existing:
+        msg = (
+            "لديك تقييم منشور بالفعل" if existing["status"] == "published"
+            else "تقييمك السابق قيد المراجعة من الإدارة"
+        )
+        raise HTTPException(status_code=400, detail=msg)
+
+    doc = {
+        "id": str(uuid.uuid4()),
+        "name": (current_user.get("full_name") or current_user.get("username") or "").strip(),
+        "role": role_label,
+        "stars": payload.stars,
+        "comment": payload.comment.strip(),
+        "email": current_user.get("email"),
+        "company_name": compound_name,
+        "compound_id": current_user.get("compound_id"),
+        "submitted_by": current_user["id"],
+        "status": "pending",
+        "created_at": now.isoformat(),
+        "published_at": None,
+        "admin_note": None,
+    }
+    await db.testimonials.insert_one(doc)
+    doc.pop("_id", None)
+    return {
+        "message": "شكراً لتقييمك! سيُراجع قبل النشر",
+        "testimonial_id": doc["id"],
+    }
+
+
+@router.get("/testimonials/my")
+async def get_my_testimonial(current_user: dict = Depends(get_current_user)):
+    """Return the current user's most recent submitted testimonial (if any)."""
+    db = get_db()
+    doc = await db.testimonials.find_one(
+        {"submitted_by": current_user["id"]},
+        {"_id": 0},
+        sort=[("created_at", -1)],
+    )
+    if not doc:
+        return {"testimonial": None}
+    return {"testimonial": serialize_datetime(doc)}
+
+
+
+
 @router.get("/testimonials/published")
 async def list_published_testimonials(limit: int = 12):
     """Public endpoint — used by the HomePage carousel."""

@@ -1,0 +1,47 @@
+{
+  "summary": "Iter143 verification — 4/5 features PASS, 1 CRITICAL route bug. Backend: 8/8 pytest cases pass (testimonials/submit-authenticated + /my + duplicate rejection; super-admin/comprehensive-report shape + 12-month trend + custom months + resident/unauth 403). Frontend: ✅ Referral WhatsApp button (wa.me + text= + 15% + #25D366 brand color), ✅ Blog 3 new slugs render with h1/h2/tables/lists, ✅ Dark Mode on /pricing+/login+/blog (dark class, body bg rgb(11,18,32), login inputs rgb(55,65,81)), ✅ Super Admin Comprehensive Report UI fully renders (comprehensive-report + 4 KPI cards + Recharts AreaChart + plans-table + top-compounds + CSV btn). ❌ /pricing PUBLIC route MISSING — visiting /pricing renders blank with React Router warning 'No routes matched location \"/pricing\"'. The Pricing component is currently mounted ONLY as path=\"pricing\" nested under /app/*, requiring auth — directly contradicts the spec which mandates a public /pricing route with the new testimonials carousel.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Pricing route in App.js",
+        "issue": "Public route /pricing does NOT exist. Route is registered as <Route path=\"pricing\" element={<Pricing />} /> NESTED INSIDE the /app/* layout (App.js line 897), so the real URL is /app/pricing which requires auth and redirects to /login. Visiting public /pricing shows a blank gradient page with console warning 'No routes matched location \"/pricing\"'. This blocks BOTH testid checks (data-testid='pricing-testimonials' / 'testimonials-section' / 'share-testimonial-btn' / 'first-testimonial-btn') from being verifiable on the public route per spec.",
+        "selector": "/pricing (route mount in App.js ~line 897)",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter143.py",
+    "/app/test_reports/pytest/iter143_results.xml"
+  ],
+  "action_items": [
+    "ADD a public-level route for /pricing in App.js (outside the /app/* nested layout). Suggested fix near the public legal routes (~line 698-702): <Route path=\"/pricing\" element={<Pricing />} />. The CustomerTestimonialsCarousel component itself is correctly implemented with all required testids — it just isn't reachable on a public URL.",
+    "Note: After fixing the route, re-verify pricing-testimonials wrapper, testimonials-section, and share-testimonial-btn (or first-testimonial-btn when no published testimonials exist — currently the DB returns 0 published, so first-testimonial-btn will be the active CTA). /api/testimonials/published returns {count:0} — confirm CTA is share-testimonial-btn at top AND first-testimonial-btn inside the empty-state card."
+  ],
+  "critical_code_review_comments": [
+    "Comprehensive report endpoint (superadmin.py L80-250): clean implementation — uses correct timezone math, bucket build is robust to year boundaries (Dec→Jan rollover), churn denominators guarded with max(1, …), top_compounds sorted + sliced to 10, top_compounds enriched with company_name. Validated 12 trend_months returned and custom ?months=6 works.",
+    "Testimonials submit-authenticated correctly de-dupes against {status:{$in:[pending,published]}} — rejected status is allowed to retry. Returns 400 with Arabic message. role_label_map covers all 7 roles + sensible default 'عميل HomeMe'.",
+    "CustomerTestimonialsCarousel.js has correct testids (testimonials-section at section root, share-testimonial-btn at top CTA, first-testimonial-btn inside empty state) and a separate Pricing.js wrapper data-testid='pricing-testimonials'. Implementation is correct — only the route mount is missing.",
+    "Referral WhatsApp button — perfect: <a href='wa.me/?text=…' encoded properly, brand color rgb(37, 211, 102) matches #25D366 exactly, copy includes '15%' string verbatim.",
+    "Blog posts render with proper Arabic semantic HTML — h1+9*h2 + table + 3 lists on first post (table & code-block elements present)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter143.py (NEW — 8 pytest cases covering all Iter143 backend endpoints)"
+  ],
+  "success_rate": {
+    "backend": "100% (8/8 pytest pass)",
+    "frontend": "80% (4 of 5 UI features verified; /pricing public route missing blocks 1 feature)"
+  },
+  "test_credentials": "Used unchanged from /app/memory/test_credentials.md (test/test123 — already had pending testimonial from smoke test, confirming 400 duplicate-rejection path; Owner_homeme/Dalia1234@ for super-admin report).",
+  "seed_data_creation": "None. Test user 'test' already had 1 pending testimonial from previous smoke test — that pre-existing record is what proves the duplicate-rejection branch.",
+  "retest_needed": true,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Reusable pytest at /app/backend/tests/test_iter143.py (8 cases). All Iter143 BACKEND features are 100% functional. Only frontend gap is the missing public /pricing route — the component (Pricing.js → CustomerTestimonialsCarousel) is fully wired with all spec testids; once main agent adds <Route path='/pricing' …/> at the public level in App.js the spec is satisfied. After re-run: /api/testimonials/published currently returns 0 items, so 'first-testimonial-btn' (empty-state CTA) is the active CTA — both testids are present in code, but only the empty-state one will be VISIBLE/clickable until an owner publishes at least one testimonial.",
+  "rca_of_the_issue": "Pricing.js route was placed inside the authenticated /app/* layout instead of the public route group. App.js line 730 opens <Route path='/app' element={<Layout>…}>, lines 731-1112 are nested children, and line 897 has <Route path='pricing'> — so the route is /app/pricing (auth-protected). React Router emits 'No routes matched location \"/pricing\"' and renders the fallback (blank gradient). FIX: duplicate the route at the public level alongside /about, /contact, /testimonials/submit (around line 700) as <Route path='/pricing' element={<Pricing />} />. No data or schema change needed."
+}

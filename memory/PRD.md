@@ -4,6 +4,72 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 143: WhatsApp Share (#41) + Blog (#38) + Resident Compound Ratings (#39) + Dark Mode Polish (#42) + Super-Admin Executive Report (#43) — Feb 13, 2026 ✅
+
+**🎯 الطلب:** 5 ميزات إضافية بعد iter142.
+
+**🔧 Backend:**
+
+1. **`routes/testimonials.py` — 2 endpoints جديدة (Feature #39):**
+   - `POST /api/testimonials/submit-authenticated`: تقييم بهوية حقيقية. يأخذ `{stars, comment}` فقط، ويملأ `name/role/company_name/compound_id` تلقائياً من بيانات المستخدم. يمنع التكرار (1 pending/published لكل user).
+   - `GET /api/testimonials/my`: يُرجع آخر تقييم للمستخدم الحالي.
+
+2. **`routes/superadmin.py` — endpoint جديد `/api/super-admin/comprehensive-report` (Feature #43):**
+   - `subscriptions{ total_active_companies, total_paid_companies, total_cancelled, by_plan }`
+   - `revenue{ lifetime_egp, this_month_egp, last_month_egp, trend_months: [12 monthly buckets] }`
+   - `churn{ rate_30d_percent, rate_90d_percent, cancelled_30d/90d }`
+   - `top_compounds[10]` مرتبة حسب activity_score = residents + 2×complaints_30d + maintenance_30d.
+
+**🎨 Frontend:**
+
+1. **`ReferralProgramPage.js` (Feature #41):** زر WhatsApp شريك (`data-testid="referral-whatsapp-btn"`) بلون البراند الرسمي `#25D366` يفتح `wa.me/?text=` برسالة جاهزة تتضمن ذكر خصم 15%.
+
+2. **`Pricing.js` (Feature #39):** استبدال الـ3 شهادات الهاردكود بـ `<CustomerTestimonialsCarousel />` الذي يجلب التقييمات الحية من `/testimonials/published`. CTA "شارك تقييمك" تنقل إلى `/testimonials/submit`.
+
+3. **`SuperAdminComprehensiveReport.js` (Feature #43):** مكوّن جديد + تبويب `executive_report` في SuperAdminPanel. يعرض:
+   - 4 KPI كروت (شركات نشطة، إيرادات الشهر، إيرادات مدى الحياة، Churn 30 يوم)
+   - مخطط 12 شهر للإيرادات (Recharts AreaChart)
+   - جدول الاشتراكات حسب الخطة
+   - جدول أكثر 10 كمبوندات نشاطاً 🥇🥈🥉
+   - زر تحميل CSV للإيرادات الشهرية
+
+4. **`content/blogPosts.js` (Feature #38):** 3 مقالات جديدة عربية احترافية:
+   - "كيف تُنشئ ميزانية سنوية احترافية لمجمعك السكني" (المالية، 11 دقيقة قراءة)
+   - "إدارة الشكاوى في المجمعات السكنية" (تجربة المستخدم، 9 دقائق قراءة)
+   - "الذكاء الاصطناعي في إدارة المجمعات: 7 طرق" (التحول الرقمي، 8 دقائق قراءة)
+   - كل مقال 1500+ كلمة، keywords محسّنة لـ SEO، جداول وقوائم منظمة.
+
+5. **Dark Mode Polish (Feature #42):**
+   - أُضيف Route عام `/pricing` (كان مخفي تحت `/app/*`) — الـTesting كشف هذا الـbug.
+   - الـCSS العام `html.dark` من iter142 يغطي الـ3 صفحات تلقائياً.
+
+**🐛 Bug Fixed Mid-Iteration:**
+- Testing agent v3 كشف أن `/pricing` كانت route خاصة تحت `/app/*`، أي مستخدم public ما يقدرش يشوف الصفحة. أُضيفت كـ public route في `App.js` بجانب `/about` و `/contact`.
+
+**🧪 Tests:**
+- ✏️ `tests/test_iter143.py` (8 cases — auth-submit + duplicate-reject + comprehensive-report shape + RBAC) — PASS.
+- ⚙️ `testing_agent_v3_fork` iteration_71 (post-fix): 100% backend + 100% frontend.
+
+**📊 Verification:**
+- ✅ زر WhatsApp يفتح `wa.me/?text=...` مع ذكر 15%.
+- ✅ Pricing الآن public ويعرض carousel ديناميكي.
+- ✅ Super Admin Comprehensive Report يعرض KPIs + chart + جداول.
+- ✅ 19 مقالة في الـBlog (16 سابقة + 3 جديدة).
+- ✅ Dark Mode يعمل على Login/Pricing/Blog عبر الـCSS العام.
+
+**Files Modified:**
+- ✏️ `backend/routes/testimonials.py` (+80 LOC)
+- ✏️ `backend/routes/superadmin.py` (+170 LOC for comprehensive-report)
+- ✏️ `frontend/src/components/ReferralProgramPage.js` (WhatsApp button)
+- ✏️ `frontend/src/components/Pricing.js` (use CustomerTestimonialsCarousel)
+- ➕ `frontend/src/components/super-admin/SuperAdminComprehensiveReport.js`
+- ✏️ `frontend/src/components/SuperAdminPanel.js` (new tab)
+- ✏️ `frontend/src/content/blogPosts.js` (+3 articles, ~500 LOC)
+- ✏️ `frontend/src/App.js` (public `/pricing` route)
+- ➕ `backend/tests/test_iter143.py`
+
+
+
 ### Iter 142: Double-Sided Referral (#37) + 6-Month Compounds Trend Chart (#36) + Dark Mode polish (#40) — Feb 13, 2026 ✅
 
 **🎯 الطلب:** إكمال ميزات #36، #37 و #40 من قائمة الـ 40 ميزة.

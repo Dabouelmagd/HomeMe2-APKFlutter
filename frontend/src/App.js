@@ -697,6 +697,7 @@ function App() {
                 <Route path="/legal/:slug" element={<LegalPage />} />
                 <Route path="/about" element={<AboutUs />} />
                 <Route path="/contact" element={<ContactUs />} />
+                <Route path="/pricing" element={<Pricing />} />
 
                 {/* Public testimonial submission */}
                 <Route path="/testimonials/submit" element={<TestimonialSubmitPage />} />

@@ -32,22 +32,40 @@ const fmt = (n) => Number(n || 0).toLocaleString('ar-EG');
  */
 const SecurityInsights = () => {
   const [data, setData] = useState(null);
+  const [bans, setBans] = useState(null);
   const [loading, setLoading] = useState(true);
   const [windowHours, setWindowHours] = useState(24);
 
   const load = (hours) => {
     setLoading(true);
     const token = localStorage.getItem('token');
-    axios
-      .get(`${API}/super-admin/security-insights?hours=${hours}`, {
-        headers: { Authorization: `Bearer ${token}` },
+    const headers = { Authorization: `Bearer ${token}` };
+    Promise.all([
+      axios.get(`${API}/super-admin/security-insights?hours=${hours}`, { headers }),
+      axios.get(`${API}/super-admin/banned-ips`, { headers }),
+    ])
+      .then(([insights, bansRes]) => {
+        setData(insights.data);
+        setBans(bansRes.data);
       })
-      .then((r) => setData(r.data))
       .catch(() => toast.error('فشل تحميل لوحة الأمان'))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { load(windowHours); }, [windowHours]);
+
+  const unbanIp = async (ip) => {
+    if (!window.confirm(`هل أنت متأكد من رفع الحظر عن ${ip}؟`)) return;
+    try {
+      await axios.delete(`${API}/super-admin/banned-ips/${encodeURIComponent(ip)}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      toast.success(`تم رفع الحظر عن ${ip}`);
+      load(windowHours);
+    } catch (e) {
+      toast.error('فشل رفع الحظر');
+    }
+  };
 
   if (loading || !data) {
     return (
@@ -158,6 +176,66 @@ const SecurityInsights = () => {
           </div>
         </div>
       )}
+
+      {/* Auto-banned IPs (Feature #53) */}
+      <div className="rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900 to-gray-950 p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-base font-bold text-white flex items-center gap-2">
+            <LockClosedIcon className="h-5 w-5 text-rose-400" />
+            🚫 IPs محظورة تلقائياً
+            {bans?.active?.length > 0 && (
+              <span className="bg-rose-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">
+                {bans.active.length}
+              </span>
+            )}
+          </h3>
+          <span className="text-[11px] text-gray-500">
+            ≥20 محاولة/ساعة · حظر 24 ساعة
+          </span>
+        </div>
+        <div className="overflow-x-auto" data-testid="security-banned-ips">
+          {!bans || bans.active.length === 0 ? (
+            <div className="text-center py-6 text-gray-500 text-sm">
+              ✅ لا توجد IPs محظورة حالياً
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="text-xs text-gray-400 uppercase border-b border-gray-800">
+                <tr>
+                  <th className="text-start py-2">IP</th>
+                  <th className="text-center py-2">المحاولات</th>
+                  <th className="text-center py-2">حُظر منذ</th>
+                  <th className="text-center py-2">ينتهي</th>
+                  <th className="text-center py-2">إجراء</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800">
+                {bans.active.map((b) => (
+                  <tr key={b.ip} className="hover:bg-gray-800/40">
+                    <td className="py-2.5 font-mono text-rose-300 font-bold">{b.ip}</td>
+                    <td className="text-center text-rose-400 font-bold">{fmt(b.failed_attempts)}</td>
+                    <td className="text-center text-[11px] text-gray-400">
+                      {b.banned_at ? new Date(b.banned_at).toLocaleString('ar-EG', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) : '—'}
+                    </td>
+                    <td className="text-center text-[11px] text-amber-400">
+                      {b.expires_at ? new Date(b.expires_at).toLocaleString('ar-EG', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) : '—'}
+                    </td>
+                    <td className="text-center">
+                      <button
+                        onClick={() => unbanIp(b.ip)}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300 text-[11px] font-bold border border-emerald-600/30"
+                        data-testid={`unban-btn-${b.ip}`}
+                      >
+                        رفع الحظر
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
 
       {/* Hourly distribution chart */}
       <div className="rounded-2xl border border-gray-700 bg-gradient-to-br from-gray-900 to-gray-950 p-5">

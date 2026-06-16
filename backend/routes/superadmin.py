@@ -233,6 +233,51 @@ async def super_admin_security_insights(
 
 
 
+@router.get("/super-admin/banned-ips")
+async def super_admin_banned_ips(
+    current_user: dict = Depends(require_super_admin),
+):
+    """List currently-active auto-banned IPs (Feature #53)."""
+    db = get_db()
+    now_iso = datetime.now(timezone.utc).isoformat()
+    out = []
+    async for row in db.banned_ips.find(
+        {"active": True, "expires_at": {"$gt": now_iso}},
+        {"_id": 0},
+    ).sort("banned_at", -1):
+        out.append(row)
+    # Also include recent expired/lifted bans for forensics
+    expired = []
+    async for row in db.banned_ips.find(
+        {"$or": [{"active": False}, {"expires_at": {"$lte": now_iso}}]},
+        {"_id": 0},
+    ).sort("banned_at", -1).limit(20):
+        expired.append(row)
+    return {"active": out, "recent_inactive": expired}
+
+
+@router.delete("/super-admin/banned-ips/{ip}")
+async def super_admin_unban_ip(
+    ip: str,
+    current_user: dict = Depends(require_super_admin),
+):
+    """Manually lift an auto-ban (Feature #53)."""
+    db = get_db()
+    res = await db.banned_ips.update_many(
+        {"ip": ip, "active": True},
+        {"$set": {
+            "active": False,
+            "lifted_at": datetime.now(timezone.utc).isoformat(),
+            "lifted_by": current_user.get("username"),
+        }},
+    )
+    if res.matched_count == 0:
+        raise HTTPException(status_code=404, detail="لا يوجد حظر نشط لهذا الـ IP")
+    return {"message": f"تم رفع الحظر عن {ip}", "modified": res.modified_count}
+
+
+
+
 
 @router.get("/super-admin/comprehensive-report")
 async def super_admin_comprehensive_report(

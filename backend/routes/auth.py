@@ -298,6 +298,34 @@ async def login(user_data: UserLogin, request: Request):
         or (request.client.host if request.client else "unknown")
     )
     client_ip = raw_ip or "unknown"
+
+    # ── Feature #53: Auto-banned IP block ────────────────────────────────
+    # IPs with 20+ failures in the last hour are auto-banned for 24h. Any
+    # request from such an IP short-circuits with HTTP 429 before bcrypt fires.
+    try:
+        from security_protector import is_ip_banned
+        if await is_ip_banned(client_ip):
+            await db.login_attempts.insert_one({
+                "username": user_data.username,
+                "ip": client_ip,
+                "user_agent": request.headers.get("user-agent", "")[:200],
+                "success": False,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "blocked_reason": "ip_banned",
+            })
+            raise HTTPException(
+                status_code=429,
+                detail=(
+                    "تم حظر عنوان IP الخاص بك مؤقتاً بسبب نشاط مشبوه. "
+                    "حاول مجدداً بعد 24 ساعة أو تواصل مع الدعم."
+                ),
+            )
+    except HTTPException:
+        raise
+    except Exception:
+        # never let the ban-check itself break login
+        pass
+
     rl_window_minutes = 15
     rl_max_attempts = 5
     rl_threshold = datetime.now(timezone.utc) - timedelta(minutes=rl_window_minutes)

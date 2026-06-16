@@ -2756,6 +2756,15 @@ async def start_weekly_digest_loop():
 
 
 @app.on_event("startup")
+async def start_security_protector_loop():
+    """Auto-ban brute-force IPs + email alerts (Feature #53). Sweeps every 5 min."""
+    import asyncio as _asyncio
+    from security_protector import security_protector_loop
+    _asyncio.create_task(security_protector_loop())
+    logging.info("Security auto-protector loop started (5-min sweep)")
+
+
+@app.on_event("startup")
 async def start_bounce_scanner_loop():
     """Poll the SMTP sender inbox every 15 minutes for delivery-failure
     (bounce) notifications and update smtp_health.status='bounced'.

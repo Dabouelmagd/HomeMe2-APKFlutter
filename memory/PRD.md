@@ -4,6 +4,63 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 146: Auto-Ban + Security Alert (Feature #53) — Feb 16, 2026 ✅
+
+**🎯 الطلب:** نظام أمان تلقائي يحمي التطبيق بدون تدخل بشري.
+
+**🔧 Backend:**
+
+1. **`security_protector.py` (NEW):**
+   - Background loop يدور كل **5 دقائق** ويفحص `login_attempts`.
+   - **Auto-Ban**: أي IP بـ **20+ محاولة فاشلة في الساعة** → يُضاف لـ `banned_ips` لمدة **24 ساعة**.
+   - **Global Alert**: لو إجمالي الفشل > **50 محاولة/ساعة** → email للمالكين (idempotent، cooldown 60 دقيقة عبر `security_alerts` collection).
+   - الـemail يحتوي: العدد الإجمالي + أعلى 5 IPs + عدد IPs المحظورة حالياً.
+   - `is_ip_banned(ip)` helper سريع للـlogin endpoint.
+
+2. **`routes/auth.py` login:**
+   - في بداية الـendpoint: لو الـIP محظور → HTTP 429 برسالة عربية فوراً، **قبل** الـbcrypt أو الـrate-limit checks (يوفّر CPU).
+   - يُسجل المحاولة المحظورة في `login_attempts` بـ `blocked_reason='ip_banned'` للـforensics.
+
+3. **`routes/superadmin.py` — 2 endpoints جديدة:**
+   - `GET /api/super-admin/banned-ips`: قائمة IPs المحظورة حالياً + آخر 20 محظور سابقاً.
+   - `DELETE /api/super-admin/banned-ips/{ip}`: رفع الحظر يدوياً (مع تسجيل `lifted_by` و `lifted_at`).
+
+4. **`server.py`:** startup hook جديد يُشغّل `security_protector_loop()`.
+
+**🎨 Frontend:**
+
+1. **`SecurityInsights.js` (Feature #53 polish):**
+   - قسم جديد **"🚫 IPs محظورة تلقائياً"** (data-testid `security-banned-ips`) أعلى الـchart.
+   - Badge counter للعدد النشط.
+   - جدول: IP / المحاولات / حُظر منذ / ينتهي / زر "رفع الحظر" (مع confirm).
+   - الـpage الآن تحمّل بالتوازي: insights + banned-ips.
+
+**🧪 Tests:**
+- ✏️ `tests/test_iter146_auto_ban.py` — 6 cases:
+  1. `_run_once` يحظر IP بعد 20 فشل + idempotency
+  2. أقل من 20 فشل → لا حظر
+  3. Owner يلست المحظورين
+  4. Owner يرفع الحظر
+  5. رفع حظر غير موجود → 404
+  6. Global alert يفعَّل عند 50+ فشل + cooldown يمنع التكرار
+- جميعها **PASS** (137 ثانية).
+
+**📊 Verification:**
+- ✅ Background loop يعمل من supervisor logs: "Security auto-protector started (sweep every 300s, ban>=20/h, alert>=50/h)".
+- ✅ Pytest 6/6 PASS.
+- ✅ Endpoints work via curl with owner token.
+- ✅ UI يعرض الجدول مع زر unban.
+
+**Files Modified:**
+- ➕ `backend/security_protector.py` (~155 LOC)
+- ✏️ `backend/server.py` (startup hook)
+- ✏️ `backend/routes/auth.py` (banned-IP early-return)
+- ✏️ `backend/routes/superadmin.py` (+2 endpoints, ~45 LOC)
+- ➕ `backend/tests/test_iter146_auto_ban.py`
+- ✏️ `frontend/src/components/super-admin/SecurityInsights.js` (Banned IPs table + unban action)
+
+
+
 ### Iter 145: Security Insights (#49) + FAQ (#50) + Smart Notifications (#51) + Multi-step Company Registration (#52) + responsive-card-table (#48b) — Feb 14, 2026 ✅
 
 **🎯 الطلب:** 4 ميزات + تطبيق responsive-card-table على Invoices.

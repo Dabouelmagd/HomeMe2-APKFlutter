@@ -450,6 +450,33 @@ async def login(user_data: UserLogin, request: Request):
             "temp_token": temp_token,
             "ttl_minutes": 5,
         }
+
+    # Feature #54 — Mandatory 2FA enrolment for privileged roles
+    # app_owner & super_admin cannot proceed without enrolling 2FA. Other
+    # admin roles keep 2FA optional.
+    MANDATORY_2FA_ROLES = {"app_owner", "super_admin"}
+    if user.get("role") in MANDATORY_2FA_ROLES and not user.get("two_factor_enabled"):
+        from routes.two_factor import create_2fa_setup_token
+        setup_token = create_2fa_setup_token(user["id"])
+        await audit_log(
+            actor=user,
+            action="auth.login.2fa_enrolment_required",
+            target_type="user",
+            target_id=user["id"],
+            details={"role": user.get("role")},
+            request=request,
+            success=True,
+        )
+        return {
+            "two_factor_setup_required": True,
+            "setup_token": setup_token,
+            "ttl_minutes": 10,
+            "role": user.get("role"),
+            "message": (
+                "تفعيل المصادقة الثنائية (2FA) إلزامي لحسابات الإدارة. "
+                "يرجى إكمال الإعداد الآن للمتابعة."
+            ),
+        }
     
     access_token = create_access_token(data={"sub": user["id"]})
     

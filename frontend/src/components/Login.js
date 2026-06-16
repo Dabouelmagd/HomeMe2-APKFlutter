@@ -12,6 +12,7 @@ import {
   hasBiometricRegistered 
 } from '../services/webauthn';
 import { FingerPrintIcon } from '@heroicons/react/24/outline';
+import MandatoryTwoFactorEnroll from './MandatoryTwoFactorEnroll';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -42,6 +43,9 @@ const Login = () => {
   // 2FA challenge state
   const [twoFa, setTwoFa] = useState({ pending: false, tempToken: '', code: '' });
   const [twoFaLoading, setTwoFaLoading] = useState(false);
+
+  // Feature #54 — Mandatory 2FA enrolment state
+  const [mandatory2FA, setMandatory2FA] = useState(null);  // { setupToken, role, message }
 
   // Preserve ?owner_only=1 flag through the login → selector flow
   const ownerOnly = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('owner_only') === '1';
@@ -168,6 +172,13 @@ const Login = () => {
       } else if (result.two_factor_required) {
         // Open 2FA challenge modal
         setTwoFa({ pending: true, tempToken: result.temp_token, code: '' });
+      } else if (result.two_factor_setup_required) {
+        // Feature #54 — Force the enrolment modal for app_owner / super_admin
+        setMandatory2FA({
+          setupToken: result.setup_token,
+          role: result.role,
+          message: result.message,
+        });
       } else if (result.email_not_verified) {
         // Show actionable inline UI: prompt to check inbox + resend link
         setUnverifiedEmail(result.email || username);
@@ -219,6 +230,27 @@ const Login = () => {
 
   return (
     <div className="auth-container">
+      {/* Feature #54 — Mandatory 2FA enrolment modal */}
+      {mandatory2FA && (
+        <MandatoryTwoFactorEnroll
+          setupToken={mandatory2FA.setupToken}
+          role={mandatory2FA.role}
+          message={mandatory2FA.message}
+          onSuccess={(authResult) => {
+            // Save the freshly issued session & navigate to dashboard
+            try {
+              localStorage.setItem('token', authResult.access_token);
+              localStorage.setItem('user', JSON.stringify(authResult.user));
+            } catch (_e) {/* ignore */}
+            window.location.href = from || '/app/dashboard';
+          }}
+          onCancel={() => {
+            setMandatory2FA(null);
+            toast.error('يلزم تفعيل المصادقة الثنائية لإتمام تسجيل الدخول');
+          }}
+        />
+      )}
+
       <div className="auth-card">
         <div className="absolute top-4 right-4">
           <LanguageSwitcher />

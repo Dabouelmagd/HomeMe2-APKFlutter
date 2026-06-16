@@ -4,6 +4,71 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 147: Mandatory 2FA for app_owner / super_admin (Feature #54) — Feb 16, 2026 ✅
+
+**🎯 الطلب:** المصادقة الثنائية إجبارية لحسابات الإدارة (لا يمكن للحساب أن يدخل التطبيق بدون تفعيلها).
+
+**🔧 Backend:**
+
+1. **`routes/two_factor.py`:**
+   - `create_2fa_setup_token(user_id)`: JWT scoped `2fa_setup`, TTL 10 دقائق.
+   - `_user_from_setup_token(token)`: validator يرفض أي scope غير `2fa_setup`.
+   - 2 endpoints جديدة:
+     - `POST /api/2fa/setup-enroll` → يولّد TOTP secret + QR code، يحفظ secret مع `two_factor_enabled=False`.
+     - `POST /api/2fa/verify-enroll` → يتحقق من الكود، يفعّل 2FA، يولّد backup codes (8)، **ويُصدر access_token نهائي + بيانات المستخدم** للدخول مباشرة.
+
+2. **`routes/auth.py` login:**
+   - بعد التحقق من الباسورد، لو `role ∈ {app_owner, super_admin}` و `!two_factor_enabled` → يرجع `{two_factor_setup_required: True, setup_token, role, message}` بدون أي access_token.
+   - لا يؤثر على باقي الأدوار (resident, company_admin, إلخ).
+
+3. **`auth_deps.py` (Critical Security Fix):**
+   - `get_current_user` الآن يرفض أي token بـ`scope` غير فارغ — هذا يمنع استخدام `2fa_pending` أو `2fa_setup` tokens كـsession tokens (كان bug خطير لو حد لقاهم).
+
+4. **`db_indexes.py`:**
+   - تصحيح index الـrate-limit ليطابق الـquery الجديد (username, success, created_at).
+   - إضافة 2 indexes جديدة على `banned_ips`.
+
+**🎨 Frontend:**
+
+1. **`MandatoryTwoFactorEnroll.js` (NEW):** Modal بـ3 مراحل:
+   - **Stage 1**: QR + secret يدوي
+   - **Stage 2**: input 6 أرقام للتحقق
+   - **Stage 3**: عرض الـbackup codes مع زر نسخ
+   - بعد النجاح: يحفظ session في `localStorage` ويوجّه إلى dashboard.
+
+2. **`Login.js`:** يستقبل `two_factor_setup_required` ويفتح الـmodal الإجباري.
+
+3. **`App.js`:** Login handler يمرر `two_factor_setup_required` للـcaller.
+
+**🧪 Tests:**
+- ✏️ `tests/test_iter147_mandatory_2fa.py` — 5 cases:
+  1. Owner login يرجع setup_required (مش access_token)
+  2. Resident login لا يتأثر
+  3. E2E: login → setup-enroll → verify-enroll → access_token → login لاحق يطلب 2FA challenge
+  4. Setup-token لا يفتح API (security fix)
+  5. كود خاطئ يُرفض
+- جميعها **PASS** + تحديث `test_iter145/146` لاستخدام `pyotp` للـowner login.
+- **16/16 PASS** (iter145+146+147) في 145 ثانية.
+
+**📊 Verification:**
+- ✅ Pytest 16/16.
+- ✅ Login as Owner_homeme returns setup_required (no access_token leaked).
+- ✅ Setup-scoped tokens مرفوضة على API endpoints.
+
+**Files Modified:**
+- ✏️ `backend/routes/two_factor.py` (+90 LOC: 2 endpoints + 2 helpers)
+- ✏️ `backend/routes/auth.py` (mandatory 2FA gate)
+- ✏️ `backend/auth_deps.py` (scope rejection — **critical security fix**)
+- ✏️ `backend/db_indexes.py` (index corrections)
+- ➕ `frontend/src/components/MandatoryTwoFactorEnroll.js`
+- ✏️ `frontend/src/components/Login.js` (mount modal)
+- ✏️ `frontend/src/App.js` (pass setup_required to caller)
+- ➕ `backend/tests/test_iter147_mandatory_2fa.py`
+- ✏️ `backend/tests/test_iter145_security_insights.py` + `test_iter146_auto_ban.py` (TOTP-aware fixtures)
+- ✏️ `memory/test_credentials.md` (TOTP secret for tests)
+
+
+
 ### Iter 146: Auto-Ban + Security Alert (Feature #53) — Feb 16, 2026 ✅
 
 **🎯 الطلب:** نظام أمان تلقائي يحمي التطبيق بدون تدخل بشري.

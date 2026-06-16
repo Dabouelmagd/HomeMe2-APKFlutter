@@ -346,6 +346,18 @@ const AuthProvider = ({ children }) => {
         };
       }
 
+      // Feature #54 — Mandatory 2FA enrolment for app_owner / super_admin
+      if (response.data?.two_factor_setup_required) {
+        return {
+          success: false,
+          two_factor_setup_required: true,
+          setup_token: response.data.setup_token,
+          ttl_minutes: response.data.ttl_minutes,
+          role: response.data.role,
+          message: response.data.message,
+        };
+      }
+
       const { access_token, user: userData } = response.data;
 
       saveCurrentSession(access_token, userData);

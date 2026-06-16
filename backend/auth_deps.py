@@ -66,6 +66,11 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     db = get_db()
     try:
         payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        # Reject scoped tokens (e.g. `2fa_pending`, `2fa_setup`) — they are
+        # NOT full session tokens and must never grant access to the API.
+        scope = payload.get("scope")
+        if scope and scope != "session":
+            raise HTTPException(status_code=401, detail="Invalid token scope")
         user_id = payload.get("sub")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")

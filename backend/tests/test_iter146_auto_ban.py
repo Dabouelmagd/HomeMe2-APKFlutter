@@ -27,10 +27,28 @@ BASE_URL = _read_backend_url().rstrip("/")
 API = f"{BASE_URL}/api"
 
 
+CRED_OWNER = {"username": "Owner_homeme", "password": "Dalia1234@"}
+_OWNER_TEST_TOTP_SECRET = "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP"
+
+
 def _login(creds):
+    """Auto-handle 2FA challenge for app_owner during tests."""
+    import pyotp
     r = requests.post(f"{API}/auth/login", json=creds, timeout=30)
     assert r.status_code == 200, r.text
-    return r.json()["access_token"]
+    d = r.json()
+    if d.get("access_token"):
+        return d["access_token"]
+    if d.get("two_factor_required"):
+        code = pyotp.TOTP(_OWNER_TEST_TOTP_SECRET).now()
+        r2 = requests.post(
+            f"{API}/2fa/verify-login",
+            json={"temp_token": d["temp_token"], "code": code},
+            timeout=30,
+        )
+        assert r2.status_code == 200, r2.text
+        return r2.json()["access_token"]
+    raise AssertionError(f"unexpected login response: {d}")
 
 
 def _hdr(t):
@@ -50,9 +68,30 @@ def db():
     return get_db()
 
 
+@pytest.fixture(scope="module", autouse=True)
+def ensure_owner_has_test_totp():
+    """Set Owner_homeme to a known 2FA secret so `_login` can pass the challenge."""
+    import asyncio as _asyncio
+    from database import init_db as _init, get_db as _get
+    async def _go():
+        _init()
+        await _get().users.update_one(
+            {"username": "Owner_homeme"},
+            {"$set": {
+                "two_factor_enabled": True,
+                "two_factor_secret": _OWNER_TEST_TOTP_SECRET,
+            }},
+        )
+    loop = _asyncio.new_event_loop()
+    try:
+        loop.run_until_complete(_go())
+    finally:
+        loop.close()
+
+
 @pytest.fixture(scope="module")
 def owner_token():
-    return _login({"username": "Owner_homeme", "password": "Dalia1234@"})
+    return _login(CRED_OWNER)
 
 
 class TestAutoBan:

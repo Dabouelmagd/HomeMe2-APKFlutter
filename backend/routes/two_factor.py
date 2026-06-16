@@ -75,6 +75,21 @@ def create_temp_2fa_token(user_id: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
+def create_2fa_setup_token(user_id: str) -> str:
+    """Feature #54 — Mandatory 2FA enrolment token.
+
+    Issued ONLY at login when an app_owner / super_admin authenticates
+    successfully but hasn't enrolled in 2FA yet. It grants access ONLY to
+    the 2FA setup endpoints (setup + verify-setup), not the rest of the app.
+    """
+    payload = {
+        "sub": user_id,
+        "scope": "2fa_setup",
+        "exp": datetime.utcnow() + timedelta(minutes=10),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
 def decode_temp_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
@@ -83,6 +98,21 @@ def decode_temp_token(token: str) -> dict:
     if payload.get("scope") != "2fa_pending":
         raise HTTPException(status_code=401, detail="Invalid token scope")
     return payload
+
+
+async def _user_from_setup_token(setup_token: str) -> dict:
+    """Validate a `2fa_setup` scoped token and return the underlying user."""
+    try:
+        payload = jwt.decode(setup_token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Setup token invalid or expired")
+    if payload.get("scope") != "2fa_setup":
+        raise HTTPException(status_code=401, detail="Invalid token scope")
+    db = get_db()
+    user = await db.users.find_one({"id": payload["sub"]}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
 
 
 # ---------- Endpoints ----------
@@ -218,6 +248,98 @@ async def verify_login(req: VerifyLoginReq):
         "access_token": access_token,
         "token_type": "bearer",
         "backup_code_used": used_idx >= 0,
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "role": user["role"],
+            "compound_id": user.get("compound_id"),
+            "compound_name": compound_name,
+            "unit_number": user.get("unit_number"),
+            "full_name": user.get("full_name"),
+            "is_family_head": user.get("is_family_head", False),
+            "family_id": user.get("family_id"),
+        },
+    }
+
+
+
+# ────────────────────────────────────────────────────────────────────────
+# Feature #54 — Mandatory 2FA enrolment endpoints (setup-scoped token)
+# ────────────────────────────────────────────────────────────────────────
+class SetupWithTokenReq(BaseModel):
+    setup_token: str
+
+
+class VerifySetupWithTokenReq(BaseModel):
+    setup_token: str
+    token_code: str
+
+
+@router.post("/setup-enroll")
+async def setup_enroll(req: SetupWithTokenReq):
+    """Issue a TOTP secret + QR for a user who is mid-mandatory-enrolment.
+
+    Authenticated via the `2fa_setup` scoped JWT (not a normal session).
+    """
+    user = await _user_from_setup_token(req.setup_token)
+    db = get_db()
+    secret = pyotp.random_base32()
+    totp = pyotp.TOTP(secret)
+    uri = totp.provisioning_uri(
+        name=user.get("username") or user.get("email") or user["id"],
+        issuer_name=ISSUER,
+    )
+    qr_b64 = _gen_qr_base64(uri)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "two_factor_secret": secret,
+            "two_factor_enabled": False,
+            "two_factor_setup_at": datetime.now(timezone.utc).isoformat(),
+        }},
+    )
+    return {"qr_code": qr_b64, "secret": secret, "provisioning_uri": uri}
+
+
+@router.post("/verify-enroll")
+async def verify_enroll(req: VerifySetupWithTokenReq):
+    """Confirm the TOTP code, mark 2FA enabled, issue final session token.
+
+    Returns the same shape as `/api/auth/login` success so the frontend can
+    transition seamlessly to the dashboard after enrolment.
+    """
+    user = await _user_from_setup_token(req.setup_token)
+    db = get_db()
+    fresh = await db.users.find_one({"id": user["id"]}, {"_id": 0})
+    if not fresh or not fresh.get("two_factor_secret"):
+        raise HTTPException(status_code=400, detail="ابدأ إعداد 2FA أولاً")
+    totp = pyotp.TOTP(fresh["two_factor_secret"])
+    if not totp.verify(req.token_code, valid_window=1):
+        raise HTTPException(status_code=400, detail="الرمز غير صحيح")
+
+    plain_codes = _gen_backup_codes(8)
+    hashed_codes = [bcrypt.hashpw(c.encode(), bcrypt.gensalt()).decode() for c in plain_codes]
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "two_factor_enabled": True,
+            "two_factor_backup_codes": hashed_codes,
+            "two_factor_backup_used": [],
+            "two_factor_enabled_at": datetime.now(timezone.utc).isoformat(),
+        }},
+    )
+
+    # Mint final access token + return user payload
+    access_token = create_access_token(data={"sub": user["id"]})
+    compound_name = None
+    if user.get("compound_id"):
+        cmp = await db.compounds.find_one({"id": user["compound_id"]})
+        if cmp:
+            compound_name = cmp.get("name")
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "backup_codes": plain_codes,
         "user": {
             "id": user["id"],
             "username": user["username"],

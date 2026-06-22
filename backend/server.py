@@ -2625,6 +2625,9 @@ from routes.legal_pages import router as legal_pages_router
 from routes.testimonials import router as testimonials_router
 app.include_router(legal_pages_router)
 app.include_router(testimonials_router)
+# Mobile Auth (Feature #55) — Flutter-friendly OTP-based auth
+from routes.mobile_auth import router as mobile_auth_router
+app.include_router(mobile_auth_router)
 # ==================== END ROUTE IMPORTS ====================
 
 # Include the main API router (for routes still in server.py)

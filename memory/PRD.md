@@ -4,6 +4,78 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 148: Flutter Mobile Auth API + Developer Starter Kit (Feature #55) — Feb 16, 2026 ✅
+
+**🎯 الطلب:** "We are building a native flutter app, the developer require the api endpoint file / configuration to connect the app to the backend"
+
+**🔧 Backend (`routes/mobile_auth.py`):**
+- 5 endpoints مُسجَّلة على `/api/mobile/auth/*`:
+  - `POST /register` — يدعم 3 أدوار (resident / compound_admin / company_admin)، يُصدر access_token فوراً + يبعت OTP بريد، يدعم FCM token + device_info + referrals.
+  - `POST /verify-otp` — كود من 6 أرقام، TTL 15 دقيقة، حد أقصى 5 محاولات.
+  - `POST /resend-otp` — cooldown 60 ثانية + anti-enumeration.
+  - `POST /login` — يدعم 2FA gates (challenge + mandatory enrolment) + FCM token تحديث.
+  - `GET /me` — Whoami بصيغة مختصرة.
+- مُسجَّل في `server.py` (السطر 2628).
+- نفس قواعد الباسوورد كالويب (≥8، Upper+lower+digit).
+- Audit log + email RTL Arabic.
+
+**📱 Flutter Starter Kit (`/app/flutter_starter/`):**
+ملفات Dart جاهزة للنسخ في مشروع المطوّر:
+- `lib/config/api_config.dart` — Base URLs (production/staging/local) + 60+ endpoint constants + WS path.
+- `lib/models/user.dart` + `auth_response.dart` — Models مع JSON serde + role helpers (`isResident`, `isCompanyAdmin`, ...).
+- `lib/services/api_client.dart` — Dio client مع Bearer interceptor + error normalisation → `ApiException`.
+- `lib/services/auth_service.dart` — register/verifyOtp/resendOtp/login/2FA flows/me/logout كاملة.
+- `lib/services/token_storage.dart` — `flutter_secure_storage` wrapper (Keychain/EncryptedSharedPrefs).
+- `lib/services/push_service.dart` — FCM token + device_info helpers.
+- `lib/exceptions.dart` — `ApiException`, `NetworkException`.
+- `lib/main.dart` — مثال كامل splash → login → home.
+- `pubspec.deps.yaml` — كل الـdependencies المطلوبة.
+- `README.md` — دليل الإعداد.
+
+**📚 Documentation (`/app/MOBILE_API.md`):**
+ملف توثيق شامل بالإنجليزية (15KB) يحتوي:
+1. Environments (production/staging/local)
+2. Auth model + JWT + 2FA flows
+3. كل endpoints الـMobile Auth (request/response/errors)
+4. 2FA endpoints
+5. Core mobile endpoints cheat-sheet (60+ endpoint: dashboards, notifications, maintenance, complaints, facilities, guests, invoices, family, polls, chat, smart devices, AI assistant)
+6. Error envelope + Security (rate-limit + auto-ban + 2FA)
+7. WebSocket spec
+8. Roles & permissions matrix
+9. Quick start cURL examples
+
+**🧪 Tests (`tests/test_iter148_mobile_auth.py`):**
+12 cases — **12/12 PASS**:
+1. company_admin happy path
+2. resident requires compound + unit
+3. resident unknown compound → 404
+4. weak password → 400
+5. duplicate username/email → 409
+6. company_admin without company_name → 400
+7. OTP cycle: wrong → 400 + correct → verified
+8. Resend cooldown → 429
+9. Login + /me happy path
+10. Wrong password → 401
+11. /me without token → 401
+12. Resend anti-enumeration (unknown email → generic 200)
+
+**📊 Verification:**
+- ✅ Pytest 12/12 PASS (مع regressions iter144/146/147 14/14 PASS).
+- ✅ Live curl: register company_admin → 201 + access_token + email RTL OTP sent.
+- ✅ Live curl: register resident → 201 with compound_id + unit_number.
+- ✅ Live curl: verify-otp → email_verified=true.
+- ✅ Live curl: /me with Bearer token → user payload.
+- ✅ Lint نظيف على `routes/mobile_auth.py` + test file.
+
+**Files Created:**
+- ✏️ `backend/routes/mobile_auth.py` (557 LOC — كانت موجودة قبلاً، تم تسجيلها فقط)
+- ✏️ `backend/server.py` (registered mobile_auth_router)
+- ➕ `backend/tests/test_iter148_mobile_auth.py` (12 test cases)
+- ➕ `MOBILE_API.md` (15KB developer reference)
+- ➕ `flutter_starter/` (10 Dart files + pubspec deps + README)
+
+
+
 ### Iter 147: Mandatory 2FA for app_owner / super_admin (Feature #54) — Feb 16, 2026 ✅
 
 **🎯 الطلب:** المصادقة الثنائية إجبارية لحسابات الإدارة (لا يمكن للحساب أن يدخل التطبيق بدون تفعيلها).

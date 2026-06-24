@@ -276,7 +276,11 @@ html.dark .bg-white,
 html.dark .bg-gray-50,
 html.dark .bg-gray-100,
 html.dark .bg-slate-50,
-html.dark .bg-slate-100 {
+html.dark .bg-slate-100,
+html.dark [class*="bg-gray-50/"],
+html.dark [class*="bg-gray-100/"],
+html.dark [class*="bg-slate-50/"],
+html.dark [class*="bg-slate-100/"] {
   background-color: #111827 !important;
   color: #e2e8f0;
 }
@@ -285,7 +289,11 @@ html.dark .bg-slate-100 {
 html.dark .bg-gray-200,
 html.dark .bg-gray-300,
 html.dark .bg-slate-200,
-html.dark .bg-slate-300 {
+html.dark .bg-slate-300,
+html.dark [class*="bg-gray-200/"],
+html.dark [class*="bg-gray-300/"],
+html.dark [class*="bg-slate-200/"],
+html.dark [class*="bg-slate-300/"] {
   background-color: #1f2937 !important;
   color: #e2e8f0;
 }
@@ -323,7 +331,30 @@ html.dark .bg-violet-50,
 html.dark .bg-fuchsia-50,
 html.dark .bg-sky-50,
 html.dark .bg-red-50,
-html.dark .bg-lime-50 {
+html.dark .bg-lime-50,
+/* Opacity-modifier variants: bg-X-50/N (Tailwind /opacity syntax compiles to a literal class name with '/' that the plain .class selector cannot match) */
+html.dark [class*="bg-blue-50/"],
+html.dark [class*="bg-emerald-50/"],
+html.dark [class*="bg-amber-50/"],
+html.dark [class*="bg-purple-50/"],
+html.dark [class*="bg-rose-50/"],
+html.dark [class*="bg-indigo-50/"],
+html.dark [class*="bg-cyan-50/"],
+html.dark [class*="bg-pink-50/"],
+html.dark [class*="bg-yellow-50/"],
+html.dark [class*="bg-teal-50/"],
+html.dark [class*="bg-green-50/"],
+html.dark [class*="bg-orange-50/"],
+html.dark [class*="bg-violet-50/"],
+html.dark [class*="bg-fuchsia-50/"],
+html.dark [class*="bg-sky-50/"],
+html.dark [class*="bg-red-50/"],
+html.dark [class*="bg-lime-50/"],
+html.dark [class*="bg-gray-50/"],
+html.dark [class*="bg-slate-50/"],
+html.dark [class*="bg-stone-50/"],
+html.dark [class*="bg-neutral-50/"],
+html.dark [class*="bg-zinc-50/"] {
   background-color: rgba(30, 41, 59, 0.6) !important;
 }
 
@@ -347,7 +378,28 @@ html.dark .bg-red-100,
 html.dark .bg-lime-100,
 html.dark .bg-stone-100,
 html.dark .bg-neutral-100,
-html.dark .bg-zinc-100 {
+html.dark .bg-zinc-100,
+/* /opacity variants */
+html.dark [class*="bg-blue-100/"],
+html.dark [class*="bg-emerald-100/"],
+html.dark [class*="bg-amber-100/"],
+html.dark [class*="bg-purple-100/"],
+html.dark [class*="bg-rose-100/"],
+html.dark [class*="bg-indigo-100/"],
+html.dark [class*="bg-cyan-100/"],
+html.dark [class*="bg-pink-100/"],
+html.dark [class*="bg-yellow-100/"],
+html.dark [class*="bg-teal-100/"],
+html.dark [class*="bg-green-100/"],
+html.dark [class*="bg-orange-100/"],
+html.dark [class*="bg-violet-100/"],
+html.dark [class*="bg-fuchsia-100/"],
+html.dark [class*="bg-sky-100/"],
+html.dark [class*="bg-red-100/"],
+html.dark [class*="bg-lime-100/"],
+html.dark [class*="bg-stone-100/"],
+html.dark [class*="bg-neutral-100/"],
+html.dark [class*="bg-zinc-100/"] {
   background-color: rgba(51, 65, 85, 0.55) !important;
 }
 

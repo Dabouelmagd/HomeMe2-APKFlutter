@@ -1,0 +1,35 @@
+{
+  "summary": "Iter150-B RETEST of the 2 issues flagged in iteration_76.json. RESULT: BOTH FIXES VERIFIED PASS. (1) Homepage account-type cards: section.bg-gray-50/80 + 3 cards (bg-blue-50/80, bg-purple-50/80, bg-emerald-50/80) now compute backgroundColor = rgba(30,41,59,0.6) → luminance 39.8 (was 245-250). All 4 cards are dark. (2) /pricing comparison table: 16 td cells with bg-purple-50/30 all compute bg lum=39.8 with text-gray-700 darkened to rgb(203,213,225) lum=211.4 → Δ contrast=171.6 (was 35). Also covers text-emerald-600 cells with Δ=149.6. Pricing total light leaks: 0. Modal verification PASS: /app/residents '+ إضافة مقيم + عائلة' modal opens with teal header 'إضافة ساكن رئيسي جديد', dark body, dark inputs, light labels, readable action buttons (screenshot 06). Light-mode regression PASS: localStorage.removeItem('darkMode') + reload → html.dark removed, body bg = rgb(255,255,255) on both / and /pricing. Backend smoke PASS: /api/health 200, /api/auth/login testcompany2 200. The CSS attribute-selector approach in /app/frontend/src/index.css (lines 280-358 using [class*='bg-X-50/'] for /opacity variants) is working as designed.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/ homepage tables", "issues": ["32 TR rows use bg-white/[0.02] (decorative striping) — the raw luminance metric reports lum=255 but actual alpha=0.02 makes them essentially invisible on the dark gradient. Not a real leak; the audit script's lum-only check is too strict for ultra-low-alpha whites. No action needed."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_77.json",
+    "/app/test_reports/screenshots/iter150b/00_home_dark_top.png",
+    "/app/test_reports/screenshots/iter150b/01_home_dark_account_cards.png",
+    "/app/test_reports/screenshots/iter150b/02_pricing_dark_table.png",
+    "/app/test_reports/screenshots/iter150b/02b_pricing_dark_top.png",
+    "/app/test_reports/screenshots/iter150b/03_home_light.png",
+    "/app/test_reports/screenshots/iter150b/04_pricing_light.png",
+    "/app/test_reports/screenshots/iter150b/05_residents_dark.png",
+    "/app/test_reports/screenshots/iter150b/06_residents_modal_dark.png"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "The [class*='bg-X-50/'] attribute-selector pattern in /app/frontend/src/index.css (lines 280-358) is a clean, future-proof fix — it catches every Tailwind /opacity-modifier variant (e.g., bg-purple-50/30, bg-blue-50/80) without needing to enumerate exact opacity values. The trailing '/' correctly prevents matching the -500 shade. Recommend keeping this pattern for any future tailwind color shade additions.",
+    "Iter76 unresolved sidebar UX issue still stands (NOT a dark-mode bug, just surfaced during prior testing): /app/audit, /app/security, /app/family-members return 'الصفحة غير موجودة' for company_admin role. Not in scope of this retest."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (health 200, login 200)", "frontend": "100% — both flagged issues resolved (homepage 4/4 account cards dark, pricing 16/16 td cells dark, modal dark, light-mode regression clean)"},
+  "test_credentials": "testcompany2 / Company123! used for residents-modal phase (verified login + persona pick → /app/dashboard → /app/residents → modal open).",
+  "seed_data_creation": "None for this retest iteration.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter150-B retest is COMPLETE — both flagged dark-mode issues (homepage account-type cards using bg-{gray|blue|emerald|purple}-50/80 AND /pricing td.bg-purple-50/30 cells) are fully fixed. The CSS attribute-selector fix at /app/frontend/src/index.css lines 280-358 is the canonical implementation pattern for future /opacity-modifier tailwind utilities. The 32 'TR.bg-white/[0.02]' rows reported by the raw audit script are false positives (alpha=0.02 makes them visually invisible). Modal C verification on /app/residents PASSED with selector 'text=إضافة مقيم + عائلة' then waiting 2000ms — the modal has [class='fixed inset-0 bg-black/60 z-[60]'] backdrop and a teal Tailwind-rendered header. No further dark-mode retest needed.",
+  "rca of the issue": "Iter150-A fix only enumerated explicit Tailwind shade classes (e.g. .bg-purple-50 {}) which DO NOT match Tailwind's /opacity-modifier compiled class names (e.g. 'bg-purple-50/80' → literally a class string with a slash). Iter150-B fix added attribute selectors [class*='bg-X-50/'] that DO match the slash-suffixed classes. Verification: computed style now returns rgba(30,41,59,0.6) for all -50/N variants → lum=39.8 (dark surface). Fix is complete and consistent across all 17 listed tailwind palette colors."
+}

@@ -261,7 +261,7 @@ code {
 }
 
 /* ──────────────────────────────────────────────────────────────────
-   Global Dark Mode overrides (Iter 142 — Feature #40)
+   Global Dark Mode overrides (Iter 142 → upgraded Iter 149)
    Most pages use raw Tailwind utilities like `bg-white` / `bg-gray-50`
    without per-component `dark:` variants. These rules darken the most
    common surfaces automatically when the `.dark` class is on <html>.
@@ -281,7 +281,32 @@ html.dark .bg-slate-100 {
   color: #e2e8f0;
 }
 
-/* Soft / accent backgrounds become subtler in dark */
+/* Mid-grey surfaces (bg-gray-200/300 used for dividers, chips, secondary buttons) */
+html.dark .bg-gray-200,
+html.dark .bg-gray-300,
+html.dark .bg-slate-200,
+html.dark .bg-slate-300 {
+  background-color: #1f2937 !important;
+  color: #e2e8f0;
+}
+
+/* Semi-transparent whites used in modals / glass cards / hero overlays */
+html.dark .bg-white\/5,
+html.dark .bg-white\/10,
+html.dark .bg-white\/20,
+html.dark .bg-white\/30,
+html.dark .bg-white\/40,
+html.dark .bg-white\/50,
+html.dark .bg-white\/60,
+html.dark .bg-white\/70,
+html.dark .bg-white\/80,
+html.dark .bg-white\/90,
+html.dark .bg-white\/95 {
+  background-color: rgba(17, 24, 39, 0.85) !important;
+  color: #e2e8f0;
+}
+
+/* Soft / accent tints (-50) used for chips and section panels */
 html.dark .bg-blue-50,
 html.dark .bg-emerald-50,
 html.dark .bg-amber-50,
@@ -293,8 +318,69 @@ html.dark .bg-pink-50,
 html.dark .bg-yellow-50,
 html.dark .bg-teal-50,
 html.dark .bg-green-50,
-html.dark .bg-orange-50 {
+html.dark .bg-orange-50,
+html.dark .bg-violet-50,
+html.dark .bg-fuchsia-50,
+html.dark .bg-sky-50,
+html.dark .bg-red-50,
+html.dark .bg-lime-50 {
   background-color: rgba(30, 41, 59, 0.6) !important;
+}
+
+/* Soft tints (-100) for badges, hover states, info banners */
+html.dark .bg-blue-100,
+html.dark .bg-emerald-100,
+html.dark .bg-amber-100,
+html.dark .bg-purple-100,
+html.dark .bg-rose-100,
+html.dark .bg-indigo-100,
+html.dark .bg-cyan-100,
+html.dark .bg-pink-100,
+html.dark .bg-yellow-100,
+html.dark .bg-teal-100,
+html.dark .bg-green-100,
+html.dark .bg-orange-100,
+html.dark .bg-violet-100,
+html.dark .bg-fuchsia-100,
+html.dark .bg-sky-100,
+html.dark .bg-red-100,
+html.dark .bg-lime-100 {
+  background-color: rgba(51, 65, 85, 0.55) !important;
+}
+
+/* Hover variants → only flip when the trigger is light */
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover,
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-100:hover,
+html.dark .hover\:bg-white:hover {
+  background-color: #1f2937 !important;
+}
+
+/* Light-tone gradients used as page wrappers (Login/Pricing/Register/...)
+   Pattern: from-{light}-50, via-white, to-{light}-50 — strictly replaced
+   with our base navy gradient so nothing leaks white into the viewport. */
+html.dark .bg-gradient-to-br[class*="from-blue-50"],
+html.dark .bg-gradient-to-br[class*="from-indigo-50"],
+html.dark .bg-gradient-to-br[class*="from-violet-50"],
+html.dark .bg-gradient-to-br[class*="from-purple-50"],
+html.dark .bg-gradient-to-br[class*="from-gray-50"],
+html.dark .bg-gradient-to-br[class*="from-slate-50"],
+html.dark .bg-gradient-to-br[class*="from-white"],
+html.dark .bg-gradient-to-b[class*="from-gray-50"],
+html.dark .bg-gradient-to-b[class*="from-blue-50"],
+html.dark .bg-gradient-to-b[class*="from-indigo-50"],
+html.dark .bg-gradient-to-b[class*="from-violet-50"],
+html.dark .bg-gradient-to-b[class*="from-white"],
+html.dark .bg-gradient-to-r[class*="from-gray-50"],
+html.dark .bg-gradient-to-r[class*="from-blue-50"],
+html.dark .bg-gradient-to-r[class*="from-white"],
+html.dark .bg-gradient-to-t[class*="from-white"],
+html.dark [class*="via-white"],
+html.dark [class*="to-white"][class*="bg-gradient"],
+html.dark [class*="bg-gradient"][class*="to-gray-50"],
+html.dark [class*="bg-gradient"][class*="to-slate-50"] {
+  background-image: linear-gradient(135deg, #0b1220 0%, #111827 50%, #0f172a 100%) !important;
 }
 
 /* Borders that were light grey → use a darker grey in dark mode */
@@ -302,8 +388,35 @@ html.dark .border-gray-100,
 html.dark .border-gray-200,
 html.dark .border-gray-300,
 html.dark .border-slate-100,
-html.dark .border-slate-200 {
+html.dark .border-slate-200,
+html.dark .border-slate-300,
+html.dark .border-white,
+html.dark .border-white\/10,
+html.dark .border-white\/20,
+html.dark .border-white\/30 {
   border-color: #1f2937 !important;
+}
+
+/* Soft coloured borders (e.g. border-blue-200) → keep tint but darker */
+html.dark .border-blue-100,
+html.dark .border-blue-200,
+html.dark .border-indigo-100,
+html.dark .border-indigo-200,
+html.dark .border-purple-100,
+html.dark .border-purple-200,
+html.dark .border-violet-100,
+html.dark .border-violet-200,
+html.dark .border-emerald-100,
+html.dark .border-emerald-200,
+html.dark .border-amber-100,
+html.dark .border-amber-200,
+html.dark .border-rose-100,
+html.dark .border-rose-200,
+html.dark .border-pink-100,
+html.dark .border-pink-200,
+html.dark .border-teal-100,
+html.dark .border-teal-200 {
+  border-color: rgba(99, 102, 241, 0.25) !important;
 }
 
 /* Text — promote dark-grey text into a lighter shade so it stays legible */
@@ -327,8 +440,50 @@ html.dark .text-slate-400 {
   color: #94a3b8 !important;
 }
 
+/* Brand-coloured text (-700/-800/-900) used for headings — lighten to
+   the -300 family so they don't disappear on a dark background. */
+html.dark .text-blue-900,
+html.dark .text-blue-800,
+html.dark .text-blue-700 { color: #93c5fd !important; }
+html.dark .text-indigo-900,
+html.dark .text-indigo-800,
+html.dark .text-indigo-700 { color: #a5b4fc !important; }
+html.dark .text-purple-900,
+html.dark .text-purple-800,
+html.dark .text-purple-700 { color: #c4b5fd !important; }
+html.dark .text-violet-900,
+html.dark .text-violet-800,
+html.dark .text-violet-700 { color: #c4b5fd !important; }
+html.dark .text-emerald-900,
+html.dark .text-emerald-800,
+html.dark .text-emerald-700 { color: #6ee7b7 !important; }
+html.dark .text-green-900,
+html.dark .text-green-800,
+html.dark .text-green-700 { color: #86efac !important; }
+html.dark .text-amber-900,
+html.dark .text-amber-800,
+html.dark .text-amber-700 { color: #fcd34d !important; }
+html.dark .text-orange-900,
+html.dark .text-orange-800,
+html.dark .text-orange-700 { color: #fdba74 !important; }
+html.dark .text-rose-900,
+html.dark .text-rose-800,
+html.dark .text-rose-700 { color: #fda4af !important; }
+html.dark .text-red-900,
+html.dark .text-red-800,
+html.dark .text-red-700 { color: #fca5a5 !important; }
+html.dark .text-pink-900,
+html.dark .text-pink-800,
+html.dark .text-pink-700 { color: #f9a8d4 !important; }
+html.dark .text-teal-900,
+html.dark .text-teal-800,
+html.dark .text-teal-700 { color: #5eead4 !important; }
+html.dark .text-cyan-900,
+html.dark .text-cyan-800,
+html.dark .text-cyan-700 { color: #67e8f9 !important; }
+
 /* Inputs / cards inherit darkness automatically via the bg-* rules above */
-html.dark input,
+html.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
 html.dark textarea,
 html.dark select {
   background-color: #1f2937 !important;
@@ -350,8 +505,50 @@ html.dark .shadow-2xl {
 }
 
 /* Divider lines on tables */
-html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+html.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
   border-color: #1f2937 !important;
+}
+
+/* Logo images sitting in a once-white container — give them a soft halo
+   so they don't read as a giant white block on the dark page. */
+html.dark img[alt*="logo" i],
+html.dark img[alt*="Home" i],
+html.dark .app-logo img,
+html.dark [data-logo-wrapper] img {
+  background-color: transparent !important;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.25),
+              0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Ring colours used for focus / active states — keep them visible */
+html.dark .ring-white,
+html.dark .ring-gray-200,
+html.dark .ring-gray-300 {
+  --tw-ring-color: rgba(148, 163, 184, 0.5) !important;
+}
+
+/* Prose / typography classes used on Blog & Legal pages */
+html.dark .prose,
+html.dark .prose-lg,
+html.dark .prose-xl {
+  color: #e2e8f0;
+}
+html.dark .prose h1,
+html.dark .prose h2,
+html.dark .prose h3,
+html.dark .prose h4,
+html.dark .prose strong { color: #f1f5f9; }
+html.dark .prose a { color: #93c5fd; }
+html.dark .prose blockquote {
+  border-left-color: #475569;
+  color: #cbd5e1;
+}
+html.dark .prose code {
+  background-color: #1f2937;
+  color: #fcd34d;
 }
 
 /* ──────────────────────────────────────────────────────────────────

@@ -1,0 +1,51 @@
+{
+  "summary": "Iter150-D verification: CSS selector specificity fix for dark-mode light-gradient overrides. Tested brand-color preservation on homepage company-comparison-table, /pricing comparison thead override, brand-gradient sweep on / and /pricing, light-mode regression, and 4-page dark-mode audit. ALL TESTS PASS.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_results": {
+    "primary_fix_company_comparison_table": {
+      "status": "PASS",
+      "details": "7 highlight rows with 'from-violet-500/10 to-fuchsia-500/10' found. ALL show violet-fuchsia brand gradient (rgba(139,92,246,0.1) + rgba(217,70,239,0.1)), NONE were incorrectly overridden to dark navy. 0 issues."
+    },
+    "primary_fix_pricing_thead_override": {
+      "status": "PASS",
+      "details": "Pricing thead 'bg-gradient-to-r from-purple-50 to-fuchsia-50' IS correctly overridden to dark navy gradient (rgb(11,18,32)/rgb(17,24,39)/rgb(15,23,42))."
+    },
+    "brand_gradient_preservation_home": {
+      "status": "PASS",
+      "details": "On /, 114 elements with from-{color}-500/600/700 classes detected. ZERO incorrectly overridden to dark navy. Brand CTAs, hero gradients, and chips all preserve their saturated brand colors."
+    },
+    "brand_gradient_preservation_pricing": {
+      "status": "PASS",
+      "details": "On /pricing, 9 brand gradient elements detected. 0 issues."
+    },
+    "resident_portal_section_override": {
+      "status": "PASS",
+      "details": "data-testid='resident-portal-section' (from-emerald-50 via-teal-50 to-cyan-50) IS correctly overridden to dark navy gradient in dark mode."
+    },
+    "light_mode_regression": {
+      "status": "PASS",
+      "details": "After clearing darkMode, resident-portal-section returns to its original light Tailwind gradient (rgb(236,253,245) → rgb(240,253,250) → rgb(236,254,255)). No override leakage in light mode."
+    },
+    "multi_page_dark_audit": {
+      "status": "PASS",
+      "details": "/, /pricing, /blog, /faq, /login, /register all show 0 light elements (luminance>180, opacity>0.3, sizable) and 0 brand-gradient override issues in dark mode."
+    }
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "The Iter150-D fix using [class~='from-X-50'] (whole-token CSS attribute selector) combined with [class*='from-X-50/'] (opacity variant) is a textbook-correct solution. Whole-token matching prevents the substring collision with from-X-500/600/700 brand shades. Implementation across 22 color families × 3 positions × 2 selector forms (132 selectors) at /app/frontend/src/index.css lines 442-506 is comprehensive and consistent."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "N/A (skipped per request)", "frontend": "100%"},
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Iter150-D verified complete. The CSS specificity fix correctly preserves brand-saturated gradients (from-X-500/600/700) while still overriding light wrapper gradients (from-X-50). The 7 highlighted rows in the homepage company-comparison-table now show their intended violet-fuchsia brand gradient in dark mode. Light mode regression also clean.",
+  "rca_of_the_issue": "Original bug RCA (already fixed by main agent): The Iter150-C CSS used [class*='from-violet-50'] (CSS substring attribute selector), which matches any class containing the substring 'from-violet-50' INCLUDING 'from-violet-500' (the brand 500-shade). This caused the homepage company-comparison-table's highlighted brand rows (className includes 'from-violet-500/10 to-fuchsia-500/10') to be incorrectly painted with the dark navy override, hiding the brand color. Iter150-D fix: switched to [class~='from-violet-50'] (whole-token attribute selector — matches only when 'from-violet-50' appears as a complete class token, NOT as a prefix of 'from-violet-500') plus an additional [class*='from-violet-50/'] selector to still catch opacity-modifier variants like 'from-violet-50/30'. This is applied across 22 color families."
+}

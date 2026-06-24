@@ -1,0 +1,43 @@
+{
+  "summary": "Iter150 verification: homepage 'systems' grid expansion from 30 to 42 cards. All visual + count + filter checks PASS. 12 new system cards confirmed in DOM. Dark mode regression PASS. Mobile auth API PASS. FAQ updated to 42. One minor pre-existing mobile horizontal overflow noted (not caused by this iteration).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Homepage @ 414x896 mobile", "issues": ["Horizontal overflow: body.scrollWidth=611px > viewport=414px (~197px overflow). Page-level issue (header/nav at narrow widths). Cards themselves wrap fine — appears pre-existing and NOT introduced by Iter150 new cards. Worth investigating in a future iteration."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_iter148_mobile_auth.py"],
+  "action_items": [
+    "(Optional / pre-existing) Investigate mobile (414px) horizontal overflow on homepage — body width = 611px. Likely caused by header/nav element, not the new systems cards."
+  ],
+  "critical_code_review_comments": [
+    "HomePage.js is 1506 lines — exceeds 700 line guideline; consider splitting into smaller components (e.g., extract SystemsSection, PricingSection, FooterSection) for maintainability.",
+    "The dynamic count pattern `t('hp_systems_title', \\`${systems.length} نظام متكامل\\`).replace('{count}', systems.length)` is clever but fragile: if the i18n value comes back with the literal text (no {count} placeholder), the .replace is a no-op which is fine, but if a translation team adds {count} for AR/EN/FR they MUST use the same placeholder name. Recommend documenting the placeholder convention in translations file.",
+    "Filter 'جديد' is expected ~22 per request but actual is 19 (matches code: counted 19 isNew=true cards). Request count expectation was off by 3 — code is correct.",
+    "Mobile auth endpoint /api/mobile/auth/register requires `role` field (request example in problem statement used `user_type` which returns 422). Document the correct field name in API docs."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "Not used — visual + API smoke only. Mobile auth tested with freshly-generated TEST_i150_* user.",
+  "seed_data_creation": "Created 1 test user via /api/mobile/auth/register (prefix TEST_i150_*) for smoke test — safe to leave or cleanup.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Iter150 = homepage systems grid expanded to 42 cards (was 30). Verified: title '42 نظام متكامل', 42 DOM cards in #systems, footer link 42, FAQ Q1 contains 42 (inside accordion innerHTML). All 12 new Iter150 cards found by title. Filter pills work: 'الكل'=42, 'AI'=7, 'جديد'=19, 'أمن'=8. Dark mode regression OK (html.dark applied, 42 cards render). Mobile viewport renders 42 cards but page has horizontal overflow ~197px (pre-existing header issue). Backend: /api/health=200, /api/mobile/auth/register with role=company_admin returns 201+JWT. All public routes (/faq, /pricing, /login, /register, /blog) return 200.",
+  "verification_details": {
+    "systems_title_text": "42 نظام متكامل",
+    "cards_in_systems_section": 42,
+    "footer_link_text": "42 نظام متكامل",
+    "all_12_new_card_titles_found": true,
+    "filter_counts": {"all": 42, "ai": 7, "new": 19, "security": 8},
+    "faq_contains_42": true,
+    "dark_mode_works_with_42_cards": true,
+    "mobile_auth_register": "201 + access_token",
+    "public_routes_200": ["/", "/faq", "/pricing", "/login", "/register", "/blog"],
+    "console_errors": "Only 3rd-party 403/400 resource errors (Google Fonts/analytics) — not from app code"
+  }
+}

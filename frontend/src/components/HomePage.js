@@ -19,7 +19,9 @@ import {
   QrCodeIcon, ClockIcon, PresentationChartBarIcon,
   BoltIcon, EnvelopeIcon, ArrowPathIcon,
   ArrowRightOnRectangleIcon, Squares2X2Icon, XMarkIcon,
-  MapIcon, ArrowUpTrayIcon, AdjustmentsHorizontalIcon
+  MapIcon, ArrowUpTrayIcon, AdjustmentsHorizontalIcon,
+  GiftIcon, MoonIcon, NoSymbolIcon, ChatBubbleBottomCenterTextIcon,
+  ListBulletIcon
 } from '@heroicons/react/24/outline';
 
 import InternalAdBanner from './InternalAdBanner';
@@ -344,6 +346,32 @@ const HomePage = () => {
     { icon: NewspaperIcon, category: 'comms', title: '📝 ' + t('sys_content_hub', 'مدوّنة Content Hub'), desc: t('sys_content_hub_d', '10+ مقالات عربية + تعليقات + CMS مع اقتراح SEO بالـ AI'), color: 'from-rose-500 to-pink-600', isNew: true },
     { icon: CheckCircleIcon, category: 'security', title: '✅ ' + t('sys_email_verify', 'تأكيد البريد الإلكتروني'), desc: t('sys_email_verify_d', 'حماية ضد الحسابات الوهمية: لازم تفعيل الإيميل قبل أول تسجيل دخول'), color: 'from-emerald-500 to-green-600', isNew: true },
     { icon: FingerPrintIcon, category: 'security', title: '🔐 ' + t('sys_biometric', 'تسجيل دخول بالبصمة'), desc: t('sys_biometric_d', 'WebAuthn: Face ID / Touch ID للموبايل، Windows Hello للديسكتوب'), color: 'from-violet-500 to-purple-600', isNew: true },
+
+    // 🛡️ Security Suite (Iter 142-147 — Features #47, #49, #53, #54)
+    { icon: LockClosedIcon, category: 'security', title: '🔒 ' + t('sys_mandatory_2fa', 'المصادقة الثنائية الإجبارية'), desc: t('sys_mandatory_2fa_d', '2FA إلزامي للمالك و Super Admin عبر Google Authenticator + Backup Codes'), color: 'from-red-500 to-rose-700', isNew: true },
+    { icon: NoSymbolIcon, category: 'security', title: '🚫 ' + t('sys_auto_ban', 'الحظر التلقائي للـIPs'), desc: t('sys_auto_ban_d', 'IP يفشل 20 مرة/ساعة → حظر تلقائي 24 ساعة + تنبيه إيميل عند الهجمات الكبيرة'), color: 'from-rose-600 to-red-700', isNew: true },
+    { icon: ExclamationTriangleIcon, category: 'security', title: '🛡️ ' + t('sys_security_insights', 'لوحة الأمن الذكية'), desc: t('sys_security_insights_d', 'IPs مشبوهة + حسابات مستهدفة + توزيع الهجمات بالساعات + Forensic logs'), color: 'from-amber-600 to-red-600', isNew: true },
+    { icon: ClockIcon, category: 'security', title: '⏱️ ' + t('sys_rate_limit', 'تحديد محاولات الدخول'), desc: t('sys_rate_limit_d', '5 محاولات/15 دقيقة لكل username + Session timeout 24 ساعة + تسجيل كل محاولة'), color: 'from-orange-500 to-red-500', isNew: true },
+
+    // 📱 Mobile + Distribution (Iter 148 — Feature #55)
+    { icon: DevicePhoneMobileIcon, category: 'admin', title: '📱 ' + t('sys_mobile_api', 'تطبيق موبايل Flutter Native'), desc: t('sys_mobile_api_d', 'API كامل للتطبيق الأصلي iOS+Android مع OTP من 6 أرقام + FCM Push + 2FA support'), color: 'from-indigo-600 to-purple-700', isNew: true },
+
+    // 🎁 Growth & Engagement (Iter 142-143 — Features #36, #37, #41)
+    { icon: GiftIcon, category: 'finance', title: '🎁 ' + t('sys_referral', 'برنامج الإحالة المزدوج'), desc: t('sys_referral_d', 'كل شركة جديدة تشترك بكود إحالة تحصل تلقائياً على خصم ترحيبي 15% + تتبع الإحالات'), color: 'from-pink-500 to-rose-600', isNew: true },
+    { icon: ChatBubbleBottomCenterTextIcon, category: 'comms', title: '💬 ' + t('sys_whatsapp_share', 'مشاركة WhatsApp'), desc: t('sys_whatsapp_share_d', 'زر مشاركة الإحالة على WhatsApp بضغطة مع رسالة جاهزة + تتبّع التحويلات'), color: 'from-green-500 to-emerald-600', isNew: true },
+
+    // 🪜 UX Onboarding (Iter 145 — Feature #52)
+    { icon: ListBulletIcon, category: 'admin', title: '🪜 ' + t('sys_wizard_signup', 'تسجيل شركة في 3 خطوات'), desc: t('sys_wizard_signup_d', 'Multi-step wizard مع Progress bar + validation تدريجي + step picker قابل للنقر'), color: 'from-cyan-500 to-blue-600', isNew: true },
+
+    // 📊 Reports & Analytics (Iter 142-144 — Features #36, #43, #44)
+    { icon: PresentationChartBarIcon, category: 'finance', title: '📊 ' + t('sys_executive_pdf', 'تقرير تنفيذي شهري PDF'), desc: t('sys_executive_pdf_d', 'PDF تلقائي للمالك مع MRR + Churn + Top 10 كمبوندات + اتجاه 12 شهر — كل أول الشهر'), color: 'from-slate-600 to-gray-800', isNew: true },
+    { icon: ChartBarIcon, category: 'finance', title: '📈 ' + t('sys_trend_chart', 'مقارنة الكمبوندات 6 أشهر'), desc: t('sys_trend_chart_d', 'Multi-line chart لإيرادات/سكان/شكاوى/صيانة لكل كمبوند مع Legend تفاعلي'), color: 'from-blue-600 to-indigo-700', isNew: true },
+
+    // ⭐ Customer Voice (Iter 143-144 — Features #39, #46)
+    { icon: StarIcon, category: 'comms', title: '⭐ ' + t('sys_resident_ratings', 'تقييمات السكان للكمبوند'), desc: t('sys_resident_ratings_d', 'الساكن المسجّل يقيّم كمبونده 1-5 نجوم + comment + AI sentiment + moderation للسوبر أدمن'), color: 'from-yellow-500 to-orange-500', isNew: true },
+
+    // 🌙 Theme & UX (Iter 142, 149)
+    { icon: MoonIcon, category: 'admin', title: '🌙 ' + t('sys_dark_mode', 'الوضع الليلي الشامل'), desc: t('sys_dark_mode_d', 'تبديل light/dark على كل الصفحات (الرئيسية/Login/Pricing/Blog/Dashboard) + يحفظ التفضيل'), color: 'from-slate-700 to-indigo-900', isNew: true },
 
     // Smart devices (coming soon)
     { icon: BoltIcon, category: 'admin', title: t('sys_smart', 'الأجهزة الذكية'), desc: t('sys_smart_d', 'تحكم بالإضاءة + التكييف + الكاميرات + الأقفال (قريباً)'), color: 'from-amber-500 to-yellow-600', comingSoon: true },
@@ -1047,7 +1075,7 @@ const HomePage = () => {
       <section className="py-16" id="systems" data-testid="systems-section">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }}>{t('hp_30_systems', '30 نظام متكامل')}</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-3" style={{ fontFamily: "'Cairo', sans-serif" }} data-testid="systems-title">{t('hp_systems_title', `${systems.length} نظام متكامل`).replace('{count}', systems.length)}</h2>
             <p className="text-gray-500">{t('hp_systems_desc', 'كل الأدوات التي تحتاجها لإدارة مجتمعك السكني باحترافية + ميزات AI متقدمة')}</p>
           </div>
 
@@ -1440,7 +1468,7 @@ const HomePage = () => {
             <div className="flex gap-6 text-sm">
               <a href="#guide" className="hover:text-white transition-colors">{t('hp_guide_btn')}</a>
               <a href="#pricing" className="hover:text-white transition-colors">{t('hp_sub_codes')}</a>
-              <a href="#systems" className="hover:text-white transition-colors">{t('hp_30_systems', '30 نظام متكامل')}</a>
+              <a href="#systems" className="hover:text-white transition-colors" data-testid="footer-systems-link">{t('hp_systems_title_footer', `${systems.length} نظام متكامل`).replace('{count}', systems.length)}</a>
               <a href="#ai-features" className="hover:text-white transition-colors">✨ {t('hp_whats_new', 'ما الجديد')}</a>
               <a href="#testimonials" className="hover:text-white transition-colors">⭐ شهادات</a>
               <a href="#faq" className="hover:text-white transition-colors">❓ {t('hp_faq', 'الأسئلة الشائعة')}</a>

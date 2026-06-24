@@ -1192,6 +1192,20 @@ html.dark .text-pink-600 { color: #f9a8d4 !important; }
 html.dark .text-teal-600 { color: #5eead4 !important; }
 .dark-mode .text-cyan-600,
 html.dark .text-cyan-600 { color: #67e8f9 !important; }
+.dark-mode .text-yellow-600,
+html.dark .text-yellow-600 { color: #fde047 !important; }
+.dark-mode .text-lime-600,
+html.dark .text-lime-600 { color: #bef264 !important; }
+.dark-mode .text-sky-600,
+html.dark .text-sky-600 { color: #7dd3fc !important; }
+.dark-mode .text-fuchsia-600,
+html.dark .text-fuchsia-600 { color: #f0abfc !important; }
+.dark-mode .text-stone-600,
+html.dark .text-stone-600,
+.dark-mode .text-neutral-600,
+html.dark .text-neutral-600,
+.dark-mode .text-zinc-600,
+html.dark .text-zinc-600 { color: #cbd5e1 !important; }
 
 /* Hover variants of those brand text classes */
 .dark-mode .hover\:text-blue-800:hover,

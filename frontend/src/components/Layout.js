@@ -1114,6 +1114,8 @@ const Layout = ({ children, isTrialMode = false }) => {
             <button
               className="lg:hidden"
               onClick={() => setSidebarOpen(true)}
+              data-testid="hamburger-button"
+              aria-label="فتح القائمة الجانبية"
             >
               <Bars3Icon className="h-6 w-6 text-gray-500" />
             </button>
@@ -1325,6 +1327,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                 to="/app/notifications"
                 className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 relative transition-all hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
                 title={t('notifications', 'الإشعارات')}
+                data-testid="notifications-bell"
               >
                 <BellIcon className="h-6 w-6" />
                 {unreadCount > 0 && (

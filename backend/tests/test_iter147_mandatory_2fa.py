@@ -41,13 +41,27 @@ def db():
 
 @pytest.fixture(scope="module")
 def disable_owner_2fa(event_loop, db):
-    """Ensure Owner_homeme has 2FA disabled so the enrolment path triggers."""
-    async def go():
+    """Ensure Owner_homeme has 2FA disabled so the enrolment path triggers.
+    
+    Teardown re-seeds the canonical TOTP secret JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP
+    so that other test suites (and the live UI) can authenticate with TOTP via
+    pyotp after this test runs.
+    """
+    SEEDED_TOTP = "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP"
+    async def setup():
         await db.users.update_one(
             {"username": "Owner_homeme"},
             {"$set": {"two_factor_enabled": False, "two_factor_secret": None}},
         )
-    event_loop.run_until_complete(go())
+    async def teardown():
+        # Restore the canonical seeded secret so downstream tests / UI flows still work.
+        await db.users.update_one(
+            {"username": "Owner_homeme"},
+            {"$set": {"two_factor_enabled": True, "two_factor_secret": SEEDED_TOTP}},
+        )
+    event_loop.run_until_complete(setup())
+    yield
+    event_loop.run_until_complete(teardown())
 
 
 @pytest.fixture(scope="module")

@@ -1,0 +1,30 @@
+{
+  "summary": "Iter 154 — FCM (Firebase Cloud Messaging) integration tested end-to-end. Backend SDK init verified (project=homeme-xzveg), all 7 endpoints (status/register/unregister/tokens/send/test/logs) working with auth, role guards, idempotent upsert, multi-device per user, graceful no-tokens handling, fake-token failure path, audit logging, and paginated logs filter. Frontend /app/fcm dashboard renders all 15 testids, stats tiles, Flutter guide, send/test forms, delivery logs; sidebar entry 'إشعارات Push (FCM)' present.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter154_fcm.py",
+    "/app/test_reports/pytest/iter154_results.xml",
+    "/app/test_reports/pytest/iter154_regression.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "fcm_service.py keeps _initialized as a module-level flag; if firebase_admin.get_app() succeeds but project_id isn't yet read (e.g., second call branch), get_project_id() works because _init_firebase reloads JSON each call when not initialized — acceptable but could be tightened.",
+    "routes/fcm.py role check '_can_manage' allows app_owner/super_admin/company_admin/admin. Consider whether company_admin should be able to push to ANY user across compounds or only their own — currently no compound scoping. Flag for future enhancement (not a bug for this iter)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (10/10 iter154 + 56/56 regression)", "frontend": "100% (15/15 testids + 3 integration flows OK)"},
+  "test_credentials": "Owner_homeme / Dalia1234@ + TOTP secret JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP",
+  "seed_data_creation": "No seed required; tests register/unregister tokens within the same flow and clean up after themselves.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "FCM backend layer fully validated with fake tokens (real delivery requires a Flutter app). Public URL test verified at https://profile-nav-debug.preview.emergentagent.com. All 7 endpoints + UI dashboard working. Owner login uses mandatory 2FA — use pyotp with provided secret. After 2FA, navigate directly to /app/fcm; the dashboard loads and lists 1 registered device + 9 prior log entries (failures, as expected from earlier test runs with fake tokens).",
+  "rca of the issue": "N/A — no issues found."
+}

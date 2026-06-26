@@ -65,6 +65,7 @@ import MyInvitesPage from './pages/MyInvitesPage';
 import SystemHealthPage from './pages/SystemHealthPage';
 import AuditLogPage from './pages/AuditLogPage';
 import WhatsAppPage from './pages/WhatsAppPage';
+import FCMPage from './pages/FCMPage';
 import OwnerKpiPage from './pages/OwnerKpiPage';
 import ChangelogManagementPage from './pages/ChangelogManagementPage';
 import VisitorPassesPage from './pages/VisitorPassesPage';
@@ -921,6 +922,12 @@ function App() {
                 <Route path="whatsapp" element={
                   <ProtectedRoute>
                     <WhatsAppPage />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="fcm" element={
+                  <ProtectedRoute>
+                    <FCMPage />
                   </ProtectedRoute>
                 } />
 

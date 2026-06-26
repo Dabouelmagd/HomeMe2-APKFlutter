@@ -1,0 +1,44 @@
+{
+  "summary": "Iter 156 — verified the testimonials-moderation badge in /api/sidebar/badges. All 7 new backend tests PASS (sidebar badge integration, public submit→increment, owner moderate→decrement, /testimonials/published filtering, non-owner isolation, anti-spam regression for unauthenticated submit). 66/66 regression tests (iter145-154) STILL PASS. Frontend smoke confirmed via direct navigation: /api/sidebar/badges returns {testimonials_pending: 3, total: 3} for app_owner, and the /app/testimonials-moderation page renders correctly with 3 pending cards each showing نشر/رفض buttons.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "verification_results": {
+    "new_tests": "7/7 PASS in 5.75s (test_iter156_testimonials_badge.py)",
+    "regression": "66/66 PASS in 29.99s (iter145-154 suite)",
+    "api_response_sample": "GET /api/sidebar/badges (owner) -> {messages_unread:0, payment_proofs_pending:0, negative_ratings_7d:0, testimonials_pending:3, total:3} — new field present, total includes it, legacy fields preserved",
+    "non_owner_isolation": "company_admin gets testimonials_pending=0 (confirmed via test_non_owner_does_not_see_testimonials_pending)",
+    "published_filter": "GET /api/testimonials/published correctly excludes pending & rejected (test_published_endpoint_only_returns_published PASS)",
+    "auto_ban_regression": "Public POST /api/testimonials/submit (anonymous) does NOT trigger iter146 auto-ban (test_auto_ban_not_triggered_by_public_submit PASS)",
+    "frontend_moderation_page": "/app/testimonials-moderation loads, shows 'مراجعة شهادات العملاء' header with pending tab 'قيد المراجعة 3' and per-card نشر/رفض buttons (verified via screenshot)",
+    "sidebar_badge_wiring_code_review": "Layout.js line 596 + 648 attach `badge: sidebarBadges?.testimonials_pending || 0` on the '⭐ مراجعة شهادات العملاء' nav entry; lines 967-971 render the badge span with bg-emerald-500/text-white when value > 0. Wiring is correct."
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iter156_testimonials_badge.py",
+    "/app/test_reports/pytest/iter156_testimonials_badge.xml",
+    "/app/test_reports/pytest/iter156_regression.xml"
+  ],
+  "action_items": [
+    "USER ACTION REQUIRED (production): After deploying iter156 to homemeapp.net, user logs in as Owner_homeme (with 2FA), goes to /app/testimonials-moderation and clicks نشر on the testimonial they submitted. After approval it will appear in the homepage carousel /api/testimonials/published.",
+    "No code changes required — backend + frontend implementation is verified correct in preview."
+  ],
+  "critical_code_review_comments": [
+    "sidebar_badges.py: clean use of asyncio.gather with a no-op asyncio.sleep(0, result=0) for non-owner roles — efficient and correct.",
+    "testimonials.py: POST /testimonials/submit is correctly public (no auth) and always saves status='pending'. The /published endpoint filters server-side by status='published'.",
+    "Backward compatibility maintained: all 4 legacy fields (messages_unread, payment_proofs_pending, negative_ratings_7d, total) remain in /api/sidebar/badges; only a NEW field was added.",
+    "Frontend Layout.js line 94: sidebarBadges state defaults all 4 counts to 0 including the new testimonials_pending — prevents undefined render flicker on first paint."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_iter156_testimonials_badge.py (created — 7 tests)"
+  ],
+  "success_rate": {"backend": "100% (7/7 new + 66/66 regression)", "frontend": "verified via UI smoke — moderation page renders & badge wiring in code"},
+  "test_credentials": "Owner_homeme / Dalia1234@ + TOTP secret JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP via /api/2fa/verify-login. company_admin used testcompany2/Company123! (no 2FA).",
+  "seed_data_creation": "Tests create TEST_-prefixed testimonials and clean them up via the test_zz_cleanup_test_testimonials teardown. UI smoke also cleaned up its seed via DELETE /api/owner/testimonials/{id}.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Test file /app/backend/tests/test_iter156_testimonials_badge.py covers full lifecycle. Note: the 2FA OTP input has placeholder='000000' (NOT maxlength='6') — use `input[placeholder='000000']` to select it in Playwright. After 2FA on owner login, the app routes to /select-account where the user picks a role tile (the compound-manager tiles are مدير المجمع, the owner-context tile is separate); to test owner-sidebar specifically, the test must click the owner role tile not a compound tile. For owner sidebar badge verification, you can navigate directly to /app/dashboard or /app/testimonials-moderation after login — the sidebar layout state depends on the active_role at the moment.",
+  "rca of the issue": "Original user complaint was that submitting a testimonial didn't show it on homepage. RCA: this is intentional anti-spam — testimonials are saved as status='pending' and require owner moderation. Mitigation already in place: (1) /api/sidebar/badges now returns testimonials_pending count; (2) sidebar entry '⭐ مراجعة شهادات العملاء' has a green badge showing the count so the owner is alerted; (3) TestimonialSubmitPage shows a thank-you message explaining moderation takes 24-48h. Verified end-to-end in preview. User still needs to deploy this change to production and approve their own pending testimonial via the moderation UI."
+}

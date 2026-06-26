@@ -91,7 +91,7 @@ const Layout = ({ children, isTrialMode = false }) => {
   const [appBranding, setAppBranding] = useState(null);
   const [companiesAlerts, setCompaniesAlerts] = useState({ urgent: 0, expiring_contracts: 0, empty_companies: 0, active_companies: 0 });
   const [supportTicketsAlerts, setSupportTicketsAlerts] = useState({ open: 0, in_progress: 0, total_active: 0 });
-  const [sidebarBadges, setSidebarBadges] = useState({ messages_unread: 0, payment_proofs_pending: 0, negative_ratings_7d: 0 });
+  const [sidebarBadges, setSidebarBadges] = useState({ messages_unread: 0, payment_proofs_pending: 0, negative_ratings_7d: 0, testimonials_pending: 0 });
   // Mute support-tickets ping (persisted)
   const [supportSoundMuted, setSupportSoundMuted] = useState(() => {
     try { return localStorage.getItem('support_sound_muted') === '1'; } catch { return false; }
@@ -593,7 +593,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
         { name: '📊 تحليلات الإيرادات (MRR/Churn)', href: 'subscription-analytics', icon: ChartPieIcon, show: true },
         { name: '✏️ محرّر الصفحات القانونية', href: 'legal-editor', icon: DocumentTextIcon, show: true },
-        { name: '⭐ مراجعة شهادات العملاء', href: 'testimonials-moderation', icon: StarIcon, show: true },
+        { name: '⭐ مراجعة شهادات العملاء', href: 'testimonials-moderation', icon: StarIcon, show: true, badge: sidebarBadges?.testimonials_pending || 0 },
         { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: 'subscription-reminders', icon: BellIcon, show: true },
       ]
     },
@@ -645,7 +645,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('owner_company_subs', 'اشتراكات شركات الإدارة'), href: 'company-subscriptions', icon: BuildingOffice2Icon, show: true },
         { name: '📊 تحليلات الإيرادات (MRR/Churn)', href: 'subscription-analytics', icon: ChartPieIcon, show: true },
         { name: '✏️ محرّر الصفحات القانونية', href: 'legal-editor', icon: DocumentTextIcon, show: true },
-        { name: '⭐ مراجعة شهادات العملاء', href: 'testimonials-moderation', icon: StarIcon, show: true },
+        { name: '⭐ مراجعة شهادات العملاء', href: 'testimonials-moderation', icon: StarIcon, show: true, badge: sidebarBadges?.testimonials_pending || 0 },
         { name: t('owner_reminders', 'تذكيرات الاشتراكات'), href: 'subscription-reminders', icon: BellIcon, show: true },
       ]
     },

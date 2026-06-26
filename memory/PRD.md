@@ -4,6 +4,98 @@
 Multi-tenant Compound Management SaaS with Arabic-first localization, role-based dashboards, advanced monetization, multi-session architecture, real-time push notifications, hierarchical user-subscriptions dashboard, and a dedicated companies-management dashboard with full CRUD + Top-10 analytics + JSON import/export backup.
 
 
+### Iter 154: FCM Mobile Push Notifications (Firebase) — Feb 26, 2026 ✅
+
+**🎯 الطلب:** ربط Flutter mobile app بـFirebase Cloud Messaging لإرسال إشعارات Push.
+
+**🔧 Backend:**
+- `services/fcm_service.py`: SDK lazy-init من Service Account JSON. Multi-device per user عبر `fcm_tokens` collection. كل sends في threadpool عبر `asyncio.to_thread` (firebase-admin sync-only). Auto-cleanup للـtokens الميتة (UnregisteredError/InvalidArgument).
+- `routes/fcm.py`: 7 endpoints — register / unregister / tokens (own) / send (admin) / test (admin) / status (admin) / logs (admin). كل actions الإدارية audit-logged.
+- `secrets/firebase-admin.json`: Service Account JSON للمشروع `homeme-xzveg` (chmod 600 + gitignored).
+
+**🎨 Frontend:**
+- `pages/FCMPage.js` على `/app/fcm`:
+  - 5 stat cards: Configured (مع project_id), Registered devices, Total sends, Succeeded, Failed.
+  - "خطوات الربط مع تطبيق Flutter" guide بالعربي.
+  - نموذجان: إرسال إلى user_id محدد + إرسال اختبار إلى token محدد.
+  - سجل الإرسال (آخر 7 أيام) مع status badges + dead tokens counter.
+- Sidebar entry: 🔔 إشعارات Push (FCM)
+
+**🧪 Tests:** 10/10 PASS لـiter154 + 56/56 regression PASS.
+- Testing agent: 100% pass (10 backend + 15 UI testids + 3 integration flows).
+- Test cases تغطّي: SDK init, multi-device, idempotent register, no-tokens graceful path, fake-token failure path, dead token cleanup, audit logging, role guards.
+
+**Files Modified:**
+- ➕ `backend/services/fcm_service.py`
+- ➕ `backend/routes/fcm.py`
+- ➕ `backend/secrets/firebase-admin.json` (gitignored)
+- ➕ `frontend/src/pages/FCMPage.js`
+- ✏️ `backend/server.py` (registered fcm_router)
+- ✏️ `backend/.env` (FIREBASE_ADMIN_JSON_PATH)
+- ✏️ `frontend/src/App.js` (route)
+- ✏️ `frontend/src/components/Layout.js` (sidebar)
+- ➕ `backend/tests/test_iter154_fcm.py`
+- ✏️ `backend/requirements.txt` (firebase_admin==7.4.0)
+
+
+### Iter 153: WhatsApp Notifications via Twilio — Feb 26, 2026 ✅
+
+**🎯 الطلب:** إرسال إشعارات WhatsApp للسكان والمديرين عبر Twilio.
+
+**🔧 Backend:**
+- `services/whatsapp_service.py`: 
+  - `send_whatsapp()` async-safe (wraps sync Twilio SDK في `asyncio.to_thread`).
+  - `normalize_to_whatsapp()` يدعم 5 صيغ مصرية (+201, 201, 00201, 01xx, +20 100 123 4567).
+  - Auto-logging لكل send في `whatsapp_logs` collection (success أو fail).
+- `routes/whatsapp.py`: 7 endpoints — send / send-bulk / status / logs / webhook (Twilio signature validation) / normalize-test. كل actions audit-logged.
+
+**🎨 Frontend:**
+- `pages/WhatsAppPage.js` على `/app/whatsapp`:
+  - 4 stat cards (Configured, Total, Sent, Failed).
+  - Sandbox warning بالعربي مع روابط ل Twilio Console.
+  - Send form مع live normalization preview.
+  - Delivery logs مع StatusBadge لكل status.
+- Sidebar: 💬 WhatsApp
+
+**🧪 Tests:** 10/10 PASS لـiter153 + 56/56 regression. Testing agent: 51/51 PASS.
+
+**Setup المطلوب من المستخدم (manual)**: تفعيل Twilio Sandbox بإرسال `join <code>` من WhatsApp إلى `+1 415 523 8886`. للإنتاج: استبدل `TWILIO_WHATSAPP_FROM` برقم WhatsApp Business المعتمد.
+
+**Files:**
+- ➕ `backend/services/whatsapp_service.py`, `backend/routes/whatsapp.py`, `backend/tests/test_iter153_whatsapp.py`
+- ➕ `frontend/src/pages/WhatsAppPage.js`
+- ✏️ `backend/.env` (TWILIO creds), `server.py`, `frontend/src/App.js`, `Layout.js`, `requirements.txt` (twilio==9.10.9)
+
+
+### Iter 152: Audit Trail Dashboard + GeoIP — Feb 26, 2026 ✅
+
+**🎯 الطلب:** Audit logging شامل لكل العمليات الحساسة + GeoIP enrichment.
+
+**🔧 Backend:**
+- `services/geoip_service.py`: hybrid lookup — MaxMind GeoLite2 (offline، إذا توفر mmdb) + ip-api.com fallback (مجاني) + MongoDB cache (TTL 30 يوم). يتعامل بشكل graceful مع private/local IPs.
+- `audit_logger.py`: كل audit entry يُغنى تلقائياً بـgeo data (country_code, country_name, city, source).
+- `routes/audit_logs.py`: filter جديد `country=XX`، parameter `enrich_geo=true`، endpoint جديد POST `/audit-logs/backfill-geo`. Summary returns جديد `top_countries`.
+- `routes/superadmin_companies.py`: أُضيف audit_log لكل من: company.create / update / delete, compound.link / unlink / create, structure.import / export, company.create_from_orphan, company.link_admin.
+- `routes/admin_users.py`: أُضيف audit_log لـuser.create / update / role_change / activate / deactivate.
+
+**🎨 Frontend:**
+- `AuditLogPage.js`: Top Countries widget، country badges 🌍 في كل صف، Backfill button، CSV export يتضمن country/city.
+
+**Other UI Fixes:**
+- **Mobile header overflow fix on 414px**: صفر horizontal overflow بعد إضافة `overflow-x-hidden` + hiding 7 aux components عبر `hidden md:flex` / `hidden lg:block`.
+- **Sidebar 404 issue**: تأكدنا أن كل الـ41 رابط في sidebar صالحة (تقرير قديم كان زائف).
+
+**🧪 Tests:** 10/10 PASS لـiter152. Testing agent: 46/46 PASS.
+
+**Files:**
+- ➕ `backend/services/geoip_service.py`, `backend/tests/test_iter152_audit_geoip.py`
+- ✏️ `backend/audit_logger.py`, `routes/audit_logs.py`, `routes/superadmin_companies.py`, `routes/admin_users.py`
+- ✏️ `frontend/src/pages/AuditLogPage.js`, `frontend/src/components/Layout.js`
+- ✏️ `backend/requirements.txt` (geoip2==5.2.0, maxminddb==3.1.1)
+
+
+
+
 ### Iter 151: Backend Performance Optimization — Top 5 Slowest Endpoints — Feb 26, 2026 ✅
 
 **🎯 الطلب:** المستخدم شارك قائمة بأبطأ 10 routes (الأبطأ منها يصل لـ60.9s في الإنتاج). تحسين أبطأ 5 endpoints لإنهاء حالات الـtimeout.

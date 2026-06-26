@@ -1,7 +1,7 @@
 """
 Super Admin — Companies Management (extracted from superadmin.py)
 """
-from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form, Request
 from datetime import datetime, timezone
 import uuid
 import asyncio
@@ -9,6 +9,7 @@ import asyncio
 from database import get_db
 from auth_deps import require_super_admin
 from helpers import serialize_datetime
+from audit_logger import audit_log
 
 router = APIRouter(prefix="/api")
 
@@ -171,7 +172,7 @@ async def list_companies_full(current_user: dict = Depends(require_super_admin))
 
 
 @router.post("/super-admin/companies/from-admin/{user_id}")
-async def create_company_from_orphan_admin(user_id: str, payload: dict = None, current_user: dict = Depends(require_super_admin)):
+async def create_company_from_orphan_admin(user_id: str, payload: dict = None, request: Request = None, current_user: dict = Depends(require_super_admin)):
     """تحويل مدير شركة يتيم إلى شركة كاملة بنقرة واحدة.
     
     - إذا كان user.company_id يشير إلى شركة موجودة: يتم ربطها فقط (admin_user_id)
@@ -193,6 +194,8 @@ async def create_company_from_orphan_admin(user_id: str, payload: dict = None, c
                     {"id": existing_cid},
                     {"$set": {"admin_user_id": user_id, "updated_at": datetime.now(timezone.utc).isoformat()}}
                 )
+                await audit_log(actor=current_user, action="company.link_admin", target_type="company",
+                                target_id=existing_cid, details={"user_id": user_id}, request=request)
             return {"success": True, "action": "linked", "company_id": existing_cid}
 
     # Create a fresh company
@@ -214,11 +217,13 @@ async def create_company_from_orphan_admin(user_id: str, payload: dict = None, c
     # Update the user to reference the new company
     await db.users.update_one({"id": user_id}, {"$set": {"company_id": new_company["id"]}})
     new_company.pop("_id", None)
+    await audit_log(actor=current_user, action="company.create_from_orphan", target_type="company",
+                    target_id=new_company["id"], details={"name": default_name, "admin_user_id": user_id}, request=request)
     return {"success": True, "action": "created", "company": serialize_datetime(new_company)}
 
 
 @router.post("/super-admin/companies")
-async def create_company(payload: dict, current_user: dict = Depends(require_super_admin)):
+async def create_company(payload: dict, request: Request = None, current_user: dict = Depends(require_super_admin)):
     """إنشاء شركة إدارة جديدة"""
     db = get_db()
     name = (payload.get("name") or "").strip()
@@ -238,27 +243,32 @@ async def create_company(payload: dict, current_user: dict = Depends(require_sup
     }
     await db.companies.insert_one(company_doc)
     company_doc.pop("_id", None)
+    await audit_log(actor=current_user, action="company.create", target_type="company",
+                    target_id=company_doc["id"], details={"name": name, "email": payload.get("email", "")}, request=request)
     return {"success": True, "company": serialize_datetime(company_doc)}
 
 
 @router.delete("/super-admin/companies/{company_id}")
-async def delete_company(company_id: str, current_user: dict = Depends(require_super_admin)):
+async def delete_company(company_id: str, request: Request = None, current_user: dict = Depends(require_super_admin)):
     """حذف شركة إدارة (يفكّ الربط عن المجمعات تلقائيًا)"""
     db = get_db()
     company = await db.companies.find_one({"id": company_id}, {"_id": 0})
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     # Unlink compounds
-    await db.compounds.update_many(
+    unlink_res = await db.compounds.update_many(
         {"$or": [{"company_id": company_id}, {"management_company_id": company_id}]},
         {"$unset": {"company_id": "", "management_company_id": ""}}
     )
     await db.companies.delete_one({"id": company_id})
+    await audit_log(actor=current_user, action="company.delete", target_type="company",
+                    target_id=company_id, before={"name": company.get("name"), "email": company.get("email")},
+                    details={"unlinked_compounds": unlink_res.modified_count}, request=request)
     return {"success": True}
 
 
 @router.post("/super-admin/companies/{company_id}/link-compound")
-async def link_compound_to_company(company_id: str, payload: dict, current_user: dict = Depends(require_super_admin)):
+async def link_compound_to_company(company_id: str, payload: dict, request: Request = None, current_user: dict = Depends(require_super_admin)):
     """ربط مجمع موجود بشركة إدارة"""
     db = get_db()
     compound_id = payload.get("compound_id")
@@ -278,11 +288,13 @@ async def link_compound_to_company(company_id: str, payload: dict, current_user:
         {"id": company_id},
         {"$addToSet": {"compound_ids": compound_id}}
     )
+    await audit_log(actor=current_user, action="compound.link_to_company", target_type="compound",
+                    target_id=compound_id, details={"company_id": company_id, "company_name": company.get("name"), "compound_name": compound.get("name")}, request=request)
     return {"success": True}
 
 
 @router.post("/super-admin/companies/{company_id}/unlink-compound")
-async def unlink_compound_from_company(company_id: str, payload: dict, current_user: dict = Depends(require_super_admin)):
+async def unlink_compound_from_company(company_id: str, payload: dict, request: Request = None, current_user: dict = Depends(require_super_admin)):
     """فكّ ربط مجمع عن شركة إدارة"""
     db = get_db()
     compound_id = payload.get("compound_id")
@@ -296,6 +308,8 @@ async def unlink_compound_from_company(company_id: str, payload: dict, current_u
         {"id": company_id},
         {"$pull": {"compound_ids": compound_id}}
     )
+    await audit_log(actor=current_user, action="compound.unlink_from_company", target_type="compound",
+                    target_id=compound_id, details={"company_id": company_id}, request=request)
     return {"success": True}
 
 
@@ -388,6 +402,7 @@ async def top10_companies(metric: str = "compounds", current_user: dict = Depend
 async def import_full_structure(
     file: UploadFile = File(...),
     mode: str = Form("merge"),  # merge | replace
+    request: Request = None,
     current_user: dict = Depends(require_super_admin),
 ):
     """استيراد بنية الإدارة من ملف JSON (merge: يضيف/يحدّث، replace: يستبدل الشركات والمجمعات)"""
@@ -409,11 +424,15 @@ async def import_full_structure(
     imported_compounds = 0
     updated_companies = 0
     updated_compounds = 0
+    deleted_companies = 0
+    deleted_compounds = 0
 
     if mode == "replace":
         # خطر: يحذف كل الشركات والمجمعات الحالية
-        await db.companies.delete_many({})
-        await db.compounds.delete_many({})
+        del_co = await db.companies.delete_many({})
+        del_cp = await db.compounds.delete_many({})
+        deleted_companies = del_co.deleted_count
+        deleted_compounds = del_cp.deleted_count
 
     for co in companies_in:
         if not co.get("id") or not co.get("name"):
@@ -440,6 +459,23 @@ async def import_full_structure(
             await db.compounds.insert_one(cpd)
             imported_compounds += 1
 
+    await audit_log(
+        actor=current_user,
+        action=f"structure.import_{mode}",
+        target_type="system",
+        details={
+            "mode": mode,
+            "filename": getattr(file, "filename", None),
+            "imported_companies": imported_companies,
+            "updated_companies": updated_companies,
+            "imported_compounds": imported_compounds,
+            "updated_compounds": updated_compounds,
+            "deleted_companies": deleted_companies,
+            "deleted_compounds": deleted_compounds,
+        },
+        request=request,
+    )
+
     return {
         "success": True, "mode": mode,
         "imported_companies": imported_companies, "updated_companies": updated_companies,
@@ -448,7 +484,7 @@ async def import_full_structure(
 
 
 @router.get("/super-admin/export-full-structure")
-async def export_full_structure(current_user: dict = Depends(require_super_admin)):
+async def export_full_structure(request: Request = None, current_user: dict = Depends(require_super_admin)):
     """تصدير بنية الإدارة كاملة (Companies + Compounds + Users + Subscriptions) كملف JSON قابل للتنزيل
     
     Performance: 5 reads + JSON serialization run concurrently. Was previously 5 sequential awaits
@@ -489,6 +525,22 @@ async def export_full_structure(current_user: dict = Depends(require_super_admin
     )
     buffer = io.BytesIO(encoded)
     filename = f"homeme-structure-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M')}.json"
+
+    # Audit the sensitive data export (PII / financial data leaves the system)
+    await audit_log(
+        actor=current_user,
+        action="structure.export",
+        target_type="system",
+        details={
+            "filename": filename,
+            "size_bytes": len(encoded),
+            "companies": len(companies),
+            "compounds": len(compounds),
+            "users": len(users),
+        },
+        request=request,
+    )
+
     return StreamingResponse(
         buffer,
         media_type="application/json",
@@ -497,7 +549,7 @@ async def export_full_structure(current_user: dict = Depends(require_super_admin
 
 
 @router.put("/super-admin/companies/{company_id}")
-async def update_management_company(company_id: str, payload: dict, current_user: dict = Depends(require_super_admin)):
+async def update_management_company(company_id: str, payload: dict, request: Request = None, current_user: dict = Depends(require_super_admin)):
     """تعديل بيانات شركة إدارة"""
     db = get_db()
     company = await db.companies.find_one({"id": company_id}, {"_id": 0})
@@ -508,12 +560,16 @@ async def update_management_company(company_id: str, payload: dict, current_user
     if not update:
         raise HTTPException(status_code=400, detail="لا توجد حقول صالحة للتحديث")
     update["updated_at"] = datetime.now(timezone.utc).isoformat()
+    before_snapshot = {k: company.get(k) for k in update.keys() if k != "updated_at"}
     await db.companies.update_one({"id": company_id}, {"$set": update})
+    await audit_log(actor=current_user, action="company.update", target_type="company",
+                    target_id=company_id, before=before_snapshot, after=update,
+                    details={"fields": list(update.keys())}, request=request)
     return {"success": True, "updated": list(update.keys())}
 
 
 @router.post("/super-admin/companies/{company_id}/compounds")
-async def add_compound_to_company(company_id: str, payload: dict, current_user: dict = Depends(require_super_admin)):
+async def add_compound_to_company(company_id: str, payload: dict, request: Request = None, current_user: dict = Depends(require_super_admin)):
     """إضافة مجمع جديد تحت شركة إدارة محددة"""
     db = get_db()
     company = await db.companies.find_one({"id": company_id}, {"_id": 0})
@@ -540,6 +596,9 @@ async def add_compound_to_company(company_id: str, payload: dict, current_user: 
         {"$addToSet": {"compound_ids": compound_doc["id"]}}
     )
     compound_doc.pop("_id", None)
+    await audit_log(actor=current_user, action="compound.create", target_type="compound",
+                    target_id=compound_doc["id"],
+                    details={"name": name, "company_id": company_id, "company_name": company.get("name")}, request=request)
     return {"success": True, "compound": serialize_datetime(compound_doc)}
 
 

@@ -199,6 +199,18 @@ async def create_user(request: Request, user_data: UserCreate, current_user: dic
         result = await db.users.insert_one(user_doc)
 
         if result.inserted_id:
+            # Audit the user creation (admin/super_admin/company_admin actions)
+            try:
+                from audit_logger import audit_log
+                await audit_log(
+                    actor=current_user, action="user.create", target_type="user",
+                    target_id=user_doc["id"],
+                    details={"username": user_data.username, "email": user_data.email,
+                             "role": user_data.role, "compound_id": target_compound},
+                    request=request,
+                )
+            except Exception:
+                pass
             # Send credentials email (fire-and-forget; failures don't block creation)
             if user_data.email:
                 try:
@@ -230,6 +242,7 @@ async def create_user(request: Request, user_data: UserCreate, current_user: dic
 async def update_user_status(
     user_id: str,
     status_data: dict,
+    request: Request = None,
     current_user: dict = Depends(require_admin)
 ):
     """Update user active/inactive status (Admin only)"""
@@ -246,7 +259,18 @@ async def update_user_status(
         
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="User not found")
-        
+
+        try:
+            from audit_logger import audit_log
+            await audit_log(
+                actor=current_user,
+                action="user.activate" if is_active else "user.deactivate",
+                target_type="user", target_id=user_id,
+                details={"is_active": is_active}, request=request,
+            )
+        except Exception:
+            pass
+
         return {"message": f"User {'activated' if is_active else 'deactivated'} successfully"}
         
     except HTTPException:
@@ -275,6 +299,7 @@ async def get_user_details(user_id: str, current_user: dict = Depends(require_ad
 async def update_user(
     user_id: str,
     payload: dict,
+    request: Request = None,
     current_user: dict = Depends(require_admin)
 ):
     """Update editable user fields (Admin only).
@@ -307,7 +332,22 @@ async def update_user(
     if not update_data:
         raise HTTPException(status_code=400, detail="لا توجد حقول صالحة للتحديث")
 
+    before_snapshot = {k: existing.get(k) for k in update_data.keys()}
     await db.users.update_one({"id": user_id}, {"$set": update_data})
+
+    try:
+        from audit_logger import audit_log
+        # Use a specific action for role changes (security-sensitive)
+        action = "user.role_change" if "role" in update_data and existing.get("role") != update_data.get("role") else "user.update"
+        await audit_log(
+            actor=current_user, action=action, target_type="user", target_id=user_id,
+            before=before_snapshot, after=update_data,
+            details={"fields": list(update_data.keys()), "username": existing.get("username")},
+            request=request,
+        )
+    except Exception:
+        pass
+
     updated = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
     return {"message": "تم تحديث المستخدم بنجاح", "user": updated}
 

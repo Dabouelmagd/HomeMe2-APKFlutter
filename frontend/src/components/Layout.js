@@ -1109,8 +1109,8 @@ const Layout = ({ children, isTrialMode = false }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col h-screen lg:ml-0 overflow-hidden">
         {/* Top bar - Fixed */}
-        <div className="flex-shrink-0 sticky top-0 z-10 bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6">
+        <div className="flex-shrink-0 sticky top-0 z-10 bg-white shadow-sm border-b border-gray-200 overflow-x-hidden">
+          <div className="flex items-center justify-between h-16 px-3 sm:px-6 gap-2">
             <button
               className="lg:hidden"
               onClick={() => setSidebarOpen(true)}
@@ -1118,7 +1118,7 @@ const Layout = ({ children, isTrialMode = false }) => {
               <Bars3Icon className="h-6 w-6 text-gray-500" />
             </button>
 
-            <div className="flex-1 min-w-0 mx-4 search-container relative">
+            <div className="flex-1 min-w-0 mx-2 sm:mx-4 search-container relative">
               {/* Modern Search Bar */}
               <div className="relative w-full max-w-2xl">
                 <div className="relative">
@@ -1227,9 +1227,9 @@ const Layout = ({ children, isTrialMode = false }) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 rtl:flex-row-reverse">
-              {/* User Info Card */}
-              <div className={`flex items-center backdrop-blur-sm px-3 py-2 rounded-lg border shadow-sm ${
+            <div className="flex items-center gap-2 sm:gap-3 rtl:flex-row-reverse flex-shrink-0">
+              {/* User Info Card — hidden on mobile to prevent header overflow */}
+              <div className={`hidden md:flex items-center backdrop-blur-sm px-3 py-2 rounded-lg border shadow-sm ${
                 (activeRole === 'app_owner') ? 'bg-rose-50/80 border-rose-200' :
                 (activeRole === 'super_admin') ? 'bg-purple-50/80 border-purple-200' :
                 'bg-white/80 border-gray-200'
@@ -1262,26 +1262,36 @@ const Layout = ({ children, isTrialMode = false }) => {
                 </div>
               </div>
 
-              {/* Compound Switcher — Quick navigation across company's compounds */}
-              <CompoundSwitcher />
+              {/* Compound Switcher — Quick navigation across company's compounds (hidden on small screens) */}
+              <div className="hidden lg:block flex-shrink-0">
+                <CompoundSwitcher />
+              </div>
 
               {/* Subscription Badge — plan status + days remaining + renewal CTA */}
-              <SubscriptionBadge />
+              <div className="hidden md:block flex-shrink-0">
+                <SubscriptionBadge />
+              </div>
 
               {/* Session Switcher */}
-              <SessionSwitcher />
+              <div className="hidden lg:block flex-shrink-0">
+                <SessionSwitcher />
+              </div>
 
               {/* Plan Limit Badge — proactive upgrade CTA for company_admin */}
-              <PlanLimitBadge />
+              <div className="hidden lg:block flex-shrink-0">
+                <PlanLimitBadge />
+              </div>
 
               {/* Quick Account Switcher — linked accounts pills */}
-              <QuickAccountSwitcher />
+              <div className="hidden lg:block flex-shrink-0">
+                <QuickAccountSwitcher />
+              </div>
 
               {/* Theme Toggle */}
               <ThemeToggle />
 
-              {/* Language Switcher */}
-              <div className="flex items-center">
+              {/* Language Switcher — hidden on extra-small screens */}
+              <div className="hidden sm:flex items-center flex-shrink-0">
                 <LanguageSwitcher />
               </div>
 

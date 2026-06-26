@@ -19,11 +19,33 @@ const auth = () => ({ headers: { Authorization: `Bearer ${localStorage.getItem('
 
 const ACTION_META = {
   'auth.login': { icon: '🔐', label: 'تسجيل دخول', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  'auth.logout': { icon: '🚪', label: 'تسجيل خروج', color: 'bg-slate-50 text-slate-700 border-slate-200' },
+  'auth.login_failed': { icon: '⚠️', label: 'فشل تسجيل دخول', color: 'bg-rose-50 text-rose-700 border-rose-200' },
+  'auth.password_change': { icon: '🔑', label: 'تغيير كلمة المرور', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+  'auth.2fa_enable': { icon: '🛡️', label: 'تفعيل 2FA', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  'auth.2fa_disable': { icon: '🔓', label: 'تعطيل 2FA', color: 'bg-rose-50 text-rose-700 border-rose-200' },
   'invite.create': { icon: '📨', label: 'إنشاء دعوة', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   'invite.revoke': { icon: '🚫', label: 'إلغاء دعوة', color: 'bg-rose-50 text-rose-700 border-rose-200' },
+  'user.create': { icon: '➕', label: 'إنشاء مستخدم', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
   'user.delete': { icon: '🗑️', label: 'حذف مستخدم', color: 'bg-rose-100 text-rose-800 border-rose-200' },
   'user.update': { icon: '✏️', label: 'تعديل مستخدم', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+  'user.activate': { icon: '✅', label: 'تفعيل مستخدم', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  'user.deactivate': { icon: '⛔', label: 'إيقاف مستخدم', color: 'bg-orange-50 text-orange-700 border-orange-200' },
+  'user.role_change': { icon: '👑', label: 'تغيير صلاحية', color: 'bg-purple-50 text-purple-700 border-purple-200' },
   'role.change': { icon: '👑', label: 'تغيير صلاحية', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+  'company.create': { icon: '🏢', label: 'إنشاء شركة', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  'company.create_from_orphan': { icon: '🏢', label: 'إنشاء شركة من يتيم', color: 'bg-indigo-50 text-indigo-700 border-indigo-200' },
+  'company.update': { icon: '✏️', label: 'تعديل شركة', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+  'company.delete': { icon: '🗑️', label: 'حذف شركة', color: 'bg-rose-100 text-rose-800 border-rose-300' },
+  'company.link_admin': { icon: '🔗', label: 'ربط مدير شركة', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  'compound.create': { icon: '🏘️', label: 'إنشاء مجمع', color: 'bg-teal-50 text-teal-700 border-teal-200' },
+  'compound.link_to_company': { icon: '🔗', label: 'ربط مجمع بشركة', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  'compound.unlink_from_company': { icon: '🔓', label: 'فكّ ربط مجمع', color: 'bg-orange-50 text-orange-700 border-orange-200' },
+  'structure.import_merge': { icon: '📥', label: 'استيراد دمج', color: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
+  'structure.import_replace': { icon: '⚠️', label: 'استيراد استبدال', color: 'bg-rose-100 text-rose-800 border-rose-300' },
+  'structure.export': { icon: '📤', label: 'تصدير بنية كاملة', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+  'impersonate_start': { icon: '🎭', label: 'بدء انتحال شخصية', color: 'bg-rose-50 text-rose-700 border-rose-300' },
+  'impersonate_stop': { icon: '🛑', label: 'إيقاف انتحال شخصية', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
 };
 
 const formatDateTime = (iso) => {
@@ -67,6 +89,13 @@ const AuditRow = ({ entry }) => {
         <div className="text-[11px] text-gray-500 flex items-center gap-3 flex-wrap">
           <span className="inline-flex items-center gap-1"><UserCircleIcon className="w-3.5 h-3.5" />{entry.actor_full_name || entry.actor_username || '—'}{entry.actor_role ? ` (${entry.actor_role})` : ''}</span>
           {entry.ip && <span className="inline-flex items-center gap-1 font-mono"><GlobeAltIcon className="w-3.5 h-3.5" />{entry.ip}</span>}
+          {entry.geo?.country_code && (
+            <span className="inline-flex items-center gap-1 bg-slate-50 border border-slate-200 text-slate-700 px-1.5 py-0.5 rounded-md font-medium" title={`${entry.geo.country_name || ''}${entry.geo.city ? ' • ' + entry.geo.city : ''}`}>
+              <span className="text-[12px]">🌍</span>
+              <span className="font-mono">{entry.geo.country_code}</span>
+              {entry.geo.city && <span className="text-[10px] text-slate-500">/ {entry.geo.city}</span>}
+            </span>
+          )}
           <span>{formatDateTime(entry.at)}</span>
         </div>
       </div>
@@ -123,8 +152,11 @@ const AuditLogPage = () => {
 
   const exportCsv = () => {
     if (!items.length) { toast.error('لا توجد بيانات للتصدير'); return; }
-    const header = ['at', 'action', 'actor_username', 'actor_role', 'target_type', 'target_id', 'success', 'ip'];
-    const rows = items.map((i) => header.map((h) => `"${(i[h] ?? '').toString().replace(/"/g, '""')}"`).join(','));
+    const header = ['at', 'action', 'actor_username', 'actor_role', 'target_type', 'target_id', 'success', 'ip', 'country', 'city'];
+    const rows = items.map((i) => {
+      const flat = { ...i, country: i.geo?.country_code || '', city: i.geo?.city || '' };
+      return header.map((h) => `"${(flat[h] ?? '').toString().replace(/"/g, '""')}"`).join(',');
+    });
     const csv = [header.join(','), ...rows].join('\n');
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
@@ -133,6 +165,17 @@ const AuditLogPage = () => {
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(a.href);
     toast.success('تم تصدير CSV');
+  };
+
+  const backfillGeo = async () => {
+    try {
+      toast.info('جاري إثراء السجل بمعلومات البلدان...');
+      const res = await axios.post(`${API}/audit-logs/backfill-geo?days=${days}&limit=500`, {}, auth());
+      toast.success(`تم إثراء ${res.data?.enriched || 0} سجل من أصل ${res.data?.processed || 0}`);
+      load();
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || 'فشل إثراء السجل');
+    }
   };
 
   const distinctActions = useMemo(() => {
@@ -164,6 +207,9 @@ const AuditLogPage = () => {
             <button onClick={load} disabled={loading} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium disabled:opacity-50" data-testid="audit-reload">
               <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               تحديث
+            </button>
+            <button onClick={backfillGeo} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg font-medium" title="إثراء السجلات القديمة بمعلومات الدولة والمدينة" data-testid="audit-backfill-geo">
+              🌍 إثراء البلدان
             </button>
             <button onClick={exportCsv} className="inline-flex items-center gap-1.5 px-3 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium" data-testid="audit-export">
               <ArrowDownTrayIcon className="w-4 h-4" />
@@ -198,9 +244,9 @@ const AuditLogPage = () => {
         <span className="text-xs text-gray-500 mr-auto">الإجمالي: <strong>{total}</strong> حدث</span>
       </div>
 
-      {/* Top actors / actions */}
+      {/* Top actors / actions / countries */}
       {summary && summary.top_actors?.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
           <div className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="text-xs font-bold text-gray-500 mb-2">⚡ أكثر العمليات</div>
             <div className="space-y-1">
@@ -222,6 +268,23 @@ const AuditLogPage = () => {
                 </div>
               ))}
             </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 p-4" data-testid="top-countries-widget">
+            <div className="text-xs font-bold text-gray-500 mb-2">🌍 أكثر الدول</div>
+            {summary.top_countries && summary.top_countries.length > 0 ? (
+              <div className="space-y-1">
+                {summary.top_countries.slice(0, 5).map((c, idx) => (
+                  <div key={c.country_code || idx} className="flex items-center justify-between text-xs">
+                    <span className="inline-flex items-center gap-1.5"><span className="font-mono bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded text-[10px]">{c.country_code || '—'}</span>{c.country_name || ''}</span>
+                    <span className="font-bold">{c.count}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-[11px] text-gray-400">
+                لا توجد بيانات جغرافية بعد — اضغط <span className="font-bold text-amber-600">🌍 إثراء البلدان</span> لإثراء السجلات
+              </div>
+            )}
           </div>
         </div>
       )}

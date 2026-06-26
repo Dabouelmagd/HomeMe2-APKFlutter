@@ -49,9 +49,27 @@ async def audit_log(
 ) -> Optional[str]:
     """Persist a single audit-log entry. Best-effort — never raises.
     Returns the inserted document id, or None on failure.
+    Auto-enriches `geo` (country/city) from cached GeoIP lookup when IP is public.
     """
     try:
         db = get_db()
+        ip = _client_ip(request)
+        # Best-effort geo enrichment (uses cache → MaxMind → ip-api fallback)
+        geo = None
+        if ip:
+            try:
+                from services.geoip_service import geoip_lookup
+                g = await geoip_lookup(ip)
+                if g:
+                    geo = {
+                        "country_code": g.get("country_code"),
+                        "country_name": g.get("country_name"),
+                        "city": g.get("city"),
+                        "source": g.get("source"),
+                    }
+            except Exception:
+                geo = None
+
         doc = {
             "id": str(uuid.uuid4()),
             "at": datetime.now(timezone.utc).isoformat(),
@@ -61,7 +79,8 @@ async def audit_log(
             "actor_role": (actor or {}).get("role"),
             "actor_compound_id": (actor or {}).get("compound_id"),
             "actor_company_id": (actor or {}).get("company_id"),
-            "ip": _client_ip(request),
+            "ip": ip,
+            "geo": geo,
             "ua": (request.headers.get("user-agent") if request else None) or None,
             "action": action,
             "target_type": target_type,

@@ -19,6 +19,7 @@ from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from typing import List, Dict, Optional
 from datetime import datetime, timezone
+import asyncio
 import io
 import re
 import uuid
@@ -254,40 +255,42 @@ async def _enforce_tenant(db, current_user: dict, compound_id: str):
 
 @router.get("/residents/bulk-import/template")
 async def download_template(current_user: dict = Depends(require_admin)):
-    """Download a blank Excel template with proper headers + sample row."""
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "السكان"
-    # RTL sheet
-    ws.sheet_view.rightToLeft = True
-    # Headers
-    ws.append(TEMPLATE_HEADERS)
-    # Sample row to guide users
-    ws.append([
-        "أحمد محمد علي", "A-12", "01001234567",
-        "ahmed@example.com", "ahmed_a12", "Pass1234!",
-        "resident", "29012345678901"
-    ])
-    ws.append([
-        "ساره خالد إبراهيم", "B-7", "01112345678",
-        "", "", "", "resident", ""
-    ])
-    # Set column widths
-    for col_letter, width in zip("ABCDEFGH", [25, 12, 16, 28, 18, 16, 28, 18]):
-        ws.column_dimensions[col_letter].width = width
-    # Bold header row
-    from openpyxl.styles import Font, PatternFill, Alignment
-    bold = Font(bold=True, color="FFFFFF")
-    fill = PatternFill("solid", fgColor="6366F1")
-    align = Alignment(horizontal="center", vertical="center")
-    for cell in ws[1]:
-        cell.font = bold
-        cell.fill = fill
-        cell.alignment = align
+    """Download a blank Excel template with proper headers + sample row.
+    
+    Performance: openpyxl workbook generation moved to threadpool so it doesn't
+    block the FastAPI event loop while other requests are in flight.
+    """
+    def _build_template():
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "السكان"
+        ws.sheet_view.rightToLeft = True
+        ws.append(TEMPLATE_HEADERS)
+        ws.append([
+            "أحمد محمد علي", "A-12", "01001234567",
+            "ahmed@example.com", "ahmed_a12", "Pass1234!",
+            "resident", "29012345678901"
+        ])
+        ws.append([
+            "ساره خالد إبراهيم", "B-7", "01112345678",
+            "", "", "", "resident", ""
+        ])
+        for col_letter, width in zip("ABCDEFGH", [25, 12, 16, 28, 18, 16, 28, 18]):
+            ws.column_dimensions[col_letter].width = width
+        from openpyxl.styles import Font, PatternFill, Alignment
+        bold = Font(bold=True, color="FFFFFF")
+        fill = PatternFill("solid", fgColor="6366F1")
+        align = Alignment(horizontal="center", vertical="center")
+        for cell in ws[1]:
+            cell.font = bold
+            cell.fill = fill
+            cell.alignment = align
+        out = io.BytesIO()
+        wb.save(out)
+        out.seek(0)
+        return out
 
-    out = io.BytesIO()
-    wb.save(out)
-    out.seek(0)
+    out = await asyncio.to_thread(_build_template)
     return StreamingResponse(
         out,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

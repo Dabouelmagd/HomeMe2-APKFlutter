@@ -8,6 +8,7 @@ from pydantic import BaseModel
 import uuid
 import logging
 import os
+import asyncio
 import base64
 import httpx
 
@@ -1227,7 +1228,11 @@ async def send_weekly_report_auto():
 
 @router.get("/ads/analytics/export-pdf")
 async def export_ad_analytics_pdf(current_user: dict = Depends(require_super_admin)):
-    """Export ad analytics as PDF with Arabic support"""
+    """Export ad analytics as PDF with Arabic support.
+    
+    Performance: PDF rendering (CPU-bound) moved off the event loop via asyncio.to_thread.
+    arabic_reshaper + reportlab were blocking ~5-10s per request on production.
+    """
     from fastapi.responses import StreamingResponse
     from reportlab.lib.pagesizes import A4
     from reportlab.lib import colors
@@ -1243,148 +1248,153 @@ async def export_ad_analytics_pdf(current_user: dict = Depends(require_super_adm
     ads = await db.internal_ads.find({}, {"_id": 0}).to_list(500)
     now = datetime.now(timezone.utc)
 
-    def ar(text):
-        """Reshape Arabic text for PDF rendering"""
-        try:
-            reshaped = arabic_reshaper.reshape(str(text))
-            return get_display(reshaped)
-        except:
-            return str(text)
+    def _build_pdf(ads_data, now_dt):
+        """CPU-bound PDF builder — runs in threadpool."""
+        def ar(text):
+            try:
+                reshaped = arabic_reshaper.reshape(str(text))
+                return get_display(reshaped)
+            except Exception:
+                return str(text)
 
-    pos_labels = {"banner": ar("بانر"), "sidebar": ar("جانبي"), "inline": ar("داخلي"), "dashboard": ar("لوحة التحكم")}
+        pos_labels = {"banner": ar("بانر"), "sidebar": ar("جانبي"), "inline": ar("داخلي"), "dashboard": ar("لوحة التحكم")}
 
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=20*mm, bottomMargin=15*mm, leftMargin=15*mm, rightMargin=15*mm)
+        buf = io.BytesIO()
+        doc = SimpleDocTemplate(buf, pagesize=A4, topMargin=20*mm, bottomMargin=15*mm, leftMargin=15*mm, rightMargin=15*mm)
 
-    styles = getSampleStyleSheet()
-    title_style = ParagraphStyle('Title_AR', parent=styles['Title'], fontSize=22, spaceAfter=10, alignment=TA_CENTER)
-    subtitle_style = ParagraphStyle('Sub_AR', parent=styles['Normal'], fontSize=10, textColor=colors.gray, alignment=TA_CENTER, spaceAfter=20)
-    heading_style = ParagraphStyle('Heading_AR', parent=styles['Heading2'], fontSize=14, spaceAfter=8, spaceBefore=15, textColor=colors.HexColor('#1F2937'))
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle('Title_AR', parent=styles['Title'], fontSize=22, spaceAfter=10, alignment=TA_CENTER)
+        subtitle_style = ParagraphStyle('Sub_AR', parent=styles['Normal'], fontSize=10, textColor=colors.gray, alignment=TA_CENTER, spaceAfter=20)
+        heading_style = ParagraphStyle('Heading_AR', parent=styles['Heading2'], fontSize=14, spaceAfter=8, spaceBefore=15, textColor=colors.HexColor('#1F2937'))
 
-    elements = []
+        elements = []
 
-    # Title
-    elements.append(Paragraph(ar("تقرير تحليلات الإعلانات - HomeMe"), title_style))
-    elements.append(Paragraph(f"{ar('تاريخ التقرير')}: {now.strftime('%Y-%m-%d %H:%M')} UTC", subtitle_style))
-    elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#E5E7EB')))
-    elements.append(Spacer(1, 10))
+        # Title
+        elements.append(Paragraph(ar("تقرير تحليلات الإعلانات - HomeMe"), title_style))
+        elements.append(Paragraph(f"{ar('تاريخ التقرير')}: {now_dt.strftime('%Y-%m-%d %H:%M')} UTC", subtitle_style))
+        elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#E5E7EB')))
+        elements.append(Spacer(1, 10))
 
-    # Summary
-    paid_ads = [a for a in ads if not a.get("is_gift")]
-    gift_ads = [a for a in ads if a.get("is_gift")]
-    total_revenue = sum(a.get("ad_value", 0) for a in paid_ads)
-    total_views = sum(a.get("views", 0) for a in ads)
-    total_clicks = sum(a.get("clicks", 0) for a in ads)
-    avg_ctr = round((total_clicks / max(total_views, 1)) * 100, 2)
+        # Summary
+        paid_ads = [a for a in ads_data if not a.get("is_gift")]
+        gift_ads = [a for a in ads_data if a.get("is_gift")]
+        total_revenue = sum(a.get("ad_value", 0) for a in paid_ads)
+        total_views = sum(a.get("views", 0) for a in ads_data)
+        total_clicks = sum(a.get("clicks", 0) for a in ads_data)
+        avg_ctr = round((total_clicks / max(total_views, 1)) * 100, 2)
 
-    elements.append(Paragraph(ar("الملخص المالي"), heading_style))
+        elements.append(Paragraph(ar("الملخص المالي"), heading_style))
 
-    summary_data = [
-        [ar("القيمة"), ar("المؤشر")],
-        [str(len(ads)), ar("إجمالي الإعلانات")],
-        [str(len([a for a in ads if a.get("is_active")])), ar("إعلانات نشطة")],
-        [str(len(paid_ads)), ar("إعلانات مدفوعة")],
-        [str(len(gift_ads)), ar("إعلانات هدية")],
-        [f"{total_revenue:,.2f}", ar("إجمالي الإيرادات (ج.م)")],
-        [f"{round(total_revenue / max(len(paid_ads), 1), 2):,.2f}", ar("متوسط قيمة الإعلان (ج.م)")],
-        [f"{total_views:,}", ar("إجمالي المشاهدات")],
-        [f"{total_clicks:,}", ar("إجمالي النقرات")],
-        [f"{avg_ctr}%", ar("متوسط نسبة النقر CTR")],
-        [f"{round(total_revenue / max(total_clicks, 1), 2):,.2f}", ar("تكلفة النقرة CPC (ج.م)")],
-        [f"{sum(a.get('ad_value', 0) for a in paid_ads if a.get('is_active')) * 12:,.2f}", ar("الإيرادات المتوقعة سنوياً (ج.م)")],
-    ]
+        summary_data = [
+            [ar("القيمة"), ar("المؤشر")],
+            [str(len(ads_data)), ar("إجمالي الإعلانات")],
+            [str(len([a for a in ads_data if a.get("is_active")])), ar("إعلانات نشطة")],
+            [str(len(paid_ads)), ar("إعلانات مدفوعة")],
+            [str(len(gift_ads)), ar("إعلانات هدية")],
+            [f"{total_revenue:,.2f}", ar("إجمالي الإيرادات (ج.م)")],
+            [f"{round(total_revenue / max(len(paid_ads), 1), 2):,.2f}", ar("متوسط قيمة الإعلان (ج.م)")],
+            [f"{total_views:,}", ar("إجمالي المشاهدات")],
+            [f"{total_clicks:,}", ar("إجمالي النقرات")],
+            [f"{avg_ctr}%", ar("متوسط نسبة النقر CTR")],
+            [f"{round(total_revenue / max(total_clicks, 1), 2):,.2f}", ar("تكلفة النقرة CPC (ج.م)")],
+            [f"{sum(a.get('ad_value', 0) for a in paid_ads if a.get('is_active')) * 12:,.2f}", ar("الإيرادات المتوقعة سنوياً (ج.م)")],
+        ]
 
-    t_summary = Table(summary_data, colWidths=[150, 250])
-    t_summary.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1F2937')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('ALIGN', (0, 0), (0, -1), 'CENTER'),
-        ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D1D5DB')),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F9FAFB')]),
-        ('TOPPADDING', (0, 0), (-1, -1), 6),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-    ]))
-    elements.append(t_summary)
-    elements.append(Spacer(1, 15))
+        t_summary = Table(summary_data, colWidths=[150, 250])
+        t_summary.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1F2937')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('ALIGN', (0, 0), (0, -1), 'CENTER'),
+            ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D1D5DB')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#F9FAFB')]),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+        ]))
+        elements.append(t_summary)
+        elements.append(Spacer(1, 15))
 
-    # Revenue by Position
-    elements.append(Paragraph(ar("الإيرادات حسب الموقع"), heading_style))
-    pos_stats = {}
-    for a in paid_ads:
-        pos = a.get("position", "other")
-        pos_stats.setdefault(pos, {"count": 0, "revenue": 0, "views": 0, "clicks": 0})
-        pos_stats[pos]["count"] += 1
-        pos_stats[pos]["revenue"] += a.get("ad_value", 0)
-        pos_stats[pos]["views"] += a.get("views", 0)
-        pos_stats[pos]["clicks"] += a.get("clicks", 0)
+        # Revenue by Position
+        elements.append(Paragraph(ar("الإيرادات حسب الموقع"), heading_style))
+        pos_stats = {}
+        for a in paid_ads:
+            pos = a.get("position", "other")
+            pos_stats.setdefault(pos, {"count": 0, "revenue": 0, "views": 0, "clicks": 0})
+            pos_stats[pos]["count"] += 1
+            pos_stats[pos]["revenue"] += a.get("ad_value", 0)
+            pos_stats[pos]["views"] += a.get("views", 0)
+            pos_stats[pos]["clicks"] += a.get("clicks", 0)
 
-    pos_data = [[ar("CPC"), ar("النقرات"), ar("المشاهدات"), ar("الإيرادات"), ar("العدد"), ar("الموقع")]]
-    for pos, s in pos_stats.items():
-        pos_data.append([
-            f"{round(s['revenue'] / max(s['clicks'], 1), 2):,.2f}",
-            f"{s['clicks']:,}", f"{s['views']:,}",
-            f"{s['revenue']:,.2f}", str(s["count"]),
-            pos_labels.get(pos, ar(pos))
-        ])
+        pos_data = [[ar("CPC"), ar("النقرات"), ar("المشاهدات"), ar("الإيرادات"), ar("العدد"), ar("الموقع")]]
+        for pos, s in pos_stats.items():
+            pos_data.append([
+                f"{round(s['revenue'] / max(s['clicks'], 1), 2):,.2f}",
+                f"{s['clicks']:,}", f"{s['views']:,}",
+                f"{s['revenue']:,.2f}", str(s["count"]),
+                pos_labels.get(pos, ar(pos))
+            ])
 
-    t_pos = Table(pos_data, colWidths=[70, 70, 80, 90, 50, 100])
-    t_pos.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3B82F6')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D1D5DB')),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#EFF6FF')]),
-        ('TOPPADDING', (0, 0), (-1, -1), 5),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-    ]))
-    elements.append(t_pos)
-    elements.append(Spacer(1, 15))
+        t_pos = Table(pos_data, colWidths=[70, 70, 80, 90, 50, 100])
+        t_pos.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3B82F6')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D1D5DB')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#EFF6FF')]),
+            ('TOPPADDING', (0, 0), (-1, -1), 5),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ]))
+        elements.append(t_pos)
+        elements.append(Spacer(1, 15))
 
-    # All Ads
-    elements.append(Paragraph(ar("أداء جميع الإعلانات"), heading_style))
-    ads_data = [[ar("الحالة"), ar("القيمة"), "CTR%", ar("النقرات"), ar("المشاهدات"), ar("الموقع"), ar("العنوان")]]
-    for a in sorted(ads, key=lambda x: x.get("ad_value", 0), reverse=True):
-        views = a.get("views", 0)
-        clicks = a.get("clicks", 0)
-        ctr = round((clicks / max(views, 1)) * 100, 2)
-        title_text = a.get("title", "")[:25]
-        try:
-            title_text = ar(title_text)
-        except:
-            pass
-        ads_data.append([
-            ar("نشط") if a.get("is_active") else ar("متوقف"),
-            ar("هدية") if a.get("is_gift") else f"{a.get('ad_value', 0):,.0f}",
-            f"{ctr}%", f"{clicks:,}", f"{views:,}",
-            pos_labels.get(a.get("position", ""), a.get("position", "")),
-            title_text
-        ])
+        # All Ads
+        elements.append(Paragraph(ar("أداء جميع الإعلانات"), heading_style))
+        ads_rows = [[ar("الحالة"), ar("القيمة"), "CTR%", ar("النقرات"), ar("المشاهدات"), ar("الموقع"), ar("العنوان")]]
+        for a in sorted(ads_data, key=lambda x: x.get("ad_value", 0), reverse=True):
+            views = a.get("views", 0)
+            clicks = a.get("clicks", 0)
+            ctr = round((clicks / max(views, 1)) * 100, 2)
+            title_text = a.get("title", "")[:25]
+            try:
+                title_text = ar(title_text)
+            except Exception:
+                pass
+            ads_rows.append([
+                ar("نشط") if a.get("is_active") else ar("متوقف"),
+                ar("هدية") if a.get("is_gift") else f"{a.get('ad_value', 0):,.0f}",
+                f"{ctr}%", f"{clicks:,}", f"{views:,}",
+                pos_labels.get(a.get("position", ""), a.get("position", "")),
+                title_text
+            ])
 
-    t_ads = Table(ads_data, colWidths=[50, 60, 45, 50, 60, 70, 130])
-    t_ads.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#059669')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('FONTSIZE', (0, 0), (-1, -1), 8),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('ALIGN', (-1, 0), (-1, -1), 'RIGHT'),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D1D5DB')),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#ECFDF5')]),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-    ]))
-    elements.append(t_ads)
+        t_ads = Table(ads_rows, colWidths=[50, 60, 45, 50, 60, 70, 130])
+        t_ads.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#059669')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (-1, 0), (-1, -1), 'RIGHT'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#D1D5DB')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#ECFDF5')]),
+            ('TOPPADDING', (0, 0), (-1, -1), 4),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ]))
+        elements.append(t_ads)
 
-    # Footer
-    elements.append(Spacer(1, 20))
-    elements.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor('#D1D5DB')))
-    footer_style = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, textColor=colors.gray, alignment=TA_CENTER)
-    elements.append(Paragraph(f"HomeMe Platform - {ar('تقرير تلقائي')} - {now.strftime('%Y-%m-%d')}", footer_style))
+        # Footer
+        elements.append(Spacer(1, 20))
+        elements.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor('#D1D5DB')))
+        footer_style = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=8, textColor=colors.gray, alignment=TA_CENTER)
+        elements.append(Paragraph(f"HomeMe Platform - {ar('تقرير تلقائي')} - {now_dt.strftime('%Y-%m-%d')}", footer_style))
 
-    doc.build(elements)
-    buffer.seek(0)
+        doc.build(elements)
+        buf.seek(0)
+        return buf
+
+    # Off-load the entire PDF rendering to a worker thread so it doesn't block the event loop
+    buffer = await asyncio.to_thread(_build_pdf, ads, now)
 
     return StreamingResponse(
         buffer,

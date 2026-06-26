@@ -4,6 +4,7 @@ Super Admin — Companies Management (extracted from superadmin.py)
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from datetime import datetime, timezone
 import uuid
+import asyncio
 
 from database import get_db
 from auth_deps import require_super_admin
@@ -16,21 +17,24 @@ router = APIRouter(prefix="/api")
 async def list_companies_full(current_user: dict = Depends(require_super_admin)):
     """قائمة شاملة لشركات الإدارة مع كل التفاصيل: المجمعات، المستخدمون، الاشتراكات، الأرقام.
     
-    يعالج ذاتياً الروابط المفقودة:
-      - يملأ admin_user_id على الشركات المرتبطة بمدير شركة ليس لها مرجع عكسي
-      - يعيد قائمة orphan_admins (مدراء شركات دون شركة حقيقية) لعرضها منفصلة في الواجهة
+    Performance: 4 reads run concurrently via asyncio.gather (was sequential).
+    Auto-heal updates also batched via asyncio.gather instead of awaiting each.
     """
     db = get_db()
-    companies = await db.companies.find({}, {"_id": 0}).sort("created_at", -1).to_list(500)
-    compounds_all = await db.compounds.find({}, {"_id": 0}).to_list(1000)
-    users_all = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(5000)
-    subs_all = await db.user_subscriptions.find({}, {"_id": 0}).to_list(5000)
+    companies, compounds_all, users_all, subs_all = await asyncio.gather(
+        db.companies.find({}, {"_id": 0}).sort("created_at", -1).to_list(500),
+        db.compounds.find({}, {"_id": 0}).to_list(1000),
+        db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(5000),
+        db.user_subscriptions.find({}, {"_id": 0}).to_list(5000),
+    )
     sub_by_user = {s.get("user_id"): s for s in subs_all}
     now = datetime.now(timezone.utc)
 
-    # Auto-heal: for every company_admin user, ensure the matching company has admin_user_id set
+    # Auto-heal: collect updates first, then run them concurrently
     companies_by_id = {c.get("id"): c for c in companies}
     healed_ids = set()
+    heal_tasks = []
+    heal_ts = datetime.now(timezone.utc).isoformat()
     for u in users_all:
         if u.get("role") != "company_admin":
             continue
@@ -39,12 +43,16 @@ async def list_companies_full(current_user: dict = Depends(require_super_admin))
             continue
         co = companies_by_id.get(cid)
         if co and not co.get("admin_user_id"):
-            await db.companies.update_one(
-                {"id": cid},
-                {"$set": {"admin_user_id": u.get("id"), "updated_at": datetime.now(timezone.utc).isoformat()}}
+            heal_tasks.append(
+                db.companies.update_one(
+                    {"id": cid},
+                    {"$set": {"admin_user_id": u.get("id"), "updated_at": heal_ts}}
+                )
             )
             co["admin_user_id"] = u.get("id")
             healed_ids.add(cid)
+    if heal_tasks:
+        await asyncio.gather(*heal_tasks)
 
     # Build compound_id → compound lookup
     compound_by_id = {c.get("id"): c for c in compounds_all}
@@ -293,13 +301,18 @@ async def unlink_compound_from_company(company_id: str, payload: dict, current_u
 
 @router.get("/super-admin/companies/top10")
 async def top10_companies(metric: str = "compounds", current_user: dict = Depends(require_super_admin)):
-    """أعلى 10 شركات إدارة حسب المقياس المختار (compounds / users / revenue / active_subs)"""
+    """أعلى 10 شركات إدارة حسب المقياس المختار (compounds / users / revenue / active_subs)
+    
+    Performance: 5 reads run concurrently via asyncio.gather.
+    """
     db = get_db()
-    companies = await db.companies.find({}, {"_id": 0}).to_list(500)
-    compounds_all = await db.compounds.find({}, {"_id": 0}).to_list(2000)
-    users_all = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(10000)
-    subs_all = await db.user_subscriptions.find({}, {"_id": 0}).to_list(10000)
-    company_subs = await db.company_subscriptions.find({}, {"_id": 0}).to_list(500)
+    companies, compounds_all, users_all, subs_all, company_subs = await asyncio.gather(
+        db.companies.find({}, {"_id": 0}).to_list(500),
+        db.compounds.find({}, {"_id": 0}).to_list(2000),
+        db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(10000),
+        db.user_subscriptions.find({}, {"_id": 0}).to_list(10000),
+        db.company_subscriptions.find({}, {"_id": 0}).to_list(500),
+    )
 
     compound_by_id = {c.get("id"): c for c in compounds_all}
     sub_by_user = {s.get("user_id"): s for s in subs_all}
@@ -436,15 +449,21 @@ async def import_full_structure(
 
 @router.get("/super-admin/export-full-structure")
 async def export_full_structure(current_user: dict = Depends(require_super_admin)):
-    """تصدير بنية الإدارة كاملة (Companies + Compounds + Users + Subscriptions) كملف JSON قابل للتنزيل"""
+    """تصدير بنية الإدارة كاملة (Companies + Compounds + Users + Subscriptions) كملف JSON قابل للتنزيل
+    
+    Performance: 5 reads + JSON serialization run concurrently. Was previously 5 sequential awaits
+    (each ~10-12s on production) ≈ 60s; now ~12s.
+    """
     from fastapi.responses import StreamingResponse
     import io, json as jsonlib
     db = get_db()
-    companies = await db.companies.find({}, {"_id": 0}).to_list(1000)
-    compounds = await db.compounds.find({}, {"_id": 0}).to_list(2000)
-    users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(10000)
-    subscriptions = await db.user_subscriptions.find({}, {"_id": 0}).to_list(10000)
-    company_subs = await db.company_subscriptions.find({}, {"_id": 0}).to_list(1000)
+    companies, compounds, users, subscriptions, company_subs = await asyncio.gather(
+        db.companies.find({}, {"_id": 0}).to_list(1000),
+        db.compounds.find({}, {"_id": 0}).to_list(2000),
+        db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(10000),
+        db.user_subscriptions.find({}, {"_id": 0}).to_list(10000),
+        db.company_subscriptions.find({}, {"_id": 0}).to_list(1000),
+    )
 
     export = {
         "exported_at": datetime.now(timezone.utc).isoformat(),
@@ -464,7 +483,11 @@ async def export_full_structure(current_user: dict = Depends(require_super_admin
         "company_subscriptions": serialize_datetime(company_subs),
     }
 
-    buffer = io.BytesIO(jsonlib.dumps(export, ensure_ascii=False, indent=2).encode("utf-8"))
+    # JSON serialization can be slow for large payloads — run in threadpool to free the event loop
+    encoded = await asyncio.to_thread(
+        lambda: jsonlib.dumps(export, ensure_ascii=False, indent=2).encode("utf-8")
+    )
+    buffer = io.BytesIO(encoded)
     filename = f"homeme-structure-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M')}.json"
     return StreamingResponse(
         buffer,

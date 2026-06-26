@@ -80,6 +80,36 @@ async def ensure_indexes():
         # Feature #53 — banned_ips: login lookup is on (ip, active, expires_at)
         ("banned_ips", [("ip", 1), ("active", 1), ("expires_at", 1)]),
         ("banned_ips", [("active", 1), ("expires_at", -1)]),
+
+        # Iter151 — Performance: indexes for top-5 slowest endpoints
+        # Companies & compounds linkage lookups
+        ("companies", [("id", 1)]),
+        ("companies", [("admin_user_id", 1)]),
+        ("compounds", [("id", 1)]),
+        ("compounds", [("company_id", 1)]),
+        ("compounds", [("management_company_id", 1)]),
+        # user_subscriptions / company_subscriptions lookups
+        ("user_subscriptions", [("user_id", 1)]),
+        ("user_subscriptions", [("end_date", 1)]),
+        ("company_subscriptions", [("company_id", 1)]),
+        # Analytics dashboard hot paths — compound_id+created_at compound indexes already exist;
+        # add status+compound for maintenance_requests pending filter
+        ("maintenance_requests", [("compound_id", 1), ("status", 1)]),
+        # resident_payments aggregation needs created_at index alone for global scope
+        ("resident_payments", [("created_at", -1)]),
+        ("resident_charges", [("compound_id", 1), ("status", 1)]),
+        ("expenses", [("compound_id", 1), ("created_at", 1)]),
+        # Users last_login for engagement metric
+        ("users", [("last_login", -1)]),
+        ("users", [("created_at", 1)]),
+        # Activity logs for analytics activity_trend
+        ("activity_logs", [("timestamp", -1)]),
+        ("activity_logs", [("compound_id", 1), ("timestamp", -1)]),
+        # Revenue collection used by analytics monthly_comparison
+        ("revenue", [("compound_id", 1), ("date", 1)]),
+        ("revenue", [("date", 1)]),
+        # internal_ads for ads dashboard
+        ("internal_ads", [("is_active", 1)]),
     ]
 
     created = 0

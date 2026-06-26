@@ -2506,6 +2506,8 @@ from routes.system_health import router as system_health_router
 app.include_router(system_health_router)
 from routes.audit_logs import router as audit_logs_router
 app.include_router(audit_logs_router)
+from routes.whatsapp import router as whatsapp_router
+app.include_router(whatsapp_router)
 from routes.onboarding import router as onboarding_router
 app.include_router(onboarding_router)
 from routes.owner_kpis import router as owner_kpis_router

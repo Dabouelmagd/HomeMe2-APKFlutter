@@ -64,6 +64,7 @@ import JoinViaInvite from './pages/JoinViaInvite';
 import MyInvitesPage from './pages/MyInvitesPage';
 import SystemHealthPage from './pages/SystemHealthPage';
 import AuditLogPage from './pages/AuditLogPage';
+import WhatsAppPage from './pages/WhatsAppPage';
 import OwnerKpiPage from './pages/OwnerKpiPage';
 import ChangelogManagementPage from './pages/ChangelogManagementPage';
 import VisitorPassesPage from './pages/VisitorPassesPage';
@@ -914,6 +915,12 @@ function App() {
                 <Route path="audit-log" element={
                   <ProtectedRoute>
                     <AuditLogPage />
+                  </ProtectedRoute>
+                } />
+
+                <Route path="whatsapp" element={
+                  <ProtectedRoute>
+                    <WhatsAppPage />
                   </ProtectedRoute>
                 } />
 

@@ -235,3 +235,8 @@ frontend/node_modules/.cache/default-development/29.pack
 /app/backend/secrets/
 frontend/node_modules/.cache/default-development/14.pack
 frontend/node_modules/.cache/default-development/27.pack
+
+# HomeMe additional secrets (added iter156)
+server.log
+*.log
+memory/test_credentials.md

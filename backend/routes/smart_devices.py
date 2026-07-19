@@ -13,7 +13,7 @@ from database import get_db
 from auth_deps import get_current_user, require_admin
 from helpers import serialize_datetime
 from document_models import *
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from homeme_integrations.llm.chat import LlmChat, UserMessage
 
 router = APIRouter(prefix="/api")
 

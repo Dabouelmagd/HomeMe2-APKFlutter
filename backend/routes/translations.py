@@ -249,7 +249,7 @@ Return ONLY a valid JSON object with the key as property name and translation as
 {items_text}"""
 
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        from homeme_integrations.llm.chat import LlmChat, UserMessage
         api_key = os.environ.get("EMERGENT_LLM_KEY", "")
         if not api_key:
             raise HTTPException(500, "LLM key not configured")
@@ -331,7 +331,7 @@ Keep it short, professional, and natural. Return ONLY the translated text, nothi
 Text: {source_text}"""
 
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        from homeme_integrations.llm.chat import LlmChat, UserMessage
         api_key = os.environ.get("EMERGENT_LLM_KEY", "")
         if not api_key:
             raise HTTPException(500, "LLM key not configured")

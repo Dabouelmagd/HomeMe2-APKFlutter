@@ -8,7 +8,7 @@ import uuid
 import asyncio
 from dotenv import load_dotenv
 
-from emergentintegrations.payments.stripe.checkout import (
+from homeme_integrations.payments.stripe.checkout import (
     StripeCheckout, 
     CheckoutSessionResponse, 
     CheckoutStatusResponse, 

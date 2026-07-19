@@ -51,10 +51,10 @@ from websocket_manager import manager
 from webauthn_service import WebAuthnService, WebAuthnRegisterOptions, WebAuthnRegisterVerify, WebAuthnLoginOptions, WebAuthnLoginVerify
 
 # Import emergent integrations for LLM
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+from homeme_integrations.llm.chat import LlmChat, UserMessage
 
-# Import Stripe integration from emergentintegrations
-from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
+# Import Stripe integration from homeme_integrations
+from homeme_integrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
 # Import subscription models and code generator
 from subscription_models import *

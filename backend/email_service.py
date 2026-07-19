@@ -103,12 +103,18 @@ class EmailService:
                     part.add_header('Content-Disposition', f'attachment; filename="{att["filename"]}"')
                     msg.attach(part)
             
-            # Create SSL context and connect
+            # Create SSL context and connect - use STARTTLS for port 587, implicit SSL for 465
             context = ssl.create_default_context()
             
-            with smtplib.SMTP_SSL(self.smtp_host, self.smtp_port, context=context) as server:
-                server.login(mb['user'], mb['password'])
-                server.sendmail(mb['from_email'], to_email, msg.as_string())
+            if int(self.smtp_port) == 587:
+                with smtplib.SMTP(self.smtp_host, self.smtp_port, timeout=15) as server:
+                    server.starttls(context=context)
+                    server.login(mb['user'], mb['password'])
+                    server.sendmail(mb['from_email'], to_email, msg.as_string())
+            else:
+                with smtplib.SMTP_SSL(self.smtp_host, self.smtp_port, context=context, timeout=15) as server:
+                    server.login(mb['user'], mb['password'])
+                    server.sendmail(mb['from_email'], to_email, msg.as_string())
             
             success = True
             logger.info(f"Email sent successfully to {to_email} via mailbox={mailbox} attachments={len(attachments) if attachments else 0}")

@@ -350,7 +350,7 @@ async def ai_seo_suggest(payload: AISuggestionInput, current_user: dict = Depend
 أرجع JSON فقط بدون أي شرح."""
 
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage  # type: ignore
+        from homeme_integrations.llm.chat import LlmChat, UserMessage  # type: ignore
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"blog_seo_{datetime.now(timezone.utc).timestamp()}",

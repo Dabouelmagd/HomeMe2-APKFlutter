@@ -72,7 +72,7 @@ class PaymentService:
     async def initialize_stripe(self, webhook_url: str):
         """Initialize Stripe checkout with webhook URL"""
         try:
-            from emergentintegrations.payments.stripe.checkout import StripeCheckout
+            from homeme_integrations.payments.stripe.checkout import StripeCheckout
             self.stripe_checkout = StripeCheckout(
                 api_key=self.api_key,
                 webhook_url=webhook_url
@@ -104,7 +104,7 @@ class PaymentService:
         Create a Stripe checkout session
         Security: Amount is taken from backend package definition only
         """
-        from emergentintegrations.payments.stripe.checkout import CheckoutSessionRequest
+        from homeme_integrations.payments.stripe.checkout import CheckoutSessionRequest
         
         if not self.stripe_checkout:
             raise Exception("Stripe not initialized")

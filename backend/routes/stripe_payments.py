@@ -18,7 +18,7 @@ import os
 import uuid
 import logging
 
-from emergentintegrations.payments.stripe.checkout import (
+from homeme_integrations.payments.stripe.checkout import (
     StripeCheckout,
     CheckoutSessionResponse,
     CheckoutStatusResponse,
@@ -267,7 +267,7 @@ async def stripe_webhook(request: Request):
         logging.error(f"[stripe] webhook verification failed: {e}")
         raise HTTPException(status_code=400, detail="webhook invalid")
 
-    # emergentintegrations surfaces a unified response — activate on checkout.session.completed
+    # homeme_integrations surfaces a unified response — activate on checkout.session.completed
     db = get_db()
     if getattr(event, "event_type", "") in ("checkout.session.completed", "payment_intent.succeeded"):
         if getattr(event, "payment_status", "") == "paid":

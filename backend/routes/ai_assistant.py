@@ -217,7 +217,7 @@ async def chat(req: ChatRequest, current_user: dict = Depends(get_current_user))
 
     # Call LLM (lazy import to avoid startup cost)
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        from homeme_integrations.llm.chat import LlmChat, UserMessage
 
         llm = LlmChat(
             api_key=EMERGENT_LLM_KEY,

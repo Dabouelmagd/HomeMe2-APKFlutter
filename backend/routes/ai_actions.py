@@ -256,7 +256,7 @@ async def _generate_message(insight_id: str, recipient_count: int, compound_name
 ابدأ مباشرة بالرسالة بدون أي مقدمة منك."""
 
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        from homeme_integrations.llm.chat import LlmChat, UserMessage
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"action_{insight_id}_{datetime.now(timezone.utc).timestamp()}",

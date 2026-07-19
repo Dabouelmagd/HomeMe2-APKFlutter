@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  homeme-mongo:
+    image: mongo:6.0
+    container_name: homeme-mongo
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - homeme_mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: homeme
+    networks:
+      - homeme-net
+
+  homeme-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backend
+    container_name: homeme-backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8002:8001"
+    depends_on:
+      - homeme-mongo
+    environment:
+      MONGO_URL: "mongodb://homeme-mongo:27017"
+      DB_NAME: "homeme"
+      JWT_SECRET: "homeme-super-secret-jwt-key-2026"
+      FRONTEND_URL: "https://homemeapp.net"
+      BACKEND_URL: "https://homemeapp.net"
+      CORS_ORIGINS: "https://homemeapp.net,https://www.homemeapp.net"
+      SMTP_HOST: "gtxm1001.siteground.biz"
+      SMTP_PORT: "587"
+      SMTP_USER: "info@datalifeai.com"
+      SMTP_PASSWORD: "dl@2026EFIL#"
+      TWILIO_ACCOUNT_SID: "placeholder"
+      TWILIO_AUTH_TOKEN: "placeholder"
+      TWILIO_WHATSAPP_FROM: "whatsapp:+14155238886"
+      EMERGENT_LLM_KEY: "placeholder"
+    volumes:
+      - homeme_uploads:/app/uploads
+      - homeme_backups:/app/backups
+    networks:
+      - homeme-net
+
+  homeme-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: homeme-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3002:80"
+    networks:
+      - homeme-net
+
+volumes:
+  homeme_mongo_data:
+  homeme_uploads:
+  homeme_backups:
+
+networks:
+  homeme-net:
+    driver: bridge

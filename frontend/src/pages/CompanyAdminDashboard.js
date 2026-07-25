@@ -12,6 +12,7 @@ import CompoundsTrendChart from '../components/company-admin/CompoundsTrendChart
 import CrmRetentionPanel from '../components/company-admin/CrmRetentionPanel';
 import CompanyReferralPanel from '../components/company-admin/CompanyReferralPanel';
 import UserTimelineModal from '../components/UserTimelineModal';
+import CompanyAssistantsManager from '../components/company-admin/CompanyAssistantsManager';
 import PageHeader from '../components/shared/PageHeader';
 import SectionCard from '../components/shared/SectionCard';
 import EmptyState from '../components/shared/EmptyState';
@@ -48,6 +49,7 @@ const CompanyAdminDashboard = () => {
   const [addUserFor, setAddUserFor] = useState(null);
   const [inviteFor, setInviteFor] = useState(null);
   const [crmUser, setCrmUser] = useState(null);
+  const [teamFor, setTeamFor] = useState(null);
   const [error, setError] = useState(null);
   const [logoUploading, setLogoUploading] = useState(false);
   const [onboardingSkipped, setOnboardingSkipped] = useState(() => {
@@ -318,8 +320,10 @@ const CompanyAdminDashboard = () => {
                 {c.address && <div className="text-[11px] text-gray-500 border-t border-gray-700/50 pt-2">📍 {c.address}</div>}
 
                 <div className="grid grid-cols-4 gap-2 pt-2">
+                  <button onClick={() => { localStorage.setItem('selectedCompoundId', c.id); localStorage.setItem('selectedCompoundName', c.name || ''); navigate('/app/dashboard'); }} className="col-span-2 bg-emerald-600/40 hover:bg-emerald-600/70 text-emerald-200 text-xs py-2 rounded font-bold border border-emerald-500/30" data-testid={`cad-manage-${c.id}`}>🏢 إدارة الكمبوند كاملة</button>
+                  <button onClick={() => setTeamFor(c)} className="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs py-1.5 rounded font-semibold">👥 فريق العمل</button>
+                  <button onClick={() => setInviteFor(c)} className="bg-teal-600/30 hover:bg-teal-600/50 text-teal-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-invite-${c.id}`}>🔗 دعوة</button>
                   <button onClick={() => setAddUserFor(c)} className="bg-green-600/30 hover:bg-green-600/50 text-green-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-add-user-${c.id}`}>➕ ساكن</button>
-                  <button onClick={() => setInviteFor(c)} className="bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-invite-${c.id}`}>🔗 دعوة</button>
                   <button onClick={() => setEditFor({ ...c })} className="bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-edit-${c.id}`}>✏️ تعديل</button>
                   <button onClick={() => removeCompound(c)} className="bg-red-600/30 hover:bg-red-600/50 text-red-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-delete-${c.id}`}>🗑 حذف</button>
                 </div>
@@ -388,6 +392,19 @@ const CompanyAdminDashboard = () => {
       {editFor && <CompoundFormModal title="✏️ تعديل المجمع" initial={editFor} onClose={() => setEditFor(null)} onSave={async (f) => { setEditFor({...editFor, ...f}); setTimeout(saveEdit, 0); }} saveLabel="حفظ" />}
       {addUserFor && <AddUserModal compound={addUserFor} onClose={() => setAddUserFor(null)} onSave={addUser} />}
       {inviteFor && <InviteLinkModal compound={inviteFor} onClose={() => setInviteFor(null)} />}
+
+      {/* Compound Team Modal */}
+      {teamFor && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={() => setTeamFor(null)}>
+          <div className="bg-white rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()} dir="rtl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-gray-900">👥 فريق عمل: {teamFor.name}</h2>
+              <button onClick={() => setTeamFor(null)} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
+            </div>
+            <CompanyAssistantsManager compoundId={teamFor.id} compoundName={teamFor.name} />
+          </div>
+        </div>
+      )}
       {crmUser && <UserTimelineModal user={crmUser} onClose={() => { setCrmUser(null); setRefreshKey(k => k + 1); }} />}
     </div>
   );

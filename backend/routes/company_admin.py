@@ -1162,3 +1162,221 @@ async def company_admin_redeem_code(payload: RedeemCodeIn, current_user: dict = 
         "expires_at": expires.isoformat(),
         "message": f"تم تفعيل خطتك حتى {expires.date().isoformat()} ✨",
     }
+
+
+# ==================== Company-Level Assistants ====================
+
+@router.get("/company-admin/assistants")
+async def list_company_assistants(
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """قائمة مساعدي الشركة (على مستوى الشركة كلها)."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    assistants = await db.users.find(
+        {
+            "company_id": cid,
+            "role": {"$in": ["admin", "manager", "assistant_manager", "accountant"]},
+            "compound_id": {"$in": [None, "", "default-compound"]},
+        },
+        {"_id": 0, "password_hash": 0},
+    ).to_list(length=500)
+    # Also get those explicitly flagged as company_assistant
+    flagged = await db.users.find(
+        {"company_id": cid, "is_company_assistant": True},
+        {"_id": 0, "password_hash": 0},
+    ).to_list(length=500)
+    # Merge deduplicated
+    seen = {a["id"] for a in assistants}
+    for a in flagged:
+        if a["id"] not in seen:
+            assistants.append(a)
+            seen.add(a["id"])
+    return {"assistants": serialize_datetime(assistants), "total": len(assistants)}
+
+
+@router.post("/company-admin/assistants")
+async def add_company_assistant(
+    payload: dict,
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """إضافة مساعد على مستوى شركة الإدارة (لا يتبع كمبوند بعينه)."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+
+    username  = (payload.get("username") or "").strip()
+    email     = (payload.get("email") or "").strip().lower()
+    password  = payload.get("password") or ""
+    full_name = (payload.get("full_name") or "").strip()
+    role      = payload.get("role") or "assistant_manager"
+    permissions = payload.get("permissions") or []
+
+    valid_roles = ["admin", "manager", "assistant_manager", "accountant"]
+    if role not in valid_roles:
+        raise HTTPException(status_code=400, detail=f"الدور غير مقبول، الأدوار المتاحة: {valid_roles}")
+    if not all([username, email, password, full_name]):
+        raise HTTPException(status_code=400, detail="الحقول المطلوبة: full_name, username, email, password")
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="كلمة المرور 6 أحرف على الأقل")
+
+    existing = await db.users.find_one({"$or": [{"username": username}, {"email": email}]})
+    if existing:
+        raise HTTPException(status_code=400, detail="اسم المستخدم أو البريد مستخدم بالفعل")
+
+    password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "username": username,
+        "email": email,
+        "password_hash": password_hash,
+        "role": role,
+        "company_id": cid,
+        "compound_id": "company-level",  # No specific compound
+        "is_company_assistant": True,
+        "permissions": permissions,
+        "full_name": full_name,
+        "phone": payload.get("phone", "") or "",
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": current_user.get("id"),
+    }
+    await db.users.insert_one(user_doc)
+    user_doc.pop("_id", None)
+    user_doc.pop("password_hash", None)
+    return {"success": True, "assistant": serialize_datetime(user_doc)}
+
+
+@router.put("/company-admin/assistants/{user_id}")
+async def update_company_assistant(
+    user_id: str,
+    payload: dict,
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """تعديل بيانات أو صلاحيات مساعد."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    assistant = await db.users.find_one({"id": user_id, "company_id": cid})
+    if not assistant:
+        raise HTTPException(status_code=404, detail="المساعد غير موجود أو لا ينتمي لشركتك")
+
+    update_fields = {}
+    for field in ["full_name", "phone", "role", "permissions", "is_active"]:
+        if field in payload:
+            update_fields[field] = payload[field]
+
+    if update_fields:
+        await db.users.update_one({"id": user_id}, {"$set": update_fields})
+    return {"success": True, "message": "تم التحديث بنجاح"}
+
+
+@router.delete("/company-admin/assistants/{user_id}")
+async def remove_company_assistant(
+    user_id: str,
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """حذف مساعد من الشركة."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    assistant = await db.users.find_one({"id": user_id, "company_id": cid})
+    if not assistant:
+        raise HTTPException(status_code=404, detail="المساعد غير موجود")
+    await db.users.delete_one({"id": user_id})
+    return {"success": True, "message": "تم حذف المساعد"}
+
+
+# ==================== Compound Team Management ====================
+
+@router.get("/company-admin/compounds/{compound_id}/team")
+async def get_compound_team(
+    compound_id: str,
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """فريق عمل كمبوند محدد (مدير + مساعدون + أمن)."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    compound = await db.compounds.find_one({"id": compound_id}, {"_id": 0})
+    if not compound:
+        raise HTTPException(status_code=404, detail="الكمبوند غير موجود")
+    if compound.get("company_id") != cid and compound.get("management_company_id") != cid:
+        raise HTTPException(status_code=403, detail="هذا الكمبوند لا ينتمي لشركتك")
+
+    team = await db.users.find(
+        {
+            "compound_id": compound_id,
+            "role": {"$in": ["admin", "manager", "assistant_manager", "accountant", "security"]},
+        },
+        {"_id": 0, "password_hash": 0},
+    ).to_list(length=200)
+
+    # Group by role
+    grouped = {"admin": [], "manager": [], "assistant_manager": [], "accountant": [], "security": []}
+    for member in team:
+        role = member.get("role", "manager")
+        if role in grouped:
+            grouped[role].append(serialize_datetime(member))
+
+    return {
+        "compound_id": compound_id,
+        "compound_name": compound.get("name", ""),
+        "team": grouped,
+        "total": len(team),
+    }
+
+
+@router.post("/company-admin/compounds/{compound_id}/team")
+async def add_compound_team_member(
+    compound_id: str,
+    payload: dict,
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """إضافة عضو لفريق عمل كمبوند محدد."""
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+    compound = await db.compounds.find_one({"id": compound_id}, {"_id": 0})
+    if not compound:
+        raise HTTPException(status_code=404, detail="الكمبوند غير موجود")
+    if compound.get("company_id") != cid and compound.get("management_company_id") != cid:
+        raise HTTPException(status_code=403, detail="هذا الكمبوند لا ينتمي لشركتك")
+
+    username  = (payload.get("username") or "").strip()
+    email     = (payload.get("email") or "").strip().lower()
+    password  = payload.get("password") or ""
+    full_name = (payload.get("full_name") or "").strip()
+    role      = payload.get("role") or "manager"
+    valid_roles = ["admin", "manager", "assistant_manager", "accountant", "security"]
+    if role not in valid_roles:
+        raise HTTPException(status_code=400, detail=f"الدور غير مقبول: {valid_roles}")
+    if not all([username, email, password, full_name]):
+        raise HTTPException(status_code=400, detail="الحقول المطلوبة: full_name, username, email, password")
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="كلمة المرور 6 أحرف على الأقل")
+
+    existing = await db.users.find_one({"$or": [{"username": username}, {"email": email}]})
+    if existing:
+        raise HTTPException(status_code=400, detail="اسم المستخدم أو البريد مستخدم بالفعل")
+
+    password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    user_doc = {
+        "id": str(uuid.uuid4()),
+        "username": username,
+        "email": email,
+        "password_hash": password_hash,
+        "role": role,
+        "company_id": cid,
+        "compound_id": compound_id,
+        "full_name": full_name,
+        "phone": payload.get("phone", "") or "",
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": current_user.get("id"),
+    }
+    await db.users.insert_one(user_doc)
+    user_doc.pop("_id", None)
+    user_doc.pop("password_hash", None)
+    return {"success": True, "member": serialize_datetime(user_doc)}

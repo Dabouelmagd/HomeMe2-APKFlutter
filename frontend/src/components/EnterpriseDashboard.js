@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../App';
+import CompanyAssistantsManager from './company-admin/CompanyAssistantsManager';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -326,6 +327,16 @@ const EnterpriseDashboard = () => {
                 </button>
                 
                 <button
+                  onClick={() => setCurrentView('assistants')}
+                  className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    currentView === 'assistants'
+                      ? 'border-emerald-500 text-emerald-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  👥 مساعدو الشركة
+                </button>
+                <button
                   onClick={() => setCurrentView('settings')}
                   className={`px-3 py-2 text-sm font-medium rounded-md ${
                     currentView === 'settings'
@@ -365,6 +376,11 @@ const EnterpriseDashboard = () => {
       {/* Content */}
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         {currentView === 'overview' && renderOverview()}
+        {currentView === 'assistants' && (
+          <div className="p-6">
+            <CompanyAssistantsManager />
+          </div>
+        )}
         {currentView === 'compounds' && (
           <div className="text-center py-8">
             <p className="text-gray-500">{t('enterprise.compounds_view_coming_soon')}</p>

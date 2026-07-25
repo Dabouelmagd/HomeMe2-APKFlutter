@@ -2328,7 +2328,7 @@ async def root():
 # silently drop the response (login XHR onload never fires). The frontend
 # does not rely on cookies for auth — it sends the JWT in the Authorization
 # header — so disabling credentials here is safe and necessary.
-ALLOWED_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://profile-nav-debug.preview.emergentagent.com,https://homemeapp.net,http://localhost:3000').split(',')
+ALLOWED_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://homemeapp.net,https://www.homemeapp.net,http://localhost:3000').split(',')
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=False,

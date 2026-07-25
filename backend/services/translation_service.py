@@ -59,7 +59,7 @@ CONTENT TO TRANSLATE:
 ---"""
 
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        from homeme_integrations.llm.chat import LlmChat, UserMessage
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"translate_{source_lang}_{target_lang}_{datetime.now(timezone.utc).timestamp()}",
@@ -111,7 +111,7 @@ INPUT:
 OUTPUT:"""
 
     try:
-        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        from homeme_integrations.llm.chat import LlmChat, UserMessage
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"trans_lines_{source_lang}_{target_lang}_{datetime.now(timezone.utc).timestamp()}",

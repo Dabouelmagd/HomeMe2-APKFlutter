@@ -110,7 +110,7 @@ const CompanyRegistrationWizard = ({
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-sm shadow-md ${
                       isCurrent
-                        ? 'bg-gradient-to-br from-violet-600 to-indigo-700 ring-4 ring-violet-200'
+                        ? 'bg-gradient-to-br from-emerald-500 to-green-600 ring-4 ring-emerald-200'
                         : isDone
                         ? 'bg-emerald-500'
                         : 'bg-gray-300'
@@ -120,7 +120,7 @@ const CompanyRegistrationWizard = ({
                   </div>
                   <span
                     className={`text-[11px] font-bold mt-0.5 ${
-                      isCurrent ? 'text-violet-700' : isDone ? 'text-emerald-600' : 'text-gray-400'
+                      isCurrent ? 'text-emerald-700' : isDone ? 'text-emerald-600' : 'text-gray-400'
                     }`}
                   >
                     {s.label}
@@ -130,7 +130,7 @@ const CompanyRegistrationWizard = ({
                   <div className="flex-1 h-1 mx-1.5 rounded-full overflow-hidden bg-gray-200">
                     <div
                       className={`h-full transition-all duration-500 ${
-                        step > s.id ? 'bg-emerald-500 w-full' : 'bg-violet-500 w-0'
+                        step > s.id ? 'bg-emerald-500 w-full' : 'bg-emerald-500 w-0'
                       }`}
                     />
                   </div>
@@ -140,7 +140,7 @@ const CompanyRegistrationWizard = ({
           })}
         </div>
         <div className="text-center text-xs text-gray-500">
-          الخطوة <strong className="text-violet-700">{step}</strong> من {totalSteps}
+          الخطوة <strong className="text-emerald-700">{step}</strong> من {totalSteps}
         </div>
       </div>
 
@@ -148,7 +148,7 @@ const CompanyRegistrationWizard = ({
       {step === 1 && (
         <div className="space-y-5" data-testid="step-1-content">
           <h3 className="text-lg font-black text-gray-900 flex items-center gap-2">
-            <BuildingOffice2Icon className="h-5 w-5 text-violet-600" />
+            <BuildingOffice2Icon className="h-5 w-5 text-emerald-600" />
             بيانات الشركة
           </h3>
           <p className="text-sm text-gray-500 -mt-3">
@@ -164,7 +164,7 @@ const CompanyRegistrationWizard = ({
               name="company_name"
               value={formData.company_name || ''}
               onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-violet-300 focus:border-violet-400 outline-none"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400 outline-none"
               placeholder="مثال: شركة الإدارة العقارية المحدودة"
               required
               data-testid="wizard-company-name"
@@ -174,7 +174,7 @@ const CompanyRegistrationWizard = ({
             )}
           </div>
 
-          <div className="bg-violet-50 border border-violet-200 rounded-xl p-4 text-sm text-violet-800 leading-relaxed">
+          <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-sm text-emerald-800 leading-relaxed">
             💡 ستتمكن من إضافة كمبوندات وفروع لشركتك من لوحة التحكم بعد إكمال التسجيل.
           </div>
         </div>
@@ -184,7 +184,7 @@ const CompanyRegistrationWizard = ({
       {step === 2 && (
         <div className="space-y-4" data-testid="step-2-content">
           <h3 className="text-lg font-black text-gray-900 flex items-center gap-2">
-            <UserCircleIcon className="h-5 w-5 text-violet-600" />
+            <UserCircleIcon className="h-5 w-5 text-emerald-600" />
             بياناتك كمسؤول الحساب
           </h3>
           <p className="text-sm text-gray-500 -mt-2">
@@ -198,7 +198,7 @@ const CompanyRegistrationWizard = ({
                 type="text" name="full_name"
                 value={formData.full_name || ''}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-violet-300 outline-none"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 outline-none"
                 required
                 data-testid="wizard-full-name"
               />
@@ -209,7 +209,7 @@ const CompanyRegistrationWizard = ({
                 type="text" name="username"
                 value={formData.username || ''}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-violet-300 outline-none"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 outline-none"
                 required
                 data-testid="wizard-username"
               />
@@ -223,7 +223,7 @@ const CompanyRegistrationWizard = ({
                 type="email" name="email"
                 value={formData.email || ''}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-violet-300 outline-none"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 outline-none"
                 required
                 data-testid="wizard-email"
               />
@@ -234,7 +234,7 @@ const CompanyRegistrationWizard = ({
                 type="tel" name="phone"
                 value={formData.phone || ''}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-violet-300 outline-none"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 outline-none"
                 data-testid="wizard-phone"
               />
             </div>
@@ -249,7 +249,7 @@ const CompanyRegistrationWizard = ({
                   name="password"
                   value={formData.password || ''}
                   onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg p-3 pe-11 focus:ring-2 focus:ring-violet-300 outline-none"
+                  className="w-full border border-gray-300 rounded-lg p-3 pe-11 focus:ring-2 focus:ring-emerald-300 outline-none"
                   minLength="8"
                   required
                   data-testid="wizard-password"
@@ -271,7 +271,7 @@ const CompanyRegistrationWizard = ({
                 name="confirmPassword"
                 value={formData.confirmPassword || ''}
                 onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-violet-300 outline-none"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 outline-none"
                 minLength="8"
                 required
                 data-testid="wizard-confirm-password"
@@ -310,7 +310,7 @@ const CompanyRegistrationWizard = ({
       {step === 3 && (
         <div className="space-y-5" data-testid="step-3-content">
           <h3 className="text-lg font-black text-gray-900 flex items-center gap-2">
-            <CreditCardIcon className="h-5 w-5 text-violet-600" />
+            <CreditCardIcon className="h-5 w-5 text-emerald-600" />
             اختر الخطة المناسبة
           </h3>
           <p className="text-sm text-gray-500 -mt-2">
@@ -342,7 +342,7 @@ const CompanyRegistrationWizard = ({
             disabled={!currentValid}
             className={`flex items-center gap-1.5 px-6 py-2.5 rounded-xl text-white text-sm font-bold transition shadow-lg ${
               currentValid
-                ? 'bg-gradient-to-r from-violet-600 to-indigo-700 hover:scale-[1.03]'
+                ? 'bg-gradient-to-r from-emerald-500 to-green-600 hover:scale-[1.03]'
                 : 'bg-gray-300 cursor-not-allowed'
             }`}
             data-testid="wizard-next-btn"

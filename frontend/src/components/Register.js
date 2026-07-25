@@ -59,9 +59,9 @@ const Register = () => {
       icon: BuildingOfficeIcon,
       title: t('register_compound', 'تسجيل مجتمع سكني'),
       desc: t('register_compound_desc', 'أنا مدير مجتمع سكني وأريد إنشاء حساب لإدارة المجتمع وإضافة السكان'),
-      color: 'from-blue-500 to-indigo-600',
-      border: 'border-blue-200 hover:border-blue-400',
-      bg: 'bg-blue-50'
+      color: 'from-emerald-400 to-green-500',
+      border: 'border-emerald-200 hover:border-emerald-400',
+      bg: 'bg-emerald-50'
     },
     {
       id: 'company_admin',
@@ -69,9 +69,9 @@ const Register = () => {
       icon: BuildingOffice2Icon,
       title: t('register_company', 'تسجيل شركة إدارة'),
       desc: t('register_company_desc', 'شركة تدير أكثر من مجتمع سكني وتريد حساب واحد لإدارتها جميعاً'),
-      color: 'from-purple-500 to-indigo-600',
-      border: 'border-purple-200 hover:border-purple-400',
-      bg: 'bg-purple-50'
+      color: 'from-emerald-500 to-green-600',
+      border: 'border-emerald-200 hover:border-emerald-400',
+      bg: 'bg-emerald-50'
     },
     {
       id: 'resident',
@@ -224,7 +224,7 @@ const Register = () => {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-500">
                 {t('already_have_account', 'لديك حساب بالفعل؟')}{' '}
-                <Link to="/login" className="text-blue-600 font-semibold hover:underline">{t('sign_in', 'تسجيل الدخول')}</Link>
+                <Link to="/login" className="text-emerald-600 font-semibold hover:underline">{t('sign_in', 'تسجيل الدخول')}</Link>
               </p>
             </div>
           </div>
@@ -392,23 +392,23 @@ const Register = () => {
 
               {accountType === 'company_admin' && (
                 <>
-                  <div className="p-4 bg-purple-50 rounded-xl border border-purple-200">
-                    <p className="text-sm text-purple-700 font-medium">{t('company_note', 'سيتم إنشاء حساب شركة لإدارة عدة مجتمعات سكنية. يمكنك إضافة المجتمعات بعد التسجيل.')}</p>
+                  <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                    <p className="text-sm text-emerald-700 font-medium">{t('company_note', 'سيتم إنشاء حساب شركة لإدارة عدة مجتمعات سكنية. يمكنك إضافة المجتمعات بعد التسجيل.')}</p>
                   </div>
                   <RegistrationPlanPicker selected={selectedPlan} onSelect={setSelectedPlan} />
                 </>
               )}
 
               {accountType === 'compound_admin' && (
-                <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
-                  <p className="text-sm text-blue-700 font-medium">{t('compound_admin_note', 'سيتم تسجيلك كمدير مجتمع سكني. يمكنك إنشاء المجتمع وإضافة السكان والأمن والإداريين بعد التسجيل.')}</p>
+                <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                  <p className="text-sm text-emerald-700 font-medium">{t('compound_admin_note', 'سيتم تسجيلك كمدير مجتمع سكني. يمكنك إنشاء المجتمع وإضافة السكان والأمن والإداريين بعد التسجيل.')}</p>
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 shadow-lg"
+                className="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-green-700 transition-all disabled:opacity-50 shadow-lg"
                 data-testid="submit-register"
               >
                 {loading ? t('registering', 'جاري التسجيل...') : t('create_account', 'إنشاء الحساب')}
@@ -418,7 +418,7 @@ const Register = () => {
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-500">
                 {t('already_have_account', 'لديك حساب بالفعل؟')}{' '}
-                <Link to="/login" className="text-blue-600 font-semibold hover:underline">{t('sign_in', 'تسجيل الدخول')}</Link>
+                <Link to="/login" className="text-emerald-600 font-semibold hover:underline">{t('sign_in', 'تسجيل الدخول')}</Link>
               </p>
             </div>
           </div>

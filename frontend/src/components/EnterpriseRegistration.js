@@ -255,7 +255,7 @@ const EnterpriseRegistration = () => {
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500"
             required
           />
         </div>
@@ -269,7 +269,7 @@ const EnterpriseRegistration = () => {
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500"
             required
           />
         </div>
@@ -284,7 +284,7 @@ const EnterpriseRegistration = () => {
               name="company_code"
               value={formData.company_code}
               onChange={handleInputChange}
-              className="flex-1 p-3 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-blue-500"
+              className="flex-1 p-3 border border-gray-300 rounded-l-md focus:ring-2 focus:ring-emerald-500"
               placeholder="COMP001"
               required
             />
@@ -307,7 +307,7 @@ const EnterpriseRegistration = () => {
             name="phone"
             value={formData.phone}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
@@ -320,7 +320,7 @@ const EnterpriseRegistration = () => {
             name="website"
             value={formData.website}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500"
             placeholder="https://..."
           />
         </div>
@@ -334,7 +334,7 @@ const EnterpriseRegistration = () => {
             value={formData.description}
             onChange={handleInputChange}
             rows="3"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500"
             placeholder={t('enterprise.description_placeholder')}
           />
         </div>
@@ -380,7 +380,7 @@ const EnterpriseRegistration = () => {
                   <div className="flex text-sm text-gray-600">
                     <label
                       htmlFor="logo-upload"
-                      className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-emerald-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
                     >
                       <span>{t('enterprise.upload_logo')}</span>
                       <input
@@ -427,7 +427,7 @@ const EnterpriseRegistration = () => {
             value={formData.address}
             onChange={handleInputChange}
             rows="3"
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500"
             required
           />
         </div>
@@ -440,7 +440,7 @@ const EnterpriseRegistration = () => {
             name="timezone"
             value={formData.timezone}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500"
           >
             <option value="UTC">UTC</option>
             <option value="America/New_York">Eastern Time</option>
@@ -463,7 +463,7 @@ const EnterpriseRegistration = () => {
             name="currency"
             value={formData.currency}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500"
           >
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>
@@ -482,7 +482,7 @@ const EnterpriseRegistration = () => {
             name="language"
             value={formData.language}
             onChange={handleInputChange}
-            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-emerald-500"
           >
             <option value="en">English</option>
             <option value="ar">العربية</option>
@@ -532,11 +532,11 @@ const EnterpriseRegistration = () => {
         </div>
       </div>
 
-      <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+      <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-lg">
         <h4 className="font-semibold text-center text-blue-800 mb-2">
           {t('enterprise.pricing_information')}
         </h4>
-        <ul className="text-sm text-blue-700 space-y-1">
+        <ul className="text-sm text-emerald-700 space-y-1">
           <li>• {t('enterprise.first_year_free')}</li>
           <li>• {t('enterprise.base_pricing')}: $0.50 {t('enterprise.per_unit_per_month')}</li>
           <li>• {t('enterprise.additional_compounds')}: $0.40 {t('enterprise.per_unit_per_month')}</li>
@@ -589,7 +589,7 @@ const EnterpriseRegistration = () => {
                   className={`px-4 py-2 text-sm font-medium rounded-md ${
                     logoUploading || !completedCrop
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                      : 'bg-emerald-600 text-white hover:bg-blue-700'
                   }`}
                 >
                   {logoUploading ? (
@@ -613,7 +613,7 @@ const EnterpriseRegistration = () => {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     step >= stepNumber
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-emerald-600 text-white'
                       : 'bg-gray-300 text-gray-600'
                   }`}
                 >
@@ -622,7 +622,7 @@ const EnterpriseRegistration = () => {
                 {stepNumber < 3 && (
                   <div
                     className={`w-20 h-1 ${
-                      step > stepNumber ? 'bg-blue-600' : 'bg-gray-300'
+                      step > stepNumber ? 'bg-emerald-600' : 'bg-gray-300'
                     }`}
                   />
                 )}
@@ -665,7 +665,7 @@ const EnterpriseRegistration = () => {
                   disabled={!validateStep(step)}
                   className={`px-6 py-3 rounded-md font-medium ${
                     validateStep(step)
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-emerald-600 text-white hover:bg-blue-700'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   }`}
                 >

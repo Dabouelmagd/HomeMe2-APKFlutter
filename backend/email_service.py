@@ -641,4 +641,67 @@ class EmailService:
 
 
 # Create singleton instance
+    async def send_invite_link(
+        self, to_email: str, recipient_name: str,
+        compound_name: str, company_name: str,
+        join_url: str, role: str, validity_days: int,
+        note: str = None
+    ) -> bool:
+        """إرسال رابط دعوة للانضمام لكمبوند."""
+        role_labels = {
+            "resident": "ساكن", "family_head": "رب أسرة",
+            "manager": "مدير", "security": "أمن",
+        }
+        role_label = role_labels.get(role, role)
+        note_html = f'<tr><td style="padding:8px 20px;"><div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:12px;font-size:13px;color:#166534;">💬 {note}</div></td></tr>' if note else ""
+
+        html = f"""
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:Cairo,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr><td align="center" style="padding:40px 20px;">
+    <table width="580" style="background:#ffffff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);overflow:hidden;">
+      <tr><td style="background:linear-gradient(135deg,#059669,#10b981);padding:32px 24px;text-align:center;">
+        <div style="font-size:48px;margin-bottom:12px;">🏘️</div>
+        <h1 style="color:#ffffff;margin:0;font-size:24px;font-weight:700;">دعوة للانضمام</h1>
+        <p style="color:#a7f3d0;margin:8px 0 0;font-size:14px;">{compound_name}</p>
+      </td></tr>
+      <tr><td style="padding:28px 24px;">
+        <p style="font-size:16px;color:#374151;margin:0 0 16px;">مرحباً {recipient_name or ""}،</p>
+        <p style="font-size:14px;color:#6b7280;line-height:1.7;margin:0 0 20px;">
+          تمت دعوتك للانضمام إلى <strong style="color:#059669">{compound_name}</strong>
+          {f'التابعة لـ <strong>{company_name}</strong>' if company_name else ""} كـ <strong>{role_label}</strong>.
+        </p>
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="background:#f0fdf4;border-radius:10px;padding:16px;text-align:center;margin-bottom:20px;">
+              <p style="margin:0 0 6px;font-size:12px;color:#6b7280;">الرابط صالح لمدة</p>
+              <p style="margin:0;font-size:20px;font-weight:700;color:#059669;">{validity_days} يوم</p>
+            </td>
+          </tr>
+        </table>
+        {note_html}
+        <div style="text-align:center;margin:28px 0;">
+          <a href="{join_url}" style="background:linear-gradient(135deg,#059669,#10b981);color:#ffffff;text-decoration:none;padding:14px 36px;border-radius:10px;font-size:16px;font-weight:700;display:inline-block;box-shadow:0 4px 12px rgba(5,150,105,0.3);">
+            ✨ انضمّ الآن
+          </a>
+        </div>
+        <p style="font-size:12px;color:#9ca3af;text-align:center;margin:16px 0 0;">
+          أو انسخ هذا الرابط: <a href="{join_url}" style="color:#059669;">{join_url}</a>
+        </p>
+      </td></tr>
+      <tr><td style="background:#f9fafb;padding:16px;text-align:center;border-top:1px solid #e5e7eb;">
+        <p style="margin:0;font-size:11px;color:#9ca3af;">HomeMe — منصة إدارة المجتمعات السكنية</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>"""
+
+        subject = f"🏘️ دعوة للانضمام إلى {compound_name}"
+        return await self.send_email(to_email, subject, html)
+
 email_service = EmailService()

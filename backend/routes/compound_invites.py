@@ -1,3 +1,4 @@
+import os
 """
 Compound Invites — shareable self-registration links per compound.
 
@@ -27,6 +28,7 @@ import bcrypt
 from database import get_db
 from auth_deps import get_current_user
 from helpers import serialize_datetime
+from email_service import email_service
 
 router = APIRouter(prefix="/api")
 
@@ -107,6 +109,29 @@ async def create_compound_invite(payload: dict, current_user: dict = Depends(get
     await db.compound_invites.insert_one(doc)
     doc.pop("_id", None)
     doc["join_url"] = _build_join_url(token)
+
+    # Send email invitation if provided
+    recipient_email = payload.get("recipient_email", "").strip()
+    recipient_name = payload.get("recipient_name", "").strip()
+    if recipient_email:
+        frontend_url = os.environ.get("FRONTEND_URL", "").rstrip("/")
+        full_join_url = f"{frontend_url}{doc['join_url']}"
+        company_doc = await db.companies.find_one({"id": doc.get("company_id")}, {"_id": 0, "name": 1}) if doc.get("company_id") else None
+        try:
+            await email_service.send_invite_link(
+                to_email=recipient_email,
+                recipient_name=recipient_name,
+                compound_name=doc.get("compound_name", ""),
+                company_name=company_doc.get("name", "") if company_doc else "",
+                join_url=full_join_url,
+                role=doc.get("role", "resident"),
+                validity_days=validity_days,
+                note=doc.get("note"),
+            )
+        except Exception as _e:
+            import logging as _lg
+            _lg.warning(f"Invite email failed: {_e}")
+
     return {"success": True, "invite": serialize_datetime(doc)}
 
 

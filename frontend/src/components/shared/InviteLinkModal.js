@@ -15,7 +15,7 @@ const InviteLinkModal = ({ compound, onClose }) => {
   const [invites, setInvites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState({ role: 'resident', validity_days: 30, max_uses: '', note: '' });
+  const [form, setForm] = useState({ role: 'resident', validity_days: 30, max_uses: '', note: '', recipient_email: '', recipient_name: '' });
   const [refreshKey, setRefreshKey] = useState(0);
 
   const baseUrl = window.location.origin;
@@ -39,10 +39,12 @@ const InviteLinkModal = ({ compound, onClose }) => {
         validity_days: parseInt(form.validity_days) || 30,
         max_uses: form.max_uses ? parseInt(form.max_uses) : null,
         note: form.note,
+        recipient_email: form.recipient_email || null,
+        recipient_name: form.recipient_name || null,
       };
       await axios.post(`${API}/compound-invites`, body, getToken());
       toast.success('تم إنشاء رابط الدعوة');
-      setForm({ role: 'resident', validity_days: 30, max_uses: '', note: '' });
+      setForm({ role: 'resident', validity_days: 30, max_uses: '', note: '', recipient_email: '', recipient_name: '' });
       setRefreshKey(k => k + 1);
     } catch (err) { toast.error(err.response?.data?.detail || 'فشل الإنشاء'); }
     finally { setCreating(false); }
@@ -81,22 +83,22 @@ const InviteLinkModal = ({ compound, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-gray-800 rounded-2xl w-full max-w-2xl p-6 space-y-4 border border-indigo-500/30 max-h-[92vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="invite-modal">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl w-full max-w-2xl p-6 space-y-4 border border-emerald-200 max-h-[92vh] overflow-y-auto" onClick={e => e.stopPropagation()} data-testid="invite-modal">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-lg font-bold text-white">🔗 روابط دعوة الانضمام</h3>
-            <p className="text-[11px] text-gray-400 mt-1">{compound.name}</p>
+            <h3 className="text-lg font-bold text-gray-900">🔗 روابط دعوة الانضمام</h3>
+            <p className="text-[11px] text-gray-500 mt-1">{compound.name}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white">✕</button>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-700">✕</button>
         </div>
 
         {/* Create form */}
-        <div className="bg-gray-900/60 border border-gray-700 rounded-xl p-4 space-y-3">
-          <div className="text-[11px] text-gray-400 uppercase tracking-wider">➕ إنشاء رابط جديد</div>
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-3">
+          <div className="text-[11px] text-emerald-700 uppercase tracking-wider font-bold">➕ إنشاء رابط جديد</div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div>
-              <label className="block text-[10px] text-gray-500 mb-1">الدور</label>
+              <label className="block text-[10px] text-gray-600 mb-1 font-medium">الدور</label>
               <select value={form.role} onChange={e => setForm({...form, role: e.target.value})}
                 className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs text-white"
                 data-testid="invite-role">
@@ -107,19 +109,19 @@ const InviteLinkModal = ({ compound, onClose }) => {
               </select>
             </div>
             <div>
-              <label className="block text-[10px] text-gray-500 mb-1">مدة الصلاحية (أيام)</label>
+              <label className="block text-[10px] text-gray-600 mb-1 font-medium">مدة الصلاحية (أيام)</label>
               <input type="number" min="1" max="365" value={form.validity_days} onChange={e => setForm({...form, validity_days: e.target.value})}
                 className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs text-white"
                 data-testid="invite-validity" />
             </div>
             <div>
-              <label className="block text-[10px] text-gray-500 mb-1">حد الاستخدام (اختياري)</label>
+              <label className="block text-[10px] text-gray-600 mb-1 font-medium">حد الاستخدام (اختياري)</label>
               <input type="number" min="1" placeholder="∞" value={form.max_uses} onChange={e => setForm({...form, max_uses: e.target.value})}
                 className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs text-white"
                 data-testid="invite-max-uses" />
             </div>
             <div>
-              <label className="block text-[10px] text-gray-500 mb-1">ملاحظة (اختيارية)</label>
+              <label className="block text-[10px] text-gray-600 mb-1 font-medium">ملاحظة (اختيارية)</label>
               <input value={form.note} onChange={e => setForm({...form, note: e.target.value})} placeholder="مثلاً: سكان مبنى A"
                 className="w-full bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-xs text-white" />
             </div>
@@ -133,7 +135,7 @@ const InviteLinkModal = ({ compound, onClose }) => {
 
         {/* Existing invites list */}
         <div className="space-y-2">
-          <div className="text-[11px] text-gray-400 uppercase tracking-wider">📋 الروابط الموجودة ({invites.length})</div>
+          <div className="text-[11px] text-emerald-700 uppercase tracking-wider font-bold">📋 الروابط الموجودة ({invites.length})</div>
           {loading ? <div className="text-center text-gray-500 py-6 text-sm">جاري التحميل...</div>
             : invites.length === 0 ? <div className="text-center text-gray-500 py-6 text-sm bg-gray-900/40 rounded-lg border border-dashed border-gray-700">لا توجد روابط بعد</div>
             : invites.map(inv => {
@@ -141,7 +143,7 @@ const InviteLinkModal = ({ compound, onClose }) => {
               const color = statusColors[inv.effective_status] || 'gray';
               const isUsable = inv.effective_status === 'active';
               return (
-                <div key={inv.id} className="bg-gray-900/60 border border-gray-700 rounded-lg p-3 space-y-2" data-testid={`invite-row-${inv.id}`}>
+                <div key={inv.id} className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 space-y-2" data-testid={`invite-row-${inv.id}`}>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className={`text-[10px] px-2 py-0.5 rounded-full bg-${color}-900/40 text-${color}-300 border border-${color}-700/40`}>{statusLabels[inv.effective_status]}</span>

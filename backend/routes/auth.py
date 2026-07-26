@@ -452,10 +452,11 @@ async def login(user_data: UserLogin, request: Request):
         }
 
     # Feature #54 — Mandatory 2FA enrolment for privileged roles
-    # app_owner & super_admin cannot proceed without enrolling 2FA. Other
-    # admin roles keep 2FA optional.
+    # Only enforced if FORCE_2FA_ADMIN=true in environment
+    import os as _os
     MANDATORY_2FA_ROLES = {"app_owner", "super_admin"}
-    if user.get("role") in MANDATORY_2FA_ROLES and not user.get("two_factor_enabled"):
+    _force_2fa = _os.environ.get("FORCE_2FA_ADMIN", "false").lower() == "true"
+    if _force_2fa and user.get("role") in MANDATORY_2FA_ROLES and not user.get("two_factor_enabled"):
         from routes.two_factor import create_2fa_setup_token
         setup_token = create_2fa_setup_token(user["id"])
         await audit_log(

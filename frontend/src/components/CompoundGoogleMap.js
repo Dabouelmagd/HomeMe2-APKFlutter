@@ -11,6 +11,14 @@ import {
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const MAPS_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'AIzaSyB1jclwy1oO3CrQ79lJiNS_djExYY89I-E';
 
+const VEHICLE_ICONS = {
+  car:        { svg: '🚗', color: '#3b82f6', label: 'سيارة أمن' },
+  motorcycle: { svg: '🏍️', color: '#f59e0b', label: 'موتوسيكل' },
+  truck:      { svg: '🚛', color: '#8b5cf6', label: 'شاحنة' },
+  bike:       { svg: '🚲', color: '#10b981', label: 'دراجة' },
+  golf_cart:  { svg: '⛳', color: '#6b7280', label: 'عربة جولف' },
+};
+
 const ROLE_ICON = {
   admin: '🛠️', manager: '📊', assistant_manager: '🤝',
   accountant: '💰', security: '🛡️', resident: '🏠', family_head: '👨‍👩‍👧',
@@ -57,6 +65,14 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   const [showUnits, setShowUnits] = useState(true);
   const [showStaff, setShowStaff] = useState(true);
   const [showBoundary, setShowBoundary] = useState(true);
+  const [vehicles, setVehicles] = useState([]);
+  const [showVehicles, setShowVehicles] = useState(true);
+  const [showTracks, setShowTracks] = useState(true);
+  const [vehicleMarkers, setVehicleMarkers] = useState([]);
+  const vehicleMarkersRef = useRef([]);
+  const trackPolylinesRef = useRef([]);
+  const [showAddVehicle, setShowAddVehicle] = useState(false);
+  const [newVehicle, setNewVehicle] = useState({ name: '', type: 'car', plate: '', color: '#3b82f6' });
 
   const isAdmin = ['app_owner', 'super_admin', 'company_admin', 'admin', 'manager'].includes(user?.role);
   const isSecurity = user?.role === 'security';
@@ -73,6 +89,10 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
       setConfig(cfgRes.data);
       setUnits(unitsRes.data?.units || []);
 
+      if (isAdmin) {
+        const vehicleRes = await axios.get(`${API}/compounds/${compoundId}/map/vehicles`, tok).catch(() => ({ data: { vehicles: [] } }));
+        setVehicles(vehicleRes.data?.vehicles || []);
+      }
       if (isAdmin) {
         const staffRes = await axios.get(`${API}/compounds/${compoundId}/map/staff`, tok);
         setStaff(staffRes.data?.staff || []);
@@ -110,6 +130,7 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
       // Place markers
       placeUnitMarkers(map, units);
       if (isAdmin) placeStaffMarkers(map, staff);
+      if (isAdmin) placeVehicleMarkers(map, vehicles);
 
       // Drawing manager for admin
       if (isAdmin) {
@@ -267,6 +288,96 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
     } catch { toast.error('فشل الحفظ'); }
   };
 
+  // ── Vehicle Markers + Track Lines ──────────────────────────────────────────
+  const placeVehicleMarkers = (map, vehicleList) => {
+    vehicleMarkersRef.current.forEach(m => m.setMap(null));
+    trackPolylinesRef.current.forEach(p => p.setMap(null));
+    vehicleMarkersRef.current = [];
+    trackPolylinesRef.current = [];
+
+    vehicleList.forEach(v => {
+      const cfg = VEHICLE_ICONS[v.type] || VEHICLE_ICONS.car;
+
+      // Draw track history as polyline
+      if (v.track_history?.length > 1 && showTracks) {
+        const path = v.track_history.map(p => ({ lat: p.lat, lng: p.lng }));
+        const polyline = new window.google.maps.Polyline({
+          path,
+          strokeColor: v.color || cfg.color,
+          strokeOpacity: 0.7,
+          strokeWeight: 3,
+          icons: [{
+            icon: {
+              path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+              scale: 3,
+              fillColor: v.color || cfg.color,
+              fillOpacity: 1,
+              strokeWeight: 0,
+            },
+            offset: '100%',
+            repeat: '80px',
+          }],
+          map,
+        });
+        trackPolylinesRef.current.push(polyline);
+      }
+
+      // Place current position marker
+      if (!v.current_location?.lat) return;
+      const marker = new window.google.maps.Marker({
+        position: v.current_location,
+        map,
+        title: v.name,
+        icon: {
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+            <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="20" cy="20" r="18" fill="${v.color || cfg.color}" stroke="white" stroke-width="3"/>
+              <text x="20" y="26" text-anchor="middle" font-size="18" fill="white">${cfg.svg}</text>
+            </svg>
+          `)}`,
+          scaledSize: new window.google.maps.Size(44, 44),
+          anchor: new window.google.maps.Point(22, 22),
+        },
+        zIndex: 20,
+      });
+
+      marker.addListener('click', () => {
+        const updatedAt = v.location_updated_at
+          ? new Date(v.location_updated_at).toLocaleTimeString('ar-EG')
+          : 'غير معروف';
+        const histLen = v.track_history?.length || 0;
+        infoWindow.current.setContent(`
+          <div dir="rtl" style="font-family:Cairo,Arial,sans-serif;min-width:180px;padding:4px">
+            <p style="margin:0 0 4px;font-weight:700;font-size:15px">${cfg.svg} ${v.name}</p>
+            <p style="margin:0 0 4px;font-size:12px;color:#6b7280">${cfg.label}</p>
+            ${v.plate ? `<p style="margin:0 0 4px;font-size:12px">🚘 ${v.plate}</p>` : ''}
+            ${v.assigned_name ? `<p style="margin:0 0 4px;font-size:12px">👤 ${v.assigned_name}</p>` : ''}
+            <p style="margin:4px 0 0;font-size:11px;color:#9ca3af">آخر تحديث: ${updatedAt}</p>
+            <p style="margin:2px 0 0;font-size:11px;color:#9ca3af">نقاط المسار: ${histLen}</p>
+            <button onclick="window._clearVehicleTrack('${v.id}')"
+              style="margin-top:8px;width:100%;background:#ef4444;color:#fff;border:none;padding:5px;border-radius:6px;cursor:pointer;font-family:inherit;font-size:11px">
+              🗑 مسح المسار
+            </button>
+          </div>
+        `);
+        infoWindow.current.open(map, marker);
+      });
+
+      vehicleMarkersRef.current.push(marker);
+    });
+
+    // Global handler for clearing track
+    window._clearVehicleTrack = async (vehicleId) => {
+      try {
+        await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/map/vehicle-location/${vehicleId}/history`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+        });
+        loadData();
+      } catch {}
+    };
+  };
+
   // ── Send my location (security) ──────────────────────────────────────────
   const sendMyLocation = () => {
     navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -292,6 +403,11 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   useEffect(() => {
     if (polygonRef.current) polygonRef.current.setVisible(showBoundary);
   }, [showBoundary]);
+
+  useEffect(() => {
+    vehicleMarkersRef.current.forEach(m => m.setVisible(showVehicles));
+    trackPolylinesRef.current.forEach(p => p.setVisible(showTracks));
+  }, [showVehicles, showTracks]);
 
   // Start drawing boundary
   const startDrawBoundary = () => {
@@ -379,13 +495,70 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
             </>
           )}
 
+          {/* Vehicles toggle */}
+          {isAdmin && (
+            <button onClick={() => setShowVehicles(p => !p)}
+              className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${showVehicles ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
+              {showVehicles ? <EyeIcon className="h-3.5 w-3.5" /> : <EyeSlashIcon className="h-3.5 w-3.5" />}
+              المركبات
+            </button>
+          )}
+
+          {/* Track toggle */}
+          {isAdmin && (
+            <button onClick={() => setShowTracks(p => !p)}
+              className={`flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${showTracks ? 'bg-purple-50 border-purple-300 text-purple-700' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>
+              {showTracks ? <EyeIcon className="h-3.5 w-3.5" /> : <EyeSlashIcon className="h-3.5 w-3.5" />}
+              المسارات
+            </button>
+          )}
+
+          {/* Add vehicle */}
+          {isAdmin && (
+            <button onClick={() => setShowAddVehicle(p => !p)}
+              className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors">
+              ➕ مركبة
+            </button>
+          )}
+
           {/* Security: send location */}
-          {isSecurity && (
+          {(isSecurity || isAdmin) && (
             <button onClick={sendMyLocation}
               className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">
               <ShieldCheckIcon className="h-3.5 w-3.5" />
-              تحديث موقعي
+              موقعي الآن
             </button>
+          )}
+
+          {/* Security: update vehicle location */}
+          {(isSecurity || isAdmin) && vehicles.length > 0 && (
+            <div className="relative">
+              <select
+                onChange={async (e) => {
+                  const vid = e.target.value;
+                  if (!vid) return;
+                  navigator.geolocation.getCurrentPosition(async (pos) => {
+                    try {
+                      await axios.put(`${API}/map/vehicle-location/${vid}`, {
+                        location: { lat: pos.coords.latitude, lng: pos.coords.longitude }
+                      }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+                      toast.success('✅ تم تحديث موقع المركبة');
+                      loadData();
+                    } catch { toast.error('فشل تحديث الموقع'); }
+                    e.target.value = '';
+                  }, () => toast.error('تعذّر الوصول للموقع'));
+                }}
+                className="text-xs border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-amber-300 cursor-pointer"
+                defaultValue="">
+                <option value="" disabled>🚗 تحديث مركبة</option>
+                {vehicles.map(v => (
+                  <option key={v.id} value={v.id}>
+                    {VEHICLE_ICONS[v.type]?.svg || '🚗'} {v.name}
+                    {v.plate ? ` (${v.plate})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
         </div>
       </div>
@@ -411,6 +584,104 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
           </div>
         )}
       </div>
+
+      {/* Add Vehicle Form */}
+      {showAddVehicle && (
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 space-y-3" dir="rtl">
+          <h3 className="font-bold text-amber-800 dark:text-amber-300 text-sm flex items-center gap-2">
+            🚗 إضافة مركبة جديدة
+          </h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">نوع المركبة</label>
+              <select value={newVehicle.type} onChange={e => setNewVehicle(p => ({...p, type: e.target.value}))}
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none">
+                <option value="car">🚗 سيارة أمن</option>
+                <option value="motorcycle">🏍️ موتوسيكل</option>
+                <option value="truck">🚛 شاحنة / تجول</option>
+                <option value="golf_cart">⛳ عربة جولف</option>
+                <option value="bike">🚲 دراجة</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">الاسم</label>
+              <input value={newVehicle.name} onChange={e => setNewVehicle(p => ({...p, name: e.target.value}))}
+                placeholder="مثال: دورية 1"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">رقم اللوحة</label>
+              <input value={newVehicle.plate} onChange={e => setNewVehicle(p => ({...p, plate: e.target.value}))}
+                placeholder="أ ب ج 1234"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">اللون</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={newVehicle.color}
+                  onChange={e => setNewVehicle(p => ({...p, color: e.target.value}))}
+                  className="w-10 h-9 border border-gray-300 rounded-lg cursor-pointer" />
+                <span className="text-xs text-gray-500">{newVehicle.color}</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={async () => {
+              try {
+                await axios.post(`${API}/compounds/${compoundId}/map/vehicles`,
+                  newVehicle,
+                  { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+                );
+                toast.success('✅ تم إضافة المركبة');
+                setNewVehicle({ name: '', type: 'car', plate: '', color: '#3b82f6' });
+                setShowAddVehicle(false);
+                loadData();
+              } catch(e) { toast.error(e.response?.data?.detail || 'فشل الإضافة'); }
+            }}
+              className="flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors">
+              <CheckIcon className="h-4 w-4" />
+              إضافة
+            </button>
+            <button onClick={() => setShowAddVehicle(false)}
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              إلغاء
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Vehicles List */}
+      {isAdmin && vehicles.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3">
+          <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">المركبات المسجّلة ({vehicles.length})</p>
+          <div className="flex flex-wrap gap-2">
+            {vehicles.map(v => {
+              const cfg = VEHICLE_ICONS[v.type] || VEHICLE_ICONS.car;
+              const hasLocation = !!v.current_location?.lat;
+              const trackLen = v.track_history?.length || 0;
+              return (
+                <div key={v.id} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs ${hasLocation ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-700' : 'bg-gray-50 border-gray-200 dark:bg-gray-700 dark:border-gray-600'}`}>
+                  <span className="text-base">{cfg.svg}</span>
+                  <div>
+                    <p className="font-bold text-gray-800 dark:text-gray-200">{v.name}</p>
+                    {v.plate && <p className="text-gray-500 dark:text-gray-400">{v.plate}</p>}
+                  </div>
+                  <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${hasLocation ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+                    {hasLocation ? `● نشط · ${trackLen} نقطة` : '● غير محدد'}
+                  </span>
+                  <button onClick={async () => {
+                    if (!window.confirm('حذف المركبة؟')) return;
+                    await axios.delete(`${API}/compounds/${compoundId}/map/vehicles/${v.id}`,
+                      { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+                    toast.success('تم الحذف');
+                    loadData();
+                  }} className="text-red-400 hover:text-red-600 transition-colors">✕</button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Map */}
       <div className="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg"
@@ -441,6 +712,9 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
         <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-gray-400 inline-block"/> شاغرة</span>
         {isAdmin && <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-blue-500 inline-block"/> أمن</span>}
         {isAdmin && <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-purple-500 inline-block"/> موظف</span>}
+        {isAdmin && <span className="flex items-center gap-1.5"><span>🚗</span> سيارة أمن</span>}
+        {isAdmin && <span className="flex items-center gap-1.5"><span>🏍️</span> موتوسيكل</span>}
+        {isAdmin && <span className="flex items-center gap-1.5"><span className="inline-block w-6 border-t-2 border-dashed border-amber-500"/> مسار</span>}
         <span className="flex items-center gap-1.5"><span className="w-8 h-0.5 bg-red-500 inline-block border-t-2 border-dashed border-red-500"/> حدود الكمبوند</span>
       </div>
     </div>

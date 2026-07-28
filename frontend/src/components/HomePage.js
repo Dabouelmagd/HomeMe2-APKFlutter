@@ -440,6 +440,10 @@ const HomePage = () => {
   ];
 
   const fx = currency === 'egp' ? 1 : 0.0204; // 1 EGP ≈ 0.0204 USD (49 ج.م = $1)
+  const VAT_RATE = 0.14; // ضريبة القيمة المضافة 14%
+  const priceWithVAT = (monthly) => monthly; // الأسعار المعروضة شاملة ضريبة القيمة المضافة
+  const priceBeforeVAT = (monthly) => Math.round(monthly / (1 + VAT_RATE));
+  const vatAmount = (monthly) => monthly - priceBeforeVAT(monthly);
   const sym = currency === 'egp' ? (i18n.language?.startsWith('ar') ? 'ج.م' : 'EGP') : '$';
   const priceOf = (egp) => {
     const val = currency === 'egp' ? egp : Math.round(egp * 0.02);

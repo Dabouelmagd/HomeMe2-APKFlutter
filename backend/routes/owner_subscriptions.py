@@ -8,6 +8,8 @@ import uuid
 import logging
 
 from database import get_db
+from email_service import email_service
+import random, string
 from auth_deps import get_current_user
 from helpers import serialize_datetime
 
@@ -441,15 +443,60 @@ async def update_company_subscription(
         return {"status": "ok", "message": "Subscription suspended"}
 
     elif action == "activate":
+        billing_period = body.get("billing_period", "monthly")
+        currency = body.get("currency", "EGP")
+        is_egypt = currency == "EGP"
+        days = 30 if billing_period == "monthly" else 365
+
         await db.company_subscriptions.update_one(
             {"company_id": company_id},
             {"$set": {
                 "status": "active",
-                "current_period_end": datetime.now(timezone.utc) + timedelta(days=365),
+                "billing_period": billing_period,
+                "currency": currency,
+                "current_period_end": datetime.now(timezone.utc) + timedelta(days=days),
                 "updated_at": datetime.now(timezone.utc)
             }}
         )
         await _log_sub_change(db, company_id, current_user, "activate", "Subscription activated")
+
+        # Send invoice email
+        try:
+            sub = await db.company_subscriptions.find_one({"company_id": company_id}, {"_id": 0})
+            company = await db.companies.find_one({"id": company_id}, {"_id": 0})
+            owner = await db.users.find_one({"company_id": company_id, "role": "company_admin"}, {"_id": 0})
+            if owner and sub:
+                plan_key = sub.get("plan", "company_startup")
+                PLAN_AR = {"company_startup": "شركة ناشئة", "company_business": "شركة متوسطة", "company_enterprise": "شركة كبرى",
+                           "starter": "مجاني", "basic": "أساسي", "pro": "احترافي", "premium": "متقدم"}
+                PLAN_EN = {"company_startup": "Startup", "company_business": "Business", "company_enterprise": "Enterprise",
+                           "starter": "Starter", "basic": "Basic", "pro": "Pro", "premium": "Premium"}
+                PLAN_PRICES_EGP = {"company_startup": 5500, "company_business": 13000, "company_enterprise": 35000,
+                                   "basic": 1200, "pro": 2200, "premium": 4000}
+                PLAN_PRICES_USD = {"company_startup": 112, "company_business": 265, "company_enterprise": 714,
+                                   "basic": 25, "pro": 45, "premium": 82}
+
+                base_price = PLAN_PRICES_USD.get(plan_key, 0) if currency == "USD" else PLAN_PRICES_EGP.get(plan_key, sub.get("plan_price", 0))
+                if billing_period == "yearly":
+                    base_price = round(base_price * 9.6)
+
+                invoice_num = "HM-" + "".join(random.choices(string.digits, k=8))
+                await email_service.send_subscription_invoice(
+                    to_email=owner.get("email", ""),
+                    customer_name=owner.get("full_name") or owner.get("username", ""),
+                    plan_name=PLAN_AR.get(plan_key, plan_key),
+                    plan_name_en=PLAN_EN.get(plan_key, plan_key),
+                    base_amount=base_price,
+                    currency=currency,
+                    billing_period=billing_period,
+                    invoice_number=invoice_num,
+                    company_name=company.get("name", "") if company else "",
+                    is_egypt=is_egypt,
+                )
+        except Exception as _e:
+            import logging as _lg
+            _lg.warning(f"Invoice email failed: {_e}")
+
         return {"status": "ok", "message": "Subscription activated"}
 
     elif action == "apply_coupon":

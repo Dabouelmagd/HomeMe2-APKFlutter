@@ -704,4 +704,117 @@ class EmailService:
         subject = f"🏘️ دعوة للانضمام إلى {compound_name}"
         return await self.send_email(to_email, subject, html)
 
+    async def send_subscription_invoice(
+        self,
+        to_email: str,
+        customer_name: str,
+        plan_name: str,
+        plan_name_en: str,
+        base_amount: float,
+        currency: str,   # "EGP" or "USD"
+        billing_period: str,  # "monthly" or "yearly"
+        invoice_number: str,
+        company_name: str = "",
+        is_egypt: bool = True,
+    ) -> bool:
+        """إرسال فاتورة الاشتراك بعد التفعيل."""
+
+        VAT_RATE = 0.14 if is_egypt else 0.0
+        vat_amount = round(base_amount * VAT_RATE, 2)
+        total_amount = round(base_amount + vat_amount, 2)
+
+        if currency == "EGP":
+            sym = "ج.م"
+            sym_en = "EGP"
+        else:
+            sym = "$"
+            sym_en = "USD"
+
+        period_ar = "شهري" if billing_period == "monthly" else "سنوي"
+        period_label = "/ شهر" if billing_period == "monthly" else "/ سنة"
+
+        vat_row = f"""
+            <tr>
+              <td style="padding:8px 16px;font-size:14px;color:#6b7280;">ضريبة القيمة المضافة (14%)</td>
+              <td style="padding:8px 16px;font-size:14px;color:#6b7280;text-align:left;">{vat_amount:,.2f} {sym}</td>
+            </tr>""" if is_egypt else ""
+
+        html = f"""<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:Cairo,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr><td align="center" style="padding:40px 20px;">
+    <table width="580" style="background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);overflow:hidden;">
+
+      <!-- Header -->
+      <tr><td style="background:linear-gradient(135deg,#059669,#10b981);padding:28px 32px;">
+        <table width="100%"><tr>
+          <td>
+            <p style="margin:0;font-size:22px;font-weight:700;color:#fff;">🏠 HomeMe</p>
+            <p style="margin:4px 0 0;font-size:13px;color:#a7f3d0;">نظام إدارة الكمبوندات السكنية</p>
+          </td>
+          <td style="text-align:left;">
+            <p style="margin:0;font-size:13px;color:#a7f3d0;">فاتورة ضريبية</p>
+            <p style="margin:2px 0 0;font-size:16px;font-weight:700;color:#fff;">#{invoice_number}</p>
+          </td>
+        </tr></table>
+      </td></tr>
+
+      <!-- Body -->
+      <tr><td style="padding:28px 32px;">
+        <p style="margin:0 0 20px;font-size:15px;color:#374151;">مرحباً <strong>{customer_name}</strong>،</p>
+        <p style="margin:0 0 24px;font-size:14px;color:#6b7280;line-height:1.7;">
+          شكراً لاشتراككم في HomeMe. يسعدنا تأكيد تفعيل اشتراككم بنجاح.
+          يرجى الاحتفاظ بهذه الفاتورة للأغراض المحاسبية.
+        </p>
+
+        <!-- Invoice details -->
+        <table width="100%" style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin-bottom:24px;">
+          <tr style="background:#f9fafb;">
+            <td style="padding:10px 16px;font-size:12px;font-weight:700;color:#6b7280;text-transform:uppercase;">البيان</td>
+            <td style="padding:10px 16px;font-size:12px;font-weight:700;color:#6b7280;text-align:left;">المبلغ</td>
+          </tr>
+          <tr>
+            <td style="padding:12px 16px;font-size:14px;color:#1f2937;">
+              <strong>خطة {plan_name}</strong> ({plan_name_en})<br>
+              <span style="font-size:12px;color:#6b7280;">اشتراك {period_ar} — {company_name}</span>
+            </td>
+            <td style="padding:12px 16px;font-size:14px;color:#1f2937;text-align:left;font-weight:700;">
+              {base_amount:,.2f} {sym}
+            </td>
+          </tr>
+          {vat_row}
+          <tr style="background:#f0fdf4;border-top:2px solid #059669;">
+            <td style="padding:12px 16px;font-size:15px;font-weight:700;color:#065f46;">الإجمالي</td>
+            <td style="padding:12px 16px;font-size:18px;font-weight:700;color:#059669;text-align:left;">
+              {total_amount:,.2f} {sym} {period_label}
+            </td>
+          </tr>
+        </table>
+
+        {'<p style="font-size:12px;color:#9ca3af;text-align:center;">* الأسعار شاملة ضريبة القيمة المضافة 14%</p>' if is_egypt else '<p style="font-size:12px;color:#9ca3af;text-align:center;">* Prices in USD — VAT not applicable</p>'}
+
+        <!-- Support -->
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:16px;margin-top:20px;">
+          <p style="margin:0;font-size:13px;color:#166534;">
+            للاستفسارات: <a href="mailto:homeme_superadmin@datalifeai.com" style="color:#059669;font-weight:700;">homeme_superadmin@datalifeai.com</a>
+          </p>
+        </div>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="background:#f9fafb;padding:16px 32px;border-top:1px solid #e5e7eb;text-align:center;">
+        <p style="margin:0;font-size:11px;color:#9ca3af;">HomeMe — داتا لايف لخدمات الذكاء الاصطناعي</p>
+        <p style="margin:4px 0 0;font-size:11px;color:#9ca3af;">الرقم الضريبي: XXXXXXXXXX | بنك الإسكندرية — IBAN: EG580005104800000144080699002</p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body></html>"""
+
+        subject = f"🧾 فاتورة HomeMe #{invoice_number} — خطة {plan_name}"
+        return await self.send_email(to_email, subject, html)
+
 email_service = EmailService()

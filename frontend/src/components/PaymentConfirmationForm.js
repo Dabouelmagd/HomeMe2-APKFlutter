@@ -165,6 +165,16 @@ const PaymentConfirmationForm = ({ defaultMethod = 'vodafone_cash', onSubmitted 
         ) : null;
       })()}
 
+      {/* VAT Note */}
+      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-3">
+        <p className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+          💡 الأسعار شاملة ضريبة القيمة المضافة 14% — سيُرسل إليك فاتورة ضريبية على بريدك الإلكتروني بعد تأكيد الدفع
+        </p>
+        <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+          🌍 للعملاء خارج مصر: الدفع بالدولار الأمريكي فقط
+        </p>
+      </div>
+
       {/* Plan + Amount */}
       <div className="grid grid-cols-2 gap-3">
         <div>

@@ -446,7 +446,11 @@ const Layout = ({ children, isTrialMode = false }) => {
     setShowSearchResults(false);
     setSearchQuery('');
 
-    // Prefer url returned by API; fallback to type-based mapping
+    // Use href (new global search) or url (legacy)
+    if (result.href) {
+      navigate(result.href);
+      return;
+    }
     if (result.url) {
       navigate(result.url);
       return;

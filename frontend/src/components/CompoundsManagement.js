@@ -290,7 +290,7 @@ const CompoundsManagement = () => {
           label={canManageCodes ? t('available_codes', 'أكواد متاحة') : t('total_residents', 'إجمالي السكان')}
           value={canManageCodes
             ? subscriptionCodes.filter(c => c.is_active).length
-            : compounds.reduce((sum, c) => sum + (c.users_count || c.residents_count || 0), 0)}
+            : compounds.reduce((sum, c) => sum + (c.users_count || c.residents_count || c.total_users || 0), 0)}
           icon={canManageCodes ? '🎟️' : '👥'}
           color="amber"
           variant="light"

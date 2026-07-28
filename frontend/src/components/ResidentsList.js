@@ -67,16 +67,32 @@ const ResidentsList = () => {
   const loadResidentsData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/family-members`, {
+      const response = await axios.get(`${API}/admin/users`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       
-      if (response.data && response.data.family_members) {
-        setResidents(response.data.family_members);
+      if (response.data && response.data.users) {
+        // Normalize: map users fields to resident fields
+        const mapped = response.data.users.map(u => ({
+          ...u,
+          name: u.full_name || u.username || '',
+          id: u.id,
+        }));
+        setResidents(mapped);
       }
     } catch (error) {
       console.error('Failed to load residents:', error);
-      // Keep test data if API fails
+      // Try fallback
+      try {
+        const fallback = await axios.get(`${API}/family-members`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        if (fallback.data?.family_members) {
+          setResidents(fallback.data.family_members);
+        }
+      } catch (e2) {
+        console.error('Fallback also failed:', e2);
+      }
     } finally {
       setLoading(false);
     }
@@ -86,12 +102,15 @@ const ResidentsList = () => {
     let filtered = [...residents];
     
     if (searchQuery.trim()) {
-      filtered = filtered.filter(resident =>
-        resident.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        resident.phone?.includes(searchQuery) ||
-        resident.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        resident.unit_number?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      filtered = filtered.filter(resident => {
+        const name = (resident.full_name || resident.name || '').toLowerCase();
+        const q = searchQuery.toLowerCase();
+        return name.includes(q) ||
+          resident.username?.toLowerCase().includes(q) ||
+          resident.phone?.includes(searchQuery) ||
+          resident.email?.toLowerCase().includes(q) ||
+          resident.unit_number?.toLowerCase().includes(q);
+      });
     }
     
     if (selectedUnit) {

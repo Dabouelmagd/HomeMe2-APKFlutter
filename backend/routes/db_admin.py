@@ -69,15 +69,37 @@ async def get_all_users(current_user: dict = Depends(get_current_user)):
 
 @router.get("/compounds")
 async def get_available_compounds(current_user: dict = Depends(get_current_user)):
-    """Get all available compounds for compound selection"""
+    """Get all available compounds with user counts for compound selection"""
     try:
         db = get_db()
-        compounds = await db.compounds.find({}, {"_id": 0}).to_list(length=10000)
         
-        # Serialize datetime objects
-        serialized_compounds = [serialize_datetime(compound) for compound in compounds]
+        # Scope: company_admin sees only their compounds
+        role = current_user.get("role")
+        company_id = current_user.get("company_id")
+        compound_id = current_user.get("compound_id")
         
-        return {"compounds": serialized_compounds}
+        query = {}
+        if role == "company_admin" and company_id:
+            query = {"$or": [{"company_id": company_id}, {"management_company_id": company_id}]}
+        elif role not in ("app_owner", "super_admin") and compound_id:
+            query = {"id": compound_id}
+        
+        compounds = await db.compounds.find(query, {"_id": 0}).to_list(length=10000)
+        
+        # Enrich each compound with live user counts
+        enriched = []
+        for c in compounds:
+            cid = c.get("id")
+            if cid:
+                total_users     = await db.users.count_documents({"compound_id": cid})
+                residents_count = await db.users.count_documents({"compound_id": cid, "role": {"$in": ["resident", "family_head"]}})
+                staff_count     = await db.users.count_documents({"compound_id": cid, "role": {"$in": ["admin", "manager", "assistant_manager", "accountant", "security"]}})
+                c["users_count"]     = total_users
+                c["residents_count"] = residents_count
+                c["staff_count"]     = staff_count
+            enriched.append(serialize_datetime(c))
+        
+        return {"compounds": enriched}
         
     except Exception as e:
         logging.error(f"Error getting compounds: {e}")

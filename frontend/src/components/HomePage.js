@@ -99,7 +99,7 @@ const HomePage = () => {
         '@type': 'AggregateOffer',
         priceCurrency: 'EGP',
         lowPrice: '0',
-        highPrice: '25000',
+        highPrice: '35000',
         offerCount: '7',
       },
       featureList: [
@@ -194,7 +194,7 @@ const HomePage = () => {
           '@type': 'AggregateOffer',
           priceCurrency: 'EGP',
           lowPrice: 0,
-          highPrice: 25000,
+          highPrice: 35000,
         },
         ...(ratingValue
           ? {
@@ -439,7 +439,7 @@ const HomePage = () => {
     { id: 'smart', icon: BoltIcon, title: t('gd_smart', 'الأجهزة الذكية (قريباً)'), content: t('gd_smart_d', 'تحكم ذكي بالإضاءة، التكييف، الكاميرات، الأقفال الذكية، أنظمة الأمان. أوامر عربية بالذكاء الاصطناعي. تكامل مع Google Home + Apple HomeKit + Alexa.') },
   ];
 
-  const fx = currency === 'egp' ? 1 : 0.02; // 1 EGP ≈ 0.02 USD
+  const fx = currency === 'egp' ? 1 : 0.0204; // 1 EGP ≈ 0.0204 USD (49 ج.م = $1)
   const sym = currency === 'egp' ? (i18n.language?.startsWith('ar') ? 'ج.م' : 'EGP') : '$';
   const priceOf = (egp) => {
     const val = currency === 'egp' ? egp : Math.round(egp * 0.02);
@@ -476,7 +476,7 @@ const HomePage = () => {
       name: t('plan_basic', 'أساسي'),
       nameEn: 'Basic',
       residents: t('plan_100_residents', 'حتى 100 ساكن'),
-      monthly: 800,
+      monthly: 1200,
       color: 'border-sky-400',
       badge: '',
       features: [
@@ -502,7 +502,7 @@ const HomePage = () => {
       name: t('plan_pro', 'احترافي'),
       nameEn: 'Pro',
       residents: t('plan_unlimited_residents'),
-      monthly: 1500,
+      monthly: 2200,
       color: 'border-blue-500 ring-2 ring-blue-500/20',
       badge: t('hp_most_popular'),
       features: [
@@ -536,7 +536,7 @@ const HomePage = () => {
       name: t('plan_premium', 'متقدم'),
       nameEn: 'Premium',
       residents: t('plan_unlimited_all', 'عدد غير محدود - كل شيء'),
-      monthly: 2800,
+      monthly: 4000,
       color: 'border-violet-500',
       badge: '',
       features: [
@@ -579,7 +579,7 @@ const HomePage = () => {
       name: t('cp_startup', 'شركة ناشئة'),
       nameEn: 'Startup',
       compounds: t('cp_up_to_3', 'حتى 3 مجتمعات'),
-      monthly: 4000,
+      monthly: 5500,
       color: 'border-amber-400',
       features: [
         t('cf_manage_3', 'إدارة حتى 3 مجتمعات سكنية'),
@@ -605,7 +605,7 @@ const HomePage = () => {
       name: t('cp_business', 'شركة متوسطة'),
       nameEn: 'Business',
       compounds: t('cp_up_to_8', '1 - 8 مجتمعات'),
-      monthly: 9500,
+      monthly: 13000,
       color: 'border-orange-500 ring-2 ring-orange-500/20',
       badge: t('hp_best_for_companies'),
       features: [
@@ -637,7 +637,7 @@ const HomePage = () => {
       name: t('cp_enterprise', 'شركة كبرى'),
       nameEn: 'Enterprise',
       compounds: t('plan_unlimited_all'),
-      monthly: 25000,
+      monthly: 35000,
       isCustom: false,
       color: 'border-red-500',
       features: [

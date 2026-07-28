@@ -60,7 +60,7 @@ COMPANY_PLANS_CATALOGUE = [
         "key": "company_startup",
         "name_ar": "شركة ناشئة",
         "name_en": "Startup",
-        "monthly_egp": 4000,
+        "monthly_egp": 5500,
         "max_compounds": 3,
         "max_residents": -1,
         "feature_flags": {
@@ -96,7 +96,7 @@ COMPANY_PLANS_CATALOGUE = [
         "key": "company_business",
         "name_ar": "شركة متوسطة",
         "name_en": "Business",
-        "monthly_egp": 9500,
+        "monthly_egp": 13000,
         "max_compounds": 8,
         "max_residents": -1,
         "popular": True,
@@ -139,7 +139,7 @@ COMPANY_PLANS_CATALOGUE = [
         "key": "company_enterprise",
         "name_ar": "شركة كبرى",
         "name_en": "Enterprise",
-        "monthly_egp": 25000,
+        "monthly_egp": 35000,
         "max_compounds": -1,
         "max_residents": -1,
         "feature_flags": {

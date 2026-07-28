@@ -12,6 +12,9 @@ from database import get_db
 # Keeping a copy here avoids a circular import at module-load time.
 _PLAN_LIMITS = {
     "starter":            {"max_compounds": 1,  "max_residents": 30},
+    "basic":              {"max_compounds": 1,  "max_residents": 100},
+    "pro":                {"max_compounds": 1,  "max_residents": -1},
+    "premium":            {"max_compounds": 1,  "max_residents": -1},
     "company_startup":    {"max_compounds": 3,  "max_residents": -1},
     "company_business":   {"max_compounds": 8,  "max_residents": -1},
     "company_enterprise": {"max_compounds": -1, "max_residents": -1},
@@ -24,6 +27,33 @@ _PLAN_FEATURES = {
         "billing_payments": False, "ads_campaigns": False, "pdf_excel_exports": False,
         "ai_financial_insights": False, "advanced_dashboard": False, "custom_api": False,
         "whitelabel": False, "priority_support": False,
+        "ai_assistant": False, "visitors_qr": False, "polls": False,
+        "complaints": False, "daily_reports": False, "facility_booking": False,
+        "smart_devices": False, "ai_autopilot": False,
+    },
+    "basic": {
+        "billing_payments": True, "ads_campaigns": False, "pdf_excel_exports": True,
+        "ai_financial_insights": False, "advanced_dashboard": False, "custom_api": False,
+        "whitelabel": False, "priority_support": False,
+        "ai_assistant": True, "visitors_qr": False, "polls": False,
+        "complaints": False, "daily_reports": False, "facility_booking": True,
+        "smart_devices": False, "ai_autopilot": False,
+    },
+    "pro": {
+        "billing_payments": True, "ads_campaigns": True, "pdf_excel_exports": True,
+        "ai_financial_insights": True, "advanced_dashboard": True, "custom_api": False,
+        "whitelabel": False, "priority_support": True,
+        "ai_assistant": True, "visitors_qr": True, "polls": True,
+        "complaints": True, "daily_reports": True, "facility_booking": True,
+        "smart_devices": False, "ai_autopilot": False,
+    },
+    "premium": {
+        "billing_payments": True, "ads_campaigns": True, "pdf_excel_exports": True,
+        "ai_financial_insights": True, "advanced_dashboard": True, "custom_api": True,
+        "whitelabel": False, "priority_support": True,
+        "ai_assistant": True, "visitors_qr": True, "polls": True,
+        "complaints": True, "daily_reports": True, "facility_booking": True,
+        "smart_devices": True, "ai_autopilot": True,
     },
     "company_startup": {
         "billing_payments": True, "ads_campaigns": True, "pdf_excel_exports": False,
@@ -44,6 +74,9 @@ _PLAN_FEATURES = {
 
 _PLAN_NAME_AR = {
     "starter":            "مجاني",
+    "basic":              "أساسي",
+    "pro":                "احترافي",
+    "premium":            "متقدم",
     "company_startup":    "شركة ناشئة",
     "company_business":   "شركة متوسطة",
     "company_enterprise": "شركة كبرى",

@@ -43,18 +43,18 @@ stripe.api_key = os.environ.get("STRIPE_API_KEY")
 PLAN_CATALOGUE = {
     "company_startup": {
         "name_ar": "شركة ناشئة",
-        "monthly_amount": 4000.00,
-        "yearly_amount": 40000.00,  # 10 × monthly = ~17% off vs paying 12 monthly
+        "monthly_amount": 5500.00,
+        "yearly_amount": 52800.00,  # 10 × monthly = ~17% off vs paying 12 monthly
     },
     "company_business": {
         "name_ar": "شركة متوسطة",
-        "monthly_amount": 9500.00,
-        "yearly_amount": 95000.00,
+        "monthly_amount": 13000.00,
+        "yearly_amount": 124800.00,
     },
     "company_enterprise": {
         "name_ar": "شركة كبرى",
-        "monthly_amount": 25000.00,
-        "yearly_amount": 250000.00,
+        "monthly_amount": 35000.00,
+        "yearly_amount": 336000.00,
     },
 }
 

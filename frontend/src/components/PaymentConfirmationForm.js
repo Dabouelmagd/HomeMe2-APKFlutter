@@ -14,9 +14,10 @@ import {
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const METHODS = [
-  { id: 'vodafone_cash', label: 'Vodafone Cash',   icon: DevicePhoneMobileIcon, accent: 'from-red-500 to-pink-600' },
-  { id: 'instapay',      label: 'InstaPay',        icon: QrCodeIcon,           accent: 'from-purple-500 to-indigo-600' },
-  { id: 'bank_transfer', label: 'تحويل بنكي',      icon: BanknotesIcon,        accent: 'from-emerald-500 to-teal-600' },
+  { id: 'vodafone_cash', label: 'فودافون كاش',  icon: DevicePhoneMobileIcon, accent: 'from-red-500 to-red-600',     number: '00201012625529' },
+  { id: 'instapay',      label: 'إنستاباي',      icon: QrCodeIcon,           accent: 'from-emerald-500 to-teal-600', number: '00201006008552' },
+  { id: 'bank_transfer', label: 'تحويل بنكي',    icon: BanknotesIcon,        accent: 'from-blue-500 to-blue-700',   number: '144080699002 — بنك الإسكندرية' },
+  { id: 'paypal',        label: 'PayPal',         icon: ReceiptPercentIcon,   accent: 'from-indigo-500 to-blue-600', number: 'dalia_abouelmagd@hotmail.com' },
 ];
 
 const PLANS = [
@@ -151,6 +152,18 @@ const PaymentConfirmationForm = ({ defaultMethod = 'vodafone_cash', onSubmitted 
           })}
         </div>
       </div>
+
+      {/* Payment Info Box */}
+      {form.method && (() => {
+        const m = METHODS.find(x => x.id === form.method);
+        return m ? (
+          <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 rounded-xl p-4">
+            <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300 mb-1">📋 بيانات الدفع</p>
+            <p className="text-sm font-mono font-bold text-emerald-900 dark:text-emerald-100 select-all">{m.number}</p>
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">اضغط للنسخ ثم حوّل المبلغ وارفع الإيصال أدناه</p>
+          </div>
+        ) : null;
+      })()}
 
       {/* Plan + Amount */}
       <div className="grid grid-cols-2 gap-3">

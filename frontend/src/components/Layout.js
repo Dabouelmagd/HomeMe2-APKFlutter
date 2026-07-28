@@ -63,6 +63,7 @@ import {
 import LanguageSwitcher from './LanguageSwitcher';
 import SessionSwitcher from './SessionSwitcher';
 import QuickAccountSwitcher from './QuickAccountSwitcher';
+import AccountSwitcherDropdown from './AccountSwitcherDropdown';
 import SidebarAccountSwitcher from './SidebarAccountSwitcher';
 import PlanLimitBadge from './PlanLimitBadge';
 import { TransliterationToggle } from './TransliterationToggle';
@@ -1290,7 +1291,7 @@ const Layout = ({ children, isTrialMode = false }) => {
 
               {/* Quick Account Switcher — linked accounts pills */}
               <div className="hidden lg:block flex-shrink-0">
-                <QuickAccountSwitcher />
+                <AccountSwitcherDropdown />
               </div>
 
               {/* Theme Toggle */}

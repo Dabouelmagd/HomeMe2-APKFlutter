@@ -86,10 +86,21 @@ async def list_linked_accounts(current_user: dict = Depends(get_current_user)):
         u = await db.users.find_one({"id": uid}, {"_id": 0})
         if not u:
             continue
+        # Fetch compound info (name + logo)
+        compound_name = ""
+        compound_logo = ""
+        if u.get("compound_id"):
+            c = await db.compounds.find_one({"id": u["compound_id"]}, {"_id": 0, "name": 1, "logo": 1})
+            if c:
+                compound_name = c.get("name", "")
+                compound_logo = c.get("logo", "")
         result.append({
             **_safe_user(u),
             "label": entry.get("label") or u.get("full_name") or u.get("username"),
             "added_at": entry.get("added_at"),
+            "compound_name": compound_name,
+            "compound_logo": compound_logo,
+            "photo": u.get("photo") or u.get("avatar") or "",
         })
     return {"accounts": result}
 

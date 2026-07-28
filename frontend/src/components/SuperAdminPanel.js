@@ -24,6 +24,8 @@ import HierarchicalSubs from './super-admin/HierarchicalSubs';
 import CompaniesTab from './super-admin/CompaniesTab';
 import AdvertiserAdsTab from './super-admin/AdvertiserAdsTab';
 import SupportTicketsTab from './super-admin/SupportTicketsTab';
+import SmokeTestCard from './SmokeTestCard';
+import AuditLogPage from '../pages/AuditLogPage';
 import DisasterRecoveryTab from './super-admin/DisasterRecoveryTab';
 import BlogManagementTab from './super-admin/BlogManagementTab';
 import EmailLogsTab from './super-admin/EmailLogsTab';
@@ -459,6 +461,8 @@ const SuperAdminPanel = () => {
             { id: 'email_logs', label: '📧 سجل البريد' },
             ...(!isSuperAdminOnly ? [
               { id: 'disaster_recovery', label: '💾 النسخ الاحتياطي' },
+            { id: 'smoke_test', label: '🧪 فحص المسارات' },
+            { id: 'audit_log', label: '📋 سجل التدقيق' },
             ] : []),
           ].map(tab => (
             <button key={tab.id} onClick={() => handleTabChange(tab.id)}
@@ -913,6 +917,21 @@ const SuperAdminPanel = () => {
 
         {activeTab === 'support_tickets' && (
           <SupportTicketsTab t={t} />
+        )}
+
+        {activeTab === 'smoke_test' && (
+          <div className="p-4">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              🧪 فحص صحة المسارات
+            </h2>
+            <SmokeTestCard />
+          </div>
+        )}
+
+        {activeTab === 'audit_log' && (
+          <div className="p-0">
+            <AuditLogPage embedded={true} />
+          </div>
         )}
 
         {activeTab === 'disaster_recovery' && (

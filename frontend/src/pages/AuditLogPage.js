@@ -119,7 +119,7 @@ const AuditRow = ({ entry }) => {
   );
 };
 
-const AuditLogPage = () => {
+const AuditLogPage = ({ embedded = false }) => {
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [summary, setSummary] = useState(null);

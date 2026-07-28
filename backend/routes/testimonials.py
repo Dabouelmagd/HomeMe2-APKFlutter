@@ -232,3 +232,40 @@ async def admin_delete_testimonial(
     if res.deleted_count == 0:
         raise HTTPException(status_code=404, detail="التقييم غير موجود")
     return {"message": "تم الحذف"}
+
+@router.get("/owner/testimonials/analytics")
+async def testimonials_analytics(
+    current_user: dict = Depends(_require_owner_or_super),
+):
+    """تحليلات التقييمات — إجمالي + متوسط التقييم + توزيع النجوم."""
+    db = get_db()
+    total      = await db.testimonials.count_documents({})
+    published  = await db.testimonials.count_documents({"status": "published"})
+    pending    = await db.testimonials.count_documents({"status": "pending"})
+    rejected   = await db.testimonials.count_documents({"status": "rejected"})
+
+    # Average rating
+    pipeline = [
+        {"$match": {"status": "published", "rating": {"$exists": True}}},
+        {"$group": {"_id": None, "avg": {"$avg": "$rating"}, "count": {"$sum": 1}}}
+    ]
+    result = await db.testimonials.aggregate(pipeline).to_list(1)
+    avg_rating = round(result[0]["avg"], 1) if result else 0
+
+    # Rating distribution
+    dist_pipeline = [
+        {"$match": {"status": "published"}},
+        {"$group": {"_id": "$rating", "count": {"$sum": 1}}},
+        {"$sort": {"_id": 1}}
+    ]
+    dist = await db.testimonials.aggregate(dist_pipeline).to_list(10)
+    rating_distribution = {str(int(d["_id"])): d["count"] for d in dist if d.get("_id")}
+
+    return {
+        "total": total,
+        "published": published,
+        "pending": pending,
+        "rejected": rejected,
+        "avg_rating": avg_rating,
+        "rating_distribution": rating_distribution,
+    }

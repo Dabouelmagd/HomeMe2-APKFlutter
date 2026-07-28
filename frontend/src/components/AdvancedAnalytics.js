@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import {
   ChartBarIcon,
+  StarIcon,
   UsersIcon,
   CurrencyDollarIcon,
   ClockIcon,
@@ -84,7 +85,19 @@ const AdvancedAnalytics = () => {
   useEffect(() => {
     fetchAnalytics();
     if (activeTab === 'ads') fetchAdAnalytics();
+    if (activeTab === 'testimonials') fetchTestimonialAnalytics();
   }, [dateRange, activeTab]);
+
+  const fetchTestimonialAnalytics = async () => {
+    try {
+      const res = await axios.get(`${API}/owner/testimonials`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      setTestimonialData(res.data);
+    } catch (err) {
+      console.error('Testimonials fetch error:', err);
+    }
+  };
 
   const fetchAdAnalytics = async () => {
     try {
@@ -401,7 +414,8 @@ const AdvancedAnalytics = () => {
             { key: 'maintenance', label: t('maintenance'), icon: WrenchScrewdriverIcon },
             ...(isSuperAdminOnly ? [] : [{ key: 'financial', label: t('financial'), icon: CurrencyDollarIcon }]),
             { key: 'engagement', label: t('engagement'), icon: BellIcon },
-            { key: 'ads', label: t('ad_analytics_tab', 'تقارير الإعلانات'), icon: SpeakerWaveIcon }
+            { key: 'ads', label: t('ad_analytics_tab', 'تقارير الإعلانات'), icon: SpeakerWaveIcon },
+            { key: 'testimonials', label: 'التقييمات', icon: StarIcon }
           ].map(tab => {
             const Icon = tab.icon;
             return (

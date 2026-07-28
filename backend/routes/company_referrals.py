@@ -273,21 +273,40 @@ async def apply_pending_credit(
 # =============================================================================
 @router.get("/public/referral/lookup/{code}")
 async def public_lookup(code: str):
-    """Validate a referral code before signup. Returns referring company name."""
+    """Validate a referral code before signup.
+    Handles both company referrals (CO-XXXXX) and individual referrals (HOMEME-XXXXX).
+    """
     db = get_db()
     code = (code or "").strip().upper()
-    if not code.startswith(CODE_PREFIX):
-        return {"valid": False}
-    ref = await db.company_referrals.find_one({"code": code}, {"_id": 0, "company_id": 1})
+
+    # ── Company referral code (CO-XXXXX) ──────────────────────────────────────
+    if code.startswith(CODE_PREFIX):
+        ref = await db.company_referrals.find_one({"code": code}, {"_id": 0, "company_id": 1})
+        if not ref:
+            return {"valid": False}
+        company = await db.companies.find_one(
+            {"id": ref["company_id"]}, {"_id": 0, "name": 1}
+        )
+        return {
+            "valid": True,
+            "code": code,
+            "type": "company",
+            "referrer_company_name": (company or {}).get("name") or "شركة HomeMe",
+        }
+
+    # ── Individual referral code (HOMEME-XXXXX or custom prefix) ──────────────
+    ref = await db.referrals.find_one({"code": code}, {"_id": 0, "user_id": 1})
     if not ref:
         return {"valid": False}
-    company = await db.companies.find_one(
-        {"id": ref["company_id"]}, {"_id": 0, "name": 1}
+    user = await db.users.find_one(
+        {"id": ref["user_id"]}, {"_id": 0, "full_name": 1, "username": 1}
     )
+    referrer_name = (user or {}).get("full_name") or (user or {}).get("username") or "HomeMe"
     return {
         "valid": True,
         "code": code,
-        "referrer_company_name": (company or {}).get("name") or "شركة HomeMe",
+        "type": "individual",
+        "referrer_company_name": referrer_name,
     }
 
 

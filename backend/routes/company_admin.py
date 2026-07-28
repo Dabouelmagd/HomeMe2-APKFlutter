@@ -1380,3 +1380,90 @@ async def add_compound_team_member(
     user_doc.pop("_id", None)
     user_doc.pop("password_hash", None)
     return {"success": True, "member": serialize_datetime(user_doc)}
+
+
+# ==================== Company Admin — Bulk Import Residents ====================
+
+@router.post("/company-admin/compounds/{compound_id}/residents/bulk-import/preview")
+async def company_bulk_import_preview(
+    compound_id: str,
+    file: UploadFile = File(...),
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """معاينة ملف Excel/CSV قبل الاستيراد الفعلي."""
+    from routes.bulk_import_residents import _parse_workbook, _validate_rows
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+
+    compound = await db.compounds.find_one({"id": compound_id}, {"_id": 0})
+    if not compound:
+        raise HTTPException(status_code=404, detail="الكمبوند غير موجود")
+    if compound.get("company_id") != cid and compound.get("management_company_id") != cid:
+        raise HTTPException(status_code=403, detail="هذا الكمبوند لا ينتمي لشركتك")
+
+    file_bytes = await file.read()
+    try:
+        rows = _parse_workbook(file_bytes, file.filename)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"خطأ في قراءة الملف: {e}")
+
+    validated = await _validate_rows(db, rows, compound_id)
+    return {"compound_id": compound_id, "rows": validated, "total": len(validated) if isinstance(validated, list) else 0}
+
+
+@router.post("/company-admin/compounds/{compound_id}/residents/bulk-import/commit")
+async def company_bulk_import_commit(
+    compound_id: str,
+    payload: dict,
+    current_user: dict = Depends(_require_company_admin),
+    company_id: Optional[str] = None,
+):
+    """تنفيذ الاستيراد الفعلي للسكان."""
+    from routes.bulk_import_residents import commit_bulk_import as _commit
+    db = get_db()
+    cid = await _resolve_company_id(current_user, company_id)
+
+    compound = await db.compounds.find_one({"id": compound_id}, {"_id": 0})
+    if not compound:
+        raise HTTPException(status_code=404, detail="الكمبوند غير موجود")
+    if compound.get("company_id") != cid and compound.get("management_company_id") != cid:
+        raise HTTPException(status_code=403, detail="هذا الكمبوند لا ينتمي لشركتك")
+
+    rows = payload.get("rows", [])
+    if not rows:
+        raise HTTPException(status_code=400, detail="لا توجد بيانات للاستيراد")
+
+    # Use the preview route to commit validated rows directly
+    created = 0
+    failed = 0
+    for row in rows:
+        if not row.get("ok"):
+            failed += 1
+            continue
+        try:
+            r = row.get("data", row)
+            password_hash = bcrypt.hashpw(
+                (r.get("password") or "HomeMe2026!").encode(), bcrypt.gensalt()
+            ).decode()
+            await db.users.insert_one({
+                "id": str(uuid.uuid4()),
+                "username": r.get("username") or f"user_{uuid.uuid4().hex[:6]}",
+                "email": r.get("email") or "",
+                "password_hash": password_hash,
+                "full_name": r.get("full_name") or "",
+                "phone": r.get("phone") or "",
+                "unit_number": r.get("unit_number") or "",
+                "national_id": r.get("national_id") or "",
+                "role": r.get("role") or "resident",
+                "compound_id": compound_id,
+                "company_id": cid,
+                "is_active": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "created_by": current_user.get("id"),
+            })
+            created += 1
+        except Exception:
+            failed += 1
+    stats = {"created": created, "failed": failed, "skipped": 0}
+    return {"success": True, "compound_id": compound_id, **stats}

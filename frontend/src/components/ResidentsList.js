@@ -18,6 +18,7 @@ import {
 import { toast } from 'sonner';
 import CreateResidentModal from './CreateResidentModal';
 import BulkImportResidentsModal from './BulkImportResidentsModal';
+import EditResidentModal from './EditResidentModal';
 import PageHeader from './shared/PageHeader';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -48,6 +49,9 @@ const ResidentsList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showBulkImport, setShowBulkImport] = useState(false);
+  const [editResident, setEditResident] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState('');
   const [sortOrder, setSortOrder] = useState('newest');
   const [units] = useState([{ id: 'test-unit-1', unit_number: 'TEST001' }]);
@@ -320,12 +324,16 @@ const ResidentsList = () => {
                       <span className="text-xs font-medium text-gray-600 group-hover:text-blue-600">{t('view_profile', 'عرض الملف')}</span>
                     </button>
                     
-                    <button className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-green-50 transition-colors group">
+                    <button
+                      onClick={() => setEditResident(resident)}
+                      className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-green-50 transition-colors group">
                       <PencilIcon className="h-5 w-5 text-gray-600 group-hover:text-green-600" />
                       <span className="text-xs font-medium text-gray-600 group-hover:text-green-600">{t('edit', 'تعديل')}</span>
                     </button>
                     
-                    <button className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-red-50 transition-colors group">
+                    <button
+                      onClick={() => setDeleteConfirm(resident)}
+                      className="flex flex-col items-center gap-1 p-3 rounded-lg hover:bg-red-50 transition-colors group">
                       <TrashIcon className="h-5 w-5 text-gray-600 group-hover:text-red-600" />
                       <span className="text-xs font-medium text-gray-600 group-hover:text-red-600">{t('delete', 'حذف')}</span>
                     </button>
@@ -348,6 +356,44 @@ const ResidentsList = () => {
           onClose={() => setShowBulkImport(false)}
           onImported={() => { setShowBulkImport(false); window.location.reload(); }}
         />
+      )}
+
+      {editResident && (
+        <EditResidentModal
+          resident={editResident}
+          onClose={() => setEditResident(null)}
+          onUpdated={() => { setEditResident(null); window.location.reload(); }}
+        />
+      )}
+
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" dir="rtl">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <div className="text-center mb-4">
+              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <TrashIcon className="h-7 w-7 text-red-600" />
+              </div>
+              <h3 className="font-bold text-gray-900 dark:text-white text-lg">تأكيد الحذف</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                هل تريد حذف <strong className="text-gray-800 dark:text-gray-200">{deleteConfirm.full_name}</strong>؟
+                <br />هذا الإجراء لا يمكن التراجع عنه.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleDelete(deleteConfirm)}
+                disabled={deleting}
+                className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl transition-colors">
+                {deleting ? 'جارٍ الحذف...' : 'نعم، احذف'}
+              </button>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-bold py-2.5 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

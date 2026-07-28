@@ -2426,6 +2426,8 @@ from routes.subscriptions import router as subscriptions_router
 from routes.chat import router as chat_router
 from routes.search import router as search_router
 from routes.global_search import router as global_search_router
+from routes.compound_map import router as compound_map_router
+app.include_router(compound_map_router)
 app.include_router(global_search_router)
 from routes.scheduled_msgs import router as scheduled_msgs_router
 from routes.services import router as services_router

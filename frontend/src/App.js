@@ -148,6 +148,7 @@ import OwnerBudget from './components/OwnerBudget';
 import SubscriptionReminders from './components/SubscriptionReminders';
 import NotificationPreferencesPage from './components/NotificationPreferencesPage';
 import CompoundMap from './components/CompoundMap';
+import CompoundGoogleMap from './components/CompoundGoogleMap';
 import StaffManagement from './components/StaffManagement';
 import AboutUs from './components/AboutUs';
 import FAQPage from './pages/FAQPage';
@@ -1056,7 +1057,7 @@ function App() {
                   <NotificationPreferencesPage />
                 } />
                 <Route path="compound-map" element={
-                  <CompoundMap />
+                  <CompoundGoogleMap />
                 } />
                 <Route path="staff" element={
                   <ProtectedRoute requiredRole="admin">

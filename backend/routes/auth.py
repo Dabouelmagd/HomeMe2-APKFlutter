@@ -345,6 +345,23 @@ async def login(user_data: UserLogin, request: Request):
             request=request,
             success=False,
         )
+        # Send security alert email to user
+        try:
+            locked_user = await db.users.find_one({"username": user_data.username}, {"_id": 0, "email": 1, "username": 1, "full_name": 1})
+            if locked_user and locked_user.get("email"):
+                frontend_url = os.environ.get("FRONTEND_URL", "https://homemeapp.net")
+                reset_link = f"{frontend_url}/forgot-password"
+                import asyncio as _asyncio
+                _asyncio.create_task(email_service.send_security_alert(
+                    to_email=locked_user["email"],
+                    username=locked_user.get("full_name") or locked_user.get("username", ""),
+                    event_type="rate_limited",
+                    event_details=f"تم رصد {recent_failed} محاولة دخول فاشلة على حسابك في الـ 15 دقيقة الأخيرة. تم تعليق تسجيل الدخول مؤقتاً لحماية حسابك.",
+                    reset_link=reset_link,
+                    ip_address=client_ip or "",
+                ))
+        except Exception:
+            pass
         raise HTTPException(
             status_code=429,
             detail=(

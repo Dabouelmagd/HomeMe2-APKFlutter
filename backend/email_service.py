@@ -817,4 +817,182 @@ class EmailService:
         subject = f"🧾 فاتورة HomeMe #{invoice_number} — خطة {plan_name}"
         return await self.send_email(to_email, subject, html)
 
+    async def send_security_alert(
+        self,
+        to_email: str,
+        username: str,
+        event_type: str,
+        event_details: str,
+        reset_link: str = "",
+        ip_address: str = "",
+    ) -> bool:
+        """إرسال تنبيه أمني للمستخدم عند حدث مشبوه."""
+
+        EVENTS = {
+            "rate_limited": {
+                "title": "⚠️ تم تجاوز حد محاولات الدخول",
+                "color": "#d97706",
+                "bg": "#fef9c3",
+                "icon": "🔒",
+                "action": "تم حظر تسجيل الدخول مؤقتاً لمدة 15 دقيقة",
+            },
+            "failed_login": {
+                "title": "🚨 محاولة دخول فاشلة",
+                "color": "#dc2626",
+                "bg": "#fee2e2",
+                "icon": "⚠️",
+                "action": "إذا لم تكن أنت، يرجى تغيير كلمة المرور فوراً",
+            },
+            "account_locked": {
+                "title": "🔐 تم قفل حسابك مؤقتاً",
+                "color": "#7c3aed",
+                "bg": "#ede9fe",
+                "icon": "🔐",
+                "action": "حسابك محمي — يمكنك إعادة المحاولة بعد 15 دقيقة",
+            },
+            "password_changed": {
+                "title": "✅ تم تغيير كلمة المرور",
+                "color": "#059669",
+                "bg": "#d1fae5",
+                "icon": "✅",
+                "action": "إذا لم تكن أنت من قام بهذا التغيير، تواصل معنا فوراً",
+            },
+            "new_login": {
+                "title": "🖥️ تسجيل دخول جديد",
+                "color": "#2563eb",
+                "bg": "#dbeafe",
+                "icon": "🖥️",
+                "action": "إذا لم تكن أنت، يرجى تأمين حسابك",
+            },
+        }
+
+        ev = EVENTS.get(event_type, {
+            "title": "تنبيه أمني",
+            "color": "#6b7280",
+            "bg": "#f3f4f6",
+            "icon": "ℹ️",
+            "action": event_details,
+        })
+
+        reset_section = f"""
+        <div style="text-align:center;margin:24px 0;">
+          <a href="{reset_link}" style="background:#059669;color:#fff;text-decoration:none;padding:12px 32px;border-radius:10px;font-size:15px;font-weight:700;display:inline-block;">
+            🔑 تغيير كلمة المرور الآن
+          </a>
+        </div>""" if reset_link else ""
+
+        ip_section = f'<p style="font-size:12px;color:#9ca3af;margin:8px 0 0;">عنوان IP: {ip_address}</p>' if ip_address else ""
+
+        html = f"""<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:Cairo,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr><td align="center" style="padding:40px 20px;">
+    <table width="560" style="background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);overflow:hidden;">
+
+      <tr><td style="background:linear-gradient(135deg,#059669,#10b981);padding:24px 32px;text-align:center;">
+        <p style="margin:0;font-size:20px;font-weight:700;color:#fff;">🏠 HomeMe</p>
+        <p style="margin:4px 0 0;font-size:12px;color:#a7f3d0;">مركز الأمان والحماية</p>
+      </td></tr>
+
+      <tr><td style="padding:28px 32px;">
+
+        <div style="background:{ev['bg']};border-radius:12px;padding:20px;text-align:center;margin-bottom:24px;">
+          <p style="margin:0;font-size:36px;">{ev['icon']}</p>
+          <p style="margin:8px 0 0;font-size:17px;font-weight:700;color:{ev['color']};">{ev['title']}</p>
+        </div>
+
+        <p style="font-size:15px;color:#374151;margin:0 0 16px;">مرحباً <strong>{username}</strong>،</p>
+
+        <div style="background:#f9fafb;border-right:4px solid {ev['color']};border-radius:0 8px 8px 0;padding:14px 16px;margin-bottom:16px;">
+          <p style="margin:0;font-size:14px;color:#374151;">{event_details}</p>
+          {ip_section}
+        </div>
+
+        <p style="font-size:13px;color:#6b7280;line-height:1.7;">{ev['action']}</p>
+
+        {reset_section}
+
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:14px;margin-top:20px;">
+          <p style="margin:0;font-size:13px;color:#166534;">
+            🛡️ HomeMe لن يطلب منك كلمة مرورك عبر البريد الإلكتروني أبداً.<br>
+            للتواصل مع الدعم: <a href="mailto:homeme_superadmin@datalifeai.com" style="color:#059669;">homeme_superadmin@datalifeai.com</a>
+          </p>
+        </div>
+
+      </td></tr>
+
+      <tr><td style="background:#f9fafb;padding:14px 32px;border-top:1px solid #e5e7eb;text-align:center;">
+        <p style="margin:0;font-size:11px;color:#9ca3af;">HomeMe Security — {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M')} UTC</p>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body></html>"""
+
+        subject = f"🔔 {ev['title']} — HomeMe"
+        return await self.send_email(to_email, subject, html)
+
+
+    async def send_app_event_alert(
+        self,
+        to_email: str,
+        username: str,
+        event_title: str,
+        event_body: str,
+        action_label: str = "",
+        action_link: str = "",
+        severity: str = "info",  # info | warning | error | success
+    ) -> bool:
+        """إرسال إشعار بريدي لأي حدث مهم في التطبيق."""
+
+        SEVERITY_STYLES = {
+            "info":    {"color": "#2563eb", "bg": "#dbeafe", "icon": "ℹ️"},
+            "warning": {"color": "#d97706", "bg": "#fef9c3", "icon": "⚠️"},
+            "error":   {"color": "#dc2626", "bg": "#fee2e2", "icon": "🚨"},
+            "success": {"color": "#059669", "bg": "#d1fae5", "icon": "✅"},
+        }
+        s = SEVERITY_STYLES.get(severity, SEVERITY_STYLES["info"])
+
+        action_btn = f"""
+        <div style="text-align:center;margin:20px 0;">
+          <a href="{action_link}" style="background:{s['color']};color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;display:inline-block;">
+            {action_label}
+          </a>
+        </div>""" if action_link and action_label else ""
+
+        html = f"""<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f9fafb;font-family:Cairo,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr><td align="center" style="padding:40px 20px;">
+    <table width="560" style="background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);overflow:hidden;">
+      <tr><td style="background:linear-gradient(135deg,#059669,#10b981);padding:20px 32px;text-align:center;">
+        <p style="margin:0;font-size:18px;font-weight:700;color:#fff;">🏠 HomeMe</p>
+      </td></tr>
+      <tr><td style="padding:28px 32px;">
+        <div style="background:{s['bg']};border-radius:12px;padding:16px;text-align:center;margin-bottom:20px;">
+          <p style="margin:0;font-size:28px;">{s['icon']}</p>
+          <p style="margin:8px 0 0;font-size:16px;font-weight:700;color:{s['color']};">{event_title}</p>
+        </div>
+        <p style="font-size:14px;color:#374151;margin:0 0 16px;">مرحباً <strong>{username}</strong>،</p>
+        <div style="background:#f9fafb;border-radius:10px;padding:16px;margin-bottom:16px;font-size:14px;color:#374151;line-height:1.8;">
+          {event_body}
+        </div>
+        {action_btn}
+        <p style="font-size:12px;color:#9ca3af;text-align:center;margin:16px 0 0;">
+          للدعم: <a href="mailto:homeme_superadmin@datalifeai.com" style="color:#059669;">homeme_superadmin@datalifeai.com</a>
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>"""
+
+        subject = f"{s['icon']} {event_title} — HomeMe"
+        return await self.send_email(to_email, subject, html)
+
 email_service = EmailService()

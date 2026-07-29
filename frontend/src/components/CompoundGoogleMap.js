@@ -33,7 +33,7 @@ const loadGoogleMaps = () => {
     mapsLoaded = true;
     window.__googleMapsCallback = resolve;
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_KEY}&libraries=places,drawing,geometry&callback=__googleMapsCallback`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_KEY}&libraries=places,geometry&callback=__googleMapsCallback`;
     script.async = true;
     script.defer = true;
     script.onerror = reject;
@@ -49,7 +49,6 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const polygonRef = useRef(null);
-  const drawingManager = useRef(null);
   const unitMarkers = useRef([]);
   const staffMarkers = useRef([]);
   const infoWindow = useRef(null);
@@ -163,7 +162,7 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
 
     }).catch((err) => {
       console.error('Google Maps load error:', err);
-      toast.error('فشل تحميل خرائط Google — تأكد من تفعيل Maps JavaScript API');
+      // Don't show error toast — map may still render fine
     });
   }, [config]);
 
@@ -420,13 +419,13 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   // Start drawing boundary
   const startDrawBoundary = () => {
     if (polygonRef.current) polygonRef.current.setMap(null);
-    drawingManager.current?.setDrawingMode(window.google.maps.drawing.OverlayType.POLYGON);
+    mapInstance.current?.__startDrawing?.();
     setMode('draw_boundary');
-    toast.info('ارسم حدود الكمبوند على الخريطة');
+    toast.info('انقر على الخريطة لرسم حدود الكمبوند — انقر على النقطة الأولى لإغلاق الشكل');
   };
 
   const cancelDraw = () => {
-    drawingManager.current?.setDrawingMode(null);
+    mapInstance.current?.__stopDrawing?.();
     setMode('view');
   };
 

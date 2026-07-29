@@ -732,8 +732,9 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
 
         {/* Mode indicator */}
         {mode === 'draw_boundary' && (
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">
-            ارسم الحدود بالنقر على الخريطة — انقر على النقطة الأولى للإغلاق
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+            <span className="animate-pulse">●</span>
+            انقر لإضافة نقاط الحدود — النقطة البيضاء للإغلاق
           </div>
         )}
       </div>

@@ -21,7 +21,7 @@ import {
   ArrowRightOnRectangleIcon, Squares2X2Icon, XMarkIcon,
   MapIcon, ArrowUpTrayIcon, AdjustmentsHorizontalIcon,
   GiftIcon, MoonIcon, NoSymbolIcon, ChatBubbleBottomCenterTextIcon,
-  ListBulletIcon
+  ListBulletIcon, MagnifyingGlassIcon, ArrowsRightLeftIcon
 } from '@heroicons/react/24/outline';
 
 import InternalAdBanner from './InternalAdBanner';
@@ -342,6 +342,9 @@ const HomePage = () => {
     { icon: AdjustmentsHorizontalIcon, category: 'comms', title: '🔔 ' + t('sys_notif_prefs', 'تفضيلات الإشعارات'), desc: t('sys_notif_prefs_d', 'كل مستخدم يتحكم في قنوات تنبيهاته (Email/Push/SMS) لكل نوع حدث'), color: 'from-orange-500 to-amber-600', isNew: true },
     { icon: MapIcon, category: 'admin', title: '🗺️ ' + t('sys_compound_map', 'خريطة الكمبوند التفاعلية'), desc: t('sys_compound_map_d', 'عرض جغرافي بصري لكل المباني والوحدات مع ربط مباشر لملف الساكن'), color: 'from-green-500 to-emerald-600', isNew: true },
     { icon: ArrowUpTrayIcon, category: 'admin', title: '📋 ' + t('sys_csv_import', 'استيراد السكان CSV'), desc: t('sys_csv_import_d', 'رفع ملف Excel/CSV لإضافة مئات السكان دفعة واحدة مع التحقق الذكي من الأخطاء'), color: 'from-teal-500 to-cyan-600', isNew: true },
+    { icon: MapIcon, category: 'security', title: '🚗 تتبع مركبات الأمن', desc: 'تتبع مواقع سيارات الأمن والموتوسيكلات داخل الكمبوند بشكل مباشر مع مسار الحركة وتاريخ التنقلات', color: 'from-blue-600 to-indigo-700', isNew: true },
+    { icon: MagnifyingGlassIcon, category: 'admin', title: '🔍 بحث شامل في التطبيق', desc: 'بحث موحد يغطي السكان والوحدات والفواتير والصيانة والإعلانات من مكان واحد مع تصفية حسب الدور', color: 'from-violet-500 to-purple-600', isNew: true },
+    { icon: ArrowsRightLeftIcon, category: 'admin', title: '🔄 تبديل الحسابات الفوري', desc: 'إمكانية ربط أكثر من حساب (أدمن + ساكن + موظف) والتبديل بينهم من dropdown واحد بدون تسجيل خروج', color: 'from-amber-500 to-orange-600', isNew: true },
     { icon: EnvelopeIcon, category: 'comms', title: '📧 ' + t('sys_email_logs', 'سجل البريد الإلكتروني'), desc: t('sys_email_logs_d', 'لوحة super-admin: نجاح/فشل/Bounce + إعادة إرسال + كشف الـ bounces تلقائياً'), color: 'from-indigo-500 to-blue-600', isNew: true },
     { icon: NewspaperIcon, category: 'comms', title: '📝 ' + t('sys_content_hub', 'مدوّنة Content Hub'), desc: t('sys_content_hub_d', '10+ مقالات عربية + تعليقات + CMS مع اقتراح SEO بالـ AI'), color: 'from-rose-500 to-pink-600', isNew: true },
     { icon: CheckCircleIcon, category: 'security', title: '✅ ' + t('sys_email_verify', 'تأكيد البريد الإلكتروني'), desc: t('sys_email_verify_d', 'حماية ضد الحسابات الوهمية: لازم تفعيل الإيميل قبل أول تسجيل دخول'), color: 'from-emerald-500 to-green-600', isNew: true },
@@ -738,6 +741,12 @@ const HomePage = () => {
     { name: t('f_smart_devices', 'الأجهزة الذكية والأتمتة (قريباً)'), starter: false, basic: false, pro: false, premium: true },
     { name: t('f_custom_api', 'API مخصص للتكامل'), starter: false, basic: false, pro: false, premium: true },
     { name: t('f_custom_reports', 'تقارير مخصصة'), starter: false, basic: false, pro: false, premium: true },
+    { name: '🗺️ خريطة الكمبوند التفاعلية', starter: false, basic: true, pro: true, premium: true },
+    { name: '🚗 تتبع مركبات الأمن', starter: false, basic: false, pro: true, premium: true },
+    { name: '🔍 بحث شامل في التطبيق', starter: true, basic: true, pro: true, premium: true },
+    { name: '🔄 تبديل الحسابات الفوري', starter: true, basic: true, pro: true, premium: true },
+    { name: '📧 إشعارات بريد لكل حدث', starter: false, basic: true, pro: true, premium: true },
+    { name: '🧾 فاتورة ضريبية تلقائية', starter: false, basic: true, pro: true, premium: true },
     { name: t('f_24_7_support', 'دعم فني مخصص 24/7'), starter: false, basic: false, pro: false, premium: true },
     { name: t('f_team_training', 'تدريب الفريق'), starter: false, basic: false, pro: false, premium: true },
     { name: t('f_account_manager', 'مدير حساب مخصص'), starter: false, basic: false, pro: false, premium: true },

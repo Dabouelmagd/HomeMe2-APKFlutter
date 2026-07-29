@@ -85,21 +85,31 @@ async def owner_kpis(current_user: dict = Depends(get_current_user)):
             pass
     churn_30d = round((cancelled_30d / max(1, active_at_window_start)) * 100, 2)
 
-    # ── Top compounds by resident count ──
+    # ── All compounds with live stats ──
     top_compounds = []
     try:
-        agg = await db.users.aggregate([
-            {"$match": {"compound_id": {"$ne": None}, "role": {"$in": ["resident", "family_head", "family_member"]}}},
-            {"$group": {"_id": "$compound_id", "count": {"$sum": 1}}},
-            {"$sort": {"count": -1}},
-            {"$limit": 5},
-        ]).to_list(length=5)
-        for r in agg:
-            c = await db.compounds.find_one({"id": r["_id"]}, {"_id": 0, "name": 1, "address": 1})
-            if c:
-                top_compounds.append({"compound_id": r["_id"], "name": c.get("name"), "address": c.get("address"), "residents": r["count"]})
-    except Exception:
-        pass
+        all_compounds = await db.compounds.find({}, {"_id": 0}).to_list(length=100)
+        for c in all_compounds:
+            cid = c.get("id")
+            residents = await db.users.count_documents({"compound_id": cid, "role": {"$in": ["resident", "family_head", "family_member"]}})
+            staff = await db.users.count_documents({"compound_id": cid, "role": {"$in": ["admin", "manager", "security", "accountant"]}})
+            total_users = await db.users.count_documents({"compound_id": cid})
+            top_compounds.append({
+                "compound_id": cid,
+                "name": c.get("name", ""),
+                "address": c.get("address", ""),
+                "city": c.get("city", ""),
+                "residents": residents,
+                "staff": staff,
+                "total_users": total_users,
+                "is_active": c.get("is_active", True),
+                "logo": c.get("logo", ""),
+                "created_at": c.get("created_at", ""),
+            })
+        # Sort by total users desc
+        top_compounds.sort(key=lambda x: x["total_users"], reverse=True)
+    except Exception as e:
+        logger.warning(f"top_compounds error: {e}")
 
     # ── Daily signups last 30d ──
     daily_signups = []

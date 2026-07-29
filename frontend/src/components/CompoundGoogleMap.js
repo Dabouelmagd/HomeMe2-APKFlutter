@@ -59,6 +59,8 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   const [staff, setStaff] = useState([]);
 
   const [mode, setMode] = useState('view'); // view | draw_boundary | place_unit
+  const [drawPoints, setDrawPoints] = useState([]);
+  const overlayClickRef = useRef(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
 
   const [showUnits, setShowUnits] = useState(true);
@@ -419,14 +421,75 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   // Start drawing boundary
   const startDrawBoundary = () => {
     if (polygonRef.current) polygonRef.current.setMap(null);
-    mapInstance.current?.__startDrawing?.();
+    setDrawPoints([]);
     setMode('draw_boundary');
-    toast.info('انقر على الخريطة لرسم حدود الكمبوند — انقر على النقطة الأولى لإغلاق الشكل');
+    toast.info('انقر على الخريطة لرسم حدود الكمبوند');
   };
 
   const cancelDraw = () => {
-    mapInstance.current?.__stopDrawing?.();
+    setDrawPoints([]);
     setMode('view');
+    // Redraw existing boundary if any
+    if (config?.boundary?.length > 2 && mapInstance.current) {
+      drawBoundary(mapInstance.current, config.boundary);
+    }
+  };
+
+  // Handle overlay click for drawing
+  const handleOverlayClick = (e) => {
+    if (mode !== 'draw_boundary' || !mapInstance.current) return;
+    const map = mapInstance.current;
+    const div = mapRef.current;
+    const rect = div.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Convert pixel to lat/lng
+    const projection = map.getProjection();
+    if (!projection) return;
+
+    const bounds = map.getBounds();
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
+    const scale = Math.pow(2, map.getZoom());
+    const worldWidth = 256 * scale;
+    const worldHeight = 256 * scale;
+
+    const neLng = ne.lng();
+    const swLng = sw.lng();
+    const neLat = ne.lat();
+    const swLat = sw.lat();
+
+    const lng = swLng + (x / div.offsetWidth) * (neLng - swLng);
+    const lat = neLat - (y / div.offsetHeight) * (neLat - swLat);
+
+    const newPoints = [...drawPoints, { lat, lng }];
+    setDrawPoints(newPoints);
+
+    // Draw markers + polyline
+    if (polygonRef.current) polygonRef.current.setMap(null);
+    if (newPoints.length >= 3) {
+      polygonRef.current = new window.google.maps.Polygon({
+        paths: newPoints,
+        strokeColor: '#dc2626', strokeWeight: 3,
+        fillColor: '#dc2626', fillOpacity: 0.1,
+        map,
+      });
+    }
+  };
+
+  const finishDrawing = () => {
+    if (drawPoints.length < 3) { toast.error('ارسم 3 نقاط على الأقل'); return; }
+    if (polygonRef.current) polygonRef.current.setMap(null);
+    polygonRef.current = new window.google.maps.Polygon({
+      paths: drawPoints,
+      strokeColor: '#dc2626', strokeWeight: 3,
+      fillColor: '#dc2626', fillOpacity: 0.1,
+      editable: true,
+      map: mapInstance.current,
+    });
+    setMode('view');
+    toast.success('✅ تم رسم الحدود — اضغط "حفظ الحدود" لتأكيدها');
   };
 
 
@@ -730,11 +793,36 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
         ) : null}
         <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
 
+        {/* Drawing overlay — captures clicks above the map */}
+        {mode === 'draw_boundary' && (
+          <div
+            onClick={handleOverlayClick}
+            style={{
+              position: 'absolute', inset: 0,
+              cursor: 'crosshair',
+              zIndex: 10,
+              background: 'transparent',
+            }}
+          />
+        )}
+
         {/* Mode indicator */}
         {mode === 'draw_boundary' && (
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
-            <span className="animate-pulse">●</span>
-            انقر لإضافة نقاط الحدود — النقطة البيضاء للإغلاق
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-2" style={{zIndex: 20}}>
+            <div className="bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+              <span className="animate-pulse">●</span>
+              {drawPoints.length === 0 ? 'انقر على الخريطة لبدء رسم الحدود' :
+               drawPoints.length < 3 ? `${drawPoints.length} نقطة — أضف ${3 - drawPoints.length} نقاط على الأقل` :
+               `${drawPoints.length} نقطة — اضغط "إنهاء" لإغلاق الشكل`}
+            </div>
+            {drawPoints.length >= 3 && (
+              <button
+                onClick={finishDrawing}
+                style={{zIndex: 20}}
+                className="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:bg-emerald-700 transition-colors">
+                ✅ إنهاء الرسم
+              </button>
+            )}
           </div>
         )}
       </div>

@@ -28,7 +28,9 @@ async def create_compound(compound_data: CompoundCreate, current_user: dict = De
 async def get_compound(compound_id: str, current_user: dict = Depends(get_current_user)):
     try:
         db = get_db()
-        if current_user.get('compound_id','') != compound_id:
+        role = current_user.get('role', '')
+        allowed_roles = ('app_owner', 'super_admin', 'company_admin')
+        if role not in allowed_roles and current_user.get('compound_id','') != compound_id:
             raise HTTPException(status_code=403, detail="Access denied")
         
         compound = await db.compounds.find_one({"id": compound_id})

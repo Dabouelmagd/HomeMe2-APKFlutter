@@ -682,7 +682,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: t('dashboard'), href: 'dashboard', icon: HomeIcon, show: true },
         { name: t('compound_management'), href: 'compound', icon: BuildingOfficeIcon, show: isAdminRole && activeRole !== 'company_admin' },
         { name: t('residents_list'), href: 'residents', icon: UserGroupIcon, show: isStaffRole },
-        { name: t('compound_map', 'خريطة الكمبوند'), href: 'compound-map', icon: MapIcon, show: isStaffRole, badge: 'جديد' },
+        { name: t('compound_map', 'خريطة الكمبوند'), href: 'compound-map', icon: MapIcon, show: isAdminRole, badge: 'جديد' },
         { name: t('user_management'), href: 'users', icon: UsersIcon, show: isAdminRole },
         { name: t('staff_management', 'إدارة المساعدين'), href: 'staff', icon: ShieldCheckIcon, show: isAdminRole, badge: 'جديد' },
         { name: t('monitoring_dashboard'), href: 'monitoring', icon: ChartPieIcon, show: isStaffRole },

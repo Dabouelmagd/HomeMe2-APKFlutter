@@ -80,22 +80,22 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
 
   // ── Load Data ────────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
-    if (!compoundId) { setLoading(false); return; }
+    if (!effectiveCompoundId) { setLoading(false); return; }
     try {
       const tok = { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } };
       const [cfgRes, unitsRes] = await Promise.all([
-        axios.get(`${API}/compounds/${compoundId}/map-config`, tok),
-        axios.get(`${API}/compounds/${compoundId}/map/units`, tok),
+        axios.get(`${API}/compounds/${effectiveCompoundId}/map-config`, tok),
+        axios.get(`${API}/compounds/${effectiveCompoundId}/map/units`, tok),
       ]);
       setConfig(cfgRes.data);
       setUnits(unitsRes.data?.units || []);
 
       if (isAdmin) {
-        const vehicleRes = await axios.get(`${API}/compounds/${compoundId}/map/vehicles`, tok).catch(() => ({ data: { vehicles: [] } }));
+        const vehicleRes = await axios.get(`${API}/compounds/${effectiveCompoundId}/map/vehicles`, tok).catch(() => ({ data: { vehicles: [] } }));
         setVehicles(vehicleRes.data?.vehicles || []);
       }
       if (isAdmin) {
-        const staffRes = await axios.get(`${API}/compounds/${compoundId}/map/staff`, tok);
+        const staffRes = await axios.get(`${API}/compounds/${effectiveCompoundId}/map/staff`, tok);
         setStaff(staffRes.data?.staff || []);
       }
     } catch (e) {
@@ -280,7 +280,7 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
     if (path.length < 3) { toast.error('الحد يحتاج 3 نقاط على الأقل'); return; }
     try {
       const center = mapInstance.current.getCenter();
-      await axios.put(`${API}/compounds/${compoundId}/map-config`, {
+      await axios.put(`${API}/compounds/${effectiveCompoundId}/map-config`, {
         boundary: path,
         center: { lat: center.lat(), lng: center.lng() },
         zoom: mapInstance.current.getZoom(),
@@ -423,12 +423,35 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
     setMode('view');
   };
 
-  if (!compoundId) {
+  const [selectedCompoundId, setSelectedCompoundId] = useState(compoundId);
+  const [allCompounds, setAllCompounds] = useState([]);
+  const effectiveCompoundId = selectedCompoundId || compoundId;
+
+  useEffect(() => {
+    if (!compoundId && ['app_owner','super_admin','company_admin'].includes(user?.role)) {
+      axios.get(`${API}/compounds`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      }).then(r => setAllCompounds(r.data?.compounds || [])).catch(() => {});
+    }
+  }, [compoundId, user?.role]);
+
+  if (!effectiveCompoundId) {
     return (
       <div className="flex items-center justify-center h-64 text-gray-400" dir="rtl">
-        <div className="text-center">
-          <MapIcon className="h-12 w-12 mx-auto mb-2 opacity-40" />
-          <p>لم يتم تحديد الكمبوند</p>
+        <div className="text-center space-y-4">
+          <MapIcon className="h-12 w-12 mx-auto opacity-40" />
+          <p className="text-gray-500">اختاري كمبوند لعرض الخريطة</p>
+          {allCompounds.length > 0 && (
+            <select
+              onChange={e => setSelectedCompoundId(e.target.value)}
+              className="border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 outline-none focus:ring-2 focus:ring-emerald-300"
+              defaultValue="">
+              <option value="" disabled>اختاري كمبوند...</option>
+              {allCompounds.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
     );
@@ -629,7 +652,7 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
           <div className="flex gap-2">
             <button onClick={async () => {
               try {
-                await axios.post(`${API}/compounds/${compoundId}/map/vehicles`,
+                await axios.post(`${API}/compounds/${effectiveCompoundId}/map/vehicles`,
                   newVehicle,
                   { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
                 );

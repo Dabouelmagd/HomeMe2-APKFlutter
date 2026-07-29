@@ -565,7 +565,9 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: t('owner_dashboard', 'لوحة التحكم الرئيسية'), href: 'dashboard', icon: HomeIcon, show: true },
         { name: t('alerts_center', 'لوحة التنبيهات'), href: 'alerts', icon: BellIcon, show: true },
+        { name: '🗺️ خريطة الكمبوندات', href: 'compound-map', icon: MapIcon, show: true, badge: 'جديد' },
         { name: t('sa_compounds', 'المجمعات السكنية'), href: 'super-admin?tab=compounds', icon: BuildingOfficeIcon, show: true },
+        { name: '🗺️ خريطة الكمبوند', href: 'compound-map', icon: MapIcon, show: true, badge: 'جديد' },
         { name: t('sa_users', 'المستخدمين'), href: 'super-admin?tab=users', icon: UsersIcon, show: true },
         { name: t('owner_budget', 'الميزانية العامة'), href: 'owner-budget', icon: CurrencyDollarIcon, show: true },
         { name: t('sa_ads', 'إدارة الإعلانات'), href: 'super-admin?tab=ads', icon: SpeakerWaveIcon, show: true },

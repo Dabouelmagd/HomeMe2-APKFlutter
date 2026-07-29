@@ -967,7 +967,7 @@ const CompoundManagement = () => {
       toast.success(t('residence_created', 'تم إنشاء الوحدة ورب العائلة بنجاح!'));
       
       if (residenceResponse.data.temporary_password) {
-        toast.success(`Family Head Login - Username: ${residenceResponse.data.username}, Password: ${residenceResponse.data.temporary_password}`, { duration: 15000 });
+        toast.success('✅ تم إنشاء حساب رب الأسرة — تم إرسال بيانات الدخول على البريد الإلكتروني', { duration: 5000 });
       }
 
       // Now add family members if any
@@ -1051,7 +1051,7 @@ const CompoundManagement = () => {
       toast.success(t('new_residence_created', 'تم إنشاء وحدة سكنية جديدة بنجاح!'));
       
       if (response.data.temporary_password) {
-        toast.success(`Temporary password: ${response.data.temporary_password}`, { duration: 10000 });
+        toast.success('✅ تم إنشاء الحساب — تم إرسال بيانات الدخول على البريد الإلكتروني', { duration: 5000 });
       }
       
       setShowAddNewResidence(false);

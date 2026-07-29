@@ -99,7 +99,9 @@ client = None
 db = None
 
 # JWT Configuration
-JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
+JWT_SECRET = os.environ.get('JWT_SECRET')
+if not JWT_SECRET:
+    raise ValueError("❌ JWT_SECRET environment variable is required! Generate with: python -c \"import secrets; print(secrets.token_hex(64))\"")
 JWT_ALGORITHM = 'HS256'
 JWT_EXPIRATION_HOURS = 24  # 24 hours (reduced from 7 days for better security)
 

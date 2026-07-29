@@ -1,3 +1,10 @@
+// Suppress console.log in production
+if (process.env.NODE_ENV === 'production') {
+  console.log = () => {};
+  console.debug = () => {};
+  console.info = () => {};
+}
+
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
@@ -36,7 +43,6 @@ function RouteChangeHandler({ children }) {
 // Components
 import Login from './components/Login';
 import Register from './components/Register';
-import DebugLogin from './components/DebugLogin';
 import HomePage from './components/HomePage';
 const BlogIndex = React.lazy(() => import('./pages/BlogIndex'));
 const BlogPost = React.lazy(() => import('./pages/BlogPost'));
@@ -727,7 +733,8 @@ function App() {
               <LanguageInitializer />
               <PageTitleUpdater />
               <RouteChangeHandler>
-                <Routes>
+                <ErrorBoundary>
+      <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth/reset-password" element={<ResetPassword />} />
           <Route path="/terms-privacy" element={<TermsPrivacy />} />
@@ -737,7 +744,7 @@ function App() {
                 <Route path="/join/:token" element={<JoinViaInvite />} />
                 <Route path="/join-family/:token" element={<JoinFamilyByInvite />} />
                 <Route path="/visitor/:token" element={<PublicVisitorPassPage />} />
-                <Route path="/debug-login" element={<DebugLogin />} />
+
                 <Route path="/select-account" element={
                   <ProtectedRoute>
                     <AccountSelector />
@@ -1206,6 +1213,7 @@ function App() {
                 } />
               </Route>
               </Routes>
+      </ErrorBoundary>
             </RouteChangeHandler>
             <GlobalUIProvider />
             <PwaInstallPrompt />

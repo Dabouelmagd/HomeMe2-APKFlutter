@@ -103,7 +103,7 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
     } finally {
       setLoading(false);
     }
-  }, [compoundId, isAdmin]);
+  }, [compoundId, isAdmin, selectedCompoundId]);
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -431,7 +431,14 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
     if (!compoundId && ['app_owner','super_admin','company_admin'].includes(user?.role)) {
       axios.get(`${API}/compounds`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      }).then(r => setAllCompounds(r.data?.compounds || [])).catch(() => {});
+      }).then(r => {
+        const list = r.data?.compounds || [];
+        setAllCompounds(list);
+        // Auto-select first compound
+        if (list.length === 1) {
+          setSelectedCompoundId(list[0].id);
+        }
+      }).catch(() => {});
     }
   }, [compoundId, user?.role]);
 

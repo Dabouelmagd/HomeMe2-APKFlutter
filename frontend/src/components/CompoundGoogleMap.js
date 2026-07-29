@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-const MAPS_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'AIzaSyB1jclwy1oO3CrQ79lJiNS_djExYY89I-E';
+const MAPS_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'AIzaSyBFpCjYAyk3Rqobw3UTzRRkVzdJozrIpNU';
 
 const VEHICLE_ICONS = {
   car:        { svg: '🚗', color: '#3b82f6', label: 'سيارة أمن' },

@@ -35,7 +35,7 @@ const loadGoogleMaps = () => new Promise((resolve, reject) => {
   }
   mapsLoaded = true;
   const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_KEY}&libraries=places,drawing,geometry&loading=async`;
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_KEY}&libraries=places,geometry&loading=async`;
   script.async = true;
   script.defer = true;
   script.onload = resolve;
@@ -103,7 +103,8 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
         setStaff(staffRes.data?.staff || []);
       }
     } catch (e) {
-      toast.error('فشل تحميل بيانات الخريطة');
+      console.error('Map data error:', e);
+      // Don't show error - map can still render
     } finally {
       setLoading(false);
     }
@@ -139,7 +140,7 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
 
       // Drawing manager for admin
       if (isAdmin) {
-        drawingManager.current = new window.google.maps.drawing.DrawingManager({
+        if (window.google.maps.drawing) drawingManager.current = new window.google.maps.drawing.DrawingManager({
           drawingMode: null,
           drawingControl: false,
           polygonOptions: {
@@ -161,7 +162,10 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
         });
       }
 
-    }).catch(() => toast.error('فشل تحميل خرائط Google'));
+    }).catch((err) => {
+      console.error('Google Maps load error:', err);
+      toast.error('فشل تحميل خرائط Google — تأكد من تفعيل Maps JavaScript API');
+    });
   }, [config]);
 
   // ── Draw Boundary ────────────────────────────────────────────────────────

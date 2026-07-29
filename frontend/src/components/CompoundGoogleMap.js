@@ -66,6 +66,8 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   const [showUnits, setShowUnits] = useState(true);
   const [showStaff, setShowStaff] = useState(true);
   const [showBoundary, setShowBoundary] = useState(true);
+  const [selectedCompoundId, setSelectedCompoundId] = useState(compoundId || null);
+  const [allCompounds, setAllCompounds] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [showVehicles, setShowVehicles] = useState(true);
   const [showTracks, setShowTracks] = useState(true);
@@ -79,6 +81,8 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   const isSecurity = user?.role === 'security';
 
   // ── Load Data ────────────────────────────────────────────────────────────
+  const effectiveCompoundId = selectedCompoundId || compoundId;
+
   const loadData = useCallback(async () => {
     if (!effectiveCompoundId) { setLoading(false); return; }
     try {
@@ -423,9 +427,6 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
     setMode('view');
   };
 
-  const [selectedCompoundId, setSelectedCompoundId] = useState(compoundId);
-  const [allCompounds, setAllCompounds] = useState([]);
-  const effectiveCompoundId = selectedCompoundId || compoundId;
 
   useEffect(() => {
     if (!compoundId && ['app_owner','super_admin','company_admin'].includes(user?.role)) {

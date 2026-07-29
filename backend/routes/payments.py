@@ -251,12 +251,12 @@ class SubscriptionPaymentRequest(BaseModel):
 
 PLAN_PRICES_EGP = {
     "starter": 0,
-    "basic": 800,
-    "pro": 1500,
-    "premium": 2800,
+    "basic": 1200,
+    "pro": 2200,
+    "premium": 4000,
     "company_startup": 4000,
-    "company_business": 9500,
-    "company_enterprise": 25000,
+    "company_business": 13000,
+    "company_enterprise": 35000,
 }
 
 DURATION_MULTIPLIERS = {
@@ -442,7 +442,7 @@ async def get_subscription_plans():
             },
             {
                 "id": "basic", "name": "أساسي", "name_en": "Basic",
-                "monthly_egp": 800, "monthly_usd": 16, "residents": "حتى 100 ساكن",
+                "monthly_egp": 1200, "monthly_usd": 25, "residents": "حتى 100 ساكن",
                 "features": [
                     "حتى 100 ساكن",
                     "بوابة دفع إلكتروني",
@@ -452,7 +452,7 @@ async def get_subscription_plans():
             },
             {
                 "id": "pro", "name": "احترافي", "name_en": "Pro",
-                "monthly_egp": 1500, "monthly_usd": 30, "residents": "غير محدود",
+                "monthly_egp": 2200, "monthly_usd": 45, "residents": "غير محدود",
                 "popular": True,
                 "features": [
                     "كل ميزات أساسي",
@@ -464,7 +464,7 @@ async def get_subscription_plans():
             },
             {
                 "id": "premium", "name": "متقدم", "name_en": "Premium",
-                "monthly_egp": 2800, "monthly_usd": 56, "residents": "غير محدود",
+                "monthly_egp": 4000, "monthly_usd": 82, "residents": "غير محدود",
                 "features": [
                     "كل ميزات احترافي",
                     "تكامل بوابات دفع متعددة",
@@ -477,7 +477,7 @@ async def get_subscription_plans():
         "company": [
             {
                 "id": "company_startup", "name": "شركة ناشئة", "name_en": "Startup",
-                "monthly_egp": 4000, "monthly_usd": 80, "compounds": "حتى 3",
+                "monthly_egp": 5500, "monthly_usd": 80, "compounds": "حتى 3",
                 "features": [
                     "حتى 3 كمباوندات",
                     "Dashboard موحّد لكل كمباوندك",
@@ -488,7 +488,7 @@ async def get_subscription_plans():
             },
             {
                 "id": "company_business", "name": "شركة متوسطة", "name_en": "Business",
-                "monthly_egp": 9500, "monthly_usd": 190, "compounds": "1-8",
+                "monthly_egp": 13000, "monthly_usd": 190, "compounds": "1-8",
                 "popular": True,
                 "features": [
                     "حتى 8 كمباوندات",
@@ -501,7 +501,7 @@ async def get_subscription_plans():
             },
             {
                 "id": "company_enterprise", "name": "شركة كبرى", "name_en": "Enterprise",
-                "monthly_egp": 25000, "monthly_usd": 500, "compounds": "غير محدود",
+                "monthly_egp": 35000, "monthly_usd": 500, "compounds": "غير محدود",
                 "features": [
                     "كمباوندات غير محدودة",
                     "كل ميزات الشركة المتوسطة",

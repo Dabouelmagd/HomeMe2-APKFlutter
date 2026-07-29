@@ -31,15 +31,15 @@ router = APIRouter(prefix="/api")
 # ---------------------------------------------------------------------------
 RESIDENTIAL_PLANS = [
     {"key": "starter",  "name_ar": "مجاني",   "name_en": "Starter",  "monthly_egp": 0,    "residents": "up_to_30"},
-    {"key": "basic",    "name_ar": "أساسي",   "name_en": "Basic",    "monthly_egp": 800,  "residents": "up_to_100"},
-    {"key": "pro",      "name_ar": "احترافي", "name_en": "Pro",      "monthly_egp": 1500, "residents": "unlimited"},
-    {"key": "premium",  "name_ar": "متقدم",   "name_en": "Premium",  "monthly_egp": 2800, "residents": "unlimited"},
+    {"key": "basic",    "name_ar": "أساسي",   "name_en": "Basic",    "monthly_egp": 1200,  "residents": "up_to_100"},
+    {"key": "pro",      "name_ar": "احترافي", "name_en": "Pro",      "monthly_egp": 2200, "residents": "unlimited"},
+    {"key": "premium",  "name_ar": "متقدم",   "name_en": "Premium",  "monthly_egp": 4000, "residents": "unlimited"},
 ]
 
 COMPANY_PLANS = [
-    {"key": "startup",     "name_ar": "شركة ناشئة",    "name_en": "Startup",     "monthly_egp": 4000,  "compounds": "up_to_3"},
-    {"key": "business",    "name_ar": "شركة متوسطة",   "name_en": "Business",    "monthly_egp": 9500,  "compounds": "up_to_8"},
-    {"key": "enterprise",  "name_ar": "شركة كبرى",     "name_en": "Enterprise",  "monthly_egp": 25000, "compounds": "unlimited"},
+    {"key": "startup",     "name_ar": "شركة ناشئة",    "name_en": "Startup",     "monthly_egp": 5500,  "compounds": "up_to_3"},
+    {"key": "business",    "name_ar": "شركة متوسطة",   "name_en": "Business",    "monthly_egp": 13000,  "compounds": "up_to_8"},
+    {"key": "enterprise",  "name_ar": "شركة كبرى",     "name_en": "Enterprise",  "monthly_egp": 35000, "compounds": "unlimited"},
 ]
 
 

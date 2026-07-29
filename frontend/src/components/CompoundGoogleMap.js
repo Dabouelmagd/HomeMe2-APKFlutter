@@ -25,23 +25,22 @@ const ROLE_ICON = {
 };
 
 let mapsLoaded = false;
-const loadGoogleMaps = () => new Promise((resolve, reject) => {
-  if (window.google?.maps) { resolve(); return; }
-  if (mapsLoaded) {
-    const check = setInterval(() => {
-      if (window.google?.maps) { clearInterval(check); resolve(); }
-    }, 100);
-    return;
-  }
-  mapsLoaded = true;
-  const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_KEY}&libraries=places,geometry&loading=async`;
-  script.async = true;
-  script.defer = true;
-  script.onload = resolve;
-  script.onerror = reject;
-  document.head.appendChild(script);
-});
+let mapsLoadPromise = null;
+const loadGoogleMaps = () => {
+  if (window.google?.maps?.Map) return Promise.resolve();
+  if (mapsLoadPromise) return mapsLoadPromise;
+  mapsLoadPromise = new Promise((resolve, reject) => {
+    mapsLoaded = true;
+    window.__googleMapsCallback = resolve;
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_KEY}&libraries=places,drawing,geometry&callback=__googleMapsCallback`;
+    script.async = true;
+    script.defer = true;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+  return mapsLoadPromise;
+};
 
 export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   const { user } = useAuth();

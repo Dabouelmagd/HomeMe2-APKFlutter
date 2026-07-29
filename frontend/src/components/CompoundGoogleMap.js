@@ -60,6 +60,9 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
 
   const [mode, setMode] = useState('view'); // view | draw_boundary | place_unit
   const [drawPoints, setDrawPoints] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searching, setSearching] = useState(false);
+  const searchInputRef = useRef(null);
   const overlayClickRef = useRef(null);
   const [selectedUnit, setSelectedUnit] = useState(null);
 
@@ -436,6 +439,66 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   };
 
   // Handle overlay click for drawing
+  // Search by address or Google Maps link
+  const handleSearch = async () => {
+    if (!searchQuery.trim() || !mapInstance.current) return;
+    setSearching(true);
+    try {
+      // Handle Google Maps URL (extract coords)
+      const coordsMatch = searchQuery.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+      const shortCoords = searchQuery.match(/(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
+
+      if (coordsMatch) {
+        const lat = parseFloat(coordsMatch[1]);
+        const lng = parseFloat(coordsMatch[2]);
+        mapInstance.current.setCenter({ lat, lng });
+        mapInstance.current.setZoom(18);
+        new window.google.maps.Marker({
+          position: { lat, lng },
+          map: mapInstance.current,
+          title: searchQuery,
+          animation: window.google.maps.Animation.DROP,
+        });
+        toast.success('✅ تم الانتقال للموقع');
+      } else if (shortCoords && !isNaN(parseFloat(shortCoords[1])) && !isNaN(parseFloat(shortCoords[2]))) {
+        const lat = parseFloat(shortCoords[1]);
+        const lng = parseFloat(shortCoords[2]);
+        mapInstance.current.setCenter({ lat, lng });
+        mapInstance.current.setZoom(18);
+        new window.google.maps.Marker({
+          position: { lat, lng },
+          map: mapInstance.current,
+          animation: window.google.maps.Animation.DROP,
+        });
+        toast.success('✅ تم الانتقال للموقع');
+      } else {
+        // Use Geocoding API
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ address: searchQuery }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            const loc = results[0].geometry.location;
+            mapInstance.current.setCenter(loc);
+            mapInstance.current.setZoom(18);
+            new window.google.maps.Marker({
+              position: loc,
+              map: mapInstance.current,
+              title: results[0].formatted_address,
+              animation: window.google.maps.Animation.DROP,
+            });
+            toast.success(`✅ ${results[0].formatted_address}`);
+          } else {
+            toast.error('لم يتم العثور على الموقع');
+          }
+          setSearching(false);
+        });
+        return;
+      }
+    } catch (e) {
+      toast.error('خطأ في البحث');
+    }
+    setSearching(false);
+  };
+
   const handleOverlayClick = (e) => {
     if (mode !== 'draw_boundary' || !mapInstance.current) return;
     const map = mapInstance.current;
@@ -658,6 +721,55 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Search Bar */}
+      <div className="flex gap-2" dir="rtl">
+        <div className="relative flex-1">
+          <input
+            ref={searchInputRef}
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSearch()}
+            placeholder="ابحث بالعنوان أو الإحداثيات أو رابط Google Maps..."
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-4 py-2.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-300 outline-none pr-10"
+            dir="rtl"
+          />
+          <MagnifyingGlassIcon className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        </div>
+        <button
+          onClick={handleSearch}
+          disabled={searching || !searchQuery.trim()}
+          className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-bold px-4 py-2.5 rounded-xl transition-colors whitespace-nowrap"
+        >
+          {searching ? (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <MagnifyingGlassIcon className="h-4 w-4" />
+          )}
+          بحث
+        </button>
+        <button
+          onClick={() => {
+            navigator.geolocation.getCurrentPosition(pos => {
+              const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+              mapInstance.current?.setCenter(loc);
+              mapInstance.current?.setZoom(18);
+              new window.google.maps.Marker({
+                position: loc, map: mapInstance.current,
+                title: 'موقعك الحالي',
+                icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: 10,
+                  fillColor: '#3b82f6', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 3 },
+                animation: window.google.maps.Animation.DROP,
+              });
+              toast.success('📍 تم تحديد موقعك الحالي');
+            }, () => toast.error('تعذّر تحديد موقعك'));
+          }}
+          className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold px-3 py-2.5 rounded-xl transition-colors whitespace-nowrap"
+          title="موقعي الحالي"
+        >
+          📍
+        </button>
       </div>
 
       {/* Stats bar */}

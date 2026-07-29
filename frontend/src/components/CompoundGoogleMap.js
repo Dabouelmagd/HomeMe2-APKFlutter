@@ -5,7 +5,7 @@ import { useAuth } from '../App';
 import {
   MapIcon, UserGroupIcon, HomeIcon, ShieldCheckIcon,
   PencilSquareIcon, CheckIcon, XMarkIcon, ArrowPathIcon,
-  EyeIcon, EyeSlashIcon,
+  EyeIcon, EyeSlashIcon, MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;

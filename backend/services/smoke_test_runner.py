@@ -24,7 +24,7 @@ from typing import Callable, Awaitable
 
 import httpx
 
-BASE_URL = os.environ.get("SMOKE_TEST_BASE_URL", "http://127.0.0.1:8001")
+BASE_URL = os.environ.get("SMOKE_TEST_BASE_URL", "http://127.0.0.1:8002")
 DEFAULT_TIMEOUT = 12.0
 
 
@@ -57,7 +57,7 @@ async def test_health_root(client: httpx.AsyncClient, _ctx: dict) -> tuple[bool,
 
 
 async def test_login_owner(client: httpx.AsyncClient, ctx: dict) -> tuple[bool, dict]:
-    tok, code = await _login(client, "Owner_homeme", "Dalia1234@")
+    tok, code = await _login(client, "Owner_homeme", os.environ.get("OWNER_PASSWORD", "SuperAdmin@2024"))
     if not tok:
         # Try superadmin as fallback
         tok, code = await _login(client, "superadmin", "SuperAdmin2024!")

@@ -143,9 +143,9 @@ export const PricingSection = ({
                 <tr className="bg-white/5 border-t border-white/10">
                   <td className="py-3 px-4 font-bold text-white text-xs">{t('hp_price_label')} {isYearly ? t('hp_yearly_price') : t('hp_monthly_price')}</td>
                   <td className="text-center py-3 px-3 text-xs font-bold text-gray-300">{t('hp_free')}</td>
-                  <td className="text-center py-3 px-3 text-xs font-bold text-sky-300">{isYearly ? yearlyOf(800) : priceOf(800)} {sym}</td>
-                  <td className="text-center py-3 px-3 text-xs font-bold text-blue-300">{isYearly ? yearlyOf(1500) : priceOf(1500)} {sym}</td>
-                  <td className="text-center py-3 px-3 text-xs font-bold text-violet-300">{isYearly ? yearlyOf(2800) : priceOf(2800)} {sym}</td>
+                  <td className="text-center py-3 px-3 text-xs font-bold text-sky-300">{isYearly ? yearlyOf(1200) : priceOf(1200)} {sym}</td>
+                  <td className="text-center py-3 px-3 text-xs font-bold text-blue-300">{isYearly ? yearlyOf(2200) : priceOf(2200)} {sym}</td>
+                  <td className="text-center py-3 px-3 text-xs font-bold text-violet-300">{isYearly ? yearlyOf(4000) : priceOf(4000)} {sym}</td>
                 </tr>
               </tbody>
             </table>
@@ -292,9 +292,9 @@ export const PricingSection = ({
                 ))}
                 <tr className="bg-white/5 border-t border-white/10">
                   <td className="py-3 px-4 font-bold text-white text-xs">{t('hp_price_label')} {isYearly ? t('hp_yearly_price') : t('hp_monthly_price')}</td>
-                  <td className="text-center py-3 px-3 text-xs font-bold text-amber-300">{isYearly ? yearlyOf(4000) : priceOf(4000)} {sym}</td>
-                  <td className="text-center py-3 px-3 text-xs font-bold text-orange-300">{isYearly ? yearlyOf(9500) : priceOf(9500)} {sym}</td>
-                  <td className="text-center py-3 px-3 text-xs font-bold text-red-300">{isYearly ? yearlyOf(25000) : priceOf(25000)} {sym}</td>
+                  <td className="text-center py-3 px-3 text-xs font-bold text-amber-300">{isYearly ? yearlyOf(5500) : priceOf(5500)} {sym}</td>
+                  <td className="text-center py-3 px-3 text-xs font-bold text-orange-300">{isYearly ? yearlyOf(13000) : priceOf(13000)} {sym}</td>
+                  <td className="text-center py-3 px-3 text-xs font-bold text-red-300">{isYearly ? yearlyOf(35000) : priceOf(35000)} {sym}</td>
                 </tr>
               </tbody>
             </table>

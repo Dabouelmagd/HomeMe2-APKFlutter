@@ -22,7 +22,7 @@ import {
   MapIcon, ArrowUpTrayIcon, AdjustmentsHorizontalIcon,
   GiftIcon, MoonIcon, NoSymbolIcon, ChatBubbleBottomCenterTextIcon,
   ListBulletIcon, MagnifyingGlassIcon, ArrowsRightLeftIcon, BanknotesIcon, DocumentArrowDownIcon, BellAlertIcon
-}} from '@heroicons/react/24/outline';
+} from '@heroicons/react/24/outline';
 
 import InternalAdBanner from './InternalAdBanner';
 import CustomerTestimonialsCarousel from './CustomerTestimonialsCarousel';

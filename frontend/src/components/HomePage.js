@@ -21,8 +21,8 @@ import {
   ArrowRightOnRectangleIcon, Squares2X2Icon, XMarkIcon,
   MapIcon, ArrowUpTrayIcon, AdjustmentsHorizontalIcon,
   GiftIcon, MoonIcon, NoSymbolIcon, ChatBubbleBottomCenterTextIcon,
-  ListBulletIcon, MagnifyingGlassIcon, ArrowsRightLeftIcon
-} from '@heroicons/react/24/outline';
+  ListBulletIcon, MagnifyingGlassIcon, ArrowsRightLeftIcon, BanknotesIcon, DocumentArrowDownIcon, BellAlertIcon
+}} from '@heroicons/react/24/outline';
 
 import InternalAdBanner from './InternalAdBanner';
 import CustomerTestimonialsCarousel from './CustomerTestimonialsCarousel';
@@ -345,6 +345,9 @@ const HomePage = () => {
     { icon: MapIcon, category: 'security', title: '🚗 تتبع مركبات الأمن', desc: 'تتبع مواقع سيارات الأمن والموتوسيكلات داخل الكمبوند بشكل مباشر مع مسار الحركة وتاريخ التنقلات', color: 'from-blue-600 to-indigo-700', isNew: true },
     { icon: MagnifyingGlassIcon, category: 'admin', title: '🔍 بحث شامل في التطبيق', desc: 'بحث موحد يغطي السكان والوحدات والفواتير والصيانة والإعلانات من مكان واحد مع تصفية حسب الدور', color: 'from-violet-500 to-purple-600', isNew: true },
     { icon: ArrowsRightLeftIcon, category: 'admin', title: '🔄 تبديل الحسابات الفوري', desc: 'إمكانية ربط أكثر من حساب (أدمن + ساكن + موظف) والتبديل بينهم من dropdown واحد بدون تسجيل خروج', color: 'from-amber-500 to-orange-600', isNew: true },
+    { icon: BanknotesIcon, category: 'finance', title: '💳 نظام الأقساط والمديونيات', desc: 'إدارة أقساط الوحدات مع جدول سداد تلقائي، فوائد تأخير، خصم الكاش، الودائع — ورفع إيصالات الدفع مباشرة من التطبيق', color: 'from-emerald-600 to-teal-700', isNew: true },
+    { icon: DocumentArrowDownIcon, category: 'finance', title: '📊 تصدير واستيراد Excel/PDF', desc: 'تصدير كل البيانات المالية والسكان والتقارير إلى Excel أو PDF بضغطة واحدة، واستيراد بيانات السكان من Excel', color: 'from-green-600 to-emerald-700', isNew: true },
+    { icon: BellAlertIcon, category: 'comms', title: '📧 إشعارات تلقائية للمتأخرين', desc: 'إرسال تلقائي لإيميلات التذكير للسكان المتأخرين في السداد مع تفاصيل المبلغ وفوائد التأخير', color: 'from-red-500 to-rose-600', isNew: true },
     { icon: EnvelopeIcon, category: 'comms', title: '📧 ' + t('sys_email_logs', 'سجل البريد الإلكتروني'), desc: t('sys_email_logs_d', 'لوحة super-admin: نجاح/فشل/Bounce + إعادة إرسال + كشف الـ bounces تلقائياً'), color: 'from-indigo-500 to-blue-600', isNew: true },
     { icon: NewspaperIcon, category: 'comms', title: '📝 ' + t('sys_content_hub', 'مدوّنة Content Hub'), desc: t('sys_content_hub_d', '10+ مقالات عربية + تعليقات + CMS مع اقتراح SEO بالـ AI'), color: 'from-rose-500 to-pink-600', isNew: true },
     { icon: CheckCircleIcon, category: 'security', title: '✅ ' + t('sys_email_verify', 'تأكيد البريد الإلكتروني'), desc: t('sys_email_verify_d', 'حماية ضد الحسابات الوهمية: لازم تفعيل الإيميل قبل أول تسجيل دخول'), color: 'from-emerald-500 to-green-600', isNew: true },
@@ -747,6 +750,11 @@ const HomePage = () => {
     { name: '🔄 تبديل الحسابات الفوري', starter: true, basic: true, pro: true, premium: true },
     { name: '📧 إشعارات بريد لكل حدث', starter: false, basic: true, pro: true, premium: true },
     { name: '🧾 فاتورة ضريبية تلقائية', starter: false, basic: true, pro: true, premium: true },
+    { name: '💳 نظام الأقساط والمديونيات', starter: false, basic: true, pro: true, premium: true },
+    { name: '💰 فوائد تأخير وخصم كاش', starter: false, basic: false, pro: true, premium: true },
+    { name: '📎 رفع إيصالات الدفع', starter: true, basic: true, pro: true, premium: true },
+    { name: '📊 تصدير Excel/PDF', starter: false, basic: true, pro: true, premium: true },
+    { name: '🔔 إشعارات المتأخرين', starter: false, basic: false, pro: true, premium: true },
     { name: t('f_24_7_support', 'دعم فني مخصص 24/7'), starter: false, basic: false, pro: false, premium: true },
     { name: t('f_team_training', 'تدريب الفريق'), starter: false, basic: false, pro: false, premium: true },
     { name: t('f_account_manager', 'مدير حساب مخصص'), starter: false, basic: false, pro: false, premium: true },

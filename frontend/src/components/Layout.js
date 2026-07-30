@@ -685,97 +685,199 @@ const Layout = ({ children, isTrialMode = false }) => {
     },
   ];
 
-  // Organized navigation by role
-  const navigationSections = isAppOwner ? ownerNavigationSections : (activeRole === 'super_admin' ? superAdminNavigationSections : [
-    // Top-priority section for company_admin (their main job)
-    ...(activeRole === 'company_admin' || activeRole === 'app_owner' || activeRole === 'super_admin' ? [{
-      title: t('management_company', 'شركة الإدارة'),
-      items: [
-        { name: t('compounds_management', 'كمبوندات الشركة'), href: 'compounds-management', icon: BuildingOfficeIcon, show: true },
-        { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: true },
-        { name: t('advanced_analytics', 'تحليلات متقدمة'), href: 'analytics', icon: ChartBarIcon, show: true },
-      ]
-    }] : []),
+  // ── Company Admin Navigation ───────────────────────────────────────────────
+  const companyAdminSections = [
     {
-      title: t('main_management', 'الإدارة الرئيسية'),
+      title: '🏠 الرئيسية',
+      color: 'emerald',
       items: [
-        { name: t('dashboard'), href: 'dashboard', icon: HomeIcon, show: true },
-        { name: t('compound_management'), href: 'compound', icon: BuildingOfficeIcon, show: isAdminRole && activeRole !== 'company_admin' },
-        { name: t('residents_list'), href: 'residents', icon: UserGroupIcon, show: isStaffRole },
-        { name: t('compound_map', 'خريطة الكمبوند'), href: 'compound-map', icon: MapIcon, show: isAdminRole, badge: 'جديد' },
-        { name: t('user_management'), href: 'users', icon: UsersIcon, show: isAdminRole },
-        { name: t('staff_management', 'إدارة المساعدين'), href: 'staff', icon: ShieldCheckIcon, show: isAdminRole, badge: 'جديد' },
-        { name: t('monitoring_dashboard'), href: 'monitoring', icon: ChartPieIcon, show: isStaffRole },
+        { name: 'لوحة التحكم', href: 'dashboard', icon: HomeIcon, show: true },
+        { name: 'خريطة الكمبوندات', href: 'compound-map', icon: MapIcon, show: true, badge: 'جديد' },
+        { name: 'المجمعات السكنية', href: 'compounds-management', icon: BuildingOfficeIcon, show: true },
+        { name: 'المراقبة والأداء', href: 'monitoring', icon: ChartPieIcon, show: true },
       ]
     },
     {
-      title: t('financial_services'),
+      title: '💰 المالية',
+      color: 'amber',
       items: [
-        { name: t('financial_management'), href: 'finances', icon: CurrencyDollarIcon, show: isStaffRole },
-        { name: t('payment_center'), href: 'payments', icon: CreditCardIcon, show: true },
-        { name: 'طرق الدفع المعتمدة', href: 'compound-payment-methods', icon: CreditCardIcon, show: isStaffRole },
-        { name: t('contracts_management', 'العقود'), href: 'contracts', icon: DocumentTextIcon, show: isStaffRole },
+        { name: 'الأقساط والمديونيات', href: 'installments', icon: CreditCardIcon, show: true, badge: 'جديد' },
+        { name: 'الإدارة المالية', href: 'finances', icon: CurrencyDollarIcon, show: true },
+        { name: 'تحليلات الإيرادات', href: 'analytics', icon: ChartBarIcon, show: true },
+        { name: 'اشتراكي', href: 'my-subscription', icon: CreditCardIcon, show: true },
+        { name: 'طرق الدفع', href: 'compound-payment-methods', icon: CreditCardIcon, show: true },
       ]
     },
     {
-      title: t('services_maintenance'),
+      title: '👥 الموارد البشرية',
+      color: 'blue',
       items: [
-        { name: t('services_management'), href: 'services', icon: WrenchScrewdriverIcon, show: true },
-        { name: t('maintenance_system'), href: 'maintenance', icon: CogIcon, show: true },
-        { name: t('facility_booking'), href: 'facility-booking', icon: CalendarDaysIcon, show: true },
-        { name: t('satisfaction_ratings', 'التقييمات'), href: 'satisfaction', icon: StarIcon, show: isStaffRole },
+        { name: 'السكان والوحدات', href: 'residents', icon: UserGroupIcon, show: true },
+        { name: 'إدارة المساعدين', href: 'staff', icon: ShieldCheckIcon, show: true },
+        { name: 'إدارة المستخدمين', href: 'users', icon: UsersIcon, show: true },
+        { name: 'طلبات الصيانة', href: 'maintenance', icon: CogIcon, show: true },
       ]
     },
     {
-      title: t('communication'),
+      title: '📢 التسويق والتواصل',
+      color: 'violet',
       items: [
-        { name: t('message_center'), href: 'messages', icon: ChatBubbleLeftEllipsisIcon, show: true },
-        { name: t('notifications_nav'), href: 'notifications', icon: BellIcon, show: true },
-        { name: t('events_announcements'), href: 'events', icon: SpeakerWaveIcon, show: true },
+        { name: 'الإعلانات والفعاليات', href: 'events', icon: SpeakerWaveIcon, show: true },
+        { name: 'الرسائل', href: 'messages', icon: ChatBubbleLeftEllipsisIcon, show: true },
+        { name: 'الإشعارات', href: 'notifications', icon: BellIcon, show: true },
+        { name: 'برنامج الإحالة', href: 'referral', icon: GiftIcon, show: true, badge: 'جديد' },
+        { name: 'التقييمات', href: 'satisfaction', icon: StarIcon, show: true },
       ]
     },
     {
-      title: t('family_management_section'),
+      title: '⚙️ الإعدادات والدعم',
+      color: 'gray',
       items: [
-        { name: t('family_management'), href: 'family', icon: UsersIcon, show: true },
-        { name: t('add_family_member'), href: 'add-family-member', icon: UserPlusIcon, show: true },
-        { name: 'إدارة دعواتي', href: 'my-invites', icon: LinkIcon, show: true },
-        { name: 'تذاكر الزوار', href: 'visitor-passes', icon: TicketIcon, show: true },
-        { name: 'إدارة الزوار', href: 'guests', icon: UsersIcon, show: isSecurityRole },
-        { name: 'مسح تذكرة (الأمن)', href: 'security-scan', icon: QrCodeIcon, show: isSecurityRole },
+        { name: 'الإعدادات', href: 'settings', icon: Cog6ToothIcon, show: true },
+        { name: 'العقود', href: 'contracts', icon: DocumentTextIcon, show: true },
+        { name: 'الشكاوى والاقتراحات', href: 'complaints', icon: ExclamationTriangleIcon, show: true },
+        { name: 'الدعم الفني', href: 'support', icon: QuestionMarkCircleIcon, show: true },
+      ]
+    },
+  ];
+
+  // ── Compound Admin Navigation ────────────────────────────────────────────
+  const compoundAdminSections = [
+    {
+      title: '🏠 الرئيسية',
+      color: 'emerald',
+      items: [
+        { name: 'لوحة التحكم', href: 'dashboard', icon: HomeIcon, show: true },
+        { name: 'خريطة الكمبوند', href: 'compound-map', icon: MapIcon, show: isAdminRole, badge: 'جديد' },
+        { name: 'لوحة التنبيهات', href: 'alerts', icon: BellIcon, show: isAdminRole },
+        { name: 'إدارة الكمبوند', href: 'compound', icon: BuildingOfficeIcon, show: isAdminRole },
+        { name: 'المراقبة', href: 'monitoring', icon: ChartPieIcon, show: isStaffRole },
       ]
     },
     {
-      title: t('tools_resources'),
+      title: '👥 السكان',
+      color: 'blue',
       items: [
-        { name: t('gallery.title'), href: 'gallery', icon: PhotoIcon, show: true },
-        { name: t('document_management'), href: 'documents', icon: DocumentTextIcon, show: true },
-        { name: t('voting_system'), href: 'voting', icon: HandRaisedIcon, show: true },
+        { name: 'السكان والوحدات', href: 'residents', icon: UserGroupIcon, show: isStaffRole },
+        { name: 'إدارة المستخدمين', href: 'users', icon: UsersIcon, show: isAdminRole },
+        { name: 'إدارة المساعدين', href: 'staff', icon: ShieldCheckIcon, show: isAdminRole },
+        { name: 'الأسر', href: 'family', icon: UsersIcon, show: true },
+        { name: 'استيراد السكان', href: 'bulk-import', icon: ArrowUpTrayIcon, show: isAdminRole },
+      ]
+    },
+    {
+      title: '💰 المالية',
+      color: 'amber',
+      items: [
+        { name: 'الأقساط والمديونيات', href: 'installments', icon: CreditCardIcon, show: isStaffRole, badge: 'جديد' },
+        { name: 'الإدارة المالية', href: 'finances', icon: CurrencyDollarIcon, show: isStaffRole },
+        { name: 'مركز المدفوعات', href: 'payments', icon: CreditCardIcon, show: true },
+        { name: 'طرق الدفع', href: 'compound-payment-methods', icon: CreditCardIcon, show: isStaffRole },
+        { name: 'العقود', href: 'contracts', icon: DocumentTextIcon, show: isStaffRole },
         { name: 'تقارير PDF', href: 'reports', icon: DocumentTextIcon, show: isStaffRole },
+      ]
+    },
+    {
+      title: '🔧 الخدمات',
+      color: 'violet',
+      items: [
+        { name: 'طلبات الصيانة', href: 'maintenance', icon: CogIcon, show: true },
+        { name: 'الخدمات والحجوزات', href: 'services', icon: WrenchScrewdriverIcon, show: true },
+        { name: 'حجز المرافق', href: 'facility-booking', icon: CalendarDaysIcon, show: true },
+        { name: 'الفعاليات والإعلانات', href: 'events', icon: SpeakerWaveIcon, show: true },
+        { name: 'الرسائل', href: 'messages', icon: ChatBubbleLeftEllipsisIcon, show: true },
+        { name: 'الشكاوى', href: 'complaints', icon: ExclamationTriangleIcon, show: true },
+        { name: 'التقييمات', href: 'satisfaction', icon: StarIcon, show: isStaffRole },
         { name: '🤖 AI Auto-Pilot', href: 'ai-autopilot', icon: SparklesIcon, show: isStaffRole },
       ]
     },
     {
-      title: t('admin_tools'),
+      title: '🛡️ الأمن والبوابة',
+      color: 'red',
       items: [
-        ...(activeRole !== 'company_admin' && activeRole !== 'app_owner' && activeRole !== 'super_admin' ? [
-          { name: t('advanced_analytics'), href: 'analytics', icon: ChartBarIcon, show: isStaffRole },
-          { name: t('my_subscription', 'إدارة اشتراكي'), href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole },
-        ] : []),
-        { name: t('subscription_codes_management'), href: 'subscription-codes', icon: KeyIcon, show: activeRole === 'app_owner' },
-        { name: t('referral_program', '🎁 برنامج الإحالة'), href: 'referral', icon: GiftIcon, show: true, badge: 'جديد' },
-      ].filter(i => i)
+        { name: 'تذاكر الزوار', href: 'visitor-passes', icon: TicketIcon, show: true },
+        { name: 'إدارة الزوار', href: 'guests', icon: UsersIcon, show: isSecurityRole },
+        { name: 'مسح تذكرة QR', href: 'security-scan', icon: QrCodeIcon, show: isSecurityRole },
+      ]
     },
     {
-      title: t('support_info'),
+      title: '📚 الموارد والإعدادات',
+      color: 'gray',
       items: [
-        { name: t('settings_nav'), href: 'settings', icon: Cog6ToothIcon, show: true },
-        { name: t('complaints_suggestions', 'الشكاوى والاقتراحات'), href: 'complaints', icon: ExclamationTriangleIcon, show: true },
-        { name: t('help_center'), href: 'help', icon: QuestionMarkCircleIcon, show: true },
-        { name: t('contact_support_nav', 'تواصل مع الدعم الفني'), href: 'support', icon: QuestionMarkCircleIcon, show: true },
+        { name: 'المعرض', href: 'gallery', icon: PhotoIcon, show: true },
+        { name: 'المستندات', href: 'documents', icon: DocumentTextIcon, show: true },
+        { name: 'التصويت والاستطلاعات', href: 'voting', icon: HandRaisedIcon, show: true },
+        { name: 'إدارة دعواتي', href: 'my-invites', icon: LinkIcon, show: true },
+        { name: 'برنامج الإحالة', href: 'referral', icon: GiftIcon, show: true },
+        { name: 'اشتراكي', href: 'my-subscription', icon: CreditCardIcon, show: isAdminRole },
+        { name: 'تحليلات متقدمة', href: 'analytics', icon: ChartBarIcon, show: isAdminRole },
+        { name: 'الإعدادات', href: 'settings', icon: Cog6ToothIcon, show: true },
+        { name: 'الدعم الفني', href: 'support', icon: QuestionMarkCircleIcon, show: true },
       ]
-    }
-  ]);
+    },
+  ];
+
+  // ── Resident/Security Navigation (minimal) ───────────────────────────────
+  const residentSections = [
+    {
+      title: '🏠 الرئيسية',
+      color: 'emerald',
+      items: [
+        { name: 'لوحة التحكم', href: 'dashboard', icon: HomeIcon, show: true },
+        { name: 'الإشعارات', href: 'notifications', icon: BellIcon, show: true },
+      ]
+    },
+    {
+      title: '💰 المالية',
+      color: 'amber',
+      items: [
+        { name: 'مركز المدفوعات', href: 'payments', icon: CreditCardIcon, show: true },
+        { name: 'أقساطي', href: 'installments', icon: BanknotesIcon, show: true, badge: 'جديد' },
+      ]
+    },
+    {
+      title: '🏘️ الكمبوند',
+      color: 'blue',
+      items: [
+        { name: 'طلبات الصيانة', href: 'maintenance', icon: CogIcon, show: true },
+        { name: 'الخدمات', href: 'services', icon: WrenchScrewdriverIcon, show: true },
+        { name: 'الفعاليات', href: 'events', icon: SpeakerWaveIcon, show: true },
+        { name: 'الرسائل', href: 'messages', icon: ChatBubbleLeftEllipsisIcon, show: true },
+        { name: 'التصويت', href: 'voting', icon: HandRaisedIcon, show: true },
+      ]
+    },
+    {
+      title: '👨‍👩‍👧 الأسرة والزوار',
+      color: 'violet',
+      items: [
+        { name: 'الأسرة', href: 'family', icon: UsersIcon, show: true },
+        { name: 'إضافة فرد', href: 'add-family-member', icon: UserPlusIcon, show: true },
+        { name: 'تذاكر الزوار', href: 'visitor-passes', icon: TicketIcon, show: true },
+        { name: 'دعواتي', href: 'my-invites', icon: LinkIcon, show: true },
+        { name: 'إدارة الزوار', href: 'guests', icon: UsersIcon, show: isSecurityRole },
+        { name: 'مسح QR', href: 'security-scan', icon: QrCodeIcon, show: isSecurityRole },
+      ]
+    },
+    {
+      title: '⚙️ أخرى',
+      color: 'gray',
+      items: [
+        { name: 'المعرض', href: 'gallery', icon: PhotoIcon, show: true },
+        { name: 'المستندات', href: 'documents', icon: DocumentTextIcon, show: true },
+        { name: 'الشكاوى', href: 'complaints', icon: ExclamationTriangleIcon, show: true },
+        { name: 'برنامج الإحالة', href: 'referral', icon: GiftIcon, show: true },
+        { name: 'الإعدادات', href: 'settings', icon: Cog6ToothIcon, show: true },
+        { name: 'الدعم الفني', href: 'support', icon: QuestionMarkCircleIcon, show: true },
+      ]
+    },
+  ];
+
+  // Organized navigation by role
+  const navigationSections = isAppOwner ? ownerNavigationSections : (activeRole === 'super_admin' ? superAdminNavigationSections :
+    activeRole === 'company_admin' ? companyAdminSections :
+    isAdminRole || isStaffRole ? compoundAdminSections :
+    residentSections
+  );
   // Improved isActive function to correctly match current route
   const isActive = (href) => {
     const currentPath = location.pathname;
@@ -914,8 +1016,26 @@ const Layout = ({ children, isTrialMode = false }) => {
 
               const isExpanded = q ? true : isSectionExpanded(sectionIndex);
               
-              // Section colors based on role theme
-              const sectionColor = `${theme.hover} border-gray-200 ${theme.text}`;
+              // Section colors based on group color property
+              const COLOR_MAP = {
+                emerald: 'hover:bg-emerald-50 border-emerald-200 text-emerald-700 dark:hover:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400',
+                violet:  'hover:bg-violet-50 border-violet-200 text-violet-700 dark:hover:bg-violet-900/20 dark:border-violet-800 dark:text-violet-400',
+                blue:    'hover:bg-blue-50 border-blue-200 text-blue-700 dark:hover:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400',
+                amber:   'hover:bg-amber-50 border-amber-200 text-amber-700 dark:hover:bg-amber-900/20 dark:border-amber-800 dark:text-amber-400',
+                orange:  'hover:bg-orange-50 border-orange-200 text-orange-700 dark:hover:bg-orange-900/20 dark:border-orange-800 dark:text-orange-400',
+                red:     'hover:bg-red-50 border-red-200 text-red-700 dark:hover:bg-red-900/20 dark:border-red-800 dark:text-red-400',
+                gray:    'hover:bg-gray-50 border-gray-200 text-gray-600 dark:hover:bg-gray-800 dark:border-gray-700 dark:text-gray-400',
+              };
+              const DOT_MAP = {
+                emerald: 'bg-emerald-500', violet: 'bg-violet-500', blue: 'bg-blue-500',
+                amber: 'bg-amber-500', orange: 'bg-orange-500', red: 'bg-red-500', gray: 'bg-gray-400',
+              };
+              const sectionColor = section.color && COLOR_MAP[section.color]
+                ? COLOR_MAP[section.color]
+                : `${theme.hover} border-gray-200 ${theme.text}`;
+              const dotColor = section.color && DOT_MAP[section.color]
+                ? DOT_MAP[section.color]
+                : theme.dot;
               
               return (
                 <div key={section.title} className="transition-all duration-200">
@@ -931,7 +1051,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <div className={`w-1.5 h-1.5 rounded-full ${theme.dot} ml-2 mr-2`}></div>
+                        <div className={`w-1.5 h-1.5 rounded-full ${dotColor} ml-2 mr-2`}></div>
                         <h3 className="text-xs font-semibold uppercase tracking-wider">
                           {section.title}
                         </h3>

@@ -480,6 +480,32 @@ const Login = () => {
           </p>
         </div>
 
+        {/* Subscription Code Bar */}
+        <div className="mt-4 border border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-4">
+          <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400 mb-2 text-center">
+            🎟️ لديك كود اشتراك؟
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              id="quick-sub-code"
+              placeholder="أدخل كود الاشتراك هنا..."
+              className="flex-1 border border-emerald-300 dark:border-emerald-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-400 text-center tracking-widest"
+              dir="ltr"
+            />
+            <button
+              onClick={() => {
+                const code = document.getElementById('quick-sub-code')?.value?.trim();
+                if (!code) { alert('أدخل الكود أولاً'); return; }
+                window.location.href = `/register?code=${code}`;
+              }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+            >
+              تفعيل ←
+            </button>
+          </div>
+        </div>
+
         {/* Why HomeMe — trust signals + key features */}
         <div className="mt-6 bg-gradient-to-br from-indigo-50 via-white to-violet-50 border border-indigo-100 rounded-xl p-5" data-testid="login-why-homeme">
           <div className="text-center mb-4">

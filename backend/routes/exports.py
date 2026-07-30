@@ -403,3 +403,215 @@ async def generate_maintenance_report(compound_id: str, start_date: str, end_dat
     pdf_content = await pdf_service.generate_maintenance_report(compound_id, start, end, language)
     filename = f"maintenance_report_{start_date[:10]}_{end_date[:10]}.pdf"
     return Response(content=pdf_content, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename={filename}"})
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# RESIDENTS EXPORT — تصدير السكان
+# ══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/residents/export-excel")
+async def export_residents_excel(
+    current_user: dict = Depends(require_admin),
+):
+    """تصدير بيانات السكان كاملة — Excel متعدد الأوراق."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
+
+    db = get_db()
+    compound_id = current_user.get("compound_id")
+    if not compound_id:
+        raise HTTPException(status_code=400, detail="compound_id مطلوب")
+
+    users = await db.users.find(
+        {"compound_id": compound_id},
+        {"_id": 0, "password_hash": 0}
+    ).to_list(5000)
+
+    wb = openpyxl.Workbook()
+    h_font = Font(bold=True, color="FFFFFF", size=11)
+    h_fill = PatternFill(start_color="059669", end_color="059669", fill_type="solid")
+
+    def hdr(ws, row, headers):
+        ws.append(headers)
+        for i in range(1, len(headers) + 1):
+            c = ws.cell(row=row, column=i)
+            c.font = h_font
+            c.fill = h_fill
+            c.alignment = Alignment(horizontal='center')
+
+    # Sheet 1: All Users
+    ws1 = wb.active
+    ws1.title = "السكان"
+    ws1.sheet_view.rightToLeft = True
+    hdr(ws1, 1, ["الاسم الكامل", "اسم المستخدم", "الدور", "البريد الإلكتروني", "الهاتف",
+                  "رقم الوحدة", "الحالة", "تاريخ الإنشاء"])
+    ROLE_AR = {"resident": "ساكن", "family_head": "رب أسرة", "admin": "مدير",
+               "manager": "مشرف", "security": "أمن", "accountant": "محاسب"}
+    for u in users:
+        ws1.append([
+            u.get("full_name", ""),
+            u.get("username", ""),
+            ROLE_AR.get(u.get("role", ""), u.get("role", "")),
+            u.get("email", ""),
+            u.get("phone", ""),
+            u.get("unit_number", ""),
+            "نشط" if u.get("is_active", True) else "غير نشط",
+            str(u.get("created_at", ""))[:10],
+        ])
+    for col in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:
+        ws1.column_dimensions[col].width = 22
+
+    # Sheet 2: Residents only
+    ws2 = wb.create_sheet("السكان فقط")
+    ws2.sheet_view.rightToLeft = True
+    hdr(ws2, 1, ["الاسم", "الهاتف", "البريد", "الوحدة", "عدد الأسرة"])
+    residents = [u for u in users if u.get("role") in ("resident", "family_head")]
+    for u in residents:
+        family = await db.users.count_documents({"family_id": u.get("id", "")})
+        ws2.append([u.get("full_name", ""), u.get("phone", ""),
+                    u.get("email", ""), u.get("unit_number", ""), family])
+    for col in ['A', 'B', 'C', 'D', 'E']:
+        ws2.column_dimensions[col].width = 25
+
+    # Sheet 3: Staff
+    ws3 = wb.create_sheet("الموظفون")
+    ws3.sheet_view.rightToLeft = True
+    hdr(ws3, 1, ["الاسم", "الدور", "الهاتف", "البريد", "تاريخ الانضمام"])
+    staff = [u for u in users if u.get("role") in ("admin", "manager", "security", "accountant")]
+    for u in staff:
+        ws3.append([u.get("full_name", ""), ROLE_AR.get(u.get("role", ""), ""),
+                    u.get("phone", ""), u.get("email", ""), str(u.get("created_at", ""))[:10]])
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=residents.xlsx"}
+    )
+
+
+@router.get("/financial/full-export-excel")
+async def export_full_financial_excel(
+    current_user: dict = Depends(require_admin),
+):
+    """تصدير شامل: السكان + الأقساط + الإيرادات + المصروفات — في ملف واحد."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
+
+    db = get_db()
+    compound_id = current_user.get("compound_id")
+    if not compound_id:
+        raise HTTPException(status_code=400, detail="compound_id مطلوب")
+
+    wb = openpyxl.Workbook()
+    h_font = Font(bold=True, color="FFFFFF", size=11)
+
+    def make_sheet(wb, title, color, headers, rows):
+        ws = wb.create_sheet(title) if wb.worksheets else wb.active
+        if not wb.worksheets or wb.active.title == "Sheet":
+            ws = wb.active
+            ws.title = title
+        else:
+            ws = wb.create_sheet(title)
+        ws.sheet_view.rightToLeft = True
+        fill = PatternFill(start_color=color, end_color=color, fill_type="solid")
+        ws.append(headers)
+        for i, h in enumerate(headers, 1):
+            c = ws.cell(1, i)
+            c.font = h_font
+            c.fill = fill
+            c.alignment = Alignment(horizontal='center')
+            ws.column_dimensions[chr(64+i)].width = 22
+        for row in rows:
+            ws.append(row)
+        return ws
+
+    # 1. Installment Plans
+    plans = await db.installment_plans.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+    plan_rows = []
+    for p in plans:
+        paid = sum(i.get("paid_amount", 0) for i in p.get("installments", []) if i.get("status") == "paid")
+        overdue = sum(1 for i in p.get("installments", []) if i.get("status") != "paid" and i.get("due_date", "") < datetime.now(timezone.utc).isoformat())
+        plan_rows.append([p.get("title", ""), p.get("unit_number", ""), p.get("total_amount", 0),
+                          paid, p.get("total_amount", 0) - paid, p.get("deposit_amount", 0),
+                          p.get("late_fee_rate", 0), overdue, p.get("status", "")])
+
+    ws1 = wb.active
+    ws1.title = "الأقساط"
+    ws1.sheet_view.rightToLeft = True
+    h_fill = PatternFill(start_color="059669", end_color="059669", fill_type="solid")
+    headers1 = ["الخطة", "الوحدة", "الإجمالي", "المحصّل", "المتبقي", "الوديعة", "فائدة التأخير%", "متأخر", "الحالة"]
+    ws1.append(headers1)
+    for i, h in enumerate(headers1, 1):
+        c = ws1.cell(1, i)
+        c.font = h_font; c.fill = h_fill; c.alignment = Alignment(horizontal='center')
+        ws1.column_dimensions[chr(64+i)].width = 20
+    for row in plan_rows:
+        ws1.append(row)
+
+    # 2. Revenue
+    revenues = await db.revenue.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+    ws2 = wb.create_sheet("الإيرادات")
+    ws2.sheet_view.rightToLeft = True
+    h2_fill = PatternFill(start_color="1d4ed8", end_color="1d4ed8", fill_type="solid")
+    headers2 = ["الوصف", "التصنيف", "المبلغ", "التاريخ", "المصدر"]
+    ws2.append(headers2)
+    for i, h in enumerate(headers2, 1):
+        c = ws2.cell(1, i)
+        c.font = h_font; c.fill = h2_fill; c.alignment = Alignment(horizontal='center')
+        ws2.column_dimensions[chr(64+i)].width = 22
+    for r in revenues:
+        ws2.append([r.get("description", ""), r.get("category", ""), float(r.get("amount", 0)),
+                    str(r.get("date", ""))[:10], r.get("source", "")])
+
+    # 3. Expenses
+    expenses = await db.expenses.find({"compound_id": compound_id}, {"_id": 0}).to_list(500)
+    ws3 = wb.create_sheet("المصروفات")
+    ws3.sheet_view.rightToLeft = True
+    h3_fill = PatternFill(start_color="dc2626", end_color="dc2626", fill_type="solid")
+    headers3 = ["الوصف", "التصنيف", "المبلغ", "التاريخ", "الحالة"]
+    ws3.append(headers3)
+    for i, h in enumerate(headers3, 1):
+        c = ws3.cell(1, i)
+        c.font = h_font; c.fill = h3_fill; c.alignment = Alignment(horizontal='center')
+        ws3.column_dimensions[chr(64+i)].width = 22
+    for e in expenses:
+        ws3.append([e.get("description", ""), e.get("category", ""), float(e.get("amount", 0)),
+                    str(e.get("date", ""))[:10], e.get("status", "")])
+
+    # 4. Summary
+    ws4 = wb.create_sheet("الملخص")
+    ws4.sheet_view.rightToLeft = True
+    total_rev = sum(float(r.get("amount", 0)) for r in revenues)
+    total_exp = sum(float(e.get("amount", 0)) for e in expenses)
+    total_inst = sum(p.get("total_amount", 0) for p in plans)
+    total_collected = sum(
+        i.get("paid_amount", 0) for p in plans
+        for i in p.get("installments", []) if i.get("status") == "paid"
+    )
+    ws4.append(["البند", "المبلغ"])
+    ws4.cell(1,1).font = Font(bold=True, size=13)
+    ws4.cell(1,2).font = Font(bold=True, size=13)
+    for row in [
+        ["إجمالي الإيرادات", total_rev],
+        ["إجمالي المصروفات", total_exp],
+        ["صافي الرصيد", total_rev - total_exp],
+        ["", ""],
+        ["إجمالي الأقساط", total_inst],
+        ["المحصّل من الأقساط", total_collected],
+        ["المتبقي من الأقساط", total_inst - total_collected],
+    ]:
+        ws4.append(row)
+    ws4.column_dimensions['A'].width = 30
+    ws4.column_dimensions['B'].width = 20
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=full_financial_report.xlsx"}
+    )

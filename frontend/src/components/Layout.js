@@ -1117,7 +1117,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                               {item.badge}
                             </span>
                           )}
-                          {item.name === t('notifications_nav') && unreadCount > 0 && (
+                          {item.href === 'notifications' && unreadCount > 0 && (
                             <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                               {unreadCount > 99 ? '99+' : unreadCount}
                             </span>
@@ -1127,7 +1127,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                               {t('new')}
                             </span>
                           )}
-                          {item.name === t('message_center') && sidebarBadges.messages_unread > 0 && (
+                          {item.href === 'messages' && sidebarBadges.messages_unread > 0 && (
                             <span
                               title={`${sidebarBadges.messages_unread} رسالة غير مقروءة`}
                               className="bg-blue-500 text-white text-[10px] rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold"
@@ -1136,7 +1136,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                               {sidebarBadges.messages_unread > 99 ? '99+' : sidebarBadges.messages_unread}
                             </span>
                           )}
-                          {item.name === t('financial_management') && sidebarBadges.payment_proofs_pending > 0 && (
+                          {(item.href === 'finances' || item.href === 'installments') && sidebarBadges.payment_proofs_pending > 0 && (
                             <span
                               title={`${sidebarBadges.payment_proofs_pending} إيصال دفع بانتظار المراجعة`}
                               className="bg-amber-500 text-white text-[10px] rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold animate-pulse"
@@ -1145,7 +1145,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                               {sidebarBadges.payment_proofs_pending > 99 ? '99+' : sidebarBadges.payment_proofs_pending}
                             </span>
                           )}
-                          {item.name === t('satisfaction_ratings', 'التقييمات') && sidebarBadges.negative_ratings_7d > 0 && (
+                          {item.href === 'satisfaction' && sidebarBadges.negative_ratings_7d > 0 && (
                             <span
                               title={`${sidebarBadges.negative_ratings_7d} تقييم سلبي (≤2 نجمة) خلال 7 أيام`}
                               className="bg-rose-500 text-white text-[10px] rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold animate-pulse"
@@ -1154,7 +1154,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                               {sidebarBadges.negative_ratings_7d > 99 ? '99+' : sidebarBadges.negative_ratings_7d}
                             </span>
                           )}
-                          {item.name === t('owner_companies_management', 'إدارة الشركات والمجمعات') && companiesAlerts.urgent > 0 && (
+                          {item.href === 'super-admin?tab=companies' && companiesAlerts.urgent > 0 && (
                             <span
                               title={`🔴 ${companiesAlerts.urgent} تنبيه عاجل — ${companiesAlerts.expiring_contracts} عقد ينتهي خلال 7 أيام • ${companiesAlerts.empty_companies} شركة بدون مجمعات`}
                               className="bg-red-500 text-white text-xs rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold animate-pulse"
@@ -1162,7 +1162,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                               {companiesAlerts.urgent > 99 ? '99+' : companiesAlerts.urgent}
                             </span>
                           )}
-                          {item.name === t('owner_companies_management', 'إدارة الشركات والمجمعات') && companiesAlerts.urgent === 0 && companiesAlerts.active_companies > 0 && (
+                          {item.href === 'super-admin?tab=companies' && companiesAlerts.urgent === 0 && companiesAlerts.active_companies > 0 && (
                             <span
                               title={`${companiesAlerts.active_companies} شركة نشطة`}
                               className="bg-indigo-600/40 text-indigo-200 text-[10px] rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-semibold"
@@ -1170,7 +1170,7 @@ const Layout = ({ children, isTrialMode = false }) => {
                               {companiesAlerts.active_companies}
                             </span>
                           )}
-                          {item.name === t('alerts_center', 'لوحة التنبيهات') && companiesAlerts.urgent > 0 && (
+                          {item.href === 'alerts' && companiesAlerts.urgent > 0 && (
                             <span
                               title={`🔔 ${companiesAlerts.urgent} تنبيه عاجل`}
                               className="bg-red-500 text-white text-xs rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center font-bold animate-pulse"

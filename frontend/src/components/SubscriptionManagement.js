@@ -169,8 +169,8 @@ export default function SubscriptionManagement() {
     { id: 'company_enterprise', name: t('cp_enterprise', 'شركة كبرى'), price: 25000 },
   ] : [
     { id: 'basic', name: t('plan_basic'), price: 1200 },
-    { id: 'pro', name: t('plan_pro'), price: 1500 },
-    { id: 'premium', name: t('plan_premium'), price: 2800 },
+    { id: 'pro', name: t('plan_pro'), price: 2200 },
+    { id: 'premium', name: t('plan_premium'), price: 4000 },
   ];
 
   return (

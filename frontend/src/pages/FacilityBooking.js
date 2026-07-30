@@ -25,6 +25,21 @@ import {
 const API = process.env.REACT_APP_BACKEND_URL;
 
 // Facility type icons mapping
+const facilityNamesAr = {
+  swimming_pool: 'حمام السباحة',
+  gym: 'الجيم',
+  tennis_court: 'ملعب التنس',
+  football_field: 'ملعب كرة قدم',
+  basketball_court: 'ملعب كرة سلة',
+  party_hall: 'قاعة حفلات',
+  meeting_room: 'غرفة اجتماعات',
+  bbq_area: 'منطقة شواء',
+  kids_playground: 'ملعب أطفال',
+  parking: 'مواقف سيارات',
+  padel: 'ملاعب البادل',
+  other: 'أخرى',
+};
+
 const facilityIcons = {
   swimming_pool: '🏊',
   gym: '🏋️',
@@ -813,7 +828,7 @@ const FacilityBooking = () => {
                 </div>
                 <div><label className="block text-sm font-medium mb-1">{t('facility_type', 'نوع المرفق')}</label>
                   <select value={facilityForm.facility_type} onChange={e => setFacilityForm(p => ({...p, facility_type: e.target.value}))} className="w-full border rounded-lg p-2.5">
-                    {Object.entries(facilityIcons).map(([k, v]) => <option key={k} value={k}>{v} {k.replace(/_/g, ' ')}</option>)}
+                    {Object.entries(facilityIcons).map(([k, v]) => <option key={k} value={k}>{v} {facilityNamesAr[k] || k.replace(/_/g, ' ')}</option>)}
                   </select>
                 </div>
                 <div className="grid grid-cols-2 gap-3">

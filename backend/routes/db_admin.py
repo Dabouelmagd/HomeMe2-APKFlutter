@@ -176,9 +176,15 @@ async def get_system_statistics(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Super admin access required")
     
     # Get comprehensive system statistics
-    total_users = await db.users.count_documents({})
-    total_admins = await db.users.count_documents({"role": "admin"})
-    total_residents = await db.users.count_documents({"role": "resident"})
+    # Scope by compound for non-superadmin
+    from auth_deps import get_current_user as gcu
+    role = current_user.get("role", "")
+    cid = current_user.get("compound_id")
+    scope = {} if role in ("app_owner", "super_admin") else {"compound_id": cid} if cid else {}
+    
+    total_users = await db.users.count_documents(scope)
+    total_admins = await db.users.count_documents({"role": "admin", **scope})
+    total_residents = await db.users.count_documents({"role": "resident", **scope})
     total_compounds = await db.compounds.count_documents({})
     total_families = await db.families.count_documents({})
     total_services = await db.services.count_documents({})

@@ -123,23 +123,51 @@ const AddFamilyMemberToUnit = () => {
   const fetchResidents = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/compounds/${user.compound_id}/residences`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-      });
-      // Flatten the nested family_head data into top-level fields
-      const rawResidences = response.data.residences || [];
-      const flatResidences = rawResidences.map(r => ({
-        id: r.family_head?.id || '',
-        full_name: r.family_head?.full_name || '',
-        email: r.family_head?.email || '',
-        phone: r.family_head?.phone || '',
-        username: r.family_head?.username || '',
-        profile_picture_url: r.family_head?.profile_picture_url || null,
-        unit_number: r.unit_number || '',
-        family_id: r.family_id || '',
-        family_members: r.family_members || [],
-        member_count: r.member_count || 0,
-      }));
+      // Try residences first, fallback to admin/users
+      const compId = user.compound_id;
+      const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+      
+      let flatResidences = [];
+      
+      // Try residences endpoint
+      const response = await axios.get(`${API}/compounds/${compId}/residences`, { headers }).catch(() => null);
+      const rawResidences = response?.data?.residences || [];
+      
+      if (rawResidences.length > 0) {
+        flatResidences = rawResidences.map(r => ({
+          id: r.family_head?.id || '',
+          full_name: r.family_head?.full_name || r.unit_number || '',
+          email: r.family_head?.email || '',
+          phone: r.family_head?.phone || '',
+          username: r.family_head?.username || '',
+          profile_picture_url: r.family_head?.profile_picture_url || null,
+          unit_number: r.unit_number || '',
+          family_id: r.family_id || '',
+          family_members: r.family_members || [],
+          member_count: r.member_count || 0,
+        })).filter(r => r.full_name);
+      }
+      
+      // Fallback: get from users list
+      if (flatResidences.length === 0) {
+        const usersRes = await axios.get(`${API}/admin/users`, { headers }).catch(() => null);
+        const users = usersRes?.data?.users || [];
+        flatResidences = users
+          .filter(u => ['resident', 'family_head'].includes(u.role))
+          .map(u => ({
+            id: u.id || '',
+            full_name: u.full_name || u.username || '',
+            email: u.email || '',
+            phone: u.phone || '',
+            username: u.username || '',
+            profile_picture_url: u.profile_picture_url || null,
+            unit_number: u.unit_number || '',
+            family_id: '',
+            family_members: [],
+            member_count: 0,
+          }));
+      }
+      
       setResidents(flatResidences);
       setFilteredResidents(flatResidences);
     } catch (error) {

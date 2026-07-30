@@ -21,12 +21,14 @@ from shared_models import *
 router = APIRouter(prefix="/api")
 
 @router.post("/email/trigger-daily-reports")
+@router.post("/email/send-daily-report")
 async def trigger_daily_reports(current_user: dict = Depends(require_admin)):
     """Manually trigger daily reports for all compounds (admin only)"""
     count = await send_daily_reports_for_all_compounds()
     return {
         "message": f"تم إرسال {count} تقرير يومي لجميع المجمعات",
-        "emails_sent": count
+        "emails_sent": count,
+        "success": True
     }
 
 # ==================== END AUTOMATED DAILY REPORT ====================

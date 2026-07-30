@@ -568,7 +568,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: 'لوحة المؤشرات', href: 'owner-kpis', icon: ChartBarIcon, show: true },
         { name: 'لوحة التنبيهات', href: 'alerts', icon: BellIcon, show: true },
-        { name: 'خريطة الكمبوندات', href: 'compound-map', icon: MapIcon, show: true, badge: 'جديد' },
+        { name: 'خريطة الكمبوندات', href: 'compounds-map', icon: MapIcon, show: true, badge: 'جديد' },
         { name: 'المستخدمين', href: 'super-admin?tab=users', icon: UsersIcon, show: true },
       ]
     },
@@ -1436,8 +1436,8 @@ const Layout = ({ children, isTrialMode = false }) => {
                 <PlanLimitBadge />
               </div>
 
-              {/* Quick Account Switcher — linked accounts pills */}
-              <div className="hidden lg:block flex-shrink-0">
+              {/* Quick Account Switcher — visible on all screens */}
+              <div className="flex-shrink-0">
                 <AccountSwitcherDropdown />
               </div>
 

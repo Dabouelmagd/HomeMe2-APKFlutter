@@ -39,13 +39,20 @@ async def get_map_config(
     if not compound:
         raise HTTPException(status_code=404, detail="الكمبوند غير موجود")
 
+    # Use saved center or default to Cairo center
+    center = compound.get("map_center")
+    if not center:
+        center = {"lat": 30.0444, "lng": 31.2357}  # Cairo default
+
     return {
         "compound_id": compound_id,
         "name": compound.get("name", ""),
-        "center": compound.get("map_center") or {"lat": 30.0444, "lng": 31.2357},
-        "zoom": compound.get("map_zoom") or 17,
-        "boundary": compound.get("map_boundary") or [],  # list of {lat, lng} points
+        "center": center,
+        "zoom": compound.get("map_zoom") or 16,
+        "boundary": compound.get("map_boundary") or [],
         "address": compound.get("address", ""),
+        "city": compound.get("city", ""),
+        "has_location": bool(compound.get("map_center")),
     }
 
 

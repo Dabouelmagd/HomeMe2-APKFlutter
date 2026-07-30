@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../App';
+import { useSearchParams } from 'react-router-dom';
 import {
   MapIcon, UserGroupIcon, HomeIcon, ShieldCheckIcon,
   PencilSquareIcon, CheckIcon, XMarkIcon, ArrowPathIcon,
@@ -44,7 +45,9 @@ const loadGoogleMaps = () => {
 
 export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   const { user } = useAuth();
-  const compoundId = propCompoundId || user?.compound_id;
+  const [searchParams] = useSearchParams();
+  const urlCompoundId = searchParams.get('compound');
+  const compoundId = propCompoundId || urlCompoundId || user?.compound_id;
 
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
@@ -117,7 +120,7 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
 
   // ── Init Map ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!config || !mapRef.current) return;
+    if (!config || !mapRef.current || loading) return;
     loadGoogleMaps().then(() => {
       const map = new window.google.maps.Map(mapRef.current, {
         center: config.center,
@@ -576,7 +579,7 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
       <div className="flex items-center justify-center h-64 text-gray-400" dir="rtl">
         <div className="text-center space-y-4">
           <MapIcon className="h-12 w-12 mx-auto opacity-40" />
-          <p className="text-gray-500">اختاري كمبوند لعرض الخريطة</p>
+          <p className="text-gray-500 font-medium">اختر كمبوند لعرض خريطته</p>
           {allCompounds.length > 0 && (
             <select
               onChange={e => setSelectedCompoundId(e.target.value)}

@@ -56,6 +56,7 @@ import {
   SignalIcon,
   LifebuoyIcon,
   LinkIcon,
+  BanknotesIcon,
   ClipboardDocumentListIcon,
   QrCodeIcon,
   SpeakerXMarkIcon

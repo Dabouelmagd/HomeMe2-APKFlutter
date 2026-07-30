@@ -49,6 +49,7 @@ import UtilityBills from './components/UtilityBills';
 import FamilyManagement from './components/FamilyManagement';
 import AddFamilyMemberToUnit from './components/AddFamilyMemberToUnit';
 import FinancialManagement from './components/FinancialManagement';
+import InstallmentManagement from './components/InstallmentManagement';
 import CompoundFinance from './components/CompoundFinance';
 import SatisfactionDashboard from './components/SatisfactionDashboard';
 import ContractsManagement from './components/ContractsManagement';
@@ -967,6 +968,11 @@ function App() {
                   <Pricing />
                 } />
                 
+                <Route path="installments" element={
+                  <ProtectedRoute adminOnly>
+                    <InstallmentManagement />
+                  </ProtectedRoute>
+                } />
                 <Route path="finances" element={
                   <ProtectedRoute adminOnly>
                     <CompoundFinance />

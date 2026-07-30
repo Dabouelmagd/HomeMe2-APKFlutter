@@ -648,3 +648,328 @@ async def get_payment_receipt(payment_id: str, current_user: dict = Depends(get_
     except Exception as e:
         logging.error(f"Error generating receipt: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate receipt")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# INSTALLMENT PLANS — أقساط الوحدات
+# ══════════════════════════════════════════════════════════════════════════════
+
+class InstallmentPlanCreate(BaseModel):
+    resident_id: str
+    unit_number: str
+    title: str                          # "ثمن الوحدة / رسوم التسجيل / ..."
+    total_amount: float
+    down_payment: float = 0.0           # دفعة أولى
+    installment_count: int              # عدد الأقساط
+    installment_amount: float           # قيمة القسط الشهري
+    start_date: str                     # "2026-08-01"
+    late_fee_rate: float = 0.0          # % فائدة تأخير شهرية
+    early_payment_discount: float = 0.0 # % خصم الدفع الكاش
+    deposit_amount: float = 0.0         # وديعة
+    deposit_refundable: bool = True
+    notes: str = ""
+    pricing_method: str = "fixed"       # fixed | per_sqm | percentage | custom
+
+
+@router.post("/financial/installment-plans")
+async def create_installment_plan(
+    data: InstallmentPlanCreate,
+    current_user: dict = Depends(require_admin),
+):
+    """إنشاء خطة أقساط لساكن/وحدة."""
+    db = get_db()
+    compound_id = current_user.get("compound_id")
+
+    # Build installment schedule
+    from datetime import datetime, timezone, timedelta
+    import calendar
+
+    base_date = datetime.fromisoformat(data.start_date)
+    installments = []
+    for i in range(data.installment_count):
+        # Add months
+        month = base_date.month + i
+        year = base_date.year + (month - 1) // 12
+        month = (month - 1) % 12 + 1
+        due_date = base_date.replace(year=year, month=month)
+        installments.append({
+            "number": i + 1,
+            "due_date": due_date.isoformat(),
+            "amount": data.installment_amount,
+            "status": "pending",
+            "paid_at": None,
+            "paid_amount": None,
+            "late_fee": 0.0,
+            "discount": 0.0,
+        })
+
+    plan = {
+        "id": str(uuid.uuid4()),
+        "compound_id": compound_id,
+        "resident_id": data.resident_id,
+        "unit_number": data.unit_number,
+        "title": data.title,
+        "total_amount": data.total_amount,
+        "down_payment": data.down_payment,
+        "installment_count": data.installment_count,
+        "installment_amount": data.installment_amount,
+        "late_fee_rate": data.late_fee_rate,
+        "early_payment_discount": data.early_payment_discount,
+        "deposit_amount": data.deposit_amount,
+        "deposit_refundable": data.deposit_refundable,
+        "deposit_status": "held" if data.deposit_amount > 0 else None,
+        "pricing_method": data.pricing_method,
+        "notes": data.notes,
+        "status": "active",
+        "installments": installments,
+        "created_by": current_user.get("id"),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.installment_plans.insert_one(plan)
+    plan.pop("_id", None)
+    return {"success": True, "plan": plan}
+
+
+@router.get("/financial/installment-plans")
+async def get_installment_plans(
+    compound_id: str = None,
+    resident_id: str = None,
+    current_user: dict = Depends(get_current_user),
+):
+    """قائمة خطط الأقساط."""
+    db = get_db()
+    cid = compound_id or current_user.get("compound_id")
+    query = {"compound_id": cid}
+    if resident_id:
+        query["resident_id"] = resident_id
+    plans = await db.installment_plans.find(query, {"_id": 0}).to_list(length=500)
+    return {"plans": plans, "total": len(plans)}
+
+
+@router.get("/financial/installment-plans/{plan_id}")
+async def get_installment_plan(
+    plan_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    db = get_db()
+    plan = await db.installment_plans.find_one({"id": plan_id}, {"_id": 0})
+    if not plan:
+        raise HTTPException(status_code=404, detail="الخطة غير موجودة")
+    return plan
+
+
+@router.put("/financial/installment-plans/{plan_id}/pay/{installment_number}")
+async def pay_installment(
+    plan_id: str,
+    installment_number: int,
+    body: dict,
+    current_user: dict = Depends(require_admin),
+):
+    """تسجيل دفع قسط مع حساب فائدة التأخير / خصم الكاش."""
+    db = get_db()
+    plan = await db.installment_plans.find_one({"id": plan_id}, {"_id": 0})
+    if not plan:
+        raise HTTPException(status_code=404, detail="الخطة غير موجودة")
+
+    from datetime import datetime, timezone, date
+    payment_method = body.get("payment_method", "cash")
+    paid_date = datetime.now(timezone.utc)
+
+    installments = plan.get("installments", [])
+    idx = next((i for i, x in enumerate(installments) if x["number"] == installment_number), None)
+    if idx is None:
+        raise HTTPException(status_code=404, detail="القسط غير موجود")
+
+    inst = installments[idx]
+    base_amount = inst["amount"]
+
+    # Calculate late fee
+    late_fee = 0.0
+    if plan.get("late_fee_rate", 0) > 0:
+        due = datetime.fromisoformat(inst["due_date"])
+        if paid_date > due:
+            months_late = max(1, (paid_date.year - due.year) * 12 + paid_date.month - due.month)
+            late_fee = round(base_amount * (plan["late_fee_rate"] / 100) * months_late, 2)
+
+    # Calculate cash discount
+    discount = 0.0
+    if payment_method == "cash" and plan.get("early_payment_discount", 0) > 0:
+        discount = round(base_amount * (plan["early_payment_discount"] / 100), 2)
+
+    final_amount = base_amount + late_fee - discount
+
+    installments[idx].update({
+        "status": "paid",
+        "paid_at": paid_date.isoformat(),
+        "paid_amount": final_amount,
+        "late_fee": late_fee,
+        "discount": discount,
+        "payment_method": payment_method,
+        "notes": body.get("notes", ""),
+    })
+
+    # Check if all paid
+    all_paid = all(x["status"] == "paid" for x in installments)
+
+    await db.installment_plans.update_one(
+        {"id": plan_id},
+        {"$set": {
+            "installments": installments,
+            "status": "completed" if all_paid else "active",
+        }}
+    )
+
+    return {
+        "success": True,
+        "installment_number": installment_number,
+        "base_amount": base_amount,
+        "late_fee": late_fee,
+        "discount": discount,
+        "final_amount": final_amount,
+        "all_paid": all_paid,
+    }
+
+
+@router.put("/financial/installment-plans/{plan_id}")
+async def update_installment_plan(
+    plan_id: str,
+    body: dict,
+    current_user: dict = Depends(require_admin),
+):
+    """تعديل خطة أقساط."""
+    db = get_db()
+    allowed = ["title", "notes", "late_fee_rate", "early_payment_discount",
+               "deposit_amount", "deposit_status", "status"]
+    update = {k: v for k, v in body.items() if k in allowed}
+    if update:
+        await db.installment_plans.update_one({"id": plan_id}, {"$set": update})
+    return {"success": True}
+
+
+@router.delete("/financial/installment-plans/{plan_id}")
+async def delete_installment_plan(
+    plan_id: str,
+    current_user: dict = Depends(require_admin),
+):
+    """حذف خطة أقساط."""
+    db = get_db()
+    await db.installment_plans.delete_one({"id": plan_id})
+    return {"success": True}
+
+
+@router.get("/financial/installment-plans/export/excel")
+async def export_installment_plans_excel(
+    compound_id: str = None,
+    current_user: dict = Depends(require_admin),
+):
+    """تصدير خطط الأقساط Excel."""
+    import openpyxl
+    from fastapi.responses import Response
+    from openpyxl.styles import Font, PatternFill, Alignment
+    import io
+
+    db = get_db()
+    cid = compound_id or current_user.get("compound_id")
+    plans = await db.installment_plans.find({"compound_id": cid}, {"_id": 0}).to_list(500)
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "خطط الأقساط"
+
+    headers = ["الساكن", "الوحدة", "العنوان", "الإجمالي", "الأقساط", "قيمة القسط",
+               "فائدة التأخير%", "خصم الكاش%", "الوديعة", "الحالة", "ملاحظات"]
+    for col, h in enumerate(headers, 1):
+        cell = ws.cell(row=1, column=col, value=h)
+        cell.font = Font(bold=True)
+        cell.fill = PatternFill("solid", fgColor="059669")
+
+    for row, p in enumerate(plans, 2):
+        ws.append([
+            p.get("resident_id", ""), p.get("unit_number", ""), p.get("title", ""),
+            p.get("total_amount", 0), p.get("installment_count", 0),
+            p.get("installment_amount", 0), p.get("late_fee_rate", 0),
+            p.get("early_payment_discount", 0), p.get("deposit_amount", 0),
+            p.get("status", ""), p.get("notes", ""),
+        ])
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return Response(
+        content=buf.getvalue(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=installment_plans.xlsx"}
+    )
+
+
+@router.get("/financial/residents/{resident_id}/full-account")
+async def get_resident_full_account(
+    resident_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    """الحساب المالي الكامل للساكن — كل الالتزامات والأقساط والودائع."""
+    db = get_db()
+    compound_id = current_user.get("compound_id")
+
+    # Installment plans
+    plans = await db.installment_plans.find(
+        {"resident_id": resident_id}, {"_id": 0}
+    ).to_list(100)
+
+    # Unit charges (maintenance, shared expenses)
+    charges = await db.unit_charges.find(
+        {"resident_id": resident_id, "compound_id": compound_id}, {"_id": 0}
+    ).to_list(200)
+
+    # Payments
+    payments = await db.payments.find(
+        {"resident_id": resident_id, "compound_id": compound_id}, {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+
+    # Calculate totals
+    total_installments = sum(p.get("total_amount", 0) for p in plans)
+    total_paid_installments = sum(
+        i.get("paid_amount", 0)
+        for p in plans for i in p.get("installments", [])
+        if i.get("status") == "paid"
+    )
+    total_deposits = sum(p.get("deposit_amount", 0) for p in plans)
+    total_charges = sum(c.get("amount", 0) for c in charges)
+    total_paid_charges = sum(c.get("amount", 0) for c in charges if c.get("status") == "paid")
+    total_late_fees = sum(
+        i.get("late_fee", 0)
+        for p in plans for i in p.get("installments", [])
+    )
+    total_discounts = sum(
+        i.get("discount", 0)
+        for p in plans for i in p.get("installments", [])
+    )
+
+    # Pending installments
+    pending_installments = [
+        {**i, "plan_title": p.get("title"), "plan_id": p.get("id"),
+         "late_fee_rate": p.get("late_fee_rate", 0),
+         "early_payment_discount": p.get("early_payment_discount", 0)}
+        for p in plans for i in p.get("installments", [])
+        if i.get("status") == "pending"
+    ]
+
+    return {
+        "resident_id": resident_id,
+        "installment_plans": plans,
+        "charges": charges,
+        "payments": payments,
+        "pending_installments": sorted(pending_installments, key=lambda x: x.get("due_date", "")),
+        "summary": {
+            "total_installments": total_installments,
+            "total_paid_installments": total_paid_installments,
+            "total_remaining_installments": total_installments - total_paid_installments,
+            "total_deposits": total_deposits,
+            "total_charges": total_charges,
+            "total_paid_charges": total_paid_charges,
+            "total_remaining_charges": total_charges - total_paid_charges,
+            "total_late_fees": total_late_fees,
+            "total_discounts": total_discounts,
+            "grand_total_due": (total_installments - total_paid_installments) + (total_charges - total_paid_charges) + total_late_fees,
+        }
+    }

@@ -120,6 +120,28 @@ export default function InstallmentManagement({ compoundId, residentView = false
     fetchPlans();
   };
 
+  const handleNotifyOverdue = async () => {
+    try {
+      const res = await axios.post(`${API}/financial/installment-plans/notify-overdue`,
+        { compound_id: compoundId }, tok());
+      toast.success(`✅ تم إرسال ${res.data.notified} إشعار للمتأخرين`);
+    } catch { toast.error('فشل الإرسال'); }
+  };
+
+  const handleUploadProof = async (planId, instNumber, file) => {
+    const fd = new FormData();
+    fd.append('proof', file);
+    fd.append('installment_number', instNumber);
+    fd.append('notes', 'إيصال دفع قسط');
+    try {
+      await axios.post(`${API}/financial/installment-plans/${planId}/upload-proof`, fd, {
+        headers: { ...tok().headers, 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success('✅ تم رفع الإيصال');
+      fetchPlans();
+    } catch { toast.error('فشل رفع الإيصال'); }
+  };
+
   const handleExport = () => {
     const url = `${API}/financial/installment-plans/export/excel?compound_id=${compoundId}`;
     const a = document.createElement('a');
@@ -151,6 +173,11 @@ export default function InstallmentManagement({ compoundId, residentView = false
         </div>
         {!residentView && (
           <div className="flex gap-2">
+            <button onClick={handleNotifyOverdue}
+              className="flex items-center gap-1.5 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 hover:bg-red-100 transition-colors">
+              <ExclamationTriangleIcon className="h-4 w-4" />
+              إشعار المتأخرين
+            </button>
             <button onClick={handleExport}
               className="flex items-center gap-1.5 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
               <DocumentArrowDownIcon className="h-4 w-4" />
@@ -293,17 +320,31 @@ export default function InstallmentManagement({ compoundId, residentView = false
                                   <span className="text-xs text-gray-500 mr-1">({inst.paid_amount} ج.م)</span>
                                 )}
                               </td>
-                              {!residentView && (
-                                <td className="px-4 py-2">
-                                  {inst.status !== 'paid' && (
+                              <td className="px-4 py-2">
+                                <div className="flex items-center gap-1">
+                                  {!residentView && inst.status !== 'paid' && (
                                     <button
                                       onClick={() => setPayModal({ plan, inst, method: 'cash', notes: '' })}
                                       className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg transition-colors">
-                                      تسجيل دفع
+                                      دفع
                                     </button>
                                   )}
-                                </td>
-                              )}
+                                  {inst.status !== 'paid' && (
+                                    <label className="cursor-pointer">
+                                      <input type="file" accept="image/*,.pdf" className="hidden"
+                                        onChange={e => e.target.files[0] && handleUploadProof(plan.id, inst.number, e.target.files[0])} />
+                                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-200 transition-colors">
+                                        📎 إيصال
+                                      </span>
+                                    </label>
+                                  )}
+                                  {inst.proof_url && (
+                                    <a href={`${process.env.REACT_APP_BACKEND_URL}${inst.proof_url}`}
+                                      target="_blank" rel="noreferrer"
+                                      className="text-xs text-emerald-600 hover:underline">✅ إيصال</a>
+                                  )}
+                                </div>
+                              </td>
                             </tr>
                           ))}
                         </tbody>

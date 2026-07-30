@@ -25,9 +25,25 @@ const ResidentFinancialDashboard = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedCharge, setSelectedCharge] = useState(null);
   const [proofModalCharge, setProofModalCharge] = useState(null);
+  const [installmentPlans, setInstallmentPlans] = useState([]);
+  const [pendingInstallments, setPendingInstallments] = useState([]);
 
   useEffect(() => {
     fetchResidentFinancialData();
+    // Fetch installment plans for this resident
+    axios.get(`${API}/financial/installment-plans`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      params: { resident_id: user?.id }
+    }).then(r => {
+      const plans = r.data.plans || [];
+      const pending = plans.flatMap(p =>
+        (p.installments || []).filter(i => i.status !== 'paid').map(i => ({
+          ...i, plan_title: p.title, plan_id: p.id
+        }))
+      );
+      setInstallmentPlans(plans);
+      setPendingInstallments(pending);
+    }).catch(() => {});
   }, []);
 
   const fetchResidentFinancialData = async () => {

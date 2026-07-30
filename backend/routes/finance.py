@@ -736,10 +736,30 @@ async def get_installment_plans(
     resident_id: str = None,
     current_user: dict = Depends(get_current_user),
 ):
-    """قائمة خطط الأقساط."""
+    """قائمة خطط الأقساط — يدعم الأدمن وشركات الإدارة."""
     db = get_db()
-    cid = compound_id or current_user.get("compound_id")
-    query = {"compound_id": cid}
+    role = current_user.get("role", "")
+
+    # Scope by role
+    if role in ("app_owner", "super_admin"):
+        # Can see all or filter by compound
+        cid = compound_id
+        query = {"compound_id": cid} if cid else {}
+    elif role == "company_admin" and current_user.get("company_id"):
+        # Get all compounds for this company
+        compounds = await db.compounds.find(
+            {"$or": [
+                {"company_id": current_user["company_id"]},
+                {"management_company_id": current_user["company_id"]}
+            ]}, {"_id": 0, "id": 1}
+        ).to_list(200)
+        compound_ids = [c["id"] for c in compounds]
+        query = {"compound_id": {"$in": compound_ids}}
+        if compound_id:
+            query = {"compound_id": compound_id}
+    else:
+        cid = compound_id or current_user.get("compound_id")
+        query = {"compound_id": cid}
     if resident_id:
         query["resident_id"] = resident_id
     plans = await db.installment_plans.find(query, {"_id": 0}).to_list(length=500)
@@ -972,4 +992,199 @@ async def get_resident_full_account(
             "total_discounts": total_discounts,
             "grand_total_due": (total_installments - total_paid_installments) + (total_charges - total_paid_charges) + total_late_fees,
         }
+    }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# NOTIFICATIONS — إشعارات الأقساط المتأخرة
+# ══════════════════════════════════════════════════════════════════════════════
+
+@router.post("/financial/installment-plans/notify-overdue")
+async def notify_overdue_installments(
+    body: dict,
+    current_user: dict = Depends(require_admin),
+):
+    """إرسال إشعارات للسكان المتأخرين في دفع الأقساط."""
+    from datetime import datetime, timezone
+    from email_service import email_service
+
+    db = get_db()
+    compound_id = body.get("compound_id") or current_user.get("compound_id")
+    query = {"compound_id": compound_id} if compound_id else {}
+    plans = await db.installment_plans.find(query, {"_id": 0}).to_list(500)
+
+    now = datetime.now(timezone.utc)
+    notified = 0
+
+    for plan in plans:
+        overdue = [i for i in plan.get("installments", [])
+                   if i.get("status") != "paid" and
+                   datetime.fromisoformat(i["due_date"].replace("Z", "+00:00")) < now]
+        if not overdue:
+            continue
+
+        # Get resident email
+        resident = await db.users.find_one(
+            {"id": plan["resident_id"]}, {"_id": 0, "email": 1, "full_name": 1, "username": 1}
+        )
+        if not resident or not resident.get("email"):
+            continue
+
+        total_overdue = sum(i["amount"] for i in overdue)
+        late_fees = sum(
+            i["amount"] * (plan.get("late_fee_rate", 0) / 100)
+            for i in overdue
+        )
+
+        html = f"""
+        <div dir='rtl' style='font-family:Cairo,Arial,sans-serif;max-width:600px;margin:auto'>
+          <div style='background:#dc2626;color:#fff;padding:20px;border-radius:12px 12px 0 0;text-align:center'>
+            <h2 style='margin:0'>⚠️ تنبيه: أقساط متأخرة</h2>
+          </div>
+          <div style='background:#fff;padding:20px;border:1px solid #e5e7eb;border-radius:0 0 12px 12px'>
+            <p>مرحباً <strong>{resident.get('full_name') or resident.get('username')}</strong>،</p>
+            <p>يوجد لديك <strong>{len(overdue)} قسط متأخر</strong> بإجمالي <strong>{total_overdue:,.0f} ج.م</strong></p>
+            <p>الخطة: <strong>{plan.get('title')}</strong> — وحدة {plan.get('unit_number', '')}</p>
+            {f"<p style='color:#dc2626'>فوائد التأخير المستحقة: {late_fees:,.0f} ج.م</p>" if late_fees > 0 else ""}
+            <p>يرجى سداد المبلغ في أقرب وقت ممكن لتجنب تراكم الفوائد.</p>
+            <div style='background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px;margin-top:16px'>
+              <p style='margin:0;font-size:12px;color:#991b1b'>
+                للدفع: تواصل مع إدارة الكمبوند أو ادفع عبر التطبيق
+              </p>
+            </div>
+          </div>
+        </div>"""
+
+        try:
+            await email_service.send_email(
+                to_email=resident["email"],
+                subject=f"⚠️ تنبيه أقساط متأخرة — {plan.get('title')}",
+                html_content=html,
+            )
+            notified += 1
+        except Exception as _e:
+            pass
+
+    return {"success": True, "notified": notified, "message": f"تم إرسال {notified} إشعار"}
+
+
+@router.post("/financial/installment-plans/{plan_id}/upload-proof")
+async def upload_installment_proof(
+    plan_id: str,
+    installment_number: int = Form(...),
+    proof: UploadFile = File(...),
+    notes: str = Form(""),
+    current_user: dict = Depends(get_current_user),
+):
+    """الساكن يرفع إيصال دفع قسط."""
+    import os
+    db = get_db()
+    plan = await db.installment_plans.find_one({"id": plan_id}, {"_id": 0})
+    if not plan:
+        raise HTTPException(status_code=404, detail="الخطة غير موجودة")
+
+    PROOF_DIR = "/app/uploads/payment_proofs"
+    os.makedirs(PROOF_DIR, exist_ok=True)
+    ext = os.path.splitext(proof.filename or "")[1].lower() or ".jpg"
+    data = await proof.read()
+    fname = f"inst_{plan_id}_{installment_number}_{uuid.uuid4().hex[:8]}{ext}"
+    fpath = os.path.join(PROOF_DIR, fname)
+    with open(fpath, "wb") as f:
+        f.write(data)
+
+    image_url = f"/api/files/payment_proofs/{fname}"
+
+    # Update installment with proof
+    plan_data = await db.installment_plans.find_one({"id": plan_id}, {"_id": 0})
+    installments = plan_data.get("installments", [])
+    for i, inst in enumerate(installments):
+        if inst["number"] == installment_number:
+            installments[i]["proof_url"] = image_url
+            installments[i]["proof_notes"] = notes
+            installments[i]["proof_uploaded_at"] = datetime.now(timezone.utc).isoformat()
+            break
+
+    await db.installment_plans.update_one(
+        {"id": plan_id},
+        {"$set": {"installments": installments}}
+    )
+
+    return {"success": True, "image_url": image_url}
+
+
+@router.get("/financial/compound-summary")
+async def get_compound_financial_summary(
+    compound_id: str = None,
+    current_user: dict = Depends(get_current_user),
+):
+    """إجماليات مالية شاملة للكمبوند — للداشبورد."""
+    db = get_db()
+    cid = compound_id or current_user.get("compound_id")
+    if not cid:
+        raise HTTPException(status_code=400, detail="compound_id مطلوب")
+
+    # Installment plans totals
+    plans = await db.installment_plans.find({"compound_id": cid}, {"_id": 0}).to_list(1000)
+    total_installments = sum(p.get("total_amount", 0) for p in plans)
+    total_collected = sum(
+        i.get("paid_amount", 0)
+        for p in plans for i in p.get("installments", [])
+        if i.get("status") == "paid"
+    )
+    total_overdue_amount = sum(
+        i.get("amount", 0)
+        for p in plans for i in p.get("installments", [])
+        if i.get("status") != "paid" and
+        i.get("due_date", "") < datetime.now(timezone.utc).isoformat()
+    )
+    total_deposits = sum(p.get("deposit_amount", 0) for p in plans)
+    overdue_residents = len(set(
+        p["resident_id"] for p in plans
+        for i in p.get("installments", [])
+        if i.get("status") != "paid" and
+        i.get("due_date", "") < datetime.now(timezone.utc).isoformat()
+    ))
+
+    # Unit charges
+    total_charges = await db.unit_charges.aggregate([
+        {"$match": {"compound_id": cid}},
+        {"$group": {"_id": "$status", "total": {"$sum": "$amount"}}}
+    ]).to_list(10)
+    charges_by_status = {r["_id"]: r["total"] for r in total_charges}
+
+    # Financial expenses/revenue
+    from datetime import datetime, timezone
+    month_start = datetime.now(timezone.utc).replace(day=1).isoformat()
+    month_expenses = await db.expenses.aggregate([
+        {"$match": {"compound_id": cid, "created_at": {"$gte": month_start}}},
+        {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+    ]).to_list(1)
+    month_revenue = await db.revenue.aggregate([
+        {"$match": {"compound_id": cid, "created_at": {"$gte": month_start}}},
+        {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+    ]).to_list(1)
+
+    return {
+        "compound_id": cid,
+        "installments": {
+            "total_amount": total_installments,
+            "collected": total_collected,
+            "remaining": total_installments - total_collected,
+            "overdue_amount": total_overdue_amount,
+            "overdue_residents": overdue_residents,
+            "total_deposits": total_deposits,
+            "plans_count": len(plans),
+        },
+        "charges": {
+            "pending": charges_by_status.get("pending", 0),
+            "paid": charges_by_status.get("paid", 0),
+            "overdue": charges_by_status.get("overdue", 0),
+        },
+        "this_month": {
+            "expenses": month_expenses[0]["total"] if month_expenses else 0,
+            "revenue": month_revenue[0]["total"] if month_revenue else 0,
+        },
+        "collection_rate": round(
+            (total_collected / total_installments * 100) if total_installments > 0 else 0, 1
+        ),
     }

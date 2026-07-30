@@ -46,7 +46,14 @@ const AdminDashboard = () => {
   const [internalAds, setInternalAds] = useState([]);
   const [referralData, setReferralData] = useState(null);
 
+  const [financialSummary, setFinancialSummary] = useState(null);
+
   useEffect(() => {
+    // Fetch financial summary
+    axios.get(`${API}/financial/compound-summary`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    }).then(r => setFinancialSummary(r.data)).catch(() => {});
+
     fetchDashboardData();
     fetchInternalAds();
     fetchReferralCode();

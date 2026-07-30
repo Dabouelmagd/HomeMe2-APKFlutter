@@ -23,7 +23,7 @@ from auth_deps import require_app_owner
 from routes.stripe_subscriptions import PLAN_CATALOGUE
 
 
-router = APIRouter(prefix="/api/subscription-analytics", tags=["subscription-analytics"])
+router = APIRouter(prefix="/api/super-admin/subscription-analytics", tags=["subscription-analytics"])
 
 
 PLAN_LABELS = {

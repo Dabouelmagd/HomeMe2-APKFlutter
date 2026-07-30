@@ -43,7 +43,7 @@ const SubscriptionAnalyticsPage = () => {
     const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
     try {
       const [s, c, m] = await Promise.all([
-        axios.get(`${API}/subscription-analytics/summary`, { headers }),
+        axios.get(`${API}/super-admin/subscription-analytics/summary`, { headers }),
         axios.get(`${API}/subscription-migration/candidates?limit=100`, { headers }),
         axios.get(`${API}/subscription-migration/stats`, { headers }),
       ]);

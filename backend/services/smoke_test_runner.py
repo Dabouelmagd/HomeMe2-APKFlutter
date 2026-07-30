@@ -218,7 +218,12 @@ async def _cleanup(client: httpx.AsyncClient, ctx: dict):
         from database import init_db, get_db
         init_db()
         db = get_db()
-        await db.users.delete_many({"email": {"$regex": "^smoke_co_"}})
+        # Delete smoke test users
+        r1 = await db.users.delete_many({"email": {"$regex": "^smoke_co_"}})
+        # Delete smoke test companies
+        r2 = await db.companies.delete_many({"name": "Smoke Test Company"})
+        r3 = await db.companies.delete_many({"email": {"$regex": "^smoke_co_"}})
+        logging.info(f"Cleanup: {r1.deleted_count} users, {r2.deleted_count + r3.deleted_count} companies deleted")
     except Exception as e:
         logging.warning(f"smoke cleanup failed: {e}")
 

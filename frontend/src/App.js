@@ -151,6 +151,7 @@ import CompoundGoogleMap from './components/CompoundGoogleMap';
 import StaffManagement from './components/StaffManagement';
 import AboutUs from './components/AboutUs';
 import FAQPage from './pages/FAQPage';
+import ImportExportPage from './pages/ImportExportPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import ReferralProgramPage from './components/ReferralProgramPage';
 import AIAssistantBubble from './components/AIAssistantBubble';
@@ -969,6 +970,11 @@ function App() {
                   <Pricing />
                 } />
                 
+                <Route path="import-export" element={
+                  <ProtectedRoute adminOnly>
+                    <ImportExportPage />
+                  </ProtectedRoute>
+                } />
                 <Route path="installments" element={
                   <ProtectedRoute adminOnly>
                     <InstallmentManagement />

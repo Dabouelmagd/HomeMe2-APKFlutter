@@ -57,6 +57,7 @@ import {
   LifebuoyIcon,
   LinkIcon,
   BanknotesIcon,
+  ArrowUpTrayIcon,
   ClipboardDocumentListIcon,
   QrCodeIcon,
   SpeakerXMarkIcon
@@ -771,6 +772,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       color: 'amber',
       items: [
         { name: 'الأقساط والمديونيات', href: 'installments', icon: CreditCardIcon, show: isStaffRole, badge: 'جديد' },
+        { name: 'استيراد وتصدير', href: 'import-export', icon: ArrowUpTrayIcon, show: isAdminRole },
         { name: 'الإدارة المالية', href: 'finances', icon: CurrencyDollarIcon, show: isStaffRole },
         { name: 'مركز المدفوعات', href: 'payments', icon: CreditCardIcon, show: true },
         { name: 'طرق الدفع', href: 'compound-payment-methods', icon: CreditCardIcon, show: isStaffRole },

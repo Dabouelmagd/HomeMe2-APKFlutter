@@ -2331,6 +2331,14 @@ async def root():
 # does not rely on cookies for auth — it sends the JWT in the Authorization
 # header — so disabling credentials here is safe and necessary.
 ALLOWED_ORIGINS = os.environ.get('CORS_ORIGINS', 'https://homemeapp.net,https://www.homemeapp.net,http://localhost:3000').split(',')
+@app.get("/api/")
+async def api_root():
+    return {"status": "ok", "service": "HomeMe API", "version": "2.0"}
+
+@app.get("/api/health")
+async def api_health():
+    return {"status": "ok"}
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=False,

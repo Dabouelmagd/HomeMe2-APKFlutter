@@ -23,6 +23,8 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
   const [ads, setAds] = useState([]);
   const [dismissed, setDismissed] = useState([]);
   const [adSettings, setAdSettings] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   const isPublicPosition = ['homepage_hero', 'homepage_mid', 'homepage_footer', 'login_page'].includes(position);
 
@@ -111,12 +113,27 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
   // Show internal ads
   if (!showInternal || visibleAds.length === 0) return null;
 
-  // Banner variant - full width
+  // Banner variant - full width SLIDESHOW
   if (variant === 'full') {
+    const slideAds = visibleAds;
+    const current = slideAds[currentIndex % Math.max(slideAds.length, 1)];
+    if (!current) return null;
+
     return (
-      <div className={`space-y-3 ${className}`} dir={isRTL ? 'rtl' : 'ltr'} data-testid={`ad-banner-${position}`}>
-        {visibleAds.map(ad => (
-          <div key={ad.id} className="relative group rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl hover:scale-[1.01] transition-all" onClick={() => handleClick(ad)} title={ad.link_url ? ad.link_url : ''}>
+      <div
+        className={`relative ${className}`}
+        dir={isRTL ? 'rtl' : 'ltr'}
+        data-testid={`ad-banner-${position}`}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        {/* Single ad display */}
+        {slideAds.map((ad, idx) => (
+          <div
+            key={ad.id}
+            className={`transition-all duration-700 ${idx === currentIndex % slideAds.length ? 'block' : 'hidden'}`}
+          >
+          <div className="relative group rounded-xl overflow-hidden cursor-pointer shadow-md hover:shadow-xl hover:scale-[1.01] transition-all" onClick={() => handleClick(ad)} title={ad.link_url ? ad.link_url : ''}>
             {ad.image_url ? (
               // صورة الإعلان كاملة بدون قص — object-contain يحافظ على الأبعاد الأصلية
               (ad.media_type === 'video') || /\.(mp4|webm|mov)(\?|$)/i.test(ad.image_url) ? (
@@ -147,7 +164,35 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
               <XMarkIcon className="w-3 h-3 text-white" />
             </button>
           </div>
+        </div>
         ))}
+
+        {/* Navigation dots */}
+        {slideAds.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+            {slideAds.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentIndex(i)}
+                className={`transition-all duration-300 rounded-full ${i === currentIndex % slideAds.length ? 'bg-white w-5 h-2' : 'bg-white/50 w-2 h-2'}`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Prev/Next arrows */}
+        {slideAds.length > 1 && (
+          <>
+            <button
+              onClick={() => setCurrentIndex(i => (i - 1 + slideAds.length) % slideAds.length)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white text-xl rounded-full w-8 h-8 flex items-center justify-center z-20 transition-colors"
+            >&#8250;</button>
+            <button
+              onClick={() => setCurrentIndex(i => (i + 1) % slideAds.length)}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/60 text-white text-xl rounded-full w-8 h-8 flex items-center justify-center z-20 transition-colors"
+            >&#8249;</button>
+          </>
+        )}
       </div>
     );
   }

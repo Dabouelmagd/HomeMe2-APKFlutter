@@ -954,7 +954,7 @@ const HomePage = () => {
       {/* Ad Space 1 - After Hero (Homepage Hero) */}
       <div className="bg-gray-100 py-3 text-center" data-testid="ad-space-1">
         <div className="max-w-7xl mx-auto px-4">
-          <InternalAdBanner position="homepage_hero" maxAds={1} variant="full" className="" />
+          <InternalAdBanner position="homepage_hero" maxAds={5} variant="full" className="" />
         </div>
       </div>
 
@@ -1379,7 +1379,7 @@ const HomePage = () => {
       {/* Ad Space 2 - Before Pricing (Homepage Mid) */}
       <div className="bg-slate-900 py-3 text-center">
         <div className="max-w-5xl mx-auto px-4">
-          <InternalAdBanner position="homepage_mid" maxAds={1} variant="full" className="" />
+          <InternalAdBanner position="homepage_mid" maxAds={5} variant="full" className="" />
         </div>
       </div>
 
@@ -1455,7 +1455,7 @@ const HomePage = () => {
       {/* Ad Space 3 - Before CTA (Homepage Footer) */}
       <div className="bg-gray-50 py-3 text-center">
         <div className="max-w-5xl mx-auto px-4">
-          <InternalAdBanner position="homepage_footer" maxAds={1} variant="full" className="" />
+          <InternalAdBanner position="homepage_footer" maxAds={5} variant="full" className="" />
         </div>
       </div>
 

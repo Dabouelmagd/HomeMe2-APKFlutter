@@ -151,6 +151,7 @@ import CompoundGoogleMap from './components/CompoundGoogleMap';
 import StaffManagement from './components/StaffManagement';
 import AboutUs from './components/AboutUs';
 import FAQPage from './pages/FAQPage';
+import ErrorBoundary from './components/ErrorBoundary';
 import ReferralProgramPage from './components/ReferralProgramPage';
 import AIAssistantBubble from './components/AIAssistantBubble';
 import ResetPassword from './components/ResetPassword';

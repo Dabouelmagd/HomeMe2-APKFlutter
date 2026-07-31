@@ -25,6 +25,9 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
   const [trialData, setTrialData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [countdown, setCountdown] = useState(null);
+  const [showCodeInput, setShowCodeInput] = useState(false);
+  const [subCode, setSubCode] = useState('');
+  const [applyingCode, setApplyingCode] = useState(false);
 
   // الأدوار التي لا يظهر لها البار إطلاقاً (هم مديرو الابلكيشن)
   const APP_ADMIN_ROLES = ['super_admin', 'app_owner'];
@@ -67,6 +70,23 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
 
   // إخفاء كامل للأدوار الإدارية أو المشتركين المدفوعين
   if (isAppAdmin || hasPaidSubscription) return null;
+
+  const applySubscriptionCode = async () => {
+    if (!subCode.trim()) return;
+    setApplyingCode(true);
+    try {
+      const res = await axios.post(`${API}/subscription/apply-code`,
+        { code: subCode.trim().toUpperCase() },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      toast.success('✅ تم تفعيل الاشتراك بنجاح!');
+      setShowCodeInput(false);
+      setSubCode('');
+      window.location.reload();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || 'كود غير صحيح');
+    } finally { setApplyingCode(false); }
+  };
 
   const fetchTrialStatus = async () => {
     try {
@@ -223,12 +243,19 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               {daysRemaining} {daysRemaining === 1 ? t('days_left') : t('days_left_plural')}
             </span>
           </div>
-          <button
-            onClick={onUpgradeClick || upgradeToPaid}
-            className="bg-white font-medium hover:bg-gray-50 transition-colors px-3 py-1 rounded text-xs text-blue-600"
-          >
-            {t('upgrade_now')}
-          </button>
+          <div className="flex gap-1.5">
+            <button
+              onClick={onUpgradeClick || upgradeToPaid}
+              className="bg-white font-medium hover:bg-gray-50 transition-colors px-3 py-1 rounded text-xs text-blue-600"
+            >
+              {t('upgrade_now')}
+            </button>
+            <button
+              onClick={() => setShowCodeInput(v => !v)}
+              className="bg-white/20 hover:bg-white/30 text-white font-bold px-2 py-1 rounded text-xs transition-colors"
+              title="كود اشتراك"
+            >🎟️</button>
+          </div>
         </div>
       </div>
     );
@@ -287,7 +314,7 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               data-testid="trial-upgrade-btn"
             >
               <ArrowUpIcon className="h-4 w-4" />
-              {isAlmostExpired ? t('subscribe_now', 'اشتركي الآن') : t('upgrade_now', 'ترقية')}
+              {isAlmostExpired ? t('subscribe_now', 'اشتركي الآن') : t('ترقية للمدفوع')}
             </button>
             <button
               onClick={() => navigate('/app/pricing')}
@@ -295,7 +322,39 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
             >
               {t('view_plans', 'عرض الباقات')}
             </button>
+            {/* Subscription code button */}
+            <button
+              onClick={() => setShowCodeInput(v => !v)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-emerald-400 text-sm font-bold rounded-lg text-emerald-700 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+              title="لديك كود اشتراك؟"
+            >
+              🎟️ كود اشتراك
+            </button>
           </div>
+          {/* Code input inline */}
+          {showCodeInput && (
+            <div className="w-full mt-3 flex gap-2 items-center bg-white border-2 border-emerald-300 rounded-xl p-3">
+              <span className="text-sm text-gray-500 flex-shrink-0">🎟️</span>
+              <input
+                value={subCode}
+                onChange={e => setSubCode(e.target.value.toUpperCase())}
+                placeholder="أدخل كود الاشتراك..."
+                className="flex-1 outline-none text-sm font-mono tracking-widest text-gray-800 bg-transparent"
+                onKeyDown={e => e.key === 'Enter' && applySubscriptionCode()}
+                autoFocus
+                dir="ltr"
+              />
+              <button
+                onClick={applySubscriptionCode}
+                disabled={applyingCode || !subCode.trim()}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+              >
+                {applyingCode ? '...' : 'تفعيل'}
+              </button>
+              <button onClick={() => { setShowCodeInput(false); setSubCode(''); }}
+                className="text-gray-400 hover:text-gray-600 text-lg px-1">✕</button>
+            </div>
+          )}
         </div>
       </div>
 

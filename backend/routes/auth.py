@@ -136,7 +136,10 @@ async def register(user_data: UserCreate, request: Request):
             "created_by": "self_registration",
         }
         await db.companies.insert_one(new_company)
-        await db.users.update_one({"id": user.id}, {"$set": {"company_id": new_company_id}})
+        await db.users.update_one({"id": user.id}, {"$set": {
+            "company_id": new_company_id,
+            "email_verified": True,   # company_admin auto-verified (paid customer)
+        }})
         # Bootstrap subscription with user-selected plan (default: starter).
         # Whitelist to catalogue keys to prevent arbitrary string injection.
         ALLOWED_PLANS = {"starter", "company_startup", "company_business", "company_enterprise"}
@@ -246,6 +249,35 @@ async def register(user_data: UserCreate, request: Request):
         "subscription_type": user_dict.get("subscription_type", "trial"),
         "subscription_end": user_dict.get("subscription_end")
     }
+
+@router.post("/auth/manual-verify/{user_id}")
+async def manual_verify_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Owner/SuperAdmin يفعّل حساب يدوياً بدون إيميل."""
+    if current_user.get("role") not in ("app_owner", "super_admin"):
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    db = get_db()
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"email_verified": True, "is_active": True}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="المستخدم غير موجود")
+    return {"success": True, "message": "تم تفعيل الحساب"}
+
+
+@router.post("/auth/verify-by-email")
+async def verify_by_email_manual(body: dict, current_user: dict = Depends(get_current_user)):
+    """Owner يفعّل حساب بالإيميل."""
+    if current_user.get("role") not in ("app_owner", "super_admin"):
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    db = get_db()
+    email = body.get("email", "")
+    result = await db.users.update_one(
+        {"email": email},
+        {"$set": {"email_verified": True, "is_active": True}}
+    )
+    return {"success": True, "matched": result.matched_count}
+
 
 @router.post("/auth/create-admin")
 async def create_admin_user():

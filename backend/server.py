@@ -2339,6 +2339,20 @@ async def api_root():
 async def api_health():
     return {"status": "ok"}
 
+# Copyright headers middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request as StarletteRequest
+
+class CopyrightHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: StarletteRequest, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Origin"] = "HomeMe Platform — homemeapp.net"
+        response.headers["X-Copyright"] = "© 2026 Data Life AI. All rights reserved."
+        response.headers["X-Robots-Tag"] = "noai, noimageai"
+        return response
+
+app.add_middleware(CopyrightHeadersMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=False,
@@ -2437,7 +2451,9 @@ from routes.chat import router as chat_router
 from routes.search import router as search_router
 from routes.global_search import router as global_search_router
 from routes.compound_map import router as compound_map_router
+from routes.watermark import router as watermark_router
 app.include_router(compound_map_router)
+app.include_router(watermark_router)
 app.include_router(global_search_router)
 from routes.scheduled_msgs import router as scheduled_msgs_router
 from routes.services import router as services_router

@@ -1,16 +1,96 @@
-User-agent: *
+# ═══════════════════════════════════════════════════════
+# HomeMe — homemeapp.net
+# © 2026 Data Life AI. All rights reserved.
+# Unauthorized scraping, crawling, or reproduction of
+# this site's structure, content, or data is prohibited.
+# ═══════════════════════════════════════════════════════
+
+# ── Standard search engines (allowed) ──────────────────
+User-agent: Googlebot
 Allow: /
-Allow: /blog
 Allow: /blog/
 Allow: /legal/
-
-# Disallow private/app routes — no need for search engines
 Disallow: /app/
 Disallow: /api/
+
+User-agent: Bingbot
+Allow: /
+Allow: /blog/
+Allow: /legal/
+Disallow: /app/
+Disallow: /api/
+
+# ── AI Training & LLM Crawlers (blocked) ───────────────
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: Omgilibot
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: YouBot
+Disallow: /
+
+User-agent: DataForSeoBot
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# ── All other bots (blocked by default) ────────────────
+User-agent: *
+Allow: /
+Allow: /blog/
+Allow: /legal/
+Allow: /pricing
+Allow: /about
+Disallow: /app/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /super-admin/
 Disallow: /select-account
 Disallow: /select-compound
 Disallow: /onboarding/
-Disallow: /admin/
-Disallow: /super-admin/
+Disallow: /register
+Disallow: /reset-password/
 
 Sitemap: https://homemeapp.net/sitemap.xml
+Crawl-delay: 10

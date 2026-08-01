@@ -16,14 +16,22 @@ router = APIRouter(prefix="/api")
 
 # ── IP Blacklist (in-memory + DB) ────────────────────────
 _BLACKLIST: set = set()
+# IPs that are NEVER blacklisted (add office/home IPs here)
+_WHITELIST: set = {
+    "127.0.0.1",
+    "::1",
+    "167.233.119.52",  # our own server
+}
 _SUSPICIOUS: dict = {}   # ip → {count, first_seen}
 
-BLACKLIST_THRESHOLD = 100   # requests per minute → blacklist
-SUSPICIOUS_THRESHOLD = 50   # requests per minute → flag
+BLACKLIST_THRESHOLD = 500   # requests per minute → blacklist (high to avoid false positives)
+SUSPICIOUS_THRESHOLD = 200  # requests per minute → flag
 
 async def check_ip_blacklist(request: Request):
     """Middleware helper — call from endpoints or middleware."""
     ip = request.client.host if request.client else "unknown"
+    if ip in _WHITELIST:
+        return ip
     if ip in _BLACKLIST:
         raise HTTPException(status_code=403, detail="Access denied")
     return ip

@@ -704,6 +704,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'الإعدادات', href: 'settings', icon: Cog6ToothIcon, show: true },
       ]
     },
+  ];
 
   // ── Company Admin Navigation ───────────────────────────────────────────────
   const companyAdminSections = [

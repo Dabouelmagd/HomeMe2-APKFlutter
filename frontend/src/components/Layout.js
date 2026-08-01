@@ -78,7 +78,7 @@ import MobileBottomNav from './MobileBottomNav';
 
 const Layout = ({ children, isTrialMode = false }) => {
   const { t, i18n } = useTranslation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -932,7 +932,7 @@ const Layout = ({ children, isTrialMode = false }) => {
   };
 
   return (
-    <div className={`flex h-screen bg-gray-50 dark:bg-gray-900 ${isRTL ? 'rtl' : 'ltr'}`}>
+    <div className={`flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden ${isRTL ? 'rtl' : 'ltr'}`}>
       {/* Impersonation banner (visible ONLY when current session is an impersonation) */}
       <ImpersonationBanner />
       {/* Mobile sidebar overlay */}
@@ -946,7 +946,6 @@ const Layout = ({ children, isTrialMode = false }) => {
       {/* Sidebar */}
       <div className={`
         fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col
-        lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}
         ${isSuperAdmin ? 'bg-gray-950 border-e border-purple-900/30' : 'bg-white dark:bg-gray-800'}
       `}>
@@ -1284,12 +1283,12 @@ const Layout = ({ children, isTrialMode = false }) => {
         <div className="flex-shrink-0 sticky top-0 z-10 bg-white shadow-sm border-b border-gray-200 overflow-x-hidden">
           <div className="flex items-center justify-between h-16 px-3 sm:px-6 gap-2">
             <button
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(true)}
+              className="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              onClick={() => setSidebarOpen(v => !v)}
               data-testid="hamburger-button"
-              aria-label="فتح القائمة الجانبية"
+              aria-label="فتح/إغلاق القائمة"
             >
-              <Bars3Icon className="h-6 w-6 text-gray-500" />
+              <Bars3Icon className="h-6 w-6 text-gray-500 dark:text-gray-400" />
             </button>
 
             <div className="flex-1 min-w-0 mx-2 sm:mx-4 search-container relative">
@@ -1513,7 +1512,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         </div>
 
         {/* Page content - Scrollable */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden page-scroll">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden page-scroll w-0 min-w-0">
           {/* Top Banner Ad - only for residents, never on low-content routes */}
           {!isAppOwner && !isAdminRole && !isLowContentRoute && (
             <div className="max-w-7xl mx-auto px-4 pt-3">

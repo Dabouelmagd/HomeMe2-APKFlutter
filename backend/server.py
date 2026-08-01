@@ -2343,6 +2343,21 @@ async def api_health():
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
 
+class IPBlacklistMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        ip = request.client.host if request.client else ""
+        # Import blacklist from security module
+        try:
+            from routes.security import _BLACKLIST, record_suspicious
+            if ip in _BLACKLIST:
+                from starlette.responses import JSONResponse
+                return JSONResponse({"detail": "Access denied"}, status_code=403)
+        except Exception:
+            pass
+        return await call_next(request)
+
+app.add_middleware(IPBlacklistMiddleware)
+
 class CopyrightHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: StarletteRequest, call_next):
         response = await call_next(request)

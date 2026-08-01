@@ -629,6 +629,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'تذاكر الدعم الفني', href: 'super-admin?tab=support_tickets', icon: LifebuoyIcon, show: true },
         { name: 'فحص صحة المسارات', href: 'super-admin?tab=smoke_test', icon: ShieldCheckIcon, show: true },
         { name: 'سجل التدقيق', href: 'audit-log', icon: ClipboardDocumentListIcon, show: true },
+        { name: '🛡️ لوحة الأمان', href: 'security-dashboard', icon: ShieldCheckIcon, show: activeRole === 'app_owner' },
         { name: 'سجل التحديثات', href: 'changelog', icon: DocumentTextIcon, show: activeRole === 'app_owner' },
         { name: 'الإعدادات', href: 'settings', icon: Cog6ToothIcon, show: true },
       ]

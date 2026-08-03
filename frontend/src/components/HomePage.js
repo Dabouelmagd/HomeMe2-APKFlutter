@@ -1197,7 +1197,7 @@ const HomePage = () => {
                 {t('hp_feat_ai_assistant_desc', 'شات AI عائم متاح في كل صفحة، يجاوب على أسئلة المستخدمين فوراً ويوجّههم للصفحات الصحيحة. مدعوم بـ Claude AI.')}
               </p>
               <div className="mt-3 inline-block bg-emerald-500/20 text-emerald-300 text-xs px-2 py-0.5 rounded font-bold">
-                ⚡ Gemini 3 Flash
+                ⚡ Claude Haiku
               </div>
             </div>
 

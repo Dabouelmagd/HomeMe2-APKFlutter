@@ -47,7 +47,9 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const urlCompoundId = searchParams.get('compound');
-  const compoundId = propCompoundId || urlCompoundId || user?.compound_id;
+  const rawCompoundId = propCompoundId || urlCompoundId || user?.compound_id;
+  // "default-compound" is a placeholder, not a real compound
+  const compoundId = (rawCompoundId && rawCompoundId !== 'default-compound') ? rawCompoundId : null;
 
   const mapRef = useRef(null);
   const mapInstance = useRef(null);

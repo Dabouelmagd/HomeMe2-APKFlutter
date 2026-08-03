@@ -1513,7 +1513,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         </div>
 
         {/* Page content - Scrollable */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden page-scroll w-0 min-w-0">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden page-scroll min-w-0">
           {/* Top Banner Ad - only for residents, never on low-content routes */}
           {!isAppOwner && !isAdminRole && !isLowContentRoute && (
             <div className="max-w-7xl mx-auto px-4 pt-3">

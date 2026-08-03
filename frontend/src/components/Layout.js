@@ -1248,11 +1248,20 @@ const Layout = ({ children, isTrialMode = false }) => {
           <div className="px-3 py-2">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className={`h-8 w-8 rounded-full bg-gradient-to-r ${theme.active} flex items-center justify-center`}>
-                  <span className="text-sm font-medium text-white">
-                    {user?.full_name?.charAt(0) || 'U'}
-                  </span>
-                </div>
+                {user?.profile_picture_url ? (
+                  <img
+                    src={user.profile_picture_url.startsWith('http') ? user.profile_picture_url : `${process.env.REACT_APP_BACKEND_URL}${user.profile_picture_url}`}
+                    alt={user?.full_name || 'User'}
+                    className="h-8 w-8 rounded-full object-cover border border-gray-200"
+                    onError={e => { e.target.style.display='none'; }}
+                  />
+                ) : (
+                  <div className={`h-8 w-8 rounded-full bg-gradient-to-r ${theme.active} flex items-center justify-center`}>
+                    <span className="text-sm font-medium text-white">
+                      {user?.full_name?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className={`${isRTL ? 'mr-3' : 'ml-3'}`}>
                 <p className={`text-sm font-medium ${isSuperAdmin ? 'text-gray-200' : 'text-gray-700'}`}>
@@ -1410,14 +1419,24 @@ const Layout = ({ children, isTrialMode = false }) => {
                 (activeRole === 'super_admin') ? 'bg-purple-50/80 border-purple-200' :
                 'bg-white/80 border-gray-200'
               }`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mr-2 rtl:mr-0 rtl:ml-2 ${
-                  (activeRole === 'app_owner') ? 'bg-gradient-to-br from-rose-500 to-pink-600' :
-                  (activeRole === 'super_admin') ? 'bg-gradient-to-br from-purple-500 to-indigo-600' :
-                  (activeRole === 'admin' || activeRole === 'company_admin') ? 'bg-gradient-to-br from-emerald-500 to-green-600' :
-                  (activeRole === 'security') ? 'bg-gradient-to-br from-slate-500 to-gray-600' :
-                  'bg-gradient-to-br from-blue-500 to-cyan-600'
-                }`}>
-                  {(user?.full_name || user?.username || 'U').charAt(0).toUpperCase()}
+                <div className="w-10 h-10 rounded-full flex-shrink-0 mr-2 rtl:mr-0 rtl:ml-2 relative">
+                  {user?.profile_picture_url ? (
+                    <img
+                      src={user.profile_picture_url.startsWith('http') ? user.profile_picture_url : `${process.env.REACT_APP_BACKEND_URL}${user.profile_picture_url}`}
+                      alt={user?.full_name || 'User'}
+                      className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+                      onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }}
+                    />
+                  ) : null}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm ${user?.profile_picture_url ? 'hidden' : 'flex'} ${
+                    (activeRole === 'app_owner') ? 'bg-gradient-to-br from-rose-500 to-pink-600' :
+                    (activeRole === 'super_admin') ? 'bg-gradient-to-br from-purple-500 to-indigo-600' :
+                    (activeRole === 'admin' || activeRole === 'company_admin') ? 'bg-gradient-to-br from-emerald-500 to-green-600' :
+                    (activeRole === 'security') ? 'bg-gradient-to-br from-slate-500 to-gray-600' :
+                    'bg-gradient-to-br from-blue-500 to-cyan-600'
+                  }`}>
+                    {(user?.full_name || user?.username || 'U').charAt(0).toUpperCase()}
+                  </div>
                 </div>
                 <div className="flex flex-col items-start rtl:items-end">
                   <span className="text-sm font-semibold text-gray-900">{user?.full_name || user?.username}</span>

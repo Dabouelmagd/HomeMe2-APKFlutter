@@ -154,6 +154,7 @@ import FAQPage from './pages/FAQPage';
 import ImportExportPage from './pages/ImportExportPage';
 import AddCompoundModal from './components/AddCompoundModal';
 import OwnerSecurityDashboardPage from './pages/OwnerSecurityDashboardPage';
+import SupportInboxPage from './pages/SupportInboxPage';
 import AllCompoundsMapPage from './pages/AllCompoundsMapPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import ReferralProgramPage from './components/ReferralProgramPage';
@@ -919,6 +920,11 @@ function App() {
                   </ProtectedRoute>
                 } />
 
+                <Route path="support-inbox" element={
+                  <ProtectedRoute adminOnly>
+                    <SupportInboxPage />
+                  </ProtectedRoute>
+                } />
                 <Route path="security-dashboard" element={
                   <ProtectedRoute adminOnly>
                     <OwnerSecurityDashboardPage />

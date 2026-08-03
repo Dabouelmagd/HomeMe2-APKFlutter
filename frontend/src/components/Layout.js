@@ -67,6 +67,7 @@ import SessionSwitcher from './SessionSwitcher';
 import QuickAccountSwitcher from './QuickAccountSwitcher';
 import AccountSwitcherDropdown from './AccountSwitcherDropdown';
 import ScrollHelper from './ScrollHelper';
+import SupportChat from './SupportChat';
 import SidebarAccountSwitcher from './SidebarAccountSwitcher';
 import PlanLimitBadge from './PlanLimitBadge';
 import { TransliterationToggle } from './TransliterationToggle';
@@ -628,6 +629,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       items: [
         { name: 'إدارة الترجمات', href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
         { name: 'تذاكر الدعم الفني', href: 'super-admin?tab=support_tickets', icon: LifebuoyIcon, show: true },
+        { name: '💬 صندوق رسائل الدعم', href: 'support-inbox', icon: ChatBubbleLeftEllipsisIcon, show: true },
         { name: 'فحص صحة المسارات', href: 'super-admin?tab=smoke_test', icon: ShieldCheckIcon, show: true },
         { name: 'سجل التدقيق', href: 'audit-log', icon: ClipboardDocumentListIcon, show: true },
         { name: '🛡️ لوحة الأمان', href: 'security-dashboard', icon: ShieldCheckIcon, show: activeRole === 'app_owner' },

@@ -94,8 +94,12 @@ async def upload_compound_logo(
     file: UploadFile = File(...),
     current_user: dict = Depends(require_admin)
 ):
-    if current_user.get('compound_id','') != compound_id:
-        raise HTTPException(status_code=403, detail="Access denied")
+    role = current_user.get('role', '')
+    # Owner, super_admin, company_admin can upload logo for any compound
+    # Regular admin can only upload for their own compound
+    if role not in ('app_owner', 'super_admin', 'company_admin'):
+        if current_user.get('compound_id','') != compound_id:
+            raise HTTPException(status_code=403, detail="Access denied")
     
     if not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail="File must be an image")

@@ -342,7 +342,7 @@ const CompoundManagement = () => {
       const formData = new FormData();
       formData.append('logo', logoFile);
 
-      const response = await axios.put(`${API}/compounds/${user.compound_id}/logo`, formData, {
+      const response = await axios.put(`${API}/compounds/${editableCompound?.id || user.compound_id}/logo`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

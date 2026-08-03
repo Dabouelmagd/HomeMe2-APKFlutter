@@ -972,11 +972,11 @@ const Layout = ({ children, isTrialMode = false }) => {
             const altText = showHomeMeLogo ? (appBranding?.app_name_ar || 'HomeMe') : 'Compound Logo';
             const testId = showHomeMeLogo ? 'homeme-logo-sidebar' : 'compound-logo-sidebar';
             return logoSrc ? (
-              <div className="mb-1">
+              <div className="mb-2 flex justify-center">
                 <img
                   src={logoSrc}
                   alt={altText}
-                  className="h-16 w-16 rounded-2xl object-cover border-2 border-gray-100 dark:border-gray-600 shadow-md"
+                  className="h-12 w-12 rounded-xl object-cover border-2 border-gray-100 dark:border-gray-600 shadow-sm"
                   data-testid={testId}
                 />
               </div>
@@ -1283,7 +1283,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col h-screen lg:ml-0 min-w-0 overflow-hidden">
         {/* Top bar - Fixed */}
-        <div className="flex-shrink-0 sticky top-0 z-10 bg-white shadow-sm border-b border-gray-200 overflow-x-hidden">
+        <div className="flex-shrink-0 sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
           <div className="flex items-center justify-between h-16 px-3 sm:px-6 gap-2">
             <button
               className="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"

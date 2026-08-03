@@ -2361,8 +2361,8 @@ app.add_middleware(IPBlacklistMiddleware)
 class CopyrightHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: StarletteRequest, call_next):
         response = await call_next(request)
-        response.headers["X-Content-Origin"] = "HomeMe Platform — homemeapp.net"
-        response.headers["X-Copyright"] = "© 2026 Data Life AI. All rights reserved."
+        response.headers["X-Content-Origin"] = "HomeMe Platform - homemeapp.net"
+        response.headers["X-Copyright"] = "Copyright 2026 Data Life AI. All rights reserved."
         response.headers["X-Robots-Tag"] = "noai, noimageai"
         return response
 

@@ -35,7 +35,7 @@ const LanguageSwitcher = ({ className = "" }) => {
     <div className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors w-full justify-start"
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors w-full justify-start font-medium border border-gray-200 dark:border-gray-600"
         title={t('language')}
       >
         <LanguageIcon className="h-5 w-5" />

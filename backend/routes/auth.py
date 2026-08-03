@@ -96,6 +96,23 @@ async def register(user_data: UserCreate, request: Request):
         user_dict["trial_used"] = True
         user_dict["trial_days"] = 14
     
+    # Auto-create compound for admin/compound_admin role
+    if user_data.role in ('admin', 'manager') and compound_id == 'default-compound':
+        from models import Compound
+        compound_name = getattr(user_data, 'compound_name', None) or f"كمبوند {user_data.full_name or user_data.username}"
+        new_compound = {
+            'id': str(uuid.uuid4()),
+            'name': compound_name,
+            'address': getattr(user_data, 'compound_address', '') or '',
+            'created_at': datetime.now(timezone.utc).isoformat(),
+            'admin_id': user.id,
+        }
+        await db.compounds.insert_one(new_compound)
+        compound_id = new_compound['id']
+        user_dict['compound_id'] = compound_id
+        # Auto-verify admin accounts
+        user_dict['email_verified'] = True
+
     await db.users.insert_one(user_dict)
 
     # --- Email verification gate ---------------------------------------

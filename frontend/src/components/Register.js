@@ -131,6 +131,8 @@ const Register = () => {
         unit_number: formData.unit_number,
         subscription_code: formData.subscription_code,
         compound_id: '',
+        compound_name: formData.compound_name || `كمبوند ${formData.full_name || formData.username}`,
+        compound_address: formData.compound_address || '',
         ...(accountType === 'company_admin' ? {
           selected_plan: selectedPlan,
           ...(refInfo?.valid ? { referral_code: refCode } : {}),

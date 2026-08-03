@@ -182,7 +182,7 @@ const CompoundManagement = () => {
     fetchAllUsers._isLoading = true;
     
     try {
-      const response = await axios.get(`${API}/admin/users`);
+      const response = await axios.get(`${API}/admin/users`, { headers: authHeaders() });
       setAllUsers(response.data.users || []);
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -203,7 +203,7 @@ const CompoundManagement = () => {
       formData.append('password', adminForm.password);
       formData.append('full_name', adminForm.full_name);
       formData.append('phone', adminForm.phone || '');
-      formData.append('compound_id', user.compound_id);
+      formData.append('compound_id', compound?.id || user.compound_id);
       formData.append('role', 'admin');
       
       if (adminForm.profile_picture) {
@@ -213,6 +213,7 @@ const CompoundManagement = () => {
       const response = await axios.post(`${API}/admin/create-admin`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
 
@@ -395,7 +396,7 @@ const CompoundManagement = () => {
     
     try {
       if (!user?.compound_id) return;
-      const response = await axios.get(`${API}/compounds/${user.compound_id}`);
+      const response = await axios.get(`${API}/compounds/${user.compound_id}`, { headers: authHeaders() });
       setCompound(response.data);
       setEditableCompound({
         name: response.data.name || '',
@@ -423,7 +424,7 @@ const CompoundManagement = () => {
 
   const loadAvailableCompounds = async () => {
     try {
-      const response = await axios.get(`${API}/compounds`);
+      const response = await axios.get(`${API}/compounds`, { headers: authHeaders() });
       setAvailableCompounds(response.data.compounds || []);
       setShowCompoundSelection(true);
     } catch (error) {
@@ -445,7 +446,7 @@ const CompoundManagement = () => {
         updateUser(updatedUser);
         
         // Fetch the selected compound data
-        const compoundResponse = await axios.get(`${API}/compounds/${selectedCompoundId}`);
+        const compoundResponse = await axios.get(`${API}/compounds/${selectedCompoundId}`, { headers: authHeaders() });
         setCompound(compoundResponse.data);
         setShowCompoundSelection(false);
         setCompoundNotFound(false);
@@ -471,7 +472,7 @@ const CompoundManagement = () => {
     
     try {
       if (!user?.compound_id) return;
-      const response = await axios.get(`${API}/compounds/${user.compound_id}/residences`);
+      const response = await axios.get(`${API}/compounds/${user.compound_id}/residences`, { headers: authHeaders() });
       setResidences(response.data.residences);
     } catch (error) {
       console.error('Failed to load residences:', error);
@@ -489,7 +490,7 @@ const CompoundManagement = () => {
     fetchRegistrationLinks._isLoading = true;
     
     try {
-      const response = await axios.get(`${API}/admin/registration-links`);
+      const response = await axios.get(`${API}/admin/registration-links`, { headers: authHeaders() });
       setRegistrationLinks(response.data.registration_links || []);
     } catch (error) {
       console.error('Failed to load registration links:', error);

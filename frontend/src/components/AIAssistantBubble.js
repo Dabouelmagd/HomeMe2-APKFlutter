@@ -322,7 +322,7 @@ const AIAssistantBubble = () => {
               </button>
             </form>
             <p className="text-[10px] text-gray-400 mt-1.5 text-center">
-              مدعوم بـ Gemini AI · لا تشاركني معلومات حساسة
+              مدعوم بـ Claude AI · لا تشاركني معلومات حساسة
             </p>
           </div>
         </div>

@@ -27,7 +27,7 @@ export const LiveDemoSection = () => {
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">✨</div>
                 <div>
                   <p className="text-sm font-bold">مساعد HomeMe</p>
-                  <p className="text-[10px] opacity-80">Gemini AI · يجاوب فوراً</p>
+                  <p className="text-[10px] opacity-80">Claude AI · يجاوب فوراً</p>
                 </div>
               </div>
             </div>

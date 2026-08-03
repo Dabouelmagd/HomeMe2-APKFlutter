@@ -518,7 +518,7 @@ const Login = () => {
           <div className="grid grid-cols-2 gap-2 mb-4">
             {[
               { icon: '🏢', label: '25+ نظام', desc: 'متكامل في منصة واحدة' },
-              { icon: '🤖', label: 'AI Assistant', desc: 'مدعوم بـ Gemini' },
+              { icon: '🤖', label: 'AI Assistant', desc: 'مدعوم بـ Claude AI' },
               { icon: '🌍', label: '3 لغات', desc: 'AR / EN / FR' },
               { icon: '🔒', label: 'آمن 100%', desc: 'TLS 1.3 + bcrypt' },
               { icon: '📱', label: 'PWA Mobile', desc: 'يعمل على كل الأجهزة' },

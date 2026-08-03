@@ -112,6 +112,8 @@ const Pricing = () => {
         storage: t('storage_500mb'),
         mobile: t('mobile_app_access'),
         support: t('community_support'),
+        supportChat: 'شات دعم فني مباشر',
+        unitListings: 'إعلانات الوحدات داخل الكمبوند',
         branding: false,
         analytics: false,
         api: false,
@@ -142,6 +144,9 @@ const Pricing = () => {
         storage: t('storage_5gb'),
         mobile: t('mobile_app_access'),
         support: t('priority_support'),
+        supportChat: 'شات دعم + صندوق تحكم للأدمن',
+        unitListings: 'إعلانات الوحدات مع موافقة الأدمن',
+        aiAssistant: '✨ مساعد AI — 20 رسالة/يوم',
         branding: t('custom_branding'),
         analytics: t('advanced_reporting'),
         api: false,
@@ -649,6 +654,24 @@ const Pricing = () => {
                         <span className="text-gray-700">{plan.features.customDev}</span>
                       </div>
                     )}
+                    {plan.features.supportChat && (
+                      <div className="flex items-center bg-emerald-50 rounded-lg px-2 py-1">
+                        <CheckIcon className="h-5 w-5 text-emerald-600 mr-3 flex-shrink-0" />
+                        <span className="text-gray-700 font-medium">💬 {plan.features.supportChat}</span>
+                      </div>
+                    )}
+                    {plan.features.unitListings && (
+                      <div className="flex items-center bg-blue-50 rounded-lg px-2 py-1">
+                        <CheckIcon className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0" />
+                        <span className="text-gray-700 font-medium">🏠 {plan.features.unitListings}</span>
+                      </div>
+                    )}
+                    {plan.features.aiAssistant && (
+                      <div className="flex items-center bg-purple-50 rounded-lg px-2 py-1">
+                        <CheckIcon className="h-5 w-5 text-purple-600 mr-3 flex-shrink-0" />
+                        <span className="text-gray-700 font-medium">{plan.features.aiAssistant}</span>
+                      </div>
+                    )}
                   </div>
                   
                   {/* CTA Button */}
@@ -1022,6 +1045,9 @@ const Pricing = () => {
                     { f: 'فريق المساعدين',          v: ['—', '—', '3', '∞'] },
                     { f: 'الإعلانات التجارية (دخل)', v: ['—', '—', '—', '✓'] },
                     { f: 'الدعم الفني',             v: ['بريد', 'بريد', 'بريد + شات', 'مخصص 24/7'] },
+                    { f: '💬 شات الدعم المباشر',     v: ['—', '✓', '✓', '✓'], highlight: true },
+                    { f: '🏠 إعلانات الوحدات (بيع/إيجار)', v: ['—', '✓', '✓', '✓'], highlight: true },
+                    { f: '✨ مساعد AI (Claude)',      v: ['—', '10/يوم', '20/يوم', 'غير محدود'], highlight: true },
                     { f: 'API للتكامل الخارجي',     v: ['—', '—', '—', '✓'] },
                   ].map((row, i) => (
                     <tr key={i} className="hover:bg-purple-50/30 transition">

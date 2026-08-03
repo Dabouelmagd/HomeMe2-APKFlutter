@@ -330,7 +330,7 @@ const HomePage = () => {
     { icon: PresentationChartBarIcon, category: 'finance', title: t('sys_pdf_reports', 'تقارير PDF متقدمة'), desc: t('sys_pdf_reports_d', 'Portfolio Report للشركات، تقارير شهرية تلقائية، تخصيص قالب'), color: 'from-rose-500 to-red-600' },
 
     // ✨ NEW AI Systems
-    { icon: SparklesIcon, category: 'ai', title: '✨ ' + t('sys_ai_chat', 'مساعد HomeMe الذكي'), desc: t('sys_ai_chat_d', 'شات AI عائم بـ Gemini يجاوب فوراً ويوجّه المستخدمين لصفحات التطبيق'), color: 'from-violet-500 to-purple-600', isAI: true },
+    { icon: SparklesIcon, category: 'ai', title: '✨ ' + t('sys_ai_chat', 'مساعد HomeMe الذكي'), desc: t('sys_ai_chat_d', 'شات AI عائم بـ Claude Haiku يجاوب فوراً ويوجّه المستخدمين لصفحات التطبيق'), color: 'from-violet-500 to-purple-600', isAI: true },
     { icon: LightBulbIcon, category: 'ai', title: '🧠 ' + t('sys_ai_advisor', 'مستشار AI استباقي'), desc: t('sys_ai_advisor_d', 'يحلل البيانات يومياً ويكتشف 6 مشاكل + يقترح إجراءات تنفيذية'), color: 'from-purple-500 to-fuchsia-600', isAI: true },
     { icon: ClockIcon, category: 'ai', title: '🤖 ' + t('sys_autopilot', 'AI Auto-Pilot'), desc: t('sys_autopilot_d', 'جدولة تنفيذ الإجراءات تلقائياً (يومي/أسبوعي) + ملخص أسبوعي بالبريد'), color: 'from-fuchsia-500 to-pink-600', isAI: true },
     { icon: EnvelopeIcon, category: 'comms', title: '📨 ' + t('sys_auto_credentials', 'إرسال بيانات الدخول تلقائياً'), desc: t('sys_auto_credentials_d', 'كل ساكن جديد (فردي أو bulk) يحصل على بريد ترحيب RTL تلقائياً'), color: 'from-indigo-500 to-violet-600', isAI: true },
@@ -424,7 +424,7 @@ const HomePage = () => {
     { id: 'roles', icon: ShieldCheckIcon, title: t('gd_roles', '6 أدوار وصلاحيات'), content: t('gd_roles_d', 'مالك التطبيق (Owner)، شركة إدارة (Company Admin)، مدير مجتمع (Admin)، إداري (Manager)، موظف أمن (Security)، ساكن (Resident). نظام RBAC متقدم + كل دور بصلاحيات مخصصة + 2FA للأدمن.') },
 
     // ✨ NEW AI Features
-    { id: 'ai_chat', icon: SparklesIcon, title: '✨ ' + t('gd_ai_chat', 'مساعد HomeMe الذكي'), content: t('gd_ai_chat_d', 'شات AI عائم متاح في كل صفحة، مدعوم بـ Gemini 3 Flash. يجاوب على أسئلة المستخدمين بالعربي فوراً، ويوجّههم للصفحات الصحيحة بزر "افتح الصفحة" Deep Link. حدود يومية: Pro=20، Premium=50، Enterprise=غير محدود.') },
+    { id: 'ai_chat', icon: SparklesIcon, title: '✨ ' + t('gd_ai_chat', 'مساعد HomeMe الذكي'), content: t('gd_ai_chat_d', 'شات AI عائم متاح في كل صفحة، مدعوم بـ Claude AI. يجاوب على أسئلة المستخدمين بالعربي فوراً، ويوجّههم للصفحات الصحيحة بزر "افتح الصفحة" Deep Link. حدود يومية: Pro=20، Premium=50، Enterprise=غير محدود.') },
     { id: 'ai_advisor', icon: LightBulbIcon, title: '🧠 ' + t('gd_ai_advisor', 'مستشار AI استباقي'), content: t('gd_ai_advisor_d', 'يحلل بيانات الكمبوند يومياً ويكتشف 6 أنواع مشاكل تلقائياً: فواتير متأخرة (>30 يوم)، صيانة معلقة (>7 أيام)، تقييمات سلبية (≤2 نجوم)، إيصالات بانتظار، شكاوى مفتوحة، عقود تنتهي قريباً. زر "⚡ تنفيذ بالـ AI" يولّد رسالة عربية احترافية ويرسلها بضغطة.') },
     { id: 'ai_autopilot', icon: ClockIcon, title: '🤖 ' + t('gd_autopilot', 'AI Auto-Pilot'), content: t('gd_autopilot_d', 'جدولة تنفيذ AI Actions تلقائياً (يومياً/أسبوعياً): تذكير الدفع، تنبيه الفنيين، الردود على التقييمات السلبية، الشكاوى. تختار اليوم والساعة (مع تحويل بتوقيت مصر). ملخص أسبوعي بالبريد كل اثنين 11 صباحاً + سجل تنفيذ كامل.') },
     { id: 'auto_credentials', icon: EnvelopeIcon, title: '📨 ' + t('gd_credentials', 'إرسال بيانات الدخول تلقائياً'), content: t('gd_credentials_d', 'كل ساكن جديد يُضاف (فردي أو Bulk Import من Excel) يحصل تلقائياً على بريد ترحيب جميل بالعربي/RTL يحتوي: اسم المستخدم، كلمة المرور المؤقتة، اسم المجمع، رابط مباشر للدخول. لا تدخل من الأدمن مطلوب — Failure-safe.') },
@@ -435,6 +435,8 @@ const HomePage = () => {
     // ✨ NEW Features (Iter 127-133)
     { id: 'notif_prefs', icon: AdjustmentsHorizontalIcon, title: '🔔 ' + t('gd_notif_prefs', 'تفضيلات الإشعارات'), content: t('gd_notif_prefs_d', 'صفحة "الإشعارات والتفضيلات" تتيح لكل مستخدم اختيار كيف يستقبل كل نوع تنبيه: بريد، Push، SMS، أو داخل التطبيق فقط. تحكم دقيق بـ 12 نوع حدث (شكوى، فاتورة، صيانة، إعلان، إلخ) — مفيش تنبيهات غير مرغوبة.') },
     { id: 'compound_map', icon: MapIcon, title: '🗺️ ' + t('gd_compound_map', 'خريطة الكمبوند'), content: t('gd_compound_map_d', 'عرض جغرافي تفاعلي لكل المباني والوحدات داخل المجمع. اضغط على أي وحدة لرؤية ملف الساكن مباشرة. مفيد للأمن (تحديد موقع البلاغ) وللإدارة (نظرة بصرية شاملة).') },
+    { id: 'support_chat', icon: ChatBubbleLeftEllipsisIcon, title: '💬 شات الدعم الفني', content: 'زرار أخضر عائم في كل صفحة يفتح محادثة مباشرة مع فريق الدعم. الأدمن يرد من صندوق تحكم مدمج مع فلترة المحادثات (مفتوح/قيد المراجعة/مغلق). badge بعدد الرسائل غير المقروءة. متاح للسكان والمديرين.' },
+    { id: 'unit_listings', icon: BuildingOffice2Icon, title: '🏠 إعلانات الوحدات', content: 'السكان يعلنون وحداتهم للإيجار أو البيع أو التشطيب — يحددون التفاصيل الكاملة (تشطيب/أثاث/تكييف/مطبخ/مسدد أو أقساط/رقم أوفر/قابل للتفاوض) — يرفعون الصور والأوراق — ويتم النشر بعد موافقة الأدمن. العمولة تظهر للأدمن فقط.' },
     { id: 'csv_import', icon: ArrowUpTrayIcon, title: '📋 ' + t('gd_csv_import', 'استيراد السكان CSV'), content: t('gd_csv_import_d', 'ارفع ملف Excel أو CSV فيه قائمة السكان (اسم، إيميل، رقم وحدة، تليفون). النظام يتحقق من الأخطاء، يستثني التكرارات، ويرسل لكل واحد بيانات دخوله تلقائياً. يوفّر ساعات من العمل اليدوي.') },
     { id: 'email_logs', icon: EnvelopeIcon, title: '📧 ' + t('gd_email_logs', 'سجل البريد الإلكتروني'), content: t('gd_email_logs_d', 'لوحة Super-Admin لتتبع كل إيميل صدر من النظام: نجاح / فشل / Bounce. إحصائيات 7 أيام و30 يوم + معدّل النجاح. زرّ "أعد الإرسال" + كشف الـ bounces تلقائياً عبر IMAP poll كل 15 دقيقة.') },
     { id: 'content_hub', icon: NewspaperIcon, title: '📝 ' + t('gd_content_hub', 'مدوّنة Content Hub'), content: t('gd_content_hub_d', 'بوابة محتوى عربية ضمن الموقع: 10+ مقالات أصيلة عن إدارة المجمعات + نظام تعليقات (مع موافقة الأدمن) + CMS كامل في Super-Admin لإضافة وتعديل المقالات. زرّ "اقترح SEO بالـ AI" يولّد عنوان وملخّص وكلمات مفتاحية تلقائياً.') },
@@ -1192,7 +1194,7 @@ const HomePage = () => {
               <div className="text-4xl mb-3">✨</div>
               <h3 className="text-xl font-bold mb-2">{t('hp_feat_ai_assistant', 'مساعد HomeMe الذكي')}</h3>
               <p className="text-sm text-violet-200 leading-relaxed">
-                {t('hp_feat_ai_assistant_desc', 'شات AI عائم متاح في كل صفحة، يجاوب على أسئلة المستخدمين فوراً ويوجّههم للصفحات الصحيحة. مدعوم بـ Gemini 3 Flash.')}
+                {t('hp_feat_ai_assistant_desc', 'شات AI عائم متاح في كل صفحة، يجاوب على أسئلة المستخدمين فوراً ويوجّههم للصفحات الصحيحة. مدعوم بـ Claude AI.')}
               </p>
               <div className="mt-3 inline-block bg-emerald-500/20 text-emerald-300 text-xs px-2 py-0.5 rounded font-bold">
                 ⚡ Gemini 3 Flash

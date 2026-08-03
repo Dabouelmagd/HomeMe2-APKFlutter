@@ -947,7 +947,9 @@ const Layout = ({ children, isTrialMode = false }) => {
       {/* Sidebar */}
       <div className={`
         fixed inset-y-0 ${isRTL ? 'right-0' : 'left-0'} z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out flex flex-col
+        lg:relative lg:translate-x-0 lg:inset-auto lg:z-auto lg:shadow-none lg:flex-shrink-0
         ${sidebarOpen ? 'translate-x-0' : (isRTL ? 'translate-x-full' : '-translate-x-full')}
+        ${!sidebarOpen ? 'lg:hidden' : ''}
         ${isSuperAdmin ? 'bg-gray-950 border-e border-purple-900/30' : 'bg-white dark:bg-gray-800'}
       `}>
         <div className={`flex flex-col items-center justify-center px-4 py-3 border-b flex-shrink-0 ${isSuperAdmin ? 'border-purple-900/30' : 'border-gray-200 dark:border-gray-700'}`}>

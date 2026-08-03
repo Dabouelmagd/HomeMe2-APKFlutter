@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import AddCompoundModal from './AddCompoundModal';
 import {
   BuildingOfficeIcon,
   UsersIcon,

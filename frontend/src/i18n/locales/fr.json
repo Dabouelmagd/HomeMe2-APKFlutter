@@ -3514,5 +3514,13 @@
   "recommendations": "Recommandations",
   "requests_by_category": "Demandes par catégorie",
   "requests_by_priority": "Demandes par priorité",
-  "residents_by_unit_type": "Résidents par type d'unité"
+  "residents_by_unit_type": "Résidents par type d'unité",
+  "about_mission": "Notre Mission",
+  "about_vision": "Notre Vision",
+  "about_team": "Notre Équipe",
+  "contact_us_title": "Contactez-Nous",
+  "contact_us_subtitle": "Nous sommes là pour vous aider",
+  "privacy_title": "Politique de Confidentialité",
+  "terms_title": "Conditions d'Utilisation",
+  "about_seo_title": "À Propos — Plateforme HomeMe"
 }

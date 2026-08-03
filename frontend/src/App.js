@@ -153,6 +153,7 @@ import AboutUs from './components/AboutUs';
 import FAQPage from './pages/FAQPage';
 import ImportExportPage from './pages/ImportExportPage';
 import AddCompoundModal from './components/AddCompoundModal';
+import OwnerSecurityDashboardPage from './pages/OwnerSecurityDashboardPage';
 import AllCompoundsMapPage from './pages/AllCompoundsMapPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import ReferralProgramPage from './components/ReferralProgramPage';
@@ -918,6 +919,11 @@ function App() {
                   </ProtectedRoute>
                 } />
 
+                <Route path="security-dashboard" element={
+                  <ProtectedRoute adminOnly>
+                    <OwnerSecurityDashboardPage />
+                  </ProtectedRoute>
+                } />
                 <Route path="audit-log" element={
                   <ProtectedRoute>
                     <AuditLogPage />

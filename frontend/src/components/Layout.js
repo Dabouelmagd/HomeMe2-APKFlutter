@@ -66,6 +66,7 @@ import LanguageSwitcher from './LanguageSwitcher';
 import SessionSwitcher from './SessionSwitcher';
 import QuickAccountSwitcher from './QuickAccountSwitcher';
 import AccountSwitcherDropdown from './AccountSwitcherDropdown';
+import ScrollHelper from './ScrollHelper';
 import SidebarAccountSwitcher from './SidebarAccountSwitcher';
 import PlanLimitBadge from './PlanLimitBadge';
 import { TransliterationToggle } from './TransliterationToggle';

@@ -122,7 +122,7 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
 
   // ── Init Map ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!config || !mapRef.current || loading) return;
+    if (!config || !mapRef.current) return;
     loadGoogleMaps().then(() => {
       const map = new window.google.maps.Map(mapRef.current, {
         center: config.center,
@@ -569,7 +569,8 @@ export default function CompoundGoogleMap({ compoundId: propCompoundId }) {
         const list = r.data?.compounds || [];
         setAllCompounds(list);
         // Auto-select first compound
-        if (list.length === 1) {
+        if (list.length >= 1) {
+          setLoading(true);
           setSelectedCompoundId(list[0].id);
         }
       }).catch(() => {});

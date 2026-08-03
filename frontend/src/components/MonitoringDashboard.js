@@ -75,9 +75,11 @@ const MonitoringDashboard = () => {
     }
   };
 
-  const handleRefresh = () => {
-    fetchMonitoringData();
-    toast.success(t('data_refreshed'));
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchMonitoringData();
+    toast.success(t('data_refreshed', 'تم تحديث البيانات'));
+    setRefreshing(false);
   };
 
   const formatDate = (dateString) => {

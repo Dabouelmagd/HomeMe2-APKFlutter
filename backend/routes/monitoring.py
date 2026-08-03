@@ -15,10 +15,14 @@ router = APIRouter()
 @router.get("/api/monitoring/stats")
 async def get_monitoring_stats(current_user: dict = Depends(get_current_user)):
     try:
-        if current_user.get("role") != "admin":
-            raise HTTPException(status_code=403, detail="Access denied. Admin only.")
+        allowed = {"admin", "super_admin", "app_owner", "company_admin", "manager"}
+        if current_user.get("role") not in allowed:
+            raise HTTPException(status_code=403, detail="Access denied.")
         await ActivityLogger.log_activity(action_type="view_monitoring", username=current_user.get("username", ""), details="Accessed monitoring dashboard")
-        stats = await MonitoringService.get_system_stats()
+        stats = await MonitoringService.get_system_stats(
+            compound_id=current_user.get("compound_id"),
+            role=current_user.get("role")
+        )
         return stats
     except HTTPException:
         raise
@@ -31,8 +35,9 @@ async def get_monitoring_stats(current_user: dict = Depends(get_current_user)):
 @router.get("/api/monitoring/activities")
 async def get_recent_activities(limit: int = 50, current_user: dict = Depends(get_current_user)):
     try:
-        if current_user.get("role") != "admin":
-            raise HTTPException(status_code=403, detail="Access denied. Admin only.")
+        allowed = {"admin", "super_admin", "app_owner", "company_admin", "manager"}
+        if current_user.get("role") not in allowed:
+            raise HTTPException(status_code=403, detail="Access denied.")
         activities = await ActivityLogger.get_recent_activities(limit=limit)
         return {"activities": activities}
     except HTTPException:
@@ -45,8 +50,9 @@ async def get_recent_activities(limit: int = 50, current_user: dict = Depends(ge
 @router.get("/api/monitoring/errors")
 async def get_recent_errors(limit: int = 30, current_user: dict = Depends(get_current_user)):
     try:
-        if current_user.get("role") != "admin":
-            raise HTTPException(status_code=403, detail="Access denied. Admin only.")
+        allowed = {"admin", "super_admin", "app_owner", "company_admin", "manager"}
+        if current_user.get("role") not in allowed:
+            raise HTTPException(status_code=403, detail="Access denied.")
         errors = await ErrorLogger.get_recent_errors(limit=limit)
         return {"errors": errors}
     except HTTPException:
@@ -59,8 +65,9 @@ async def get_recent_errors(limit: int = 30, current_user: dict = Depends(get_cu
 @router.get("/api/monitoring/charts")
 async def get_monitoring_charts(days: int = 7, current_user: dict = Depends(get_current_user)):
     try:
-        if current_user.get("role") != "admin":
-            raise HTTPException(status_code=403, detail="Access denied. Admin only.")
+        allowed = {"admin", "super_admin", "app_owner", "company_admin", "manager"}
+        if current_user.get("role") not in allowed:
+            raise HTTPException(status_code=403, detail="Access denied.")
         login_stats = await MonitoringService.get_login_stats(days=days)
         error_stats = await MonitoringService.get_error_stats(days=days)
         user_growth = await MonitoringService.get_user_growth(days=days)
@@ -84,8 +91,9 @@ async def health_check():
 @router.post("/api/monitoring/errors/{error_id}/resolve")
 async def mark_error_resolved(error_id: str, current_user: dict = Depends(get_current_user)):
     try:
-        if current_user.get("role") != "admin":
-            raise HTTPException(status_code=403, detail="Access denied. Admin only.")
+        allowed = {"admin", "super_admin", "app_owner", "company_admin", "manager"}
+        if current_user.get("role") not in allowed:
+            raise HTTPException(status_code=403, detail="Access denied.")
         success = await ErrorLogger.mark_error_resolved(error_id)
         if success:
             await ActivityLogger.log_activity(action_type="resolve_error", username=current_user.get("username", ""), details=f"Marked error {error_id} as resolved")

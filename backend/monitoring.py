@@ -31,7 +31,8 @@ class MonitoringService:
             resident_users = await db.users.count_documents({"role": "resident"})
             
             # Compound statistics
-            total_compounds = await db.compounds.count_documents({})
+            cscope = {} if role in ("app_owner", "super_admin") else ({"management_company_id": compound_id} if role == "company_admin" else {"id": compound_id} if compound_id else {})
+            total_compounds = await db.compounds.count_documents(cscope)
             total_units = await db.residences.count_documents({})
             
             # Recent logins (last 24 hours)

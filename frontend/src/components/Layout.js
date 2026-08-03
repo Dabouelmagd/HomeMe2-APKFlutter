@@ -933,7 +933,7 @@ const Layout = ({ children, isTrialMode = false }) => {
   };
 
   return (
-    <div className={`flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden ${isRTL ? 'rtl' : 'ltr'}`}>
+    <div className={`flex h-screen bg-gray-50 dark:bg-gray-900 ${isRTL ? 'rtl' : 'ltr'}`} style={{overflow: "hidden", maxWidth: "100vw"}}>
       {/* Impersonation banner (visible ONLY when current session is an impersonation) */}
       <ImpersonationBanner />
       {/* Mobile sidebar overlay */}
@@ -1279,7 +1279,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col h-screen lg:ml-0 overflow-hidden">
+      <div className="flex-1 flex flex-col h-screen lg:ml-0 min-w-0 overflow-hidden">
         {/* Top bar - Fixed */}
         <div className="flex-shrink-0 sticky top-0 z-10 bg-white shadow-sm border-b border-gray-200 overflow-x-hidden">
           <div className="flex items-center justify-between h-16 px-3 sm:px-6 gap-2">

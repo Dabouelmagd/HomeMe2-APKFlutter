@@ -24,10 +24,9 @@ load_dotenv()
 
 router = APIRouter(prefix="/api/ai-assistant", tags=["ai-assistant"])
 
-EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 DAILY_MESSAGE_LIMIT = 20
-MODEL_PROVIDER = "gemini"
-MODEL_NAME = "gemini-3-flash-preview"
+MODEL_NAME = "claude-haiku-4-5-20251001"
 
 # ============================================================================
 # System Prompt — HomeMe Expert
@@ -178,8 +177,8 @@ async def clear_history(current_user: dict = Depends(get_current_user)):
 
 @router.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest, current_user: dict = Depends(get_current_user)):
-    if not EMERGENT_LLM_KEY:
-        raise HTTPException(status_code=503, detail="AI service not configured")
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        raise HTTPException(status_code=503, detail="AI service not configured — ANTHROPIC_API_KEY missing")
 
     db = get_db()
     user_id = current_user["id"]
@@ -215,35 +214,44 @@ async def chat(req: ChatRequest, current_user: dict = Depends(get_current_user))
     }.get(role, "مستخدم")
     augmented_prompt = f"{SYSTEM_PROMPT}\n\nالمستخدم الحالي دوره: {role_label}"
 
-    # Call LLM (lazy import to avoid startup cost)
+    # Call Anthropic Claude API directly
     try:
-        from homeme_integrations.llm.chat import LlmChat, UserMessage
+        import httpx
+        
+        # Build messages for multi-turn context
+        messages = []
+        for m in history_msgs[-6:]:
+            messages.append({
+                "role": m["role"],  # "user" or "assistant"
+                "content": m["text"]
+            })
+        # Add current message
+        messages.append({"role": "user", "content": req.message})
 
-        llm = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=session_id,
-            system_message=augmented_prompt,
-        ).with_model(MODEL_PROVIDER, MODEL_NAME)
-
-        # Replay history into the chat (so the LLM has multi-turn context)
-        for m in history_msgs:
-            # Only replay user messages — LlmChat tracks responses itself when it sends
-            # but for a fresh instance we simulate context by sending past user msgs concatenated.
-            pass  # The LlmChat instance is fresh; we rely on a stitched single message approach below.
-
-        # Build a single context message containing recent history + new msg for stateless multi-turn
-        if history_msgs:
-            history_block = "\n".join(
-                f"{'المستخدم' if m['role'] == 'user' else 'المساعد'}: {m['text']}"
-                for m in history_msgs[-6:]
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": os.environ.get("ANTHROPIC_API_KEY", ""),
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json",
+                },
+                json={
+                    "model": "claude-haiku-4-5-20251001",
+                    "max_tokens": 1024,
+                    "system": augmented_prompt,
+                    "messages": messages,
+                }
             )
-            full_msg = f"المحادثة السابقة:\n{history_block}\n\nالرسالة الحالية:\n{req.message}"
-        else:
-            full_msg = req.message
+        
+        if resp.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"AI API error: {resp.text[:200]}")
+        
+        data = resp.json()
+        raw_reply = data.get("content", [{}])[0].get("text", "")
 
-        user_msg = UserMessage(text=full_msg)
-        raw_reply = await llm.send_message(user_msg)
-
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"AI service error: {str(e)[:200]}")
 

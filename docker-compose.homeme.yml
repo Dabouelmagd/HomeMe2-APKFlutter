@@ -39,6 +39,7 @@ services:
       TWILIO_AUTH_TOKEN: "placeholder"
       TWILIO_WHATSAPP_FROM: "whatsapp:+14155238886"
       EMERGENT_LLM_KEY: "placeholder"
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
       SMOKE_TEST_BASE_URL: "http://127.0.0.1:8001"
     volumes:
       - homeme_uploads:/app/uploads

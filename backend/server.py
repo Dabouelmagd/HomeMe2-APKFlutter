@@ -2623,6 +2623,27 @@ app.include_router(family_router)
 app.include_router(admin_reg_router)
 app.include_router(admin_users_router)
 app.include_router(security_router)
+
+# Root-level honeypot routes (no /api prefix)
+from fastapi import Request as HRequest
+from fastapi.responses import JSONResponse
+
+@app.get("/.env")
+@app.get("/.git/config")  
+@app.get("/wp-admin/")
+@app.get("/phpmyadmin/")
+@app.get("/.htaccess")
+@app.get("/backup.sql")
+@app.get("/config.php")
+async def root_honeypot(request: HRequest):
+    ip = request.client.host if request.client else "unknown"
+    try:
+        from routes.security import _BLACKLIST, record_suspicious
+        await record_suspicious(ip, f"honeypot:{request.url.path}")
+        _BLACKLIST.add(ip)
+    except Exception:
+        pass
+    return JSONResponse({"error": "Not found"}, status_code=404)
 app.include_router(push_email_router)
 app.include_router(compounds_router2)
 app.include_router(utility_router)

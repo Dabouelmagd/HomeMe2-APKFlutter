@@ -75,6 +75,9 @@ async def record_suspicious(ip: str, reason: str):
 @router.get("/phpmyadmin/")
 @router.get("/actuator/health")
 @router.get("/.git/config")
+@router.get("/.htaccess")
+@router.get("/config.php")
+@router.get("/backup.sql")
 async def honeypot(request: Request):
     """Honeypot — auto-blacklist any IP that hits these."""
     ip = request.client.host if request.client else "unknown"

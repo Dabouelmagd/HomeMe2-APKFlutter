@@ -122,8 +122,11 @@ async def add_admin(
     user_id: str,
     current_user: dict = Depends(require_admin)
 ):
-    if current_user.get('compound_id','') != compound_id:
-        raise HTTPException(status_code=403, detail="Access denied")
+    role = current_user.get('role', '')
+    # Allow owner/super_admin/company_admin to access any compound
+    if role not in ('app_owner', 'super_admin', 'company_admin'):
+        if current_user.get('compound_id','') != compound_id:
+            raise HTTPException(status_code=403, detail="Access denied")
     
     # Check if user exists and is in the same compound
     user = await db.users.find_one({"id": user_id, "compound_id": compound_id})

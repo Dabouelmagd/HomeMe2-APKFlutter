@@ -320,7 +320,11 @@ const CompanyAdminDashboard = () => {
                 {c.address && <div className="text-[11px] text-gray-500 border-t border-gray-700/50 pt-2">📍 {c.address}</div>}
 
                 <div className="grid grid-cols-4 gap-2 pt-2">
-                  <button onClick={() => { localStorage.setItem('selectedCompoundId', c.id); localStorage.setItem('selectedCompoundName', c.name || ''); navigate('/app/dashboard'); }} className="col-span-2 bg-emerald-600/40 hover:bg-emerald-600/70 text-emerald-200 text-xs py-2 rounded font-bold border border-emerald-500/30" data-testid={`cad-manage-${c.id}`}>🏢 إدارة الكمبوند كاملة</button>
+                  <button onClick={() => { 
+                    // Set compound context then navigate to compound management
+                    localStorage.setItem('impersonateCompoundId', c.id);
+                    navigate(`/app/compound?compound_id=${c.id}`); 
+                  }} className="col-span-2 bg-emerald-600/40 hover:bg-emerald-600/70 text-emerald-200 text-xs py-2 rounded font-bold border border-emerald-500/30" data-testid={`cad-manage-${c.id}`}>🏢 إدارة الكمبوند كاملة</button>
                   <button onClick={() => setTeamFor(c)} className="bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 text-xs py-1.5 rounded font-semibold">👥 فريق العمل</button>
                   <button onClick={() => setInviteFor(c)} className="bg-teal-600/30 hover:bg-teal-600/50 text-teal-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-invite-${c.id}`}>🔗 دعوة</button>
                   <button onClick={() => setAddUserFor(c)} className="bg-green-600/30 hover:bg-green-600/50 text-green-200 text-xs py-1.5 rounded font-semibold" data-testid={`cad-add-user-${c.id}`}>➕ ساكن</button>

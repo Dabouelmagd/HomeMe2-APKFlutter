@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usePermissions } from '../hooks/usePermissions';
 import axios from 'axios';
 import { useAuth } from '../App';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { formatDate } from '../utils/dateUtils';
@@ -203,7 +204,7 @@ const CompoundManagement = () => {
       formData.append('password', adminForm.password);
       formData.append('full_name', adminForm.full_name);
       formData.append('phone', adminForm.phone || '');
-      formData.append('compound_id', compound?.id || user.compound_id);
+      formData.append('compound_id', compound?.id || effectiveCompoundId);
       formData.append('role', 'admin');
       
       if (adminForm.profile_picture) {
@@ -288,7 +289,7 @@ const CompoundManagement = () => {
     }
     
     try {
-      const response = await axios.put(`${API}/compounds/${user.compound_id}`, {
+      const response = await axios.put(`${API}/compounds/${effectiveCompoundId}`, {
         name: editableCompound.name.trim(),
         address: editableCompound.address.trim(),
         description: editableCompound.description?.trim() || ''
@@ -343,7 +344,7 @@ const CompoundManagement = () => {
       const formData = new FormData();
       formData.append('logo', logoFile);
 
-      const response = await axios.put(`${API}/compounds/${editableCompound?.id || user.compound_id}/logo`, formData, {
+      const response = await axios.put(`${API}/compounds/${editableCompound?.id || effectiveCompoundId}/logo`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -364,7 +365,7 @@ const CompoundManagement = () => {
     let isMounted = true;
     
     const loadData = async () => {
-      if (!user?.compound_id || !isMounted) return;
+      if (!effectiveCompoundId || !isMounted) return;
       
       try {
         await fetchCompound();
@@ -387,7 +388,7 @@ const CompoundManagement = () => {
       isMounted = false;
       clearTimeout(timeoutId);
     };
-  }, [user?.compound_id, user?.role]);
+  }, [effectiveCompoundId, user?.role]);
 
   const fetchCompound = React.useCallback(async () => {
     // Prevent concurrent calls
@@ -395,8 +396,8 @@ const CompoundManagement = () => {
     fetchCompound._isLoading = true;
     
     try {
-      if (!user?.compound_id) return;
-      const response = await axios.get(`${API}/compounds/${user.compound_id}`, { headers: authHeaders() });
+      if (!effectiveCompoundId) return;
+      const response = await axios.get(`${API}/compounds/${effectiveCompoundId}`, { headers: authHeaders() });
       setCompound(response.data);
       setEditableCompound({
         name: response.data.name || '',
@@ -420,7 +421,7 @@ const CompoundManagement = () => {
       fetchCompound._isLoading = false;
       setLoading(false);
     }
-  }, [user?.compound_id]);
+  }, [effectiveCompoundId]);
 
   const loadAvailableCompounds = async () => {
     try {
@@ -471,8 +472,8 @@ const CompoundManagement = () => {
     fetchResidences._isLoading = true;
     
     try {
-      if (!user?.compound_id) return;
-      const response = await axios.get(`${API}/compounds/${user.compound_id}/residences`, { headers: authHeaders() });
+      if (!effectiveCompoundId) return;
+      const response = await axios.get(`${API}/compounds/${effectiveCompoundId}/residences`, { headers: authHeaders() });
       setResidences(response.data.residences);
     } catch (error) {
       console.error('Failed to load residences:', error);
@@ -482,7 +483,7 @@ const CompoundManagement = () => {
     } finally {
       fetchResidences._isLoading = false;
     }
-  }, [user?.compound_id]);
+  }, [effectiveCompoundId]);
 
   const fetchRegistrationLinks = React.useCallback(async () => {
     // Prevent concurrent calls
@@ -951,7 +952,7 @@ const CompoundManagement = () => {
       formData.append('full_name', comprehensiveFamilyForm.head_full_name);
       formData.append('email', comprehensiveFamilyForm.head_email);
       formData.append('phone', comprehensiveFamilyForm.head_phone || '');
-      formData.append('compound_id', user.compound_id);
+      formData.append('compound_id', effectiveCompoundId);
       formData.append('date_of_birth', comprehensiveFamilyForm.head_date_of_birth);
       formData.append('id_number', comprehensiveFamilyForm.head_id_number || '');
       
@@ -1037,7 +1038,7 @@ const CompoundManagement = () => {
       formData.append('full_name', newResidenceForm.full_name);
       formData.append('email', newResidenceForm.email);
       formData.append('phone', newResidenceForm.phone || '');
-      formData.append('compound_id', user.compound_id);
+      formData.append('compound_id', effectiveCompoundId);
       
       if (newResidenceForm.profile_picture) {
         formData.append('profile_picture', newResidenceForm.profile_picture);
@@ -1079,7 +1080,7 @@ const CompoundManagement = () => {
       formData.append('file', file);
 
       const response = await axios.put(
-        `${API}/compounds/${user.compound_id}/logo`,
+        `${API}/compounds/${effectiveCompoundId}/logo`,
         formData,
         {
           headers: {

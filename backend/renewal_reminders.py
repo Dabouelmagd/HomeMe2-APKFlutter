@@ -51,7 +51,8 @@ def _build_company_email_html(name: str, days: int, plan_key: str, expiry: str, 
     plan_name_ar = PLAN_NAME_AR.get(plan_key, plan_key)
     return f"""
     <div style='font-family:Tahoma,Arial,sans-serif;direction:rtl;max-width:600px;margin:auto;'>
-      <div style='background:linear-gradient(135deg,{color},#7c3aed);color:#fff;padding:24px;border-radius:12px 12px 0 0;'>
+      <div style='background:linear-gradient(135deg,{color},#7c3aed);color:#fff;padding:24px;border-radius:12px 12px 0 0;text-align:center;'>
+        <img src='https://homemeapp.net/homeme-logo.png' alt='HomeMe' width='100' style='display:block;margin:0 auto 10px;background:#fff;border-radius:10px;padding:5px;' />
         <h2 style='margin:0;font-size:22px;'>{urgency}</h2>
         <p style='margin:6px 0 0;opacity:0.95;font-size:13px;'>اشتراك HomeMe في خطة "{plan_name_ar}"</p>
       </div>

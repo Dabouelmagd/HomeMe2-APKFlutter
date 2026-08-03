@@ -964,27 +964,26 @@ const Layout = ({ children, isTrialMode = false }) => {
             <div className="w-6"></div>
           </div>
 
-          {/* Sidebar Logo: HomeMe global branding for owner/super_admin without a compound, else compound logo */}
-          {(() => {
-            const isHighLevel = activeRole === 'app_owner' || activeRole === 'super_admin';
-            const homemeLogoUrl = appBranding?.logo_url
-              ? `${process.env.REACT_APP_BACKEND_URL}${appBranding.logo_url}`
-              : null;
-            const showHomeMeLogo = isHighLevel && !user?.compound_id && homemeLogoUrl;
-            const logoSrc = showHomeMeLogo ? homemeLogoUrl : compoundLogo;
-            const altText = showHomeMeLogo ? (appBranding?.app_name_ar || 'HomeMe') : 'Compound Logo';
-            const testId = showHomeMeLogo ? 'homeme-logo-sidebar' : 'compound-logo-sidebar';
-            return logoSrc ? (
-              <div className="mb-2 flex justify-center">
-                <img
-                  src={logoSrc}
-                  alt={altText}
-                  className="h-12 w-12 rounded-xl object-cover border-2 border-gray-100 dark:border-gray-600 shadow-sm"
-                  data-testid={testId}
-                />
-              </div>
-            ) : null;
-          })()}
+          {/* Sidebar Logo — HomeMe official logo always shown, compound logo overlaid if available */}
+          <div className="mb-2 flex flex-col items-center gap-1">
+            {/* HomeMe logo — always visible at top of sidebar */}
+            <img
+              src="/homeme-logo.png"
+              alt="HomeMe"
+              className="h-14 w-auto object-contain"
+              data-testid="homeme-logo-sidebar"
+              onError={e => { e.target.style.display='none'; }}
+            />
+            {/* Compound logo below HomeMe logo (if uploaded) */}
+            {compoundLogo && (
+              <img
+                src={compoundLogo}
+                alt="Compound Logo"
+                className="h-10 w-10 rounded-xl object-cover border-2 border-gray-100 dark:border-gray-600 shadow-sm"
+                data-testid="compound-logo-sidebar"
+              />
+            )}
+          </div>
           {user?.compound_name && (
             <p className={`text-sm font-bold mb-0.5 text-center ${isSuperAdmin ? 'text-purple-300' : 'text-gray-800 dark:text-gray-200'}`}>{user.compound_name}</p>
           )}

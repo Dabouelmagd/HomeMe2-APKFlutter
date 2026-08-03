@@ -742,6 +742,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'إدارة المساعدين', href: 'staff', icon: ShieldCheckIcon, show: true },
         { name: 'إدارة المستخدمين', href: 'users', icon: UsersIcon, show: true },
         { name: 'طلبات الصيانة', href: 'maintenance', icon: CogIcon, show: true },
+        { name: '👷 دليل العمال والصنايعية', href: 'workers', icon: WrenchScrewdriverIcon, show: true },
       ]
     },
     {
@@ -809,6 +810,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       color: 'violet',
       items: [
         { name: 'طلبات الصيانة', href: 'maintenance', icon: CogIcon, show: true },
+        { name: '👷 دليل العمال والصنايعية', href: 'workers', icon: WrenchScrewdriverIcon, show: true },
         { name: 'الخدمات والحجوزات', href: 'services', icon: WrenchScrewdriverIcon, show: true },
         { name: 'حجز المرافق', href: 'facility-booking', icon: CalendarDaysIcon, show: true },
         { name: 'الفعاليات والإعلانات', href: 'events', icon: SpeakerWaveIcon, show: true },
@@ -867,6 +869,7 @@ const Layout = ({ children, isTrialMode = false }) => {
       color: 'blue',
       items: [
         { name: 'طلبات الصيانة', href: 'maintenance', icon: CogIcon, show: true },
+        { name: '👷 دليل العمال والصنايعية', href: 'workers', icon: WrenchScrewdriverIcon, show: true },
         { name: 'الخدمات', href: 'services', icon: WrenchScrewdriverIcon, show: true },
         { name: 'الفعاليات', href: 'events', icon: SpeakerWaveIcon, show: true },
         { name: 'الرسائل', href: 'messages', icon: ChatBubbleLeftEllipsisIcon, show: true },

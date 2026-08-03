@@ -156,6 +156,7 @@ import AddCompoundModal from './components/AddCompoundModal';
 import OwnerSecurityDashboardPage from './pages/OwnerSecurityDashboardPage';
 import SupportInboxPage from './pages/SupportInboxPage';
 import UnitListingsPage from './pages/UnitListingsPage';
+import WorkersPage from './pages/WorkersPage';
 import AllCompoundsMapPage from './pages/AllCompoundsMapPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import ReferralProgramPage from './components/ReferralProgramPage';
@@ -921,6 +922,11 @@ function App() {
                   </ProtectedRoute>
                 } />
 
+                <Route path="workers" element={
+                  <ProtectedRoute>
+                    <WorkersPage />
+                  </ProtectedRoute>
+                } />
                 <Route path="unit-listings" element={
                   <ProtectedRoute>
                     <UnitListingsPage />

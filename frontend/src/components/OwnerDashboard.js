@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../App';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import AddCompoundModal from './AddCompoundModal';
 import {
   BuildingOfficeIcon,
   UsersIcon,
@@ -250,7 +251,15 @@ const OwnerDashboard = () => {
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
             <h3 className="font-bold text-gray-900">{t('od_compounds_overview', 'المجمعات السكنية')}</h3>
-            <button onClick={() => navigate('/app/super-admin?tab=compounds')} className="text-xs text-blue-600 hover:underline">{t('od_view_all', 'عرض الكل')}</button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowAddCompound(true)}
+                className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors shadow-sm"
+              >
+                <PlusIcon className="h-3.5 w-3.5" /> إضافة كمبوند
+              </button>
+              <button onClick={() => navigate('/app/super-admin?tab=compounds')} className="text-xs text-blue-600 hover:underline">{t('od_view_all', 'عرض الكل')}</button>
+            </div>
           </div>
           <div className="divide-y divide-gray-50">
             {compounds.slice(0, 5).map((c, i) => (
@@ -285,8 +294,9 @@ const OwnerDashboard = () => {
             { name: t('owner_company_subs', 'شركات الإدارة'), href: '/app/super-admin?tab=companies', icon: BuildingOffice2Icon, bg: 'bg-gradient-to-br from-indigo-500 to-blue-600' },
             { name: t('sa_ads', 'الإعلانات'), href: '/app/super-admin?tab=ads', icon: SpeakerWaveIcon, bg: 'bg-gradient-to-br from-amber-500 to-orange-600' },
             { name: t('owner_translations', 'الترجمات'), href: '/app/super-admin?tab=translations', icon: LanguageIcon, bg: 'bg-gradient-to-br from-rose-500 to-pink-600' },
+            { name: '➕ إضافة كمبوند', href: null, icon: PlusIcon, bg: 'bg-gradient-to-br from-emerald-500 to-green-600', action: () => setShowAddCompound(true) },
           ].map((link, i) => (
-            <button key={i} onClick={() => navigate(link.href)} className={`${link.bg} rounded-xl p-4 text-white text-start hover:opacity-90 transition-opacity shadow-md`}>
+            <button key={i} onClick={() => link.action ? link.action() : navigate(link.href)} className={`${link.bg} rounded-xl p-4 text-white text-start hover:opacity-90 transition-opacity shadow-md`}>
               <link.icon className="w-6 h-6 text-white/70 mb-2" />
               <p className="text-sm font-bold">{link.name}</p>
             </button>
@@ -294,6 +304,18 @@ const OwnerDashboard = () => {
         </div>
       </div>
     </div>
+
+    {/* Add Compound Modal */}
+    {showAddCompound && (
+      <AddCompoundModal
+        open={showAddCompound}
+        onClose={() => setShowAddCompound(false)}
+        onSuccess={() => {
+          setShowAddCompound(false);
+          window.location.reload();
+        }}
+      />
+    )}
   );
 };
 

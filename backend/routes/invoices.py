@@ -264,7 +264,7 @@ async def generate_manual_invoice(current_user: dict = Depends(get_current_user)
     if recent:
         raise HTTPException(status_code=400, detail="توجد فاتورة مسجلة اليوم بالفعل")
 
-    plan_prices = {"basic": 500, "pro": 1200, "premium": 2200, "company_startup": 3500, "company_business": 7500, "company_enterprise": 20000}
+    plan_prices = {"basic": 1200, "pro": 2200, "premium": 4000, "company_startup": 5500, "company_business": 13000, "company_enterprise": 35000}
     transaction = {
         "id": str(uuid.uuid4()),
         "user_id": current_user["id"],

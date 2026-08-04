@@ -107,7 +107,7 @@ async def apply_coupon(data: CouponApply, current_user: dict = Depends(get_curre
         if used:
             raise HTTPException(status_code=400, detail="لقد استخدمت هذا الكوبون من قبل")
 
-        plan_prices = {"basic": 500, "pro": 1200, "premium": 2200, "company_startup": 3500, "company_business": 7500, "company_enterprise": 20000}
+        plan_prices = {"basic": 1200, "pro": 2200, "premium": 4000, "company_startup": 5500, "company_business": 13000, "company_enterprise": 35000}
         duration_mult = {"1_month": 1, "3_months": 3, "6_months": 6, "9_months": 9, "1_year": 10, "lifetime": 120}
 
         original = plan_prices.get(data.plan, 0) * duration_mult.get(data.duration, 1)

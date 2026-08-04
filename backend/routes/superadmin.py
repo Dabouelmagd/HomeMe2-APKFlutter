@@ -956,7 +956,7 @@ async def subscription_analytics(current_user: dict = Depends(require_super_admi
         revenue_estimate = 0
         expiring_soon = []
         
-        plan_prices = {"basic": 500, "pro": 1200, "premium": 2200, "company_startup": 3500, "company_business": 7500, "company_enterprise": 20000}
+        plan_prices = {"basic": 1200, "pro": 2200, "premium": 4000, "company_startup": 5500, "company_business": 13000, "company_enterprise": 35000}
         
         from datetime import datetime, timedelta, timezone
         now = datetime.now(timezone.utc)

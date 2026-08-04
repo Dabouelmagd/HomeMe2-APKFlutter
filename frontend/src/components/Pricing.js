@@ -87,7 +87,7 @@ const Pricing = () => {
     enterprise:     { monthly: 4000,  yearly: 43200 },   // save 9,600
     multi_compound: { monthly: 5500,  yearly: 59400 },   // save 13,200
   };
-  const EGP_TO_USD = 40; // 1 USD = 50 EGP
+  const EGP_TO_USD = 30; // 1 USD = 50 EGP
 
   const getEGP = (planId, period) => EGP_PRICES[planId]?.[period] ?? 0;
   const getUSD = (planId, period) => Math.round(getEGP(planId, period) / EGP_TO_USD);

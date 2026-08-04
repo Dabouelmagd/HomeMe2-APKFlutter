@@ -53,7 +53,17 @@ const Pricing = () => {
     },
   });
   const [billingPeriod, setBillingPeriod] = useState('monthly');
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState(() => {
+    // Default to EGP for Arabic/Egyptian users, USD for others
+    try {
+      const saved = localStorage.getItem('pricing_currency');
+      if (saved) return saved;
+      const lang = navigator.language || '';
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+      if (lang.startsWith('ar') || tz.includes('Cairo') || tz.includes('Africa')) return 'EGP';
+    } catch(e) {}
+    return 'USD';
+  });
   const [showDiscountCode, setShowDiscountCode] = useState(false);
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(null);
@@ -64,13 +74,46 @@ const Pricing = () => {
   const [verifiedCode, setVerifiedCode] = useState(null);
   const [verifyingCode, setVerifyingCode] = useState(false);
 
-  // Format price based on currency
-  const formatPrice = (usdPrice) => {
+  // Save currency preference
+  React.useEffect(() => {
+    try { localStorage.setItem('pricing_currency', currency); } catch(e) {}
+  }, [currency]);
+
+  // EGP prices (authoritative) — USD = EGP / 50
+  const EGP_PRICES = {
+    community:      { monthly: 0,     yearly: 0 },
+    essential:      { monthly: 1200,  yearly: 12960 },   // save 2,880
+    professional:   { monthly: 2200,  yearly: 23760 },   // save 5,280
+    enterprise:     { monthly: 4000,  yearly: 43200 },   // save 9,600
+    multi_compound: { monthly: 5500,  yearly: 59400 },   // save 13,200
+  };
+  const EGP_TO_USD = 50; // 1 USD = 50 EGP
+
+  const getEGP = (planId, period) => EGP_PRICES[planId]?.[period] ?? 0;
+  const getUSD = (planId, period) => Math.round(getEGP(planId, period) / EGP_TO_USD);
+
+  const formatPrice = (planId, period) => {
     if (currency === 'EGP') {
-      const egpPrice = usdPrice * 50; // Approximate conversion to Egyptian Pound
-      return `${egpPrice.toFixed(0)} ج.م`;
+      const p = getEGP(planId, period);
+      if (p === 0) return 'مجاناً';
+      return `${p.toLocaleString('ar-EG')} ج.م`;
+    } else {
+      const p = getUSD(planId, period);
+      if (p === 0) return 'Free';
+      return `$${p}`;
     }
-    return `$${usdPrice}`;
+  };
+
+  // Legacy formatPrice for backward compat (takes EGP value directly)
+  const formatPriceVal = (egpVal) => {
+    if (currency === 'EGP') {
+      if (egpVal === 0) return 'مجاناً';
+      return `${egpVal.toLocaleString('ar-EG')} ج.م`;
+    } else {
+      const usd = Math.round(egpVal / EGP_TO_USD);
+      if (usd === 0) return 'Free';
+      return `$${usd}`;
+    }
   };
 
   // Get discounted price (10% off for yearly)
@@ -362,24 +405,24 @@ const Pricing = () => {
             {/* Currency Selector */}
             <div className="flex bg-gray-100 rounded-lg p-1">
               <button
-                onClick={() => setCurrency('USD')}
+                onClick={() => { setCurrency('USD'); }}
                 className={`px-4 py-2 rounded-md font-medium transition-colors ${
                   currency === 'USD' 
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                🇺🇸 USD
+                🇺🇸 USD ($)
               </button>
               <button
-                onClick={() => setCurrency('EGP')}
+                onClick={() => { setCurrency('EGP'); }}
                 className={`px-4 py-2 rounded-md font-medium transition-colors ${
                   currency === 'EGP' 
                     ? 'bg-white text-blue-600 shadow-sm' 
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
-                🇪🇬 EGP
+                🇪🇬 جنيه مصري
               </button>
             </div>
 
@@ -554,7 +597,7 @@ const Pricing = () => {
                   <div className="text-center mb-6">
                     <div className="flex items-baseline justify-center mb-2">
                       <span className="text-4xl font-bold text-gray-900">
-                        {formatPrice(currentPrice)}
+                        {formatPriceVal(currentPrice)}
                       </span>
                       {plan.id !== 'community' && !plan.perPerson && (
                         <span className="text-gray-600 ml-2">
@@ -573,22 +616,22 @@ const Pricing = () => {
                       <div className="mt-3 text-sm space-y-1">
                         {/* Original Price (Before Discount) */}
                         <div className="text-gray-500 line-through">
-                          {t('before_discount')}: {formatPrice(getOriginalYearlyTotal(plan.price.monthly))}
+                          {t('before_discount')}: {formatPriceVal(getOriginalYearlyTotal(plan.price.monthly))}
                         </div>
                         {/* Price After Discount */}
                         <div className="text-blue-600 font-semibold">
-                          {t('after_discount')}: {formatPrice(getYearlyTotal(plan.price.monthly))} {t('per_year')}
+                          {t('after_discount')}: {formatPriceVal(getYearlyTotal(plan.price.monthly))} {t('per_year')}
                         </div>
                         {/* Savings Amount */}
                         <div className="text-green-600 font-semibold">
-                          {t('you_save')}: {formatPrice(getSavings(plan.price.monthly))} {t('annually')}
+                          {t('you_save')}: {formatPriceVal(getSavings(plan.price.monthly))} {t('annually')}
                         </div>
                       </div>
                     )}
                     
                     {appliedDiscount && currentPrice !== originalPrice && plan.id !== 'community' && (
                       <div className="text-sm text-gray-500 line-through mt-1">
-                        {t('was_price', { price: `${formatPrice(originalPrice)}` })}
+                        {t('was_price', { price: `${formatPriceVal(originalPrice)}` })}
                       </div>
                     )}
                   </div>

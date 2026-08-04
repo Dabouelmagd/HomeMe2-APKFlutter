@@ -726,7 +726,7 @@ function App() {
     <div className="App">
       <AppVersionGuard />
       <ChangelogModal />
-      <BrowserRouter>
+      <BrowserRouter basename={process.env.PUBLIC_URL || ""}>
         <ScrollToTop />
         <ThemeProvider>
         <AuthProvider>

@@ -3,6 +3,8 @@ name: Preview Deploy (GitHub Pages)
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 permissions:
   contents: write
@@ -38,6 +40,8 @@ jobs:
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
+        if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: frontend/build
+          commit_message: 'preview: ${{ github.event.head_commit.message }}'

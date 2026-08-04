@@ -354,10 +354,10 @@ export default function UserGuidePage() {
       </div>
 
       {/* ── Main Layout ── */}
-      <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row gap-6">
+      <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col lg:flex-row-reverse gap-6" dir="ltr">
 
         {/* Sidebar nav */}
-        <aside className="lg:w-64 flex-shrink-0">
+        <aside className="lg:w-64 flex-shrink-0" dir="rtl">
           <div className="sticky top-20 space-y-1">
             <p className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-1">الفصول</p>
             {CHAPTERS.map(ch => {
@@ -404,7 +404,7 @@ export default function UserGuidePage() {
         </aside>
 
         {/* Content */}
-        <main className="flex-1 min-w-0">
+        <main className="flex-1 min-w-0" dir="rtl">
 
           {/* Chapter header */}
           <div className={`bg-gradient-to-r ${chapter?.color} rounded-2xl p-6 mb-6 text-white`}>

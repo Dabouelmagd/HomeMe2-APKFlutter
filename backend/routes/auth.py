@@ -419,7 +419,12 @@ async def login(user_data: UserLogin, request: Request):
             ),
         )
 
+    # Support login with username OR email
+    _login_val = user_data.username.strip().lower()
     user = await db.users.find_one({"username": user_data.username})
+    if not user:
+        # Try email match (case-insensitive)
+        user = await db.users.find_one({"email": {"$regex": f"^{_login_val}$", "$options": "i"}})
     # Run bcrypt in a thread pool — verify_password is CPU-bound and would
     # otherwise block the asyncio event loop (~250ms per call on prod CPUs).
     password_ok = bool(user) and await asyncio.to_thread(

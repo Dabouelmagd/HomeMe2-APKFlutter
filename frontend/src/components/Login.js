@@ -332,18 +332,18 @@ const Login = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username" className="form-label">
-              {t('username')}
+              {t('username', 'اسم المستخدم أو البريد الإلكتروني')}
             </label>
             <input
               type="text"
               id="username"
               name="username"
-              autoComplete="username"
+              autoComplete="username email"
               value={formData.username}
               onChange={handleChange}
               className="form-input"
               required
-              placeholder={t('username')}
+              placeholder={t('username_or_email', 'اسم المستخدم أو الإيميل')}
             />
           </div>
 

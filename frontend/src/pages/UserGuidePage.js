@@ -7,7 +7,7 @@ import {
   WrenchScrewdriverIcon, CurrencyDollarIcon, ShieldCheckIcon,
   SparklesIcon, BellIcon, QrCodeIcon, StarIcon,
   DocumentTextIcon, ArrowDownTrayIcon, PhoneIcon,
-  ChatBubbleLeftEllipsisIcon, BanknotesIcon, NoSymbolIcon,
+  ChatBubbleLeftEllipsisIcon, BanknotesIcon, NoSymbolIcon, CurrencyDollarIcon,
   MagnifyingGlassIcon, CheckCircleIcon, ArrowTopRightOnSquareIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
@@ -202,6 +202,32 @@ const CHAPTERS = [
         { s: '"إدارة الكمبوند الكاملة" الزرار الأخضر' },
         { s: 'نفس صلاحيات مدير الكمبوند: سكان، مالية، عمال، إعلانات' },
         { s: 'اضغط "رجوع" للعودة للداشبورد الموحد' },
+      ]},
+    ],
+  },
+  {
+    id: 'pricing', icon: CurrencyDollarIcon, color: 'from-emerald-500 to-teal-600',
+    badge: 'الأسعار',
+    title: 'خطط الاشتراك والأسعار',
+    desc: 'خطط المجمعات السكنية + شركات الإدارة بالجنيه المصري',
+    sections: [
+      { title: 'خطط المجمعات السكنية', steps: [
+        { s: '🆓 مجاني (Starter) — 0 ج.م — حتى 30 ساكن', tip: 'إدارة أساسية، صيانة، تقرير شهري، بوابة المقيم' },
+        { s: '📘 أساسي (Basic) — 1,200 ج.م/شهر — حتى 100 ساكن', tip: 'وفر 2,880 ج.م مع التجديد السنوي' },
+        { s: '⭐ احترافي (Pro) — 2,200 ج.م/شهر — عدد غير محدود', tip: 'الأكثر طلباً — وفر 5,280 ج.م سنوياً' },
+        { s: '💎 متقدم (Premium) — 4,000 ج.م/شهر — كل شيء غير محدود', tip: 'وفر 9,600 ج.م مع التجديد السنوي' },
+      ]},
+      { title: 'خطط شركات الإدارة', steps: [
+        { s: '🌱 شركة ناشئة (Startup) — 5,500 ج.م/شهر — حتى 3 مجتمعات', tip: 'وفر 13,200 ج.م مع التجديد السنوي' },
+        { s: '🏢 شركة متوسطة (Business) — 13,000 ج.م/شهر — 1-8 مجتمعات', tip: 'الأفضل للشركات — وفر 31,200 ج.م سنوياً' },
+        { s: '🏛️ شركة كبرى (Enterprise) — 35,000 ج.م/شهر — غير محدود', tip: 'وفر 84,000 ج.م مع التجديد السنوي' },
+      ]},
+      { title: 'ما يشمله كل خطة', steps: [
+        { s: 'مجاني: إدارة مقيمين أساسية، طلبات صيانة، إشعارات محدودة، تقرير شهري' },
+        { s: 'أساسي: + النظام المالي الكامل، تصدير Excel/PDF، مساعد AI (5 رسائل/يوم)' },
+        { s: 'احترافي: + إدارة الزوار QR، تحليلات متقدمة، مساعد AI (20 رسالة/يوم)، مستشار AI استباقي' },
+        { s: 'متقدم: + API مخصص، AI Auto-Pilot، مساعد AI (50 رسالة/يوم)، دعم 24/7', tip: 'كل شيء بلا حدود' },
+        { s: 'جميع الخطط: تجربة مجانية 14 يوم بدون بطاقة ائتمان', tip: 'خصم 17% عند التجديد السنوي' },
       ]},
     ],
   },
@@ -534,9 +560,9 @@ export default function UserGuidePage() {
             <Link to="/register" className="bg-white text-emerald-900 font-black px-8 py-3 rounded-2xl hover:bg-emerald-50 transition-colors">
               🚀 ابدأ مجاناً
             </Link>
-            <Link to="/pricing" className="border-2 border-white/30 text-white font-bold px-8 py-3 rounded-2xl hover:bg-white/10 transition-colors">
-              💰 شوف الأسعار
-            </Link>
+            <button onClick={() => setActiveChapter("pricing")} className="border-2 border-white/30 text-white font-bold px-8 py-3 rounded-2xl hover:bg-white/10 transition-colors">
+              💰 خطط الأسعار
+            </button>
             <a href="https://wa.me/201012625529" target="_blank" rel="noreferrer"
               className="border-2 border-green-400/50 text-green-300 font-bold px-8 py-3 rounded-2xl hover:bg-green-900/30 transition-colors">
               💬 تواصل واتساب

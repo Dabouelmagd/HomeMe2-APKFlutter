@@ -60,7 +60,8 @@ import {
   ArrowUpTrayIcon,
   ClipboardDocumentListIcon,
   QrCodeIcon,
-  SpeakerXMarkIcon
+  SpeakerXMarkIcon,
+  BookOpenIcon
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import SessionSwitcher from './SessionSwitcher';

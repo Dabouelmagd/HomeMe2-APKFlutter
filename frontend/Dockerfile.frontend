@@ -13,7 +13,9 @@ COPY . .
 ENV REACT_APP_BACKEND_URL=https://homemeapp.net
 ENV DISABLE_ESLINT_PLUGIN=true
 ENV NODE_OPTIONS=--max-old-space-size=2048
-RUN npm run build 2>/dev/null || yarn build
+# Cache buster — ensures rebuild picks up latest source changes
+ARG CACHEBUST=1
+RUN echo "Build timestamp: $CACHEBUST" && npm run build 2>/dev/null || yarn build
 
 # ── Stage 2: Serve with nginx ────────────────────────────────────────────────
 FROM nginx:alpine

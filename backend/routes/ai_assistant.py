@@ -178,7 +178,13 @@ async def clear_history(current_user: dict = Depends(get_current_user)):
 @router.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest, current_user: dict = Depends(get_current_user)):
     if not os.environ.get("ANTHROPIC_API_KEY"):
-        raise HTTPException(status_code=503, detail="AI service not configured — ANTHROPIC_API_KEY missing")
+        # Graceful fallback — return helpful message instead of error
+        fallback = "مرحباً! خدمة المساعد الذكي غير مفعّلة حالياً. للمساعدة، تواصل مع إدارة الكمبوند أو فريق الدعم الفني عبر الزرار الأخضر 💬"
+        now = datetime.now(timezone.utc).isoformat()
+        msg = {"id": str(uuid.uuid4()), "role": "assistant", "content": fallback, "route": None, "created_at": now}
+        await db.ai_chat_messages.insert_one({**msg, "user_id": current_user["id"], "compound_id": current_user.get("compound_id", "")})
+        msg.pop("_id", None)
+        return ChatResponse(reply=fallback, route=None, usage_today=1, limit=20)
 
     db = get_db()
     user_id = current_user["id"]

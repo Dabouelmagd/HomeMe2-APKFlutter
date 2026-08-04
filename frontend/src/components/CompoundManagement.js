@@ -16,6 +16,7 @@ import AddRegistrationLinkModal from './compound/modals/AddRegistrationLinkModal
 import AddNewResidenceModal from './compound/modals/AddNewResidenceModal';
 import CompoundSelectionModal from './compound/modals/CompoundSelectionModal';
 import ComprehensiveFamilyModal from './compound/modals/ComprehensiveFamilyModal';
+import TrialStatus from './TrialStatus';
 import {
   HomeIcon,
   LinkIcon,
@@ -1122,6 +1123,9 @@ const CompoundManagement = () => {
           actions={<LanguageSwitcher />}
           testId="compound-mgmt-header"
         />
+
+      {/* Trial Status Bar — shows upgrade + subscription code button */}
+      <TrialStatus showFull={true} />
 
       {/* Enhanced Tab Navigation with Icons */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-2">

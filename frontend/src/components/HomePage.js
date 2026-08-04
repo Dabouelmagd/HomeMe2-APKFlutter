@@ -800,6 +800,7 @@ const HomePage = () => {
               { href: '#ai-features', sectionId: 'ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new' },
               { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing' },
               { href: '#guide', sectionId: 'guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide' },
+              { href: '/guide', sectionId: '', label: '📖 ' + t('nav_full_guide', 'الدليل الكامل'), testid: 'nav-full-guide', isLink: true },
               { href: '#testimonials', sectionId: 'testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials' },
               { href: '#faq', sectionId: 'faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq' },
             ].map((item, i) => {
@@ -816,7 +817,9 @@ const HomePage = () => {
                   }}
                   aria-current={isActive ? 'page' : undefined}
                   className={`relative px-3 py-2 text-sm font-semibold rounded-lg transition-all whitespace-nowrap ${
-                    isActive
+                    item.isLink
+                      ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200'
+                      : isActive
                       ? 'text-blue-700 bg-blue-50'
                       : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
                   }`}
@@ -886,6 +889,7 @@ const HomePage = () => {
               { href: '#ai-features', sectionId: 'ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new-m' },
               { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing-m' },
               { href: '#guide', sectionId: 'guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide-m' },
+              { href: '/guide', sectionId: '', label: '📖 دليل كامل', testid: 'nav-full-guide-m', isLink: true },
               { href: '#testimonials', sectionId: 'testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials-m' },
               { href: '#faq', sectionId: 'faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq-m' },
             ].map((item, i) => {
@@ -948,7 +952,7 @@ const HomePage = () => {
                 {t('hp_start_trial')}
                 <ArrowRightIcon className="h-5 w-5 rotate-180" />
               </Link>
-              <a href="#guide" className="px-8 py-4 border-2 border-white/30 text-white rounded-2xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2" data-testid="hero-cta-guide">
+              <a href="/guide" className="px-8 py-4 border-2 border-white/30 text-white rounded-2xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2" data-testid="hero-cta-guide">
                 <BookOpenIcon className="h-5 w-5" />
                 {t('hp_guide_btn')}
               </a>
@@ -1494,6 +1498,7 @@ const HomePage = () => {
             </div>
             <div className="flex gap-6 text-sm">
               <a href="#guide" className="hover:text-white transition-colors">{t('hp_guide_btn')}</a>
+              <Link to="/guide" className="hover:text-white transition-colors font-bold">📖 دليل التشغيل الكامل</Link>
               <a href="#pricing" className="hover:text-white transition-colors">{t('hp_sub_codes')}</a>
               <a href="#systems" className="hover:text-white transition-colors" data-testid="footer-systems-link">{t('hp_systems_title_footer', `${systems.length} نظام متكامل`).replace('{count}', systems.length)}</a>
               <a href="#ai-features" className="hover:text-white transition-colors">✨ {t('hp_whats_new', 'ما الجديد')}</a>

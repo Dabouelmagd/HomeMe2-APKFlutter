@@ -179,6 +179,12 @@ const WrittenGuide = () => {
           ))}
         </div>
       </div>
+    {/* Link to full guide page */}
+      <div className="mt-6 text-center">
+        <a href="/guide" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white font-bold px-6 py-3 rounded-2xl text-sm transition-all border border-white/30">
+          📖 عرض دليل التشغيل الكامل في صفحة منفصلة →
+        </a>
+      </div>
     </div>
   );
 };

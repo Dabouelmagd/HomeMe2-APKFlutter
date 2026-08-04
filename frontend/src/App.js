@@ -151,6 +151,7 @@ import CompoundGoogleMap from './components/CompoundGoogleMap';
 import StaffManagement from './components/StaffManagement';
 import AboutUs from './components/AboutUs';
 import FAQPage from './pages/FAQPage';
+import UserGuidePage from './pages/UserGuidePage';
 import ImportExportPage from './pages/ImportExportPage';
 import AddCompoundModal from './components/AddCompoundModal';
 import OwnerSecurityDashboardPage from './pages/OwnerSecurityDashboardPage';
@@ -763,6 +764,9 @@ function App() {
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/faq" element={<FAQPage />} />
+                <Route path="/guide" element={<UserGuidePage />} />
+                <Route path="/user-guide" element={<UserGuidePage />} />
+                <Route path="/docs" element={<UserGuidePage />} />
 
                 {/* Public testimonial submission */}
                 <Route path="/testimonials/submit" element={<TestimonialSubmitPage />} />

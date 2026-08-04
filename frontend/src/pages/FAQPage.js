@@ -298,6 +298,17 @@ const FAQPage = () => {
         </div>
       </section>
     </div>
+  {/* Guide CTA */}
+  <div className="max-w-4xl mx-auto px-4 py-10 text-center">
+    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-700 rounded-2xl p-8">
+      <p className="text-2xl mb-2">📖</p>
+      <h3 className="font-black text-gray-900 dark:text-white text-lg mb-2">هل تريد دليل أكثر تفصيلاً؟</h3>
+      <p className="text-sm text-gray-500 mb-4">دليل التشغيل الكامل يشمل 50 نظام مع خطوات مفصّلة لكل دور</p>
+      <a href="/guide" className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-colors">
+        📖 افتح دليل التشغيل الكامل ←
+      </a>
+    </div>
+  </div>
   );
 };
 

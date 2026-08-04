@@ -1180,6 +1180,14 @@ const Pricing = () => {
           </div>
         </div>
       </div>
+
+    {/* Guide CTA at bottom of pricing */}
+    <div className="text-center py-8 border-t border-gray-200 dark:border-gray-700 mt-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">تريد معرفة كيفية استخدام كل الميزات؟</p>
+      <a href="/guide" className="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 font-bold text-sm underline underline-offset-2">
+        📖 افتح دليل التشغيل الكامل ←
+      </a>
+    </div>
     </div>
   );
 };

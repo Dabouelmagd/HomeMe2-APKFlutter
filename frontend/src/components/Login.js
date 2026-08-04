@@ -708,6 +708,12 @@ const Login = () => {
           </div>
         </div>
       )}
+    {/* Guide link */}
+    <div className="fixed bottom-4 left-4 z-50">
+      <a href="/guide" className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg transition-colors">
+        📖 دليل التشغيل
+      </a>
+    </div>
     </div>
   );
 };

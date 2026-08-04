@@ -73,7 +73,7 @@ const HomePage = () => {
     og: {
       title: 'HomeMe — نظام إدارة الكمبوندات السكنية بالذكاء الاصطناعي',
       description:
-        'منصة عربية متكاملة لإدارة المجمعات السكنية مع 48 نظام: محاسبة، صيانة، شكاوى، حجوزات، تقارير PDF، ومساعد AI. تجربة مجانية 14 يوماً.',
+        'منصة عربية متكاملة لإدارة المجمعات السكنية مع 50 نظام: محاسبة، صيانة، شكاوى، حجوزات، تقارير PDF، ومساعد AI. تجربة مجانية 14 يوماً.',
       type: 'website',
       url: 'https://homemeapp.net/',
       image: 'https://homemeapp.net/og-cover.png',
@@ -187,7 +187,7 @@ const HomePage = () => {
         name: 'HomeMe',
         applicationCategory: 'BusinessApplication',
         operatingSystem: 'Web, iOS, Android (PWA)',
-        description: 'منصة إدارة المجتمعات السكنية المتكاملة مع AI Assistant و Stripe Auto-Renewal و+48 نظام',
+        description: 'منصة إدارة المجتمعات السكنية المتكاملة مع AI Assistant و Stripe Auto-Renewal و+50 نظام',
         url: typeof window !== 'undefined' ? window.location.origin : 'https://homemeapp.net',
         inLanguage: ['ar', 'en', 'fr'],
         offers: {
@@ -379,6 +379,10 @@ const HomePage = () => {
     // 🌙 Theme & UX (Iter 142, 149)
     { icon: MoonIcon, category: 'admin', title: '🌙 ' + t('sys_dark_mode', 'الوضع الليلي الشامل'), desc: t('sys_dark_mode_d', 'تبديل light/dark على كل الصفحات (الرئيسية/Login/Pricing/Blog/Dashboard) + يحفظ التفضيل'), color: 'from-slate-700 to-indigo-900', isNew: true },
 
+    // 🆕 Aug 4, 2026
+    { icon: WrenchScrewdriverIcon, category: 'maintenance', title: '👷 دليل العمال والصنايعية', desc: 'السكان يضيفون عمالاً بعد تجربتهم مع تقييمات ونجوم — موافقة الأدمن — قائمة سوداء تسري على الكمبوند والشركة والأونر', color: 'from-amber-500 to-orange-600', isNew: true },
+    { icon: BanknotesIcon, category: 'finance', title: '🧾 تأكيد إيصالات الدفع', desc: 'الساكن يرفع صورة الإيصال — المحاسب يراجع ويضغط "تم الدفع" — يُحدَّث الالتزام تلقائياً ويُرسل إشعار للساكن', color: 'from-emerald-600 to-teal-600', isNew: true },
+
     // Smart devices (coming soon)
     { icon: BoltIcon, category: 'admin', title: t('sys_smart', 'الأجهزة الذكية'), desc: t('sys_smart_d', 'تحكم بالإضاءة + التكييف + الكاميرات + الأقفال (قريباً)'), color: 'from-amber-500 to-yellow-600', comingSoon: true },
   ];
@@ -408,7 +412,7 @@ const HomePage = () => {
   ];
 
   const guideItems = [
-    { id: 'overview', icon: HomeModernIcon, title: t('gd_overview', 'نظرة عامة على المنصة'), content: t('gd_overview_d', 'منصة سحابية متكاملة لإدارة المجتمعات السكنية تضم 48 نظام. تدعم العربية بالكامل (RTL)، 3 لغات (AR/EN/FR)، تطبيق PWA، ومدعومة بالذكاء الاصطناعي.') },
+    { id: 'overview', icon: HomeModernIcon, title: t('gd_overview', 'نظرة عامة على المنصة'), content: t('gd_overview_d', 'منصة سحابية متكاملة لإدارة المجتمعات السكنية تضم 50 نظام. تدعم العربية بالكامل (RTL)، 3 لغات (AR/EN/FR)، تطبيق PWA، ومدعومة بالذكاء الاصطناعي.') },
     { id: 'registration', icon: UserIcon, title: t('gd_registration', 'التسجيل وإنشاء الحساب'), content: t('gd_registration_d', '3 أنواع حسابات: مدير مجتمع (ساكن/أدمن)، شركة إدارة (1-غير محدود مجمعات)، أو ساكن. تجربة مجانية 14 يوم بدون بطاقة ائتمان مع كل ميزات الخطة المختارة. تسجيل بـ Email أو رقم جوال.') },
     { id: 'financial', icon: CurrencyDollarIcon, title: t('gd_financial', 'النظام المالي والمحاسبي'), content: t('gd_financial_d', 'ميزانية شاملة، 4 طرق لتوزيع المصروفات (بالتساوي/بالنسبة/مخصص/لكل شقة)، متابعة السداد بالألوان (أخضر/أصفر/أحمر)، رسوم بيانية شهرية، تصدير Excel بـ 5 أوراق + PDF. دعم Stripe + PayPal + Vodafone Cash + InstaPay.') },
     { id: 'maintenance', icon: WrenchScrewdriverIcon, title: t('gd_maintenance', 'إدارة الصيانة والخدمات'), content: t('gd_maintenance_d', 'تقديم طلبات مع صور وفيديو وأولوية (عادي/مستعجل/طارئ). إشعارات فورية للمدراء والفنيين. تقييم 5 نجوم بعد الإنجاز. AI Auto-Pilot ينبّه الفنيين تلقائياً عن الطلبات المعلقة لأكثر من 7 أيام.') },

@@ -1124,8 +1124,8 @@ const CompoundManagement = () => {
           testId="compound-mgmt-header"
         />
 
-      {/* Trial Status Bar — shows upgrade + subscription code button */}
-      <TrialStatus showFull={true} />
+      {/* Trial Status Bar — compact bar with upgrade + code buttons */}
+      <TrialStatus showFull={false} />
 
       {/* Enhanced Tab Navigation with Icons */}
       <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-2">

@@ -49,7 +49,8 @@ async def get_analytics_dashboard(
             scope = {"compound_id": compound_id}
         elif role in ("app_owner", "super_admin"):
             scope = {}
-        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id"):
+            # company_admin always scoped to ALL their compounds via company_id
             company_id = current_user["company_id"]
             owned = await db.compounds.find(
                 {"$or": [{"company_id": company_id}, {"management_company_id": company_id}]},

@@ -69,7 +69,7 @@ async def get_expenses(compound_id: Optional[str] = None, start_date: Optional[s
             query["compound_id"] = compound_id
         elif role in ("app_owner", "super_admin"):
             pass  # global
-        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") :
             owned = await db.compounds.find(
                 {"$or": [{"company_id": current_user["company_id"]}, {"management_company_id": current_user["company_id"]}]},
                 {"_id": 0, "id": 1}
@@ -135,7 +135,7 @@ async def get_revenue(compound_id: Optional[str] = None, start_date: Optional[st
             query["compound_id"] = compound_id
         elif role in ("app_owner", "super_admin"):
             pass
-        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") :
             owned = await db.compounds.find(
                 {"$or": [{"company_id": current_user["company_id"]}, {"management_company_id": current_user["company_id"]}]},
                 {"_id": 0, "id": 1}
@@ -409,7 +409,7 @@ async def get_balance_sheet(year: Optional[int] = None, compound_id: Optional[st
         if compound_id:
             scope = {"compound_id": compound_id}
             label_compound = compound_id
-        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") :
             # Aggregate across ALL company's compounds when no specific compound is active
             company_id = current_user["company_id"]
             owned = await db.compounds.find(
@@ -487,7 +487,7 @@ async def export_balance_sheet_pdf(year: Optional[int] = None, compound_id: Opti
             scope = {"compound_id": compound_id}
             cmpd = await db.compounds.find_one({"id": compound_id}, {"_id": 0, "name": 1})
             compound_label = (cmpd or {}).get("name") or compound_id
-        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") and (not cu_compound or cu_compound in ("default-compound", "")):
+        elif role in ("company_admin", "assistant_manager", "accountant") and current_user.get("company_id") :
             company_id = current_user["company_id"]
             owned = await db.compounds.find(
                 {"$or": [{"company_id": company_id}, {"management_company_id": company_id}]},

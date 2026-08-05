@@ -40,6 +40,7 @@ const OwnerDashboard = () => {
   const [budget, setBudget] = useState(null);
   const [reminders, setReminders] = useState(null);
   const [adStats, setAdStats] = useState(null);
+  const [slotStats, setSlotStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -49,8 +50,9 @@ const OwnerDashboard = () => {
       axios.get(`${API}/owner/budget`, getHeaders()).then(r => r.data).catch(() => null),
       axios.get(`${API}/owner/subscription-reminders?days_ahead=30`, getHeaders()).then(r => r.data).catch(() => null),
       axios.get(`${API}/ads/analytics`, getHeaders()).then(r => r.data).catch(() => null),
-    ]).then(([d, b, r, a]) => {
-      setData(d); setBudget(b); setReminders(r); setAdStats(a);
+      axios.get(`${API}/ad-slots/stats`, getHeaders()).then(r => r.data).catch(() => null),
+    ]).then(([d, b, r, a, sl]) => {
+      setData(d); setBudget(b); setReminders(r); setAdStats(a); setSlotStats(sl);
     }).catch(err => {
       console.error('Owner dashboard load error:', err);
     }).finally(() => {
@@ -234,6 +236,32 @@ const OwnerDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Ad Slots Stats */}
+      {slotStats && (
+        <div className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2">
+              <RectangleGroupIcon className="h-4 w-4 text-emerald-600" />
+              المساحات الإعلانية
+            </h3>
+            <button onClick={() => navigate('/app/super-admin?tab=ads')} className="text-xs text-blue-600 hover:underline">إدارة</button>
+          </div>
+          <div className="grid grid-cols-4 gap-2 text-center">
+            {[
+              { l: 'إجمالي الطلبات', v: slotStats.total, c: 'text-gray-700' },
+              { l: 'بانتظار الموافقة', v: slotStats.pending, c: 'text-amber-600' },
+              { l: 'نشطة', v: slotStats.active, c: 'text-emerald-600' },
+              { l: 'الإيرادات', v: `${(slotStats.total_revenue||0).toLocaleString()} ج.م`, c: 'text-blue-600' },
+            ].map(({l,v,c}) => (
+              <div key={l} className="bg-gray-50 rounded-lg p-2">
+                <p className={`text-lg font-black ${c}`}>{v}</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">{l}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Gifts & Coupons Row */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">

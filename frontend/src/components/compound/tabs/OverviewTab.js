@@ -1,3 +1,4 @@
+import CompoundAdSlots from '../../CompoundAdSlots';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../../utils/dateUtils';
@@ -165,6 +166,10 @@ const OverviewTab = ({ compound, user, uploading, onLogoUpload, onAddAdminClick,
           <p className="text-gray-500">{t('no_residences')}</p>
           <p className="text-sm text-gray-400">{t('residences_appear')}</p>
         </div>
+      </div>
+      {/* Ad Slots Section */}
+      <div className="mt-6">
+        <CompoundAdSlots compoundId={compound?.id} />
       </div>
     </div>
   );

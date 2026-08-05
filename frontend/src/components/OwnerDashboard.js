@@ -41,6 +41,7 @@ const OwnerDashboard = () => {
   const [reminders, setReminders] = useState(null);
   const [adStats, setAdStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     Promise.all([
@@ -50,9 +51,12 @@ const OwnerDashboard = () => {
       axios.get(`${API}/ads/analytics`, getHeaders()).then(r => r.data).catch(() => null),
     ]).then(([d, b, r, a]) => {
       setData(d); setBudget(b); setReminders(r); setAdStats(a);
+    }).catch(err => {
+      console.error('Owner dashboard load error:', err);
+    }).finally(() => {
       setLoading(false);
     });
-  }, []);
+  }, [refreshKey]);
 
   if (loading) {
     return (
@@ -82,6 +86,12 @@ const OwnerDashboard = () => {
               {t('od_welcome', 'مرحباً')}، {user?.full_name || user?.name}
             </h1>
             <p className="text-gray-400 text-sm">{t('od_subtitle_new', 'إدارة شاملة للمنصة - المجمعات والاشتراكات والإيرادات')}</p>
+            <button
+              onClick={() => { setLoading(true); setRefreshKey(k => k + 1); }}
+              className="mt-2 text-xs text-rose-300 hover:text-white border border-rose-300/30 hover:border-white/30 px-3 py-1 rounded-lg transition-colors"
+            >
+              🔄 تحديث البيانات
+            </button>
           </div>
           <div className="hidden sm:flex flex-col items-end gap-1">
             <div className="flex items-center gap-2 bg-green-500/10 backdrop-blur px-3 py-1.5 rounded-lg border border-green-500/20">

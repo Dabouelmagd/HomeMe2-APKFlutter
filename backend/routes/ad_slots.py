@@ -25,7 +25,7 @@ AD_SLOT_SPECS = [
         "position": "dashboard",
         "description": "بانر عريض أعلى الداشبورد — مرئي لكل المستخدمين",
         "visibility": "عالية جداً",
-        "price_monthly": 500,
+        "price_monthly": 1500,
         "max_per_compound": 1,
     },
     {
@@ -37,7 +37,7 @@ AD_SLOT_SPECS = [
         "position": "sidebar",
         "description": "مربع إعلاني في الشريط الجانبي",
         "visibility": "عالية",
-        "price_monthly": 350,
+        "price_monthly": 900,
         "max_per_compound": 2,
     },
     {
@@ -49,7 +49,7 @@ AD_SLOT_SPECS = [
         "position": "inline",
         "description": "بانر صغير بين أقسام الداشبورد",
         "visibility": "متوسطة",
-        "price_monthly": 200,
+        "price_monthly": 600,
         "max_per_compound": 3,
     },
     {
@@ -61,7 +61,7 @@ AD_SLOT_SPECS = [
         "position": "banner",
         "description": "بانر أسفل كل صفحات الكمبوند",
         "visibility": "متوسطة",
-        "price_monthly": 250,
+        "price_monthly": 750,
         "max_per_compound": 2,
     },
 ]

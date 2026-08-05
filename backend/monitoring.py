@@ -21,7 +21,7 @@ class MonitoringService:
     """Service for monitoring system health and statistics"""
     
     @staticmethod
-    async def get_system_stats():
+    async def get_system_stats(compound_id: str = None, role: str = None):
         """Get comprehensive system statistics"""
         try:
             # User statistics

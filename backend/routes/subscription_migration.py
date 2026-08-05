@@ -19,7 +19,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from database import get_db
-from auth_deps import require_app_owner
+from auth_deps import require_app_owner, require_super_admin
 from email_service import email_service
 
 logger = logging.getLogger(__name__)
@@ -145,7 +145,7 @@ async def list_candidates(
 
 
 @router.get("/stats")
-async def migration_stats(current_user: dict = Depends(require_app_owner)):
+async def migration_stats(current_user: dict = Depends(require_super_admin)):
     """Overall migration progress for the Owner."""
     db = get_db()
     total_active = await db.company_subscriptions.count_documents({"status": "active"})

@@ -311,9 +311,9 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
                     className="flex-1 min-w-0 text-[11px] font-semibold rounded-lg border border-emerald-300 bg-white dark:bg-gray-900 px-2 py-1 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                     data-testid="plan-trial-plan-select"
                   >
-                    <option value="company_startup">الخطة الناشئة (4,000 ج.م)</option>
-                    <option value="company_business">الخطة المتوسطة (9,500 ج.م)</option>
-                    <option value="company_enterprise">الخطة الكبرى (25,000 ج.م)</option>
+                    <option value="company_startup">شركة ناشئة (5,500 ج.م)</option>
+                    <option value="company_business">شركة متوسطة (13,000 ج.م)</option>
+                    <option value="company_enterprise">شركة كبرى (35,000 ج.م)</option>
                   </select>
                   <button
                     type="button"
@@ -380,9 +380,9 @@ export const PlanUpgradeDialog = ({ currentPlan = 'starter', reason = null, onCl
                   className="w-full px-2 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
                   data-testid="plan-coupon-plan"
                 >
-                  <option value="company_startup">شركة ناشئة (٣,٥٠٠ ج.م)</option>
-                  <option value="company_business">شركة متوسطة (٧,٥٠٠ ج.م)</option>
-                  <option value="company_enterprise">شركة كبرى (٢٠,٠٠٠ ج.م)</option>
+                  <option value="company_startup">شركة ناشئة (5,500 ج.م)</option>
+                  <option value="company_business">شركة متوسطة (13,000 ج.م)</option>
+                  <option value="company_enterprise">شركة كبرى (35,000 ج.م)</option>
                 </select>
               </div>
               <div className="flex-1 min-w-[160px]">

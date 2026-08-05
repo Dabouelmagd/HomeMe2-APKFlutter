@@ -44,14 +44,25 @@ def _monthly_amount(plan: str, billing_cycle: Optional[str]) -> float:
 
 
 @router.get("/summary")
-async def get_summary(current_user: dict = Depends(require_app_owner)):
+async def get_summary(current_user: dict = Depends(get_current_user)):
+    # Owner sees all — company_admin sees their own company only
+    role = current_user.get("role", "")
+    if role not in ("app_owner", "super_admin", "company_admin"):
+        raise HTTPException(status_code=403, detail="غير مصرح")
+
     db = get_db()
     now = datetime.now(timezone.utc)
     thirty_days_ago = (now - timedelta(days=30)).isoformat()
     seven_days_ahead = (now + timedelta(days=7)).isoformat()
 
+    # Scope: company_admin sees only their company
+    scope_filter = {}
+    if role == "company_admin":
+        company_id = current_user.get("company_id") or current_user.get("id")
+        scope_filter = {"company_id": company_id}
+
     # All active subscriptions
-    active_cursor = db.company_subscriptions.find({"status": "active"}, {"_id": 0})
+    active_cursor = db.company_subscriptions.find({"status": "active", **scope_filter}, {"_id": 0})
     active_subs = await active_cursor.to_list(length=10000)
 
     mrr_by_plan = {k: 0.0 for k in PLAN_CATALOGUE.keys()}
@@ -74,7 +85,7 @@ async def get_summary(current_user: dict = Depends(require_app_owner)):
         paying_count += 1
 
     # Trial subs
-    trial_count = await db.company_subscriptions.count_documents({"status": "trial"})
+    trial_count = await db.company_subscriptions.count_documents({"status": "trial", **scope_filter})
 
     # Canceled in last 30 days
     canceled_30d = await db.company_subscriptions.count_documents({

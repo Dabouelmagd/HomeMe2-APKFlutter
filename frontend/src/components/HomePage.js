@@ -781,7 +781,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center gap-4">
           <div className="flex items-center gap-4 flex-shrink-0">
             <img
-              src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
+              src="/homeme-logo.png"
               alt="HomeMe"
               className="h-20 lg:h-28 w-auto rounded-2xl shadow-lg"
               data-testid="homepage-logo"
@@ -927,7 +927,7 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
             <img
-              src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
+              src="/homeme-logo.png"
               alt="HomeMe"
               className="h-32 w-auto rounded-3xl shadow-2xl mx-auto mb-8 ring-4 ring-white/20"
               data-testid="hero-logo"
@@ -1491,7 +1491,7 @@ const HomePage = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-3">
               <img
-                src="https://customer-assets.emergentagent.com/job_homeme-subscriptions/artifacts/6yk66f7n_WhatsApp%20Image%202022-01-17%20at%2010.23.44%20AM.637bf42d664818.47361218.jpeg"
+                src="/homeme-logo.png"
                 alt="HomeMe" className="h-10 w-auto rounded-lg"
               />
               <span className="font-bold text-white">HomeMe</span>

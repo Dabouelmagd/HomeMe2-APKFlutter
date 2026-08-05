@@ -41,6 +41,7 @@ const OwnerDashboard = () => {
   const [reminders, setReminders] = useState(null);
   const [adStats, setAdStats] = useState(null);
   const [slotStats, setSlotStats] = useState(null);
+  const [allSlots, setAllSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -53,6 +54,18 @@ const OwnerDashboard = () => {
       axios.get(`${API}/ad-slots/stats`, getHeaders()).then(r => r.data).catch(() => null),
     ]).then(([d, b, r, a, sl]) => {
       setData(d); setBudget(b); setReminders(r); setAdStats(a); setSlotStats(sl);
+    }).then(async () => {
+      // After main data loads, fetch ad slots for each compound
+      try {
+        const compList = (await axios.get(`${API}/super-admin/dashboard`, getHeaders()).catch(() => ({ data: null }))).data?.compounds || [];
+        const slotPromises = compList.map(c =>
+          axios.get(`${API}/ad-slots/compound/${c.id}`, getHeaders())
+            .then(r => ({ compound: c, slots: r.data.slots || [] }))
+            .catch(() => ({ compound: c, slots: [] }))
+        );
+        const results = await Promise.all(slotPromises);
+        setAllSlots(results);
+      } catch(e) { console.error('Slots load error:', e); }
     }).catch(err => {
       console.error('Owner dashboard load error:', err);
     }).finally(() => {
@@ -260,6 +273,67 @@ const OwnerDashboard = () => {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* All Compounds Ad Slots */}
+      {allSlots.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <RectangleGroupIcon className="h-5 w-5 text-emerald-600" />
+              المساحات الإعلانية — كل الكمبوندات
+            </h3>
+            <span className="text-xs text-gray-500">{allSlots.reduce((s, c) => s + c.slots.filter(sl => !sl.is_full).length, 0)} مساحة متاحة</span>
+          </div>
+          {allSlots.map(({ compound, slots }) => (
+            <div key={compound.id} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+              {/* Compound header */}
+              <div className="flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <BuildingOfficeIcon className="h-4 w-4 text-emerald-600" />
+                  </div>
+                  <span className="font-bold text-sm text-gray-900 dark:text-white">{compound.name}</span>
+                </div>
+                <div className="flex gap-1.5">
+                  <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">
+                    {slots.filter(s => !s.is_full).length} متاح
+                  </span>
+                  <span className="text-[10px] bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 font-bold px-2 py-0.5 rounded-full">
+                    {slots.filter(s => s.is_full).length} محجوز
+                  </span>
+                </div>
+              </div>
+              {/* Slots grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-3">
+                {slots.map(slot => (
+                  <div key={slot.slot_key}
+                    className={`rounded-xl border-2 p-2.5 text-center transition-all ${
+                      slot.is_full
+                        ? 'border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 dark:border-emerald-800'
+                        : 'border-dashed border-amber-300 dark:border-amber-700 bg-amber-50/50 dark:bg-amber-900/10 cursor-pointer hover:border-amber-400 hover:bg-amber-50'
+                    }`}
+                    onClick={() => !slot.is_full && navigate(`/app/compound?compound_id=${compound.id}`)}
+                  >
+                    <div className={`text-lg mb-1 ${slot.is_full ? '✅' : '📋'}`}>
+                      {slot.is_full ? '✅' : '📋'}
+                    </div>
+                    <p className="text-[10px] font-black text-gray-800 dark:text-gray-200 leading-tight">{slot.name_ar}</p>
+                    <p className="text-[9px] text-gray-400 font-mono mt-0.5">{slot.dimensions}</p>
+                    <p className={`text-[10px] font-bold mt-1 ${slot.is_full ? 'text-emerald-600' : 'text-amber-600'}`}>
+                      {slot.is_full ? 'محجوزة' : `${slot.price_monthly.toLocaleString()} ج.م`}
+                    </p>
+                    {!slot.is_full && (
+                      <div className="mt-1.5 text-[9px] bg-amber-500 text-white px-2 py-0.5 rounded-full font-bold">
+                        للحجز
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

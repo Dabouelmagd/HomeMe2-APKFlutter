@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { blogPosts } from '../content/blogPosts';
 import i18n from 'i18next';
 import { useNavigate, Link } from 'react-router-dom';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -120,7 +121,7 @@ const HomePage = () => {
   const [activeSection, setActiveSection] = useState('top');
 
   useEffect(() => {
-    const NAV_SECTIONS = ['systems', 'ai-features', 'live-demo', 'guide', 'testimonials', 'faq', 'pricing'];
+    const NAV_SECTIONS = ['systems', 'ai-features', 'live-demo', 'guide', 'blog', 'testimonials', 'faq', 'pricing'];
     const HEADER_OFFSET = 200; // px allowance for sticky header
 
     const handleScroll = () => {
@@ -800,6 +801,7 @@ const HomePage = () => {
               { href: '#ai-features', sectionId: 'ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new' },
               { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing' },
               { href: '#guide', sectionId: 'guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide' },
+              { href: '/blog', sectionId: '', label: '📝 ' + t('nav_blog', 'المدوّنة'), testid: 'nav-blog', isLink: true },
               { href: '/guide', sectionId: '', label: '📖 ' + t('nav_full_guide', 'الدليل الكامل'), testid: 'nav-full-guide', isLink: true },
               { href: '#testimonials', sectionId: 'testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials' },
               { href: '#faq', sectionId: 'faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq' },
@@ -889,6 +891,7 @@ const HomePage = () => {
               { href: '#ai-features', sectionId: 'ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new-m' },
               { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing-m' },
               { href: '#guide', sectionId: 'guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide-m' },
+              { href: '/blog', sectionId: '', label: '📝 المدوّنة', testid: 'nav-blog-m', isLink: true },
               { href: '/guide', sectionId: '', label: '📖 دليل كامل', testid: 'nav-full-guide-m', isLink: true },
               { href: '#testimonials', sectionId: 'testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials-m' },
               { href: '#faq', sectionId: 'faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq-m' },

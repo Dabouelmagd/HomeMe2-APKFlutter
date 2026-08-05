@@ -631,6 +631,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'إدارة الترجمات', href: 'super-admin?tab=translations', icon: LanguageIcon, show: true },
         { name: 'تذاكر الدعم الفني', href: 'super-admin?tab=support_tickets', icon: LifebuoyIcon, show: true },
         { name: '📖 دليل التشغيل', href: '/guide', icon: BookOpenIcon, show: true, external: true },
+        { name: '📝 المدوّنة', href: '/blog', icon: NewspaperIcon, show: true },
         { name: '💬 صندوق رسائل الدعم', href: 'support-inbox', icon: ChatBubbleLeftEllipsisIcon, show: true },
         { name: 'فحص صحة المسارات', href: 'super-admin?tab=smoke_test', icon: ShieldCheckIcon, show: true },
         { name: 'سجل التدقيق', href: 'audit-log', icon: ClipboardDocumentListIcon, show: true },

@@ -421,19 +421,19 @@ const OwnerDashboard = () => {
           })}
         </div>
       </div>
-    </div>
 
-    {/* Add Compound Modal */}
-    {showAddCompound && (
-      <AddCompoundModal
-        open={showAddCompound}
-        onClose={() => setShowAddCompound(false)}
-        onSuccess={() => {
-          setShowAddCompound(false);
-          window.location.reload();
-        }}
-      />
-    )}
+      {/* Add Compound Modal */}
+      {showAddCompound && (
+        <AddCompoundModal
+          open={showAddCompound}
+          onClose={() => setShowAddCompound(false)}
+          onSuccess={() => {
+            setShowAddCompound(false);
+            window.location.reload();
+          }}
+        />
+      )}
+    </div>
   );
 };
 

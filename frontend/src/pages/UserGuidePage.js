@@ -7,7 +7,7 @@ import {
   WrenchScrewdriverIcon, CurrencyDollarIcon, ShieldCheckIcon,
   SparklesIcon, BellIcon, QrCodeIcon, StarIcon,
   DocumentTextIcon, ArrowDownTrayIcon, PhoneIcon,
-  ChatBubbleLeftEllipsisIcon, BanknotesIcon, NoSymbolIcon, CurrencyDollarIcon,
+  ChatBubbleLeftEllipsisIcon, BanknotesIcon, NoSymbolIcon,
   MagnifyingGlassIcon, CheckCircleIcon, ArrowTopRightOnSquareIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';

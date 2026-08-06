@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "HomeMe - Complete residential compound management solution",
   "author": "HomeMe Team",
-  "homepage": "/HomeMe2-APKFlutter",
   "private": true,
   "dependencies": {
     "@heroicons/react": "^2.2.0",

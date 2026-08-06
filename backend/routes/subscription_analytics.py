@@ -19,7 +19,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends
 
 from database import get_db
-from auth_deps import require_app_owner
+from auth_deps import require_app_owner, get_current_user
 from routes.stripe_subscriptions import PLAN_CATALOGUE
 
 

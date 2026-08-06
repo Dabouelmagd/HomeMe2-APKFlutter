@@ -345,10 +345,12 @@ const OwnerDashboard = () => {
           { label: t('ad_gifts', 'إعلانات هدية'), value: gifts.gift_ads || 0, icon: GiftTopIcon, color: 'text-rose-600 bg-rose-50', href: '/app/super-admin?tab=ads' },
           { label: t('sa_referrals', 'الإحالات'), value: budget?.ads?.total_ads || 0, icon: UserGroupIcon, color: 'text-teal-600 bg-teal-50', href: '/app/super-admin?tab=referrals' },
           { label: t('budget_profit_margin', 'هامش الربح'), value: `${s.profit_margin || 0}%`, icon: ChartBarIcon, color: 'text-amber-600 bg-amber-50', href: '/app/owner-budget' },
-        ].map((item, i) => (
+        ].map((item, i) => {
+          const ItemIcon = item.icon;
+          return (
           <div key={i} onClick={() => navigate(item.href)} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex items-center gap-3">
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${item.color}`}>
-              <item.icon className="w-4 h-4" />
+              <ItemIcon className="w-4 h-4" />
             </div>
             <div>
               <p className="text-lg font-black text-gray-900">{item.value}</p>
@@ -407,12 +409,15 @@ const OwnerDashboard = () => {
             { name: t('sa_ads', 'الإعلانات'), href: '/app/super-admin?tab=ads', icon: SpeakerWaveIcon, bg: 'bg-gradient-to-br from-amber-500 to-orange-600' },
             { name: t('owner_translations', 'الترجمات'), href: '/app/super-admin?tab=translations', icon: LanguageIcon, bg: 'bg-gradient-to-br from-rose-500 to-pink-600' },
             { name: '➕ إضافة كمبوند', href: null, icon: PlusIcon, bg: 'bg-gradient-to-br from-emerald-500 to-green-600', action: () => setShowAddCompound(true) },
-          ].map((link, i) => (
+          ].map((link, i) => {
+            const NavIcon = link.icon;
+            return (
             <button key={i} onClick={() => link.action ? link.action() : navigate(link.href)} className={`${link.bg} rounded-xl p-4 text-white text-start hover:opacity-90 transition-opacity shadow-md`}>
-              <link.icon className="w-6 h-6 text-white/70 mb-2" />
+              <NavIcon className="w-6 h-6 text-white/70 mb-2" />
               <p className="text-sm font-bold">{link.name}</p>
             </button>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

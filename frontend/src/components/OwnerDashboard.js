@@ -316,7 +316,7 @@ const OwnerDashboard = () => {
                     }`}
                     onClick={() => !slot.is_full && navigate(`/app/compound?compound_id=${compound.id}`)}
                   >
-                    <div className={`text-lg mb-1 ${slot.is_full ? '✅' : '📋'}`}>
+                    <div className="text-lg mb-1">
                       {slot.is_full ? '✅' : '📋'}
                     </div>
                     <p className="text-[10px] font-black text-gray-800 dark:text-gray-200 leading-tight">{slot.name_ar}</p>

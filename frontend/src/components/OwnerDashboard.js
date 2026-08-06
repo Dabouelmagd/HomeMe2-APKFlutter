@@ -25,6 +25,8 @@ import {
   ClockIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
+  PlusIcon,
+  RectangleGroupIcon,
 } from '@heroicons/react/24/outline';
 import SuperAdminQuickStats from './SuperAdminQuickStats';
 
@@ -44,6 +46,7 @@ const OwnerDashboard = () => {
   const [allSlots, setAllSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showAddCompound, setShowAddCompound] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -52,15 +55,14 @@ const OwnerDashboard = () => {
       axios.get(`${API}/owner/subscription-reminders?days_ahead=30`, getHeaders()).then(r => r.data).catch(() => null),
       axios.get(`${API}/ads/analytics`, getHeaders()).then(r => r.data).catch(() => null),
       axios.get(`${API}/ad-slots/stats`, getHeaders()).then(r => r.data).catch(() => null),
-    ]).then(([d, b, r, a, sl]) => {
+    ]).then(async ([d, b, r, a, sl]) => {
       setData(d); setBudget(b); setReminders(r); setAdStats(a); setSlotStats(sl);
-    }).then(async () => {
-      // After main data loads, fetch ad slots for each compound
+      // Fetch ad slots for each compound
       try {
-        const compList = (await axios.get(`${API}/super-admin/dashboard`, getHeaders()).catch(() => ({ data: null }))).data?.compounds || [];
+        const compList = d?.compounds || [];
         const slotPromises = compList.map(c =>
           axios.get(`${API}/ad-slots/compound/${c.id}`, getHeaders())
-            .then(r => ({ compound: c, slots: r.data.slots || [] }))
+            .then(res => ({ compound: c, slots: res.data.slots || [] }))
             .catch(() => ({ compound: c, slots: [] }))
         );
         const results = await Promise.all(slotPromises);

@@ -357,7 +357,8 @@ const OwnerDashboard = () => {
               <p className="text-[10px] text-gray-400">{item.label}</p>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Compounds List */}

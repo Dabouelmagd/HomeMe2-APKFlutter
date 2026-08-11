@@ -21,6 +21,7 @@ import uuid
 import logging
 
 from database import get_db
+from audit import log_action, AuditAction
 from auth_deps import get_current_user, require_admin
 from helpers import serialize_datetime, notify_compound_admins
 

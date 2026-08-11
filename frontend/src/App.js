@@ -6,6 +6,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 import React, { useState, useEffect, createContext, useContext } from 'react';
+import useIdleLogout from './hooks/useIdleLogout';
 import { useTranslation } from 'react-i18next';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -485,6 +486,12 @@ const AuthProvider = ({ children }) => {
       setSocket(null);
     }
   };
+
+  // Idle auto-logout — 15 minutes of inactivity
+  useIdleLogout(() => {
+    logout();
+    window.location.href = '/login?reason=idle';
+  }, !!user);
 
   // Switch to another active session (for multi-account)
   const switchSession = (targetSessionId) => {

@@ -9,6 +9,7 @@ import io
 import logging
 
 from database import get_db
+from pagination import paginate
 from auth_deps import get_current_user, require_admin
 from helpers import serialize_datetime
 from pdf_report_service import PDFReportService
@@ -152,6 +153,46 @@ async def export_financial_excel(
     except Exception as e:
         logging.error(f"Error exporting Excel: {e}")
         raise HTTPException(status_code=500, detail="Failed to export Excel")
+
+
+@router.get("/residents")
+async def list_residents_paginated(
+    compound_id: str = None,
+    page: int = 1,
+    limit: int = 50,
+    search: str = None,
+    current_user: dict = Depends(require_admin),
+):
+    """Paginated residents list with optional search."""
+    from database import get_db
+    db = get_db()
+    role = current_user.get("role", "")
+    cid = compound_id or current_user.get("compound_id", "")
+    
+    query = {}
+    if role not in ("app_owner", "super_admin"):
+        query["compound_id"] = cid
+    elif cid and cid != "all":
+        query["compound_id"] = cid
+    
+    if search and search.strip():
+        query["$or"] = [
+            {"full_name": {"$regex": search.strip(), "$options": "i"}},
+            {"email": {"$regex": search.strip(), "$options": "i"}},
+            {"unit_number": {"$regex": search.strip(), "$options": "i"}},
+            {"phone": {"$regex": search.strip(), "$options": "i"}},
+        ]
+    
+    result = await paginate(
+        collection=db.users,
+        query=query,
+        page=page,
+        limit=limit,
+        sort_field="created_at",
+        sort_dir=-1,
+        projection={"_id": 0, "password_hash": 0},
+    )
+    return result
 
 
 @router.get("/residents/{resident_id}/profile")

@@ -250,12 +250,51 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
             >
               {t('upgrade_now')}
             </button>
-            <button
-              onClick={() => setShowCodeInput(v => !v)}
-              className="bg-white/20 hover:bg-white/30 text-white font-bold px-2 py-1 rounded text-xs transition-colors"
-              title="كود اشتراك"
-            >🎟️</button>
+
           </div>
+        </div>
+        {/* Action buttons below compact bar */}
+        {showCodeInput && (
+          <div className="mt-2 flex gap-2">
+            <input
+              type="text"
+              value={subCode}
+              onChange={e => setSubCode(e.target.value.toUpperCase())}
+              placeholder="أدخل كود الاشتراك..."
+              className="flex-1 text-xs px-3 py-1.5 rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/50 outline-none focus:bg-white/20"
+            />
+            <button onClick={applyCode}
+              className="bg-white text-blue-600 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-gray-50 transition-colors">
+              تفعيل
+            </button>
+          </div>
+        )}
+        {/* 3 action buttons */}
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={() => navigate('/app/my-subscription')}
+            className="flex-1 flex items-center justify-center gap-1.5 bg-white/15 hover:bg-white/25 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-colors border border-white/20"
+            title="تجديد الاشتراك"
+          >
+            <ArrowPathIcon className="h-3.5 w-3.5" />
+            تجديد
+          </button>
+          <button
+            onClick={() => setShowCodeInput(v => !v)}
+            className="flex-1 flex items-center justify-center gap-1.5 bg-white/15 hover:bg-white/25 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-colors border border-white/20"
+            title="إضافة كود اشتراك"
+          >
+            <TicketIcon className="h-3.5 w-3.5" />
+            كود
+          </button>
+          <button
+            onClick={onUpgradeClick || upgradeToPaid}
+            className="flex-1 flex items-center justify-center gap-1.5 bg-white text-blue-600 hover:bg-gray-50 text-xs font-bold py-1.5 px-2 rounded-lg transition-colors"
+            title="ترقية الاشتراك"
+          >
+            <ArrowUpCircleIcon className="h-3.5 w-3.5" />
+            ترقية
+          </button>
         </div>
       </div>
     );

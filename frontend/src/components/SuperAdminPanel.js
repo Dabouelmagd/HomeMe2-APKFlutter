@@ -16,6 +16,7 @@ import {
   LanguageIcon
 } from '@heroicons/react/24/outline';
 import TranslationManager from './TranslationManager';
+import AppUpdatesManager from './AppUpdatesManager';
 import AdsTab from './super-admin/AdsTab';
 import UsersTab from './super-admin/UsersTab';
 import CodesTab from './super-admin/CodesTab';
@@ -457,6 +458,7 @@ const SuperAdminPanel = () => {
               { id: 'security_insights', label: '🛡️ ' + t('sa_security', 'الأمان') },
             ] : []),
             { id: 'translations', label: t('sa_translations', 'إدارة الترجمات') },
+            { id: 'app_updates', label: '🆕 تحديثات التطبيق' },
             { id: 'support_tickets', label: t('sa_support_tickets', '🎧 تذاكر الدعم') },
             { id: 'blog', label: t('sa_blog_management', '📝 إدارة المدوّنة') },
             { id: 'email_logs', label: '📧 سجل البريد' },
@@ -900,6 +902,11 @@ const SuperAdminPanel = () => {
         {/* Translations Tab */}
         {activeTab === 'translations' && (
           <TranslationManager />
+        )}
+
+        {/* App Updates Tab */}
+        {activeTab === 'app_updates' && (
+          <AppUpdatesManager />
         )}
 
         {/* User Subscriptions Tab — Hierarchical */}

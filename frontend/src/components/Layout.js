@@ -75,6 +75,7 @@ import { TransliterationToggle } from './TransliterationToggle';
 import ThemeToggle from './ThemeToggle';
 import BackButton from './BackButton';
 import InternalAdBanner from './InternalAdBanner';
+import AppUpdatesBell from './AppUpdatesBell';
 import AIAssistantBubble from './AIAssistantBubble';
 import MobileBottomNav from './MobileBottomNav';
 // import AdvancedSearchModal from './AdvancedSearchModal';
@@ -1524,6 +1525,9 @@ const Layout = ({ children, isTrialMode = false }) => {
                   {supportSoundMuted ? <SpeakerXMarkIcon className="h-6 w-6" /> : <LifebuoyIcon className="h-6 w-6" />}
                 </button>
               )}
+
+              {/* App Updates Bell */}
+              {(isAdminRole || isStaffRole) && <AppUpdatesBell />}
 
               {/* Notifications Bell */}
               <Link

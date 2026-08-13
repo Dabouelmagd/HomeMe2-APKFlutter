@@ -884,7 +884,7 @@ const HomePage = () => {
 
         {/* Mobile/Tablet Nav — horizontal scrollable strip */}
         <nav className="lg:!hidden border-t border-gray-100 bg-gray-50/50 overflow-x-auto" data-testid="homepage-nav-mobile" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
-          <div className="flex items-center gap-0.5 px-2 py-1.5 min-w-max">
+          <div className="flex items-center gap-0.5 px-2 py-1.5 flex-wrap">
             {[
               { href: '#top', sectionId: 'top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home-m' },
               { href: '#systems', sectionId: 'systems', label: t('nav_features', 'المميزات'), testid: 'nav-features-m' },

@@ -3150,7 +3150,7 @@
   "od_welcome": "Welcome",
   "od_subtitle": "App Owner Dashboard - Complete management of all compounds and subscribers",
   "od_system_active": "System Active",
-  "od_total_compounds": "Residential Compounds",
+  "od_total_compounds": "Total Compounds",
   "od_total_users": "Total Users",
   "od_total_families": "Total Families",
   "od_revenue": "Monthly Revenue",
@@ -3543,5 +3543,12 @@
   "contact_us_subtitle": "We are here to help",
   "privacy_title": "Privacy Policy",
   "terms_title": "Terms of Service",
-  "about_seo_title": "About Us — HomeMe Platform"
+  "about_seo_title": "About Us — HomeMe Platform",
+  "od_owner_panel": "App Owner Dashboard",
+  "od_subtitle_new": "Complete platform management — compounds, subscriptions and revenue",
+  "od_companies": "Management Companies",
+  "od_active_subscriptions": "Active Subscriptions",
+  "od_total_revenue": "Total Revenue",
+  "od_refresh": "Refresh Data",
+  "od_quick_nav": "Quick Navigation"
 }

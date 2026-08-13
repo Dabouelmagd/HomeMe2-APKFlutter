@@ -93,6 +93,17 @@ const InternalAdBanner = ({ position = 'banner', maxAds = 2, className = '', var
 
   // Nothing to show
   if (!showInternal && !showAdsense) return null;
+
+  // For homepage positions: show placeholder inviting advertisers
+  const isHomepagePos = ['homepage_hero','homepage_mid','homepage_footer'].includes(position);
+  if (showInternal && visibleAds.length === 0 && !showAdsense && isHomepagePos) {
+    return (
+      <div className={`${className} border-2 border-dashed border-emerald-200 dark:border-emerald-800 rounded-2xl p-6 text-center bg-emerald-50/50 dark:bg-emerald-900/10`}>
+        <p className="text-emerald-600 dark:text-emerald-400 font-bold text-sm">📢 مساحة إعلانية متاحة</p>
+        <p className="text-gray-500 dark:text-gray-400 text-xs mt-1">للإعلان هنا تواصل معنا: info@datalifeai.com</p>
+      </div>
+    );
+  }
   if (showInternal && visibleAds.length === 0 && !showAdsense) return null;
 
   // Show AdSense fallback

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { refreshTranslations } from '../i18n/index';
 import { toast } from 'sonner';
 import {
   MagnifyingGlassIcon,

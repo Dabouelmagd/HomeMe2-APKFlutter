@@ -164,6 +164,16 @@ async def add_translation(body: dict):
     return {"status": "ok", "key": key}
 
 
+
+
+@router.get("/translations/export/all")
+async def export_all_translations():
+    """Export all languages at once for frontend dynamic loading."""
+    return {
+        lang: _load_locale(lang)
+        for lang in SUPPORTED_LANGS
+    }
+
 @router.get("/translations/export/{lang}")
 async def export_locale(lang: str):
     if lang not in SUPPORTED_LANGS:

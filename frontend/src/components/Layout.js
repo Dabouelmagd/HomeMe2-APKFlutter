@@ -755,6 +755,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'الإعلانات والفعاليات', href: 'events', icon: SpeakerWaveIcon, show: true },
         { name: 'الرسائل', href: 'messages', icon: ChatBubbleLeftEllipsisIcon, show: true },
         { name: 'الإشعارات', href: 'notifications', icon: BellIcon, show: true },
+        { name: '📝 المدوّنة', href: '/blog', icon: NewspaperIcon, show: true, external: true, badge: 'جديد' },
         { name: 'برنامج الإحالة', href: 'referral', icon: GiftIcon, show: true, badge: 'جديد' },
         { name: 'التقييمات', href: 'satisfaction', icon: StarIcon, show: true },
       ]
@@ -817,6 +818,7 @@ const Layout = ({ children, isTrialMode = false }) => {
         { name: 'الخدمات والحجوزات', href: 'services', icon: WrenchScrewdriverIcon, show: true },
         { name: 'حجز المرافق', href: 'facility-booking', icon: CalendarDaysIcon, show: true },
         { name: 'الفعاليات والإعلانات', href: 'events', icon: SpeakerWaveIcon, show: true },
+        { name: '📝 المدوّنة', href: '/blog', icon: NewspaperIcon, show: true, external: true },
         { name: 'الرسائل', href: 'messages', icon: ChatBubbleLeftEllipsisIcon, show: true },
         { name: 'الشكاوى', href: 'complaints', icon: ExclamationTriangleIcon, show: true },
         { name: 'التقييمات', href: 'satisfaction', icon: StarIcon, show: isStaffRole },

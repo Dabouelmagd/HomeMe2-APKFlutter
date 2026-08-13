@@ -44,6 +44,7 @@ const OwnerDashboard = () => {
   const [adStats, setAdStats] = useState(null);
   const [slotStats, setSlotStats] = useState(null);
   const [allSlots, setAllSlots] = useState([]);
+  const [supportTickets, setSupportTickets] = useState({ open: 0, in_progress: 0, recent: [] });
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showAddCompound, setShowAddCompound] = useState(false);
@@ -68,6 +69,19 @@ const OwnerDashboard = () => {
         const results = await Promise.all(slotPromises);
         setAllSlots(results);
       } catch(e) { console.error('Slots load error:', e); }
+
+      // Fetch support tickets
+      try {
+        const [tkAlerts, tkList] = await Promise.all([
+          axios.get(`${API}/sidebar-alerts/support-tickets`, getHeaders()).then(r => r.data).catch(() => ({})),
+          axios.get(`${API}/admin/support-tickets?limit=5&status=open`, getHeaders()).then(r => r.data).catch(() => ({})),
+        ]);
+        setSupportTickets({
+          open: tkAlerts.open || 0,
+          in_progress: tkAlerts.in_progress || 0,
+          recent: tkList.tickets || [],
+        });
+      } catch(e) { console.error('Support tickets error:', e); }
     }).catch(err => {
       console.error('Owner dashboard load error:', err);
     }).finally(() => {
@@ -339,6 +353,70 @@ const OwnerDashboard = () => {
           ))}
         </div>
       )}
+
+      {/* Support Tickets Card */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-3">
+            <h3 className="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+              <LifebuoyIcon className="h-4 w-4 text-purple-600" />
+              تذاكر الدعم الفني
+            </h3>
+            {supportTickets.open > 0 && (
+              <span className="text-xs bg-red-100 text-red-700 font-black px-2 py-0.5 rounded-full animate-pulse">
+                {supportTickets.open} مفتوحة
+              </span>
+            )}
+            {supportTickets.in_progress > 0 && (
+              <span className="text-xs bg-amber-100 text-amber-700 font-black px-2 py-0.5 rounded-full">
+                {supportTickets.in_progress} قيد المعالجة
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => navigate('/app/super-admin?tab=support_tickets')}
+            className="text-xs text-blue-600 hover:underline font-bold"
+          >
+            عرض الكل
+          </button>
+        </div>
+        {supportTickets.recent.length === 0 ? (
+          <div className="px-5 py-6 text-center">
+            <CheckCircleIcon className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-500">لا توجد تذاكر مفتوحة</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            {supportTickets.recent.map((tk, i) => (
+              <div key={tk.id || i}
+                onClick={() => navigate('/app/super-admin?tab=support_tickets')}
+                className="flex items-start gap-3 px-5 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+              >
+                <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
+                  tk.status === 'open' ? 'bg-red-500 animate-pulse' :
+                  tk.status === 'in_progress' ? 'bg-amber-500' : 'bg-emerald-500'
+                }`} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{tk.subject}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    {tk.name} · {tk.category === 'bug' ? '🐛 خطأ تقني' :
+                      tk.category === 'feature_request' ? '💡 اقتراح' :
+                      tk.category === 'complaint' ? '😞 شكوى' :
+                      tk.category === 'security' ? '🔒 أمان' : '💬 استفسار'}
+                  </p>
+                </div>
+                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0 ${
+                  tk.status === 'open' ? 'bg-red-100 text-red-700' :
+                  tk.status === 'in_progress' ? 'bg-amber-100 text-amber-700' :
+                  'bg-emerald-100 text-emerald-700'
+                }`}>
+                  {tk.status === 'open' ? 'مفتوحة' : tk.status === 'in_progress' ? 'قيد المعالجة' : 'مغلقة'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Gifts & Coupons Row */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">

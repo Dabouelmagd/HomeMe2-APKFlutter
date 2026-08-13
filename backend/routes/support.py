@@ -208,6 +208,7 @@ async def list_support_tickets(
     status: Optional[str] = None,
     category: Optional[str] = None,
     search: Optional[str] = None,
+    limit: int = 500,
     db=Depends(get_db),
     current_user: dict = Depends(require_super_admin),
 ):
@@ -225,7 +226,7 @@ async def list_support_tickets(
             {"name": {"$regex": s, "$options": "i"}},
             {"email": {"$regex": s, "$options": "i"}},
         ]
-    tickets = await db.support_tickets.find(query, {"_id": 0}).sort("created_at", -1).to_list(length=500)
+    tickets = await db.support_tickets.find(query, {"_id": 0}).sort("created_at", -1).to_list(length=limit)
 
     # Stats
     pipeline = [{"$group": {"_id": "$status", "count": {"$sum": 1}}}]

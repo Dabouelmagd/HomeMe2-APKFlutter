@@ -267,7 +267,8 @@ const OwnerDashboard = () => {
               { l: 'إجمالي الطلبات', v: slotStats.total, c: 'text-gray-700' },
               { l: 'بانتظار الموافقة', v: slotStats.pending, c: 'text-amber-600' },
               { l: 'نشطة', v: slotStats.active, c: 'text-emerald-600' },
-              { l: 'الإيرادات', v: `${(slotStats.total_revenue||0).toLocaleString()} ج.م`, c: 'text-blue-600' },
+              { l: 'إيرادات المساحات', v: `${(slotStats.total_revenue||0).toLocaleString()} ج.م`, c: 'text-blue-600' },
+              { l: 'إجمالي الإعلانات', v: `${((adStats?.summary?.total_revenue||0)).toLocaleString()} ج.م`, c: 'text-emerald-600' },
             ].map(({l,v,c}) => (
               <div key={l} className="bg-gray-50 rounded-lg p-2">
                 <p className={`text-lg font-black ${c}`}>{v}</p>

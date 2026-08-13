@@ -524,6 +524,15 @@ async def get_ad_analytics(current_user: dict = Depends(require_super_admin)):
     gift_count = len([a for a in ad_stats if a["is_gift"]])
     avg_ctr = round((total_clicks / total_views * 100), 2) if total_views > 0 else 0
 
+    # Include ad slot bookings revenue
+    db = get_db() if "db" not in dir() else db
+    slot_bookings = await db.ad_slot_bookings.find(
+        {"status": "active"}, {"_id": 0, "total_price": 1}
+    ).to_list(1000)
+    slot_revenue = sum(b.get("total_price", 0) for b in slot_bookings)
+    slot_pending = await db.ad_slot_bookings.count_documents({"status": "pending"})
+    slot_active  = await db.ad_slot_bookings.count_documents({"status": "active"})
+
     return {
         "summary": {
             "total_ads": len(ad_stats),
@@ -531,7 +540,11 @@ async def get_ad_analytics(current_user: dict = Depends(require_super_admin)):
             "total_clicks": total_clicks,
             "total_views": total_views,
             "avg_ctr": avg_ctr,
-            "total_revenue": total_revenue,
+            "total_revenue": total_revenue + slot_revenue,
+            "internal_ads_revenue": total_revenue,
+            "slot_bookings_revenue": slot_revenue,
+            "slot_bookings_active": slot_active,
+            "slot_bookings_pending": slot_pending,
             "gift_ads": gift_count,
         },
         "all_ads": ad_stats,

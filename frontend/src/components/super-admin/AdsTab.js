@@ -467,6 +467,7 @@ const AdsTab = ({
   editAd,
   setEditAd,
   handleUpdateAd,
+  slotBookings,
   campaigns,
   campaignStats,
   showCreateCampaign,

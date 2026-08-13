@@ -89,6 +89,7 @@ const SuperAdminPanel = () => {
   const [ads, setAds] = useState([]);
   const [adStats, setAdStats] = useState({});
   const [adSettings, setAdSettings] = useState({});
+  const [slotBookings, setSlotBookings] = useState({ bookings: [], stats: {} });
   const [campaigns, setCampaigns] = useState([]);
   const [campaignStats, setCampaignStats] = useState({});
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
@@ -230,13 +231,19 @@ const SuperAdminPanel = () => {
   // Ads
   const fetchAds = async () => {
     try {
-      const [adsRes, settingsRes] = await Promise.all([
+      const [adsRes, settingsRes, slotsRes, slotStatsRes] = await Promise.all([
         axios.get(`${API}/ads`, getToken()),
         axios.get(`${API}/ads/ad-settings`, getToken()).catch(() => ({ data: {} })),
+        axios.get(`${API}/ad-slots/bookings`, getToken()).catch(() => ({ data: { bookings: [] } })),
+        axios.get(`${API}/ad-slots/stats`, getToken()).catch(() => ({ data: {} })),
       ]);
       setAds(adsRes.data.ads || []);
       setAdStats(adsRes.data.stats || {});
       setAdSettings(settingsRes.data || {});
+      setSlotBookings({
+        bookings: slotsRes.data.bookings || [],
+        stats: slotStatsRes.data || {},
+      });
     } catch { /* */ }
   };
   const [editAd, setEditAd] = useState(null);
@@ -583,6 +590,7 @@ const SuperAdminPanel = () => {
             editAd={editAd}
             setEditAd={setEditAd}
             handleUpdateAd={handleUpdateAd}
+            slotBookings={slotBookings}
             campaigns={campaigns}
             campaignStats={campaignStats}
             showCreateCampaign={showCreateCampaign}

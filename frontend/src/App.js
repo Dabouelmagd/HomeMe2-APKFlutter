@@ -505,7 +505,22 @@ const AuthProvider = ({ children }) => {
     if (target.selectedRole) localStorage.setItem('selectedRole', target.selectedRole);
     if (target.selectedCompoundId) localStorage.setItem('selectedCompoundId', target.selectedCompoundId);
     
-    setUser(target.user);
+    // Always set active_role from target user's real role (not leftover from old session)
+    const targetUser = { ...target.user };
+    if (!targetUser.active_role || targetUser.active_role !== (target.selectedRole || targetUser.role)) {
+      targetUser.active_role = target.selectedRole || targetUser.role;
+    }
+    localStorage.setItem('user', JSON.stringify(targetUser));
+    // Clear stale compound/role from previous session
+    if (!target.selectedCompoundId) {
+      localStorage.removeItem('selectedCompoundId');
+    }
+    if (target.selectedRole) {
+      localStorage.setItem('selectedRole', target.selectedRole);
+    } else {
+      localStorage.setItem('selectedRole', targetUser.role);
+    }
+    setUser(targetUser);
     window.location.reload();
     return true;
   };

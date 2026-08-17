@@ -56,7 +56,7 @@ const saveCurrentSession = (token, user, extras = {}) => {
   sessions[sid] = {
     token,
     user,
-    selectedRole: extras.selectedRole || null,
+    selectedRole: extras.selectedRole || userData.active_role || userData.role || null,
     selectedCompoundId: extras.selectedCompoundId || null,
     lastActive: Date.now(),
   };

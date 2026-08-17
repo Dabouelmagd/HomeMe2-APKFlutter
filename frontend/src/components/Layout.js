@@ -544,7 +544,11 @@ const Layout = ({ children, isTrialMode = false }) => {
     return state === undefined ? true : state;
   };
 
-  const activeRole = user?.active_role || user?.role;
+  // Get active role — prefer localStorage selectedRole for freshness after session switch
+  const storedRole = localStorage.getItem('selectedRole');
+  const activeRole = (storedRole && storedRole !== 'null' && storedRole !== 'undefined')
+    ? storedRole
+    : (user?.active_role || user?.role);
   const isAdminRole = ['admin','company_admin','super_admin','app_owner'].includes(activeRole);
   const isStaffRole = ['admin','company_admin','super_admin','app_owner','manager'].includes(activeRole);
   const isSecurityRole = ['admin','company_admin','super_admin','app_owner','manager','security'].includes(activeRole);

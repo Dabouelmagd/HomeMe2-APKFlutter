@@ -2472,6 +2472,7 @@ from routes.support_chat import router as support_chat_router
 from routes.workers import router as workers_router
 from routes.ad_slots import router as ad_slots_router
 from routes.app_updates import router as app_updates_router
+from routes.tracking import router as tracking_router
 from routes.unit_listings import router as unit_listings_router
 app.include_router(compound_map_router)
 app.include_router(watermark_router)
@@ -2479,6 +2480,7 @@ app.include_router(support_chat_router)
 app.include_router(workers_router)
 app.include_router(ad_slots_router)
 app.include_router(app_updates_router)
+app.include_router(tracking_router)
 app.include_router(unit_listings_router)
 app.include_router(global_search_router)
 from routes.scheduled_msgs import router as scheduled_msgs_router

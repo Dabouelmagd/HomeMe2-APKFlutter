@@ -3095,6 +3095,16 @@ async def shutdown_db_client():
 import os as _os
 _frontend_build = _os.path.join(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))), "frontend", "build")
 
+
+@app.on_event("startup")
+async def start_blog_scheduler():
+    """Daily blog post at 09:00 Cairo time using Claude AI."""
+    import asyncio as _asyncio
+    from database import get_db as _get_db
+    _db = _get_db()
+    _asyncio.create_task(run_blog_scheduler(_db))
+    logging.info("📝 Daily blog scheduler started — posts at 09:00 Cairo time")
+
 if _os.path.exists(_frontend_build) and _os.path.exists(_os.path.join(_frontend_build, "static")):
     from fastapi.responses import FileResponse as _FileResponse
 

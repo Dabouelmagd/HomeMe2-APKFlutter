@@ -390,3 +390,17 @@ async def ai_seo_suggest(payload: AISuggestionInput, current_user: dict = Depend
     except Exception as e:
         logger.exception(f"AI SEO suggest failed: {e}")
         raise HTTPException(502, f"AI service error: {str(e)[:200]}")
+
+
+@router.post("/super-admin/blog/trigger-now")
+async def trigger_blog_now(current_user: dict = Depends(get_current_user)):
+    """Owner: manually trigger blog post generation (for testing)."""
+    _ensure_super_admin(current_user)
+    from blog_scheduler import publish_daily_post
+    from database import get_db as _get_db
+    db = _get_db()
+    result = await publish_daily_post(db)
+    if result:
+        return {"success": True, "post": {"title": result.get("title"), "slug": result.get("slug")}}
+    return {"success": False, "message": "تأكد من إعداد ANTHROPIC_API_KEY في بيئة التشغيل"}
+

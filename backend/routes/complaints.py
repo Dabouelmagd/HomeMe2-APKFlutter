@@ -104,7 +104,10 @@ async def get_complaints(
 ):
     db = get_db()
     try:
-        query = {"compound_id": current_user["compound_id"]}
+        # Use active compound from header if set (for admin switching between compounds)
+        from fastapi import Request
+        compound_id = current_user.get("compound_id") or current_user.get("active_compound_id")
+        query = {"compound_id": compound_id} if compound_id else {}
         if current_user.get("role") not in ["admin", "super_admin"]:
             query["user_id"] = current_user["id"]
         if type:

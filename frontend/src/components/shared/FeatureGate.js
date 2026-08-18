@@ -35,9 +35,13 @@ const PLAN_PRICES = {
 export default function FeatureGate({ children, feature, requiredPlan, currentPlan, onUpgrade }) {
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const currentIdx = PLAN_ORDER.indexOf(currentPlan || 'starter');
+  // During trial period, all features are unlocked (treat as premium)
+  const isTrial = currentPlan === 'trial' || !currentPlan;
+  const effectivePlan = isTrial ? 'premium' : (currentPlan || 'starter');
+
+  const currentIdx = PLAN_ORDER.indexOf(effectivePlan);
   const requiredIdx = PLAN_ORDER.indexOf(requiredPlan || 'basic');
-  const isLocked = currentIdx < requiredIdx;
+  const isLocked = !isTrial && currentIdx < requiredIdx;
 
   if (!isLocked) return <>{children}</>;
 

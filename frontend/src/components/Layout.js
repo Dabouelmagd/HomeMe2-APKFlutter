@@ -61,7 +61,13 @@ import {
   ClipboardDocumentListIcon,
   QrCodeIcon,
   SpeakerXMarkIcon,
-  BookOpenIcon
+  BookOpenIcon,
+  MapPinIcon,
+  BellAlertIcon,
+  MegaphoneIcon,
+  ArrowPathIcon,
+  ArrowUpCircleIcon,
+  CheckCircleIcon,
 } from '@heroicons/react/24/outline';
 import LanguageSwitcher from './LanguageSwitcher';
 import SessionSwitcher from './SessionSwitcher';
@@ -1307,10 +1313,10 @@ const Layout = ({ children, isTrialMode = false }) => {
       {/* Main content */}
       <div className="flex-1 flex flex-col h-screen lg:ml-0 min-w-0 overflow-hidden">
         {/* Top bar - Fixed */}
-        <div className="flex-shrink-0 sticky top-0 z-30 bg-white shadow-sm border-b border-gray-200">
-          <div className="flex items-center justify-between h-16 px-3 sm:px-6 gap-2">
+        <div className="flex-shrink-0 sticky top-0 z-30 bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center h-16 px-3 sm:px-6 gap-2 max-w-screen-2xl mx-auto w-full">
             <button
-              className="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="flex-shrink-0 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors lg:hidden"
               onClick={() => setSidebarOpen(v => !v)}
               data-testid="hamburger-button"
               aria-label="فتح/إغلاق القائمة"
@@ -1318,9 +1324,16 @@ const Layout = ({ children, isTrialMode = false }) => {
               <Bars3Icon className="h-6 w-6 text-gray-500 dark:text-gray-400" />
             </button>
 
-            <div className="flex-1 min-w-0 mx-2 sm:mx-4 search-container relative">
+            {/* Logo + App Name — right side */}
+            <div className="flex items-center gap-2.5 flex-shrink-0 lg:hidden">
+              <img src="/homeme-logo.png" alt="HomeMe" className="h-8 w-8 rounded-lg"
+                onError={e => e.target.style.display='none'} />
+              <span className="font-black text-gray-900 dark:text-white text-sm hidden sm:block">HomeMe</span>
+            </div>
+
+            <div className="flex-1 min-w-0 mx-2 sm:mx-4 search-container relative flex justify-center">
               {/* Modern Search Bar */}
-              <div className="relative w-full max-w-2xl">
+              <div className="relative w-full max-w-xl">
                 <div className="relative">
                   <MagnifyingGlassIcon className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 ${isRTL ? 'right-4' : 'left-4'}`} />
                   <input

@@ -195,10 +195,10 @@ async def get_family_members(
     """Get all family members for the current user's unit"""
     try:
         db = get_db()
-        if current_user.role == "admin":
+        if current_user.get("role") in ("admin", "company_admin", "app_owner", "super_admin", "manager"):
             # Admin can see all family members in the compound
             family_members = await db.family_members.find({
-                "compound_id": current_user.compound_id,
+                "compound_id": current_user.get("compound_id"),
                 "is_active": True
             }).to_list(length=1000)
         else:

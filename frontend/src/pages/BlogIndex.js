@@ -31,14 +31,20 @@ const BlogIndex = () => {
   }, []);
 
   const allPosts = useMemo(() => {
-    // DB posts first (newest), then hardcoded (already sorted desc by date)
+    // Merge DB posts with hardcoded posts
     const merged = [...dbPosts, ...BLOG_POSTS];
     // De-dup by slug — DB takes priority
     const seen = new Set();
-    return merged.filter((p) => {
+    const deduped = merged.filter((p) => {
       if (seen.has(p.slug)) return false;
       seen.add(p.slug);
       return true;
+    });
+    // Sort: newest first (الأحدث أولاً)
+    return deduped.sort((a, b) => {
+      const dateA = new Date(a.published_at || a.publishedAt || a.created_at || a.date || 0);
+      const dateB = new Date(b.published_at || b.publishedAt || b.created_at || b.date || 0);
+      return dateB - dateA; // descending — newest first
     });
   }, [dbPosts]);
 

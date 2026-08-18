@@ -206,6 +206,22 @@ async def run_blog_scheduler(db):
     """Run forever — publishes at 09:00 Cairo time daily."""
     logger.info("🕒 Blog scheduler started")
 
+    # Check if today's post already exists — if not, publish immediately
+    try:
+        today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+        existing = await db.blog_posts.find_one(
+            {"published_at": {"$gte": today}},
+            {"_id": 0, "id": 1}
+        )
+        if not existing:
+            logger.info("📝 No post for today — publishing immediately on startup")
+            await asyncio.sleep(5)  # Wait for DB to fully initialize
+            await publish_daily_post(db)
+        else:
+            logger.info(f"✅ Today's blog post already exists — waiting for tomorrow")
+    except Exception as e:
+        logger.error(f"Startup blog check error: {e}")
+
     while True:
         try:
             now_utc = datetime.now(timezone.utc)

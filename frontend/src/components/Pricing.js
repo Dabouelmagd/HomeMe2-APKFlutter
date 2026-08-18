@@ -138,149 +138,287 @@ const Pricing = () => {
   };
 
   const plans = [
+    // ─── 1. FREE ────────────────────────────────────────────
     {
       id: 'community',
-      name: t('community_plan', 'مجاني'),
-      subtitle: t('perfect_small_communities', 'مثالي للمجتمعات الصغيرة'),
+      name: 'مجاني',
+      nameEn: 'Starter',
+      subtitle: 'للتجربة والمجتمعات الصغيرة',
       price: { monthly: 0, yearly: 0 },
       originalPrice: null,
       icon: UserGroupIcon,
-      gradient: 'from-gray-400 to-gray-600',
+      gradient: 'from-gray-500 to-gray-700',
+      color: 'gray',
       popular: false,
-      features: {
-        residents: t('residents_5'),
-        services: t('services_2_max'),
-        chat: t('basic_chat_messaging'),
-        family: t('family_management_photos'),
-        storage: t('storage_500mb'),
-        mobile: t('mobile_app_access'),
-        support: t('community_support'),
-        supportChat: 'شات دعم فني مباشر',
-        unitListings: 'إعلانات الوحدات داخل الكمبوند',
-        branding: false,
-        analytics: false,
-        api: false,
-        multiCompound: false,
-        whiteLabel: false,
-        customDev: false
-      },
-      limitations: [
-        'Limited to 5 residents',
-        'Only 2 services allowed',
-        'Basic support only'
-      ]
+      badge: null,
+      features: [
+        { cat: '👥 السكان', items: [
+          { text: 'حتى 30 ساكن', ok: true },
+          { text: 'ملف السكان الأساسي', ok: true },
+          { text: 'إرسال بيانات الدخول', ok: true },
+          { text: 'استيراد CSV', ok: false },
+          { text: 'إدارة العائلة والصور', ok: false },
+        ]},
+        { cat: '💰 المالية', items: [
+          { text: 'تقرير شهري واحد', ok: true },
+          { text: 'الفواتير الأساسية', ok: true },
+          { text: 'النظام المالي الكامل', ok: false },
+          { text: 'تصدير Excel/PDF', ok: false },
+          { text: 'نظام الأقساط', ok: false },
+        ]},
+        { cat: '🔧 الخدمات', items: [
+          { text: 'طلبات الصيانة', ok: true },
+          { text: 'إشعارات محدودة', ok: true },
+          { text: 'حجز المرافق', ok: false },
+          { text: 'دليل العمال', ok: false },
+        ]},
+        { cat: '🛡️ الأمن', items: [
+          { text: 'بوابة الساكن', ok: true },
+          { text: 'دعوة الزوار + QR', ok: false },
+          { text: 'تتبع الأشخاص', ok: false },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: 'مساعد AI', ok: false },
+          { text: 'مستشار AI استباقي', ok: false },
+        ]},
+        { cat: '📢 التسويق', items: [
+          { text: 'إعلانات الوحدات', ok: false },
+          { text: 'مساحات إعلانية', ok: false },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'دعم بالبريد الإلكتروني', ok: true },
+          { text: 'شات دعم مباشر', ok: false },
+        ]},
+      ],
     },
+
+    // ─── 2. BASIC ────────────────────────────────────────────
     {
       id: 'essential',
-      name: t('essential_plan', 'أساسي'),
-      subtitle: t('great_growing_communities', 'رائع للمجتمعات النامية'),
+      name: 'أساسي',
+      nameEn: 'Basic',
+      subtitle: 'رائع للمجتمعات النامية',
       price: { monthly: 1200, yearly: 12960 },
       originalPrice: { monthly: 1200, yearly: 14400 },
       icon: SparklesIcon,
-      gradient: 'from-blue-500 to-cyan-600',
-      popular: true,
-      features: {
-        residents: t('residents_100'),
-        services: t('unlimited_services'),
-        chat: t('advanced_chat_messaging'),
-        family: t('family_management_photos'),
-        storage: t('storage_5gb'),
-        mobile: t('mobile_app_access'),
-        support: t('priority_support'),
-        supportChat: 'شات دعم + صندوق تحكم للأدمن',
-        unitListings: 'إعلانات الوحدات مع موافقة الأدمن',
-        aiAssistant: '✨ مساعد AI — 20 رسالة/يوم',
-        branding: t('custom_branding'),
-        analytics: t('advanced_reporting'),
-        api: false,
-        multiCompound: false,
-        whiteLabel: false,
-        customDev: false
-      },
-      limitations: []
+      gradient: 'from-sky-500 to-blue-600',
+      color: 'blue',
+      popular: false,
+      badge: null,
+      savingsYearly: 2880,
+      features: [
+        { cat: '👥 السكان', items: [
+          { text: 'حتى 100 ساكن', ok: true },
+          { text: 'ملف السكان الكامل', ok: true },
+          { text: 'إرسال بيانات الدخول تلقائياً', ok: true },
+          { text: 'استيراد CSV بالجملة', ok: true },
+          { text: 'إدارة العائلة والصور', ok: true },
+        ]},
+        { cat: '💰 المالية', items: [
+          { text: 'النظام المالي الكامل', ok: true },
+          { text: 'توزيع المصروفات (4 طرق)', ok: true },
+          { text: 'تصدير Excel و PDF', ok: true },
+          { text: 'إدارة العقود والمزودين', ok: true },
+          { text: 'تأكيد إيصالات الدفع', ok: true },
+          { text: 'نظام الأقساط', ok: false },
+          { text: 'تقارير PDF متقدمة', ok: false },
+        ]},
+        { cat: '🔧 الخدمات', items: [
+          { text: 'طلبات الصيانة الكاملة', ok: true },
+          { text: 'تقييمات الرضا والخدمات', ok: true },
+          { text: 'حجز المرافق', ok: true },
+          { text: 'دليل العمال والصنايعية', ok: false },
+        ]},
+        { cat: '🛡️ الأمن', items: [
+          { text: 'بوابة الساكن الكاملة', ok: true },
+          { text: 'دعوة الزوار + QR Code', ok: false },
+          { text: 'تتبع الأشخاص والسيارات', ok: false },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: '✨ مساعد AI — 5 رسائل/يوم', ok: true },
+          { text: '🧠 مستشار AI استباقي', ok: false },
+          { text: '🤖 AI Auto-Pilot', ok: false },
+        ]},
+        { cat: '📢 التسويق', items: [
+          { text: 'إشعارات البريد الإلكتروني', ok: true },
+          { text: 'إعلانات الوحدات (بيع/إيجار)', ok: false },
+          { text: 'مساحات إعلانية في الكمبوند', ok: false },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'دعم فني بالبريد', ok: true },
+          { text: 'شات دعم مباشر', ok: false },
+        ]},
+      ],
     },
+
+    // ─── 3. PRO ──────────────────────────────────────────────
     {
       id: 'professional',
-      name: t('professional_plan', 'احترافي'),
-      subtitle: t('multiple_communities', 'لمجتمعات متعددة'),
+      name: 'احترافي',
+      nameEn: 'Pro',
+      subtitle: 'الأكثر طلباً للمجمعات النامية',
       price: { monthly: 2200, yearly: 23760 },
       originalPrice: { monthly: 2200, yearly: 26400 },
       icon: TrophyIcon,
-      gradient: 'from-purple-500 to-indigo-600',
-      popular: false,
-      features: {
-        residents: t('residents_500'),
-        services: t('unlimited_services'),
-        chat: t('advanced_chat_messaging'),
-        family: t('family_management_photos'),
-        storage: t('storage_50gb'),
-        mobile: t('mobile_app_access'),
-        support: t('priority_support'),
-        branding: t('custom_branding'),
-        analytics: t('advanced_analytics'),
-        api: t('api_access'),
-        multiCompound: t('multi_compound_management'),
-        whiteLabel: t('white_label_options'),
-        customDev: false
-      },
-      limitations: []
+      gradient: 'from-blue-600 to-indigo-700',
+      color: 'indigo',
+      popular: true,
+      badge: '⭐ الأكثر طلباً',
+      savingsYearly: 5280,
+      features: [
+        { cat: '👥 السكان', items: [
+          { text: 'عدد غير محدود من السكان', ok: true },
+          { text: 'ملف السكان الكامل', ok: true },
+          { text: 'إرسال بيانات الدخول تلقائياً', ok: true },
+          { text: 'استيراد CSV بالجملة', ok: true },
+          { text: 'إدارة العائلة والصور', ok: true },
+          { text: 'إدارة المساعدين والمساكن', ok: true },
+        ]},
+        { cat: '💰 المالية', items: [
+          { text: 'النظام المالي الكامل', ok: true },
+          { text: 'توزيع المصروفات (4 طرق)', ok: true },
+          { text: 'تصدير Excel و PDF', ok: true },
+          { text: 'نظام الأقساط المتقدم', ok: true },
+          { text: 'تأكيد إيصالات الدفع', ok: true },
+          { text: 'تقارير PDF تنفيذية', ok: true },
+          { text: 'إدارة العقود والمزودين', ok: true },
+        ]},
+        { cat: '🔧 الخدمات', items: [
+          { text: 'طلبات الصيانة المتقدمة', ok: true },
+          { text: 'دليل العمال والصنايعية', ok: true },
+          { text: 'حجز المرافق والخدمات', ok: true },
+          { text: 'تقييمات الرضا المتقدمة', ok: true },
+          { text: 'الشكاوى والاقتراحات', ok: true },
+        ]},
+        { cat: '🛡️ الأمن', items: [
+          { text: 'إدارة الزوار + QR Code', ok: true },
+          { text: 'تتبع الأشخاص والسيارات', ok: true },
+          { text: 'البلاغات الأمنية', ok: true },
+          { text: 'تتبع مركبات الأمن', ok: true },
+        ]},
+        { cat: '📢 التواصل والتسويق', items: [
+          { text: 'إعلانات وفعاليات وأحداث', ok: true },
+          { text: 'استطلاعات الرأي', ok: true },
+          { text: 'إعلانات الوحدات (بيع/إيجار)', ok: true },
+          { text: 'مساحات إعلانية في الكمبوند', ok: true },
+          { text: 'تقارير يومية بالبريد', ok: true },
+          { text: 'برنامج الإحالة', ok: true },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: '✨ مساعد AI — 20 رسالة/يوم', ok: true },
+          { text: '🧠 مستشار AI استباقي', ok: true },
+          { text: '🤖 AI Auto-Pilot', ok: false },
+          { text: 'تحليلات متقدمة + رسوم بيانية', ok: true },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'شات دعم مباشر', ok: true },
+          { text: 'صندوق رسائل الأدمن', ok: true },
+          { text: 'دعم فني أولوية', ok: true },
+        ]},
+      ],
     },
+
+    // ─── 4. PREMIUM ──────────────────────────────────────────
     {
       id: 'enterprise',
-      name: t('enterprise_plan', 'متقدم'),
-      subtitle: t('large_organizations', 'للمؤسسات الكبيرة'),
+      name: 'متقدم',
+      nameEn: 'Premium',
+      subtitle: 'كل شيء بلا حدود',
       price: { monthly: 4000, yearly: 43200 },
       originalPrice: { monthly: 4000, yearly: 48000 },
       icon: BuildingOfficeIcon,
-      gradient: 'from-emerald-500 to-teal-600',
+      gradient: 'from-violet-600 to-purple-700',
+      color: 'purple',
       popular: false,
-      features: {
-        residents: t('unlimited_residents'),
-        services: t('unlimited_services'),
-        chat: t('advanced_chat_messaging'),
-        family: t('family_management_photos'),
-        storage: t('unlimited_storage'),
-        mobile: t('mobile_app_access'),
-        support: t('dedicated_support'),
-        branding: t('custom_branding'),
-        analytics: t('advanced_analytics'),
-        api: t('full_api_access'),
-        multiCompound: t('multiple_compounds'),
-        whiteLabel: t('white_label_options'),
-        customDev: t('custom_development')
-      },
-      limitations: []
+      badge: '💎 الأفضل',
+      savingsYearly: 9600,
+      features: [
+        { cat: '👥 السكان', items: [
+          { text: 'عدد غير محدود من السكان', ok: true },
+          { text: 'كل مميزات الاحترافي', ok: true },
+          { text: 'تقارير السكان المخصصة', ok: true },
+        ]},
+        { cat: '💰 المالية', items: [
+          { text: 'كل المميزات المالية', ok: true },
+          { text: 'API تكامل مع أنظمة محاسبية', ok: true },
+          { text: 'تقارير مخصصة متقدمة', ok: true },
+          { text: 'تحليلات MRR + ARR', ok: true },
+        ]},
+        { cat: '🔧 الخدمات', items: [
+          { text: 'كل مميزات الخدمات', ok: true },
+          { text: 'الأجهزة الذكية والأتمتة', ok: true, badge: 'قريباً' },
+        ]},
+        { cat: '🛡️ الأمن', items: [
+          { text: 'كل مميزات الأمن', ok: true },
+          { text: 'لوحة الأمان المتقدمة', ok: true },
+          { text: 'Forensic logs كاملة', ok: true },
+        ]},
+        { cat: '📢 التسويق', items: [
+          { text: 'كل مميزات التسويق', ok: true },
+          { text: 'API إعلانات مخصص', ok: true },
+          { text: 'White Label (علامتك التجارية)', ok: true },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: '✨ مساعد AI — 50 رسالة/يوم', ok: true },
+          { text: '🧠 مستشار AI استباقي', ok: true },
+          { text: '🤖 AI Auto-Pilot كامل', ok: true },
+          { text: 'تقارير AI أسبوعية تلقائية', ok: true },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'دعم مخصص 24/7', ok: true },
+          { text: 'مدير حساب مخصص', ok: true },
+          { text: 'تدريب الفريق', ok: true },
+          { text: 'SLA مضمون', ok: true },
+        ]},
+      ],
     },
+
+    // ─── 5. COMPANY STARTUP ──────────────────────────────────
     {
       id: 'multi_compound',
-      name: t('multi_compound_plan', 'شركة ناشئة'),
-      subtitle: t('for_multiple_locations', 'لشركات الإدارة'),
+      name: 'شركة ناشئة',
+      nameEn: 'Startup',
+      subtitle: 'لشركات تدير حتى 3 مجتمعات',
       price: { monthly: 5500, yearly: 59400 },
       originalPrice: { monthly: 5500, yearly: 66000 },
       icon: BuildingOfficeIcon,
-      gradient: 'from-indigo-500 to-purple-600',
+      gradient: 'from-amber-500 to-orange-600',
+      color: 'amber',
       popular: false,
-      features: {
-        residents: t('unlimited_residents'),
-        services: t('unlimited_services'),
-        chat: t('advanced_chat_messaging'),
-        family: t('family_management_photos'),
-        storage: t('unlimited_storage'),
-        mobile: t('mobile_app_access'),
-        support: t('dedicated_support'),
-        branding: t('custom_branding'),
-        analytics: t('advanced_analytics'),
-        api: t('full_api_access'),
-        multiCompound: t('unlimited_compounds'),
-        whiteLabel: t('white_label_options'),
-        customDev: t('custom_development')
-      },
-      limitations: [],
-      perPerson: true
-    }
+      badge: '🏢 للشركات',
+      savingsYearly: 13200,
+      isCompany: true,
+      features: [
+        { cat: '🏢 إدارة الشركة', items: [
+          { text: 'إدارة حتى 3 مجتمعات سكنية', ok: true },
+          { text: 'لوحة تحكم موحدة', ok: true },
+          { text: 'عدد غير محدود من السكان', ok: true },
+          { text: 'كل مميزات الاحترافي لكل مجتمع', ok: true },
+          { text: 'مقارنة أداء المجتمعات', ok: false },
+          { text: 'إدارة فرق متعددة', ok: false },
+        ]},
+        { cat: '💰 المالية', items: [
+          { text: 'النظام المالي الكامل', ok: true },
+          { text: 'تقارير موحدة لكل المجتمعات', ok: true },
+          { text: 'تصدير Excel و PDF', ok: true },
+          { text: 'تحليلات MRR / Churn', ok: false },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: '✨ مساعد AI — 20 رسالة/يوم/مستخدم', ok: true },
+          { text: '🧠 مستشار AI استباقي', ok: true },
+          { text: '🤖 AI Auto-Pilot', ok: false },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'شات دعم مباشر', ok: true },
+          { text: 'دعم فني بالبريد والواتساب', ok: true },
+          { text: 'مدير حساب مخصص', ok: false },
+        ]},
+      ],
+    },
   ];
 
   const discountOffers = [
+
     {
       code: 'WELCOME40',
       title: '🎉 Seasonal Welcome',
@@ -636,85 +774,29 @@ const Pricing = () => {
                     )}
                   </div>
                   
-                  {/* Features */}
-                  <div className="space-y-3 mb-8">
-                    <div className="flex items-center">
-                      <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                      <span className="text-gray-700">{plan.features.residents}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                      <span className="text-gray-700">{plan.features.services}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                      <span className="text-gray-700">{plan.features.chat}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                      <span className="text-gray-700">{plan.features.family}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                      <span className="text-gray-700">{plan.features.storage}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                      <span className="text-gray-700">{plan.features.support}</span>
-                    </div>
+                  {/* Features — grouped by category */}
+                  <div className="space-y-4 mb-8">
+                    {Array.isArray(plan.features) && plan.features.map((section, si) => (
+                      <div key={si}>
+                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                          {section.cat}
+                        </p>
+                        <ul className="space-y-1">
+                          {section.items.map((item, ii) => (
+                            <li key={ii} className="flex items-center gap-2">
+                              <span className={`text-sm flex-shrink-0 ${item.ok ? 'text-emerald-500' : 'text-gray-300 dark:text-gray-600'}`}>
+                                {item.ok ? '✓' : '✗'}
+                              </span>
+                              <span className={`text-xs leading-relaxed ${item.ok ? 'text-gray-700 dark:text-gray-200' : 'text-gray-400 dark:text-gray-500 line-through'}`}>
+                                {item.text}
+                              </span>
+                              {item.badge && <span className="text-[9px] bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded font-bold">{item.badge}</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
                     
-                    {plan.features.branding && (
-                      <div className="flex items-center">
-                        <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">{plan.features.branding}</span>
-                      </div>
-                    )}
-                    
-                    {plan.features.analytics && (
-                      <div className="flex items-center">
-                        <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">{plan.features.analytics}</span>
-                      </div>
-                    )}
-                    
-                    {plan.features.api && (
-                      <div className="flex items-center">
-                        <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">{plan.features.api}</span>
-                      </div>
-                    )}
-                    
-                    {plan.features.multiCompound && (
-                      <div className="flex items-center">
-                        <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">{plan.features.multiCompound}</span>
-                      </div>
-                    )}
-                    
-                    {plan.features.customDev && (
-                      <div className="flex items-center">
-                        <CheckIcon className="h-5 w-5 text-green-500 mr-3" />
-                        <span className="text-gray-700">{plan.features.customDev}</span>
-                      </div>
-                    )}
-                    {plan.features.supportChat && (
-                      <div className="flex items-center bg-emerald-50 rounded-lg px-2 py-1">
-                        <CheckIcon className="h-5 w-5 text-emerald-600 mr-3 flex-shrink-0" />
-                        <span className="text-gray-700 font-medium">💬 {plan.features.supportChat}</span>
-                      </div>
-                    )}
-                    {plan.features.unitListings && (
-                      <div className="flex items-center bg-blue-50 rounded-lg px-2 py-1">
-                        <CheckIcon className="h-5 w-5 text-blue-600 mr-3 flex-shrink-0" />
-                        <span className="text-gray-700 font-medium">🏠 {plan.features.unitListings}</span>
-                      </div>
-                    )}
-                    {plan.features.aiAssistant && (
-                      <div className="flex items-center bg-purple-50 rounded-lg px-2 py-1">
-                        <CheckIcon className="h-5 w-5 text-purple-600 mr-3 flex-shrink-0" />
-                        <span className="text-gray-700 font-medium">{plan.features.aiAssistant}</span>
-                      </div>
-                    )}
                   </div>
                   
                   {/* CTA Button */}

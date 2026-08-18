@@ -148,3 +148,55 @@ async def add_admin(
     return {"message": "Admin added successfully"}
 
 # Family Management Routes
+
+
+@router.post("/{compound_id}/reset")
+async def reset_compound(
+    compound_id: str,
+    body: dict,
+    current_user: dict = Depends(require_admin),
+):
+    """Reset compound data — keeps settings but clears residents, payments, etc."""
+    confirm = body.get("confirm_text", "")
+    if confirm != "اعادة تعيين":
+        raise HTTPException(400, "اكتب 'اعادة تعيين' للتأكيد")
+
+    # Verify ownership
+    db = get_db()
+    compound = await db.compounds.find_one({"id": compound_id})
+    if not compound:
+        raise HTTPException(404, "الكمبوند غير موجود")
+    if compound.get("admin_id") != current_user["id"] and current_user.get("role") not in ("app_owner", "super_admin"):
+        raise HTTPException(403, "غير مصرح")
+
+    what = body.get("what", [])  # ["residents","payments","maintenance","visitors"]
+    deleted = {}
+
+    if "residents" in what or not what:
+        r = await db.users.delete_many({"compound_id": compound_id, "role": "resident"})
+        deleted["residents"] = r.deleted_count
+
+    if "payments" in what or not what:
+        r = await db.payments.delete_many({"compound_id": compound_id})
+        deleted["payments"] = r.deleted_count
+        await db.invoices.delete_many({"compound_id": compound_id})
+        await db.financial_obligations.delete_many({"compound_id": compound_id})
+
+    if "maintenance" in what or not what:
+        r = await db.maintenance_requests.delete_many({"compound_id": compound_id})
+        deleted["maintenance"] = r.deleted_count
+
+    if "visitors" in what or not what:
+        r = await db.visitor_passes.delete_many({"compound_id": compound_id})
+        deleted["visitors"] = r.deleted_count
+
+    if "complaints" in what or not what:
+        await db.complaints.delete_many({"compound_id": compound_id})
+
+    from datetime import datetime, timezone
+    await db.compounds.update_one(
+        {"id": compound_id},
+        {"$set": {"reset_at": datetime.now(timezone.utc).isoformat()}}
+    )
+
+    return {"success": True, "reset": deleted, "compound_id": compound_id}

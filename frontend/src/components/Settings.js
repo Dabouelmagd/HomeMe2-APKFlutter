@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../App';
@@ -34,6 +35,169 @@ import {
   UserManagementSettings,
   AddAdminSettings
 } from './settings';
+
+
+// ── Settings sub-components ────────────────────────────────────
+const OverviewSettings = () => {
+  const { user } = useAuth();
+  const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+  const [stats, setStats] = React.useState(null);
+  React.useEffect(() => {
+    fetch(`${API}/compounds/${user?.compound_id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    }).then(r => r.json()).then(d => setStats(d)).catch(() => {});
+  }, []);
+  return (
+    <div className="p-6 space-y-4" dir="rtl">
+      <h3 className="font-black text-gray-900 dark:text-white">نظرة عامة على الكمبوند</h3>
+      {stats ? (
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            ['اسم الكمبوند', stats.name],
+            ['العنوان', stats.address || '—'],
+            ['عدد المباني', stats.buildings_count || 0],
+            ['عدد الوحدات', stats.units_count || 0],
+          ].map(([l,v]) => (
+            <div key={l} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 p-3">
+              <p className="text-xs text-gray-500">{l}</p>
+              <p className="font-bold text-gray-900 dark:text-white mt-1">{v}</p>
+            </div>
+          ))}
+        </div>
+      ) : <p className="text-gray-400 text-sm">جاري التحميل...</p>}
+    </div>
+  );
+};
+
+const ResidencesSettings = () => {
+  const navigate = useNavigate();
+  React.useEffect(() => { navigate('/app/residents'); }, []);
+  return null;
+};
+
+const RegistrationLinksSettings = () => {
+  const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+  const { user } = useAuth();
+  const [links, setLinks] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  React.useEffect(() => {
+    fetch(`${API}/compound-invites?compound_id=${user?.compound_id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    }).then(r => r.json()).then(d => setLinks(d.invites || [])).catch(() => {});
+  }, []);
+  const generate = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/compound-invites`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ compound_id: user?.compound_id, role: 'resident', expires_days: 30 })
+      });
+      const data = await res.json();
+      setLinks(p => [data, ...p]);
+    } catch {}
+    setLoading(false);
+  };
+  return (
+    <div className="p-6 space-y-4" dir="rtl">
+      <div className="flex items-center justify-between">
+        <h3 className="font-black text-gray-900 dark:text-white">روابط التسجيل</h3>
+        <button onClick={generate} disabled={loading}
+          className="bg-emerald-600 text-white text-xs font-bold px-4 py-2 rounded-xl hover:bg-emerald-700 disabled:opacity-60">
+          + إنشاء رابط جديد
+        </button>
+      </div>
+      <div className="space-y-2">
+        {links.length === 0 && <p className="text-gray-400 text-sm text-center py-4">لا توجد روابط بعد</p>}
+        {links.map((l,i) => (
+          <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 rounded-xl p-3 flex items-center justify-between gap-2">
+            <code className="text-xs text-emerald-700 break-all">{`https://homemeapp.net/register?invite=${l.code || l.id || i}`}</code>
+            <button onClick={() => { navigator.clipboard.writeText(`https://homemeapp.net/register?invite=${l.code || l.id || i}`); }}
+              className="text-xs text-blue-600 hover:underline flex-shrink-0">نسخ</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const UserManagementSettings = () => {
+  const navigate = useNavigate();
+  React.useEffect(() => { navigate('/app/user-management'); }, []);
+  return null;
+};
+
+const AddAdminSettings = () => {
+  const navigate = useNavigate();
+  React.useEffect(() => { navigate('/app/staff'); }, []);
+  return null;
+};
+
+const ProfileSettings = () => {
+  const navigate = useNavigate();
+  React.useEffect(() => { navigate('/app/profile'); }, []);
+  return null;
+};
+
+const PrivacySettings = () => (
+  <div className="p-6" dir="rtl">
+    <h3 className="font-black text-gray-900 dark:text-white mb-4">الخصوصية</h3>
+    <div className="space-y-3">
+      {[
+        ['مشاركة الموقع', 'يمكنك التحكم في من يرى موقعك داخل الكمبوند'],
+        ['رؤية ملفك الشخصي', 'السكان والإدارة يمكنهم رؤية اسمك ووحدتك'],
+        ['سجل النشاط', 'يتم حفظ نشاطك لمدة 90 يوماً'],
+      ].map(([t,d]) => (
+        <div key={t} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 p-4 flex items-center justify-between">
+          <div><p className="font-bold text-sm text-gray-900 dark:text-white">{t}</p>
+               <p className="text-xs text-gray-500 mt-0.5">{d}</p></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const BiometricSettings = () => (
+  <div className="p-6 text-center" dir="rtl">
+    <div className="text-5xl mb-4">🔐</div>
+    <h3 className="font-black text-gray-900 dark:text-white mb-2">إعدادات البصمة</h3>
+    <p className="text-gray-500 text-sm mb-4">تسجيل الدخول بالبصمة أو التعرف على الوجه متاح عبر التطبيق المحمول فقط</p>
+    <a href="https://homemeapp.net" target="_blank" rel="noreferrer"
+      className="inline-block bg-emerald-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm">
+      تحميل التطبيق
+    </a>
+  </div>
+);
+
+const LanguageSettings = () => {
+  const { i18n } = useTranslation();
+  const langs = [
+    { code: 'ar', label: 'العربية', flag: '🇸🇦', dir: 'rtl' },
+    { code: 'en', label: 'English', flag: '🇬🇧', dir: 'ltr' },
+    { code: 'fr', label: 'Français', flag: '🇫🇷', dir: 'ltr' },
+  ];
+  const current = i18n.language?.split('-')[0] || 'ar';
+  const change = (code) => {
+    i18n.changeLanguage(code);
+    localStorage.setItem('i18nextLng', code);
+    document.dir = code === 'ar' ? 'rtl' : 'ltr';
+  };
+  return (
+    <div className="p-6 space-y-3" dir="rtl">
+      <h3 className="font-black text-gray-900 dark:text-white">اختيار اللغة</h3>
+      {langs.map(l => (
+        <button key={l.code} onClick={() => change(l.code)}
+          className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+            current === l.code ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
+          }`}>
+          <span className="text-2xl">{l.flag}</span>
+          <span className="font-bold text-gray-900 dark:text-white">{l.label}</span>
+          {current === l.code && <span className="mr-auto text-emerald-600 text-sm font-bold">✓ محددة</span>}
+        </button>
+      ))}
+    </div>
+  );
+};
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -192,7 +356,17 @@ const Settings = () => {
           lightColor: 'bg-pink-50 dark:bg-pink-900/20',
           textColor: 'text-pink-600 dark:text-pink-400',
           badge: '0'
-        }
+        },
+        ...(!isHighLevelAdmin ? [{
+          id: 'reset_compound',
+          name: '♻️ إعادة تعيين الكمبوند',
+          description: 'حذف بيانات الكمبوند مع الحفاظ على الإعدادات',
+          icon: ArrowPathIcon,
+          color: 'bg-red-600',
+          lightColor: 'bg-red-50 dark:bg-red-900/20',
+          textColor: 'text-red-600 dark:text-red-400',
+          danger: true
+        }] : [])
       ]
     }
   ];
@@ -230,6 +404,8 @@ const Settings = () => {
         return <RegistrationLinksSettings />;
       case 'user_management':
         return <UserManagementSettings />;
+      case 'reset_compound':
+        return <ResetCompoundPanel compoundId={user?.compound_id} />;
       case 'add_admin':
         return <AddAdminSettings />;
       case 'notifications':
@@ -370,6 +546,67 @@ const Settings = () => {
           {renderContent()}
         </div>
       </div>
+    </div>
+  );
+};
+
+
+const ResetCompoundPanel = ({ compoundId }) => {
+  const [confirmText, setConfirmText] = React.useState('');
+  const [selected, setSelected] = React.useState(['residents','payments','maintenance','visitors']);
+  const [loading, setLoading] = React.useState(false);
+  const options = [
+    {id:'residents',label:'السكان والمقيمين'},
+    {id:'payments',label:'المدفوعات والفواتير'},
+    {id:'maintenance',label:'طلبات الصيانة'},
+    {id:'visitors',label:'الزوار والتصاريح'},
+    {id:'complaints',label:'الشكاوى والاقتراحات'},
+  ];
+  const toggle = (id) => setSelected(p => p.includes(id) ? p.filter(x=>x!==id) : [...p,id]);
+  const submit = async () => {
+    if (confirmText !== 'اعادة تعيين') return toast.error('اكتب كلمة التأكيد بالضبط');
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/compounds/${compoundId}/reset`,
+        {confirm_text: confirmText, what: selected},
+        {headers:{Authorization:`Bearer ${token}`}}
+      );
+      toast.success('✅ تمت إعادة تعيين الكمبوند');
+      setConfirmText('');
+    } catch(e) { toast.error(e.response?.data?.detail || 'فشلت العملية'); }
+    finally { setLoading(false); }
+  };
+  return (
+    <div className="max-w-lg mx-auto p-6 space-y-4" dir="rtl">
+      <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+        <h3 className="font-black text-red-700 flex items-center gap-2 mb-2">
+          ⚠️ تحذير: إعادة تعيين الكمبوند
+        </h3>
+        <p className="text-red-600 text-sm">هذا الإجراء لا يمكن التراجع عنه. سيتم حذف البيانات المحددة نهائياً.</p>
+      </div>
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 p-4">
+        <p className="font-bold text-sm mb-3">اختر البيانات المراد حذفها:</p>
+        <div className="space-y-2">
+          {options.map(o => (
+            <label key={o.id} className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={selected.includes(o.id)} onChange={()=>toggle(o.id)}
+                className="w-4 h-4 text-red-600" />
+              <span className="text-sm">{o.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+      <div>
+        <label className="block text-sm font-bold mb-1">اكتب "اعادة تعيين" للتأكيد:</label>
+        <input value={confirmText} onChange={e=>setConfirmText(e.target.value)}
+          placeholder="اعادة تعيين" dir="rtl"
+          className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-red-300" />
+      </div>
+      <button onClick={submit} disabled={loading || confirmText !== 'اعادة تعيين'}
+        className="w-full bg-red-600 hover:bg-red-700 text-white font-black py-3 rounded-xl text-sm disabled:opacity-50 transition-colors">
+        {loading ? 'جاري الحذف...' : '♻️ تأكيد إعادة التعيين'}
+      </button>
     </div>
   );
 };

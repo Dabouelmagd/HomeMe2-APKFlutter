@@ -143,6 +143,13 @@ const StaffManagement = () => {
                     </div>
                   </div>
                   <button
+                    onClick={() => handleEdit(s)}
+                    className="p-2 rounded-lg hover:bg-blue-50 text-blue-600"
+                    title={t('edit', 'تعديل')}
+                  >
+                    <PencilSquareIcon className="h-5 w-5" />
+                  </button>
+                  <button
                     onClick={() => handleDelete(s.id)}
                     className="p-2 rounded-lg hover:bg-red-50 text-red-600"
                     title={t('delete', 'حذف')}

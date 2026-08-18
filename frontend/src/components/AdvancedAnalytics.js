@@ -112,8 +112,10 @@ const AdvancedAnalytics = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('token');
       const response = await axios.get(`${API}/analytics/dashboard`, {
-        params: { date_range: dateRange }
+        params: { date_range: dateRange },
+        headers: { Authorization: `Bearer ${token}` }
       });
       
       setAnalytics(response.data || {});

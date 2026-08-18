@@ -162,6 +162,40 @@ async def create_staff(data: StaffCreate, current_user: dict = Depends(get_curre
     # before returning.
     out = {k: v for k, v in user_doc.items() if k not in ("password_hash", "_id")}
     logger.info(f"[staff] created {data.username} role={data.staff_role} modules={modules}")
+
+    # Send welcome email with login credentials
+    try:
+        from email_service import email_service
+        compound = await db.compounds.find_one({"id": current_user.get("compound_id")}, {"_id": 0, "name": 1})
+        compound_name = compound.get("name", "الكمبوند") if compound else "الكمبوند"
+        role_labels = {"manager":"مدير مساعد","accountant":"محاسب","security":"موظف أمن","staff_general":"موظف عام","maintenance":"موظف صيانة"}
+        role_label = role_labels.get(data.staff_role, data.staff_role)
+        html_content = (
+            f'<div dir="rtl" style="font-family:Tahoma,Arial;max-width:600px;margin:auto;">' +
+            f'<div style="background:linear-gradient(135deg,#064e3b,#047857);padding:24px;border-radius:12px 12px 0 0;text-align:center;">' +
+            f'<img src="https://homemeapp.net/homeme-logo.png" width="80" style="background:#fff;border-radius:10px;padding:6px;display:block;margin:0 auto 12px;" />' +
+            f'<h2 style="color:#fff;margin:0;">مرحباً بك في {compound_name}</h2>' +
+            f'<p style="color:rgba(255,255,255,0.8);">تم إنشاء حسابك كـ {role_label}</p></div>' +
+            f'<div style="background:#fff;padding:24px;border:1px solid #e2e8f0;">' +
+            f'<p>مرحباً <strong>{data.full_name or data.username}</strong>،</p>' +
+            f'<table width="100%" cellpadding="10" style="background:#f8fafc;border-radius:8px;margin:16px 0;">' +
+            f'<tr><td><strong>رابط الدخول:</strong></td><td><a href="https://homemeapp.net/login">homemeapp.net</a></td></tr>' +
+            f'<tr><td><strong>اسم المستخدم:</strong></td><td><strong>{data.username}</strong></td></tr>' +
+            f'<tr><td><strong>كلمة المرور:</strong></td><td><strong>{data.password}</strong></td></tr>' +
+            f'<tr><td><strong>الدور:</strong></td><td>{role_label} في {compound_name}</td></tr></table>' +
+            f'<p style="color:#dc2626;font-size:13px;">⚠️ يُرجى تغيير كلمة المرور بعد أول تسجيل دخول.</p></div>' +
+            f'<div style="background:#f8fafc;padding:14px;text-align:center;font-size:12px;color:#94a3b8;border-radius:0 0 12px 12px;">HomeMe | homemeapp.net</div></div>'
+        )
+        await email_service.send_email(
+            to_email=data.email,
+            to_name=data.full_name or data.username,
+            subject=f"مرحباً بك في {compound_name} — بيانات الدخول",
+            html_content=html_content,
+        )
+        logger.info(f"[staff] welcome email sent to {data.email}")
+    except Exception as e:
+        logger.error(f"[staff] welcome email failed: {e}")
+
     return {"saved": True, "staff": out}
 
 

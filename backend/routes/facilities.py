@@ -18,6 +18,28 @@ async def get_facilities(compound_id: str = None, current_user: dict = Depends(g
         compound_id = current_user.get("compound_id") or ""
     facility_service = FacilityBookingService(db)
     facilities = await facility_service.get_facilities(compound_id)
+
+    # Auto-seed default facilities if compound has none
+    if not facilities and compound_id:
+        import uuid
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc).isoformat()
+        defaults = [
+            {"name": "حمام السباحة", "type": "swimming_pool", "capacity": 50, "price_per_hour": 0, "icon": "🏊"},
+            {"name": "الجيم", "type": "gym", "capacity": 20, "price_per_hour": 0, "icon": "🏋️"},
+            {"name": "الملعب المتعدد", "type": "sports_court", "capacity": 30, "price_per_hour": 0, "icon": "⚽"},
+            {"name": "قاعة الأفراح", "type": "event_hall", "capacity": 200, "price_per_hour": 500, "icon": "🎉"},
+            {"name": "نادي الأطفال", "type": "kids_area", "capacity": 25, "price_per_hour": 0, "icon": "🎠"},
+        ]
+        docs = [{
+            "id": str(uuid.uuid4()), "compound_id": compound_id,
+            "is_active": True, "requires_booking": True,
+            "open_time": "06:00", "close_time": "22:00", "created_at": now,
+            **d
+        } for d in defaults]
+        await db.facilities.insert_many(docs)
+        facilities = [{k:v for k,v in doc.items() if k != "_id"} for doc in docs]
+
     return {"facilities": facilities}
 
 

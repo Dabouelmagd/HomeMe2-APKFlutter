@@ -150,6 +150,16 @@ const BlogIndex = () => {
                 <span className="absolute top-3 right-3 bg-white/90 backdrop-blur text-indigo-700 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
                   {post.category}
                 </span>
+                {/* جديد badge — يظهر لمدة 24 ساعة */}
+                {(() => {
+                  const postDate = new Date(post.published_at || post.publishedAt || post.created_at || post.date || 0);
+                  const hoursAgo = (Date.now() - postDate.getTime()) / (1000 * 60 * 60);
+                  return hoursAgo <= 24 ? (
+                    <span className="absolute top-3 left-3 bg-emerald-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-md animate-pulse">
+                      ✨ جديد
+                    </span>
+                  ) : null;
+                })()}
               </div>
               <div className="p-5">
                 <h2 className="text-lg font-black text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors leading-snug">

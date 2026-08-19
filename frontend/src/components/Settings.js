@@ -24,17 +24,7 @@ import {
 import PageHeader from './shared/PageHeader';
 
 // Import settings components
-import {
-  BiometricSettings,
-  ProfileSettings,
-  PrivacySettings,
-  LanguageSettings,
-  OverviewSettings,
-  ResidencesSettings,
-  RegistrationLinksSettings,
-  UserManagementSettings,
-  AddAdminSettings
-} from './settings';
+
 
 
 // ── Settings sub-components ────────────────────────────────────

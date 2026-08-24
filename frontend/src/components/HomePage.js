@@ -778,18 +778,18 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: "'Cairo', 'Tajawal', sans-serif" }}>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-100 shadow-sm" data-testid="homepage-header">
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center gap-4">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-100 shadow-sm w-full" data-testid="homepage-header" dir="rtl">
+        <div className="max-w-screen-2xl mx-auto px-4 h-16 flex items-center gap-4 w-full">
           <div className="flex items-center gap-4 flex-shrink-0">
             <img
               src="/homeme-logo.png"
               alt="HomeMe"
-              className="h-20 lg:h-28 w-auto rounded-2xl shadow-lg"
+              className="h-10 w-auto rounded-xl shadow-sm flex-shrink-0"
               data-testid="homepage-logo"
             />
-            <div>
-              <span className="text-3xl lg:text-5xl font-black text-gray-900 block leading-tight tracking-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
-              <span className="text-[10px] lg:text-xs text-gray-500 font-medium block">{t('hp_subtitle')}</span>
+            <div className="flex-shrink-0">
+              <span className="text-xl font-black text-gray-900 block leading-tight tracking-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
+              <span className="text-[10px] text-gray-500 font-medium block hidden sm:block">{t('hp_subtitle')}</span>
             </div>
           </div>
 
@@ -799,10 +799,10 @@ const HomePage = () => {
               { href: '#top', sectionId: 'top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home' },
               { href: '#systems', sectionId: 'systems', label: t('nav_features', 'المميزات'), testid: 'nav-features' },
               { href: '#ai-features', sectionId: 'ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new' },
-              { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing' },
+              { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار') + ' ▾', testid: 'nav-pricing', hasDropdown: true },
               { href: '#guide', sectionId: 'guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide' },
               { href: '/blog', sectionId: '', label: '📝 ' + t('nav_blog', 'المدوّنة'), testid: 'nav-blog', isLink: true },
-              { href: '/guide', sectionId: '', label: '📖 ' + t('nav_full_guide', 'الدليل الكامل'), testid: 'nav-full-guide', isLink: true },
+              { href: '/guide', sectionId: '', label: '📖 ' + t('nav_full_guide', 'الدليل'), testid: 'nav-full-guide', isLink: true },
               { href: '#testimonials', sectionId: 'testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials' },
               { href: '#faq', sectionId: 'faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq' },
             ].map((item, i) => {

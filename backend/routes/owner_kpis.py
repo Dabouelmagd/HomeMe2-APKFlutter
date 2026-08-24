@@ -18,6 +18,10 @@ import logging
 from database import get_db
 from auth_deps import get_current_user
 
+# Simple in-memory cache for owner_kpis (5 min TTL)
+_kpis_cache: dict = {}
+_CACHE_TTL = 300  # 5 minutes
+
 router = APIRouter(prefix="/api")
 logger = logging.getLogger(__name__)
 
@@ -30,6 +34,14 @@ def _can_view(user: dict) -> bool:
 async def owner_kpis(current_user: dict = Depends(get_current_user)):
     if not _can_view(current_user):
         raise HTTPException(status_code=403, detail="غير مصرح")
+
+    # Return cached result if fresh (< 5 min)
+    import time
+    cache_key = "owner_kpis"
+    cached = _kpis_cache.get(cache_key)
+    if cached and (time.time() - cached["ts"]) < _CACHE_TTL:
+        return cached["data"]
+
     db = get_db()
     now = datetime.now(timezone.utc)
     iso24 = (now - timedelta(hours=24)).isoformat()
@@ -124,7 +136,12 @@ async def owner_kpis(current_user: dict = Depends(get_current_user)):
     except Exception:
         pass
 
-    return {
+    # Cache the result
+    import time as _time
+    _result = 
+    _kpis_cache["owner_kpis"] = {"data": _result, "ts": _time.time()}
+    return _result
+   return {
         "compounds": {"total": total_compounds, "active": active_compounds, "new_30d": new_compounds_30d},
         "users": {"total": total_users, "active": active_users, "new_30d": new_users_30d},
         "engagement": {"dau": dau, "mau": mau, "stickiness": round((dau / max(1, mau)) * 100, 1) if mau else 0},

@@ -208,8 +208,26 @@ async def smoke_test_monitor_loop():
                 await recompute_baselines()
                 regs = await detect_regressions()
                 if regs["new_regressions"]:
-                    await _email_perf_regressions_to_owners(db, regs["new_regressions"])
-                    logging.info(f"[perf_budget] {len(regs['new_regressions'])} new regression(s); emailed owners.")
+                    # Cooldown: only email if last alert was > 6 hours ago
+                    _now_ts = datetime.now(timezone.utc)
+                    _cooldown_h = 6
+                    _to_alert = []
+                    for _reg in regs["new_regressions"]:
+                        _ep = _reg.get("endpoint", "")
+                        _last = await db.perf_alert_cooldown.find_one({"endpoint": _ep})
+                        if not _last or (_now_ts - datetime.fromisoformat(_last["sent_at"].replace("Z",""))).total_seconds() > _cooldown_h * 3600:
+                            _to_alert.append(_reg)
+                    if _to_alert:
+                        await _email_perf_regressions_to_owners(db, _to_alert)
+                        for _reg in _to_alert:
+                            await db.perf_alert_cooldown.update_one(
+                                {"endpoint": _reg.get("endpoint")},
+                                {"$set": {"endpoint": _reg.get("endpoint"), "sent_at": _now_ts.isoformat()}},
+                                upsert=True
+                            )
+                        logging.info(f"[perf_budget] {len(_to_alert)} new regression(s); emailed owners.")
+                    else:
+                        logging.info(f"[perf_budget] {len(regs['new_regressions'])} regression(s) suppressed by cooldown (< {_cooldown_h}h).")
                 elif regs["resolved"]:
                     logging.info(f"[perf_budget] {len(regs['resolved'])} regression(s) auto-resolved.")
             except Exception as e:

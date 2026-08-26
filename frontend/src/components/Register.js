@@ -4,6 +4,7 @@ import { useAuth } from '../App';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
+import EgyptLocationPicker from './EgyptLocationPicker';
 import {
   BuildingOfficeIcon,
   BuildingOffice2Icon,
@@ -30,7 +31,7 @@ const Register = () => {
   const [selectedPlan, setSelectedPlan] = useState('starter');
   const [formData, setFormData] = useState({
     username: '', email: '', password: '', confirmPassword: '',
-    full_name: '', phone: '', compound_name: '', company_name: '', compound_city: '', compound_address: '', units_count: '', buildings_count: '', compound_phone: '', compound_lat: '', compound_lng: '',
+    full_name: '', phone: '', compound_name: '', company_name: '', compound_city: '', compound_address: '', units_count: '', buildings_count: '', compound_phone: '', compound_lat: '', compound_lng: '', compound_location: {},
     unit_number: '', subscription_code: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -420,18 +421,20 @@ const Register = () => {
                         className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
                         placeholder="مثال: كمبوند النرجس، عمارة رقم 5..." required />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">المدينة / الحي</label>
-                      <input type="text" name="compound_city" value={formData.compound_city || ''} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
-                        placeholder="القاهرة، الإسكندرية..." />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">العنوان التفصيلي</label>
-                      <input type="text" name="compound_address" value={formData.compound_address || ''} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
-                        placeholder="الشارع، المنطقة..." />
-                    </div>
+                  </div>
+                  {/* Location Picker — full width */}
+                  <div className="md:col-span-2">
+                    <EgyptLocationPicker
+                      value={formData.compound_location || {}}
+                      onChange={(loc) => {
+                        handleChange({ target: { name: 'compound_location', value: loc }});
+                        handleChange({ target: { name: 'compound_city', value: loc.area || loc.governorate || '' }});
+                        handleChange({ target: { name: 'compound_address', value: loc.fullLocation || '' }});
+                      }}
+                    />
+                  </div>
+                  {/* Hidden placeholder to maintain grid */ }
+                  <div className="hidden">
                     {/* Map location picker */}
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">📍 الموقع على الخريطة</label>

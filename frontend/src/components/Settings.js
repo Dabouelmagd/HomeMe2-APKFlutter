@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../App';
 import PushNotifications from './PushNotifications';
+import EgyptLocationPicker from './EgyptLocationPicker';
 import NotificationPreferencesPage from './NotificationPreferencesPage';
 import WeeklyDigestSettings from './WeeklyDigestSettings';
 import {

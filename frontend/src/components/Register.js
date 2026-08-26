@@ -30,7 +30,7 @@ const Register = () => {
   const [selectedPlan, setSelectedPlan] = useState('starter');
   const [formData, setFormData] = useState({
     username: '', email: '', password: '', confirmPassword: '',
-    full_name: '', phone: '', compound_name: '', company_name: '', compound_city: '', compound_address: '', units_count: '', buildings_count: '', compound_phone: '',
+    full_name: '', phone: '', compound_name: '', company_name: '', compound_city: '', compound_address: '', units_count: '', buildings_count: '', compound_phone: '', compound_lat: '', compound_lng: '',
     unit_number: '', subscription_code: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -137,6 +137,8 @@ const Register = () => {
         compound_phone: formData.compound_phone || '',
         units_count: formData.units_count ? parseInt(formData.units_count) : null,
         buildings_count: formData.buildings_count ? parseInt(formData.buildings_count) : null,
+        compound_lat: formData.compound_lat ? parseFloat(formData.compound_lat) : null,
+        compound_lng: formData.compound_lng ? parseFloat(formData.compound_lng) : null,
         ...(accountType === 'company_admin' ? {
           selected_plan: selectedPlan,
           ...(refInfo?.valid ? { referral_code: refCode } : {}),
@@ -429,6 +431,62 @@ const Register = () => {
                       <input type="text" name="compound_address" value={formData.compound_address || ''} onChange={handleChange}
                         className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
                         placeholder="الشارع، المنطقة..." />
+                    </div>
+                    {/* Map location picker */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">📍 الموقع على الخريطة</label>
+                      <div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-dashed border-emerald-300 rounded-xl overflow-hidden" style={{height: 180}}>
+                        {formData.compound_lat ? (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <div className="text-4xl mb-1">📍</div>
+                            <p className="text-xs font-bold text-emerald-700">{formData.compound_address || 'تم تحديد الموقع'}</p>
+                            <p className="text-[10px] text-gray-500">{Number(formData.compound_lat).toFixed(4)}, {Number(formData.compound_lng).toFixed(4)}</p>
+                            <button type="button" onClick={() => {
+                              const input = document.getElementById('reg-map-search');
+                              if (input) input.focus();
+                            }} className="mt-2 text-xs text-blue-600 underline">تغيير الموقع</button>
+                          </div>
+                        ) : (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4">
+                            <div className="text-3xl">🗺️</div>
+                            <p className="text-sm text-gray-600 text-center">ابحث عن موقع الكمبوند لتحديده على الخريطة</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <input
+                          id="reg-map-search"
+                          type="text"
+                          placeholder="ابحث: مثال 'النرجس 6، القاهرة'"
+                          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-300"
+                          onKeyDown={async (e) => {
+                            if (e.key !== 'Enter') return;
+                            e.preventDefault();
+                            const q = e.target.value.trim();
+                            if (!q) return;
+                            try {
+                              const key = 'AIzaSyBFpCjYAyk3Rqobw3UTzRRkVzdJozrIpNU';
+                              const res = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(q + ' مصر')}&language=ar&key=${key}`);
+                              const data = await res.json();
+                              if (data.results?.[0]) {
+                                const loc = data.results[0].geometry.location;
+                                handleChange({ target: { name: 'compound_lat', value: loc.lat }});
+                                handleChange({ target: { name: 'compound_lng', value: loc.lng }});
+                                if (!formData.compound_address) {
+                                  handleChange({ target: { name: 'compound_address', value: data.results[0].formatted_address }});
+                                }
+                              }
+                            } catch {}
+                          }}
+                        />
+                        <button type="button" className="bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700"
+                          onClick={() => {
+                            const input = document.getElementById('reg-map-search');
+                            input?.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true}));
+                          }}>
+                          بحث
+                        </button>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">عدد الوحدات السكنية</label>

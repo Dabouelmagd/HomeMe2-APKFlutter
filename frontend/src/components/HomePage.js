@@ -779,22 +779,24 @@ const HomePage = () => {
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: "'Cairo', 'Tajawal', sans-serif" }}>
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-100 shadow-sm w-full" data-testid="homepage-header" dir="rtl">
-        <div className="max-w-screen-2xl mx-auto px-4 h-16 flex items-center gap-4 w-full">
-          <div className="flex items-center gap-4 flex-shrink-0">
+        <div className="max-w-screen-2xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-2 sm:gap-4 w-full" dir="rtl">
+          {/* Logo + Name — always on the RIGHT (RTL start) */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <img
               src="/homeme-logo.png"
               alt="HomeMe"
-              className="h-10 w-auto rounded-xl shadow-sm flex-shrink-0"
+              className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl shadow-sm object-contain flex-shrink-0"
               data-testid="homepage-logo"
+              onError={e => { e.target.style.display='none'; }}
             />
             <div className="flex-shrink-0">
-              <span className="text-xl font-black text-gray-900 block leading-tight tracking-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
-              <span className="text-[10px] text-gray-500 font-medium block hidden sm:block">{t('hp_subtitle')}</span>
+              <span className="text-base sm:text-xl font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
+              <span className="text-[9px] sm:text-[10px] text-gray-500 font-medium hidden sm:block">{t('hp_subtitle', 'إدارة المجمعات السكنية')}</span>
             </div>
           </div>
 
           {/* Center Navigation — desktop only */}
-          <nav className="hidden lg:!flex items-center gap-1 flex-1 justify-center" data-testid="homepage-nav" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 flex-1 justify-center overflow-hidden" data-testid="homepage-nav" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
             {[
               { href: '#top', sectionId: 'top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home' },
               { href: '#systems', sectionId: 'systems', label: t('nav_features', 'المميزات'), testid: 'nav-features' },

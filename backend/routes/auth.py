@@ -100,6 +100,8 @@ async def register(user_data: UserCreate, request: Request):
     if user_data.role in ('admin', 'manager') and compound_id == 'default-compound':
         from models import Compound
         compound_name = getattr(user_data, 'compound_name', None) or f"كمبوند {user_data.full_name or user_data.username}"
+        _lat = getattr(user_data, 'compound_lat', None)
+        _lng = getattr(user_data, 'compound_lng', None)
         new_compound = {
             'id': str(uuid.uuid4()),
             'name': compound_name,
@@ -110,6 +112,12 @@ async def register(user_data: UserCreate, request: Request):
             'buildings_count': getattr(user_data, 'buildings_count', None),
             'created_at': datetime.now(timezone.utc).isoformat(),
             'admin_id': user.id,
+            # Map config — auto-set if lat/lng provided during registration
+            'map_config': {
+                'center': {'lat': _lat, 'lng': _lng} if _lat and _lng else None,
+                'zoom': 17,
+                'boundary': [],  # empty — drawn later from compound map page
+            } if _lat and _lng else None,
         }
         await db.compounds.insert_one(new_compound)
         compound_id = new_compound['id']

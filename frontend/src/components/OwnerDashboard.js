@@ -45,6 +45,7 @@ const OwnerDashboard = () => {
   const [slotStats, setSlotStats] = useState(null);
   const [allSlots, setAllSlots] = useState([]);
   const [supportTickets, setSupportTickets] = useState({ open: 0, in_progress: 0, recent: [] });
+  const [govStats, setGovStats] = useState({ total_zones: 0, total_residents: 0, open_complaints: 0, compounds_count: 0, zones: [] });
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showAddCompound, setShowAddCompound] = useState(false);
@@ -69,6 +70,22 @@ const OwnerDashboard = () => {
         const results = await Promise.all(slotPromises);
         setAllSlots(results);
       } catch(e) { console.error('Slots load error:', e); }
+
+      // Fetch gov zones stats
+      try {
+        const [gStats, gZones] = await Promise.all([
+          axios.get(`${API}/gov/stats`, getHeaders()).then(r => r.data).catch(() => ({})),
+          axios.get(`${API}/gov/zones`, getHeaders()).then(r => r.data).catch(() => ({ zones: [] })),
+        ]);
+        setGovStats({
+          total_zones: gStats.total_zones || 0,
+          total_residents: gStats.total_residents || 0,
+          open_complaints: gStats.open_complaints || 0,
+          compounds_count: gStats.compounds_count || 0,
+          monthly_revenue: gStats.monthly_revenue || 0,
+          zones: gZones.zones || [],
+        });
+      } catch(e) { console.error('Gov stats error:', e); }
 
       // Fetch support tickets
       try {
@@ -490,6 +507,7 @@ const OwnerDashboard = () => {
             { name: t('owner_company_subs', 'شركات الإدارة'), href: '/app/super-admin?tab=companies', icon: BuildingOffice2Icon, bg: 'bg-gradient-to-br from-indigo-500 to-blue-600' },
             { name: t('sa_ads', 'الإعلانات'), href: '/app/super-admin?tab=ads', icon: SpeakerWaveIcon, bg: 'bg-gradient-to-br from-amber-500 to-orange-600' },
             { name: t('owner_translations', 'الترجمات'), href: '/app/super-admin?tab=translations', icon: LanguageIcon, bg: 'bg-gradient-to-br from-rose-500 to-pink-600' },
+            { name: '🏛️ لوحة المحليات', href: '/app/gov-dashboard', icon: BuildingOffice2Icon, bg: 'bg-gradient-to-br from-blue-700 to-indigo-700' },
             { name: '➕ إضافة كمبوند', href: null, icon: PlusIcon, bg: 'bg-gradient-to-br from-emerald-500 to-green-600', action: () => setShowAddCompound(true) },
           ].map((link, i) => {
             const NavIcon = link.icon;

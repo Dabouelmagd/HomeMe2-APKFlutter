@@ -192,6 +192,14 @@ export default function GovDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showAdd, setShowAdd] = useState(false);
   const [alerts, setAlerts] = useState([]);
+  const [financial, setFinancial] = useState({});
+  const [subs, setSubs] = useState({});
+  const [selectedZone, setSelectedZone] = useState(null);
+  const [zoneStaff, setZoneStaff] = useState([]);
+  const [zoneInvites, setZoneInvites] = useState([]);
+  const [showStaffModal, setShowStaffModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [financialPeriod, setFinancialPeriod] = useState('month');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -204,9 +212,15 @@ export default function GovDashboard() {
       setStats(statsRes.data || {});
       setZones(zonesRes.data.zones || []);
       setAlerts(alertsRes.data.alerts || []);
+      const [finRes, subsRes] = await Promise.all([
+        axios.get(`${API}/gov/financial/summary?period=${financialPeriod}`, tok()).catch(() => ({ data: {} })),
+        axios.get(`${API}/gov/subscriptions`, tok()).catch(() => ({ data: {} })),
+      ]);
+      setFinancial(finRes.data || {});
+      setSubs(subsRes.data || {});
     } catch { toast.error('فشل تحميل البيانات'); }
     finally { setLoading(false); }
-  }, []);
+  }, [financialPeriod]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -215,6 +229,22 @@ export default function GovDashboard() {
     const matchType = filterType === 'all' || z.type === filterType;
     return matchSearch && matchType;
   });
+
+  const loadZoneStaff = useCallback(async (zoneId) => {
+    if (!zoneId) return;
+    const [staffRes, invRes] = await Promise.all([
+      axios.get(`${API}/gov/zones/${zoneId}/staff`, tok()).catch(() => ({ data: { staff: [] } })),
+      axios.get(`${API}/gov/zones/${zoneId}/invites`, tok()).catch(() => ({ data: { invites: [] } })),
+    ]);
+    setZoneStaff(staffRes.data.staff || []);
+    setZoneInvites(invRes.data.invites || []);
+  }, []);
+
+  const handleSelectZone = (zone) => {
+    setSelectedZone(zone);
+    loadZoneStaff(zone.id);
+    setActiveTab('zone_detail');
+  };
 
   const tabs = [
     { id: 'overview',      label: 'نظرة عامة',       icon: ChartBarIcon },
@@ -225,6 +255,9 @@ export default function GovDashboard() {
     { id: 'reports',       label: 'التقارير',          icon: DocumentTextIcon },
     { id: 'security',      label: 'الأمان',           icon: ShieldCheckIcon },
     { id: 'staff',         label: 'الموظفون',         icon: UsersIcon },
+    { id: 'financial',     label: 'الإيرادات',        icon: CurrencyDollarIcon },
+    { id: 'subscriptions', label: 'الاشتراكات',       icon: BoltIcon },
+    ...(selectedZone ? [{ id: 'zone_detail', label: `📍 ${selectedZone.name}`, icon: MapPinIcon }] : []),
   ];
 
   return (
@@ -392,7 +425,7 @@ export default function GovDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {filtered.map(z => (
                 <ZoneCard key={z.id} zone={z}
-                  onClick={() => navigate(`/app/gov-zone/${z.id}`)} />
+                  onClick={() => handleSelectZone(z)} />
               ))}
               {filtered.length === 0 && (
                 <div className="col-span-3 text-center py-12 text-gray-400">
@@ -486,14 +519,202 @@ export default function GovDashboard() {
 
         {/* ── Staff Tab ────────────────────────────────────────── */}
         {activeTab === 'staff' && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6 text-center text-gray-400">
-            <UsersIcon className="h-10 w-10 mx-auto mb-2 opacity-30" />
-            <p className="font-bold">إدارة موظفي الجهة الحكومية</p>
-            <p className="text-sm mt-1">إضافة موظفين وتحديد صلاحياتهم لكل وحدة إدارية</p>
-            <button onClick={() => navigate('/app/staff')}
-              className="mt-3 bg-violet-700 text-white font-bold px-5 py-2 rounded-xl text-sm">
-              إدارة الموظفين
-            </button>
+          <div className="space-y-3">
+            <p className="text-sm text-gray-500 dark:text-gray-400">اختر وحدة إدارية من تبويب "الوحدات الإدارية" لإدارة موظفيها</p>
+            {zones.slice(0,6).map(z => (
+              <button key={z.id} onClick={() => handleSelectZone(z)}
+                className="w-full flex items-center gap-3 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-300 transition-colors">
+                <span className="text-xl">{z.type==='district'?'🏘️':z.type==='markaz'?'🏛️':'🏙️'}</span>
+                <div className="text-start">
+                  <p className="font-bold text-sm text-gray-900 dark:text-white">{z.name}</p>
+                  <p className="text-xs text-gray-500">{z.type_label}</p>
+                </div>
+                <span className="mr-auto text-blue-600 text-xs font-bold">إدارة الموظفين ←</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ── Financial Tab ─────────────────────────────────────── */}
+        {activeTab === 'financial' && (
+          <div className="space-y-4">
+            {/* Period selector */}
+            <div className="flex gap-2 justify-end">
+              {[['month','شهري'],['quarter','ربع سنوي'],['year','سنوي']].map(([v,l]) => (
+                <button key={v} onClick={() => setFinancialPeriod(v)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold border-2 transition-all ${financialPeriod===v?'border-blue-500 bg-blue-50 text-blue-700':'border-gray-200 text-gray-600'}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+            {/* Summary cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <StatCard icon={CurrencyDollarIcon} label="إجمالي الإيرادات" value={`${(financial.total_revenue||0).toLocaleString()} ج.م`} color="emerald" />
+              <StatCard icon={CurrencyDollarIcon} label="إجمالي المصروفات" value={`${(financial.total_expenses||0).toLocaleString()} ج.م`} color="rose" />
+              <StatCard icon={ArrowTrendingUpIcon} label="الصافي" value={`${(financial.net||0).toLocaleString()} ج.م`} color={financial.net>=0?'blue':'rose'} />
+              <StatCard icon={BoltIcon} label="تحصيل معلق" value={`${(financial.pending_collection||0).toLocaleString()} ج.م`} color="amber" />
+            </div>
+            {/* MRR */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
+              <p className="font-bold text-gray-900 dark:text-white mb-1">💰 الإيرادات الشهرية المتكررة (MRR)</p>
+              <p className="text-3xl font-black text-emerald-600">{(financial.mrr||0).toLocaleString()} ج.م</p>
+              <p className="text-xs text-gray-500 mt-1">التقدير السنوي: {(financial.arr_estimate||0).toLocaleString()} ج.م</p>
+            </div>
+            {/* Zone breakdown */}
+            {financial.zone_breakdown?.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-4">
+                <p className="font-bold text-gray-900 dark:text-white mb-3">الإيرادات حسب الوحدة الإدارية</p>
+                <div className="space-y-2">
+                  {financial.zone_breakdown.map((z,i) => {
+                    const max = financial.zone_breakdown[0]?.revenue || 1;
+                    return (
+                      <div key={i}>
+                        <div className="flex justify-between text-xs mb-0.5">
+                          <span className="font-medium text-gray-700 dark:text-gray-300">{z.name}</span>
+                          <span className="font-black text-emerald-600">{(z.revenue||0).toLocaleString()} ج.م</span>
+                        </div>
+                        <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full"
+                            style={{width:`${Math.round((z.revenue/max)*100)}%`}} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Subscriptions Tab ─────────────────────────────────── */}
+        {activeTab === 'subscriptions' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <StatCard icon={CheckCircleIcon} label="اشتراكات نشطة"  value={subs.active||0}  color="emerald" />
+              <StatCard icon={ClockIcon}       label="فترة تجريبية"   value={subs.trial||0}   color="amber" />
+              <StatCard icon={BoltIcon}        label="منتهية"          value={subs.expired||0} color="rose" />
+              <StatCard icon={CurrencyDollarIcon} label="MRR" value={`${(subs.mrr||0).toLocaleString()} ج.م`} color="blue" />
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-700">
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">كل الاشتراكات</h3>
+              </div>
+              <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                {(subs.subscriptions||[]).slice(0,10).map((s,i) => (
+                  <div key={i} className="flex items-center justify-between px-5 py-3">
+                    <div>
+                      <p className="text-sm font-bold text-gray-900 dark:text-white">{s.compound_name || s.compound_id}</p>
+                      <p className="text-xs text-gray-500">{s.plan_name||s.plan} · {(s.monthly_amount||0).toLocaleString()} ج.م/شهر</p>
+                    </div>
+                    <span className={`text-xs font-black px-2 py-0.5 rounded-full ${
+                      s.status==='active'?'bg-emerald-100 text-emerald-700':
+                      s.status==='trial'?'bg-amber-100 text-amber-700':'bg-gray-100 text-gray-500'}`}>
+                      {s.status==='active'?'نشط':s.status==='trial'?'تجريبي':'منتهي'}
+                    </span>
+                  </div>
+                ))}
+                {(!subs.subscriptions||subs.subscriptions.length===0) && (
+                  <div className="p-8 text-center text-gray-400 text-sm">لا توجد اشتراكات بعد</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Zone Detail Tab ───────────────────────────────────── */}
+        {activeTab === 'zone_detail' && selectedZone && (
+          <div className="space-y-4">
+            {/* Zone header */}
+            <div className="bg-gradient-to-r from-blue-700 to-indigo-700 rounded-2xl p-4 text-white">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{selectedZone.type==='district'?'🏘️':selectedZone.type==='markaz'?'🏛️':'🏙️'}</span>
+                  <div>
+                    <h3 className="font-black text-lg">{selectedZone.name}</h3>
+                    <p className="text-blue-200 text-xs">{selectedZone.type_label} · {selectedZone.governorate}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => setShowInviteModal(true)}
+                    className="bg-white/20 hover:bg-white/30 text-white font-bold px-3 py-1.5 rounded-lg text-xs border border-white/30">
+                    📧 دعوة
+                  </button>
+                  <button onClick={() => setShowStaffModal(true)}
+                    className="bg-white text-blue-700 font-bold px-3 py-1.5 rounded-lg text-xs">
+                    + موظف جديد
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  ['الكمبوندات', selectedZone.compounds_count||0],
+                  ['الوحدات', (selectedZone.units_count||0).toLocaleString()],
+                  ['السكان', (selectedZone.residents_count||0).toLocaleString()],
+                ].map(([l,v]) => (
+                  <div key={l} className="bg-white/10 rounded-lg p-2 text-center">
+                    <p className="text-lg font-black">{v}</p>
+                    <p className="text-[10px] text-white/70">{l}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Staff list */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">👥 موظفو الوحدة</h3>
+                <button onClick={() => setShowStaffModal(true)}
+                  className="text-xs bg-blue-600 text-white font-bold px-3 py-1 rounded-lg">+ إضافة</button>
+              </div>
+              {zoneStaff.length === 0 ? (
+                <div className="p-6 text-center text-gray-400 text-sm">لا يوجد موظفون — اضغط "+ إضافة" لإضافة أول موظف</div>
+              ) : (
+                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                  {zoneStaff.map((s,i) => (
+                    <div key={i} className="flex items-center gap-3 px-5 py-3">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        {(s.full_name||'؟')[0]}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">{s.full_name}</p>
+                        <p className="text-xs text-gray-500">{s.role_label} · {s.email}</p>
+                      </div>
+                      <button onClick={async () => {
+                        await axios.delete(`${API}/gov/zones/${selectedZone.id}/staff/${s.id}`, tok());
+                        loadZoneStaff(selectedZone.id);
+                        toast.success('تم الحذف');
+                      }} className="text-red-400 hover:text-red-600 text-xs">حذف</button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Invites */}
+            <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <h3 className="font-bold text-gray-900 dark:text-white text-sm">📧 الدعوات المرسلة</h3>
+                <button onClick={() => setShowInviteModal(true)}
+                  className="text-xs bg-indigo-600 text-white font-bold px-3 py-1 rounded-lg">+ دعوة جديدة</button>
+              </div>
+              {zoneInvites.length === 0 ? (
+                <div className="p-6 text-center text-gray-400 text-sm">لا توجد دعوات — أرسل دعوات بالإيميل أو الكود</div>
+              ) : (
+                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                  {zoneInvites.map((inv,i) => (
+                    <div key={i} className="flex items-center gap-3 px-5 py-3">
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-gray-900 dark:text-white">{inv.email||'دعوة بالكود'}</p>
+                        <p className="text-xs text-gray-500">كود: <strong>{inv.code}</strong> · تنتهي {inv.expires_at?.slice(0,10)}</p>
+                      </div>
+                      <span className={`text-xs font-black px-2 py-0.5 rounded-full ${inv.status==='used'?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}`}>
+                        {inv.status==='used'?'مُستخدمة':'بانتظار'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -504,6 +725,107 @@ export default function GovDashboard() {
           onSuccess={() => { setShowAdd(false); load(); }}
           parentGovId={user?.compound_id}
         />
+      )}
+
+      {/* Add Staff Modal */}
+      {showStaffModal && selectedZone && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowStaffModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()} dir="rtl">
+            <div className="bg-gradient-to-r from-blue-700 to-indigo-700 p-4 rounded-t-2xl">
+              <h3 className="font-black text-white">👤 إضافة موظف — {selectedZone.name}</h3>
+            </div>
+            <form className="p-4 space-y-3" onSubmit={async (e) => {
+              e.preventDefault();
+              const fd = new FormData(e.target);
+              const body = Object.fromEntries(fd.entries());
+              try {
+                const res = await axios.post(`${API}/gov/zones/${selectedZone.id}/staff`, body, tok());
+                toast.success(`✅ تمت الإضافة — كلمة المرور المؤقتة: ${res.data.temp_password}`);
+                setShowStaffModal(false);
+                loadZoneStaff(selectedZone.id);
+              } catch(err) { toast.error(err.response?.data?.detail || 'فشل الإضافة'); }
+            }}>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">الدور الوظيفي</label>
+                <select name="staff_role" className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-gray-700 outline-none">
+                  {[['manager','مدير الوحدة'],['accountant','محاسب'],['admin','إداري'],['security','أمن'],['clerk','موظف']].map(([v,l]) => (
+                    <option key={v} value={v}>{l}</option>
+                  ))}
+                </select>
+              </div>
+              {[['الاسم الكامل *','full_name','text','محمد أحمد'],['البريد الإلكتروني *','email','email','name@example.com'],['اسم المستخدم','username','text','username123'],['الهاتف','phone','tel','01xxxxxxxxx']].map(([l,n,t,p]) => (
+                <div key={n}>
+                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">{l}</label>
+                  <input type={t} name={n} placeholder={p} required={l.includes('*')}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-gray-700 outline-none" />
+                </div>
+              ))}
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-xl p-2 text-xs text-blue-700 dark:text-blue-300">
+                📧 سيتم إرسال بيانات الدخول على الإيميل تلقائياً
+              </div>
+              <div className="flex gap-2">
+                <button type="submit" className="flex-1 bg-blue-700 text-white font-black py-2.5 rounded-xl text-sm hover:bg-blue-800">إضافة وإرسال إيميل</button>
+                <button type="button" onClick={() => setShowStaffModal(false)} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm">إلغاء</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Invite Modal */}
+      {showInviteModal && selectedZone && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowInviteModal(false)}>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()} dir="rtl">
+            <div className="bg-gradient-to-r from-indigo-700 to-violet-700 p-4 rounded-t-2xl">
+              <h3 className="font-black text-white">📧 إرسال دعوة — {selectedZone.name}</h3>
+            </div>
+            <form className="p-4 space-y-3" onSubmit={async (e) => {
+              e.preventDefault();
+              const fd = new FormData(e.target);
+              const body = Object.fromEntries(fd.entries());
+              try {
+                const res = await axios.post(`${API}/gov/zones/${selectedZone.id}/invite`, body, tok());
+                const code = res.data.code;
+                const link = res.data.reg_link;
+                toast.success(`✅ الدعوة أُرسلت — الكود: ${code}`);
+                setShowInviteModal(false);
+                loadZoneStaff(selectedZone.id);
+                // Copy code to clipboard
+                navigator.clipboard.writeText(code).catch(() => {});
+              } catch(err) { toast.error(err.response?.data?.detail || 'فشل الإرسال'); }
+            }}>
+              <div>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">طريقة الدعوة</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[['email','📧 إيميل'],['code','🔑 كود فقط'],['both','📧 + كود']].map(([v,l]) => (
+                    <label key={v} className="flex items-center gap-1 p-2 border border-gray-200 rounded-lg cursor-pointer hover:border-indigo-300 text-xs font-bold">
+                      <input type="radio" name="method" value={v} defaultChecked={v==='both'} className="accent-indigo-600" /> {l}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              {[['الاسم (اختياري)','name','text','اسم المدعو'],['البريد الإلكتروني','email','email','name@example.com']].map(([l,n,t,p]) => (
+                <div key={n}>
+                  <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">{l}</label>
+                  <input type={t} name={n} placeholder={p}
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-gray-700 outline-none" />
+                </div>
+              ))}
+              <div>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">الدور في الوحدة</label>
+                <select name="role" className="w-full border border-gray-300 dark:border-gray-600 rounded-xl px-3 py-2 text-sm bg-white dark:bg-gray-700 outline-none">
+                  {[['resident','مقيم'],['admin','مدير'],['staff','موظف']].map(([v,l]) => (
+                    <option key={v} value={v}>{l}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-2">
+                <button type="submit" className="flex-1 bg-indigo-700 text-white font-black py-2.5 rounded-xl text-sm hover:bg-indigo-800">إرسال الدعوة</button>
+                <button type="button" onClick={() => setShowInviteModal(false)} className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm">إلغاء</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

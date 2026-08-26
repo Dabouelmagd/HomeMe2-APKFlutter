@@ -71,18 +71,27 @@ const OwnerDashboard = () => {
         setAllSlots(results);
       } catch(e) { console.error('Slots load error:', e); }
 
-      // Fetch gov zones stats
+      // Fetch gov zones stats + financial
       try {
-        const [gStats, gZones] = await Promise.all([
+        const [gStats, gZones, gFinancial, gSubs] = await Promise.all([
           axios.get(`${API}/gov/stats`, getHeaders()).then(r => r.data).catch(() => ({})),
           axios.get(`${API}/gov/zones`, getHeaders()).then(r => r.data).catch(() => ({ zones: [] })),
+          axios.get(`${API}/gov/financial/summary?period=month`, getHeaders()).then(r => r.data).catch(() => ({})),
+          axios.get(`${API}/gov/subscriptions`, getHeaders()).then(r => r.data).catch(() => ({})),
         ]);
         setGovStats({
           total_zones: gStats.total_zones || 0,
           total_residents: gStats.total_residents || 0,
           open_complaints: gStats.open_complaints || 0,
           compounds_count: gStats.compounds_count || 0,
-          monthly_revenue: gStats.monthly_revenue || 0,
+          monthly_revenue: gFinancial.total_revenue || 0,
+          total_expenses: gFinancial.total_expenses || 0,
+          net: gFinancial.net || 0,
+          mrr: gFinancial.mrr || 0,
+          pending_collection: gFinancial.pending_collection || 0,
+          active_subs: gSubs.active || 0,
+          trial_subs: gSubs.trial || 0,
+          zone_breakdown: gFinancial.zone_breakdown || [],
           zones: gZones.zones || [],
         });
       } catch(e) { console.error('Gov stats error:', e); }

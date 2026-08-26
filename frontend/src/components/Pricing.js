@@ -52,6 +52,7 @@ const Pricing = () => {
       image: 'https://homemeapp.net/og-cover.png',
     },
   });
+  const [segment, setSegment] = useState('compound'); // 'compound' | 'gov'
   const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [currency, setCurrency] = useState(() => {
     // Default to EGP for Arabic/Egyptian users, USD for others
@@ -494,6 +495,131 @@ const Pricing = () => {
     },
   ];
 
+  // ── Government / Municipal Plans (منفصلة) ─────────────────────
+  const govPlans = [
+    {
+      id: 'gov_district',
+      name: 'حي / منطقة',
+      nameEn: 'District',
+      subtitle: 'لإدارة الأحياء والمناطق السكنية',
+      price: { monthly: 8000, yearly: 86400 },
+      gradient: 'from-teal-600 to-cyan-700',
+      color: 'teal',
+      popular: false,
+      badge: '🏘️ حي',
+      savingsYearly: 9600,
+      features: [
+        { cat: '🏘️ نطاق التغطية', items: [
+          { text: 'إدارة حي واحد كامل', ok: true },
+          { text: 'حتى 50 كمبوند / عمارة', ok: true },
+          { text: 'عدد غير محدود من الوحدات', ok: true },
+          { text: 'خريطة الحي التفاعلية', ok: true },
+        ]},
+        { cat: '💰 المالية', items: [
+          { text: 'تقارير مالية موحدة للحي', ok: true },
+          { text: 'تحصيل الرسوم والخدمات', ok: true },
+          { text: 'ربط مع الجهات الحكومية', ok: false },
+        ]},
+        { cat: '🔧 الخدمات', items: [
+          { text: 'طلبات الصيانة المجمعة', ok: true },
+          { text: 'إدارة شكاوى السكان', ok: true },
+          { text: 'جدول الخدمات البلدية', ok: true },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: 'تقارير AI شهرية للحي', ok: true },
+          { text: 'مساعد AI — 30 رسالة/يوم', ok: true },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'دعم فني مخصص', ok: true },
+          { text: 'تدريب الفريق البلدي', ok: true },
+        ]},
+      ],
+    },
+    {
+      id: 'gov_markaz',
+      name: 'مركز / قضاء',
+      nameEn: 'Municipality',
+      subtitle: 'لمراكز المدن والأقضية',
+      price: { monthly: 18000, yearly: 194400 },
+      gradient: 'from-blue-700 to-indigo-800',
+      color: 'blue',
+      popular: true,
+      badge: '🏛️ الأكثر طلباً',
+      savingsYearly: 21600,
+      features: [
+        { cat: '🏛️ نطاق التغطية', items: [
+          { text: 'إدارة مركز / قضاء كامل', ok: true },
+          { text: 'عدد غير محدود من الأحياء', ok: true },
+          { text: 'عدد غير محدود من الوحدات', ok: true },
+          { text: 'خريطة تفاعلية متقدمة', ok: true },
+        ]},
+        { cat: '💰 المالية', items: [
+          { text: 'تقارير مالية شاملة', ok: true },
+          { text: 'ربط مع الجهات الحكومية', ok: true },
+          { text: 'تحليلات الإيرادات البلدية', ok: true },
+          { text: 'API تكامل حكومي', ok: true },
+        ]},
+        { cat: '🔧 الخدمات', items: [
+          { text: 'إدارة الخدمات البلدية كاملة', ok: true },
+          { text: 'شكاوى ومقترحات المواطنين', ok: true },
+          { text: 'جداول جمع القمامة والصيانة', ok: true },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: 'تقارير AI أسبوعية', ok: true },
+          { text: 'مساعد AI — 100 رسالة/يوم', ok: true },
+          { text: 'تحليل رضا المواطنين AI', ok: true },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'مدير حساب حكومي مخصص', ok: true },
+          { text: 'تدريب وتأهيل الموظفين', ok: true },
+          { text: 'SLA حكومي مضمون', ok: true },
+        ]},
+      ],
+    },
+    {
+      id: 'gov_city',
+      name: 'محافظة / مدينة',
+      nameEn: 'Governorate',
+      subtitle: 'للمحافظات والمدن الكبرى',
+      price: { monthly: 45000, yearly: 486000 },
+      gradient: 'from-emerald-700 to-teal-800',
+      color: 'emerald',
+      popular: false,
+      badge: '🏙️ Enterprise حكومي',
+      savingsYearly: 54000,
+      features: [
+        { cat: '🏙️ نطاق التغطية', items: [
+          { text: 'إدارة محافظة / مدينة كاملة', ok: true },
+          { text: 'عدد غير محدود من المراكز', ok: true },
+          { text: 'عدد غير محدود من الأحياء', ok: true },
+          { text: 'GIS متقدم + خريطة ذكية', ok: true },
+        ]},
+        { cat: '💰 المالية والتكامل', items: [
+          { text: 'تكامل مالي حكومي كامل', ok: true },
+          { text: 'API لأنظمة الحكومة الإلكترونية', ok: true },
+          { text: 'لوحة مؤشرات المحافظة', ok: true },
+          { text: 'تقارير مقدمة لمجلس المدينة', ok: true },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: 'AI غير محدود لكل الأقسام', ok: true },
+          { text: 'تحليلات بيانات السكان', ok: true },
+          { text: 'خطط تنمية ذكية بالـ AI', ok: true },
+        ]},
+        { cat: '🔒 الأمان والامتثال', items: [
+          { text: 'Dedicated server مخصص', ok: true },
+          { text: 'تشفير حكومي متقدم', ok: true },
+          { text: 'Audit logs كاملة', ok: true },
+          { text: 'SLA 99.9% مضمون', ok: true },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'فريق دعم حكومي 24/7', ok: true },
+          { text: 'تدريب شامل للموظفين', ok: true },
+          { text: 'زيارات ميدانية للتدريب', ok: true },
+        ]},
+      ],
+    },
+  ];
+
   const discountOffers = [
 
     {
@@ -597,6 +723,40 @@ const Pricing = () => {
             </button>
           </div>
 
+          {/* Segment Switcher */}
+          <div className="flex justify-center mb-10">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-1.5 shadow-lg border border-gray-200 dark:border-gray-700 flex gap-1">
+              <button
+                onClick={() => setSegment('compound')}
+                className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-black transition-all ${
+                  segment === 'compound'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <span className="text-lg">🏠</span>
+                <div className="text-start">
+                  <p className="font-black leading-tight">كمبوندات وعمارات</p>
+                  <p className={`text-[10px] font-normal leading-tight ${segment === 'compound' ? 'text-white/80' : 'text-gray-400'}`}>للمجمعات السكنية الخاصة</p>
+                </div>
+              </button>
+              <button
+                onClick={() => setSegment('gov')}
+                className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-black transition-all ${
+                  segment === 'gov'
+                    ? 'bg-gradient-to-r from-blue-700 to-indigo-700 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                <span className="text-lg">🏛️</span>
+                <div className="text-start">
+                  <p className="font-black leading-tight">محافظات ومحليات</p>
+                  <p className={`text-[10px] font-normal leading-tight ${segment === 'gov' ? 'text-white/80' : 'text-gray-400'}`}>للجهات الحكومية والبلديات</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
           {/* Header */}
           <div className="text-center mb-12">
           {/* HomeMe Logo */}
@@ -608,11 +768,13 @@ const Pricing = () => {
             />
           </div>
           
-          <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center">
-            {t('choose_your_account_type')}
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 text-center">
+            {segment === 'gov' ? '🏛️ خطط المحافظات والمحليات' : t('choose_your_account_type')}
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto text-center">
-            {t('select_plan_best_fits')}
+          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto text-center">
+            {segment === 'gov'
+              ? 'حلول متكاملة للجهات الحكومية والبلديات — من الحي حتى المحافظة'
+              : t('select_plan_best_fits')}
           </p>
           
           {/* Currency and Billing Toggle */}

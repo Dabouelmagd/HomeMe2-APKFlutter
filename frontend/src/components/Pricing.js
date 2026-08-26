@@ -417,6 +417,83 @@ const Pricing = () => {
     },
   ];
 
+    // ─── 6. COMPANY MID ──────────────────────────────────────
+    {
+      id: 'company_mid',
+      name: 'شركة متوسطة',
+      nameEn: 'Business',
+      subtitle: 'لشركات تدير 1-8 مجتمعات',
+      price: { monthly: 13000, yearly: 140400 },
+      originalPrice: { monthly: 13000, yearly: 156000 },
+      icon: BuildingOfficeIcon,
+      gradient: 'from-indigo-600 to-blue-700',
+      color: 'indigo',
+      popular: false,
+      badge: '🏢 الأفضل للشركات',
+      savingsYearly: 31200,
+      isCompany: true,
+      features: [
+        { cat: '🏢 إدارة الشركة', items: [
+          { text: 'إدارة 1-8 مجتمعات سكنية', ok: true },
+          { text: 'لوحة تحكم موحدة متقدمة', ok: true },
+          { text: 'مقارنة أداء المجتمعات', ok: true },
+          { text: 'إدارة فرق متعددة', ok: true },
+          { text: 'عدد غير محدود من السكان', ok: true },
+        ]},
+        { cat: '💰 المالية', items: [
+          { text: 'تقارير موحدة لكل المجتمعات', ok: true },
+          { text: 'تحليلات MRR / Churn', ok: true },
+          { text: 'تصدير Excel و PDF', ok: true },
+          { text: 'API تكامل محاسبي', ok: true },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: '✨ مساعد AI — 50 رسالة/يوم', ok: true },
+          { text: '🧠 مستشار AI استباقي', ok: true },
+          { text: '🤖 AI Auto-Pilot', ok: true },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'مدير حساب مخصص', ok: true },
+          { text: 'دعم فني أولوية 24/7', ok: true },
+        ]},
+      ],
+    },
+
+    // ─── 7. COMPANY LARGE ─────────────────────────────────────
+    {
+      id: 'company_large',
+      name: 'شركة كبرى',
+      nameEn: 'Enterprise',
+      subtitle: 'غير محدود — للمجموعات الكبرى',
+      price: { monthly: 35000, yearly: 378000 },
+      originalPrice: { monthly: 35000, yearly: 420000 },
+      icon: BuildingOfficeIcon,
+      gradient: 'from-rose-600 to-pink-700',
+      color: 'rose',
+      popular: false,
+      badge: '🏛️ Enterprise',
+      savingsYearly: 84000,
+      isCompany: true,
+      features: [
+        { cat: '🏢 إدارة الشركة', items: [
+          { text: 'عدد غير محدود من المجتمعات', ok: true },
+          { text: 'White Label — علامتك التجارية', ok: true },
+          { text: 'API مخصص للتكامل', ok: true },
+          { text: 'SLA مضمون', ok: true },
+        ]},
+        { cat: '✨ الذكاء الاصطناعي', items: [
+          { text: 'AI غير محدود لكل المستخدمين', ok: true },
+          { text: '🤖 AI Auto-Pilot كامل', ok: true },
+          { text: 'تقارير AI أسبوعية تلقائية', ok: true },
+        ]},
+        { cat: '💬 الدعم', items: [
+          { text: 'مدير حساب مخصص 24/7', ok: true },
+          { text: 'تدريب الفريق', ok: true },
+          { text: 'Dedicated server option', ok: true },
+        ]},
+      ],
+    },
+  ];
+
   const discountOffers = [
 
     {
@@ -1142,41 +1219,46 @@ const Pricing = () => {
             </div>
             <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-x-auto">
               <table className="w-full text-sm" data-testid="pricing-comparison-table">
-                <thead className="bg-gradient-to-r from-purple-50 to-fuchsia-50">
-                  <tr>
-                    <th className="px-4 py-3 text-start font-bold text-gray-700 sticky right-0 bg-gradient-to-r from-purple-50 to-fuchsia-50">
-                      {t('feature', 'الميزة')}
-                    </th>
-                    <th className="px-4 py-3 text-center font-bold text-gray-700">{t('free_plan', 'مجاني')}</th>
-                    <th className="px-4 py-3 text-center font-bold text-blue-700">{t('basic_plan', 'أساسي')}</th>
-                    <th className="px-4 py-3 text-center font-bold text-purple-700 bg-purple-100/50">{t('pro_plan', 'احترافي')} <span className="block text-[10px] font-normal text-purple-600">⭐ الأكثر شيوعاً</span></th>
-                    <th className="px-4 py-3 text-center font-bold text-fuchsia-700">{t('premium_plan', 'متقدم')}</th>
+                <thead>
+                  <tr className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700">
+                    <th className="px-3 py-3 text-start font-bold text-gray-700 dark:text-gray-300 sticky right-0 bg-gray-50 dark:bg-gray-800 min-w-[140px]">الميزة</th>
+                    <th className="px-2 py-3 text-center font-bold text-gray-500 text-xs min-w-[80px]">مجاني</th>
+                    <th className="px-2 py-3 text-center font-bold text-sky-700 text-xs min-w-[80px]">أساسي<br/><span className="text-[10px] font-normal">1,200 ج.م</span></th>
+                    <th className="px-2 py-3 text-center font-bold text-indigo-700 text-xs bg-indigo-50/50 dark:bg-indigo-900/20 min-w-[80px]">احترافي ⭐<br/><span className="text-[10px] font-normal">2,200 ج.م</span></th>
+                    <th className="px-2 py-3 text-center font-bold text-violet-700 text-xs min-w-[80px]">متقدم 💎<br/><span className="text-[10px] font-normal">4,000 ج.م</span></th>
+                    <th className="px-2 py-3 text-center font-bold text-amber-700 text-xs min-w-[80px]">ناشئة 🌱<br/><span className="text-[10px] font-normal">5,500 ج.م</span></th>
+                    <th className="px-2 py-3 text-center font-bold text-blue-800 text-xs min-w-[80px]">متوسطة 🏢<br/><span className="text-[10px] font-normal">13,000 ج.م</span></th>
+                    <th className="px-2 py-3 text-center font-bold text-rose-700 text-xs min-w-[80px]">كبرى 🏛️<br/><span className="text-[10px] font-normal">35,000 ج.م</span></th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {[
-                    { f: 'عدد الوحدات',            v: ['20', '100', '500', '∞'] },
-                    { f: 'إدارة السكان والعائلات',  v: ['✓', '✓', '✓', '✓'] },
-                    { f: 'الفواتير والمدفوعات',     v: ['✓', '✓', '✓', '✓'] },
-                    { f: 'طلبات الصيانة',          v: ['10/شهر', '50/شهر', '∞', '∞'] },
-                    { f: 'الإعلانات والتواصل',     v: ['—', '✓', '✓', '✓'] },
-                    { f: 'الزوار + QR Code',       v: ['—', '✓', '✓', '✓'] },
-                    { f: 'تقارير PDF',             v: ['—', 'أساسية', 'متقدمة', 'مخصصة'] },
-                    { f: 'استيراد سكان CSV',        v: ['—', '✓', '✓', '✓'] },
-                    { f: 'مدفوعات أونلاين (Stripe)', v: ['—', '—', '✓', '✓'] },
-                    { f: 'مساعد AI + Auto-Pilot',  v: ['—', '—', '✓', '✓'] },
-                    { f: 'خريطة الكمبوند التفاعلية', v: ['—', '—', '✓', '✓'] },
-                    { f: 'تقرير أسبوعي تلقائي',     v: ['—', '—', '✓', '✓'] },
-                    { f: 'فريق المساعدين',          v: ['—', '—', '3', '∞'] },
-                    { f: 'الإعلانات التجارية (دخل)', v: ['—', '—', '—', '✓'] },
-                    { f: 'الدعم الفني',             v: ['بريد', 'بريد', 'بريد + شات', 'مخصص 24/7'] },
-                    { f: '💬 شات الدعم المباشر',     v: ['—', '✓', '✓', '✓'], highlight: true },
-                    { f: '🏠 إعلانات الوحدات (بيع/إيجار)', v: ['—', '✓', '✓', '✓'], highlight: true },
-                    { f: '✨ مساعد AI (Claude)',      v: ['—', '10/يوم', '20/يوم', 'غير محدود'], highlight: true },
-                    { f: '👷 دليل العمال والصنايعية', v: ['—', '✓', '✓', '✓'], highlight: true },
-                    { f: '🧾 تأكيد إيصالات الدفع',   v: ['✓', '✓', '✓', '✓'], highlight: true },
-                    { f: '🚫 القائمة السوداء للعمالة', v: ['—', '✓', '✓', '✓'], highlight: true },
-                    { f: 'API للتكامل الخارجي',     v: ['—', '—', '—', '✓'] },
+                    // [ مجاني, أساسي, احترافي, متقدم, ناشئة, متوسطة, كبرى ]
+                    { f: 'عدد الوحدات السكنية',    v: ['30', '100', '∞', '∞', '∞', '∞', '∞'] },
+                    { f: 'عدد المجتمعات',           v: ['1', '1', '1', '1', '3', '8', '∞'] },
+                    { f: 'إدارة السكان والعائلات',  v: ['✓', '✓', '✓', '✓', '✓', '✓', '✓'] },
+                    { f: 'الفواتير والمدفوعات',     v: ['✓', '✓', '✓', '✓', '✓', '✓', '✓'] },
+                    // [ مجاني, أساسي, احترافي, متقدم, ناشئة, متوسطة, كبرى ]
+                    { f: '🔧 طلبات الصيانة',          v: ['محدودة', '50/شهر', '∞', '∞', '∞', '∞', '∞'] },
+                    { f: '📢 الإعلانات والتواصل',     v: ['—', '✓', '✓', '✓', '✓', '✓', '✓'] },
+                    { f: '🛡️ الزوار + QR Code',       v: ['—', '—', '✓', '✓', '✓', '✓', '✓'] },
+                    { f: '📄 تقارير PDF',             v: ['—', 'أساسية', 'متقدمة', 'مخصصة', 'موحدة', 'موحدة', 'مخصصة'] },
+                    { f: '📥 استيراد سكان CSV',        v: ['—', '✓', '✓', '✓', '✓', '✓', '✓'] },
+                    { f: '💳 مدفوعات أونلاين',        v: ['—', '—', '✓', '✓', '✓', '✓', '✓'] },
+                    { f: '📍 نظام تتبع الأشخاص',      v: ['—', '—', '✓', '✓', '✓', '✓', '✓'] },
+                    { f: '🤖 مساعد AI + Auto-Pilot',  v: ['—', '5/يوم', '20/يوم', '50/يوم', '20/يوم', '50/يوم', '∞'] },
+                    { f: '🗺️ خريطة الكمبوند التفاعلية', v: ['—', '—', '✓', '✓', '✓', '✓', '✓'] },
+                    { f: '📊 تقرير أسبوعي تلقائي',    v: ['—', '—', '✓', '✓', '✓', '✓', '✓'] },
+                    { f: '👥 فريق المساعدين',         v: ['—', '2', '5', '∞', '∞', '∞', '∞'] },
+                    { f: '📢 الإعلانات التجارية',      v: ['—', '—', '✓', '✓', '✓', '✓', '✓'] },
+                    { f: '🔗 API للتكامل الخارجي',    v: ['—', '—', '—', '✓', '—', '✓', '✓'] },
+                    { f: '🏷️ White Label',             v: ['—', '—', '—', '—', '—', '—', '✓'] },
+                    { f: '📈 تحليلات MRR/Churn',      v: ['—', '—', '—', '✓', '—', '✓', '✓'] },
+                    { f: '🏢 لوحة تحكم موحدة للشركة', v: ['—', '—', '—', '—', '✓', '✓', '✓'] },
+                    { f: '💬 الدعم الفني',             v: ['بريد', 'بريد', 'شات', '24/7', 'شات', 'مخصص', 'مخصص 24/7'] },
+                    { f: '🏠 إعلانات الوحدات',         v: ['—', '—', '✓', '✓', '✓', '✓', '✓'], highlight: true },
+                    { f: '👷 دليل العمال',             v: ['—', '✓', '✓', '✓', '✓', '✓', '✓'], highlight: true },
+                    { f: '🧾 تأكيد إيصالات الدفع',    v: ['✓', '✓', '✓', '✓', '✓', '✓', '✓'], highlight: true },
                   ].map((row, i) => (
                     <tr key={i} className="hover:bg-purple-50/30 transition">
                       <td className="px-4 py-3 font-medium text-gray-700 sticky right-0 bg-white">{row.f}</td>

@@ -226,36 +226,64 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
 
   if (!showFull) {
     // Compact version
+    const isExpiredOrAlmost = isExpired || isAlmostExpired;
     return (
-      <div className={`rounded-lg p-3 text-white ${
-        isAlmostExpired
-          ? 'bg-gradient-to-r from-orange-500 to-red-500'
-          : 'bg-gradient-to-r from-blue-500 to-purple-600'
-      }`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {isAlmostExpired ? (
-              <ExclamationTriangleIcon className="h-5 w-5" />
+      <div className={`rounded-xl text-white ${
+        isExpired ? 'bg-gradient-to-r from-red-600 to-red-700' :
+        isAlmostExpired ? 'bg-gradient-to-r from-orange-500 to-red-500' :
+        'bg-gradient-to-r from-blue-600 to-purple-600'
+      }`} dir="rtl">
+        {/* Main bar */}
+        <div className="flex items-center justify-between px-3 py-2.5">
+          <div className="flex items-center gap-2">
+            {isExpired ? (
+              <XMarkIcon className="h-4 w-4 flex-shrink-0" />
+            ) : isAlmostExpired ? (
+              <ExclamationTriangleIcon className="h-4 w-4 flex-shrink-0" />
             ) : (
-              <ClockIcon className="h-5 w-5" />
+              <ClockIcon className="h-4 w-4 flex-shrink-0" />
             )}
-            <span className="text-sm font-medium">
-              {daysRemaining} {daysRemaining === 1 ? t('days_left') : t('days_left_plural')}
-            </span>
+            <div>
+              {isExpired ? (
+                <p className="text-xs font-black">⚠️ انتهت فترة التجربة — اشترك الآن</p>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-black">
+                    {countdown ? (
+                      countdown.days > 0
+                        ? `${countdown.days} يوم و ${countdown.hours} ساعة متبقية`
+                        : `${countdown.hours}:${String(countdown.minutes).padStart(2,'0')}:${String(countdown.seconds).padStart(2,'0')} متبقية`
+                    ) : `${daysRemaining} يوم متبقي`}
+                  </p>
+                  {daysRemaining <= 7 && (
+                    <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full font-bold animate-pulse">
+                      انتهاء قريب!
+                    </span>
+                  )}
+                </div>
+              )}
+              <p className="text-[10px] text-white/70">الفترة التجريبية المجانية — 14 يوم</p>
+            </div>
           </div>
-          <div className="flex gap-1.5">
-            <button
-              onClick={onUpgradeClick || upgradeToPaid}
-              className="bg-white font-medium hover:bg-gray-50 transition-colors px-3 py-1 rounded text-xs text-blue-600"
-            >
-              {t('upgrade_now')}
-            </button>
-
-          </div>
+          <button
+            onClick={onUpgradeClick || upgradeToPaid}
+            className="bg-white text-blue-600 font-black hover:bg-gray-50 transition-colors px-3 py-1.5 rounded-lg text-xs flex-shrink-0"
+          >
+            اشترك الآن ⬆️
+          </button>
         </div>
-        {/* Action buttons below compact bar */}
+        {/* Progress bar */}
+        {!isExpired && (
+          <div className="px-3 pb-1">
+            <div className="h-1 bg-white/20 rounded-full overflow-hidden">
+              <div className="h-full bg-white/60 rounded-full transition-all"
+                style={{ width: `${Math.max(0, Math.min(100, ((14 - daysRemaining) / 14) * 100))}%` }} />
+            </div>
+          </div>
+        )}
+        {/* Code input + action buttons */}
         {showCodeInput && (
-          <div className="mt-2 flex gap-2">
+          <div className="px-3 pb-2 flex gap-2">
             <input
               type="text"
               value={subCode}
@@ -264,36 +292,33 @@ const TrialStatus = ({ showFull = false, onUpgradeClick = null }) => {
               className="flex-1 text-xs px-3 py-1.5 rounded-lg border border-white/30 bg-white/10 text-white placeholder-white/50 outline-none focus:bg-white/20"
             />
             <button onClick={applyCode}
-              className="bg-white text-blue-600 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-gray-50 transition-colors">
-              تفعيل
+              className="bg-white text-blue-600 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-gray-50 transition-colors flex-shrink-0">
+              تفعيل ✓
             </button>
           </div>
         )}
         {/* 3 action buttons */}
-        <div className="flex gap-2 mt-2">
+        <div className="flex gap-1.5 px-3 pb-2.5">
           <button
-            onClick={() => navigate('/app/my-subscription')}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-white/15 hover:bg-white/25 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-colors border border-white/20"
-            title="تجديد الاشتراك"
+            onClick={() => navigate('/pricing')}
+            className="flex-1 flex items-center justify-center gap-1 bg-white/15 hover:bg-white/25 text-white text-[10px] font-bold py-1.5 rounded-lg transition-colors border border-white/20"
           >
-            <ArrowPathIcon className="h-3.5 w-3.5" />
-            تجديد
+            <ArrowPathIcon className="h-3 w-3" />
+            الأسعار
           </button>
           <button
             onClick={() => setShowCodeInput(v => !v)}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-white/15 hover:bg-white/25 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-colors border border-white/20"
-            title="إضافة كود اشتراك"
+            className={`flex-1 flex items-center justify-center gap-1 text-[10px] font-bold py-1.5 rounded-lg transition-colors border ${showCodeInput ? 'bg-white text-blue-600' : 'bg-white/15 hover:bg-white/25 text-white border-white/20'}`}
           >
-            <TicketIcon className="h-3.5 w-3.5" />
+            <TicketIcon className="h-3 w-3" />
             كود
           </button>
           <button
             onClick={onUpgradeClick || upgradeToPaid}
-            className="flex-1 flex items-center justify-center gap-1.5 bg-white text-blue-600 hover:bg-gray-50 text-xs font-bold py-1.5 px-2 rounded-lg transition-colors"
-            title="ترقية الاشتراك"
+            className="flex-1 flex items-center justify-center gap-1 bg-white text-blue-600 hover:bg-gray-50 text-[10px] font-bold py-1.5 rounded-lg transition-colors"
           >
-            <ArrowUpCircleIcon className="h-3.5 w-3.5" />
-            ترقية
+            <ArrowUpCircleIcon className="h-3 w-3" />
+            اشترك
           </button>
         </div>
       </div>

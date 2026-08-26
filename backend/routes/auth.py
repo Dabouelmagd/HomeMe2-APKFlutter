@@ -104,6 +104,10 @@ async def register(user_data: UserCreate, request: Request):
             'id': str(uuid.uuid4()),
             'name': compound_name,
             'address': getattr(user_data, 'compound_address', '') or '',
+            'city': getattr(user_data, 'compound_city', '') or '',
+            'phone': getattr(user_data, 'compound_phone', '') or '',
+            'units_count': getattr(user_data, 'units_count', None),
+            'buildings_count': getattr(user_data, 'buildings_count', None),
             'created_at': datetime.now(timezone.utc).isoformat(),
             'admin_id': user.id,
         }

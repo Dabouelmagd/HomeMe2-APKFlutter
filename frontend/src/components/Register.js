@@ -30,7 +30,7 @@ const Register = () => {
   const [selectedPlan, setSelectedPlan] = useState('starter');
   const [formData, setFormData] = useState({
     username: '', email: '', password: '', confirmPassword: '',
-    full_name: '', phone: '', compound_name: '', company_name: '',
+    full_name: '', phone: '', compound_name: '', company_name: '', compound_city: '', compound_address: '', units_count: '', buildings_count: '', compound_phone: '',
     unit_number: '', subscription_code: ''
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -133,6 +133,10 @@ const Register = () => {
         compound_id: '',
         compound_name: formData.compound_name || `كمبوند ${formData.full_name || formData.username}`,
         compound_address: formData.compound_address || '',
+        compound_city: formData.compound_city || '',
+        compound_phone: formData.compound_phone || '',
+        units_count: formData.units_count ? parseInt(formData.units_count) : null,
+        buildings_count: formData.buildings_count ? parseInt(formData.buildings_count) : null,
         ...(accountType === 'company_admin' ? {
           selected_plan: selectedPlan,
           ...(refInfo?.valid ? { referral_code: refCode } : {}),
@@ -402,8 +406,52 @@ const Register = () => {
               )}
 
               {accountType === 'compound_admin' && (
-                <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
-                  <p className="text-sm text-emerald-700 font-medium">{t('compound_admin_note', 'سيتم تسجيلك كمدير مجتمع سكني. يمكنك إنشاء المجتمع وإضافة السكان والأمن والإداريين بعد التسجيل.')}</p>
+                <div className="space-y-4" dir="rtl">
+                  <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                    <p className="text-sm text-emerald-700 font-bold">🏠 تفاصيل المجمع السكني</p>
+                    <p className="text-xs text-emerald-600 mt-0.5">يمكنك إضافة الشعار وباقي التفاصيل بعد التسجيل من الإعدادات</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">اسم الكمبوند / العمارة *</label>
+                      <input type="text" name="compound_name" value={formData.compound_name || ''} onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
+                        placeholder="مثال: كمبوند النرجس، عمارة رقم 5..." required />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">المدينة / الحي</label>
+                      <input type="text" name="compound_city" value={formData.compound_city || ''} onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
+                        placeholder="القاهرة، الإسكندرية..." />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">العنوان التفصيلي</label>
+                      <input type="text" name="compound_address" value={formData.compound_address || ''} onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
+                        placeholder="الشارع، المنطقة..." />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">عدد الوحدات السكنية</label>
+                      <input type="number" name="units_count" value={formData.units_count || ''} onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
+                        placeholder="50" min="1" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">عدد المباني</label>
+                      <input type="number" name="buildings_count" value={formData.buildings_count || ''} onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
+                        placeholder="1" min="1" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">هاتف الكمبوند</label>
+                      <input type="tel" name="compound_phone" value={formData.compound_phone || ''} onChange={handleChange}
+                        className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-emerald-300 outline-none"
+                        placeholder="01xxxxxxxxx" />
+                    </div>
+                  </div>
+                  <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 text-xs text-blue-700">
+                    💡 بعد التسجيل: يمكنك رفع شعار الكمبوند وإضافة المزيد من التفاصيل من <strong>الإعدادات → نظرة عامة</strong>
+                  </div>
                 </div>
               )}
 

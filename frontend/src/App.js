@@ -1265,7 +1265,9 @@ function App() {
                 } />
 
                 {/* 404 fallback for any unknown /app/* route — prevents WHITE SCREEN */}
-                <Route path="*" element={
+                                <Route path="bulk-import" element={<ProtectedRoute adminOnly><ImportExportPage /></ProtectedRoute>} />
+                <Route path="gov-dashboard" element={<GovDashboard />} />
+<Route path="*" element={
                   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-6" dir="rtl">
                     <div className="max-w-md text-center bg-white rounded-3xl shadow-2xl p-8">
                       <div className="text-6xl mb-4">🔍</div>

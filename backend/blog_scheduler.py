@@ -245,3 +245,15 @@ async def run_blog_scheduler(db):
         except Exception as e:
             logger.error(f"Blog scheduler error: {e}")
             await asyncio.sleep(3600)  # retry in 1 hour
+
+
+# Manual trigger endpoint — POST /api/blog/trigger-daily
+from fastapi import APIRouter as _AR
+_trigger_router = _AR()
+
+@_trigger_router.post("/api/blog/trigger-daily")
+async def trigger_daily_blog():
+    """Manually trigger today's blog post (owner only)"""
+    import asyncio
+    asyncio.create_task(generate_and_publish_blog())
+    return {"success": True, "message": "Blog generation triggered"}

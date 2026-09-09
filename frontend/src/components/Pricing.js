@@ -27,6 +27,14 @@ const API = process.env.REACT_APP_BACKEND_URL;
 const Pricing = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+
+  // Detect user subscription status
+  const userPlanId = user?.subscription_plan || user?.plan || null;
+  const trialActive = user?.subscription_status === 'trial' || user?.status === 'trial';
+  const trialEnded  = user?.subscription_status === 'expired' || user?.status === 'expired';
+  const isPaid      = user?.subscription_status === 'active' || user?.subscription_status === 'paid';
+  const currentPlan = userPlanId; // e.g. 'professional', 'essential', etc.
+  const isLoggedIn  = !!user;
   const navigate = useNavigate();
 
   // 🔍 SEO — pricing page targets high-intent users searching for plans/cost
@@ -723,6 +731,57 @@ const Pricing = () => {
             </button>
           </div>
 
+          {/* Trial Status Banner — shown when logged in */}
+          {isLoggedIn && (trialActive || trialEnded) && (
+            <div className={`rounded-2xl p-4 mb-8 flex items-center gap-4 ${
+              trialEnded
+                ? 'bg-gradient-to-r from-red-600 to-rose-700 text-white'
+                : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white'
+            }`} dir="rtl">
+              <div className="text-3xl flex-shrink-0">
+                {trialEnded ? '⚠️' : '⏳'}
+              </div>
+              <div className="flex-1">
+                {trialEnded ? (
+                  <>
+                    <p className="font-black text-base">انتهت فترة التجربة المجانية</p>
+                    <p className="text-sm text-white/80 mt-0.5">
+                      اختر خطة للاستمرار في استخدام كل مميزات HomeMe
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-black text-base">أنت في الفترة التجريبية المجانية — 14 يوم</p>
+                    <p className="text-sm text-white/80 mt-0.5">
+                      اختر خطتك الآن وسيبدأ الاشتراك بعد انتهاء التجربة تلقائياً
+                    </p>
+                  </>
+                )}
+              </div>
+              <div className="flex-shrink-0 text-right">
+                <p className="text-xs text-white/70">الخطة الحالية</p>
+                <p className="font-black capitalize">{currentPlan || 'مجاني'}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Subscribed Banner — plan active */}
+          {isLoggedIn && isPaid && (
+            <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl p-4 mb-8 flex items-center gap-4" dir="rtl">
+              <span className="text-3xl">✅</span>
+              <div className="flex-1">
+                <p className="font-black">اشتراكك نشط — {currentPlan}</p>
+                <p className="text-sm text-white/80 mt-0.5">يمكنك الترقية لخطة أعلى في أي وقت</p>
+              </div>
+              <button
+                onClick={() => navigate('/app/my-subscription')}
+                className="bg-white/20 hover:bg-white/30 border border-white/30 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all"
+              >
+                إدارة الاشتراك
+              </button>
+            </div>
+          )}
+
           {/* Segment Switcher */}
           <div className="flex justify-center mb-10">
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-1.5 shadow-lg border border-gray-200 dark:border-gray-700 flex gap-1">
@@ -1038,22 +1097,94 @@ const Pricing = () => {
                     
                   </div>
                   
-                  {/* CTA Button */}
-                  <button
-                    onClick={() => handleSelectPlan(plan.id)}
-                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-all ${
-                      plan.popular
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
-                        : plan.id === 'community'
-                        ? 'bg-gray-100 hover:bg-gray-200 text-gray-800'
-                        : 'bg-gray-900 hover:bg-gray-800 text-white'
-                    }`}
-                  >
-                    {plan.id === 'community' ? t('start_free') : t('choose_plan', { plan: plan.name })}
-                  </button>
-                  
-                  {plan.id === 'community' && (
-                    <p className="text-center text-sm text-gray-500 mt-2">
+                  {/* Trial Badge — shown on every paid plan */}
+                  {plan.id !== 'community' && (
+                    <div className={`mb-3 rounded-xl px-3 py-2 text-center border ${
+                      trialActive
+                        ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800'
+                        : trialEnded
+                        ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
+                        : isPaid && currentPlan === plan.id
+                        ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800'
+                        : 'bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200 dark:bg-emerald-900/10 dark:border-emerald-800'
+                    }`}>
+                      {isPaid && currentPlan === plan.id ? (
+                        <div className="flex items-center justify-center gap-1.5">
+                          <span className="text-emerald-600 text-base">✅</span>
+                          <span className="text-xs font-black text-emerald-700 dark:text-emerald-300">خطتك الحالية</span>
+                        </div>
+                      ) : trialActive ? (
+                        <div>
+                          <p className="text-xs font-black text-blue-700 dark:text-blue-300">⏳ فترة تجريبية نشطة</p>
+                          <p className="text-[10px] text-blue-500 mt-0.5">اشترك الآن للاستمرار بعد انتهاء الـ 14 يوم</p>
+                        </div>
+                      ) : trialEnded ? (
+                        <div>
+                          <p className="text-xs font-black text-red-700 dark:text-red-300">⚠️ انتهت فترة التجربة</p>
+                          <p className="text-[10px] text-red-500 mt-0.5">اشترك الآن لاستعادة الوصول الكامل</p>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-xs font-black text-emerald-700 dark:text-emerald-300">🎁 جرّب مجاناً 14 يوم</p>
+                          <p className="text-[10px] text-emerald-600 mt-0.5">بدون بطاقة ائتمان • إلغاء في أي وقت</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* CTA Button — smart based on user status */}
+                  {isPaid && currentPlan === plan.id ? (
+                    // Current active plan — locked/greyed
+                    <div className="w-full py-3 px-4 rounded-xl font-black text-center text-sm
+                      bg-emerald-100 text-emerald-700 border-2 border-emerald-200
+                      dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-800
+                      flex items-center justify-center gap-2 cursor-default select-none">
+                      <span>✅</span> خطتك الحالية — نشطة
+                    </div>
+                  ) : isPaid && currentPlan !== plan.id ? (
+                    // Subscribed to different plan — upgrade/downgrade
+                    <button
+                      onClick={() => handleSelectPlan(plan.id)}
+                      className={`w-full py-3 px-4 rounded-xl font-black text-sm transition-all ${
+                        plan.popular
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
+                          : 'bg-gray-900 hover:bg-gray-800 text-white'
+                      }`}
+                    >
+                      ⬆️ الترقية لهذه الخطة
+                    </button>
+                  ) : plan.id === 'community' ? (
+                    // Free plan
+                    <button
+                      onClick={() => handleSelectPlan(plan.id)}
+                      className="w-full py-3 px-4 rounded-xl font-black text-sm
+                        bg-gray-100 hover:bg-gray-200 text-gray-800 transition-all"
+                    >
+                      {isLoggedIn ? '✓ خطتك الحالية' : t('start_free')}
+                    </button>
+                  ) : (
+                    // Paid plan — not subscribed yet
+                    <button
+                      onClick={() => handleSelectPlan(plan.id)}
+                      className={`w-full py-3 px-4 rounded-xl font-black text-sm transition-all ${
+                        plan.popular
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                          : trialEnded
+                          ? 'bg-rose-600 hover:bg-rose-700 text-white animate-pulse'
+                          : 'bg-gray-900 hover:bg-gray-800 text-white'
+                      }`}
+                    >
+                      {trialEnded
+                        ? '🔓 اشترك الآن — استعد وصولك'
+                        : trialActive
+                        ? `🚀 اشترك في ${plan.name}`
+                        : `🎁 ابدأ تجربة ${plan.name} مجاناً`}
+                    </button>
+                  )}
+
+                  {/* Free plan note */}
+                  {plan.id === 'community' && !isLoggedIn && (
+                    <p className="text-center text-xs text-gray-500 mt-2">
                       {t('no_credit_card_required')}
                     </p>
                   )}

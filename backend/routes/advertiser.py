@@ -9,7 +9,7 @@ Flow:
   5. Approved ads appear in the normal internal_ads flow (is_active + visible to residents)
   6. Advertiser views analytics: GET /api/advertiser/ads/{id}/stats (impressions, clicks, CTR)
 """
-from fastapi import APIRouter, HTTPException, Depends, Body, UploadFile, File
+from fastapi import APIRouter, Request, Request, HTTPException, Depends, Body, UploadFile, File
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 from pathlib import Path
@@ -346,10 +346,47 @@ async def track_impression(ad_id: str):
 
 
 @router.post("/advertiser-ads/{ad_id}/track-click")
-async def track_click(ad_id: str):
-    """Public endpoint: زيادة عداد النقرات."""
+async def track_click(ad_id: str, request: Request):
+    """Public endpoint: زيادة عداد النقرات مع حماية من Click Fraud."""
+    import time
     db = get_db()
+
+    # ── IP + Session Throttling ─────────────────────────────────
+    client_ip  = request.headers.get("X-Forwarded-For", request.client.host or "unknown").split(",")[0].strip()
+    session_id = request.headers.get("X-Session-ID", "")
+    throttle_key = f"click:{ad_id}:{client_ip}"
+    session_key  = f"click:{ad_id}:sess:{session_id}" if session_id else None
+    now = int(time.time())
+    window = 3600  # 1 hour cooldown per IP per ad
+
+    existing = await db.click_throttle.find_one({"key": throttle_key})
+    if existing and (now - existing.get("ts", 0)) < window:
+        return {"success": False, "reason": "throttled"}
+    if session_key:
+        sess_existing = await db.click_throttle.find_one({"key": session_key})
+        if sess_existing and (now - sess_existing.get("ts", 0)) < window:
+            return {"success": False, "reason": "session_throttled"}
+
+    # Save throttle record (TTL index on ts field — 1 hour)
+    await db.click_throttle.update_one(
+        {"key": throttle_key},
+        {"$set": {"key": throttle_key, "ts": now, "ad_id": ad_id, "ip": client_ip}},
+        upsert=True
+    )
+    if session_key:
+        await db.click_throttle.update_one(
+            {"key": session_key},
+            {"$set": {"key": session_key, "ts": now, "ad_id": ad_id}},
+            upsert=True
+        )
+
+    # ── Record click with metadata ──────────────────────────────
     res = await db.advertiser_ads.update_one({"id": ad_id}, {"$inc": {"clicks": 1}})
+    await db.ad_click_log.insert_one({
+        "ad_id": ad_id, "ip": client_ip,
+        "session_id": session_id, "ts": now,
+        "user_agent": request.headers.get("User-Agent", "")[:200],
+    })
     return {"success": res.matched_count > 0}
 
 

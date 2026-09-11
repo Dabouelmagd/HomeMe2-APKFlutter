@@ -101,6 +101,145 @@ async def get_compound_slots(
     return {"slots": slots, "compound_id": compound_id}
 
 
+# ── Tiered Pricing Calculator ──────────────────────────────────────────
+TIERED_DISCOUNTS = {
+    "weekly":    {"discount": 0.00, "label": "أسبوعي",       "days": 7},
+    "monthly":   {"discount": 0.15, "label": "شهري (خصم 15%)", "days": 30},
+    "quarterly": {"discount": 0.30, "label": "ربع سنوي (خصم 30%)", "days": 90},
+}
+
+@router.get("/pricing")
+async def get_slot_pricing(
+    slot_key: str = "",
+    period: str = "monthly",   # weekly | monthly | quarterly
+    current_user: dict = Depends(get_current_user),
+):
+    """Return tiered pricing for a slot."""
+    db = get_db()
+    slot = await db.ad_slot_specs.find_one({"slot_key": slot_key}, {"_id": 0})
+    if not slot:
+        # Default base prices per slot type
+        BASE_PRICES = {
+            "hero_spotlight":   {"weekly": 2500,  "monthly": 8000},
+            "top_sticky":       {"weekly": 1800,  "monthly": 5500},
+            "section_divider":  {"weekly": 800,   "monthly": 2500},
+            "native_feed":      {"weekly": 600,   "monthly": 1800},
+            "popup_modal":      {"weekly": 1200,  "monthly": 3500},
+            "sidebar":          {"weekly": 500,   "monthly": 1500},
+            "dashboard_banner": {"weekly": 700,   "monthly": 2000},
+        }
+        base = BASE_PRICES.get(slot_key, {"weekly": 500, "monthly": 1500})
+    else:
+        base = {"weekly": slot.get("base_price_weekly", 500),
+                "monthly": slot.get("base_price_monthly", 1500)}
+
+    tier = TIERED_DISCOUNTS.get(period, TIERED_DISCOUNTS["monthly"])
+    weekly_rate  = base["weekly"]
+    monthly_rate = base["monthly"]
+    days         = tier["days"]
+
+    # Calculate price for requested period
+    if period == "weekly":
+        raw_price = weekly_rate
+    elif period == "monthly":
+        raw_price = monthly_rate
+    else:  # quarterly
+        raw_price = monthly_rate * 3
+
+    final_price   = raw_price * (1 - tier["discount"])
+    savings       = raw_price - final_price
+    daily_rate    = final_price / days
+
+    return {
+        "slot_key":    slot_key,
+        "period":      period,
+        "period_label": tier["label"],
+        "days":        days,
+        "base_price":  raw_price,
+        "discount_pct": tier["discount"] * 100,
+        "final_price": round(final_price, 2),
+        "savings":     round(savings, 2),
+        "daily_rate":  round(daily_rate, 2),
+        "all_tiers": {
+            p: {
+                "label":       TIERED_DISCOUNTS[p]["label"],
+                "days":        TIERED_DISCOUNTS[p]["days"],
+                "base_price":  monthly_rate if p != "weekly" else weekly_rate,
+                "discount_pct": TIERED_DISCOUNTS[p]["discount"] * 100,
+                "final_price": round(
+                    (weekly_rate if p == "weekly" else monthly_rate * (1 if p == "monthly" else 3))
+                    * (1 - TIERED_DISCOUNTS[p]["discount"]), 2
+                ),
+            }
+            for p in TIERED_DISCOUNTS
+        }
+    }
+
+
+# ── Availability Checker (real-time) ───────────────────────────────────
+@router.get("/availability")
+async def check_availability(
+    slot_key:   str = "",
+    start_date: str = "",   # ISO date string
+    end_date:   str = "",
+    current_user: dict = Depends(get_current_user),
+):
+    """Check if a slot is available for given date range — no overlapping bookings."""
+    from datetime import datetime
+    db = get_db()
+
+    if not slot_key or not start_date or not end_date:
+        raise HTTPException(400, "slot_key, start_date, end_date required")
+
+    try:
+        start = datetime.fromisoformat(start_date)
+        end   = datetime.fromisoformat(end_date)
+    except Exception:
+        raise HTTPException(400, "Invalid date format — use ISO (YYYY-MM-DD)")
+
+    if end <= start:
+        raise HTTPException(400, "end_date must be after start_date")
+
+    # Find overlapping active bookings
+    overlapping = await db.ad_slot_bookings.count_documents({
+        "slot_key": slot_key,
+        "status":   {"$in": ["active", "pending", "approved"]},
+        "$and": [
+            {"start_date": {"$lt": end_date}},
+            {"end_date":   {"$gt": start_date}},
+        ]
+    })
+
+    # Get slot max_concurrent
+    slot_spec = await db.ad_slot_specs.find_one({"slot_key": slot_key}, {"_id": 0})
+    max_concurrent = slot_spec.get("max_concurrent_ads", 1) if slot_spec else 1
+
+    available = overlapping < max_concurrent
+    slots_remaining = max_concurrent - overlapping
+
+    # Get next available date if busy
+    next_available = None
+    if not available:
+        upcoming = await db.ad_slot_bookings.find(
+            {"slot_key": slot_key, "status": {"$in": ["active","approved"]},
+             "end_date": {"$gte": start_date}},
+            {"end_date": 1}
+        ).sort("end_date", 1).limit(1).to_list(1)
+        if upcoming:
+            next_available = upcoming[0].get("end_date")
+
+    return {
+        "slot_key":         slot_key,
+        "start_date":       start_date,
+        "end_date":         end_date,
+        "available":        available,
+        "slots_remaining":  slots_remaining,
+        "max_concurrent":   max_concurrent,
+        "overlapping_count": overlapping,
+        "next_available":   next_available,
+    }
+
+
 # ── Request a slot booking ─────────────────────────────────────────
 @router.post("/request")
 async def request_slot(

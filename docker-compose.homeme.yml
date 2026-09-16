@@ -25,6 +25,7 @@ services:
     depends_on:
       - homeme-mongo
     environment:
+      - GOVME_MONGODB_URL=mongodb://govme-mongo:27017/govme
       MONGO_URL: "mongodb://homeme-mongo:27017"
       DB_NAME: "homeme"
       JWT_SECRET: "homeme-super-secret-jwt-key-2026"
@@ -46,6 +47,7 @@ services:
       - homeme_backups:/app/backups
     networks:
       - homeme-net
+      - govme-net
 
   homeme-frontend:
     build:

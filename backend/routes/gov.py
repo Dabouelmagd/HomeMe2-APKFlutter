@@ -8,7 +8,7 @@ from typing import Optional
 import uuid
 
 from auth_deps import get_current_user
-from database import get_db
+from database_gov import get_govme_db
 
 router = APIRouter(prefix="/api/gov", tags=["gov"])
 
@@ -20,7 +20,7 @@ GOV_TYPE_LABELS = {
 
 @router.get("/stats")
 async def gov_stats(current_user: dict = Depends(get_current_user)):
-    db = get_db()
+    db = get_govme_db()
     gov_id = current_user.get("compound_id") or current_user.get("gov_id", "")
 
     zones = await db.gov_zones.find({"parent_gov_id": gov_id}, {"_id": 0}).to_list(500)
@@ -59,7 +59,7 @@ async def gov_stats(current_user: dict = Depends(get_current_user)):
 
 @router.get("/zones")
 async def get_zones(current_user: dict = Depends(get_current_user)):
-    db = get_db()
+    db = get_govme_db()
     gov_id = current_user.get("compound_id") or current_user.get("gov_id", "")
     zones = await db.gov_zones.find({"parent_gov_id": gov_id}, {"_id": 0}).to_list(200)
 
@@ -80,7 +80,7 @@ async def get_zones(current_user: dict = Depends(get_current_user)):
 
 @router.post("/zones")
 async def create_zone(body: dict, current_user: dict = Depends(get_current_user)):
-    db = get_db()
+    db = get_govme_db()
     gov_id = current_user.get("compound_id") or current_user.get("gov_id", "")
     zone = {
         "id": str(uuid.uuid4()),
@@ -104,7 +104,7 @@ async def create_zone(body: dict, current_user: dict = Depends(get_current_user)
 
 @router.get("/alerts")
 async def get_alerts(current_user: dict = Depends(get_current_user)):
-    db = get_db()
+    db = get_govme_db()
     gov_id = current_user.get("compound_id") or current_user.get("gov_id", "")
     zones = await db.gov_zones.find({"parent_gov_id": gov_id}, {"compound_ids": 1}).to_list(200)
     all_cids = [c for z in zones for c in z.get("compound_ids", [])]
@@ -126,7 +126,7 @@ async def get_alerts(current_user: dict = Depends(get_current_user)):
 async def gov_financial_summary(
     period: str = "month",  # month | quarter | year
     current_user: dict = Depends(get_current_user),
-    db=Depends(get_db),
+    db=Depends(get_govme_db),
 ):
     gov_id = current_user.get("compound_id") or current_user.get("gov_id", "")
     zones  = await db.gov_zones.find({"parent_gov_id": gov_id}, {"compound_ids": 1}).to_list(200)
@@ -192,7 +192,7 @@ async def gov_financial_summary(
 
 
 @router.get("/subscriptions")
-async def gov_subscriptions(current_user: dict = Depends(get_current_user), db=Depends(get_db)):
+async def gov_subscriptions(current_user: dict = Depends(get_current_user), db=Depends(get_govme_db)):
     gov_id = current_user.get("compound_id") or current_user.get("gov_id", "")
     zones  = await db.gov_zones.find({"parent_gov_id": gov_id}, {"compound_ids": 1, "name": 1}).to_list(200)
     all_cids = [c for z in zones for c in z.get("compound_ids", [])]
@@ -218,13 +218,13 @@ async def gov_subscriptions(current_user: dict = Depends(get_current_user), db=D
 
 # ── Staff per Zone: Admin, Accountant, Security, Clerk ───────────────
 @router.get("/zones/{zone_id}/staff")
-async def get_zone_staff(zone_id: str, current_user: dict = Depends(get_current_user), db=Depends(get_db)):
+async def get_zone_staff(zone_id: str, current_user: dict = Depends(get_current_user), db=Depends(get_govme_db)):
     staff = await db.gov_staff.find({"zone_id": zone_id}, {"_id": 0, "password_hash": 0}).to_list(100)
     return {"staff": staff}
 
 
 @router.post("/zones/{zone_id}/staff")
-async def add_zone_staff(zone_id: str, body: dict, current_user: dict = Depends(get_current_user), db=Depends(get_db)):
+async def add_zone_staff(zone_id: str, body: dict, current_user: dict = Depends(get_current_user), db=Depends(get_govme_db)):
     import secrets, hashlib
 
     zone = await db.gov_zones.find_one({"id": zone_id})
@@ -300,14 +300,14 @@ async def add_zone_staff(zone_id: str, body: dict, current_user: dict = Depends(
 
 
 @router.delete("/zones/{zone_id}/staff/{staff_id}")
-async def remove_zone_staff(zone_id: str, staff_id: str, current_user: dict = Depends(get_current_user), db=Depends(get_db)):
+async def remove_zone_staff(zone_id: str, staff_id: str, current_user: dict = Depends(get_current_user), db=Depends(get_govme_db)):
     await db.gov_staff.delete_one({"id": staff_id, "zone_id": zone_id})
     return {"success": True}
 
 
 # ── Invitations: Email + Code ─────────────────────────────────────────
 @router.post("/zones/{zone_id}/invite")
-async def invite_to_zone(zone_id: str, body: dict, current_user: dict = Depends(get_current_user), db=Depends(get_db)):
+async def invite_to_zone(zone_id: str, body: dict, current_user: dict = Depends(get_current_user), db=Depends(get_govme_db)):
     import secrets as _secrets
 
     zone = await db.gov_zones.find_one({"id": zone_id})
@@ -366,6 +366,6 @@ async def invite_to_zone(zone_id: str, body: dict, current_user: dict = Depends(
 
 
 @router.get("/zones/{zone_id}/invites")
-async def get_zone_invites(zone_id: str, current_user: dict = Depends(get_current_user), db=Depends(get_db)):
+async def get_zone_invites(zone_id: str, current_user: dict = Depends(get_current_user), db=Depends(get_govme_db)):
     invites = await db.gov_invites.find({"zone_id": zone_id}, {"_id": 0}).to_list(100)
     return {"invites": invites}

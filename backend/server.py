@@ -2474,6 +2474,7 @@ from routes.ad_slots import router as ad_slots_router
 from routes.app_updates import router as app_updates_router
 from routes.tracking import router as tracking_router
 from routes.gov import router as gov_router
+from database_gov import init_govme_indexes
 from routes.unit_listings import router as unit_listings_router
 app.include_router(compound_map_router)
 app.include_router(watermark_router)
@@ -3085,6 +3086,8 @@ async def startup_db_client():
         logging.info("App Owner account created (Owner_homeme / Dalia1234@)")
     
     logging.info("Database connection and indexes initialized")
+    await init_govme_indexes()
+    logging.info("GovMe database initialized")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():

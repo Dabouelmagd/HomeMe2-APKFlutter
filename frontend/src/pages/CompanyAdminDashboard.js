@@ -430,6 +430,7 @@ const CompanyAdminDashboard = () => {
           />
 
           </div>
+        </div>
         )}
 
         {/* ── Financial Tab ─────────────────────── */}

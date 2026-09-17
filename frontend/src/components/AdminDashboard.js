@@ -138,6 +138,18 @@ const AdminDashboard = () => {
       case 'services':
         navigate('/app/services');
         break;
+      case 'security':
+        navigate('/app/visitor-passes');
+        break;
+      case 'announcements':
+        navigate('/app/messages');
+        break;
+      case 'workers':
+        navigate('/app/workers');
+        break;
+      case 'complaints':
+        navigate('/app/complaints');
+        break;
       default:
         break;
     }

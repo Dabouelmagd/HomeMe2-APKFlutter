@@ -469,7 +469,7 @@ const Layout = ({ children, isTrialMode = false }) => {
     }
     switch (result.type) {
       case 'user':
-        navigate('/app/admin/users');
+        navigate('/app/users');
         break;
       case 'compound':
         navigate('/app/super-admin');

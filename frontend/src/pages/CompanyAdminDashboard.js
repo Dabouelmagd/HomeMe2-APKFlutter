@@ -52,6 +52,9 @@ const CompanyAdminDashboard = () => {
   const [teamFor, setTeamFor] = useState(null);
   const [error, setError] = useState(null);
   const [logoUploading, setLogoUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [financialData, setFinancialData] = useState(null);
+  const [staffData, setStaffData] = useState([]);
   const [onboardingSkipped, setOnboardingSkipped] = useState(() => {
     return localStorage.getItem('cad_onboarding_skipped') === '1';
   });
@@ -122,6 +125,15 @@ const CompanyAdminDashboard = () => {
       setError(err.response?.data?.detail || 'فشل التحميل');
     }).finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
+  }, [refreshKey]);
+
+  // Fetch financial + staff data for tabs
+  useEffect(() => {
+    const tok = getToken();
+    axios.get(`${API}/company-admin/financial/summary`, tok)
+      .then(r => setFinancialData(r.data)).catch(() => {});
+    axios.get(`${API}/company-admin/staff`, tok)
+      .then(r => setStaffData(r.data?.staff || [])).catch(() => {});
   }, [refreshKey]);
 
   const reload = () => {
@@ -340,6 +352,33 @@ const CompanyAdminDashboard = () => {
         <CompanyPlanUsageCard />
 
         {/* Aggregated Stats Panel — إحصائيات شاملة + drill-down per-compound */}
+        {/* ── Tab Navigation ───────────────────── */}
+        <div className="flex gap-2 overflow-x-auto pb-1 border-b border-indigo-500/20">
+          {[
+            { key: 'overview',      label: '📊 نظرة عامة' },
+            { key: 'financial',     label: '💰 المالية' },
+            { key: 'compounds',     label: '🏢 الكمبوندات' },
+            { key: 'subscriptions', label: '📋 الاشتراكات' },
+            { key: 'staff',         label: '👥 الفريق' },
+            { key: 'reports',       label: '📈 التقارير' },
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-4 py-2 rounded-xl font-bold text-sm whitespace-nowrap transition-all ${
+                activeTab === tab.key
+                  ? 'bg-indigo-600 text-white shadow-lg'
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Overview Tab ──────────────────────── */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
         <AggregatedStatsPanel refreshKey={refreshKey} onSelectCompound={(c) => {
           // Select this compound and navigate to the shared admin dashboard (same UX as Owner/Admin)
           localStorage.setItem('selectedCompoundId', c.id);
@@ -389,6 +428,112 @@ const CompanyAdminDashboard = () => {
             refreshKey={refreshKey}
             onRefresh={() => setRefreshKey(k => k + 1)}
           />
+
+          </div>
+        )}
+
+        {/* ── Financial Tab ─────────────────────── */}
+        {activeTab === 'financial' && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20" dir="rtl">
+            <h3 className="text-white font-black text-lg mb-4">💰 الملخص المالي</h3>
+            {financialData ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'إجمالي الإيرادات', value: `${(financialData.total_revenue || 0).toLocaleString('ar-EG')} ج.م`, icon: '💵' },
+                  { label: 'الفواتير المعلقة', value: financialData.pending_invoices || 0, icon: '📄' },
+                  { label: 'المدفوعات هذا الشهر', value: `${(financialData.monthly_revenue || 0).toLocaleString('ar-EG')} ج.م`, icon: '📈' },
+                  { label: 'نسبة التحصيل', value: `${financialData.collection_rate || 0}%`, icon: '✅' },
+                ].map((stat, i) => (
+                  <div key={i} className="bg-white/10 rounded-xl p-4 text-center">
+                    <p className="text-2xl mb-1">{stat.icon}</p>
+                    <p className="text-white font-black text-xl">{stat.value}</p>
+                    <p className="text-white/60 text-xs mt-1">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-white/60 text-center py-8">جاري التحميل...</p>
+            )}
+          </div>
+        )}
+
+        {/* ── Subscriptions Tab ─────────────────── */}
+        {activeTab === 'subscriptions' && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20" dir="rtl">
+            <h3 className="text-white font-black text-lg mb-4">📋 اشتراكات الكمبوندات</h3>
+            <div className="space-y-3">
+              {compounds.map(c => (
+                <div key={c.id} className="flex items-center justify-between bg-white/10 rounded-xl p-4">
+                  <div>
+                    <p className="text-white font-bold">{c.name}</p>
+                    <p className="text-white/60 text-xs">{c.plan || 'غير محدد'}</p>
+                  </div>
+                  <span className={`text-xs font-black px-3 py-1 rounded-full ${
+                    c.subscription_status === 'active' ? 'bg-emerald-500/20 text-emerald-300' :
+                    c.subscription_status === 'trial'  ? 'bg-blue-500/20 text-blue-300' :
+                    'bg-red-500/20 text-red-300'
+                  }`}>
+                    {c.subscription_status === 'active' ? '✅ نشط' :
+                     c.subscription_status === 'trial'  ? '⏳ تجريبي' : '⚠️ منتهي'}
+                  </span>
+                </div>
+              ))}
+              {compounds.length === 0 && (
+                <p className="text-white/60 text-center py-8">لا توجد كمبوندات</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Staff Tab ─────────────────────────── */}
+        {activeTab === 'staff' && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20" dir="rtl">
+            <h3 className="text-white font-black text-lg mb-4">👥 فريق العمل</h3>
+            <div className="space-y-3">
+              {staffData.length > 0 ? staffData.map((s, i) => (
+                <div key={i} className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
+                  <div className="w-10 h-10 rounded-full bg-indigo-500/30 flex items-center justify-center text-white font-black">
+                    {(s.full_name || s.username || '?')[0]}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-white font-bold text-sm">{s.full_name || s.username}</p>
+                    <p className="text-white/60 text-xs">{s.role} · {s.email}</p>
+                  </div>
+                </div>
+              )) : (
+                <p className="text-white/60 text-center py-8">لا يوجد موظفون مضافون</p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Reports Tab ───────────────────────── */}
+        {activeTab === 'reports' && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20" dir="rtl">
+            <h3 className="text-white font-black text-lg mb-4">📈 التقارير والتصدير</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                { label: 'تقرير المحفظة الكاملة', desc: 'جميع الكمبوندات والإيرادات', endpoint: '/reports/company/portfolio', icon: '📊' },
+                { label: 'تقرير الاشتراكات', desc: 'حالة اشتراكات كل كمبوند', endpoint: '/company-admin/subscriptions/report', icon: '📋' },
+                { label: 'تقرير المالية', desc: 'الإيرادات والمصروفات', endpoint: '/company-admin/financial/export', icon: '💰' },
+              ].map((rep, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    const tok = localStorage.getItem('token');
+                    window.open(`${API}${rep.endpoint}?token=${tok}`, '_blank');
+                  }}
+                  className="bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl p-5 text-right transition-all group"
+                >
+                  <p className="text-3xl mb-3">{rep.icon}</p>
+                  <p className="text-white font-black text-sm group-hover:text-indigo-300">{rep.label}</p>
+                  <p className="text-white/60 text-xs mt-1">{rep.desc}</p>
+                  <p className="text-indigo-400 text-xs mt-2 font-bold">تحميل PDF/Excel ↗</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         </SectionCard>
       </div>
 

@@ -428,8 +428,7 @@ const CompanyAdminDashboard = () => {
             refreshKey={refreshKey}
             onRefresh={() => setRefreshKey(k => k + 1)}
           />
-
-          </div>
+        </SectionCard>
         </div>
         )}
 

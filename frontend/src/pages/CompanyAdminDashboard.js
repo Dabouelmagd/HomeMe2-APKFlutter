@@ -534,7 +534,6 @@ const CompanyAdminDashboard = () => {
             </div>
           </div>
         )}
-        </SectionCard>
       </div>
 
       {createOpen && <CompoundFormModal title="➕ إضافة مجمع جديد" initial={{}} onClose={() => setCreateOpen(false)} onSave={createCompound} saveLabel="إضافة" />}

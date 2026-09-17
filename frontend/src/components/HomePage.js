@@ -779,164 +779,96 @@ const HomePage = () => {
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: "'Cairo', 'Tajawal', sans-serif" }}>
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm w-full" data-testid="homepage-header" dir="rtl">
-        <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-2 sm:gap-4" dir="rtl">
-          {/* Logo + Name — always on the RIGHT (RTL start) */}
-          {/* Mobile menu button */}
-          <button
-            className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
-            onClick={() => setMobileMenuOpen && setMobileMenuOpen(o => !o)}
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3" dir="rtl">
+
+          {/* Logo + Name */}
           <div className="flex items-center gap-2 flex-shrink-0">
-            <img
-              src="/homeme-logo.png"
-              alt="HomeMe"
-              className="h-8 w-8 rounded-xl shadow-sm object-contain flex-shrink-0"
-              data-testid="homepage-logo"
-              onError={e => { e.target.style.display='none'; }}
-            />
-            <div className="flex-shrink-0">
-              <span className="text-lg font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
-              <span className="text-[9px] text-gray-500 font-medium hidden md:block">{t('hp_subtitle', 'إدارة المجمعات السكنية')}</span>
+            <img src="/homeme-logo.png" alt="HomeMe"
+              className="h-8 w-8 rounded-xl shadow-sm object-contain"
+              onError={e => { e.target.style.display='none'; }} />
+            <div>
+              <span className="text-base font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
+              <span className="text-[9px] text-gray-500 hidden sm:block">إدارة المجمعات السكنية</span>
             </div>
           </div>
 
-          {/* Center Navigation — desktop only */}
-          <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center min-w-0" data-testid="homepage-nav" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
+          {/* Nav links — desktop */}
+          <nav className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
             {[
-              { href: '#top', sectionId: 'top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home' },
-              { href: '#systems', sectionId: 'systems', label: t('nav_features', 'المميزات'), testid: 'nav-features' },
-              { href: '#ai-features', sectionId: 'ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new' },
-              { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار') + ' ▾', testid: 'nav-pricing', hasDropdown: true },
-              { href: '#guide', sectionId: 'guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide' },
-              { href: '/blog', sectionId: '', label: '📝 ' + t('nav_blog', 'المدوّنة'), testid: 'nav-blog', isLink: true },
-              { href: '/guide', sectionId: '', label: '📖 ' + t('nav_full_guide', 'الدليل'), testid: 'nav-full-guide', isLink: true },
-              { href: '#testimonials', sectionId: 'testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials' },
-              { href: '#faq', sectionId: 'faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq' },
-            ].map((item, i) => {
-              const isActive = activeSection === item.sectionId;
-              return (
-                <a
-                  key={i}
-                  href={item.href}
-                  onClick={(e) => {
-                    if (item.href === '#top') {
-                      e.preventDefault();
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                  }}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`relative px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-semibold rounded-lg transition-all whitespace-nowrap ${
-                    item.isLink
-                      ? 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200'
-                      : isActive
-                      ? 'text-blue-700 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
-                  }`}
-                  data-testid={item.testid}
-                  data-active={isActive ? 'true' : 'false'}
-                >
-                  {item.label}
-                  {isActive && (
-                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full" aria-hidden="true" />
-                  )}
-                </a>
-              );
-            })}
+              { href: '#top', label: t('nav_home', 'الرئيسية') },
+              { href: '#systems', label: t('nav_features', 'المميزات') },
+              { href: '#ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد') },
+              { href: '#pricing', label: t('nav_pricing', 'الأسعار') },
+              { href: '#guide', label: t('nav_guide', 'الدليل') },
+              { href: '#testimonials', label: t('nav_testimonials', 'آراء العملاء') },
+              { href: '#faq', label: t('nav_faq', 'الأسئلة') },
+            ].map((item, i) => (
+              <a key={i} href={item.href}
+                onClick={item.href === '#top' ? (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } : undefined}
+                className="px-2.5 py-1.5 text-xs font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap">
+                {item.label}
+              </a>
+            ))}
           </nav>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <button
-              onClick={() => navigate('/login?owner_only=1')}
-              className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-all group relative"
-              data-testid="owner-quick-login"
-              title={t('hp_owner_login_tooltip', 'دخول المالك / السوبر أدمن فقط')}
-            >
-              <KeyIcon className="h-5 w-5" />
-            </button>
+          {/* Spacer on mobile */}
+          <div className="flex-1 lg:hidden" />
+
+          {/* Right actions */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
             <LanguageSwitcher />
             <ThemeToggle />
             {user ? (
               <>
-                <Link
-                  to="/app/dashboard"
-                  className="hidden sm:!inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-xs sm:text-sm hover:shadow-lg transition-all whitespace-nowrap"
-                  data-testid="header-dashboard"
-                  title={t('hp_dashboard', 'لوحة التحكم')}
-                >
-                  <Squares2X2Icon className="h-4 w-4" />
+                <Link to="/app/dashboard"
+                  className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold text-xs hover:shadow-lg transition-all">
+                  <Squares2X2Icon className="h-3.5 w-3.5" />
                   <span>{t('hp_dashboard', 'لوحة التحكم')}</span>
                 </Link>
-                <button
-                  onClick={() => { logout(); }}
-                  className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 text-red-600 border-2 border-red-200 hover:bg-red-50 hover:border-red-400 rounded-xl font-semibold text-xs sm:text-sm transition-all whitespace-nowrap"
-                  data-testid="header-logout"
-                  title={t('logout', 'تسجيل الخروج')}
-                >
-                  <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                  <span className="hidden sm:!inline">{t('logout', 'تسجيل الخروج')}</span>
+                <button onClick={() => { logout(); }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 text-red-600 border border-red-200 hover:bg-red-50 rounded-lg font-bold text-xs transition-all">
+                  <ArrowRightOnRectangleIcon className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">{t('logout', 'خروج')}</span>
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="hidden lg:!inline-flex px-3 py-1.5 text-blue-600 border-2 border-blue-600 rounded-lg font-semibold text-xs hover:bg-blue-50 transition-all" data-testid="header-login">
+                <Link to="/login"
+                  className="hidden sm:inline-flex px-3 py-1.5 text-blue-600 border border-blue-600 rounded-lg font-bold text-xs hover:bg-blue-50 transition-all">
                   {t('login', 'تسجيل الدخول')}
                 </Link>
-                <Link to="/register" className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold text-xs hover:shadow-lg transition-all whitespace-nowrap" data-testid="header-register">
-                  {t('register_now', 'إنشاء حساب')}
+                <Link to="/register"
+                  className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold text-xs hover:shadow-lg transition-all whitespace-nowrap">
+                  {t('register_now', 'سجل الآن')}
                 </Link>
               </>
             )}
           </div>
         </div>
 
-        {/* Mobile/Tablet Nav — horizontal scrollable strip */}
-        <nav className="lg:!hidden border-t border-gray-100 bg-gray-50/50 overflow-x-auto" data-testid="homepage-nav-mobile" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
-          <div className="flex items-center gap-0.5 px-2 py-1.5 flex-wrap">
+        {/* Mobile nav — shown below header */}
+        <div className="lg:hidden border-t border-gray-100 bg-white/95 overflow-x-auto" dir="rtl">
+          <div className="flex items-center gap-1 px-4 py-2">
             {[
-              { href: '#top', sectionId: 'top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home-m' },
-              { href: '#systems', sectionId: 'systems', label: t('nav_features', 'المميزات'), testid: 'nav-features-m' },
-              { href: '#ai-features', sectionId: 'ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), testid: 'nav-whats-new-m' },
-              { href: '#pricing', sectionId: 'pricing', label: t('nav_pricing', 'الأسعار'), testid: 'nav-pricing-m' },
-              { href: '#guide', sectionId: 'guide', label: t('nav_guide', 'الدليل'), testid: 'nav-guide-m' },
-              { href: '/blog', sectionId: '', label: '📝 المدوّنة', testid: 'nav-blog-m', isLink: true },
-              { href: '/guide', sectionId: '', label: '📖 دليل كامل', testid: 'nav-full-guide-m', isLink: true },
-              { href: '#testimonials', sectionId: 'testimonials', label: t('nav_testimonials', 'آراء العملاء'), testid: 'nav-testimonials-m' },
-              { href: '#faq', sectionId: 'faq', label: t('nav_faq', 'الأسئلة'), testid: 'nav-faq-m' },
-            ].map((item, i) => {
-              const isActive = activeSection === item.sectionId;
-              return (
-                <a
-                  key={i}
-                  href={item.href}
-                  onClick={(e) => {
-                    if (item.href === '#top') {
-                      e.preventDefault();
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                  }}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
-                    isActive
-                      ? 'text-blue-700 bg-blue-100 shadow-sm'
-                      : 'text-gray-600 hover:text-blue-600 hover:bg-white'
-                  }`}
-                  data-testid={item.testid}
-                  data-active={isActive ? 'true' : 'false'}
-                >
-                  {item.label}
-                </a>
-              );
-            })}
+              { href: '#top', label: 'الرئيسية' },
+              { href: '#systems', label: 'المميزات' },
+              { href: '#ai-features', label: '✨ الجديد' },
+              { href: '#pricing', label: 'الأسعار' },
+              { href: '#guide', label: 'الدليل' },
+              { href: '#testimonials', label: 'آراء' },
+              { href: '#faq', label: 'أسئلة' },
+            ].map((item, i) => (
+              <a key={i} href={item.href}
+                className="px-2.5 py-1 text-[11px] font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap flex-shrink-0">
+                {item.label}
+              </a>
+            ))}
           </div>
-        </nav>
+        </div>
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white pt-16 pb-24 lg:pt-20 lg:pb-32" data-testid="hero-section">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white pt-28 pb-24 lg:pt-20 lg:pb-32" data-testid="hero-section">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 25% 40%, rgba(99,102,241,0.4), transparent 50%), radial-gradient(circle at 75% 70%, rgba(59,130,246,0.3), transparent 50%)' }} />
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">

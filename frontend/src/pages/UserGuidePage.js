@@ -6,6 +6,7 @@ import {
   SparklesIcon, BuildingOfficeIcon, ChatBubbleLeftEllipsisIcon,
   UserGroupIcon, BanknotesIcon, MagnifyingGlassIcon, XMarkIcon,
   NoSymbolIcon, PhoneIcon, MapPinIcon, BellAlertIcon, GlobeAltIcon, MegaphoneIcon,
+  BuildingOffice2Icon,
 } from '@heroicons/react/24/outline';
 
 /* ── Chapter data ────────────────────────────────────────────── */

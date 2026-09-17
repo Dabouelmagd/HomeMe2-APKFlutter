@@ -793,7 +793,7 @@ const HomePage = () => {
           </div>
 
           {/* Nav links — desktop */}
-          <nav className="hidden lg:flex items-center gap-0.5 flex-1 justify-center">
+          <nav className="flex items-center gap-0.5 flex-1 justify-center overflow-x-auto min-w-0">
             {[
               { href: '#top', label: t('nav_home', 'الرئيسية') },
               { href: '#systems', label: t('nav_features', 'المميزات') },
@@ -805,7 +805,7 @@ const HomePage = () => {
             ].map((item, i) => (
               <a key={i} href={item.href}
                 onClick={item.href === '#top' ? (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } : undefined}
-                className="px-2.5 py-1.5 text-xs font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap">
+                className="px-2 py-1.5 text-xs font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap flex-shrink-0">
                 {item.label}
               </a>
             ))}
@@ -846,29 +846,11 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Mobile nav — shown below header */}
-        <div className="lg:hidden border-t border-gray-100 bg-white/95 overflow-x-auto" dir="rtl">
-          <div className="flex items-center gap-1 px-4 py-2">
-            {[
-              { href: '#top', label: 'الرئيسية' },
-              { href: '#systems', label: 'المميزات' },
-              { href: '#ai-features', label: '✨ الجديد' },
-              { href: '#pricing', label: 'الأسعار' },
-              { href: '#guide', label: 'الدليل' },
-              { href: '#testimonials', label: 'آراء' },
-              { href: '#faq', label: 'أسئلة' },
-            ].map((item, i) => (
-              <a key={i} href={item.href}
-                className="px-2.5 py-1 text-[11px] font-bold text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap flex-shrink-0">
-                {item.label}
-              </a>
-            ))}
-          </div>
-        </div>
+
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white pt-28 pb-24 lg:pt-20 lg:pb-32" data-testid="hero-section">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white pt-16 pb-24 lg:pt-20 lg:pb-32" data-testid="hero-section">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 25% 40%, rgba(99,102,241,0.4), transparent 50%), radial-gradient(circle at 75% 70%, rgba(59,130,246,0.3), transparent 50%)' }} />
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">

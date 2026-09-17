@@ -29,7 +29,9 @@ import {
   UserPlusIcon,
   CreditCardIcon,
   ExclamationTriangleIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  ShieldCheckIcon,
+  SpeakerWaveIcon
 } from '@heroicons/react/24/outline';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;

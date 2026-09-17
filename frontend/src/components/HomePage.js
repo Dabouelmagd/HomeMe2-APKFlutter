@@ -781,6 +781,15 @@ const HomePage = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm w-full" data-testid="homepage-header" dir="rtl">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-2 sm:gap-4" dir="rtl">
           {/* Logo + Name — always on the RIGHT (RTL start) */}
+          {/* Mobile menu button */}
+          <button
+            className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            onClick={() => setMobileMenuOpen && setMobileMenuOpen(o => !o)}
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
           <div className="flex items-center gap-2 flex-shrink-0">
             <img
               src="/homeme-logo.png"
@@ -796,7 +805,7 @@ const HomePage = () => {
           </div>
 
           {/* Center Navigation — desktop only */}
-          <nav className="hidden md:flex items-center gap-0.5 xl:gap-1 flex-1 justify-center overflow-hidden" data-testid="homepage-nav" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
+          <nav className="hidden md:flex items-center gap-0.5 flex-1 justify-center min-w-0" data-testid="homepage-nav" aria-label={t('hp_main_nav', 'القائمة الرئيسية')}>
             {[
               { href: '#top', sectionId: 'top', label: t('nav_home', 'الرئيسية'), testid: 'nav-home' },
               { href: '#systems', sectionId: 'systems', label: t('nav_features', 'المميزات'), testid: 'nav-features' },
@@ -873,10 +882,10 @@ const HomePage = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="hidden sm:!inline-flex px-4 py-2 text-blue-600 border-2 border-blue-600 rounded-xl font-semibold text-sm hover:bg-blue-50 transition-all" data-testid="header-login">
+                <Link to="/login" className="hidden lg:!inline-flex px-3 py-1.5 text-blue-600 border-2 border-blue-600 rounded-lg font-semibold text-xs hover:bg-blue-50 transition-all" data-testid="header-login">
                   {t('login', 'تسجيل الدخول')}
                 </Link>
-                <Link to="/register" className="px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold text-xs sm:text-sm hover:shadow-lg transition-all whitespace-nowrap" data-testid="header-register">
+                <Link to="/register" className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold text-xs hover:shadow-lg transition-all whitespace-nowrap" data-testid="header-register">
                   {t('register_now', 'إنشاء حساب')}
                 </Link>
               </>
@@ -927,7 +936,7 @@ const HomePage = () => {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white pt-32 pb-24 lg:pt-40 lg:pb-32" data-testid="hero-section">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white pt-16 pb-24 lg:pt-20 lg:pb-32" data-testid="hero-section">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 25% 40%, rgba(99,102,241,0.4), transparent 50%), radial-gradient(circle at 75% 70%, rgba(59,130,246,0.3), transparent 50%)' }} />
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">

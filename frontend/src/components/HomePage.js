@@ -778,8 +778,8 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: "'Cairo', 'Tajawal', sans-serif" }}>
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-100 shadow-sm w-full" data-testid="homepage-header" dir="rtl">
-        <div className="max-w-screen-2xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-2 sm:gap-4 w-full" dir="rtl">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm w-full" data-testid="homepage-header" dir="rtl">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-2 sm:gap-4" dir="rtl">
           {/* Logo + Name — always on the RIGHT (RTL start) */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <img
@@ -927,7 +927,7 @@ const HomePage = () => {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white py-24 lg:py-32" data-testid="hero-section">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white pt-32 pb-24 lg:pt-40 lg:pb-32" data-testid="hero-section">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 25% 40%, rgba(99,102,241,0.4), transparent 50%), radial-gradient(circle at 75% 70%, rgba(59,130,246,0.3), transparent 50%)' }} />
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">

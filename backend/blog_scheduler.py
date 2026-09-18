@@ -107,12 +107,16 @@ async def generate_blog_post(topic: str) -> dict | None:
                     "content-type": "application/json",
                 },
                 json={
-                    "model": "claude-haiku-4-5",
+                    "model": "claude-haiku-4-5-20251001",
                     "max_tokens": 2000,
                     "messages": [{"role": "user", "content": prompt}],
                 }
             )
             data = resp.json()
+            # Debug: log response if error
+            if "error" in data or "content" not in data:
+                logger.error(f"API error response: {data}")
+                return None
             raw = data["content"][0]["text"].strip()
             # Clean JSON
             if raw.startswith("```"):

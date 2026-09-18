@@ -781,7 +781,7 @@ const HomePage = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm w-full" data-testid="homepage-header" dir="rtl">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3" dir="rtl">
 
-          {/* Logo + Name */}
+          {/* RIGHT: Logo + Name */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <img src="/homeme-logo.png" alt="HomeMe"
               className="h-8 w-8 rounded-xl shadow-sm object-contain"
@@ -792,8 +792,8 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Nav links — desktop */}
-          <nav className="flex items-center gap-0.5 flex-1 justify-center overflow-x-auto min-w-0">
+          {/* CENTER: Nav links */}
+          <nav className="flex items-center gap-0.5 flex-1 justify-center overflow-x-auto min-w-0 scrollbar-hide">
             {[
               { href: '#top', label: t('nav_home', 'الرئيسية') },
               { href: '#systems', label: t('nav_features', 'المميزات') },
@@ -811,8 +811,7 @@ const HomePage = () => {
             ))}
           </nav>
 
-          {/* Spacer on mobile */}
-          <div className="flex-1 lg:hidden" />
+
 
           {/* Right actions */}
           <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -834,7 +833,7 @@ const HomePage = () => {
             ) : (
               <>
                 <Link to="/login"
-                  className="hidden sm:inline-flex px-3 py-1.5 text-blue-600 border border-blue-600 rounded-lg font-bold text-xs hover:bg-blue-50 transition-all">
+                  className="inline-flex px-3 py-1.5 text-blue-600 border border-blue-600 rounded-lg font-bold text-xs hover:bg-blue-50 transition-all whitespace-nowrap">
                   {t('login', 'تسجيل الدخول')}
                 </Link>
                 <Link to="/register"

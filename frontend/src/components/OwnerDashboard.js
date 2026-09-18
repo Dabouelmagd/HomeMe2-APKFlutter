@@ -45,7 +45,6 @@ const OwnerDashboard = () => {
   const [slotStats, setSlotStats] = useState(null);
   const [allSlots, setAllSlots] = useState([]);
   const [supportTickets, setSupportTickets] = useState({ open: 0, in_progress: 0, recent: [] });
-  const [govStats, setGovStats] = useState({ total_zones: 0, total_residents: 0, open_complaints: 0, compounds_count: 0, zones: [] });
   const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showAddCompound, setShowAddCompound] = useState(false);
@@ -134,6 +133,18 @@ const OwnerDashboard = () => {
   return (
     <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'} data-testid="owner-dashboard">
       {/* Welcome Header */}
+      {/* GovMe — separate platform */}
+      <a href="https://govme.homemeapp.net" target="_blank" rel="noopener noreferrer"
+        className="flex items-center justify-between bg-gradient-to-r from-blue-700 to-indigo-700 rounded-2xl p-4 hover:opacity-90 transition-all cursor-pointer no-underline"
+        dir="rtl">
+        <div>
+          <p className="text-white font-black text-sm">🏛️ نظام المحافظات والمحليات</p>
+          <p className="text-blue-200 text-xs mt-0.5">متاح الآن على منصة GovMe المنفصلة</p>
+        </div>
+        <span className="bg-white text-blue-700 font-black text-xs px-4 py-2 rounded-xl whitespace-nowrap flex-shrink-0">
+          انتقل لـ GovMe ↗
+        </span>
+      </a>
       <div className="relative overflow-hidden bg-gradient-to-r from-gray-900 via-rose-950 to-gray-900 rounded-2xl p-6 text-white shadow-xl">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0aDR2NGgtNHpNNDAgMzBoNHY0aC00ek0yOCAzOGg0djRoLTR6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-50"></div>
         <div className="relative flex items-center justify-between">
@@ -516,7 +527,6 @@ const OwnerDashboard = () => {
             { name: t('owner_company_subs', 'شركات الإدارة'), href: '/app/super-admin?tab=companies', icon: BuildingOffice2Icon, bg: 'bg-gradient-to-br from-indigo-500 to-blue-600' },
             { name: t('sa_ads', 'الإعلانات'), href: '/app/super-admin?tab=ads', icon: SpeakerWaveIcon, bg: 'bg-gradient-to-br from-amber-500 to-orange-600' },
             { name: t('owner_translations', 'الترجمات'), href: '/app/super-admin?tab=translations', icon: LanguageIcon, bg: 'bg-gradient-to-br from-rose-500 to-pink-600' },
-            { name: '🏛️ لوحة المحليات', href: '/app/gov-dashboard', icon: BuildingOffice2Icon, bg: 'bg-gradient-to-br from-blue-700 to-indigo-700' },
             { name: '➕ إضافة كمبوند', href: null, icon: PlusIcon, bg: 'bg-gradient-to-br from-emerald-500 to-green-600', action: () => setShowAddCompound(true) },
           ].map((link, i) => {
             const NavIcon = link.icon;

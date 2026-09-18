@@ -146,13 +146,15 @@ const Login = () => {
     // 🛡️ Browser autofill safety net: read live DOM values in case React state
     // is stale (autofill populates the input.value but does NOT fire onChange,
     // so on first submit `formData` may still be empty → 401 "Invalid credentials").
-    const liveUsername = (e.target?.username?.value || formData.username || '').trim();
-    const livePassword = e.target?.password?.value || formData.password || '';
-
-    // Also sync the React state so subsequent renders/effects see the right values.
-    if (liveUsername !== formData.username || livePassword !== formData.password) {
-      setFormData({ username: liveUsername, password: livePassword });
-    }
+    // Read from DOM directly to avoid React state sync issues
+    const usernameInput = document.querySelector('input[name="username"]') || 
+                         document.querySelector('input[type="text"]') ||
+                         document.querySelector('input[type="email"]');
+    const passwordInput = document.querySelector('input[name="password"]') ||
+                         document.querySelector('input[type="password"]');
+    
+    const liveUsername = (usernameInput?.value || formData.username || '').trim();
+    const livePassword = passwordInput?.value || formData.password || '';
 
     if (!liveUsername || !livePassword) {
       setLoading(false);

@@ -114,7 +114,13 @@ const Login = () => {
   // Check for biometric when username changes
   useEffect(() => {
     const checkUserBiometric = async () => {
-      if (formData.username && biometricAvailable) {
+      // Only check if username looks valid (not a JSON token or URL)
+      const isValidUsername = formData.username && 
+        formData.username.length < 100 && 
+        !formData.username.includes('{') &&
+        !formData.username.includes('access_token') &&
+        !formData.username.includes('http');
+      if (isValidUsername && biometricAvailable) {
         const hasBio = await hasBiometricRegistered(formData.username);
         setShowBiometricLogin(hasBio);
       } else {

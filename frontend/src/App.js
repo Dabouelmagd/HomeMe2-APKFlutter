@@ -724,13 +724,9 @@ const LanguageInitializer = () => {
 
 // Compound Selection Redirect
 const CompoundRedirect = () => {
-  const remembered = localStorage.getItem('rememberedAccount');
-  const rememberCompound = localStorage.getItem('rememberCompound') === 'true';
-  
-  if (remembered && rememberCompound) {
-    return <Navigate to="/app/dashboard" replace />;
-  }
-  return <Navigate to="/select-account" replace />;
+  const token = localStorage.getItem('token');
+  if (token) return <Navigate to="/app/dashboard" replace />;
+  return <Navigate to="/login" replace />;
 };
 
 // Require compound selection before accessing dashboard

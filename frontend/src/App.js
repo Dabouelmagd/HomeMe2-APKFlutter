@@ -1313,14 +1313,16 @@ const DashboardRouter = () => {
   
   if (activeRole === 'app_owner') {
     return <OwnerDashboard />;
-  } else if (activeRole === 'company_admin') {
-    return <CompanyAdminDashboard />;
   } else if (activeRole === 'super_admin') {
     return <AdminDashboard />;
-  } else if (activeRole === 'admin' || activeRole === 'manager') {
+  } else if (activeRole === 'company_admin') {
+    return <CompanyAdminDashboard />;
+  } else if (activeRole === 'compound_admin' || activeRole === 'admin' || activeRole === 'manager') {
     return <AdminDashboard />;
   } else if (activeRole === 'security') {
     return <SecurityDashboard />;
+  } else if (activeRole === 'gov_admin') {
+    return <Navigate to="https://govme.homemeapp.net" replace />;
   } else {
     return <ResidentDashboard />;
   }

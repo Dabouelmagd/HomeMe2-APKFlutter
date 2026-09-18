@@ -784,7 +784,7 @@ const HomePage = () => {
           {/* RIGHT: Icon first, then text */}
           <div className="flex items-center gap-3 flex-shrink-0">
             <img src="/homeme-logo.png" alt="HomeMe"
-              className="h-14 w-14 rounded-2xl shadow-md object-contain border border-gray-100 flex-shrink-0"
+              className="h-16 w-16 rounded-2xl shadow-md object-contain border border-gray-100 flex-shrink-0"
               onError={e => { e.target.style.display='none'; }} />
             <div className="flex flex-col items-start">
               <span className="font-black text-gray-900 leading-none block w-full" style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", letterSpacing: '-1px', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)' }}>HomeMe</span>

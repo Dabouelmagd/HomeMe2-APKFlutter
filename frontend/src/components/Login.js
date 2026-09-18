@@ -164,6 +164,7 @@ const Login = () => {
 
     try {
       const result = await login({ username: liveUsername, password: livePassword });
+      console.log('Login result:', JSON.stringify(result));
       if (result.success) {
         // Save username if remember me is checked
         if (rememberMe) {
@@ -204,6 +205,7 @@ const Login = () => {
         toast.error(result.error);
       }
     } catch (error) {
+      console.error('Login JS error:', error);
       toast.error('Login failed. Please try again.');
     } finally {
       setLoading(false);

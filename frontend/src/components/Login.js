@@ -146,15 +146,8 @@ const Login = () => {
     // 🛡️ Browser autofill safety net: read live DOM values in case React state
     // is stale (autofill populates the input.value but does NOT fire onChange,
     // so on first submit `formData` may still be empty → 401 "Invalid credentials").
-    // Read from DOM directly to avoid React state sync issues
-    const usernameInput = document.querySelector('input[name="username"]') || 
-                         document.querySelector('input[type="text"]') ||
-                         document.querySelector('input[type="email"]');
-    const passwordInput = document.querySelector('input[name="password"]') ||
-                         document.querySelector('input[type="password"]');
-    
-    const liveUsername = (usernameInput?.value || formData.username || '').trim();
-    const livePassword = passwordInput?.value || formData.password || '';
+    const liveUsername = (formData.username || '').trim();
+    const livePassword = formData.password || '';
 
     if (!liveUsername || !livePassword) {
       setLoading(false);
@@ -163,8 +156,34 @@ const Login = () => {
     }
 
     try {
-      const result = await login({ username: liveUsername, password: livePassword });
-      console.log('Login result:', JSON.stringify(result));
+      // Direct API call — same approach as simple-login.html which works reliably
+      const loginResp = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: liveUsername, password: livePassword }),
+      });
+      const loginData = await loginResp.json();
+
+      let result;
+      if (loginData.access_token) {
+        localStorage.setItem('token', loginData.access_token);
+        localStorage.setItem('user', JSON.stringify(loginData.user));
+        localStorage.setItem('rememberedAccount', JSON.stringify(loginData.user));
+        localStorage.setItem('rememberCompound', 'true');
+        if (loginData.user?.compound_id) {
+          localStorage.setItem('selectedCompoundId', loginData.user.compound_id);
+        }
+        result = { success: true, user: loginData.user };
+      } else if (loginData.two_factor_required) {
+        result = { success: false, two_factor_required: true, temp_token: loginData.temp_token, ttl_minutes: loginData.ttl_minutes };
+      } else if (loginData.two_factor_setup_required) {
+        result = { success: false, two_factor_setup_required: true, setup_token: loginData.setup_token, ttl_minutes: loginData.ttl_minutes, role: loginData.role, message: loginData.message };
+      } else if (loginData.detail?.code === 'EMAIL_NOT_VERIFIED') {
+        result = { success: false, email_not_verified: true, email: loginData.detail.email, error: loginData.detail.message };
+      } else {
+        result = { success: false, error: loginData.detail || 'اسم المستخدم أو كلمة المرور غير صحيحة' };
+      }
+
       if (result.success) {
         // Save username if remember me is checked
         if (rememberMe) {
@@ -176,17 +195,9 @@ const Login = () => {
         }
 
         toast.success(t('welcome_back'));
-        // Get user from localStorage (saved by login() function in App.js)
-        const loginUser = JSON.parse(localStorage.getItem('user') || '{}');
-        localStorage.setItem('rememberedAccount', JSON.stringify(loginUser));
-        localStorage.setItem('rememberCompound', 'true');
-        if (loginUser.compound_id) {
-          localStorage.setItem('selectedCompoundId', loginUser.compound_id);
-        }
-        // Wait for AuthProvider to finish /auth/me call before navigating
         setTimeout(() => {
-          navigate('/app/dashboard', { replace: true });
-        }, 1000);
+          window.location.href = '/app/dashboard';
+        }, 300);
       } else if (result.two_factor_required) {
         // Open 2FA challenge modal
         setTwoFa({ pending: true, tempToken: result.temp_token, code: '' });

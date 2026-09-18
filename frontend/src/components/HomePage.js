@@ -781,15 +781,15 @@ const HomePage = () => {
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm w-full" data-testid="homepage-header" dir="rtl">
         <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-3" dir="rtl">
 
-          {/* RIGHT: Logo + Name */}
+          {/* RIGHT: Icon first, then text */}
           <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="flex flex-col items-end">
+            <img src="/homeme-logo.png" alt="HomeMe"
+              className="h-12 w-12 rounded-2xl shadow-md object-contain border border-gray-100 flex-shrink-0"
+              onError={e => { e.target.style.display='none'; }} />
+            <div className="flex flex-col items-start">
               <span className="text-2xl font-black text-gray-900 leading-none tracking-tight" style={{ fontFamily: "'Montserrat', 'Cairo', sans-serif", letterSpacing: '-0.5px' }}>HomeMe</span>
               <span className="text-[10px] text-gray-500 font-medium leading-tight hidden sm:block" style={{ fontFamily: "'Cairo', sans-serif" }}>منصة إدارة المجمعات السكنية المتكاملة</span>
             </div>
-            <img src="/homeme-logo.png" alt="HomeMe"
-              className="h-11 w-11 rounded-2xl shadow-md object-contain border border-gray-100"
-              onError={e => { e.target.style.display='none'; }} />
           </div>
 
           {/* CENTER: Nav links */}

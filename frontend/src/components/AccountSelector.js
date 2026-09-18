@@ -69,6 +69,13 @@ const ROLE_CONFIG = {
     bg: 'bg-amber-600/20',
     badge: 'bg-amber-500/20 text-amber-300',
   },
+  compound_admin: {
+    icon: BuildingOfficeIcon,
+    gradient: 'from-blue-600 to-indigo-700',
+    border: 'border-blue-500',
+    bg: 'bg-blue-600/20',
+    badge: 'bg-blue-500/20 text-blue-300',
+  },
 };
 
 const AccountSelector = () => {

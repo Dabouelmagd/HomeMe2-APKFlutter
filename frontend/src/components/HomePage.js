@@ -841,9 +841,13 @@ const HomePage = () => {
             ) : (
               <>
                 <Link to="/login"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 text-blue-600 border border-blue-600 rounded-lg font-bold text-xs hover:bg-blue-50 transition-all whitespace-nowrap">
-                  <ShieldCheckIcon className="h-3.5 w-3.5" />
+                  className="inline-flex px-3 py-1.5 text-blue-600 border border-blue-600 rounded-lg font-bold text-xs hover:bg-blue-50 transition-all whitespace-nowrap">
                   {t('login', 'تسجيل الدخول')}
+                </Link>
+                <Link to="/login?owner_only=1"
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 text-purple-700 border border-purple-300 bg-purple-50 rounded-lg font-bold text-xs hover:bg-purple-100 transition-all whitespace-nowrap">
+                  <ShieldCheckIcon className="h-3.5 w-3.5" />
+                  {t('owner_login', 'دخول الإدارة')}
                 </Link>
                 <Link to="/register"
                   className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-bold text-xs hover:shadow-lg transition-all whitespace-nowrap">

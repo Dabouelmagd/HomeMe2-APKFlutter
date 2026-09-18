@@ -735,16 +735,10 @@ const CompoundRedirect = () => {
 
 // Require compound selection before accessing dashboard
 const RequireCompound = ({ children }) => {
-  const remembered = localStorage.getItem('rememberedAccount');
-  const selectedCompound = localStorage.getItem('selectedCompoundId');
   const token = localStorage.getItem('token');
-  const userStr = localStorage.getItem('user');
-  // Allow if token exists (user is logged in)
-  if (token && userStr) return children;
-  if (!remembered && !selectedCompound) {
-    return <Navigate to="/select-account" replace />;
-  }
-  return children;
+  // Allow any logged-in user — compound selection handled by DashboardRouter
+  if (token) return children;
+  return <Navigate to="/login" replace />;
 };
 
 // Main App Component  

@@ -787,8 +787,8 @@ const HomePage = () => {
               className="h-14 w-14 rounded-2xl shadow-md object-contain border border-gray-100 flex-shrink-0"
               onError={e => { e.target.style.display='none'; }} />
             <div className="flex flex-col items-start">
-              <span className="text-3xl font-black text-gray-900 leading-none" style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", letterSpacing: '-1px' }}>HomeMe</span>
-              <span className="text-[11px] text-gray-500 font-medium mt-0.5" style={{ fontFamily: "'Cairo', sans-serif" }}>منصة إدارة المجمعات السكنية المتكاملة</span>
+              <span className="font-black text-gray-900 leading-none block w-full" style={{ fontFamily: "'Montserrat', 'Arial Black', sans-serif", letterSpacing: '-1px', fontSize: 'clamp(1.6rem, 3vw, 2.2rem)' }}>HomeMe</span>
+              <span className="text-[11px] text-gray-500 font-medium mt-0.5 whitespace-nowrap" style={{ fontFamily: "'Cairo', sans-serif" }}>منصة إدارة المجمعات السكنية المتكاملة</span>
             </div>
           </div>
 

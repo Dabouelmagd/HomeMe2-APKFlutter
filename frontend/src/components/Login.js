@@ -173,10 +173,8 @@ const Login = () => {
         }
 
         toast.success(t('welcome_back'));
-        // Force full page reload to dashboard
-        setTimeout(() => {
-          window.location.replace('/app/dashboard');
-        }, 300);
+        // Use navigate for SPA routing — token already saved to localStorage
+        navigate('/app/dashboard', { replace: true });
       } else if (result.two_factor_required) {
         // Open 2FA challenge modal
         setTwoFa({ pending: true, tempToken: result.temp_token, code: '' });

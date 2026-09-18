@@ -173,8 +173,8 @@ const Login = () => {
         }
 
         toast.success(t('welcome_back'));
-        // Navigate to the original requested page or dashboard
-        navigate(from, { replace: true });
+        // Navigate directly to dashboard
+        window.location.href = '/app/dashboard';
       } else if (result.two_factor_required) {
         // Open 2FA challenge modal
         setTwoFa({ pending: true, tempToken: result.temp_token, code: '' });

@@ -795,19 +795,27 @@ const HomePage = () => {
           {/* CENTER: Nav links */}
           <nav className="flex items-center gap-0.5 flex-1 justify-center overflow-x-auto min-w-0 scrollbar-hide">
             {[
-              { href: '#top', label: t('nav_home', 'الرئيسية') },
-              { href: '#systems', label: t('nav_features', 'المميزات') },
-              { href: '#ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد') },
-              { href: '#pricing', label: t('nav_pricing', 'الأسعار') },
-              { href: '#guide', label: t('nav_guide', 'الدليل') },
-              { href: '#testimonials', label: t('nav_testimonials', 'آراء العملاء') },
-              { href: '#faq', label: t('nav_faq', 'الأسئلة') },
+              { href: '#top',         label: t('nav_home', 'الرئيسية'),          internal: false },
+              { href: '#systems',     label: t('nav_features', 'المميزات'),       internal: false },
+              { href: '#ai-features', label: '✨ ' + t('nav_whats_new', 'الجديد'), internal: false },
+              { href: '#pricing',     label: t('nav_pricing', 'الأسعار'),         internal: false },
+              { href: '/blog',        label: '📝 ' + t('nav_blog', 'المدونة'),    internal: true  },
+              { href: '/guide',       label: '📖 ' + t('nav_user_guide', 'الدليل الشامل'), internal: true },
+              { href: '#testimonials',label: t('nav_testimonials', 'آراء العملاء'), internal: false },
+              { href: '#faq',         label: t('nav_faq', 'الأسئلة'),             internal: false },
             ].map((item, i) => (
-              <a key={i} href={item.href}
-                onClick={item.href === '#top' ? (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } : undefined}
-                className="px-2 py-1.5 text-xs font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap flex-shrink-0">
-                {item.label}
-              </a>
+              item.internal ? (
+                <Link key={i} to={item.href}
+                  className="px-2 py-1.5 text-xs font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap flex-shrink-0">
+                  {item.label}
+                </Link>
+              ) : (
+                <a key={i} href={item.href}
+                  onClick={item.href === '#top' ? (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } : undefined}
+                  className="px-2 py-1.5 text-xs font-semibold text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all whitespace-nowrap flex-shrink-0">
+                  {item.label}
+                </a>
+              )
             ))}
           </nav>
 

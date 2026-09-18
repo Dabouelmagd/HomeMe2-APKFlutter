@@ -779,17 +779,17 @@ const HomePage = () => {
     <div className="min-h-screen bg-white" dir={isRTL ? 'rtl' : 'ltr'} style={{ fontFamily: "'Cairo', 'Tajawal', sans-serif" }}>
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-b border-gray-200 shadow-sm w-full" data-testid="homepage-header" dir="rtl">
-        <div className="w-full px-4 sm:px-6 lg:px-8 h-14 flex items-center gap-3" dir="rtl">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-3" dir="rtl">
 
           {/* RIGHT: Logo + Name */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <img src="/homeme-logo.png" alt="HomeMe"
-              className="h-8 w-8 rounded-xl shadow-sm object-contain"
-              onError={e => { e.target.style.display='none'; }} />
-            <div>
-              <span className="text-base font-black text-gray-900 block leading-tight" style={{ fontFamily: "'Cairo', sans-serif" }}>HomeMe</span>
-              <span className="text-[9px] text-gray-500 hidden sm:block">إدارة المجمعات السكنية</span>
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="flex flex-col items-end">
+              <span className="text-2xl font-black text-gray-900 leading-none tracking-tight" style={{ fontFamily: "'Montserrat', 'Cairo', sans-serif", letterSpacing: '-0.5px' }}>HomeMe</span>
+              <span className="text-[10px] text-gray-500 font-medium leading-tight hidden sm:block" style={{ fontFamily: "'Cairo', sans-serif" }}>منصة إدارة المجمعات السكنية المتكاملة</span>
             </div>
+            <img src="/homeme-logo.png" alt="HomeMe"
+              className="h-11 w-11 rounded-2xl shadow-md object-contain border border-gray-100"
+              onError={e => { e.target.style.display='none'; }} />
           </div>
 
           {/* CENTER: Nav links */}
@@ -857,7 +857,7 @@ const HomePage = () => {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white pt-16 pb-24 lg:pt-20 lg:pb-32" data-testid="hero-section">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white pt-20 pb-24 lg:pt-24 lg:pb-32" data-testid="hero-section">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 25% 40%, rgba(99,102,241,0.4), transparent 50%), radial-gradient(circle at 75% 70%, rgba(59,130,246,0.3), transparent 50%)' }} />
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto">

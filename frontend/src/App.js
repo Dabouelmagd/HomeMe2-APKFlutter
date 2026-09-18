@@ -641,30 +641,30 @@ const ProtectedRoute = ({ children, adminOnly = false, roles = null }) => {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  if (loading) {
+  // Check localStorage as fallback while React state loads
+  const token = localStorage.getItem('token');
+  const localUser = token ? JSON.parse(localStorage.getItem('user') || 'null') : null;
+  const effectiveUser = user || localUser;
+
+  if (loading && !effectiveUser) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mb-6"></div>
-        {/* Splash Ad during loading */}
-        <div className="w-full max-w-md px-4">
-          <InternalAdBanner position="splash" maxAds={1} variant="full" />
-        </div>
       </div>
     );
   }
 
-  if (!user) {
-    // Save the current location so we can redirect back after login
+  if (!effectiveUser) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  if (adminOnly && !['admin', 'super_admin', 'company_admin', 'manager', 'app_owner'].includes(user.role)) {
+  if (adminOnly && !['admin', 'super_admin', 'company_admin', 'compound_admin', 'manager', 'app_owner'].includes(effectiveUser.role)) {
     return <Navigate to="/app/dashboard" replace />;
   }
 
   // 🛡️ Per-route role whitelist — prevents role-scoped pages (e.g. /app/super-admin)
   // from being accessible by unauthorized roles after an account-switch.
-  if (roles && Array.isArray(roles) && !roles.includes(user.role)) {
+  if (roles && Array.isArray(roles) && !roles.includes(effectiveUser.role)) {
     return <Navigate to="/app/dashboard" replace />;
   }
 

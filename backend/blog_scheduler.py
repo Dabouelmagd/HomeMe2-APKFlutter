@@ -107,21 +107,32 @@ async def generate_blog_post(topic: str) -> dict | None:
                     "content-type": "application/json",
                 },
                 json={
-                    "model": "claude-haiku-4-5",
+                    "model": "claude-haiku-4-5-20251001",
                     "max_tokens": 2000,
                     "messages": [{"role": "user", "content": prompt}],
                 }
             )
             data = resp.json()
+            if "error" in data or "content" not in data:
+                logger.error(f"API error response: {data}")
+                return None
             raw = data["content"][0]["text"].strip()
-            # Clean JSON
-            if raw.startswith("```"):
-                raw = raw.split("```")[1]
-                if raw.startswith("json"):
-                    raw = raw[4:]
-            import json
-            post_data = json.loads(raw.strip())
-            return post_data
+            import json, re
+            # Remove markdown code blocks
+            raw = re.sub(r"```(?:json)?", "", raw).strip()
+            # Fix common JSON issues — remove trailing commas
+            raw = re.sub(r",\s*}", "}", raw)
+            raw = re.sub(r",\s*]", "]", raw)
+            # Extract JSON object if wrapped in text
+            match = re.search(r"\{.*\}", raw, re.DOTALL)
+            if match:
+                raw = match.group(0)
+            try:
+                post_data = json.loads(raw)
+                return post_data
+            except Exception as je:
+                logger.error(f"JSON parse error: {je}\nRaw: {raw[:300]}")
+                return None
     except Exception as e:
         logger.error(f"Blog generation error: {e}")
         return None

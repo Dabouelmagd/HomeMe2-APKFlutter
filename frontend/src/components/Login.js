@@ -173,7 +173,17 @@ const Login = () => {
         }
 
         toast.success(t('welcome_back'));
-        // Use navigate for SPA routing — token already saved to localStorage
+        // Save compound info required by RequireCompound guard
+        const loginUser = result?.user || {};
+        if (loginUser.compound_id) {
+          localStorage.setItem('selectedCompoundId', loginUser.compound_id);
+          localStorage.setItem('rememberedAccount', JSON.stringify(loginUser));
+          localStorage.setItem('rememberCompound', 'true');
+        } else {
+          // app_owner / super_admin have no compound — bypass guard
+          localStorage.setItem('rememberedAccount', JSON.stringify(loginUser));
+          localStorage.setItem('rememberCompound', 'true');
+        }
         navigate('/app/dashboard', { replace: true });
       } else if (result.two_factor_required) {
         // Open 2FA challenge modal

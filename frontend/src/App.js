@@ -737,6 +737,10 @@ const CompoundRedirect = () => {
 const RequireCompound = ({ children }) => {
   const remembered = localStorage.getItem('rememberedAccount');
   const selectedCompound = localStorage.getItem('selectedCompoundId');
+  const token = localStorage.getItem('token');
+  const userStr = localStorage.getItem('user');
+  // Allow if token exists (user is logged in)
+  if (token && userStr) return children;
   if (!remembered && !selectedCompound) {
     return <Navigate to="/select-account" replace />;
   }

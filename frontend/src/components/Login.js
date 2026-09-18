@@ -173,16 +173,12 @@ const Login = () => {
         }
 
         toast.success(t('welcome_back'));
-        // Save compound info required by RequireCompound guard
-        const loginUser = result?.user || {};
+        // Get user from localStorage (saved by login() function in App.js)
+        const loginUser = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('rememberedAccount', JSON.stringify(loginUser));
+        localStorage.setItem('rememberCompound', 'true');
         if (loginUser.compound_id) {
           localStorage.setItem('selectedCompoundId', loginUser.compound_id);
-          localStorage.setItem('rememberedAccount', JSON.stringify(loginUser));
-          localStorage.setItem('rememberCompound', 'true');
-        } else {
-          // app_owner / super_admin have no compound — bypass guard
-          localStorage.setItem('rememberedAccount', JSON.stringify(loginUser));
-          localStorage.setItem('rememberCompound', 'true');
         }
         navigate('/app/dashboard', { replace: true });
       } else if (result.two_factor_required) {

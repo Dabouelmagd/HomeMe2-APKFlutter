@@ -180,7 +180,10 @@ const Login = () => {
         if (loginUser.compound_id) {
           localStorage.setItem('selectedCompoundId', loginUser.compound_id);
         }
-        navigate('/app/dashboard', { replace: true });
+        // Wait for AuthProvider to finish /auth/me call before navigating
+        setTimeout(() => {
+          navigate('/app/dashboard', { replace: true });
+        }, 1000);
       } else if (result.two_factor_required) {
         // Open 2FA challenge modal
         setTwoFa({ pending: true, tempToken: result.temp_token, code: '' });

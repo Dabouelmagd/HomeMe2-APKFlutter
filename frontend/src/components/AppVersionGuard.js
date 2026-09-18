@@ -36,26 +36,8 @@ const AppVersionGuard = () => {
     };
 
     const check = async () => {
-      try {
-        const res = await fetch(`${API}/version`, { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        const current = data?.version;
-        if (!current) return;
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (!stored) {
-          localStorage.setItem(STORAGE_KEY, current);
-          return;
-        }
-        if (stored !== current && !isSnoozed()) {
-          // Capture the changelog so we can persist it to localStorage right
-          // before the reload — ChangelogModal will pick it up on next mount.
-          if (Array.isArray(data?.changelog)) setPendingChangelog(data.changelog);
-          // Don't update STORAGE_KEY yet — only after the user confirms,
-          // so the banner re-appears on next poll if they navigate away.
-          setNewVersion(current);
-        }
-      } catch { /* network hiccup */ }
+      // Version check disabled — was blocking login navigation
+      return;
     };
 
     const firstTimeout = setTimeout(check, 1500);
